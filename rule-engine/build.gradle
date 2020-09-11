@@ -1,0 +1,12 @@
+apply plugin: 'application'
+
+dependencies {
+    implementation project(':core')
+    implementation project(':domain')
+
+    runtimeOnly("com.h2database:h2")
+}
+
+run.doFirst {
+
+}

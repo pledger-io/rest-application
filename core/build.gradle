@@ -1,0 +1,9 @@
+apply plugin: 'application'
+
+dependencies {
+    compileOnly("org.projectlombok:lombok:1.16.10")
+}
+
+run.doFirst {
+
+}

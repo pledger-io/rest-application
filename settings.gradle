@@ -1,0 +1,3 @@
+rootProject.name="FinTrack"
+
+include 'core', 'domain', 'rule-engine', 'bpmn-process', 'jpa-repository', 'fintrack-ui', 'fintrack-api'

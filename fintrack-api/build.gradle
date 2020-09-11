@@ -1,0 +1,29 @@
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+dependencies {
+    annotationProcessor("io.micronaut.configuration:micronaut-openapi")
+
+    implementation("io.swagger.core.v3:swagger-annotations")
+    implementation("io.micronaut.security:micronaut-security")
+    implementation("io.micronaut.security:micronaut-security-jwt")
+    implementation("io.micronaut.servlet:micronaut-http-server-jetty")
+
+    implementation("at.favre.lib:bcrypt:0.9.0")
+    implementation("org.bouncycastle:bcprov-jdk15on:1.66")
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.66")
+
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.66")
+
+    implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
+
+    implementation("com.jongsoft.utils:highchart-core:2.3.2")
+
+    implementation project(':core'), project(':domain'), project(':jpa-repository'), project(':bpmn-process'), project(':fintrack-ui')
+}
+
+mainClassName = "com.jongsoft.finance.Application"
+
+shadowJar {
+    mergeServiceFiles()
+}

@@ -1,0 +1,17 @@
+apply plugin: 'application'
+
+dependencies {
+    implementation 'com.jongsoft.lang:language:1.0.0'
+    implementation 'com.jongsoft.lang:language-fasterxml:0.0.7'
+
+    implementation("org.bouncycastle:bcprov-jdk15on:1.66")
+    implementation("com.opencsv:opencsv:4.6")
+
+    implementation project(':core'), project(':domain'), project(':rule-engine')
+
+    runtimeOnly("com.h2database:h2")
+}
+
+run.doFirst {
+
+}

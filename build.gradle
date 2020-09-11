@@ -1,0 +1,107 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:6.0.0'
+    }
+}
+
+plugins {
+    id "com.diffplug.eclipse.apt" version "3.22.0"
+    id "application"
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
+subprojects {
+    apply plugin: "com.diffplug.eclipse.apt"
+    apply plugin: 'java'
+
+    version "2.0.0"
+    group "com.jongsoft.finance"
+
+    java {
+        sourceCompatibility = JavaVersion.toVersion('14')
+        targetCompatibility = JavaVersion.toVersion('14')
+    }
+
+    test {
+        useJUnitPlatform()
+
+        jvmArgs("--enable-preview")
+    }
+
+    configurations {
+        // for dependencies that are needed for development only
+        developmentOnly
+    }
+
+    plugins.withType(JavaPlugin) {
+        java {
+            modularity.inferModulePath = true
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+        options.compilerArgs.addAll([
+                '-parameters',
+                '--enable-preview',
+                // enables incremental compilation
+                '-Amicronaut.processing.incremental=true',
+                '-Amicronaut.processing.annotations=com.jongsoft.finance.*',
+                "-Amicronaut.processing.group=$project.group",
+                "-Amicronaut.processing.module=$project.name",
+        ])
+    }
+
+    tasks.withType(JavaExec) {
+        classpath += configurations.developmentOnly
+        jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote', '--enable-preview')
+        if (gradle.startParameter.continuous) {
+            systemProperties(
+                    'micronaut.io.watch.restart':'true',
+                    'micronaut.io.watch.enabled':'true',
+                    "micronaut.io.watch.paths":"src/main"
+            )
+        }
+    }
+
+    // test.classpath += configurations.developmentOnly
+
+    dependencies {
+        annotationProcessor(platform("io.micronaut:micronaut-bom:$micronautVersion"))
+        annotationProcessor("io.micronaut:micronaut-inject-java")
+        annotationProcessor("io.micronaut:micronaut-validation")
+        annotationProcessor("io.micronaut.data:micronaut-data-processor")
+        annotationProcessor("io.micronaut.security:micronaut-security-annotations")
+        annotationProcessor('org.projectlombok:lombok:1.18.12')
+        implementation(platform("io.micronaut:micronaut-bom:$micronautVersion"))
+        implementation "org.camunda.bpm:camunda-engine:$camundaVersion"
+        implementation("io.micronaut:micronaut-inject")
+        implementation("io.micronaut:micronaut-validation")
+        implementation("io.micronaut:micronaut-runtime")
+        implementation("javax.annotation:javax.annotation-api")
+        implementation("io.micronaut:micronaut-http-client")
+//        implementation("io.micronaut.beanvalidation:micronaut-hibernate-validator")
+
+        runtimeOnly("ch.qos.logback:logback-classic")
+        implementation('com.jongsoft.lang:language:1.0.0')
+        compileOnly "org.projectlombok:lombok:1.18.12"
+
+        testAnnotationProcessor(enforcedPlatform("io.micronaut:micronaut-bom:$micronautVersion"))
+        testAnnotationProcessor("io.micronaut:micronaut-inject-java")
+        testImplementation(enforcedPlatform("io.micronaut:micronaut-bom:$micronautVersion"))
+        testImplementation("org.junit.jupiter:junit-jupiter-api")
+        testImplementation("io.micronaut.test:micronaut-test-junit5")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+        testCompile("org.assertj:assertj-core:3.17.1")
+        testCompile("org.mockito:mockito-core:3.5.7")
+    }
+}
