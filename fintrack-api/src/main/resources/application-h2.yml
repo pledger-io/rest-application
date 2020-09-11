@@ -1,0 +1,7 @@
+datasources:
+  default:
+    url: jdbc:h2:file:${micronaut.application.storage.location}/db/personal_finance_db;MODE=MYSQL;AUTO_SERVER=TRUE
+    driverClassName: org.h2.Driver
+    username: ${DATABASE_USER:fintrack}
+    password: ${DATABASE_PASSWORD:fintrack}
+    dialect: mysql

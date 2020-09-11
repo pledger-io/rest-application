@@ -1,0 +1,49 @@
+micronaut:
+  application:
+    name: finTrack
+    security:
+      secret: MyLittleSecret
+      encrypt: true
+    storage:
+      location: ${java.io.tmpdir}
+  security:
+    authentication: bearer
+    token:
+      jwt:
+        enabled: true
+        bearer:
+          enabled: true
+        cookie:
+          enabled: false
+  router:
+    static-resources:
+#      ui:
+#        paths: classpath:public
+#        mapping: /ui/**
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /openapi/**
+
+jpa:
+  default:
+    packages-to-scan:
+      - 'com.jongsoft.finance.jpa'
+    properties:
+      jdbc:
+        time_zone: UTC
+      hibernate:
+        hbm2ddl:
+          auto: none
+        physical_naming_strategy: 'com.jongsoft.finance.jpa.DefaultNamingStrategy'
+        show_sql: false
+
+flyway:
+  datasources:
+    default:
+      enabled: true
+      baseline-on-migrate: true
+      locations: ["classpath:db/camunda", "classpath:db/migration"]
+      java-migrations:
+        - db.migration.V20200429151821__MigrateEncryptedStorage
+        - db.migration.V20200430171321__MigrateToEncryptedDatabase
+        - db.migration.V20200503171321__MigrateToDecryptDatabase
