@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1cx2fzh" targetNamespace="http://jong-soft.org/fintrack/transactions/rules/import" exporter="Camunda Modeler" exporterVersion="3.0.1">
+  <bpmn:process id="ImportTransactionRules" name="Import transaction rule configuration" isExecutable="true" camunda:versionTag="1.0.0" camunda:historyTimeToLive="P14D">
+    <bpmn:extensionElements>
+      <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
+      <camunda:executionListener delegateExpression="${stopProcessListener}" event="end" />
+    </bpmn:extensionElements>
+    <bpmn:startEvent id="ruleImportStart">
+      <bpmn:outgoing>flowToParsing</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="flowToParsing" sourceRef="ruleImportStart" targetRef="parseConfigurationJson" />
+    <bpmn:serviceTask id="parseConfigurationJson" name="Parse JSON" camunda:delegateExpression="${parseTransactionRuleDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="storageToken">${storageToken}</camunda:inputParameter>
+          <camunda:outputParameter name="rules">${ruleLines}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>flowToParsing</bpmn:incoming>
+      <bpmn:outgoing>flowToAnalysis</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:subProcess id="AnalyzeRuleSubProcess" name="Analyze rule">
+      <bpmn:incoming>flowToAnalysis</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_06gj8mj</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="${rules}" camunda:elementVariable="ruleConfiguration" />
+      <bpmn:startEvent id="analyzeRuleStart">
+        <bpmn:outgoing>SequenceFlow_0ok6l0u</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="processRuleConfiguration" name="Proces rule" camunda:delegateExpression="${processTransactionRuleDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="ruleConfiguration">${ruleConfiguration}</camunda:inputParameter>
+            <camunda:outputParameter name="transactionRule">${transactionRule}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_0ok6l0u</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1btdqvl</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="hasGroup" name="has group" default="SequenceFlow_1n9xexk">
+        <bpmn:incoming>SequenceFlow_1btdqvl</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1n9xexk</bpmn:outgoing>
+        <bpmn:outgoing>SequenceFlow_0yitzk1</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="SequenceFlow_0ok6l0u" sourceRef="analyzeRuleStart" targetRef="processRuleConfiguration" />
+      <bpmn:serviceTask id="processRuleGroup" name="Process Rule Group" camunda:delegateExpression="${ruleGroupLookupDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="name">${ruleConfiguration.group}</camunda:inputParameter>
+            <camunda:outputParameter name="id">${group}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_0yitzk1</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_19u0mke</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_19u0mke" sourceRef="processRuleGroup" targetRef="task_link_group" />
+      <bpmn:subProcess id="buildChangeSubProcess" name="Process change part">
+        <bpmn:incoming>SequenceFlow_1n9xexk</bpmn:incoming>
+        <bpmn:incoming>SequenceFlow_188m40j</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_03zw3cp</bpmn:outgoing>
+        <bpmn:multiInstanceLoopCharacteristics camunda:collection="${ruleConfiguration.changes}" camunda:elementVariable="changeConfiguration" />
+        <bpmn:startEvent id="processChangeStart">
+          <bpmn:outgoing>SequenceFlow_0tlb203</bpmn:outgoing>
+        </bpmn:startEvent>
+        <bpmn:sequenceFlow id="SequenceFlow_0tlb203" sourceRef="processChangeStart" targetRef="changeTypeGW" />
+        <bpmn:sequenceFlow id="sf_determineAccount" name="else" sourceRef="changeTypeGW" targetRef="determineAccountTask" />
+        <bpmn:serviceTask id="determineBudgetTask" name="Determine budget" camunda:delegateExpression="${processBudgetLookupDelegate}">
+          <bpmn:extensionElements>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="name">${changeConfiguration.value}</camunda:inputParameter>
+              <camunda:outputParameter name="id">${budget.id.toString()}</camunda:outputParameter>
+            </camunda:inputOutput>
+          </bpmn:extensionElements>
+          <bpmn:incoming>sf_determineBudget</bpmn:incoming>
+          <bpmn:outgoing>SequenceFlow_1wlwy68</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:sequenceFlow id="sf_determineBudget" name="budget" sourceRef="changeTypeGW" targetRef="determineBudgetTask">
+          <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${changeConfiguration.field == 'BUDGET'}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="sf_determineCategory" name="category" sourceRef="changeTypeGW" targetRef="determineCategoryTask">
+          <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${changeConfiguration.field == 'CATEGORY'}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="SequenceFlow_0dljygk" sourceRef="determineCategoryTask" targetRef="persistChangeTask" />
+        <bpmn:sequenceFlow id="SequenceFlow_1wlwy68" sourceRef="determineBudgetTask" targetRef="persistChangeTask" />
+        <bpmn:sequenceFlow id="SequenceFlow_1owrbto" sourceRef="determineAccountTask" targetRef="persistChangeTask" />
+        <bpmn:endEvent id="processChangeEnd">
+          <bpmn:incoming>SequenceFlow_19r3dzy</bpmn:incoming>
+        </bpmn:endEvent>
+        <bpmn:sequenceFlow id="SequenceFlow_19r3dzy" sourceRef="persistChangeTask" targetRef="processChangeEnd" />
+        <bpmn:serviceTask id="determineCategoryTask" name="Determine category" camunda:delegateExpression="${processCategoryLookupDelegate}">
+          <bpmn:extensionElements>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="name">${changeConfiguration.value}</camunda:inputParameter>
+              <camunda:outputParameter name="id">${category.id.toString()}</camunda:outputParameter>
+            </camunda:inputOutput>
+          </bpmn:extensionElements>
+          <bpmn:incoming>sf_determineCategory</bpmn:incoming>
+          <bpmn:outgoing>SequenceFlow_0dljygk</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:serviceTask id="determineAccountTask" name="Determine account" camunda:delegateExpression="${processAccountLookupDelegate}">
+          <bpmn:extensionElements>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="name">${changeConfiguration.value}</camunda:inputParameter>
+              <camunda:outputParameter name="id">${id.toString()}</camunda:outputParameter>
+            </camunda:inputOutput>
+          </bpmn:extensionElements>
+          <bpmn:incoming>sf_determineAccount</bpmn:incoming>
+          <bpmn:outgoing>SequenceFlow_1owrbto</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:serviceTask id="persistChangeTask" name="Persist change into rule" camunda:delegateExpression="${processRuleChangeCreationDelegate}">
+          <bpmn:extensionElements>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="entity">${transactionRule}</camunda:inputParameter>
+              <camunda:inputParameter name="value">${id}</camunda:inputParameter>
+              <camunda:inputParameter name="field">${changeConfiguration.field}</camunda:inputParameter>
+            </camunda:inputOutput>
+          </bpmn:extensionElements>
+          <bpmn:incoming>SequenceFlow_0dljygk</bpmn:incoming>
+          <bpmn:incoming>SequenceFlow_1wlwy68</bpmn:incoming>
+          <bpmn:incoming>SequenceFlow_1owrbto</bpmn:incoming>
+          <bpmn:incoming>SequenceFlow_0p4fure</bpmn:incoming>
+          <bpmn:incoming>SequenceFlow_07tbiwr</bpmn:incoming>
+          <bpmn:outgoing>SequenceFlow_19r3dzy</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:exclusiveGateway id="changeTypeGW" name="change type" default="sf_determineAccount">
+          <bpmn:incoming>SequenceFlow_0tlb203</bpmn:incoming>
+          <bpmn:outgoing>sf_determineAccount</bpmn:outgoing>
+          <bpmn:outgoing>sf_determineBudget</bpmn:outgoing>
+          <bpmn:outgoing>sf_determineCategory</bpmn:outgoing>
+          <bpmn:outgoing>sf_contract_lookup</bpmn:outgoing>
+          <bpmn:outgoing>sf_tag</bpmn:outgoing>
+        </bpmn:exclusiveGateway>
+        <bpmn:sequenceFlow id="sf_contract_lookup" name="contract" sourceRef="changeTypeGW" targetRef="st_determine_contract">
+          <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${changeConfiguration.field == 'CONTRACT'}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="SequenceFlow_0p4fure" sourceRef="st_determine_contract" targetRef="persistChangeTask" />
+        <bpmn:serviceTask id="st_determine_contract" name="Determine Contract" camunda:delegateExpression="${processContractLookupDelegate}">
+          <bpmn:extensionElements>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="name">${changeConfiguration.value}</camunda:inputParameter>
+              <camunda:outputParameter name="id">${contract.id.toString()}</camunda:outputParameter>
+            </camunda:inputOutput>
+          </bpmn:extensionElements>
+          <bpmn:incoming>sf_contract_lookup</bpmn:incoming>
+          <bpmn:outgoing>SequenceFlow_0p4fure</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:serviceTask id="st_determine_tag" name="Determine Tag" camunda:delegateExpression="${tagLookupDelegate}">
+          <bpmn:extensionElements>
+            <camunda:inputOutput>
+              <camunda:inputParameter name="name">${changeConfiguration.value}</camunda:inputParameter>
+              <camunda:outputParameter name="id">${contract.id.toString()}</camunda:outputParameter>
+            </camunda:inputOutput>
+          </bpmn:extensionElements>
+          <bpmn:incoming>sf_tag</bpmn:incoming>
+          <bpmn:outgoing>SequenceFlow_07tbiwr</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:sequenceFlow id="sf_tag" name="tag" sourceRef="changeTypeGW" targetRef="st_determine_tag">
+          <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${changeConfiguration.field == 'TAGS'}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="SequenceFlow_07tbiwr" sourceRef="st_determine_tag" targetRef="persistChangeTask" />
+      </bpmn:subProcess>
+      <bpmn:sequenceFlow id="SequenceFlow_1btdqvl" sourceRef="processRuleConfiguration" targetRef="hasGroup" />
+      <bpmn:sequenceFlow id="SequenceFlow_03zw3cp" sourceRef="buildChangeSubProcess" targetRef="Task_1cw86mx" />
+      <bpmn:endEvent id="analyzeRuleEnd">
+        <bpmn:incoming>SequenceFlow_18w1pi0</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_18w1pi0" sourceRef="Task_1cw86mx" targetRef="analyzeRuleEnd" />
+      <bpmn:serviceTask id="Task_1cw86mx" name="Persist rule" camunda:delegateExpression="${persistTransactionRuleDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="transactionRule">${transactionRule}</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_03zw3cp</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_18w1pi0</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_1n9xexk" name="no" sourceRef="hasGroup" targetRef="buildChangeSubProcess" />
+      <bpmn:sequenceFlow id="SequenceFlow_0yitzk1" name="yes" sourceRef="hasGroup" targetRef="processRuleGroup">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ruleConfiguration.group != null}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="SequenceFlow_188m40j" sourceRef="task_link_group" targetRef="buildChangeSubProcess" />
+      <bpmn:serviceTask id="task_link_group" name="Link to group" camunda:expression="${transactionRule.assign(group.name)}">
+        <bpmn:incoming>SequenceFlow_19u0mke</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_188m40j</bpmn:outgoing>
+      </bpmn:serviceTask>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="flowToAnalysis" sourceRef="parseConfigurationJson" targetRef="AnalyzeRuleSubProcess" />
+    <bpmn:endEvent id="ruleImportEnd">
+      <bpmn:incoming>SequenceFlow_06gj8mj</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_06gj8mj" sourceRef="AnalyzeRuleSubProcess" targetRef="ruleImportEnd" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ImportTransactionRules">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="ruleImportStart">
+        <dc:Bounds x="621" y="69" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1xs6umg_di" bpmnElement="flowToParsing">
+        <di:waypoint x="639" y="105" />
+        <di:waypoint x="639" y="159" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1soyf7y_di" bpmnElement="parseConfigurationJson">
+        <dc:Bounds x="589" y="159" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_1j88oj3_di" bpmnElement="AnalyzeRuleSubProcess" isExpanded="true">
+        <dc:Bounds x="189" y="311" width="898" height="1127" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_07h2ql1_di" bpmnElement="flowToAnalysis">
+        <di:waypoint x="639" y="239" />
+        <di:waypoint x="639" y="311" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_1julvw8_di" bpmnElement="analyzeRuleStart">
+        <dc:Bounds x="542" y="335" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_03mu3j7_di" bpmnElement="processRuleConfiguration">
+        <dc:Bounds x="510" y="397" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_09rdz9e_di" bpmnElement="hasGroup" isMarkerVisible="true">
+        <dc:Bounds x="535" y="530" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="493" y="569" width="50" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ok6l0u_di" bpmnElement="SequenceFlow_0ok6l0u">
+        <di:waypoint x="560" y="371" />
+        <di:waypoint x="560" y="397" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1y42kv2_di" bpmnElement="processRuleGroup">
+        <dc:Bounds x="670" y="485" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_19u0mke_di" bpmnElement="SequenceFlow_19u0mke">
+        <di:waypoint x="720" y="565" />
+        <di:waypoint x="720" y="599" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="SubProcess_1nxz727_di" bpmnElement="buildChangeSubProcess" isExpanded="true">
+        <dc:Bounds x="246" y="716" width="794" height="503" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_0yl529t_di" bpmnElement="processChangeStart">
+        <dc:Bounds x="562" y="739" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0tlb203_di" bpmnElement="SequenceFlow_0tlb203">
+        <di:waypoint x="580" y="775" />
+        <di:waypoint x="580" y="804" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1tk5jhy_di" bpmnElement="sf_determineAccount">
+        <di:waypoint x="555" y="829" />
+        <di:waypoint x="359" y="829" />
+        <di:waypoint x="359" y="904" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="447" y="811" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_1ekhopq_di" bpmnElement="determineBudgetTask">
+        <dc:Bounds x="459" y="904" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0co9o7z_di" bpmnElement="sf_determineBudget">
+        <di:waypoint x="573" y="847" />
+        <di:waypoint x="509" y="847" />
+        <di:waypoint x="509" y="904" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="516" y="875" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_04kbwr8_di" bpmnElement="sf_determineCategory">
+        <di:waypoint x="586" y="848" />
+        <di:waypoint x="654" y="848" />
+        <di:waypoint x="654" y="904" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="609" y="876" width="43" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1btdqvl_di" bpmnElement="SequenceFlow_1btdqvl">
+        <di:waypoint x="560" y="477" />
+        <di:waypoint x="560" y="530" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0dljygk_di" bpmnElement="SequenceFlow_0dljygk">
+        <di:waypoint x="654" y="984" />
+        <di:waypoint x="654" y="1014" />
+        <di:waypoint x="596" y="1014" />
+        <di:waypoint x="596" y="1039" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1wlwy68_di" bpmnElement="SequenceFlow_1wlwy68">
+        <di:waypoint x="509" y="984" />
+        <di:waypoint x="509" y="1012" />
+        <di:waypoint x="560" y="1012" />
+        <di:waypoint x="560" y="1039" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1owrbto_di" bpmnElement="SequenceFlow_1owrbto">
+        <di:waypoint x="359" y="984" />
+        <di:waypoint x="359" y="1079" />
+        <di:waypoint x="510" y="1079" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0fdosob_di" bpmnElement="processChangeEnd">
+        <dc:Bounds x="542" y="1145" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_19r3dzy_di" bpmnElement="SequenceFlow_19r3dzy">
+        <di:waypoint x="560" y="1119" />
+        <di:waypoint x="560" y="1145" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_03zw3cp_di" bpmnElement="SequenceFlow_03zw3cp">
+        <di:waypoint x="644" y="1219" />
+        <di:waypoint x="644" y="1242" />
+        <di:waypoint x="558" y="1242" />
+        <di:waypoint x="558" y="1267" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_1djjkjl_di" bpmnElement="analyzeRuleEnd">
+        <dc:Bounds x="540" y="1380" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_18w1pi0_di" bpmnElement="SequenceFlow_18w1pi0">
+        <di:waypoint x="558" y="1347" />
+        <di:waypoint x="558" y="1380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_08xlec5_di" bpmnElement="ruleImportEnd">
+        <dc:Bounds x="621" y="1494" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_06gj8mj_di" bpmnElement="SequenceFlow_06gj8mj">
+        <di:waypoint x="639" y="1438" />
+        <di:waypoint x="639" y="1494" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_19godb0_di" bpmnElement="determineCategoryTask">
+        <dc:Bounds x="604" y="904" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1rumy7d_di" bpmnElement="determineAccountTask">
+        <dc:Bounds x="309" y="904" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0lows0i_di" bpmnElement="persistChangeTask">
+        <dc:Bounds x="510" y="1039" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0pewopo_di" bpmnElement="Task_1cw86mx">
+        <dc:Bounds x="508" y="1267" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0ra4amu_di" bpmnElement="changeTypeGW" isMarkerVisible="true">
+        <dc:Bounds x="555" y="804" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="596" y="803" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1n9xexk_di" bpmnElement="SequenceFlow_1n9xexk">
+        <di:waypoint x="558" y="578" />
+        <di:waypoint x="558" y="648" />
+        <di:waypoint x="537" y="648" />
+        <di:waypoint x="537" y="716" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="546" y="689" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0yitzk1_di" bpmnElement="SequenceFlow_0yitzk1">
+        <di:waypoint x="585" y="555" />
+        <di:waypoint x="627" y="555" />
+        <di:waypoint x="627" y="525" />
+        <di:waypoint x="670" y="525" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="597" y="564" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_188m40j_di" bpmnElement="SequenceFlow_188m40j">
+        <di:waypoint x="720" y="679" />
+        <di:waypoint x="720" y="698" />
+        <di:waypoint x="689" y="698" />
+        <di:waypoint x="689" y="716" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_06jdu6r_di" bpmnElement="task_link_group">
+        <dc:Bounds x="670" y="599" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0c9dt92_di" bpmnElement="sf_contract_lookup">
+        <di:waypoint x="605" y="829" />
+        <di:waypoint x="795" y="829" />
+        <di:waypoint x="795" y="904" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="752" y="877" width="41" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0p4fure_di" bpmnElement="SequenceFlow_0p4fure">
+        <di:waypoint x="795" y="984" />
+        <di:waypoint x="795" y="1068" />
+        <di:waypoint x="610" y="1068" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1jdl885_di" bpmnElement="st_determine_contract">
+        <dc:Bounds x="745" y="904" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1hipapf_di" bpmnElement="st_determine_tag">
+        <dc:Bounds x="895" y="904" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_17fr90k_di" bpmnElement="sf_tag">
+        <di:waypoint x="602" y="826" />
+        <di:waypoint x="763" y="808" />
+        <di:waypoint x="945" y="808" />
+        <di:waypoint x="945" y="904" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="950" y="878" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_07tbiwr_di" bpmnElement="SequenceFlow_07tbiwr">
+        <di:waypoint x="945" y="984" />
+        <di:waypoint x="945" y="1094" />
+        <di:waypoint x="610" y="1094" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

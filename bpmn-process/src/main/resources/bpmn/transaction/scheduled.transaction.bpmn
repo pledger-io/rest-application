@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_15wd9h4" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.0.1">
+  <bpmn:process id="ScheduledTransaction" name="ScheduledTransaction" isExecutable="true" camunda:versionTag="1.0.0">
+    <bpmn:extensionElements>
+      <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
+    </bpmn:extensionElements>
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>SequenceFlow_1kq9igm</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="EndEvent_0x5zcld">
+      <bpmn:incoming>SequenceFlow_0gwemet</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_1kq9igm" sourceRef="StartEvent_1" targetRef="st_generate_json" />
+    <bpmn:sequenceFlow id="SequenceFlow_1qobije" sourceRef="st_generate_json" targetRef="Task_1cm5fk9" />
+    <bpmn:sequenceFlow id="SequenceFlow_144l4ji" sourceRef="Task_1cm5fk9" targetRef="sp_call_apply_rules" />
+    <bpmn:sequenceFlow id="SequenceFlow_0e1epc7" sourceRef="sp_call_apply_rules" targetRef="st_detect_duplicates" />
+    <bpmn:sequenceFlow id="SequenceFlow_0gwemet" sourceRef="st_detect_duplicates" targetRef="EndEvent_0x5zcld" />
+    <bpmn:serviceTask id="Task_1cm5fk9" name="Create transaction" camunda:delegateExpression="${createTransactionDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="transactionToken">${transactionToken}</camunda:inputParameter>
+          <camunda:inputParameter name="accountId">${destinationId}</camunda:inputParameter>
+          <camunda:inputParameter name="targetAccount">${sourceId}</camunda:inputParameter>
+          <camunda:outputParameter name="transactionId">${transactionId}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1qobije</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_144l4ji</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="st_detect_duplicates" name="Detect duplicates" camunda:delegateExpression="${duplicateTransactionFinderDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="transactionId">${transactionId}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0e1epc7</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0gwemet</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="st_generate_json" name="Generate transaction JSON" camunda:delegateExpression="${generateTransactionJsonDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="id">${id}</camunda:inputParameter>
+          <camunda:inputParameter name="scheduled">${scheduled}</camunda:inputParameter>
+          <camunda:outputParameter name="transactionToken">${transactionToken}</camunda:outputParameter>
+          <camunda:outputParameter name="sourceId">${sourceId}</camunda:outputParameter>
+          <camunda:outputParameter name="destinationId">${destinationId}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_1kq9igm</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1qobije</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="sp_call_apply_rules" name="Apply rules" camunda:delegateExpression="${transactionRuleMatcherDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="transactionId">${transactionId}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_144l4ji</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0e1epc7</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ScheduledTransaction">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="148" y="81" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0x5zcld_di" bpmnElement="EndEvent_0x5zcld">
+        <dc:Bounds x="1023" y="81" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1kq9igm_di" bpmnElement="SequenceFlow_1kq9igm">
+        <di:waypoint x="184" y="99" />
+        <di:waypoint x="275" y="99" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1qobije_di" bpmnElement="SequenceFlow_1qobije">
+        <di:waypoint x="375" y="99" />
+        <di:waypoint x="481" y="99" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_144l4ji_di" bpmnElement="SequenceFlow_144l4ji">
+        <di:waypoint x="581" y="99" />
+        <di:waypoint x="671" y="99" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0e1epc7_di" bpmnElement="SequenceFlow_0e1epc7">
+        <di:waypoint x="771" y="99" />
+        <di:waypoint x="859" y="99" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0gwemet_di" bpmnElement="SequenceFlow_0gwemet">
+        <di:waypoint x="959" y="99" />
+        <di:waypoint x="1023" y="99" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_1mivo5t_di" bpmnElement="Task_1cm5fk9">
+        <dc:Bounds x="481" y="59" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0aynn6e_di" bpmnElement="st_detect_duplicates">
+        <dc:Bounds x="859" y="59" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_074uvu0_di" bpmnElement="st_generate_json">
+        <dc:Bounds x="275" y="59" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1kiaxcf_di" bpmnElement="sp_call_apply_rules">
+        <dc:Bounds x="671" y="59" width="100" height="80" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

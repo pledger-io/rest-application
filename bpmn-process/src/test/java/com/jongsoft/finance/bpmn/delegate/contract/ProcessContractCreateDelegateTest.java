@@ -1,0 +1,84 @@
+package com.jongsoft.finance.bpmn.delegate.contract;
+
+import java.time.LocalDate;
+
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jongsoft.finance.ProcessMapper;
+import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.domain.account.Contract;
+import com.jongsoft.finance.domain.account.ContractProvider;
+import com.jongsoft.finance.domain.user.Role;
+import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.serialized.ContractJson;
+import com.jongsoft.lang.API;
+
+import io.micronaut.context.event.ApplicationEventPublisher;
+
+class ProcessContractCreateDelegateTest {
+
+    private static final UserAccount USER_ACCOUNT = UserAccount.builder().roles(API.List(new Role("admin"))).build();
+    private AccountProvider accountProvider;
+    private ContractProvider contractProvider;
+    private StorageService storageService;
+
+    private ProcessContractCreateDelegate subject;
+
+    private DelegateExecution execution;
+
+    private ApplicationEventPublisher eventPublisher;
+
+    @BeforeEach
+    void setup() throws JsonProcessingException {
+        accountProvider = Mockito.mock(AccountProvider.class);
+        contractProvider = Mockito.mock(ContractProvider.class);
+        storageService = Mockito.mock(StorageService.class);
+        execution = Mockito.mock(DelegateExecution.class);
+        eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+
+        subject = new ProcessContractCreateDelegate(accountProvider, contractProvider, storageService);
+
+        final ContractJson contractJson = new ContractJson();
+        contractJson.setName("Test contract");
+        contractJson.setCompany("Telfo");
+        contractJson.setDescription("My personal contract");
+        contractJson.setTerminated(true);
+        contractJson.setStart(LocalDate.of(2018, 1, 1));
+        contractJson.setEnd(LocalDate.of(2019, 1, 1));
+
+        final String value = ProcessMapper.writeSafe(contractJson);
+        Mockito.when(execution.getVariableLocalTyped("contract")).thenReturn(new PrimitiveTypeValueImpl.StringValueImpl(value));
+
+        new EventBus(eventPublisher);
+    }
+
+    @Test
+    void execute() throws Exception {
+        Mockito.when(accountProvider.lookup("Telfo"))
+                .thenReturn(API.Option(Account.builder()
+                        .id(1L)
+                        .user(USER_ACCOUNT)
+                        .build()));
+
+        Contract contract = Contract.builder()
+                .id(1L)
+                .startDate(LocalDate.of(2018, 1, 1))
+                .endDate(LocalDate.of(2019, 1, 1))
+                .build();
+        Mockito.when(contractProvider.lookup("Test contract"))
+                .thenReturn(API.Option())
+                .thenReturn(API.Option(contract));
+
+        subject.execute(execution);
+
+        Mockito.verify(accountProvider).lookup("Telfo");
+        Mockito.verify(contractProvider, Mockito.times(2)).lookup("Test contract");
+    }
+}
