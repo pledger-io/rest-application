@@ -1,0 +1,42 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-title">
+    <span appLocalization="page.application.setting.edit"></span>
+  </h4>
+  <button type="button" class="close" aria-describedby="modal-title" (click)="dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <form ngForm #form="ngForm">
+
+    <div class="form-group row">
+      <label for="value" class="col-sm-3">{{ setting.name }}</label>
+      <div class="col-sm-9">
+        <app-input-field control="AccountReconcile">
+          <input type="number" name="value" id="value"
+                 *ngIf="setting.type == 'NUMBER'"
+                 class="form-control" required
+                 [(ngModel)]="value">
+
+          <span *ngIf="setting.type == 'FLAG'">
+            <input type="radio" [(ngModel)]="value" value="false" name="value"> Off <br />
+            <input type="radio" [(ngModel)]="value" value="true" name="value"> On
+          </span>
+        </app-input-field>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary"
+          (click)="dismiss()"
+          [disabled]="processing"
+          appLocalization="common.action.cancel"></button>
+  <button type="button" class="btn btn-success"
+          (click)="process()"
+          [disabled]="processing || form.invalid"
+          appLocalization="common.action.save"></button>
+</div>

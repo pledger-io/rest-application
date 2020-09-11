@@ -1,0 +1,36 @@
+.btn {
+  margin-right: .5em;
+  color: white !important;
+}
+
+@media print {
+  #transaction-list {
+    table {
+      margin-top: 0 !important;
+    }
+  }
+}
+
+table {
+  thead {
+    th {
+      &:first-child {
+        width: 75px;
+      }
+
+      &:nth-child(2) {
+        width: 100px;
+      }
+
+      &:nth-last-child(2) {
+        width: 75px;
+      }
+    }
+  }
+}
+
+.tags {
+  & > .badge {
+    margin-right: .2ch;
+  }
+}

@@ -1,0 +1,96 @@
+<div class="row">
+  <div id="profile-main">
+    <div class="card">
+      <div class="card-header">
+        <span appLocalization="page.title.user.profile"></span>
+      </div>
+      <div class="card-body" *ngIf="profile">
+        <div>
+          <h6 appLocalization="page.user.profile.theme"></h6>
+          <span class="text-muted" appLocalization="page.user.profile.theme.explain"></span>
+
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input"
+                   name="themeSelector"
+                   value="dark"
+                   id="theme-dark"
+                   (click)="patchProfile('theme', 'dark')"
+                   [checked]="profile.theme == 'dark'">
+            <label for="theme-dark" class="custom-control-label">Dark</label>
+          </div>
+          <div class="custom-control custom-radio">
+            <input type="radio" class="custom-control-input"
+                   name="themeSelector"
+                   value="navy"
+                   id="theme-navy"
+                   (click)="patchProfile('theme', 'navy')"
+                   [checked]="profile.theme == 'navy'">
+            <label for="theme-navy" class="custom-control-label">Navy</label>
+          </div>
+        </div>
+
+        <div>
+          <h6 appLocalization="page.user.profile.currency"></h6>
+          <div class="custom-control custom-radio" *ngFor="let currency of currencies">
+            <input type="radio" class="custom-control-input"
+                   name="currencySelector"
+                   [id]="currency"
+                   [value]="currency"
+                   (click)="patchProfile('currency', currency)"
+                   [checked]="currency == profile.currency">
+            <label [for]="currency"
+                   class="custom-control-label" >{{ currency }}</label>
+          </div>
+        </div>
+
+        <hr/>
+
+        <h4 appLocalization="page.user.profile.twofactor"></h4>
+        <div id="two-factor-enable" *ngIf="!profile.mfa">
+          <div class="alert alert-light" appLocalization="page.user.profile.twofactor.explained"></div>
+          <button class="btn btn-sm btn-outline-primary" (click)="openMultiFactor()">
+            <i class="fas fa-lock"></i>
+            <span appLocalization="page.user.profile.action.twofactor.enable"></span>
+          </button>
+        </div>
+        <div id="two-factor-disable" *ngIf="profile.mfa">
+          <div class="alert alert-light" appLocalization="page.user.profile.twofactor.disableExplain">
+            info text
+          </div>
+          <a class="btn btn-sm btn-outline-danger" href="javascript: void 0" (click)="disableMultiFactor()">
+            <i class="fas fa-unlock"></i>
+            <span appLocalization="page.user.profile.action.twofactor.disable"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="profile-actions">
+    <div class="card">
+      <div class="card-body">
+        <button class="btn btn-primary w-100 mt-2 mb-2" (click)="importProfile()">
+          <i class="fas fa-upload"></i>
+          <span appLocalization="page.user.profile.import"></span>
+        </button>
+        <button class="btn btn-secondary w-100 mt-2 mb-2"
+           [appDownload]="service.download.bind(service)"
+           fileName="profile.json">
+          <i class="fas fa-download"></i>
+          <span appLocalization="page.user.profile.export"></span>
+        </button>
+        <button class="btn btn-secondary w-100 mt-2 mb-2" (click)="applyAllRules()">
+          <i class="fas fa-exchange-alt"></i>
+          <span appLocalization="page.user.profile.applyRules"></span>
+        </button>
+        <button class="btn btn-secondary w-100 mt-2 mb-2"
+                [appDownload]="service.export.bind(service)"
+                [fileName]="'Transactions-' + exportDateString() + '.csv'">
+          <i class="fas fa-file-csv"></i>
+          <span appLocalization="page.user.profile.transactions"></span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+
+<div class="row" *ngIf="range">
+  <div class="col-sm-8">
+    <div class="card" >
+      <div class="card-header" appLocalization="page.reports.category.title"></div>
+      <div class="card-body">
+        <app-graph-display [endPoint]="'categories/' + range.computeStartYear() + '/graph/'"
+                           (svg)="pdf.categorySVG($event)"
+                           [currency]="currency"></app-graph-display>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-4">
+    <div class="card">
+      <div class="card-header">
+        <span appLocalization="page.reports.category.monthly"></span>
+        <span class="float-right">
+          <button class="btn btn-sm btn-link" (click)="download()"><span class="fa fa-download"></span></button>
+        </span>
+      </div>
+      <div class="card-body">
+        <table class="table table-hover table-sm">
+          <thead>
+          <tr>
+            <th appLocalization="common.month"></th>
+            <th appLocalization="page.reports.category.income"></th>
+            <th appLocalization="page.reports.category.expense"></th>
+          </tr>
+          </thead>
+          <tbody *ngIf="categories">
+          <tr *ngFor="let month of months">
+            <td [appLocalization]="'common.month.' + month.month"></td>
+            <td>
+              <app-statistical-balance [range]="month.range"
+                                       [categories]="categories"
+                                       [currency]="currency"
+                                       [onlyIncome]="true"></app-statistical-balance>
+            </td>
+            <td>
+              <app-statistical-balance [range]="month.range"
+                                       [currency]="currency"
+                                       [categories]="categories" [onlyIncome]="false"></app-statistical-balance>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body" *ngIf="categories">
+    <table class="table table-hover table-responsive-lg table-sm">
+      <thead>
+      <tr>
+        <th appLocalization="Category.label"></th>
+        <th *ngFor="let month of months">
+          <span [appLocalization]="'common.month.' + month.month"></span>
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let category of categories">
+        <td>{{ category.label }}</td>
+        <td *ngFor="let month of months">
+          <app-statistical-balance [range]="month.range"
+                                   [currency]="currency"
+                                   [categories]="[category]"></app-statistical-balance>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

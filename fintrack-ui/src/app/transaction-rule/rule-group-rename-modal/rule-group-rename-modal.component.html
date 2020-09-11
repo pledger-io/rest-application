@@ -1,0 +1,35 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-title" appLocalization="page.settings.rules.group.rename"></h4>
+  <button type="button" class="close" aria-describedby="modal-title" (click)="dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <form ngForm #form="ngForm" autocomplete="off">
+    <app-error-message></app-error-message>
+
+    <div class="form-group row mt-2">
+      <label for="name" class="col-sm-2 col-form-label" appLocalization="TransactionRule.name"></label>
+      <div class="col-sm-8">
+        <app-input-field control="TransactionRule">
+          <input type="text" class="form-control" name="name" id="name" required
+                 appLocalization="TransactionRule.name"
+                 location="placeholder"
+                 [(ngModel)]="name" />
+        </app-input-field>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary"
+          (click)="dismiss()"
+          [disabled]="processing"
+          appLocalization="common.action.cancel"></button>
+  <button type="button" class="btn btn-success"
+          (click)="process()"
+          [disabled]="processing || form.invalid"
+          appLocalization="common.action.save"></button>
+</div>

@@ -1,0 +1,81 @@
+<div class="card">
+  <div class="card-header">
+    <span appLocalization="page.nav.accounts.liability"></span>
+    <a class="btn btn-sm btn-primary float-right d-print-none"
+       routerLink="/accounts/liability/add/" role="button">
+      <i class="fas fa-plus"></i>
+      <span appLocalization="page.title.accounts.liabilities.add" class="d-none d-md-inline">Add account</span>
+    </a>
+  </div>
+
+  <div class="card-body">
+    <table class="table table-hover table-responsive-sm table-sm mt-4">
+      <thead>
+      <tr>
+        <th class="text-center">
+        </th>
+        <th>
+          <span appLocalization="Account.name"></span>
+        </th>
+        <th>
+          <span appLocalization="Account.interest"></span>
+          (<span appLocalization="Account.interestPeriodicity"></span>)
+        </th>
+        <th appLocalization="common.account.saldo"></th>
+      </tr>
+      </thead>
+      <tbody *ngIf="results && results.content.length == 0">
+      <tr>
+        <td colspan="4"
+            class="text-center"
+            appLocalization="common.overview.noresults"></td>
+      </tr>
+      </tbody>
+      <tbody *ngIf="!results">
+      <tr>
+        <td colspan="4"><app-spinner></app-spinner></td>
+      </tr>
+      </tbody>
+      <tbody *ngIf="results && results.content.length">
+      <tr *ngFor="let account of results.content">
+        <td>
+          <a [routerLink]="account.id + '/edit/'"
+             class="text-primary"
+             appLocalization="common.action.edit" location="title"><i class="fas fa-edit"></i></a>
+          <a href="javascript:void 0"
+             appLocalization="common.action.delete"
+             location="title"
+             (click)="confirmDelete(account)"
+             class="text-danger"><i class="fas fa-trash-alt"></i></a>
+        </td>
+        <td>
+          <a [routerLink]="'./' + account.id + '/transactions'" class="text-primary">{{ account.name }}</a>
+          <span class="text-muted small ml-2">
+            <span *ngIf="account.account.iban">{{ account.account.iban }}</span>
+            <span *ngIf="account.account.number">{{ account.account.number }}</span>
+          </span>
+          <div class="text-muted small" *ngIf="account.history.lastTransaction">
+            <label appLocalization="Account.lastActivity"></label>
+            {{ account.history.lastTransaction | customDate }}
+          </div>
+          <div class="text-muted small">{{ account.description }}</div>
+        </td>
+        <td>{{ account.interest.value | percent }} (<span [appLocalization]="'Periodicity.'+ account.interest.periodicity"></span>)</td>
+        <td>
+          <app-statistical-balance [account]="[account]" [currency]="account.account.currency"></app-statistical-balance>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center"
+      *ngIf="results && results.content.length != 0"
+      [page]="info.page"
+      [pageSize]="info.pageSize"
+      [collectionSize]="results.info.records"
+      [maxSize]="10" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
+      (pageChange)="pageChanged()"></ngb-pagination>
+  </div>
+</div>

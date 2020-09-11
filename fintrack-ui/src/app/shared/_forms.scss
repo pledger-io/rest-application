@@ -1,0 +1,57 @@
+form {
+  .invalid-feedback {
+    font-style: italic;
+  }
+
+  legend {
+    font-size: 120%;
+    font-weight: 500;
+    color: rgba(0, 0, 0, .6);
+  }
+
+  label {
+    .fa-question-circle {
+      cursor: pointer;
+      color: #187da0;
+      margin-top: 4px;
+      float: right;
+      z-index: 1001;
+    }
+  }
+
+  .input-group-prepend {
+    select, input {
+      padding: 0.25rem 0.5rem !important;
+      background: none !important;
+    }
+  }
+
+  input.form-control.ng-valid.ng-touched ::ng-deep, select.ng-valid.ng-touched ::ng-deep {
+    border-color: #28a745;
+    padding-right: calc(1.5em + .75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: center right calc(.375em + .1875rem);
+    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+
+    &:focus {
+      border-color: #28a745;
+      box-shadow: 0 0 0 .2rem rgba(40, 167, 69, .25)
+    }
+  }
+
+  input.form-control.ng-invalid.ng-touched ::ng-deep, select.ng-invalid.ng-touched ::ng-deep {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + .75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23dc3545' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23dc3545' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center right calc(.375em + .1875rem);
+    background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+
+    &:focus {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .25)
+    }
+  }
+}
+

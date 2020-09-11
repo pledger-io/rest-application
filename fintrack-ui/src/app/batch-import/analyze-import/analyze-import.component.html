@@ -1,0 +1,86 @@
+<div *ngIf="!model">
+  <app-spinner></app-spinner>
+</div>
+
+<div class="card" *ngIf="model">
+  <div class="card-header">
+    <span appLocalization="page.nav.settings.import"></span>
+  </div>
+
+  <div class="card-body wizard">
+    <div class="wizard-steps">
+      <span data-step="step-upload" appLocalization="page.nav.settings.import.start" class="border-bottom" style="width: 220px"></span>
+      <span data-step="step-settings" appLocalization="page.settings.import.analyze.settings" class="active border-bottom" style="width: 140px"></span>
+      <span data-step="step-mappings" appLocalization="page.settings.import.analyze.columns" class="border-bottom" style="width: 160px"></span>
+      <span data-step="step-status" appLocalization="page.nav.settings.import" class="border-bottom" style="width: 180px"></span>
+      <span data-step="step-status" appLocalization="page.settings.import.details" class="border-bottom" style="width: 180px"></span>
+      <span class="border-bottom filler"></span>
+    </div>
+
+    <form novalidate autocomplete="off" #batchConfig="ngForm">
+
+      <fieldset id="step-settings">
+        <legend appLocalization="page.settings.import.analyze.settings"></legend>
+        <div class="form-group row">
+          <label for="dateFormat" class="col-sm-3 col-form-label" appLocalization="ImportConfig.Json.dateFormat"></label>
+          <div class="col-sm-9">
+            <app-input-field control="BatchImport">
+              <input type="text" class="form-control w-50" id="dateFormat" name="dateFormat"
+                     appLocalization="ImportConfig.Json.dateFormat"
+                     location="placeholder"
+                     [(ngModel)]="model.dateFormat"
+                     required>
+            </app-input-field>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="account" class="col-sm-3 col-form-label"appLocalization="ImportConfig.Json.account"></label>
+          <div class="col-sm-9">
+            <app-input-field control="BatchImport">
+              <select id="account" name="account" class="form-control w-50" [(ngModel)]="model.accountId" required>
+                <option *ngFor="let account of accounts"
+                        [value]="account.id"
+                        [label]="account.name"></option>
+              </select>
+            </app-input-field>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="delimiter" class="col-sm-3 col-form-label" appLocalization="ImportConfig.Json.delimiter"></label>
+          <div class="col-sm-9">
+            <app-input-field control="BatchImport">
+              <select id="delimiter" name="delimiter" class="form-control w-50" [(ngModel)]="model.delimiter" required>
+                <option value="," appLocalization="ImportConfig.Json.delimiter.comma"></option>
+                <option value=";" appLocalization="ImportConfig.Json.delimiter.dotComma"></option>
+              </select>
+            </app-input-field>
+          </div>
+        </div>
+
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="headers" name="headers" [(ngModel)]="model.hasHeader">
+          <label class="form-check-label" for="headers" appLocalization="ImportConfig.Json.headers">Check me out</label>
+        </div>
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="generateAccounts" name="generateAccounts" [(ngModel)]="model.generateAccounts">
+          <label class="form-check-label" for="generateAccounts" appLocalization="ImportConfig.Json.generateAccount">Check me out</label>
+        </div>
+        <div class="form-group form-check">
+          <input type="checkbox" class="form-check-input" id="applyRules" name="applyRules" [(ngModel)]="model.applyRules">
+          <label class="form-check-label" for="applyRules" appLocalization="ImportConfig.Json.applyRules">Check me out</label>
+        </div>
+      </fieldset>
+
+    </form>
+  </div>
+
+  <div class="card-footer">
+    <app-back-button></app-back-button>
+    <button type="button" class="btn btn-sm btn-primary"
+            [disabled]="batchConfig.invalid"
+            (click)="process()"
+            appLocalization="common.action.next"></button>
+  </div>
+</div>

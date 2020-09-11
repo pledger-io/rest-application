@@ -1,0 +1,58 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-title" appLocalization="page.title.budget.group.expense.add"></h4>
+  <button type="button" class="close" aria-describedby="modal-title" (click)="dismiss()">
+    <span aria-hidden="true" class="fa fa-times"></span>
+  </button>
+</div>
+<div class="modal-body">
+  <app-spinner *ngIf="processing"></app-spinner>
+
+  <form #createExpense="ngForm" autocomplete="off" [hidden]="processing">
+    <div class="alert alert-light" appLocalization="page.budget.group.expense.expained">
+      info text
+    </div>
+
+    <app-error-message></app-error-message>
+
+    <div class="form-group row mt-2">
+      <label for="name" class="col-sm-3 col-form-label" appLocalization="Budget.Expense.name">Name</label>
+      <div class="col-sm-9">
+        <app-input-field control="Budget.Expense">
+          <input type="text" class="form-control" id="name" name="name" required
+                 #name
+                 appLocalization="Budget.Expense.name" location="placeholder"
+                 [(ngModel)]="model.name">
+        </app-input-field>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="lowerBound" class="col-sm-3 col-form-label" appLocalization="Budget.Expense.lowerBound">Name</label>
+      <div class="col-sm-9">
+        <app-input-field control="Budget.Expense">
+          <input type="number" class="form-control" id="lowerBound" name="lowerBound"
+                 appLocalization="Budget.Expense.lowerBound" location="placeholder"
+                 [(ngModel)]="model.lowerBound"
+                 required min="0">
+        </app-input-field>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label for="upperBound" class="col-sm-3 col-form-label" appLocalization="Budget.Expense.upperBound">Name</label>
+      <div class="col-sm-9">
+        <app-input-field control="Budget.Expense">
+          <input type="number" class="form-control" id="upperBound" name="upperBound"
+                 appLocalization="Budget.Expense.upperBound" location="placeholder"
+                 [(ngModel)]="model.upperBound"
+                 required min="0">
+        </app-input-field>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="dismiss()" [disabled]="processing" appLocalization="common.action.cancel"></button>
+  <button type="button" class="btn btn-success"
+          [disabled]="createExpense.invalid || processing"
+          (click)="create()"
+          appLocalization="common.action.save"></button>
+</div>

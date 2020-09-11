@@ -1,0 +1,99 @@
+<div class="row">
+  <div class="col-sm-4">
+    <div class="card" id="contract-details">
+      <div class="card-body">
+        <div class="form-group">
+          <label appLocalization="Contract.name"></label>
+          <span>{{ contract.name }}</span>
+        </div>
+        <div class="form-group">
+          <label appLocalization="Contract.company"></label>
+          <span>
+            {{ contract.company.name }}
+          </span>
+        </div>
+        <div class="form-group">
+          <label appLocalization="Contract.start"></label>
+          <span>
+            {{ contract.start }}
+          </span>
+        </div>
+        <div class="form-group">
+          <label appLocalization="Contract.end"></label>
+          <span>
+            {{ contract.end }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-8">
+    <div class="card" *ngIf="contract.description">
+      <div class="card-body">
+        <h5 appLocalization="Contract.description"></h5>
+        {{ contract.description }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" appLocalization="page.title.budget.contracts.transactions"></div>
+  <div class="card-body">
+    <table class="table table-sm table-responsive-sm table-hover mb-2 mt-2">
+      <thead>
+      <tr>
+        <th></th>
+        <th appLocalization="Transaction.date"></th>
+        <th appLocalization="Transaction.description"></th>
+        <th appLocalization="Transaction.amount"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngIf="transactions && !transactions.content.length">
+        <td colspan="4" appLocalization="common.overview.noresults" class="text-center"></td>
+      </tr>
+      <tr *ngIf="!transactions">
+        <td colspan="4"><app-spinner></app-spinner></td>
+      </tr>
+      </tbody>
+      <tbody *ngIf="transactions && transactions.content.length">
+      <tr *ngFor="let transaction of transactions.content">
+        <td>
+          <a [routerLink]="['/accounts', transaction.source.frontEndType, transaction.source.id, 'transaction', transaction.id, 'edit']"
+             *ngIf="!transaction.source.isSystem() && !transaction.destination.isSystem()"
+             class="text-primary"
+             appLocalization="common.action.edit" location="title"><i class="fas fa-edit"></i></a>
+        </td>
+        <td>{{ transaction.dates.transaction | customDate }}</td>
+        <td>
+          <div>{{ transaction.description }}</div>
+          <div *ngIf="transaction.metadata.tags" class="tags">
+            <span *ngFor="let tag of transaction.metadata.tags" class="badge badge-info badge-pill">{{ tag }}</span>
+          </div>
+
+          <div class="small text-muted" *ngIf="transaction.metadata.category">
+            <label appLocalization="Transaction.category" class="d-none d-sm-inline"></label> {{ transaction.metadata.category }}
+          </div>
+          <div class="small text-muted" *ngIf="transaction.metadata.budget">
+            <label appLocalization="Transaction.budget" class="d-none d-sm-inline"></label> {{ transaction.metadata.budget }}
+          </div>
+        </td>
+        <td>
+          <span *ngIf="transaction.source.isOwn()" [appBalance]="-transaction.amount" [currency]="transaction.currency"></span>
+          <span *ngIf="transaction.destination.isOwn()" [appBalance]="transaction.amount" [currency]="transaction.currency"></span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center"
+      *ngIf="transactions"
+      [(page)]="currentPage"
+      [pageSize]="20"
+      [collectionSize]="transactions.info.records"
+      (pageChange)="pageChanged()"></ngb-pagination>
+  </div>
+</div>

@@ -1,0 +1,212 @@
+@import "app/shared/constants";
+@import "app/shared/themes";
+
+@mixin flag-icon($country) {
+  .flag-icon-#{$country} {
+    background-image: url('assets/flags/4x3/#{$country}.svg');
+    &.flag-icon-squared {
+      background-image: url('assets/flags/1x1/#{$country}.svg');
+    }
+  }
+}
+
+.dark:root {
+  --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --app-body-background: #e4e5e6;
+  --app-background: #fff;
+  --app-border-color: #c8ced3;
+  --app-text-muted-color: #73818f;
+  --app-header-background: #fff;
+  --app-header-text: #000;
+  --sidebar-color: #fff;
+  --sidebar-icon-color: #74828e;
+  --sidebar-background: #2f353a;
+  --sidebar-title-color: #e4e7ea;
+  --sidebar-sub-background: #3a4046;
+  --card-header-background: #f0f3f5;
+  --card-header-color: #000;
+  --wizard-step-color: #6c757d;
+  --link-color: #007bff;
+}
+
+.navy:root {
+  --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --app-body-background: #c7e0f9;
+  --app-background: #fff;
+  --app-border-color: #192d3e;
+  --app-text-muted-color: #73818f;
+  --app-header-background: #002C51;
+  --app-header-text: #fff;
+  --sidebar-color: #fff;
+  --sidebar-icon-color: #74828e;
+  --sidebar-background: #002C51;
+  --sidebar-title-color: #b7deff;
+  --sidebar-sub-background: #002C51;
+  --card-header-background: #3f8cbf;
+  --card-header-color: #fff;
+  --wizard-step-color: #6c757d;
+  --link-color: #007bff;
+}
+
+body {
+  font-family: var(--font-family-sans-serif);
+  -webkit-font-smoothing: antialiased;
+  font-size: .875rem;
+  line-height: 1.5;
+  font-weight: 400;
+  background: var(--app-body-background);
+
+  .flag-icon {
+    background-size: contain;
+    background-position: 50%;
+    background-repeat: no-repeat;
+    position: relative;
+    display: inline-block;
+    width: (4 / 3) * 1em;
+    line-height: 1em;
+    margin-right: 2px;
+    &:before {
+      content: '\00a0';
+    }
+    &.flag-icon-squared {
+      width: 1em;
+    }
+  }
+
+  @include flag-icon(nl);
+  @include flag-icon(en);
+  @include flag-icon(de);
+
+  .text-green {
+    color: #047135;
+  }
+
+  ul.pagination {
+    margin-bottom: 0;
+  }
+
+  .form-group {
+    margin-bottom: .5rem;
+
+    .input-group {
+      select, input {
+        padding: .25rem .5rem;
+        font-size: .875rem;
+        line-height: 1.5;
+        border-radius: .2rem;
+      }
+    }
+
+    .col-form-label {
+      padding-top: calc(.25rem + 1px);
+      padding-bottom: calc(.25rem + 1px);
+      font-size: .875rem;
+      line-height: 1.5;
+    }
+
+    select.form-control, input.form-control {
+      height: calc(1.5em + .5rem + 2px);
+      padding: .25rem .5rem;
+      font-size: .875rem;
+      line-height: 1.5;
+      border-radius: .2rem;
+    }
+  }
+
+  .modal {
+
+    .modal-header {
+      padding: 0.5rem 1.2rem;
+      background-color: var(--card-header-background);
+      border-bottom-color: var(--app-border-color);
+      position: relative;
+
+      h4 {
+        font-size: 1.4rem;
+        color: var(--card-header-color);
+      }
+
+      .close {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+
+        font-size: 1.4rem;
+        padding: 0 1.5rem;
+        margin: 0;
+        color: var(--card-header-color);
+
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+
+    .modal-body {
+      .alert {
+        margin-bottom: 0;
+      }
+    }
+
+    .modal-footer {
+      padding: 0.5rem 1.2rem;
+
+      .btn {
+        padding: .25rem .5rem;
+        font-size: .875rem;
+        line-height: 1.5;
+        border-radius: .2rem;
+      }
+    }
+  }
+}
+
+@media print {
+  .main {
+    margin-left: 0 !important;
+  }
+
+  .print-break-before {
+    page-break-before: always;
+    margin-top: 1em;
+  }
+}
+
+// Desktop resolution (tabled landscape)
+@media (min-width: $tabled-portrait-max-width) {
+  .sidebar-lg-show {
+    .main {
+      margin-left: $sidebar-offset;
+    }
+    .sidebar {
+      margin-left: 0 !important;
+    }
+  }
+}
+
+// Tablet resolution (portrait mode)
+@media (max-width: $tabled-portrait-max-width) {
+  .sidebar-show {
+    .main {
+      margin-left: $sidebar-offset;
+    }
+    .sidebar {
+      overflow-y: scroll !important;
+      margin-left: 0 !important;
+    }
+  }
+}
+
+// Mobile phone resolution (landscape)
+@media (max-width: $phone-landscape-max-width) {
+  .sidebar-show {
+    .main {
+      margin-left: 0;
+    }
+  }
+}
+
+// Mobile phone resolution (portrait)
+@media (max-width: $phone-portrait-max-width) {
+}

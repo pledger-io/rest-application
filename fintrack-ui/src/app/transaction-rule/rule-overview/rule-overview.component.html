@@ -1,0 +1,31 @@
+<app-spinner [show]="!groups"></app-spinner>
+
+<div class="mb-3 text-right">
+  <button class="btn btn-sm btn-info" (click)="addGroup()">
+    <i class="fas fa-plus"></i> <span appLocalization="page.settings.rules.group.add"></span>
+  </button>
+</div>
+
+<div class="card mb-3" *ngFor="let ruleGroup of groups" #el>
+  <div class="card-header" (mouseenter)="el.show = true" (mouseleave)="el.show = false">
+    <span>{{ ruleGroup.name }}</span>
+    <a href="javascript:void 0" class="ml-1" *ngIf="el.show" (click)="rename(ruleGroup)"><i class="fa fa-edit"></i></a>
+
+    <a class="btn btn-sm btn-primary float-right text-white d-print-none" role="button" [routerLink]="'/rules/' + ruleGroup.name + '/add'">
+      <i class="fas fa-plus"></i> <span appLocalization="page.settings.rules.add" class="pl-1 d-none d-md-inline-block"></span>
+    </a>
+    <a class="btn btn-sm float-right btn-outline-success mr-1 order-down d-print-none" role="button"
+       href="javascript: void 0" (click)="down(ruleGroup.name)"
+       appLocalization="common.action.down" location="title">
+      <i class="fas fa-arrow-down"></i>
+    </a>
+    <a class="btn btn-sm float-right btn-outline-success mr-1 order-up d-print-none" role="button"
+       href="javascript: void 0" (click)="up(ruleGroup.name)"
+       appLocalization="common.action.up" location="title">
+      <i class="fas fa-arrow-up"></i>
+    </a>
+  </div>
+  <div class="card-body">
+    <app-rule-overview-list [group]="ruleGroup.name"></app-rule-overview-list>
+  </div>
+</div>

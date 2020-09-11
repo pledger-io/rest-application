@@ -1,0 +1,153 @@
+<div class="card" *ngIf="range">
+  <div class="card-header">
+    <span appLocalization="page.reports.default.title"></span>
+    <span class="float-right">
+      <button class="btn btn-sm btn-link" (click)="download()"><span class="fa fa-download"></span></button>
+    </span>
+  </div>
+  <div class="card-body">
+    <app-graph-display [currency]="currency"
+                       [endPoint]="'statistics/graph/income-expenses/' + range.from + '/' + range.until"
+                       (svg)="pdf.balanceSVG($event)"
+                       [highstock]="true"></app-graph-display>
+  </div>
+</div>
+
+<div class="row" *ngIf="range">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header" appLocalization="page.reports.default.balances"></div>
+      <div class="card-body">
+        <table class="table table-hover table-sm" id="income">
+          <thead>
+          <tr>
+            <th appLocalization="Account.name"></th>
+            <th appLocalization="page.reports.default.startBalance"></th>
+            <th appLocalization="page.reports.default.endBalance"></th>
+            <th appLocalization="common.difference"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let account of ownAccounts">
+            <td>
+              <a [routerLink]="'/accounts/own/' + account.id + '/transactions/' + range.from + '/' + range.until">{{ account.name }}</a>
+            </td>
+            <td>
+              <app-statistical-balance [account]="[account]" [range]="rangeToStart" [currency]="currency"></app-statistical-balance>
+            </td>
+            <td>
+              <app-statistical-balance [account]="[account]" [range]="rangeToEnd" [currency]="currency"></app-statistical-balance>
+            </td>
+            <td>
+              <app-statistical-balance [account]="[account]" [range]="range" [currency]="currency"></app-statistical-balance>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header" appLocalization="page.reports.default.title"></div>
+      <div class="card-body">
+        <table class="table table-sm" id="expense">
+          <tr>
+            <td appLocalization="common.in"></td>
+            <td class="text-right">
+              <app-statistical-balance onlyIncome="true"
+                                       [range]="range"
+                                       [currency]="currency"></app-statistical-balance>
+            </td>
+          </tr>
+          <tr>
+            <td appLocalization="common.out"></td>
+            <td class="text-right">
+              <app-statistical-balance onlyIncome="false" [range]="range" [currency]="currency"></app-statistical-balance>
+            </td>
+          </tr>
+          <tr>
+            <td appLocalization="common.difference" class="font-italic"></td>
+            <td class="text-right">
+              <app-statistical-balance [range]="range"
+                                       [currency]="currency"></app-statistical-balance>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row print-break-before" *ngIf="range">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header" appLocalization="page.reports.default.top.debit"></div>
+      <div class="card-body">
+        <table class="table table-sm table-hover">
+          <thead>
+          <tr>
+            <th appLocalization="Account.name"></th>
+            <th appLocalization="common.total" class="text-right"></th>
+            <th appLocalization="common.average" class="text-right"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let account of debtors">
+            <td>
+              <a [routerLink]="'/accounts/own/' + account.account.id + '/transactions/' + range.from + '/' + range.until">{{ account.account.name }}</a>
+            </td>
+            <td class="text-right" data-balance>
+              <span [appBalance]="account.total" [currency]="currency"></span>
+            </td>
+            <td class="text-right" data-balance>
+              <span [appBalance]="account.average" [currency]="currency"></span>
+            </td>
+          </tr>
+          <tr *ngIf="!debtors || debtors.length == 0">
+            <td colspan="3" class="text-center text-muted text-lowercase">
+              <span appLocalization="common.overview.noresults" *ngIf="debtors && debtors.length == 0"></span>
+              <app-spinner [show]="!debtors"></app-spinner>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header" appLocalization="page.reports.default.top.credit"></div>
+      <div class="card-body">
+        <table class="table table-sm table-hover">
+          <thead>
+          <tr>
+            <th appLocalization="Account.name"></th>
+            <th appLocalization="common.total" class="text-right"></th>
+            <th appLocalization="common.average" class="text-right"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let account of creditors">
+            <td>
+              <a [routerLink]="'/accounts/own/' + account.account.id + '/transactions/' + range.from + '/' + range.until">{{ account.account.name }}</a>
+            </td>
+            <td class="text-right">
+              <span [appBalance]="-account.total" [currency]="account.account.account.currency"></span>
+            </td>
+            <td class="text-right">
+              <span [appBalance]="-account.average" [currency]="account.account.account.currency"></span>
+            </td>
+          </tr>
+          <tr *ngIf="!creditors || creditors.length == 0">
+            <td colspan="3" class="text-center text-muted text-lowercase">
+              <span appLocalization="common.overview.noresults" *ngIf="creditors && creditors.length == 0"></span>
+              <app-spinner [show]="!creditors"></app-spinner>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

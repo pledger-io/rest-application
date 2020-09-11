@@ -1,0 +1,57 @@
+<div *ngIf="!model">
+  <app-spinner></app-spinner>
+</div>
+
+<div class="card" *ngIf="model">
+  <div class="card-header">
+    <span appLocalization="page.nav.settings.import"></span>
+  </div>
+
+  <div class="card-body wizard">
+    <div class="wizard-steps">
+      <span data-step="step-upload" appLocalization="page.nav.settings.import.start" class="border-bottom" style="width: 220px"></span>
+      <span data-step="step-settings" appLocalization="page.settings.import.analyze.settings" class="border-bottom" style="width: 140px"></span>
+      <span data-step="step-mappings" appLocalization="page.settings.import.analyze.columns" class="active border-bottom" style="width: 160px"></span>
+      <span data-step="step-status" appLocalization="page.nav.settings.import" class="border-bottom" style="width: 180px"></span>
+      <span data-step="step-status" appLocalization="page.settings.import.details" class="border-bottom" style="width: 180px"></span>
+      <span class="border-bottom filler"></span>
+    </div>
+
+    <form novalidate autocomplete="off" #batchMappings="ngForm">
+      <legend appLocalization="page.settings.import.analyze.columns">Column mappings</legend>
+
+      <div class="form-group row" *ngFor="let column of model.columnRoles; let i = index">
+        <label for="type" class="col-sm-2 col-form-label"><span appLocalization="ImportConfig.Json.column"></span> {{ i }}</label>
+        <div class="col-sm-9">
+          <select id="type" class="form-control" [(ngModel)]="model.columnRoles[i]" [name]="'columnRole_' + i" required>
+            <option value="_ignore" appLocalization="ImportConfig.Json.Mapping.IGNORE"></option>
+            <option value="transaction-date" appLocalization="ImportConfig.Json.Mapping.DATE"></option>
+            <option value="booking-date" appLocalization="ImportConfig.Json.Mapping.BOOK_DATE"></option>
+            <option value="interest-date" appLocalization="ImportConfig.Json.Mapping.INTEREST_DATE"></option>
+            <option value="opposing-name" appLocalization="ImportConfig.Json.Mapping.OPPOSING_NAME"></option>
+            <option value="opposing-iban" appLocalization="ImportConfig.Json.Mapping.OPPOSING_IBAN"></option>
+            <option value="account-iban" appLocalization="ImportConfig.Json.Mapping.ACCOUNT_IBAN"></option>
+            <option value="amount" appLocalization="ImportConfig.Json.Mapping.AMOUNT"></option>
+            <option value="custom-indicator" appLocalization="ImportConfig.Json.Mapping.CUSTOM_INDICATOR"></option>
+            <option value="description" appLocalization="ImportConfig.Json.Mapping.DESCRIPTION"></option>
+          </select>
+        </div>
+        <div class="col-sm-1">
+          <a href="javascript:void 0" (click)="remove(i)" class="btn btn-link text-danger"><i class="fas fa-trash"></i></a>
+        </div>
+      </div>
+
+      <button class="btn btn-sm btn-outline-info float-right mr-5"
+              (click)="add()"
+              appLocalization="page.settings.import.details.add"></button>
+    </form>
+  </div>
+
+  <div class="card-footer">
+    <app-back-button></app-back-button>
+    <button type="button" class="btn btn-sm btn-primary"
+            [disabled]="batchMappings.invalid"
+            (click)="process()"
+            appLocalization="common.action.next"></button>
+  </div>
+</div>

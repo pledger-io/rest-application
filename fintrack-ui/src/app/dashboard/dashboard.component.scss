@@ -1,0 +1,29 @@
+.sum-card {
+  .no-gutters {
+    .col-md-4 {
+      font-size: 45px;
+      text-align: center;
+      background: rgba(0,0,0,0.2);
+
+      .fa {
+        line-height: 80px;
+      }
+    }
+
+    .card-body {
+      padding: 1rem;
+
+      h5 {
+        margin-bottom: 0.2rem
+      }
+
+      .card-text ::ng-deep {
+        color: #FFF !important;
+
+        .text-danger{
+          color: #FFF !important;
+        }
+      }
+    }
+  }
+}

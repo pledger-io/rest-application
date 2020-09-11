@@ -1,0 +1,51 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-title" appLocalization="page.transactions.add"></h4>
+  <button type="button" class="close" aria-describedby="modal-title" (click)="dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <form ngForm #editForm="ngForm">
+    <fieldset>
+      <legend appLocalization="page.transaction.add.link"></legend>
+      <div class="form-group row">
+        <label for="category" class="col-sm-3 col-form-label" appLocalization="Transaction.category"></label>
+        <div class="col-sm-9">
+          <app-autocomplete placeholder="Transaction.category" name="category"
+                            [(model)]="model.category" [type]="EntityType.CATEGORY"></app-autocomplete>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="budget" class="col-sm-3 col-form-label" appLocalization="Transaction.budget"></label>
+        <div class="col-sm-9">
+          <app-autocomplete placeholder="Transaction.budget" name="budget"
+                            [(model)]="model.budget" [type]="EntityType.BUDGET"></app-autocomplete>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="contract" class="col-sm-3 col-form-label" appLocalization="Transaction.contract"></label>
+        <div class="col-sm-9">
+          <app-autocomplete placeholder="Transaction.contract" name="contract"
+                            [(model)]="model.contract" [type]="EntityType.CONTRACT"></app-autocomplete>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="tags" class="col-sm-3 col-form-label" appLocalization="Transaction.tags"></label>
+        <div class="col-sm-9">
+          <app-tag-input [(tags)]="model.tags"></app-tag-input>
+        </div>
+      </div>
+    </fieldset>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary"
+          (click)="dismiss()"
+          appLocalization="common.action.cancel"></button>
+  <button type="button" class="btn btn-success"
+          (click)="process()"
+          [disabled]="editForm.invalid"
+          appLocalization="common.action.save"></button>
+</div>

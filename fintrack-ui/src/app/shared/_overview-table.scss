@@ -1,0 +1,49 @@
+@import "constants";
+
+table.table-responsive-sm {
+  thead {
+    th {
+      border-top: 0;
+    }
+  }
+  tbody {
+    td {
+      &:first-child {
+        text-align: center;
+        vertical-align: middle;
+
+        & > a {
+          margin-right: 5px;
+        }
+      }
+
+      label {
+        font-weight: 500;
+        margin-bottom: 0;
+
+        &:after {
+          content: ": ";
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $phone-landscape-max-width) {
+  table.table-responsive-sm {
+    thead {
+      tr.rotated {
+        th {
+          height: 140px;
+          white-space: nowrap;
+
+          & > div {
+            & > span {
+              padding: 5px 10px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

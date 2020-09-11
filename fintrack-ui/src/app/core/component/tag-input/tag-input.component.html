@@ -1,0 +1,28 @@
+<span *ngFor="let tag of tags; let counter = index"
+      [title]="tag" spellcheck="false"
+      class="tag">
+    <span class="remove" role="button" aria-label="remove tag" (click)="remove(counter)"></span>
+    <div>
+      <span class="text">{{ tag }}</span>
+    </div>
+</span>
+
+<div class="position-relative">
+  <span class="tag input" role="textbox" aria-autocomplete="both" aria-multiline="false" [class.hidden]="!editing">
+      <div>
+        <span #input class="text" contenteditable="true"
+              (keyup)="typeahead($event)"
+              (keydown.escape)="cancel()"
+              (keydown.tab)="create(input.innerText); input.innerText = ''"></span>
+      </div>
+  </span>
+  <div #selectList class="dropdown-menu border" role="listbox" [class.d-none]="selectable.length == 0">
+    <button class="dropdown-item" role="option"
+            *ngFor="let option of selectable"
+            (click)="select(option); input.innerText = ''">
+      <div>{{ option }}</div>
+    </button>
+  </div>
+</div>
+
+<button (click)="add(); input.focus(); selectList.style.left = input.offsetLeft - 10 + 'px'" class="add">+</button>

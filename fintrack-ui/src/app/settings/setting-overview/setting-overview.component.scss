@@ -1,0 +1,7 @@
+@import "../../shared/overview-table";
+
+.table {
+  thead > tr > th:first-child {
+    width: 50px;
+  }
+}

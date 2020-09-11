@@ -1,0 +1,165 @@
+<div class="row">
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-0">{{ account.name }}</h4>
+
+        <div class="text-muted mb-2">{{ account.description }}</div>
+
+        <div class="label-set">
+          <label>
+            <span appLocalization="Account.interest"></span>:
+          </label>
+          {{ account.interest.value | percent:'1.2' }}
+        </div>
+        <div class="label-set">
+          <label>
+            <span appLocalization="Account.interestPeriodicity"></span>:
+          </label>
+          <span [appLocalization]="'Periodicity.' + account.interest.periodicity"></span>
+        </div>
+        <div class="label-set" *ngIf="openingTransaction">
+          <label>
+            <span appLocalization="page.accounts.liability.startBalance"></span>:
+          </label>
+          <span [appBalance]="openingTransaction.amountFor(account)"></span>
+        </div>
+        <div class="label-set">
+            <label>
+              <span appLocalization="page.accounts.liability.paid"></span>:
+            </label>
+            <app-statistical-balance [account]="[account]"
+                                     [range]="dateRange"
+                                     onlyIncome="true"></app-statistical-balance>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-5">
+            <h4 class="card-title mb-0" appLocalization="common.account.balance"></h4>
+            <div class="small text-muted"><span [appLocalization]="'common.month.' + (dateRange.computeStartMonth() + 1)"></span> {{ dateRange.computeStartYear() }}</div>
+          </div>
+        </div>
+        <div class="mt-3">
+          <app-graph-display [endPoint]="'accounts/' + account.id + '/transactions/graph/balance/' + dateRange.from + '/' + dateRange.until"></app-graph-display>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card print-break-before" id="transaction-list">
+  <div class="card-header">
+    <span appLocalization="page.title.transactions.overview"></span>
+  </div>
+  <div class="card-body">
+    <a class="btn btn-sm btn-success d-print-none" [routerLink]="account.path + '/transaction/add/debit'" role="button">
+      <i class="far fa-plus-square"></i>
+      <span appLocalization="page.account.liability.payment.add" class="d-none d-md-inline"></span>
+    </a>
+
+    <table class="table table-sm table-responsive-sm table-hover mb-4 mt-4">
+      <thead>
+      <tr>
+        <th>
+          <a *ngIf="hasSelection"
+             (click)="onMultiEditClick()"
+             href="javascript:void 0" appLocalization="common.action.edit" location="title"><i class="fas fa-edit"></i></a>
+        </th>
+        <th appLocalization="Transaction.date"></th>
+        <th appLocalization="Transaction.to">Amount</th>
+        <th appLocalization="Transaction.amount">Amount</th>
+        <th width="15"></th>
+      </tr>
+      </thead>
+      <tbody *ngIf="transactions && transactions.content.length">
+      <tr *ngFor="let transaction of transactions.content" (click)="onTransactionSplitClick(transaction)">
+        <td class="pl-4">
+          <input type="checkbox" class="form-check-input"
+                 [checked]="isSelected(transaction.id)"
+                 (change)="onTransactionSelect(transaction.id)"/>
+          <a [routerLink]="account.path + '/transaction/' + transaction.id + '/edit/'"
+             *ngIf="!transaction.source.isSystem() && !transaction.destination.isSystem()"
+             class="text-primary" data-toggle="tooltip"
+             data-placement="bottom"
+             appLocalization="common.action.edit" location="title"><i class="fas fa-edit"></i></a>
+          <a href="javascript:void 0"
+             data-confirm-ok-class="btn-danger"
+             appLocalization="common.action.delete"
+             location="title"
+             (click)="onTransactionDeleteClick(transaction)"
+             class="text-danger" data-toggle="tooltip" data-placement="bottom" ><i class="fas fa-trash-alt"></i></a>
+        </td>
+        <td class="align-middle text-center">
+          <div class="small">{{ transaction.dates.transaction | customDate }}</div>
+          <i [class]="'fas text-muted fa-' + transaction.type.class"></i>
+        </td>
+        <td>
+          <div *ngIf="transaction.isSystemCreated()">
+            <a [routerLink]="transaction.oppositeAccount(account).path + '/transactions'">
+              {{ transaction.oppositeAccount(account).name }}
+            </a>
+          </div>
+          <div *ngIf="transaction.metadata.tags" class="tags">
+            <span *ngFor="let tag of transaction.metadata.tags" class="badge badge-info badge-pill">{{ tag }}</span>
+          </div>
+          <div class="small text-muted" *ngIf="transaction.metadata.category">
+            <label appLocalization="Transaction.category" class="d-none d-sm-inline"></label> {{ transaction.metadata.category }}
+          </div>
+          <div class="small text-muted" *ngIf="transaction.metadata.budget">
+            <label appLocalization="Transaction.budget" class="d-none d-sm-inline"></label> {{ transaction.metadata.budget }}
+          </div>
+          <div class="small text-muted" *ngIf="transaction.metadata.contract">
+            <label appLocalization="Transaction.contract" class="d-none d-sm-inline"></label> {{ transaction.metadata.contract }}
+          </div>
+
+          <div class="small text-muted d-none d-sm-block"
+               [class.mt-1]="transaction.hasMetadata()">{{ transaction.description }}</div>
+
+          <div *ngIf="transaction.detailed" class="pl-3 small mt-2">
+            <div class="row font-weight-bold">
+              <div class="col-sm-2" appLocalization="Transaction.description"></div>
+              <div class="col-sm-2 col-xl-1" appLocalization="Transaction.amount"></div>
+            </div>
+            <div class="row" *ngFor="let record of transaction.split">
+              <div class="col-sm-2">{{ record.description }}</div>
+              <div class="col-sm-2 col-xl-1" [appBalance]="record.amount" [currency]="transaction.currency"></div>
+            </div>
+          </div>
+        </td>
+        <td [appBalance]="transaction.amountFor(account)" [currency]="transaction.currency" class="small align-middle"></td>
+        <td class="align-middle">
+          <span *ngIf="transaction.metadata.failureCode"
+                [appLocalization]="'Transaction.failureCode.' + transaction.metadata.failureCode"
+                location="title" class="d-print-none"><i class="fas fa-exclamation-circle"></i></span>
+          <span *ngIf="transaction.isSplit()" class="d-print-none"><i class="far fa-caret-square-down"></i></span>
+        </td>
+      </tr>
+      </tbody>
+      <tbody *ngIf="transactions && !transactions.content.length">
+      <tr>
+        <td colspan="5" class="text-center text-muted text-lowercase" appLocalization="common.overview.noresults"></td>
+      </tr>
+      </tbody>
+      <tbody *ngIf="!transactions">
+      <tr>
+        <td colspan="5"><app-spinner></app-spinner></td>
+      </tr>
+      </tbody>
+    </table>
+
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center"
+      *ngIf="transactions"
+      [(page)]="pageable.page"
+      [pageSize]="pageable.pageSize"
+      [maxSize]="10" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
+      [collectionSize]="transactions.info.records"
+      (pageChange)="pageChanged()"></ngb-pagination>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<div class="register-div">
+  <div class="card my-auto">
+    <div class="card-header">
+      <span appLocalization="page.title.register">Add account</span>
+    </div>
+    <form (submit)="register()" autocomplete="off" #form="ngForm">
+      <div class="card-body" style="min-width: 410px;">
+        <div *ngIf="validationFailure">
+          <div class="alert alert-danger" appLocalization="page.login.invalid">
+            Invalid username or password.
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="username" class="col-sm-4 col-form-label" appLocalization="UserAccount.username"></label>
+          <div class="col-sm-8">
+            <app-input-field control="UserAccount">
+              <input type="text" id="username" name="username" autofocus="autofocus" class="form-control"
+                     [(ngModel)]="credentials.username" required email/>
+            </app-input-field>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="password" class="col-sm-4 col-form-label" appLocalization="UserAccount.password"></label>
+          <div class="col-sm-8">
+            <app-input-field control="UserAccount">
+              <input #password='password' password-input type="password" id="password" name="password"
+                     [validators]="[Criteria.at_least_six_chars, Criteria.at_least_one_lower_case_char, Criteria.at_least_one_upper_case_char, Criteria.at_least_one_digit_char]"
+                     class="form-control" [(ngModel)]="credentials.password" required/>
+            </app-input-field>
+          </div>
+        </div>
+        <div class="card mt-1 shadow">
+          <div class="card-body text-muted">
+            <div *ngFor="let result of password.validated" class="ml-2">
+              <em class="fa mr-1" [className]="result.style"></em>
+              <span [appLocalization]="'Account.password.' + result.validator"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-right">
+          <a routerLink="/login" queryParamsHandling="preserve" appLocalization="page.register.login" class="btn btn-sm btn-link"></a>
+        </div>
+      </div>
+      <div class="card-footer text-right">
+        <button class="btn btn-sm btn-primary"
+                [disabled]="form.invalid"
+                type="submit"><em class="fas fa-sign-in-alt"></em> <span appLocalization="page.register.register"></span></button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+#contract-details {
+
+  .form-group {
+    margin-bottom: .2rem;
+
+    label {
+      width: 5rem;
+      font-weight: bold;
+      text-align: right;
+      margin-bottom: 0;
+
+      &:after {
+        content: ':';
+      }
+    }
+
+    span {
+      margin-left: 2.1rem;
+    }
+  }
+
+}
+
+
+table {
+  thead {
+    th {
+      &:first-child {
+        width: 25px;
+      }
+
+      &:nth-child(2) {
+        width: 100px;
+      }
+
+      &:last-child {
+        width: 75px;
+      }
+    }
+  }
+}

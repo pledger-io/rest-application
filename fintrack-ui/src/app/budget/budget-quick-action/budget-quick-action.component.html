@@ -1,0 +1,30 @@
+<div class="btn-group" role="group" aria-label="Button group" *ngIf="loaded">
+  <div ngbDropdown>
+    <a href="javascript:void 0" class="btn" ngbDropdownToggle role="button" id="month-selector">
+      <span [appLocalization]="'common.month.' + (currentRange.computeStartMonth() + 1)"></span>
+    </a>
+    <div ngbDropdownMenu class="dropdown-menu-right month-picker" aria-labelledby="month-selector">
+      <div class="row" *ngFor="let row of [0, 1, 2, 3]">
+        <div class="col-sm-4 text-truncate text-center" *ngFor="let col of [1, 2, 3]">
+          <a [routerLink]="buildMonthLink(row * 3 + col)"
+             class="btn btn-link" data-toggle="tooltip" data-placement="bottom"
+             [appLocalization]="'common.month.' + (row * 3 + col)"
+             location="title">
+            <span [appLocalization]="'common.month.' + (row * 3 + col)">January</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ngbDropdown>
+    <a href="javascript:void 0" class="btn" ngbDropdownToggle id="year-selector" role="button">{{ currentRange.computeStartYear() }}</a>
+    <div ngbDropdownMenu class="dropdown-menu-right" aria-labelledby="year-selector">
+      <a *ngFor="let year of yearRange"
+         [routerLink]="'/budgets/' + year + '-01-01/' + year + '-01-31'"
+         class="dropdown-item text-center">
+        {{ year }}
+      </a>
+    </div>
+  </div>
+</div>

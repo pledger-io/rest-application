@@ -1,0 +1,104 @@
+@import "shared/constants";
+
+.app-body {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  overflow-x: hidden;
+  margin-top: $top-bar-height;
+  min-height: calc(100vh - 55px);
+
+  .main {
+    flex: 1;
+    min-width: 0;
+    transition: margin-left .25s,margin-right .25s,width .25s,flex .25s,-ms-flex .25s;
+
+    &#budget-overview {
+      .card-body .row > .col-sm-2:after {
+        content: ': ';
+      }
+    }
+
+    ::ng-deep .btn > *:first-child {
+      &.fa,&.fas, &.far {
+        margin-right: 5px;
+      }
+    }
+
+    ::ng-deep .card {
+      margin-bottom: 1.5rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      word-wrap: break-word;
+      background-color: var(--app-background);
+      background-clip: border-box;
+      border: 1px solid var(--app-border-color);
+      border-radius: .25rem;
+      box-shadow: 0 .2rem 0.3rem rgba(0, 0, 0, 0.175);
+
+      &.bg-primary {
+        background-color: #e24241!important;
+        border-color: #187da0;
+      }
+
+      &.bg-income {
+        border-color: #047135;
+      }
+
+      &.bg-danger {
+        border-color: #f5302e;
+        background-color: white !important;
+      }
+
+      &.bg-info {
+        border-color: #2eadd3;
+        background-color: #63c2de!important;
+      }
+
+      .card-header {
+        padding: .75rem 1.25rem;
+        margin-bottom: 0;
+
+        background-color: var(--card-header-background);
+        border-bottom-color: var(--app-border-color);
+        color: var(--card-header-color);
+
+        &:first-child {
+          border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;
+        }
+
+        .btn {
+          margin-top: -2px;
+          margin-bottom: -2px;
+        }
+      }
+
+      .card-body {
+        flex: 1 1 auto;
+        padding: 1.25rem;
+      }
+
+      .card-footer {
+        text-align: right;
+        padding: .75rem 1.25rem;
+        border-radius: 0 0 calc(0.25rem - 1px) calc(0.25rem - 1px);
+
+        background-color: var(--card-header-background);
+        border-top-color: var(--app-border-color);
+
+        .btn {
+          margin-right: 5px;
+        }
+      }
+    }
+
+  }
+}
+
+@media print {
+  .app-body {
+    margin-top: 0;
+  }
+}

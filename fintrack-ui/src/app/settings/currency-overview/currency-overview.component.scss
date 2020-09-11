@@ -1,0 +1,20 @@
+table {
+  thead {
+    th:first-child {
+      width: 3rem;
+    }
+
+    th:nth-child(2) {
+      width: 2rem;
+    }
+    th:nth-child(3) {
+      width: 3rem;
+    }
+    th:nth-child(5) {
+      width: 15rem;
+    }
+    th:last-child {
+      width: 5rem;
+    }
+  }
+}

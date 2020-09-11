@@ -1,0 +1,100 @@
+@import "../../shared/overview-table";
+
+.filters::ng-deep {
+  max-width: 90em;
+
+  fieldset {
+    padding: .8em;
+    border: 1px #6c757d3d solid;
+
+    legend {
+      margin-bottom: 0;
+    }
+
+    legend + .form-row {
+      margin-top: -15px;
+    }
+  }
+
+  label:not(.custom-control-label) {
+    display: inline-flex;
+    margin-right: .5em;
+    font-weight: bold;
+
+    &:after {
+      content: ': ';
+    }
+  }
+
+  input[type=text] {
+    display: inline-flex;
+    border: 0;
+    width: 75%;
+    padding: 0;
+    height: auto;
+
+    &:focus {
+      outline: none !important;
+      border-bottom: 1px #6c757d3d solid;
+      box-shadow: none !important;
+    }
+
+    &:hover {
+      border-bottom: 1px #6c757d3d solid;
+    }
+  }
+
+  select {
+    display: inline-flex;
+    border: 0;
+    width: 75%;
+
+    &:focus {
+      outline: none !important;
+    }
+
+    &:hover {
+      border-bottom: 1px #6c757d3d solid;
+    }
+  }
+}
+
+.dropdown-menu {
+  padding: 0;
+
+  .dropdown-item {
+    border-bottom: 1px solid #6c757d3d;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    em.fa {
+      margin-left: -10px;
+    }
+  }
+}
+
+table {
+  thead {
+    th {
+      &:first-child {
+        width: 75px;
+      }
+
+      &:nth-child(2) {
+        width: 100px;
+      }
+
+      &:nth-child(3) {
+        width: 120pt;
+      }
+    }
+  }
+}
+
+.tags {
+  & > .badge {
+    margin-right: .2ch;
+  }
+}

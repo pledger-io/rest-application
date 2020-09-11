@@ -1,0 +1,55 @@
+<div class="card">
+  <div class="card-header">
+    <span appLocalization="page.nav.settings.import"></span>
+    <a class="btn btn-sm btn-primary float-right" routerLink="/import/start" role="button">
+      <em class="fas fa-upload"></em>
+      <span appLocalization="page.settings.import.new" class="d-none d-md-inline"></span>
+    </a>
+  </div>
+  <div class="card-body">
+    <table class="table table-hover mt-4">
+      <thead>
+      <tr>
+        <th appLocalization="BatchImport.slug"></th>
+        <th appLocalization="BatchImport.created"></th>
+        <th appLocalization="BatchImport.config" class="d-none d-md-table-cell"></th>
+        <th appLocalization="BatchImport.finished" class="text-center"></th>
+      </tr>
+      </thead>
+      <tbody *ngIf="!loading && !empty">
+        <tr *ngFor="let import of page.content"
+            [class.text-danger]="!import.finished"
+            [class.text-success]="import.finished">
+          <td class="text-left">
+            <a [routerLink]="'/import/' + import.slug + '/status'" *ngIf="import.finished">{{ import.slug }}</a>
+            <a [routerLink]="'/import/' + import.slug + '/analyze'" *ngIf="!import.finished">{{ import.slug }}</a>
+          </td>
+          <td>{{ import.created | customDate }}</td>
+          <td class="d-none d-md-table-cell">{{ import.config.name }}</td>
+          <td class="text-center">
+            <i class="fas" appProcessStatus [business-key]="import.slug" definition-key="BatchTransactionImport"></i>
+          </td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="!loading && empty">
+      <tr>
+        <td colspan="4" appLocalization="common.overview.noresults"></td>
+      </tr>
+      </tbody>
+      <tbody *ngIf="loading">
+        <td colspan="4"><app-spinner></app-spinner></td>
+      <tr>
+      </tr>
+      </tbody>
+    </table>
+
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center"
+      *ngIf="page"
+      [(page)]="info.page"
+      [pageSize]="info.pageSize"
+      [collectionSize]="page.info.records"
+      (pageChange)="pageChanged()"></ngb-pagination>
+  </div>
+</div>

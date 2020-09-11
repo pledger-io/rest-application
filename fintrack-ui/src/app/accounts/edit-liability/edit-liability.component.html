@@ -1,0 +1,135 @@
+<div class="card">
+  <div class="card-header">
+    <span appLocalization="page.account.accounts.add"></span>
+  </div>
+
+  <div class="card-body">
+    <form #liability="ngForm" name="liability">
+      <div class="row">
+        <fieldset *ngIf="model" class="col-6">
+          <legend appLocalization="page.account.accounts.general"></legend>
+          <div class="form-group row">
+            <label for="name" class="col-sm-2 col-form-label" appLocalization="Account.name"></label>
+            <div class="col-sm-8">
+              <app-input-field control="Account">
+                <input type="text" class="form-control" name="name" id="name" required
+                       appLocalization="Account.name"
+                       location="placeholder"
+                       [(ngModel)]="model.name" />
+              </app-input-field>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label for="type" class="col-sm-2 col-form-label" appLocalization="Account.type"></label>
+            <div class="col-sm-8">
+              <app-input-field control="Account">
+                <select id="type" name="type" class="form-control w-75" [(ngModel)]="model.type" required>
+                  <option value="loan" appLocalization="AccountType.loan"></option>
+                  <option value="mortgage" appLocalization="AccountType.mortgage"></option>
+                  <option value="debt" appLocalization="AccountType.debt"></option>
+                </select>
+              </app-input-field>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label for="interest" class="col-sm-2 col-form-label" appLocalization="Account.interest"></label>
+            <div class="col-sm-3">
+              <app-input-field control="Account">
+                <div class="input-group-sm input-group">
+                  <input type="number" id="interest" name="interest" class="form-control"
+                           appPercentage
+                           required
+                           [(ngModel)]="model.interest">
+                  <div class="input-group-append"><span class="input-group-text">%</span></div>
+                </div>
+              </app-input-field>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="interestPeriodicity" class="col-sm-2 col-form-label" appLocalization="Account.interestPeriodicity"></label>
+            <div class="col-sm-3">
+              <app-input-field control="Account">
+                <select id="interestPeriodicity" name="interestPeriodicity" class="form-control"
+                        [(ngModel)]="model.interestPeriodicity" required>
+                  <option value="MONTHS" appLocalization="Periodicity.MONTHS"></option>
+                  <option value="YEARS" appLocalization="Periodicity.YEARS"></option>
+                </select>
+              </app-input-field>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="col-6">
+          <legend appLocalization="page.account.accounts.liability.opening"></legend>
+          <div class="form-group row">
+            <label for="date" class="col-sm-3 col-form-label" appLocalization="page.accounts.liability.startDate"></label>
+            <div class="col-sm-7">
+              <div class="input-group">
+                <input type="text" class="form-control" id="date" name="date" required
+                       ngbDatepicker [(ngModel)]="openingBalance.startDate" #transactionDate="ngbDatepicker"
+                       appLocalization="page.accounts.liability.startDate" location="placeholder"
+                       [readonly]="editing()">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary fa fa-calendar"
+                          (click)="transactionDate.toggle()"
+                          [disabled]="editing()"
+                          type="button"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="amount" class="col-sm-3 col-form-label" appLocalization="page.accounts.liability.startBalance"></label>
+            <div class="col-sm-7 input-group">
+              <div class="input-group-prepend">
+                <app-currency-selector [(value)]="model.currency" class="input-group-text" [readonly]="editing()"></app-currency-selector>
+              </div>
+              <input type="number" id="amount" name="amount" class="form-control"
+                     required
+                     [(ngModel)]="openingBalance.amount"
+                     [readOnly]="editing()">
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="row mt-5">
+        <fieldset *ngIf="model" class="col-6">
+          <legend appLocalization="page.account.accounts.accountdetails">Account details</legend>
+
+          <div class="form-group row">
+            <label for="number" class="col-sm-2 col-form-label" appLocalization="page.accounts.liability.number"></label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" id="number" name="number"
+                     appLocalization="page.accounts.liability.number"
+                     location="placeholder"
+                     [(ngModel)]="model.number">
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label for="name" class="col-sm-2 col-form-label" appLocalization="Account.description"></label>
+            <div class="col-sm-10">
+                <textarea class="form-control" id="description" name="description"
+                          appLocalization="Account.description"
+                          location="placeholder"
+                          [(ngModel)]="model.description"
+                          rows="5">
+                </textarea>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+    </form>
+  </div>
+
+  <div class="card-footer">
+    <button (click)="persist()" class="btn btn-sm btn-primary" [disabled]="liability.invalid">
+      <i class="far fa-dot-circle"></i>
+      <span appLocalization="common.action.save"></span>
+    </button>
+    <app-back-button></app-back-button>
+  </div>
+</div>

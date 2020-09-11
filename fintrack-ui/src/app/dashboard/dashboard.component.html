@@ -1,0 +1,81 @@
+<div class="row mt-3">
+  <div class="col-sm-2">
+    <div class="card rounded-lg sum-card bg-success shadow-lg">
+      <div class="row no-gutters">
+        <div class="col-md-4">
+          <i class="fa fa-balance-scale"></i>
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title" appLocalization="page.dashboard.balance"></h5>
+            <p class="card-text">
+              <app-statistical-balance
+                [range]="range"></app-statistical-balance>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-2">
+    <div class="card rounded-lg sum-card bg-primary shadow-lg">
+      <div class="row no-gutters">
+        <div class="col-md-4">
+          <i class="fa fa-tasks"></i>
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title" appLocalization="page.dashboard.budget"></h5>
+            <p class="card-text" [appBalance]="budget"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-2">
+    <div class="card rounded-lg sum-card bg-info shadow-lg">
+      <div class="row no-gutters">
+        <div class="col-md-4">
+          <i class="fa fa-chart-line"></i>
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title" appLocalization="page.dashboard.netWorth"></h5>
+            <p class="card-text"><app-statistical-balance class="card-text text-center"></app-statistical-balance></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-2"></div>
+</div>
+
+<div class="card">
+  <div class="card-header" appLocalization="page.dashboard.accounts.balance"></div>
+  <div class="card-body">
+    <app-graph-display [highstock]="true"
+                       [endPoint]="'statistics/balance/graph/' + range.from + '/' + range.until"></app-graph-display>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header" appLocalization="page.dashboard.budgets.balance"></div>
+      <div class="card-body">
+        <app-graph-display [endPoint]="'budgets/graph/' + range.from + '/' + range.until"></app-graph-display>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header" appLocalization="page.dashboard.categories.balance"></div>
+      <div class="card-body">
+        <app-graph-display [endPoint]="'categories/graph/' + range.from + '/' + range.until"></app-graph-display>
+      </div>
+    </div>
+
+  </div>
+</div>

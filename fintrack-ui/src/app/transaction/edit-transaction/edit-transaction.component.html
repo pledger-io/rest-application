@@ -1,0 +1,185 @@
+<div class="card">
+  <form novalidate autocomplete="off" id="transaction" #transactionForm="ngForm">
+    <div class="card-header">
+      <span appLocalization="page.transactions.add"></span>
+    </div>
+
+    <div class="card-body" *ngIf="processing">
+      <app-spinner [show]="processing"></app-spinner>
+    </div>
+    <div class="card-body" *ngIf="!processing">
+      <app-error-message></app-error-message>
+
+      <fieldset>
+        <legend appLocalization="page.transaction.add.details"></legend>
+
+        <div class="form-group row">
+          <label for="description" class="col-sm-3 col-form-label" appLocalization="Transaction.description"></label>
+          <div class="col-sm-9">
+            <app-input-field control="Transaction">
+              <input type="text" class="form-control" id="description" name="description"
+                     appLocalization="Transaction.description" location="placeholder"
+                     [(ngModel)]="model.description"
+                     required>
+            </app-input-field>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="from" class="col-sm-3 col-form-label" appLocalization="Transaction.source"></label>
+          <div class="col-sm-9">
+            <app-input-field control="Transaction">
+              <div *ngIf="!isEditOnDestination" class="font-weight-bold form-control-plaintext">{{ model.source.name }}</div>
+
+              <a href="javascript:void 0" *ngIf="model.noSource()" class="create-link"
+                 (click)="createAccount(model.source, 'debtor')"
+                 appLocalization="page.account.debtor.add"></a>
+              <app-autocomplete *ngIf="isEditOnDestination && !isSourceManaged"
+                                [(model)]="model.source"
+                                [type]="EntityType.DEBIT_ACCOUNT"
+                                name="from"></app-autocomplete>
+
+              <select *ngIf="isSourceManaged" class="form-control" id="from" name="from"
+                      [compareWith]="compareAccount"
+                      [(ngModel)]="model.source">
+                <option *ngFor="let a of ownAccounts"
+                        [ngValue]="a"
+                        [label]="a.name"></option>
+              </select>
+            </app-input-field>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="from" class="col-sm-3 col-form-label" appLocalization="Transaction.to"></label>
+          <div class="col-sm-9">
+            <app-input-field control="Transaction">
+              <div *ngIf="isEditOnDestination" class="font-weight-bold form-control-plaintext">{{ model.destination.name }}</div>
+
+              <a href="javascript:void 0" *ngIf="model.noDestination()" class="create-link"
+                 (click)="createAccount(model.destination, 'creditor')"
+                 appLocalization="page.account.creditor.add"></a>
+              <app-autocomplete *ngIf="!isEditOnDestination && !isDestinationManaged"
+                                [(model)]="model.destination"
+                                [type]="EntityType.CREDIT_ACCOUNT"
+                                name="to"></app-autocomplete>
+
+              <select *ngIf="isDestinationManaged" class="form-control" id="to" name="to"
+                      [compareWith]="compareAccount"
+                      [(ngModel)]="model.destination">
+                <option *ngFor="let a of ownAccounts"
+                        [ngValue]="a"
+                        [label]="a.name"></option>
+              </select>
+            </app-input-field>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="amount" class="col-sm-3 col-form-label" appLocalization="Transaction.amount"></label>
+          <div class="col-sm-4 col-md-3 input-group">
+            <div class="input-group-prepend">
+              <app-currency-selector [(value)]="model.currency" class="input-group-text" readonly></app-currency-selector>
+            </div>
+            <input type="number" id="amount" name="amount" class="form-control" required [(ngModel)]="model.amount" [readOnly]="splitTransaction">
+            <button class="btn btn-sm btn-outline-primary ml-3"
+                    *ngIf="splitTransaction"
+                    (click)="addSplitRecord()">Add</button>
+          </div>
+          <div class="pl-3 col-sm-9 offset-sm-3 mt-4" *ngIf="splitTransaction">
+            <table class="table mb-0">
+              <thead>
+              <tr>
+                <th appLocalization="Transaction.description"></th>
+                <th appLocalization="Transaction.amount" width="150"></th>
+                <th width="25"></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let split of splitRecords;let counter = index">
+                <td>
+                  <input [(ngModel)]="split.description"
+                         [name]="'split-description-'+ counter"
+                         class="form-control form-control-sm"
+                         required/>
+                </td>
+                <td>
+                  <input [(ngModel)]="split.amount"
+                         [name]="'split-amount-'+ counter"
+                         (change)="recalculateSum()"
+                         min="0"
+                         type="number"
+                         class="form-control form-control-sm">
+                </td>
+                <td>
+                  <a href="javascript:void 0"
+                     *ngIf="splitRecords.length > 2"
+                     (click)="removeSplitRecord(counter); recalculateSum()"
+                     appLocalization="common.action.delete" location="title"
+                     class="text-danger"><i class="fas fa-trash-alt"></i></a>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="amount" class="col-sm-3 col-form-label" appLocalization="Transaction.date"></label>
+          <div class="col-sm-4 col-md-3">
+            <div class="input-group">
+              <input type="text" class="form-control" id="date" name="date" required
+                     ngbDatepicker [(ngModel)]="model.date" #transactionDate="ngbDatepicker"
+                     appLocalization="Transaction.date" location="placeholder">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary fa fa-calendar" (click)="transactionDate.toggle()" type="button"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend appLocalization="page.transaction.add.link"></legend>
+        <div class="form-group row">
+          <label for="category" class="col-sm-3 col-form-label" appLocalization="Transaction.category"></label>
+          <div class="col-sm-9">
+            <app-autocomplete placeholder="Transaction.category" name="category"
+                              [(model)]="model.category" [type]="EntityType.CATEGORY"></app-autocomplete>
+          </div>
+        </div>
+        <div class="form-group row" *ngIf="typeOfTransaction.isCredit || (!isEditOnDestination && !isDestinationManaged)">
+          <label for="budget" class="col-sm-3 col-form-label" appLocalization="Transaction.budget"></label>
+          <div class="col-sm-9">
+            <app-autocomplete placeholder="Transaction.budget" name="budget"
+                              [(model)]="model.budget" [type]="EntityType.BUDGET"></app-autocomplete>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="contract" class="col-sm-3 col-form-label" appLocalization="Transaction.contract"></label>
+          <div class="col-sm-9">
+            <app-autocomplete placeholder="Transaction.contract" name="contract"
+                              [(model)]="model.contract" [type]="EntityType.CONTRACT"></app-autocomplete>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label class="col-sm-3 col-form-label" appLocalization="Transaction.tags"></label>
+          <div class="col-sm-9">
+            <app-tag-input [(tags)]="model.tags"></app-tag-input>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="row" *ngIf="!splitTransaction">
+        <div class="offset-sm-3 col-sm-9">
+          <button class="btn btn-sm btn-outline-info px-4" (click)="startSplit()">Split transaction</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer" *ngIf="!processing">
+      <button type="button" class="btn btn-sm btn-primary" [disabled]="transactionForm.invalid" (click)="saveTransaction()">
+        <i class="far fa-dot-circle"></i>
+        <span appLocalization="common.action.save"></span>
+      </button>
+      <app-back-button></app-back-button>
+    </div>
+  </form>
+</div>

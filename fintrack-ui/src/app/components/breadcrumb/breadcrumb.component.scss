@@ -1,0 +1,24 @@
+.breadcrumb {
+  transition: left .25s,right .25s,width .25s;
+
+  position: relative;
+  border-radius: 0;
+  border-bottom: 1px solid var(--app-border-color);
+
+  background-color: var(--app-background);
+
+  display: flex;
+  flex-wrap: wrap;
+  padding: .75rem 1rem;
+  margin-bottom: 1.5rem;
+  list-style: none;
+
+  .breadcrumb-menu {
+    margin-left: auto;
+
+    &.btn {
+      color: var(--app-text-muted-color);
+    }
+  }
+
+}

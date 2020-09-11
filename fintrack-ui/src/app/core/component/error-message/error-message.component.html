@@ -1,0 +1,5 @@
+<div *ngIf="error" class="alert-danger p-3 rounded mb-3 mt-3">
+  <em class="fa fa-exclamation-triangle mr-2"></em>
+  <span *ngIf="!error.validationFailed">{{ error.message }}</span>
+  <span *ngIf="error.validationFailed" appLocalization="errors.form.validation.failed"></span>
+</div>

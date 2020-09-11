@@ -1,0 +1,24 @@
+table {
+  thead {
+    th {
+      &:first-child {
+        width: 75px;
+      }
+
+      &:nth-child(2) {
+        width: 100px;
+      }
+
+      &:nth-last-child(2) {
+        width: 75px;
+      }
+    }
+  }
+}
+
+.label-set {
+  label {
+    width: 120px;
+    margin: 0;
+  }
+}

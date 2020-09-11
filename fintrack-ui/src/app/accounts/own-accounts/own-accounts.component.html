@@ -1,0 +1,110 @@
+<div class="card">
+  <div class="card-header">
+    <span appLocalization="page.nav.accounts.accounts"></span>
+    <a class="btn btn-sm float-right btn-primary" routerLink="/accounts/own/add/" role="button">
+      <i class="fas fa-plus"></i>
+      <span appLocalization="page.account.accounts.add" class="d-none d-md-inline"></span>
+    </a>
+  </div>
+  <div class="card-body">
+    <table class="table table-hover table-responsive-sm table-sm mt-4">
+      <thead>
+      <tr>
+        <th></th>
+        <th appLocalization="Account.name">Name</th>
+        <th appLocalization="Account.type" class="d-none d-md-table-cell">Type</th>
+        <th appLocalization="Account.lastActivity" class="d-none d-md-table-cell">Last transaction</th>
+        <th appLocalization="Account.number" class="d-none d-md-table-cell">Account number</th>
+        <th appLocalization="common.account.saldo">Current value</th>
+      </tr>
+      </thead>
+      <tbody *ngIf="!loading">
+      <tr *ngFor="let account of accounts">
+        <td class="text-center">
+          <a [routerLink]="'/accounts/own/' + account.id + '/edit/'"
+             class="text-primary"
+             appLocalization="common.action.edit" location="title"><i class="fas fa-edit"></i></a>
+          <a href="javascript:void 0"
+             appLocalization="common.action.delete" location="title"
+             (click)="confirmDelete(account)"
+             class="text-danger"><i class="fas fa-trash-alt"></i></a>
+          <a href="javascript: void 0"
+             class="text-dark"
+             appLocalization="page.reports.default.reconcile" location="title"
+             (click)="onReconcileClick(account)"><i class="fas fa-check"></i></a>
+        </td>
+        <td>
+          <a [routerLink]="'./' + account.id + '/transactions'" class="text-primary">{{ account.name }}</a>
+        </td>
+        <td [appLocalization]="'AccountType.' + account.type " class="d-none d-md-table-cell"></td>
+        <td class="d-none d-md-table-cell">{{ account.history.lastTransaction | customDate }}</td>
+        <td class="d-none d-md-table-cell">
+          <span *ngIf="account.account.iban">{{ account.account.iban }}</span>
+          <span *ngIf="account.account.number && !account.account.iban" class="d-none d-lg-inline">{{ account.account.number }}</span>
+        </td>
+        <td>
+          <app-statistical-balance [account]="[account]" [currency]="account.account.currency"></app-statistical-balance>
+        </td>
+      </tr>
+      </tbody>
+      <tbody *ngIf="loading">
+      <tr>
+        <td colspan="6"><app-spinner></app-spinner></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card" *ngIf="reconciles && reconciles.length">
+  <div class="card-header">
+    <span appLocalization="page.accounts.reconcile.active"></span>
+  </div>
+  <div class="card-body">
+    <div class="alert alert-light" appLocalization="page.accounts.reconcile.active.explained">
+      info text
+    </div>
+
+    <table class="table table-hover table-responsive-sm table-sm mt-4">
+      <thead>
+      <tr>
+        <th rowspan="2"></th>
+        <th appLocalization="Account.name" rowspan="2" style="min-width: 20em"></th>
+        <th appLocalization="common.year" rowspan="2" width="75"></th>
+        <th appLocalization="common.start" colspan="2"></th>
+        <th appLocalization="common.end" colspan="2"></th>
+      </tr>
+      <tr>
+        <th appLocalization="common.expected" class="w-auto"></th>
+        <th appLocalization="common.actual" class="w-auto"></th>
+        <th appLocalization="common.expected" class="w-auto"></th>
+        <th appLocalization="common.actual" class="w-auto"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let process of reconciles">
+        <td>
+          <a href="javascript:void 0"
+             (click)="onReconcileClick(process.account, process.year - 1, process.value('openBalance'))"
+             appLocalization="page.accounts.reconcile.previous" location="title"
+             class="text-primary"><i class="fa fa-hammer"></i></a>
+          <a href="javascript:void 0"
+             (click)="closeReconcileTask(process)"
+             appLocalization="common.action.retry" location="title"
+             class="text-secondary"><i class="fa fa-redo"></i></a>
+          <a href="javascript:void 0"
+             (click)="confirmReconcileDelete(process)"
+             appLocalization="common.action.delete" location="title"
+             class="text-danger"><i class="fas fa-trash-alt"></i></a>
+        </td>
+        <td *ngIf="process.loaded">{{ process.account.name }}</td>
+        <td *ngIf="process.loaded">{{ process.year }}</td>
+        <td *ngIf="process.loaded" [appBalance]="process.value('openBalance')"></td>
+        <td *ngIf="process.loaded" [appBalance]="process.value('computedStartBalance')"></td>
+        <td *ngIf="process.loaded" [appBalance]="process.value('endBalance')"></td>
+        <td *ngIf="process.loaded" [appBalance]="process.value('computedEndBalance')"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

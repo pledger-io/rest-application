@@ -1,0 +1,154 @@
+<div class="row" *ngIf="budgetsLoaded">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header" appLocalization="page.reports.budget.incomePercent"></div>
+      <div class="card-body">
+        <div class="progress my-4" style="height: 5em">
+          <div class="progress-bar font-weight-bold animated slide-in-left" role="progressbar"
+               style="background-color: #6996b2!important"
+               [style.width]="percentageEarned +'%'" aria-valuemin="0" aria-valuemax="100">
+            {{ percentageEarned | number:'1.1-2' }}%
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header">
+        <span appLocalization="page.reports.budget.expensePercent"></span>
+        <span class="float-right">
+          <button class="btn btn-sm btn-link" (click)="download()"><span class="fa fa-download"></span></button>
+        </span>
+      </div>
+      <div class="card-body">
+        <div class="progress my-4" style="height: 5em">
+          <div class="progress-bar font-weight-bold animated slide-in-left" role="progressbar"
+               style="background-color: #de7370!important"
+               [style.width]="percentageSpent +'%'" aria-valuemin="0" aria-valuemax="100">
+            {{ percentageSpent | number:'1.1-2' }}%
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header" appLocalization="page.reports.budget.incomePercent"></div>
+      <div class="card-body">
+        <app-graph-display [endPoint]="'budgets/'+ range.computeStartYear() +'/graph/income'" (svg)="pdf.incomeSVG($event)"></app-graph-display>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-header" appLocalization="page.reports.budget.expensePercent"></div>
+      <div class="card-body">
+        <app-graph-display [endPoint]="'budgets/'+ range.computeStartYear() +'/graph/expenses'" (svg)="pdf.expenseSVG($event)"></app-graph-display>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row" *ngIf="budgetsLoaded">
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <table class="table table-sm table-responsive-md">
+          <thead>
+          <tr>
+            <th appLocalization="common.month"></th>
+            <th appLocalization="Transaction.budget"></th>
+            <th appLocalization="graph.series.budget.actual"></th>
+            <th appLocalization="common.difference"></th>
+            <th appLocalization="common.percentage"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let statistic of budgets">
+            <td>
+              <span [appLocalization]="'common.month.' + (statistic.range.computeStartMonth() + 1)"></span>
+            </td>
+            <td>
+              <span [appBalance]="statistic.budget.income"></span>
+            </td>
+            <td>
+              <span [appBalance]="statistic.actualIncome" [currency]="currency"></span>
+            </td>
+            <td>
+              <span [appBalance]="statistic.actualIncome - statistic.budget.income" [currency]="currency"></span>
+            </td>
+            <td [class.text-green]="(statistic.actualIncome / statistic.budget.income) > 1"
+                [class.text-danger]="(statistic.actualIncome / statistic.budget.income) < 1">
+              {{ (statistic.actualIncome / statistic.budget.income) - 1 | percent:'1.2' }}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <table class="table table-sm table-responsive-md">
+          <thead>
+          <tr>
+            <th appLocalization="common.month"></th>
+            <th appLocalization="Transaction.budget"></th>
+            <th appLocalization="graph.series.budget.actual"></th>
+            <th appLocalization="common.difference"></th>
+            <th appLocalization="common.percentage"></th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let statistic of budgets">
+            <td>
+              <span [appLocalization]="'common.month.' + (statistic.range.computeStartMonth() + 1)"></span>
+            </td>
+            <td>
+              <span [appBalance]="-statistic.budget.totalExpenses"></span>
+            </td>
+            <td>
+              <span [appBalance]="statistic.actualSpent" [currency]="currency"></span>
+            </td>
+            <td>
+              <span [appBalance]="statistic.budget.totalExpenses + statistic.actualSpent"></span>
+            </td>
+            <td [class.text-danger]="Math.abs(statistic.actualSpent / statistic.budget.totalExpenses) > 1"
+                [class.text-green]="Math.abs(statistic.actualSpent / statistic.budget.totalExpenses) < 1">
+              {{ (statistic.actualSpent / statistic.budget.totalExpenses) + 1 | percent:'1.2' }}
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card print-break-before">
+  <div class="card-body">
+    <table class="table table-sm table-responsive-lg">
+      <thead>
+      <tr>
+        <th appLocalization="Budget.Expense.name"></th>
+        <th *ngFor="let statistic of budgets">
+          <span [appLocalization]="'common.month.' + (statistic.range.computeStartMonth() + 1)"></span>
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let expense of expenses">
+        <td>{{ expense.name }}</td>
+        <td *ngFor="let statistic of budgets">
+          <app-statistical-balance [range]="statistic.range" [expenses]="[expense]" [onlyIncome]="false" [currency]="currency"></app-statistical-balance>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

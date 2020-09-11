@@ -1,0 +1,76 @@
+<div class="card">
+  <form #contractForm="ngForm" autocomplete="off">
+    <div class="card-header">
+      <span appLocalization="page.budget.contracts.add"></span>
+    </div>
+
+    <div class="card-body">
+      <app-error-message></app-error-message>
+
+      <div class="form-group row">
+        <label for="name" class="col-sm-2 col-form-label" appLocalization="Contract.name"></label>
+        <div class="col-sm-10">
+          <app-input-field control="Contract">
+            <input type="text" class="form-control" id="name" name="name"
+                   appLocalization="Contract.name" location="placeholder"
+                   [(ngModel)]="model.name" required>
+          </app-input-field>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="company" class="col-sm-2 col-form-label" appLocalization="Contract.company"></label>
+        <div class="col-sm-10">
+          <app-autocomplete [(model)]="model.company"
+                            [type]="EntityType.CREDIT_ACCOUNT"
+                            name="company"></app-autocomplete>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="start" class="col-sm-2 col-form-label" appLocalization="Contract.start"></label>
+        <div class="col-sm-4 col-md-3">
+          <div class="input-group">
+            <input type="text" class="form-control" id="start" name="start" required
+                   ngbDatepicker [(ngModel)]="model.start" #startDate="ngbDatepicker"
+                   appLocalization="Contract.start" location="placeholder">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary fa fa-calendar" (click)="startDate.toggle()" type="button"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="end" class="col-sm-2 col-form-label" appLocalization="Contract.end"></label>
+        <div class="col-sm-4 col-md-3">
+          <div class="input-group">
+            <input type="text" class="form-control" id="end" name="end" required
+                   ngbDatepicker [(ngModel)]="model.end" #endDate="ngbDatepicker"
+                   appLocalization="Contract.end" location="placeholder">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary fa fa-calendar" (click)="endDate.toggle()" type="button"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <label for="name" class="col-sm-2 col-form-label" appLocalization="Contract.description"></label>
+        <div class="col-sm-10">
+          <app-input-field control="Contract">
+            <textarea class="form-control" id="description" name="description"
+                      appLocalization="Contract.description" location="placeholder"
+                      [(ngModel)]="model.description" rows="5">
+            </textarea>
+          </app-input-field>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <button type="button" class="btn btn-sm btn-primary" [disabled]="contractForm.invalid" (click)="save()">
+        <i class="far fa-dot-circle"></i>
+        <span appLocalization="common.action.save"></span>
+      </button>
+      <app-back-button></app-back-button>
+    </div>
+  </form>
+</div>

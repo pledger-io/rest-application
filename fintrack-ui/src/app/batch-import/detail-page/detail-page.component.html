@@ -1,0 +1,130 @@
+<div class="row">
+  <div class="col-sm-4">
+    <div class="card">
+      <div class="card-header">
+        <span appLocalization="page.settings.import.details"></span>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-5" appLocalization="BatchImport.slug"></div>
+          <div class="col-sm-6">{{ batchImport.slug }}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5" appLocalization="BatchImport.created"></div>
+          <div class="col-sm-6">{{ batchImport.created | customDate }}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5" appLocalization="BatchImport.finished"></div>
+          <div class="col-sm-6">{{ batchImport.finished | customDate }}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5" appLocalization="BatchImport.totalExpenses"></div>
+          <div class="col-sm-6">
+            <app-statistical-balance onlyIncome="false" [importSlug]="batchImport.slug"></app-statistical-balance>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5" appLocalization="BatchImport.totalIncome"></div>
+          <div class="col-sm-6">
+            <app-statistical-balance onlyIncome="true" [importSlug]="batchImport.slug"></app-statistical-balance>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5" appLocalization="page.settings.import.transactionCount"></div>
+          <div class="col-sm-6">
+            <span *ngIf="!empty">{{ page.info.records }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span appLocalization="page.title.transactions.overview">Checking accounts</span>
+  </div>
+  <div class="card-body">
+    <app-error-message></app-error-message>
+
+    <table class="table table-responsive-sm table-hover table-sm mt-4">
+      <thead>
+      <tr>
+        <th>
+          <a *ngIf="hasSelection"
+             (click)="openMultiEdit()"
+             href="javascript:void 0" appLocalization="common.action.edit" location="title"><i class="fas fa-edit"></i></a>
+        </th>
+        <th appLocalization="Transaction.date">Date</th>
+        <th appLocalization="Transaction.description">Description</th>
+        <th appLocalization="Transaction.amount">Amount</th>
+        <th appLocalization="Transaction.source">Amount</th>
+        <th appLocalization="Transaction.to">Amount</th>
+        <th appLocalization="Transaction.category">Category</th>
+        <th appLocalization="Transaction.budget">Budget</th>
+        <th width="15"></th>
+      </tr>
+      </thead>
+      <tbody *ngIf="!empty && !loading">
+      <tr *ngFor="let transaction of page.content">
+        <td class="pl-4">
+          <input type="checkbox" class="form-check-input"
+                 [checked]="transactionSelected(transaction.id)"
+                 (change)="toggleTransaction(transaction.id)"/>
+          <a [routerLink]="'/accounts/own/' + transaction.source.id + '/transaction/' + transaction.id + '/edit'"
+             class="text-primary" data-toggle="tooltip"
+             data-placement="bottom"
+             appLocalization="common.action.edit" location="title"><i class="fas fa-edit"></i></a>
+          <a href="javascript:void 0"
+             data-confirm-ok-class="btn-danger"
+             appLocalization="common.action.delete"
+             location="title"
+             (click)="confirmDelete(transaction)"
+             class="text-danger" data-toggle="tooltip" data-placement="bottom" ><i class="fas fa-trash-alt"></i></a>
+        </td>
+        <td>{{ transaction.dates.transaction | customDate }}</td>
+        <td>{{ transaction.description }}</td>
+        <td class="small">
+          <span *ngIf="transaction.source.isOwn()" [appBalance]="-transaction.amount" [currency]="transaction.currency"></span>
+          <span *ngIf="transaction.destination.isOwn()" [appBalance]="transaction.amount" [currency]="transaction.currency"></span>
+        </td>
+        <td>
+          <a [routerLink]="'/accounts/'+ transaction.source.type +'/' + transaction.source.id + '/transactions/'">{{ transaction.source.name }}</a>
+        </td>
+        <td>
+          <a [routerLink]="'/accounts/'+ transaction.destination.type +'/' + transaction.destination.id + '/transactions/'">{{ transaction.destination.name }}</a>
+        </td>
+        <td>{{ transaction.metadata.category }}</td>
+        <td>{{ transaction.metadata.budget }}</td>
+        <td>
+          <span *ngIf="transaction.metadata.failureCode"
+                 [appLocalization]="'Transaction.failureCode.' + transaction.metadata.failureCode"
+                 location="title"><i class="fas fa-exclamation-circle"></i></span>
+        </td>
+      </tr>
+      </tbody>
+      <tbody *ngIf="empty && !loading">
+      <tr>
+        <td colspan="9" class="text-center text-muted text-lowercase" appLocalization="common.overview.noresults"></td>
+      </tr>
+      </tbody>
+      <tbody *ngIf="loading">
+      <tr>
+        <td colspan="9"><app-spinner></app-spinner></td>
+      </tr>
+      </tbody>
+    </table>
+
+    <ngb-pagination
+      size="sm"
+      class="d-flex justify-content-center"
+      *ngIf="page"
+      [(page)]="pager.page"
+      [pageSize]="pager.pageSize"
+      [maxSize]="10" [rotate]="true" [ellipses]="false" [boundaryLinks]="true"
+      [collectionSize]="page.info.records"
+      (pageChange)="pageChanged()"></ngb-pagination>
+  </div>
+</div>

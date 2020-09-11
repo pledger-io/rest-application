@@ -1,0 +1,20 @@
+@import "../../shared/forms";
+
+.wizard {
+
+  .wizard-steps {
+    margin: -1.25rem -1.25rem 1.25rem -1.25rem;
+    position: relative;
+    display: table;
+    width: calc(100% + 2.5rem);
+
+    & > span {
+      display: table-cell;
+      height: 50px;
+      vertical-align: middle;
+      padding: 0 20px;
+      min-width: 75px;
+    }
+  }
+
+}

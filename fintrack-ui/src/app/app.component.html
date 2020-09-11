@@ -1,0 +1,16 @@
+<div [class.sidebar-show]="sidebarService.isVisible()">
+  <app-header></app-header>
+
+  <main class="app-body" data-navigation="nav-item-checking">
+    <app-sidebar></app-sidebar>
+    <div class="main">
+      <app-breadcrumb *ngIf="authorizationService.authorized"></app-breadcrumb>
+
+      <div class="container-fluid">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </main>
+</div>
+
+<app-toasty aria-live="polite" aria-atomic="true"></app-toasty>
