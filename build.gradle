@@ -1,19 +1,6 @@
 buildscript {
     repositories {
         jcenter()
-
-        maven {
-            url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-            mavenContent{
-                releasesOnly()
-            }
-        }
-        maven {
-            url 'https://oss.sonatype.org/content/repositories/snapshots/'
-            mavenContent{
-                snapshotsOnly()
-            }
-        }
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.0.0'
@@ -28,8 +15,20 @@ plugins {
 allprojects {
     repositories {
         mavenCentral()
-        mavenLocal()
         jcenter()
+
+        maven {
+            url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            mavenContent{
+                releasesOnly()
+            }
+        }
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+            mavenContent{
+                snapshotsOnly()
+            }
+        }
     }
 }
 

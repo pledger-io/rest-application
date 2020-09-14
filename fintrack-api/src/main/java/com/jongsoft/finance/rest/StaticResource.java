@@ -9,7 +9,6 @@ import java.net.URL;
 
 import javax.inject.Inject;
 
-import io.micronaut.core.io.IOUtils;
 import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -21,7 +20,9 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.reactivex.Single;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 
 @Slf4j
 @Controller
@@ -37,7 +38,7 @@ public class StaticResource {
     }
 
     @Get("/favicon.ico")
-    public HttpResponse<?> favicon() throws IOException {
+    public Single<HttpResponse<?>> favicon() throws IOException {
         return resource("assets/favicon.ico");
     }
 
@@ -55,22 +56,27 @@ public class StaticResource {
     }
 
     @Get("/ui/{path:(.+)\\.[\\w]+$}")
-    public HttpResponse<?> resource(@PathVariable String path) throws IOException {
+    public Single<HttpResponse<?>> resource(@PathVariable String path) throws IOException {
         log.info("Loading static resource: {}", path);
 
-        var actualResource = res.getResource("classpath:public/" + path);
-        if (actualResource.isEmpty()) {
-            return HttpResponse.notFound("Resource at path " + path  + " is not found on the server");
-        } else {
-            return loadFromUri(actualResource.get());
-        }
+        return Single.create(emitter -> {
+            var actualResource = res.getResource("classpath:public/" + path);
+            if (actualResource.isEmpty()) {
+                emitter.onSuccess(HttpResponse.notFound(
+                        "Resource at path " + path  + " is not found on the server"));
+            } else {
+                emitter.onSuccess(loadFromUri(actualResource.get()));
+            }
+        });
     }
 
     private HttpResponse<?> loadFromUri(URL uri) throws IOException {
         var streamedFile = new StreamedFile(uri);
-        var reader = new BufferedReader(new InputStreamReader(streamedFile.getInputStream()));
 
-        return HttpResponse.ok(IOUtils.readText(reader))
+        return HttpResponse.ok(
+                IOUtils.readFully(
+                        streamedFile.getInputStream(),
+                        (int) streamedFile.getLength()))
                 .contentType(streamedFile.getMediaType())
                 .characterEncoding("utf-8");
     }
