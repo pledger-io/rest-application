@@ -1,6 +1,19 @@
 buildscript {
     repositories {
         jcenter()
+
+        maven {
+            url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            mavenContent{
+                releasesOnly()
+            }
+        }
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+            mavenContent{
+                snapshotsOnly()
+            }
+        }
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.0.0'
@@ -15,6 +28,7 @@ plugins {
 allprojects {
     repositories {
         mavenCentral()
+        mavenLocal()
         jcenter()
     }
 }
@@ -22,9 +36,6 @@ allprojects {
 subprojects {
     apply plugin: "com.diffplug.eclipse.apt"
     apply plugin: 'java'
-
-    version "2.0.0"
-    group "com.jongsoft.finance"
 
     java {
         sourceCompatibility = JavaVersion.toVersion('14')

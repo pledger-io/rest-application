@@ -1,9 +1,0 @@
-<select id="currency" name="currency" [class]="class"
-        [compareWith]="compare"
-        [(ngModel)]="selected"
-        (ngModelChange)="update()"
-        [disabled]="readonly">
-  <option value="" *ngIf="optional"></option>
-  <option [ngValue]="currency"
-          *ngFor="let currency of currencies">{{ currency.symbol }}</option>
-</select>

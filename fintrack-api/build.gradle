@@ -19,8 +19,9 @@ dependencies {
 
     implementation("com.jongsoft.utils:highchart-core:2.3.2")
 
-    implementation project(':core'), project(':domain'), project(':jpa-repository'), project(':bpmn-process'), project(':fintrack-ui')
-}
+    implementation("com.jongsoft.finance:fintrack-ui:${version}")
+    implementation project(':core'), project(':domain'), project(':jpa-repository'), project(':bpmn-process')
+};
 
 mainClassName = "com.jongsoft.finance.Application"
 
