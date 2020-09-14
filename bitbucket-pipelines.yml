@@ -5,6 +5,5 @@ pipelines:
     - step:
         caches:
           - gradle
-          - node
         script:
-          - bash ./gradlew build
+          - bash ./gradlew test
