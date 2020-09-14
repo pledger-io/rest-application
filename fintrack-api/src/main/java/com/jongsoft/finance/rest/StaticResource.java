@@ -1,14 +1,5 @@
 package com.jongsoft.finance.rest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import javax.inject.Inject;
-
 import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -21,8 +12,15 @@ import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 @Slf4j
 @Controller
@@ -38,10 +36,12 @@ public class StaticResource {
     }
 
     @Get("/favicon.ico")
-    public Single<HttpResponse<?>> favicon() throws IOException {
+    @Operation(hidden = true)
+    public Single<HttpResponse<?>> favicon() {
         return resource("assets/favicon.ico");
     }
 
+    @Operation(hidden = true)
     @Get("/ui/{path:([^\\.]+)$}")
     @Produces(MediaType.TEXT_HTML)
     public HttpResponse<?> refresh(HttpRequest<?> request, @PathVariable String path) throws IOException {
@@ -55,8 +55,9 @@ public class StaticResource {
         }
     }
 
+    @Operation(hidden = true)
     @Get("/ui/{path:(.+)\\.[\\w]+$}")
-    public Single<HttpResponse<?>> resource(@PathVariable String path) throws IOException {
+    public Single<HttpResponse<?>> resource(@PathVariable String path) {
         log.info("Loading static resource: {}", path);
 
         return Single.create(emitter -> {

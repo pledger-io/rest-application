@@ -1,13 +1,14 @@
 package com.jongsoft.finance.jpa.core;
 
-import javax.persistence.EntityManager;
-
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.jpa.FilterDelegate;
+import com.jongsoft.finance.jpa.ResultPageImpl;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+
+import javax.persistence.EntityManager;
 
 public abstract class DataProviderJpa<T, Y extends EntityJpa>
         extends RepositoryJpa {
@@ -61,27 +62,10 @@ public abstract class DataProviderJpa<T, Y extends EntityJpa>
         long hits = singleValue(countquery);
         Sequence<T> page = this.<Y>multiValue(query).map(this::convert);
 
-        return new ResultPage<>() {
-            @Override
-            public int pages() {
-                return limit.isPresent() ? (int) hits / limit.get() : 1;
-            }
-
-            @Override
-            public long total() {
-                return hits;
-            }
-
-            @Override
-            public boolean hasNext() {
-                return hits > (offset.getOrSupply(() -> 0) + page.size());
-            }
-
-            @Override
-            public Sequence<T> content() {
-                return page;
-            }
-        };
+        return new ResultPageImpl<>(
+                page,
+                limit.getOrSupply(() -> Integer.MAX_VALUE),
+                hits);
     }
 
 

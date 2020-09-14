@@ -3,6 +3,8 @@ package com.jongsoft.finance.domain.core;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 
+import java.util.function.Function;
+
 public interface ResultPage<T> {
 
     default int pages() {
@@ -25,8 +27,10 @@ public interface ResultPage<T> {
         return false;
     }
 
+    <R> ResultPage<R> map(Function<T, R> mapper);
+
     static <T> ResultPage<T> empty() {
-        return new ResultPage<T>() {};
+        return ResultPage.of();
     }
 
     static <T> ResultPage<T> of(T...elements) {
@@ -34,6 +38,11 @@ public interface ResultPage<T> {
             @Override
             public Sequence<T> content() {
                 return API.List(elements);
+            }
+
+            @Override
+            public <R> ResultPage<R> map(Function<T, R> mapper) {
+                throw new IllegalStateException();
             }
         };
     }
