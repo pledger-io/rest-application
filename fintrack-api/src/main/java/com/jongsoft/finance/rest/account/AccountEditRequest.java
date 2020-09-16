@@ -1,9 +1,15 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.schedule.Periodicity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 class AccountEditRequest {
 
     @NotNull

@@ -9,16 +9,19 @@ import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.rest.model.AccountResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
-import com.jongsoft.lang.collection.List;
 import io.micronaut.http.annotation.*;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller("/api/accounts")
 @Tag(name = "Account information")
+@Secured(SecurityRule.IS_AUTHENTICATED)
 public class AccountResource {
 
     private final SettingProvider settingProvider;
@@ -53,7 +56,7 @@ public class AccountResource {
            var response = accounts.content()
                    .map(AccountResponse::new);
 
-           emitter.onSuccess(response);
+           emitter.onSuccess(response.toJava());
         });
     }
 
@@ -69,7 +72,7 @@ public class AccountResource {
             var response = accounts.content()
                     .map(AccountResponse::new);
 
-            emitter.onSuccess(response);
+            emitter.onSuccess(response.toJava());
         });
     }
 
@@ -89,7 +92,7 @@ public class AccountResource {
             var response = accounts.content()
                     .map(AccountResponse::new);
 
-            emitter.onSuccess(response);
+            emitter.onSuccess(response.toJava());
         });
     }
 

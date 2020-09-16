@@ -42,7 +42,7 @@ public interface ResultPage<T> {
 
             @Override
             public <R> ResultPage<R> map(Function<T, R> mapper) {
-                throw new IllegalStateException();
+                return (ResultPage<R>) ResultPage.of(API.List(elements).iterator().toNativeArray());
             }
         };
     }
