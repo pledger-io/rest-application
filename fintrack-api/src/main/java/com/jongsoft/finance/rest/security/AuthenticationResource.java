@@ -1,24 +1,12 @@
 package com.jongsoft.finance.rest.security;
 
-import java.util.Map;
-
-import javax.validation.Valid;
-
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
-
 import com.jongsoft.finance.security.PasswordEncoder;
-
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.MutableHttpResponse;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.AuthenticationProvider;
 import io.micronaut.security.authentication.UserDetails;
@@ -29,10 +17,15 @@ import io.micronaut.security.token.jwt.signature.rsa.RSASignatureConfiguration;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
+
+import javax.validation.Valid;
+import java.util.Map;
 
 @Tag(name = "Authentication")
 @Controller(consumes = MediaType.APPLICATION_JSON)
-public class LoginResource {
+public class AuthenticationResource {
 
     private final AccessRefreshTokenGenerator accessRefreshTokenGenerator;
     private final AuthenticationProvider authenticationProvider;
@@ -42,7 +35,7 @@ public class LoginResource {
     private final PasswordEncoder passwordEncoder;
     private final ProcessEngine processEngine;
 
-    public LoginResource(
+    public AuthenticationResource(
             final AccessRefreshTokenGenerator accessRefreshTokenGenerator,
             final AuthenticationProvider authenticationProvider,
             final RSASignatureConfiguration rsaSignatureConfiguration,
