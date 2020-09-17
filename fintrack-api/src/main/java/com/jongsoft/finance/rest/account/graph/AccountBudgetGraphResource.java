@@ -15,11 +15,17 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.RequestAttribute;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Locale;
 
+@Tag(name = "Account information")
 @Controller("/api/accounts/{id}/transactions/graph/budget/{start}/{end}")
 public class AccountBudgetGraphResource extends BudgetPieChart {
 
@@ -38,6 +44,14 @@ public class AccountBudgetGraphResource extends BudgetPieChart {
     }
 
     @Get
+    @Operation(
+            summary = "Generate an account budget pie chart",
+            parameters = {
+                    @Parameter(name = "id", in = ParameterIn.PATH, description = "The account identifier", schema = @Schema(implementation = Long.class)),
+                    @Parameter(name = "start", in = ParameterIn.PATH, description = "The start date", schema = @Schema(implementation = LocalDate.class)),
+                    @Parameter(name = "end", in = ParameterIn.PATH, description = "The end date", schema = @Schema(implementation = LocalDate.class))
+            }
+    )
     Highchart budget(
             @PathVariable long id,
             @PathVariable LocalDate start,

@@ -14,11 +14,17 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.RequestAttribute;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Locale;
 
+@Tag(name = "Account information")
 @Controller("/api/accounts/{id}/transactions/graph/category")
 public class AccountCategoryGraphResource extends CategoryPieChart {
 
@@ -37,6 +43,14 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
     }
 
     @Get("expenses/{start}/{end}")
+    @Operation(
+            summary = "Generate an account category expense pie chart",
+            parameters = {
+                    @Parameter(name = "id", in = ParameterIn.PATH, description = "The account identifier", schema = @Schema(implementation = Long.class)),
+                    @Parameter(name = "start", in = ParameterIn.PATH, description = "The start date", schema = @Schema(implementation = LocalDate.class)),
+                    @Parameter(name = "end", in = ParameterIn.PATH, description = "The end date", schema = @Schema(implementation = LocalDate.class))
+            }
+    )
     Highchart expenses(
             @PathVariable long id,
             @PathVariable LocalDate start,
@@ -53,6 +67,14 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
     }
 
     @Get("income/{start}/{end}")
+    @Operation(
+            summary = "Generate an account category income pie chart",
+            parameters = {
+                    @Parameter(name = "id", in = ParameterIn.PATH, description = "The account identifier", schema = @Schema(implementation = Long.class)),
+                    @Parameter(name = "start", in = ParameterIn.PATH, description = "The start date", schema = @Schema(implementation = LocalDate.class)),
+                    @Parameter(name = "end", in = ParameterIn.PATH, description = "The end date", schema = @Schema(implementation = LocalDate.class))
+            }
+    )
     Highchart income(
             @PathVariable long id,
             @PathVariable LocalDate start,

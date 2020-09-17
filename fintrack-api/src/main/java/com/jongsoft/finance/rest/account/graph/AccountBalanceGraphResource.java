@@ -27,6 +27,10 @@ import io.micronaut.http.annotation.RequestAttribute;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.mutable.MutableDouble;
 
 import java.time.LocalDate;
@@ -37,6 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+@Tag(name = "Account information")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/accounts/{id}/transactions/graph/balance/{start}/{end}")
 public class AccountBalanceGraphResource {
@@ -63,7 +68,12 @@ public class AccountBalanceGraphResource {
 
     @Get
     @Operation(
-            summary = "Generate an account balance graph"
+            summary = "Generate an account balance graph",
+            parameters = {
+                    @Parameter(name = "id", in = ParameterIn.PATH, description = "The account identifier", schema = @Schema(implementation = Long.class)),
+                    @Parameter(name = "start", in = ParameterIn.PATH, description = "The start date", schema = @Schema(implementation = LocalDate.class)),
+                    @Parameter(name = "end", in = ParameterIn.PATH, description = "The end date", schema = @Schema(implementation = LocalDate.class))
+            }
     )
     Highchart balance(
             @PathVariable long id,
