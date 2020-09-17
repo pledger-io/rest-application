@@ -1,0 +1,62 @@
+package com.jongsoft.finance.rest.account.graph;
+
+import com.jongsoft.finance.domain.FilterFactory;
+import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.domain.core.Currency;
+import com.jongsoft.finance.domain.core.CurrencyProvider;
+import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.domain.user.BudgetProvider;
+import com.jongsoft.finance.filter.RequestAttributes;
+import com.jongsoft.finance.graph.BudgetPieChart;
+import com.jongsoft.highchart.Highchart;
+import com.jongsoft.lang.API;
+import io.micronaut.context.MessageSource;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.RequestAttribute;
+
+import java.security.Principal;
+import java.time.LocalDate;
+import java.util.Locale;
+
+@Controller("/api/accounts/{id}/transactions/graph/budget/{start}/{end}")
+public class AccountBudgetGraphResource extends BudgetPieChart {
+
+    private final AccountProvider accountProvider;
+    private final CurrencyProvider currencyProvider;
+
+    public AccountBudgetGraphResource(
+            MessageSource messageSource,
+            FilterFactory filterFactory,
+            AccountProvider accountProvider,
+            TransactionProvider transactionService,
+            BudgetProvider budgetService, CurrencyProvider currencyProvider) {
+        super(messageSource, filterFactory, transactionService, budgetService);
+        this.accountProvider = accountProvider;
+        this.currencyProvider = currencyProvider;
+    }
+
+    @Get
+    Highchart budget(
+            @PathVariable long id,
+            @PathVariable LocalDate start,
+            @PathVariable LocalDate end,
+            @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
+            Principal principal) {
+        var account = accountProvider.lookup(id)
+                .filter(a -> a.getUser().getUsername().equals(principal.getName()))
+                .get();
+
+        return createChart(currencySymbol(account.getCurrency()), locale)
+                .addSeries(createSeries(API.List(account), start, end, locale));
+    }
+
+    private String currencySymbol(String code) {
+        return currencyProvider.lookup(code)
+                .map(Currency::getSymbol)
+                .map(String::valueOf)
+                .getOrSupply(() -> "");
+    }
+
+}
