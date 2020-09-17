@@ -124,7 +124,7 @@ public class TransactionResponse {
         }
 
         public double getAmount() {
-            return wrapped.getAmount();
+            return Math.abs(wrapped.getAmount());
         }
     }
 }

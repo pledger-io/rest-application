@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.security.Principal;
 import java.util.function.Consumer;
 
@@ -135,7 +136,7 @@ public class AccountTransactionResource {
                     builderConsumer);
 
             transaction.register();
-            emitter.onSuccess(HttpResponse.created(null));
+            emitter.onSuccess(HttpResponse.created(new URI("/accounts/"+ fromAccount.getId() +"/transactions")));
         });
     }
 

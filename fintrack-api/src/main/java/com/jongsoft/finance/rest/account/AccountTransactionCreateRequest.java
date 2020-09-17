@@ -1,7 +1,6 @@
 package com.jongsoft.finance.rest.account;
 
-import lombok.Data;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -13,6 +12,8 @@ import java.util.List;
 class AccountTransactionCreateRequest {
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     static class EntityRef {
         @NotNull
         private Long id;
@@ -44,6 +45,23 @@ class AccountTransactionCreateRequest {
     private EntityRef budget;
     private EntityRef contract;
     private List<String> tags;
+
+    @Builder
+    @Generated
+    public AccountTransactionCreateRequest(@NotNull LocalDate date, LocalDate interestDate, LocalDate bookDate, @NotNull @NotBlank String currency, @NotBlank @Size(max = 1024) String description, @NotNull double amount, @NotNull EntityRef source, @NotNull EntityRef destination, EntityRef category, EntityRef budget, EntityRef contract, List<String> tags) {
+        this.date = date;
+        this.interestDate = interestDate;
+        this.bookDate = bookDate;
+        this.currency = currency;
+        this.description = description;
+        this.amount = amount;
+        this.source = source;
+        this.destination = destination;
+        this.category = category;
+        this.budget = budget;
+        this.contract = contract;
+        this.tags = tags;
+    }
 
     public LocalDate getDate() {
         return date;
