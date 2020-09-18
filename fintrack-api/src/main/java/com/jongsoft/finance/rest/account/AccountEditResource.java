@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.rest.NotFoundException;
 import com.jongsoft.finance.rest.model.AccountResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
@@ -37,7 +38,7 @@ public class AccountEditResource {
 
     @Get
     @Operation(
-            summary = "Get a single account",
+            summary = "Get Account",
             description = "Look in the system for an account with matching account id",
             parameters = @Parameter(name = "accountId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
             responses = {
@@ -47,18 +48,18 @@ public class AccountEditResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Single<HttpResponse<AccountResponse>> get(@PathVariable long accountId) {
+    Single<AccountResponse> get(@PathVariable long accountId) {
         return Single.create(emitter -> {
-           var account = getOrFail(emitter, accountId);
-           if (account.isPresent()) {
-               emitter.onSuccess(HttpResponse.ok(new AccountResponse(account.get())));
-           }
+            accountProvider.lookup(accountId)
+                    .map(AccountResponse::new)
+                    .ifPresent(emitter::onSuccess)
+                    .elseRun(() -> emitter.onError(new NotFoundException("Account not found")));
         });
     }
 
     @Post
     @Operation(
-            summary = "Update one of your accounts",
+            summary = "Update Account",
             parameters = @Parameter(name = "accountId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
             responses = {
                     @ApiResponse(responseCode = "200", description = "The updated account",
@@ -98,7 +99,7 @@ public class AccountEditResource {
 
     @Delete
     @Operation(
-            summary = "Delete one of your accounts",
+            summary = "Delete Account",
             parameters = @Parameter(name = "accountId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
             responses = {
                     @ApiResponse(responseCode = "204", description = "Account successfully deleted"),

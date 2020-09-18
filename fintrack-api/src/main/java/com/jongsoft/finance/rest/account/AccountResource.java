@@ -45,7 +45,7 @@ public class AccountResource {
 
     @Get("/my-own")
     @Operation(
-            summary = "List all accounts marked as owned",
+            summary = "List own accounts",
             description = "List all accounts that are creatable in the front-end using one of the selectable account types"
     )
     Single<List<AccountResponse>> ownAccounts() {
@@ -62,7 +62,7 @@ public class AccountResource {
 
     @Get("/all")
     @Operation(
-            summary = "Fetch all accounts in the system",
+            summary = "List all accounts",
             description = "Fetch all accounts registered to the authenticated user"
     )
     Single<List<AccountResponse>> allAccounts() {
@@ -78,7 +78,7 @@ public class AccountResource {
 
     @Get("/auto-complete")
     @Operation(
-            summary = "Search in the accounts based upon the partial name",
+            summary = "Autocomplete accounts",
             description = "Performs a search operation based on the partial name (token) of the given account type"
     )
     Single<List<AccountResponse>> autocomplete(@QueryValue String token, @QueryValue String type) {
@@ -98,7 +98,7 @@ public class AccountResource {
 
     @Post
     @Operation(
-            summary = "Search in the accounts",
+            summary = "Search accounts",
             description = "Search through all accounts using the provided filter set"
     )
     Single<ResultPageResponse<AccountResponse>> accounts(@Valid @Body AccountSearchRequest searchRequest) {
@@ -120,7 +120,7 @@ public class AccountResource {
 
     @Put
     @Operation(
-            summary = "Create a new account",
+            summary = "Create account",
             description = "This operation will allow for adding new accounts to the system"
     )
     public Single<AccountResponse> create(@Valid @Body AccountEditRequest accountEditRequest) {

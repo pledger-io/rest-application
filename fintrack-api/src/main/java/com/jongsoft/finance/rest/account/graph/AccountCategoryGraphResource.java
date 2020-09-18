@@ -24,7 +24,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Locale;
 
-@Tag(name = "Account information")
+@Tag(name = "Graph Generation")
 @Controller("/api/accounts/{id}/transactions/graph/category")
 public class AccountCategoryGraphResource extends CategoryPieChart {
 
@@ -44,7 +44,8 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
 
     @Get("expenses/{start}/{end}")
     @Operation(
-            summary = "Generate an account category expense pie chart",
+            summary = "Account Category Expense Graph",
+            description = "Generate an account category expense pie chart",
             parameters = {
                     @Parameter(name = "id", in = ParameterIn.PATH, description = "The account identifier", schema = @Schema(implementation = Long.class)),
                     @Parameter(name = "start", in = ParameterIn.PATH, description = "The start date", schema = @Schema(implementation = LocalDate.class)),
@@ -68,7 +69,8 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
 
     @Get("income/{start}/{end}")
     @Operation(
-            summary = "Generate an account category income pie chart",
+            summary = "Account Category Income Graph",
+            description = "Generate an account category income pie chart",
             parameters = {
                     @Parameter(name = "id", in = ParameterIn.PATH, description = "The account identifier", schema = @Schema(implementation = Long.class)),
                     @Parameter(name = "start", in = ParameterIn.PATH, description = "The start date", schema = @Schema(implementation = LocalDate.class)),

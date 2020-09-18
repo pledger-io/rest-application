@@ -3,6 +3,7 @@ package com.jongsoft.finance.rest.account;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.rest.NotFoundException;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
@@ -36,10 +37,8 @@ class AccountEditResourceTest extends TestSetup {
 
     @Test
     void get_missing() {
-        var response = subject.get(1L).blockingGet();
-
-        Mockito.verify(accountProvider).lookup(1L);
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
+        org.junit.jupiter.api.Assertions.assertThrows(NotFoundException.class,
+                () -> subject.get(1L).blockingGet());
     }
 
     @Test
@@ -56,7 +55,6 @@ class AccountEditResourceTest extends TestSetup {
         var response = subject.get(123L).blockingGet();
 
         Mockito.verify(accountProvider).lookup(123L);
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
     }
 
     @Test
