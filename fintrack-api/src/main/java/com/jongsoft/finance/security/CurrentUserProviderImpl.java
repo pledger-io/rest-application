@@ -1,13 +1,14 @@
 package com.jongsoft.finance.security;
 
-import javax.inject.Singleton;
-
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
-
 import io.micronaut.security.utils.SecurityService;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 @Singleton
+@Named("currentUserProvider")
 public class CurrentUserProviderImpl implements CurrentUserProvider {
 
     private final SecurityService securityService;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_11iudjt" targetNamespace="http://jong-soft.org/fintrack/user/register" exporter="Camunda Modeler" exporterVersion="3.0.1">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_11iudjt" targetNamespace="http://jong-soft.org/fintrack/user/register" exporter="Camunda Modeler" exporterVersion="3.7.3">
   <bpmn:process id="RegisterUserAccount" name="Register User Account" isExecutable="true" camunda:versionTag="1.0.0">
     <bpmn:startEvent id="se_register_account">
       <bpmn:outgoing>sf_locate_account</bpmn:outgoing>
@@ -19,7 +19,13 @@
       <bpmn:incoming>SequenceFlow_1q5pqa4</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_102zsei</bpmn:outgoing>
     </bpmn:sendTask>
-    <bpmn:serviceTask id="st_create_account" name="Create account" camunda:expression="${userService.create(username, passwordHash)}">
+    <bpmn:serviceTask id="st_create_account" name="Create account" camunda:class="com.jongsoft.finance.bpmn.delegate.user.CreateUserDelegate">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="username">${username}</camunda:inputParameter>
+          <camunda:inputParameter name="password">${passwordHash}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
       <bpmn:incoming>sf_account_free</bpmn:incoming>
       <bpmn:outgoing>sf_wait_for_mail</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -48,8 +54,7 @@
     <bpmn:serviceTask id="st_convert_mail_properties" name="Prepare mail contents" camunda:delegateExpression="${propertyConversionDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="user">${userService.getCurrentUser()}
-</camunda:inputParameter>
+          <camunda:inputParameter name="user">${currentUserProvider.currentUser()}</camunda:inputParameter>
           <camunda:outputParameter name="mailProperties">${propertyConversionResult}</camunda:outputParameter>
         </camunda:inputOutput>
         <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
@@ -61,22 +66,29 @@
   <bpmn:error id="Error_1kt8lal" name="DuplicateAccountException" errorCode="400" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="RegisterUserAccount">
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="se_register_account">
-        <dc:Bounds x="181" y="206" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0bv6skg_di" bpmnElement="sf_locate_account">
-        <di:waypoint x="217" y="224" />
-        <di:waypoint x="301" y="224" />
+      <bpmndi:BPMNEdge id="SequenceFlow_1q5pqa4_di" bpmnElement="SequenceFlow_1q5pqa4">
+        <di:waypoint x="997" y="113" />
+        <di:waypoint x="1070" y="113" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ExclusiveGateway_1sjapi2_di" bpmnElement="eg_account_exists" isMarkerVisible="true">
-        <dc:Bounds x="480" y="199" width="50" height="50" />
+      <bpmndi:BPMNEdge id="SequenceFlow_102zsei_di" bpmnElement="SequenceFlow_102zsei">
+        <di:waypoint x="1170" y="113" />
+        <di:waypoint x="1231" y="113" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ai6in3_di" bpmnElement="sf_account_taken">
+        <di:waypoint x="505" y="249" />
+        <di:waypoint x="505" y="336" />
+        <di:waypoint x="650" y="336" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="528" y="206" width="73" height="14" />
+          <dc:Bounds x="514" y="290" width="13" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_182ji34_di" bpmnElement="sf_decide_exists">
-        <di:waypoint x="401" y="224" />
-        <di:waypoint x="480" y="224" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_191lcjy_di" bpmnElement="SequenceFlow_191lcjy">
+        <di:waypoint x="838" y="113" />
+        <di:waypoint x="897" y="113" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1if5hip_di" bpmnElement="sf_wait_for_mail">
+        <di:waypoint x="718" y="113" />
+        <di:waypoint x="802" y="113" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1mnsywe_di" bpmnElement="sf_account_free">
         <di:waypoint x="505" y="199" />
@@ -86,10 +98,23 @@
           <dc:Bounds x="512" y="153" width="17" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_1if5hip_di" bpmnElement="sf_wait_for_mail">
-        <di:waypoint x="718" y="113" />
-        <di:waypoint x="802" y="113" />
+      <bpmndi:BPMNEdge id="SequenceFlow_182ji34_di" bpmnElement="sf_decide_exists">
+        <di:waypoint x="401" y="224" />
+        <di:waypoint x="480" y="224" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0bv6skg_di" bpmnElement="sf_locate_account">
+        <di:waypoint x="217" y="224" />
+        <di:waypoint x="301" y="224" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="se_register_account">
+        <dc:Bounds x="181" y="206" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_1sjapi2_di" bpmnElement="eg_account_exists" isMarkerVisible="true">
+        <dc:Bounds x="480" y="199" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="528" y="206" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="SendTask_00cdvq2_di" bpmnElement="st_send_welcome_mail">
         <dc:Bounds x="1070" y="73" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -99,10 +124,6 @@
       <bpmndi:BPMNShape id="ServiceTask_01rat76_di" bpmnElement="tk_locate_account">
         <dc:Bounds x="301" y="184" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_191lcjy_di" bpmnElement="SequenceFlow_191lcjy">
-        <di:waypoint x="838" y="113" />
-        <di:waypoint x="897" y="113" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="IntermediateCatchEvent_16rxar0_di" bpmnElement="te_mail_delay">
         <dc:Bounds x="802" y="95" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -115,28 +136,12 @@
           <dc:Bounds x="630" y="361" width="77" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_1ai6in3_di" bpmnElement="sf_account_taken">
-        <di:waypoint x="505" y="249" />
-        <di:waypoint x="505" y="336" />
-        <di:waypoint x="650" y="336" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="514" y="290" width="13" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_0v11pke_di" bpmnElement="ee_register_complete">
         <dc:Bounds x="1231" y="95" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1228" y="138" width="42" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_102zsei_di" bpmnElement="SequenceFlow_102zsei">
-        <di:waypoint x="1170" y="113" />
-        <di:waypoint x="1231" y="113" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_1q5pqa4_di" bpmnElement="SequenceFlow_1q5pqa4">
-        <di:waypoint x="997" y="113" />
-        <di:waypoint x="1070" y="113" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_0qfxdyj_di" bpmnElement="st_convert_mail_properties">
         <dc:Bounds x="897" y="73" width="100" height="80" />
       </bpmndi:BPMNShape>
