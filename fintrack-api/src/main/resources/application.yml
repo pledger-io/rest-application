@@ -22,7 +22,7 @@ micronaut:
         mapping: /openapi/**
       swagger:
         paths: classpath:META-INF/swagger
-        mapping: /openapi/spec/**
+        mapping: /spec/**
   server:
     cors:
       enabled: true

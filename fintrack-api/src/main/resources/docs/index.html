@@ -10,11 +10,30 @@
 </head>
 <body>
 <rapi-doc id="thedoc"
-          spec-url="/openapi/spec/fintrack-2.0.0.yml"
+          spec-url="/spec/fintrack-2.0.0.yml"
           heading-text="FinTrack API"
-          render-style="read"
           show-header="false"
-          allow-server-selection="false"></rapi-doc>
+          schema-style="table"
+          render-style="read"
+          show-info="false"
+          default-schema-tab="example"
+          allow-server-selection="false">
+    <div style="display:flex; color: #fff; padding: 12px 32px; margin: 0; background-color: var(--nav-bg-color);">
+        <div>
+            <div style="font-weight:700; font-size:32px"> FinTrack API</div>
+            <div style="font-weight:300; font-size:14px; opacity: 0.9;">
+                <p>
+                    FinTrack is a "self hosted" application that helps in keeping track of your personal finances.
+                    It helps you keep track of your income and expenses to allow you to spend less many and save more.
+                </p>
+            </div>
+        </div>
+        <div style="flex:1"></div>
+        <object data="../images/woman-coding.svg" type="image/svg+xml" width="300"></object>
+    </div>
+
+    <img slot="nav-log" src="/ui/assets/logo.jpg" />
+</rapi-doc>
 <script src="rapidoc-min.js"></script>
 </body>
 </html>
