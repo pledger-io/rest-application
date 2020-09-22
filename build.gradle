@@ -10,6 +10,7 @@ buildscript {
 plugins {
     id "com.diffplug.eclipse.apt" version "3.22.0"
     id "application"
+    id 'jacoco'
 }
 
 allprojects {
@@ -85,21 +86,6 @@ subprojects {
         }
     }
 
-    tasks.withType(JacocoReport) {
-        executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-
-        subprojects.each {
-            sourceSets it.sourceSets.main
-        }
-
-        reports {
-            xml.enabled true
-            xml.destination file("${buildDir}/reports/jacoco/report.xml")
-            html.enabled false
-            csv.enabled false
-        }
-    }
-
     // test.classpath += configurations.developmentOnly
 
     dependencies {
@@ -130,5 +116,26 @@ subprojects {
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
         testCompile("org.assertj:assertj-core:3.17.1")
         testCompile("org.mockito:mockito-core:3.5.7")
+    }
+}
+
+tasks.register("codeCoverageReport", JacocoReport) {
+    subprojects { subproject ->
+        subproject.plugins.withType(JacocoPlugin).configureEach {
+            subproject.tasks.matching({ t -> t.extensions.findByType(JacocoTaskExtension) }).configureEach { testTask ->
+                sourceSets subproject.sourceSets.main
+                executionData(testTask)
+            }
+
+            subproject.tasks.matching({ t -> t.extensions.findByType(JacocoTaskExtension) }).forEach {
+                rootProject.tasks.codeCoverageReport.dependsOn(it)
+            }
+        }
+    }
+
+    reports {
+        xml.enabled true
+        xml.destination file("${buildDir}/reports/jacoco/report.xml")
+        html.enabled true
     }
 }

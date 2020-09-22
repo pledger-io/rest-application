@@ -7,7 +7,7 @@ pipelines:
         caches:
           - gradle
         script:
-          - bash ./gradlew clean test
+          - bash ./gradlew check
         after-script:
-          - bash ./gradlew jacocoTestReport
+          - bash ./gradlew codeCoverageReport
           - bash <(curl -s https://codecov.io/bash)
