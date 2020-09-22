@@ -10,4 +10,4 @@ pipelines:
           - bash ./gradlew check
         after-script:
           - bash ./gradlew codeCoverageReport
-          - bash <(curl -s https://codecov.io/bash) -f ./build/reports/jacoco/report.xml
+          - bash <(curl -s https://codecov.io/bash) -f ./build/reports/jacoco/report.xml -t $CODECOV_TOKEN
