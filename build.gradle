@@ -31,12 +31,12 @@ allprojects {
         }
     }
     
-    apply plugin: 'jacoco'
 }
 
 subprojects {
     apply plugin: "com.diffplug.eclipse.apt"
     apply plugin: 'java'
+    apply plugin: 'jacoco'
 
     java {
         sourceCompatibility = JavaVersion.toVersion('14')
@@ -85,6 +85,21 @@ subprojects {
         }
     }
 
+    tasks.withType(JacocoReport) {
+        executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+        subprojects.each {
+            sourceSets it.sourceSets.main
+        }
+
+        reports {
+            xml.enabled true
+            xml.destination file("${buildDir}/reports/jacoco/report.xml")
+            html.enabled false
+            csv.enabled false
+        }
+    }
+
     // test.classpath += configurations.developmentOnly
 
     dependencies {
@@ -116,23 +131,4 @@ subprojects {
         testCompile("org.assertj:assertj-core:3.17.1")
         testCompile("org.mockito:mockito-core:3.5.7")
     }
-}
-
-task codeCoverageReport(type: JacocoReport) {
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-
-    subprojects.each {
-        sourceSets it.sourceSets.main
-    }
-
-    reports {
-        xml.enabled true
-        xml.destination file("${buildDir}/reports/jacoco/report.xml")
-        html.enabled false
-        csv.enabled false
-    }
-}
-
-codeCoverageReport.dependsOn {
-    subprojects*.test
 }
