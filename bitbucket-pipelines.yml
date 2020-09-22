@@ -3,7 +3,11 @@ image: openjdk:14
 pipelines:
   default:
     - step:
+        name: Build software
         caches:
           - gradle
         script:
-          - bash ./gradlew test
+          - bash ./gradlew check
+        after-script:
+          - bash ./gradlew codeCoverageReport
+          - bash <(curl -s https://codecov.io/bash) -f ./build/reports/jacoco/report.xml

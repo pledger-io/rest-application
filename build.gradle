@@ -10,6 +10,7 @@ buildscript {
 plugins {
     id "com.diffplug.eclipse.apt" version "3.22.0"
     id "application"
+    id 'jacoco'
 }
 
 allprojects {
@@ -31,12 +32,12 @@ allprojects {
         }
     }
     
-    apply plugin: 'jacoco'
 }
 
 subprojects {
     apply plugin: "com.diffplug.eclipse.apt"
     apply plugin: 'java'
+    apply plugin: 'jacoco'
 
     java {
         sourceCompatibility = JavaVersion.toVersion('14')
@@ -118,21 +119,23 @@ subprojects {
     }
 }
 
-task codeCoverageReport(type: JacocoReport) {
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+tasks.register("codeCoverageReport", JacocoReport) {
+    subprojects { subproject ->
+        subproject.plugins.withType(JacocoPlugin).configureEach {
+            subproject.tasks.matching({ t -> t.extensions.findByType(JacocoTaskExtension) }).configureEach { testTask ->
+                sourceSets subproject.sourceSets.main
+                executionData(testTask)
+            }
 
-    subprojects.each {
-        sourceSets it.sourceSets.main
+            subproject.tasks.matching({ t -> t.extensions.findByType(JacocoTaskExtension) }).forEach {
+                rootProject.tasks.codeCoverageReport.dependsOn(it)
+            }
+        }
     }
 
     reports {
         xml.enabled true
         xml.destination file("${buildDir}/reports/jacoco/report.xml")
-        html.enabled false
-        csv.enabled false
+        html.enabled true
     }
-}
-
-codeCoverageReport.dependsOn {
-    subprojects*.test
 }
