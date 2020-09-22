@@ -30,6 +30,8 @@ allprojects {
             }
         }
     }
+    
+    apply plugin: 'jacoco'
 }
 
 subprojects {
@@ -114,4 +116,23 @@ subprojects {
         testCompile("org.assertj:assertj-core:3.17.1")
         testCompile("org.mockito:mockito-core:3.5.7")
     }
+}
+
+task codeCoverageReport(type: JacocoReport) {
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    subprojects.each {
+        sourceSets it.sourceSets.main
+    }
+
+    reports {
+        xml.enabled true
+        xml.destination file("${buildDir}/reports/jacoco/report.xml")
+        html.enabled false
+        csv.enabled false
+    }
+}
+
+codeCoverageReport.dependsOn {
+    subprojects*.test
 }
