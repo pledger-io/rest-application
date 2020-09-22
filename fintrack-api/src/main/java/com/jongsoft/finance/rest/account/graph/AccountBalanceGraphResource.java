@@ -41,7 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-@Tag(name = "Account information")
+@Tag(name = "Graph Generation")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/accounts/{id}/transactions/graph/balance/{start}/{end}")
 public class AccountBalanceGraphResource {
@@ -68,7 +68,8 @@ public class AccountBalanceGraphResource {
 
     @Get
     @Operation(
-            summary = "Generate an account balance graph",
+            summary = "Account Balance Graph",
+            description = "Generate an account balance graph",
             parameters = {
                     @Parameter(name = "id", in = ParameterIn.PATH, description = "The account identifier", schema = @Schema(implementation = Long.class)),
                     @Parameter(name = "start", in = ParameterIn.PATH, description = "The start date", schema = @Schema(implementation = LocalDate.class)),

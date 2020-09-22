@@ -1,22 +1,23 @@
 package com.jongsoft.finance.jpa.importer;
 
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.importer.CSVConfigProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
 import com.jongsoft.finance.jpa.importer.entity.CSVImportConfig;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-
 import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
+@Transactional
 public class CSVConfigProviderJpa extends RepositoryJpa implements CSVConfigProvider {
 
     private final EntityManager entityManager;

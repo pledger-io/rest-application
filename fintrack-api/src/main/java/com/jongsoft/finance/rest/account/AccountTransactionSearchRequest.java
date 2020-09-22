@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.core.date.DateRange;
+import io.micronaut.core.annotation.Introspected;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Setter
+@Introspected
 @NoArgsConstructor
 class AccountTransactionSearchRequest {
 

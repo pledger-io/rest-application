@@ -1,10 +1,5 @@
 package com.jongsoft.finance.jpa.importer;
 
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
@@ -12,14 +7,20 @@ import com.jongsoft.finance.domain.importer.ImportProvider;
 import com.jongsoft.finance.jpa.FilterDelegate;
 import com.jongsoft.finance.jpa.core.DataProviderJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.control.Optional;
-
 import io.micronaut.data.model.Sort;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.transaction.Transactional;
+
 @Slf4j
 @Singleton
+@Transactional
 public class ImportProviderJpa extends DataProviderJpa<BatchImport, ImportJpa> implements ImportProvider {
 
     private final AuthenticationFacade authenticationFacade;

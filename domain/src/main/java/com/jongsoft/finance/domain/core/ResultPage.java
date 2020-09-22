@@ -42,7 +42,7 @@ public interface ResultPage<T> {
 
             @Override
             public <R> ResultPage<R> map(Function<T, R> mapper) {
-                return (ResultPage<R>) ResultPage.of(API.List(elements).iterator().toNativeArray());
+                return (ResultPage<R>) ResultPage.of(API.List(elements).map(mapper).iterator().toNativeArray());
             }
         };
     }

@@ -25,7 +25,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Locale;
 
-@Tag(name = "Account information")
+@Tag(name = "Graph Generation")
 @Controller("/api/accounts/{id}/transactions/graph/budget/{start}/{end}")
 public class AccountBudgetGraphResource extends BudgetPieChart {
 
@@ -45,7 +45,8 @@ public class AccountBudgetGraphResource extends BudgetPieChart {
 
     @Get
     @Operation(
-            summary = "Generate an account budget pie chart",
+            summary = "Account Budget Graph",
+            description = "Generate an account budget pie chart",
             parameters = {
                     @Parameter(name = "id", in = ParameterIn.PATH, description = "The account identifier", schema = @Schema(implementation = Long.class)),
                     @Parameter(name = "start", in = ParameterIn.PATH, description = "The start date", schema = @Schema(implementation = LocalDate.class)),

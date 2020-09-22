@@ -2,10 +2,12 @@ package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
+import io.micronaut.core.annotation.Introspected;
 import lombok.*;
 
 import java.util.List;
 
+@Introspected
 @Setter
 @Builder
 @NoArgsConstructor

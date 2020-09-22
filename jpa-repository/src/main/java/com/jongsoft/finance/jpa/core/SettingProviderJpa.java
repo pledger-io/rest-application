@@ -1,9 +1,5 @@
 package com.jongsoft.finance.jpa.core;
 
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.core.Setting;
 import com.jongsoft.finance.domain.core.SettingProvider;
@@ -12,11 +8,15 @@ import com.jongsoft.finance.jpa.core.entity.SettingJpa;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-
 import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
+@Transactional
 public class SettingProviderJpa extends RepositoryJpa implements SettingProvider {
 
     private final EntityManager entityManager;

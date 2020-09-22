@@ -4,9 +4,9 @@ import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.account.AccountTypeProvider;
-import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.rest.model.AccountResponse;
+import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
 import io.micronaut.http.annotation.*;
@@ -45,7 +45,7 @@ public class AccountResource {
 
     @Get("/my-own")
     @Operation(
-            summary = "List all accounts marked as owned",
+            summary = "List own accounts",
             description = "List all accounts that are creatable in the front-end using one of the selectable account types"
     )
     Single<List<AccountResponse>> ownAccounts() {
@@ -62,7 +62,7 @@ public class AccountResource {
 
     @Get("/all")
     @Operation(
-            summary = "Fetch all accounts in the system",
+            summary = "List all accounts",
             description = "Fetch all accounts registered to the authenticated user"
     )
     Single<List<AccountResponse>> allAccounts() {
@@ -78,7 +78,7 @@ public class AccountResource {
 
     @Get("/auto-complete")
     @Operation(
-            summary = "Search in the accounts based upon the partial name",
+            summary = "Autocomplete accounts",
             description = "Performs a search operation based on the partial name (token) of the given account type"
     )
     Single<List<AccountResponse>> autocomplete(@QueryValue String token, @QueryValue String type) {
@@ -98,10 +98,10 @@ public class AccountResource {
 
     @Post
     @Operation(
-            summary = "Search in the accounts",
+            summary = "Search accounts",
             description = "Search through all accounts using the provided filter set"
     )
-    Single<ResultPage<AccountResponse>> accounts(@Valid @Body AccountSearchRequest searchRequest) {
+    Single<ResultPageResponse<AccountResponse>> accounts(@Valid @Body AccountSearchRequest searchRequest) {
         return Single.create(emitter -> {
             var filter = accountFilterFactory.account()
                     .page(Math.max(0, searchRequest.page() - 1))
@@ -114,13 +114,13 @@ public class AccountResource {
             var response = accountProvider.lookup(filter)
                     .map(AccountResponse::new);
 
-            emitter.onSuccess(response);
+            emitter.onSuccess(new ResultPageResponse<>(response));
         });
     }
 
     @Put
     @Operation(
-            summary = "Create a new account",
+            summary = "Create account",
             description = "This operation will allow for adding new accounts to the system"
     )
     public Single<AccountResponse> create(@Valid @Body AccountEditRequest accountEditRequest) {

@@ -1,12 +1,14 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.schedule.Periodicity;
+import io.micronaut.core.annotation.Introspected;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 
+@Introspected
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor

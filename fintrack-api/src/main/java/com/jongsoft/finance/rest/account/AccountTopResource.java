@@ -37,7 +37,7 @@ public class AccountTopResource {
 
     @Get("/debit/{start}/{end}")
     @Operation(
-            summary = "List the top debit accounts",
+            summary = "Top debit accounts",
             description = "Calculates and returns the accounts where you spent the most for the given date range"
     )
     List<AccountProvider.AccountSpending> topDebtors(@PathVariable LocalDate start, @PathVariable LocalDate end) {
@@ -50,7 +50,7 @@ public class AccountTopResource {
 
     @Get("/top/creditor/{start}/{end}")
     @Operation(
-            summary = "List the top creditor accounts",
+            summary = "Top creditor accounts",
             description = "Calculates and returns the accounts that credited the most money for the given date range"
     )
     List<AccountProvider.AccountSpending> topCreditor(@PathVariable LocalDate start, @PathVariable LocalDate end) {
