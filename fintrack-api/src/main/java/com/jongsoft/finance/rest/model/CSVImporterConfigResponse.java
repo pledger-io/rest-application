@@ -10,4 +10,15 @@ public class CSVImporterConfigResponse {
         this.wrapped = wrapped;
     }
 
+    public long getId() {
+        return wrapped.getId();
+    }
+
+    public String getName() {
+        return wrapped.getName();
+    }
+
+    public String getFile() {
+        return wrapped.getFileCode();
+    }
 }

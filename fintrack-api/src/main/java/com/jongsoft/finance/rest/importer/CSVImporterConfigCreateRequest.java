@@ -1,10 +1,11 @@
 package com.jongsoft.finance.rest.importer;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
-@Data
+@NoArgsConstructor
 class CSVImporterConfigCreateRequest {
 
     @NotBlank
@@ -13,4 +14,17 @@ class CSVImporterConfigCreateRequest {
     @NotBlank
     private String fileCode;
 
+    @Builder
+    CSVImporterConfigCreateRequest(String name, String fileCode) {
+        this.name = name;
+        this.fileCode = fileCode;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getFileCode() {
+        return fileCode;
+    }
 }
