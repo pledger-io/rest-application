@@ -2,7 +2,7 @@
 ![Image version](https://img.shields.io/docker/v/gjong/fintrack?sort=semver)
 [![SonarCloud Quality](https://sonarcloud.io/api/project_badges/measure?project=com.jongsoft.finance%3Acashflow&metric=alert_status&?style=flat-square)](https://sonarcloud.io/dashboard?id=com.jongsoft.finance%3Acashflow)
 ![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/jongsoftdev/fintrack-application/master)
-[![Coveralls bitbucket branch](https://img.shields.io/coveralls/bitbucket/jongsoftdev/personal-finance/master.svg?style=flat-square)](https://coveralls.io/bitbucket/jongsoftdev/personal-finance?branch=master)
+[![codecov](https://codecov.io/bb/jongsoftdev/fintrack-application/branch/master/graph/badge.svg)](https://codecov.io/bb/jongsoftdev/fintrack-application)
 ![APMLicense](https://img.shields.io/apm/l/vim-mode.svg?style=flat-square)
 
 -----------------------
