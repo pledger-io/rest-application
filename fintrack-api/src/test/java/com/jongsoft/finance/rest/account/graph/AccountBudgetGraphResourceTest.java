@@ -13,6 +13,7 @@ import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.API;
 import io.micronaut.context.i18n.ResourceBundleMessageSource;
+import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -67,7 +68,7 @@ public class AccountBudgetGraphResourceTest extends TestSetup {
         Mockito.when(transactionService.balance(Mockito.any())).thenReturn(API.Option());
         Mockito.when(accountProvider.lookup(123L)).thenReturn(API.Option(account));
         Mockito.when(budgetService.lookup(2019, 1)).thenReturn(
-                API.Option(Budget.builder()
+                Single.just(Budget.builder()
                         .expenses(API.List(expense))
                         .build()));
         Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());

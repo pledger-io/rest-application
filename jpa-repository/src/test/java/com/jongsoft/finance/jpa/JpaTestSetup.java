@@ -1,18 +1,16 @@
 package com.jongsoft.finance.jpa;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-
+import io.micronaut.core.io.IOUtils;
+import io.micronaut.test.annotation.MicronautTest;
 import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.micronaut.core.io.IOUtils;
-import io.micronaut.test.annotation.MicronautTest;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 @MicronautTest(
         environments = "application"
@@ -21,7 +19,7 @@ public abstract class JpaTestSetup {
 
     private final Logger log;
 
-    @Inject
+    @PersistenceContext
     private EntityManager entityManager;
 
     public JpaTestSetup() {

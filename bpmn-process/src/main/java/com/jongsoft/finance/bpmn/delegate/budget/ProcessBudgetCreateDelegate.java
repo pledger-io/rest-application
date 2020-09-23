@@ -1,18 +1,17 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.StringValue;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.BudgetJson;
-
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.variable.value.StringValue;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * This delegate will create process a serialize {@link BudgetJson} into a new budget period in the system. It will
@@ -58,7 +57,7 @@ public class ProcessBudgetCreateDelegate implements JavaDelegate {
         } else {
             var original = budgetProvider.lookup(
                     budgetJson.getStart().getYear(),
-                    budgetJson.getStart().getMonthValue()).get();
+                    budgetJson.getStart().getMonthValue()).blockingGet();
             budget = original.indexBudget(budgetJson.getStart(), budgetJson.getExpectedIncome());
         }
 

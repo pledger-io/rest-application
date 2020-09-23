@@ -66,7 +66,7 @@ public abstract class BudgetPieChart {
 
         DateRange dateRange = DateRange.of(start, end);
         Budget budget = budgetProvider.lookup(start.getYear(), start.getMonthValue())
-                .getOrThrow(() -> new IllegalStateException("No budget active during provided month"));
+                .blockingGet();
 
         if (budget != null) {
             var request = filterFactory.transaction()
