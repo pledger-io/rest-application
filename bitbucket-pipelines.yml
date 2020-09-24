@@ -10,9 +10,4 @@ pipelines:
           - bash ./gradlew check
         after-script:
           - bash ./gradlew jacocoTestReport
-          - bash <(curl -s https://codecov.io/bash) -f "./bpmn-process/build/reports/jacoco/report.xml"
-          - bash <(curl -s https://codecov.io/bash) -f "./core/build/reports/jacoco/report.xml"
-          - bash <(curl -s https://codecov.io/bash) -f "./domain/build/reports/jacoco/report.xml"
-          - bash <(curl -s https://codecov.io/bash) -f "./fintrack-api/build/reports/jacoco/report.xml"
-          - bash <(curl -s https://codecov.io/bash) -f "./jpa-repository/build/reports/jacoco/report.xml"
-          - bash <(curl -s https://codecov.io/bash) -f "./rule-engine/build/reports/jacoco/report.xml"
+          - bash <(curl -s https://codecov.io/bash) -s .
