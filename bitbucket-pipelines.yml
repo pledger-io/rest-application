@@ -10,4 +10,4 @@ pipelines:
           - bash ./gradlew check
         after-script:
           - bash ./gradlew jacocoTestReport
-          - bash <(curl -s https://codecov.io/bash) -s "."
+          - bash <(curl -s https://codecov.io/bash) -s "*/build/report/*"
