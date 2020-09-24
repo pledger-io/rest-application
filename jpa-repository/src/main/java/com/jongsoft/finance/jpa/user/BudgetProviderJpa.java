@@ -15,8 +15,10 @@ import io.reactivex.Single;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
 @Singleton
+@Transactional
 @Named("budgetProvider")
 public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
 

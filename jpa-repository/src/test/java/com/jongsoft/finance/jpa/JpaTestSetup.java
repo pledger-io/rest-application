@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,7 +19,7 @@ public abstract class JpaTestSetup {
 
     private final Logger log;
 
-    @PersistenceContext
+    @Inject
     private EntityManager entityManager;
 
     public JpaTestSetup() {
