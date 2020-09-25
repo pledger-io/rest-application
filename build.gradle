@@ -9,6 +9,7 @@ buildscript {
 
 plugins {
     id "com.diffplug.eclipse.apt" version "3.22.0"
+    id "org.sonarqube" version "3.0"
     id "application"
     id 'jacoco'
 }
@@ -130,5 +131,13 @@ subprojects {
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
         testCompile("org.assertj:assertj-core:3.17.1")
         testCompile("org.mockito:mockito-core:3.5.7")
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "FinTrack:API"
+        property "sonar.organization", "jongsoft"
+        property "sonar.host.url", "https://sonarcloud.io"
     }
 }
