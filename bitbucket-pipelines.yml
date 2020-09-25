@@ -13,4 +13,4 @@ pipelines:
               EXTRA_ARGS: -Dsonar.projectName="FinTrack REST API" -Dsonar.projectKey="FinTrack:API" -Dsonar.organization="jongsoft"
         after-script:
           - bash ./gradlew jacocoTestReport
-          - bash <(curl -s https://codecov.io/bash) -s "*/build/reports/*"
+          - bash <(curl -s https://codecov.io/bash) -s "*/build/reports/*" -f '*report.xml'
