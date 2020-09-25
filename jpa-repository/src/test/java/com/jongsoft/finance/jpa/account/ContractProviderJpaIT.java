@@ -1,9 +1,11 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.account.ContractProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import io.reactivex.subscribers.TestSubscriber;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -57,18 +59,26 @@ public class ContractProviderJpaIT extends JpaTestSetup {
     @Test
     void search() {
         setup();
-        var check = contractProvider.search("conT");
 
-        Assertions.assertThat(check).hasSize(1);
-        Assertions.assertThat(check.head().getId()).isEqualTo(1L);
+        TestSubscriber<Contract> subscriber = new TestSubscriber<>();
+
+        contractProvider.search("conT")
+                .subscribe(subscriber);
+
+        subscriber.assertValueCount(1);
+        subscriber.assertResult(Contract.builder().id(1L).build());
     }
 
     @Test
     void search_incorrectUser() {
         setup();
-        var check = contractProvider.search("betwe");
 
-        Assertions.assertThat(check).hasSize(0);
+        TestSubscriber<Contract> subscriber = new TestSubscriber<>();
+
+        contractProvider.search("betwe")
+                .subscribe(subscriber);
+
+        subscriber.assertNoValues();
     }
 
     @MockBean

@@ -1,12 +1,14 @@
 package com.jongsoft.finance.rest.budget;
 
 import com.jongsoft.finance.core.date.DateRange;
+import io.micronaut.core.annotation.Introspected;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
+@Introspected
 @EqualsAndHashCode
 class ComputedExpenseResponse {
 

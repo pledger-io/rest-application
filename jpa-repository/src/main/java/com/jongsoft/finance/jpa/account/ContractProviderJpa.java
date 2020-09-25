@@ -1,23 +1,25 @@
 package com.jongsoft.finance.jpa.account;
 
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.account.ContractProvider;
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.account.entity.ContractJpa;
 import com.jongsoft.finance.jpa.core.DataProviderJpa;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-
+import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
+@Transactional
 public class ContractProviderJpa extends DataProviderJpa<Contract, ContractJpa> implements ContractProvider {
 
     private final AuthenticationFacade authenticationFacade;
@@ -60,7 +62,7 @@ public class ContractProviderJpa extends DataProviderJpa<Contract, ContractJpa> 
     }
 
     @Override
-    public Sequence<Contract> search(String partialName) {
+    public Flowable<Contract> search(String partialName) {
         log.trace("Contract lookup by partial name: {}", partialName);
 
         var hql = """
@@ -72,8 +74,10 @@ public class ContractProviderJpa extends DataProviderJpa<Contract, ContractJpa> 
         query.setParameter("username", authenticationFacade.authenticated());
         query.setParameter("name", "%" + partialName + "%");
 
-        return this.<ContractJpa>multiValue(query)
+        var response = this.<ContractJpa>multiValue(query)
                 .map(this::convert);
+
+        return Flowable.fromIterable(response);
     }
 
     @Override
