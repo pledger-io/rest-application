@@ -1,5 +1,20 @@
 package com.jongsoft.finance.security;
 
+import com.nimbusds.jose.JWSAlgorithm;
+import io.micronaut.context.annotation.Bean;
+import io.micronaut.context.annotation.Factory;
+import io.micronaut.context.annotation.Value;
+import io.micronaut.security.token.jwt.signature.SignatureGeneratorConfiguration;
+import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGenerator;
+import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGeneratorConfiguration;
+import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMException;
+import org.bouncycastle.openssl.PEMKeyPair;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+
+import javax.inject.Named;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,24 +25,6 @@ import java.security.Security;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Optional;
-
-import javax.inject.Named;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMException;
-import org.bouncycastle.openssl.PEMKeyPair;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-
-import com.nimbusds.jose.JWSAlgorithm;
-
-import io.micronaut.context.annotation.Bean;
-import io.micronaut.context.annotation.Factory;
-import io.micronaut.context.annotation.Value;
-import io.micronaut.security.token.jwt.signature.SignatureGeneratorConfiguration;
-import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGenerator;
-import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGeneratorConfiguration;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Factory
@@ -71,27 +68,22 @@ public class SignatureConfiguration implements RSASignatureGeneratorConfiguratio
         Security.addProvider(new BouncyCastleProvider());
 
         // Parse the EC key pair
-        PEMParser pemParser;
-        try {
-            pemParser = new PEMParser(new InputStreamReader(Files.newInputStream(Paths.get(pemPath))));
+        try (PEMParser pemParser = new PEMParser(new InputStreamReader(Files.newInputStream(Paths.get(pemPath))))) {
             PEMKeyPair pemKeyPair = (PEMKeyPair) pemParser.readObject();
 
             // Convert to Java (JCA) format
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
             KeyPair keyPair = converter.getKeyPair(pemKeyPair);
-            pemParser.close();
 
             return Optional.of(keyPair);
-
         } catch (FileNotFoundException e) {
             log.warn("file not found: {}", pemPath);
-
         } catch (PEMException e) {
             log.warn("PEMException {}", e.getMessage());
-
         } catch (IOException e) {
             log.warn("IOException {}", e.getMessage());
         }
+
         return Optional.empty();
     }
 
