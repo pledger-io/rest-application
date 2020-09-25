@@ -27,7 +27,7 @@ public class BudgetResponse {
                 .stream();
     }
 
-    class Period {
+    public class Period {
 
         public LocalDate getFrom() {
             return wrapped.getStart();

@@ -97,11 +97,15 @@ public class BudgetResource {
             summary = "Create budget",
             description = "Create a new budget in the system with the provided start date"
     )
-    Single<Budget> create(@Valid @Body BudgetCreateRequest budgetCreateRequest) {
+    Single<BudgetResponse> create(@Valid @Body BudgetCreateRequest budgetCreateRequest) {
         LocalDate startDate = LocalDate.of(budgetCreateRequest.getYear(), budgetCreateRequest.getMonth(), 1);
 
         return Single.create(
-                emitter -> currentUserProvider.currentUser().createBudget(startDate, budgetCreateRequest.getIncome()));
+                emitter -> {
+                    var budget = currentUserProvider.currentUser()
+                            .createBudget(startDate, budgetCreateRequest.getIncome());
+                    emitter.onSuccess(new BudgetResponse(budget));
+                });
     }
 
     @Post

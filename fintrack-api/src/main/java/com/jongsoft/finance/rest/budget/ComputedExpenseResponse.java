@@ -1,11 +1,13 @@
 package com.jongsoft.finance.rest.budget;
 
 import com.jongsoft.finance.core.date.DateRange;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 
+@EqualsAndHashCode
 class ComputedExpenseResponse {
 
     private double allowed;
