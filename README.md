@@ -5,6 +5,8 @@
 [![codecov](https://codecov.io/bb/jongsoftdev/fintrack-application/branch/master/graph/badge.svg)](https://codecov.io/bb/jongsoftdev/fintrack-application)
 ![APMLicense](https://img.shields.io/apm/l/vim-mode.svg?style=flat-square)
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bbitbucket.org%2Fjongsoftdev%2Ffintrack-application.svg?type=small)](https://app.fossa.com/projects/git%2Bbitbucket.org%2Fjongsoftdev%2Ffintrack-application?ref=badge_small)
+
 -----------------------
 
 **[Read the documentation](https://fintrack.jongsoft.com/)**
@@ -27,15 +29,27 @@ following features:
 
 ## Get started
 
-This repository contains the REST api application needed to run FinTrack. To start using this repository simply check out
-the source code and build it using Gradle.
+**Note:** the front-end application can be found in the [fintrack-ui](https://bitbucket.org/jongsoftdev/fintrack-ui) repository.
 
-The generated phat JAR in the ```fintrack-api``` module can be started, which will run the backend of FinTrack. You can 
-then open the API documentation by accessing:
+In this repository you will find the backend REST application needed to run FinTrack.
+
+### Building the source
+
+To build the application the following needs to be present on your local PC:
+
+* JDK 14 or higher
+* GIT for completing the checkout
+
+You can build the application using the Gradle command:
+
+    ./gradlew build
+
+### Running the backend
+
+The generated phat JAR in the ```fintrack-api``` module can be started, which will run the backend of FinTrack. To access the
+API documentation use the url:
 
     http://localhost:8080/openapi/index.html
-
-**Note:** the front-end application can be found in the [fintrack-ui](https://bitbucket.org/jongsoftdev/fintrack-ui) repository.
 
 ## License
 Copyright 2020 Jong Soft Development
