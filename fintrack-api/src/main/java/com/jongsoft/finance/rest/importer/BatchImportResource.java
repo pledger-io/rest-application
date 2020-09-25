@@ -1,11 +1,10 @@
 package com.jongsoft.finance.rest.importer;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.importer.CSVConfigProvider;
 import com.jongsoft.finance.domain.importer.ImportProvider;
-import com.jongsoft.finance.rest.BadRequestException;
-import com.jongsoft.finance.rest.NotFoundException;
 import com.jongsoft.finance.rest.model.CSVImporterConfigResponse;
 import com.jongsoft.finance.rest.model.ImporterResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
@@ -75,7 +74,7 @@ public class BatchImportResource {
                     .map(config -> config.createImport(request.getUploadToken()))
                     .map(ImporterResponse::new)
                     .ifPresent(emitter::onSuccess)
-                    .elseRun(() -> emitter.onError(new NotFoundException("CSV configuration not found")));
+                    .elseRun(() -> emitter.onError(StatusException.notFound("CSV configuration not found")));
         });
     }
 
@@ -90,7 +89,7 @@ public class BatchImportResource {
             importProvider.lookup(batchSlug)
                     .map(ImporterResponse::new)
                     .ifPresent(emitter::onSuccess)
-                    .elseRun(() -> emitter.onError(new NotFoundException("CSV configuration not found")));
+                    .elseRun(() -> emitter.onError(StatusException.notFound("CSV configuration not found")));
         });
     }
 
@@ -111,7 +110,8 @@ public class BatchImportResource {
     Single<CSVImporterConfigResponse> createConfig(@Valid @Body CSVImporterConfigCreateRequest request) {
         return Single.create(emitter -> {
             csvConfigProvider.lookup(request.getName())
-                    .ifPresent(x -> emitter.onError(new BadRequestException("Configuration with name " + request.getName() + " already exists.")))
+                    .ifPresent(x -> emitter.onError(StatusException.badRequest(
+                            "Configuration with name " + request.getName() + " already exists.")))
                     .elseRun(() -> {
                         var config = currentUserProvider.currentUser().createImportConfiguration(
                                 request.getName(),

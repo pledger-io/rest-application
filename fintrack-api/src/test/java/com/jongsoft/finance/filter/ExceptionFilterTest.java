@@ -1,6 +1,6 @@
 package com.jongsoft.finance.filter;
 
-import com.jongsoft.finance.rest.NotFoundException;
+import com.jongsoft.finance.core.exception.StatusException;
 import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.filter.ServerFilterChain;
@@ -29,7 +29,7 @@ class ExceptionFilterTest {
         var chain = Mockito.mock(ServerFilterChain.class);
 
         Mockito.when(chain.proceed(mockRequest))
-                .thenReturn(Publishers.just(new NotFoundException("Cannot find exception")));
+                .thenReturn(Publishers.just(StatusException.notFound("Cannot find exception")));
         Mockito.when(mockRequest.getUri()).thenReturn(new URI("http://localhost"));
 
         var response = Single.fromPublisher(subject.doFilterOnce(mockRequest, chain))

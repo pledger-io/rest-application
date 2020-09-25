@@ -54,12 +54,13 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
                     and b.from <= :start
                     and (b.until is null or b.until > :end)""";
 
+        var query = entityManager.createQuery(hql);
+        query.setParameter("username", authenticationFacade.authenticated());
+        query.setParameter("start", range.getStart());
+        query.setParameter("end", range.getEnd());
+        var budget = convert(singleValue(query));
+
         return Single.create(emitter -> {
-            var query = entityManager.createQuery(hql);
-            query.setParameter("username", authenticationFacade.authenticated());
-            query.setParameter("start", range.getStart());
-            query.setParameter("end", range.getEnd());
-            var budget = convert(singleValue(query));
             if (budget != null) {
                 emitter.onSuccess(budget);
             } else {

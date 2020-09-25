@@ -1,11 +1,11 @@
 package com.jongsoft.finance.filter;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.exceptions.HttpStatusException;
 import io.micronaut.http.filter.OncePerRequestHttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.hateoas.JsonError;
@@ -25,8 +25,8 @@ public class ExceptionFilter extends OncePerRequestHttpServerFilter {
                     error.link(Link.SELF, Link.of(request.getUri()));
 
                     int statusCode = 500;
-                    if (throwable instanceof HttpStatusException e) {
-                        statusCode = e.getStatus().getCode();
+                    if (throwable instanceof StatusException e) {
+                        statusCode = e.getStatusCode();
                     } else if (throwable instanceof AuthorizationException) {
                         statusCode = HttpStatus.UNAUTHORIZED.getCode();
                     }

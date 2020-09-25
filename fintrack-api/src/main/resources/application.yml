@@ -39,7 +39,6 @@ jpa:
           auto: none
         physical_naming_strategy: 'com.jongsoft.finance.jpa.DefaultNamingStrategy'
         show_sql: false
-
 flyway:
   datasources:
     default:
