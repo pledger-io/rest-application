@@ -8,9 +8,9 @@ pipelines:
           - gradle
         script:
           - bash ./gradlew check
-          - pipe: sonarsource/sonarcloud-scan:1.2.1
-            variables:
-              EXTRA_ARGS: -Dsonar.projectName="FinTrack REST API" -Dsonar.projectKey="FinTrack:API" -Dsonar.organization="jongsoft"
+#          - pipe: sonarsource/sonarcloud-scan:1.2.1
+#            variables:
+#              EXTRA_ARGS: -Dsonar.projectName="FinTrack REST API" -Dsonar.projectKey="FinTrack:API" -Dsonar.organization="jongsoft"
         after-script:
           - bash ./gradlew jacocoTestReport
           - bash <(curl -s https://codecov.io/bash) -s "*/build/reports/*" -f '*report.xml'
