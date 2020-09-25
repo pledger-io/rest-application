@@ -1,8 +1,8 @@
 package com.jongsoft.finance.rest.account;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.rest.NotFoundException;
 import com.jongsoft.finance.rest.model.AccountResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
@@ -53,7 +53,7 @@ public class AccountEditResource {
             accountProvider.lookup(accountId)
                     .map(AccountResponse::new)
                     .ifPresent(emitter::onSuccess)
-                    .elseRun(() -> emitter.onError(new NotFoundException("Account not found")));
+                    .elseRun(() -> emitter.onError(StatusException.notFound("Account not found")));
         });
     }
 

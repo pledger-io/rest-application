@@ -5,6 +5,8 @@
 [![codecov](https://codecov.io/bb/jongsoftdev/fintrack-application/branch/master/graph/badge.svg)](https://codecov.io/bb/jongsoftdev/fintrack-application)
 ![APMLicense](https://img.shields.io/apm/l/vim-mode.svg?style=flat-square)
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bbitbucket.org%2Fjongsoftdev%2Ffintrack-application.svg?type=small)](https://app.fossa.com/projects/git%2Bbitbucket.org%2Fjongsoftdev%2Ffintrack-application?ref=badge_small)
+
 -----------------------
 
 **[Read the documentation](https://fintrack.jongsoft.com/)**
@@ -14,7 +16,6 @@
 -----------------------
 
 ## About FinTrack
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bbitbucket.org%2Fjongsoftdev%2Ffintrack-application.svg?type=small)](https://app.fossa.com/projects/git%2Bbitbucket.org%2Fjongsoftdev%2Ffintrack-application?ref=badge_small)
 FinTrack is a "self hosted" application that helps in keeping track of your personal finances. It helps you keep track
 of your income and expenses to allow you to spend less many and save more.
 

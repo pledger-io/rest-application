@@ -1,20 +1,24 @@
 package com.jongsoft.finance.jpa.user;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-
 import com.jongsoft.finance.core.date.DateRange;
-import com.jongsoft.finance.security.AuthenticationFacade;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
 import com.jongsoft.finance.jpa.user.entity.BudgetJpa;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.reactivex.Single;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
 @Singleton
+@Transactional
 @Named("budgetProvider")
 public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
 
@@ -41,7 +45,7 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
     }
 
     @Override
-    public Optional<Budget> lookup(int year, int month) {
+    public Single<Budget> lookup(int year, int month) {
         var range = DateRange.forMonth(year, month);
 
         var hql = """
@@ -54,8 +58,15 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
         query.setParameter("username", authenticationFacade.authenticated());
         query.setParameter("start", range.getStart());
         query.setParameter("end", range.getEnd());
+        var budget = convert(singleValue(query));
 
-        return API.Option(convert(singleValue(query)));
+        return Single.create(emitter -> {
+            if (budget != null) {
+                emitter.onSuccess(budget);
+            } else {
+                emitter.onError(StatusException.notFound("Cannot find budget for " + year + "-" + month));
+            }
+        });
     }
 
     @Override

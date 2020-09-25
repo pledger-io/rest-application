@@ -37,21 +37,19 @@ class BudgetProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_201901() throws IOException {
         setup();
-        var check = budgetProvider.lookup(2019, 1);
+        var check = budgetProvider.lookup(2019, 1).blockingGet();
 
-        Assertions.assertThat(check.isPresent()).isTrue();
-        Assertions.assertThat(check.get().getExpenses()).hasSize(2);
-        Assertions.assertThat(check.get().getExpectedIncome()).isEqualTo(2500);
+        Assertions.assertThat(check.getExpenses()).hasSize(2);
+        Assertions.assertThat(check.getExpectedIncome()).isEqualTo(2500);
     }
 
     @Test
     void lookup_202001() throws IOException {
         setup();
-        var check = budgetProvider.lookup(2020, 1);
+        var check = budgetProvider.lookup(2020, 1).blockingGet();
 
-        Assertions.assertThat(check.isPresent()).isTrue();
-        Assertions.assertThat(check.get().getExpenses()).hasSize(2);
-        Assertions.assertThat(check.get().getExpectedIncome()).isEqualTo(2800);
+        Assertions.assertThat(check.getExpenses()).hasSize(2);
+        Assertions.assertThat(check.getExpectedIncome()).isEqualTo(2800);
     }
 
     @Test
