@@ -14,7 +14,7 @@ public class ExpenseResponse {
         return wrapped.getId();
     }
 
-    public String name() {
+    public String getName() {
         return wrapped.getName();
     }
 

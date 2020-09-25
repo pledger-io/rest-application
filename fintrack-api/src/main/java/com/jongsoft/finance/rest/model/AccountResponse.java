@@ -3,6 +3,8 @@ package com.jongsoft.finance.rest.model;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.schedule.Periodicity;
 
+import java.time.LocalDate;
+
 public class AccountResponse {
 
     private final Account wrapped;
@@ -35,6 +37,10 @@ public class AccountResponse {
         return new InterestInformation();
     }
 
+    public History getHistory() {
+        return new History();
+    }
+
     public class InterestInformation {
 
         public Periodicity getPeriodicity() {
@@ -64,5 +70,17 @@ public class AccountResponse {
         public String getCurrency() {
             return wrapped.getCurrency();
         }
+    }
+
+    public class History {
+
+        public LocalDate getFirstTransaction() {
+            return wrapped.getFirstTransaction();
+        }
+
+        public LocalDate getLastTransaction() {
+            return wrapped.getLastTransaction();
+        }
+
     }
 }

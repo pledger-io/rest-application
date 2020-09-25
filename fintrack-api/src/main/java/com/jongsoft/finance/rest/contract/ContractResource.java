@@ -5,7 +5,6 @@ import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.account.ContractProvider;
 import com.jongsoft.finance.rest.model.ContractResponse;
-import com.jongsoft.lang.API;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -42,8 +41,8 @@ public class ContractResource {
         var contracts = contractProvider.lookup();
 
         return new ContractOverviewResponse(
-                contracts.reject(Contract::isTerminated),
-                API.List(contracts.filter(Contract::isTerminated)));
+                contracts.reject(Contract::isTerminated).map(ContractResponse::new).toJava(),
+                contracts.filter(Contract::isTerminated).map(ContractResponse::new).toJava());
     }
 
     @Get("/auto-complete")
