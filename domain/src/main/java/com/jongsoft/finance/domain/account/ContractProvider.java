@@ -2,12 +2,12 @@ package com.jongsoft.finance.domain.account;
 
 import com.jongsoft.finance.domain.core.DataProvider;
 import com.jongsoft.finance.domain.core.Exportable;
-import com.jongsoft.lang.control.Optional;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 
 public interface ContractProvider extends DataProvider<Contract>, Exportable<Contract> {
 
-    Optional<Contract> lookup(String name);
+    Maybe<Contract> lookup(String name);
 
     Flowable<Contract> search(String partialName);
 

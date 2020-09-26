@@ -67,12 +67,11 @@ public class AccountResource {
     )
     Single<List<AccountResponse>> allAccounts() {
         return Single.create(emitter -> {
-            var accounts = accountProvider.lookup(accountFilterFactory.account());
+            var accounts = accountProvider.lookup()
+                    .map(AccountResponse::new)
+                    .toJava();
 
-            var response = accounts.content()
-                    .map(AccountResponse::new);
-
-            emitter.onSuccess(response.toJava());
+            emitter.onSuccess(accounts);
         });
     }
 

@@ -1,20 +1,21 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.TagProvider;
 import com.jongsoft.finance.jpa.core.DataProviderJpa;
 import com.jongsoft.finance.jpa.transaction.entity.TagJpa;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-
+import io.micronaut.transaction.SynchronousTransactionManager;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import java.sql.Connection;
 
 @Slf4j
 @Singleton
@@ -24,8 +25,11 @@ public class TagProviderJpa extends DataProviderJpa<Tag, TagJpa> implements TagP
     private final AuthenticationFacade authenticationFacade;
     private final EntityManager entityManager;
 
-    public TagProviderJpa(AuthenticationFacade authenticationFacade, EntityManager entityManager) {
-        super(entityManager, TagJpa.class);
+    public TagProviderJpa(
+            AuthenticationFacade authenticationFacade,
+            EntityManager entityManager,
+            SynchronousTransactionManager<Connection> transactionManager) {
+        super(entityManager, TagJpa.class, transactionManager);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }

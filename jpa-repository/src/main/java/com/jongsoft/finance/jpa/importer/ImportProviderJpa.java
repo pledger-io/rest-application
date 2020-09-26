@@ -11,12 +11,14 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.data.model.Sort;
+import io.micronaut.transaction.SynchronousTransactionManager;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
+import java.sql.Connection;
 
 @Slf4j
 @Singleton
@@ -26,8 +28,11 @@ public class ImportProviderJpa extends DataProviderJpa<BatchImport, ImportJpa> i
     private final AuthenticationFacade authenticationFacade;
     private final EntityManager entityManager;
 
-    public ImportProviderJpa(AuthenticationFacade authenticationFacade, EntityManager entityManager) {
-        super(entityManager, ImportJpa.class);
+    public ImportProviderJpa(
+            AuthenticationFacade authenticationFacade,
+            EntityManager entityManager,
+            SynchronousTransactionManager<Connection> transactionManager) {
+        super(entityManager, ImportJpa.class, transactionManager);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }

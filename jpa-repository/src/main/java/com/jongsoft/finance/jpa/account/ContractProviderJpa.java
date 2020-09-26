@@ -7,17 +7,20 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.account.entity.ContractJpa;
 import com.jongsoft.finance.jpa.core.DataProviderJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
-import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.SynchronousTransactionManager;
+import io.micronaut.transaction.annotation.ReadOnly;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.sql.Connection;
 
 @Slf4j
+@ReadOnly
 @Singleton
 @Transactional
 public class ContractProviderJpa extends DataProviderJpa<Contract, ContractJpa> implements ContractProvider {
@@ -25,8 +28,11 @@ public class ContractProviderJpa extends DataProviderJpa<Contract, ContractJpa> 
     private final AuthenticationFacade authenticationFacade;
     private final EntityManager entityManager;
 
-    public ContractProviderJpa(AuthenticationFacade authenticationFacade, EntityManager entityManager) {
-        super(entityManager, ContractJpa.class);
+    public ContractProviderJpa(
+            AuthenticationFacade authenticationFacade,
+            EntityManager entityManager,
+            SynchronousTransactionManager<Connection> transactionManager) {
+        super(entityManager, ContractJpa.class, transactionManager);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }
@@ -39,15 +45,15 @@ public class ContractProviderJpa extends DataProviderJpa<Contract, ContractJpa> 
                 select c from ContractJpa c
                 where c.user.username = :username""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
+        var query = entityManager.createQuery(hql)
+                .setParameter("username", authenticationFacade.authenticated());
 
         return this.<ContractJpa>multiValue(query)
                 .map(this::convert);
     }
 
     @Override
-    public Optional<Contract> lookup(String name) {
+    public Maybe<Contract> lookup(String name) {
         log.trace("Contract lookup by name: {}", name);
 
         var hql = """
@@ -55,10 +61,9 @@ public class ContractProviderJpa extends DataProviderJpa<Contract, ContractJpa> 
                 where c.name = :name
                     and c.user.username = :username""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-        query.setParameter("name", name);
-        return API.Option(convert(singleValue(query)));
+        return maybe(hql,
+                query -> query.setParameter("username", authenticationFacade.authenticated())
+                        .setParameter("name", name));
     }
 
     @Override
@@ -70,14 +75,9 @@ public class ContractProviderJpa extends DataProviderJpa<Contract, ContractJpa> 
                 where lower(c.name) like lower(:name)
                     and c.user.username = :username""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-        query.setParameter("name", "%" + partialName + "%");
-
-        var response = this.<ContractJpa>multiValue(query)
-                .map(this::convert);
-
-        return Flowable.fromIterable(response);
+        return flow(hql,
+                query -> query.setParameter("username", authenticationFacade.authenticated())
+                        .setParameter("name", "%" + partialName + "%"));
     }
 
     @Override

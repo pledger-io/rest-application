@@ -1,19 +1,18 @@
 package com.jongsoft.finance.bpmn.delegate.contract;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.bouncycastle.util.encoders.Hex;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.StringValue;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.account.ContractProvider;
 import com.jongsoft.finance.serialized.ContractJson;
-
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.util.encoders.Hex;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.variable.value.StringValue;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
@@ -43,7 +42,10 @@ public class ProcessContractCreateDelegate implements JavaDelegate {
                 execution.getCurrentActivityName(),
                 contractJson.getName());
 
-        if (!contractProvider.lookup(contractJson.getName()).isPresent()) {
+        var noDuplicate = contractProvider.lookup(contractJson.getName())
+                .isEmpty()
+                .blockingGet();
+        if (noDuplicate) {
             var account = accountProvider.lookup(contractJson.getCompany()).get();
 
             account.createContract(
@@ -52,14 +54,16 @@ public class ProcessContractCreateDelegate implements JavaDelegate {
                     contractJson.getStart(),
                     contractJson.getEnd());
 
-            var persistedContract = contractProvider.lookup(contractJson.getName()).get();
-            if (contractJson.getContract() != null) {
-                persistedContract.registerUpload(storageService.store(Hex.decode(contractJson.getContract())));
-            }
+            contractProvider.lookup(contractJson.getName())
+                    .subscribe(contract -> {
+                        if (contractJson.getContract() != null) {
+                            contract.registerUpload(storageService.store(Hex.decode(contractJson.getContract())));
+                        }
 
-            if (contractJson.isTerminated()) {
-                persistedContract.terminate();
-            }
+                        if (contractJson.isTerminated()) {
+                            contract.terminate();
+                        }
+                    });
         }
     }
 }

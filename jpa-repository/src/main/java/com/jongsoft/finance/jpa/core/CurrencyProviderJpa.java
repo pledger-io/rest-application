@@ -1,9 +1,5 @@
 package com.jongsoft.finance.jpa.core;
 
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.account.events.CurrencyCreatedEvent;
 import com.jongsoft.finance.domain.core.Currency;
@@ -14,8 +10,13 @@ import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-
+import io.micronaut.transaction.SynchronousTransactionManager;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+import java.sql.Connection;
 
 @Slf4j
 @Singleton
@@ -24,8 +25,10 @@ public class CurrencyProviderJpa extends DataProviderJpa<Currency, CurrencyJpa> 
 
     private final EntityManager entityManager;
 
-    public CurrencyProviderJpa(EntityManager entityManager) {
-        super(entityManager, CurrencyJpa.class);
+    public CurrencyProviderJpa(
+            EntityManager entityManager,
+            SynchronousTransactionManager<Connection> transactionManager) {
+        super(entityManager, CurrencyJpa.class, transactionManager);
         this.entityManager = entityManager;
     }
 
@@ -108,7 +111,7 @@ public class CurrencyProviderJpa extends DataProviderJpa<Currency, CurrencyJpa> 
 
         var hql = "update CurrencyJpa c set"
                 + updatePart
-                +" where c.code = :code";
+                + " where c.code = :code";
 
         var query = entityManager.createQuery(hql);
         query.setParameter("code", event.getCode());

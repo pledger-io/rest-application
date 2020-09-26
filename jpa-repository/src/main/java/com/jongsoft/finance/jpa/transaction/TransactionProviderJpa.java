@@ -1,15 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import java.time.LocalDate;
-import java.util.Objects;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.transaction.Transaction;
@@ -23,11 +14,20 @@ import com.jongsoft.finance.jpa.transaction.entity.TransactionJournal;
 import com.jongsoft.finance.jpa.transaction.entity.TransactionJpa;
 import com.jongsoft.finance.jpa.user.entity.CategoryJpa;
 import com.jongsoft.finance.jpa.user.entity.ExpenseJpa;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-
+import io.micronaut.transaction.SynchronousTransactionManager;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+import java.sql.Connection;
+import java.time.LocalDate;
+import java.util.Objects;
 
 @Slf4j
 @Singleton
@@ -38,8 +38,11 @@ public class TransactionProviderJpa extends DataProviderJpa<Transaction, Transac
     private final AuthenticationFacade authenticationFacade;
     private final EntityManager entityManager;
 
-    public TransactionProviderJpa(AuthenticationFacade authenticationFacade, EntityManager entityManager) {
-        super(entityManager, TransactionJournal.class);
+    public TransactionProviderJpa(
+            AuthenticationFacade authenticationFacade,
+            EntityManager entityManager,
+            SynchronousTransactionManager<Connection> transactionManager) {
+        super(entityManager, TransactionJournal.class, transactionManager);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }

@@ -1,27 +1,27 @@
 package com.jongsoft.finance.jpa.account;
 
-import java.util.Objects;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
-import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.core.SystemAccountTypes;
+import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.account.entity.AccountJpa;
 import com.jongsoft.finance.jpa.core.DataProviderJpa;
 import com.jongsoft.finance.jpa.projections.TripleProjection;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-
+import io.micronaut.transaction.SynchronousTransactionManager;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+import java.sql.Connection;
+import java.util.Objects;
 
 @Slf4j
 @Singleton
@@ -32,8 +32,11 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
     private final AuthenticationFacade authenticationFacade;
     private final EntityManager entityManager;
 
-    public AccountProviderJpa(AuthenticationFacade authenticationFacade, EntityManager entityManager) {
-        super(entityManager, AccountJpa.class);
+    public AccountProviderJpa(
+            AuthenticationFacade authenticationFacade,
+            EntityManager entityManager,
+            SynchronousTransactionManager<Connection> transactionManager) {
+        super(entityManager, AccountJpa.class, transactionManager);
         this.authenticationFacade = authenticationFacade;
 
         this.entityManager = entityManager;
@@ -60,10 +63,10 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
         log.trace("Account listing");
 
         String hql = """
-                      select a 
-                      from AccountJpa a
-                      where a.user.username = :username 
-                        and a.archived = false""";
+                select a 
+                from AccountJpa a
+                where a.user.username = :username 
+                  and a.archived = false""";
 
         var query = entityManager.createQuery(hql);
         query.setParameter("username", authenticationFacade.authenticated());
@@ -77,12 +80,12 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
         log.trace("Account name lookup: {}", name);
 
         String hql = """
-                      select a 
-                      from AccountJpa a
-                      where 
-                        a.name = :name
-                        and a.user.username = :username
-                        and a.archived = false""";
+                select a 
+                from AccountJpa a
+                where 
+                  a.name = :name
+                  and a.user.username = :username
+                  and a.archived = false""";
 
         var query = entityManager.createQuery(hql);
         query.setParameter("name", name);
@@ -96,12 +99,12 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
         log.trace("Account type lookup: {}", accountType);
 
         var hql = """
-                    select a 
-                    from AccountJpa a
-                    where 
-                        a.type.label = :label
-                        and a.user.username = :username
-                        and a.archived = false""";
+                select a 
+                from AccountJpa a
+                where 
+                    a.type.label = :label
+                    and a.user.username = :username
+                    and a.archived = false""";
         var query = entityManager.createQuery(hql);
 
         query.setParameter("label", accountType.label());

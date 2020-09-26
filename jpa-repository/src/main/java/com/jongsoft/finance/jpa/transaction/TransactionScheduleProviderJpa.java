@@ -1,19 +1,20 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import java.time.LocalDate;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.TransactionScheduleProvider;
 import com.jongsoft.finance.jpa.core.DataProviderJpa;
 import com.jongsoft.finance.jpa.transaction.entity.ScheduledTransactionJpa;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
+import io.micronaut.transaction.SynchronousTransactionManager;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import java.sql.Connection;
+import java.time.LocalDate;
 
 @Singleton
 @Named("transactionScheduleProvider")
@@ -23,8 +24,11 @@ public class TransactionScheduleProviderJpa extends DataProviderJpa<ScheduledTra
     private final AuthenticationFacade authenticationFacade;
     private final EntityManager entityManager;
 
-    public TransactionScheduleProviderJpa(AuthenticationFacade authenticationFacade, EntityManager entityManager) {
-        super(entityManager, ScheduledTransactionJpa.class);
+    public TransactionScheduleProviderJpa(
+            AuthenticationFacade authenticationFacade,
+            EntityManager entityManager,
+            SynchronousTransactionManager<Connection> transactionManager) {
+        super(entityManager, ScheduledTransactionJpa.class, transactionManager);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }

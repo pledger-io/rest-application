@@ -80,7 +80,7 @@ class AccountResourceTest extends TestSetup {
 
     @Test
     void allAccounts() {
-        var resultPage = ResultPage.of(Account.builder()
+        var resultPage = API.List(Account.builder()
                 .id(1L)
                 .name("Sample account")
                 .description("Long description")
@@ -92,12 +92,12 @@ class AccountResourceTest extends TestSetup {
                 .type("creditor")
                 .build());
 
-        Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))
+        Mockito.when(accountProvider.lookup())
                 .thenReturn(resultPage);
 
         subject.allAccounts().blockingGet();
 
-        Mockito.verify(accountProvider).lookup(Mockito.any(AccountProvider.FilterCommand.class));
+        Mockito.verify(accountProvider).lookup();
     }
 
     @Test
