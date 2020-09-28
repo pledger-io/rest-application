@@ -8,6 +8,7 @@ import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.SynchronousTransactionManager;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 
@@ -15,7 +16,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.sql.Connection;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public abstract class DataProviderJpa<T, Y extends EntityJpa>
         extends RepositoryJpa {
@@ -43,14 +43,18 @@ public abstract class DataProviderJpa<T, Y extends EntityJpa>
     }
 
     protected Flowable<T> flow(String hql, Function<TypedQuery<Y>, TypedQuery<Y>> conditionApplier) {
-        return transactionManager.executeRead(status -> {
-            var response = conditionApplier.apply(entityManager.createQuery(hql, forClass))
-                    .getResultStream()
-                    .map(this::convert)
-                    .collect(Collectors.toList());
+        return Flowable.create(emitter -> {
+            transactionManager.executeRead(status -> {
+                conditionApplier.apply(entityManager.createQuery(hql, forClass))
+                        .getResultStream()
+                        .map(this::convert)
+                        .forEach(emitter::onNext);
 
-            return Flowable.fromIterable(response);
-        });
+                emitter.onComplete();
+
+                return null;
+            });
+        }, BackpressureStrategy.BUFFER);
     }
 
     protected Maybe<T> maybe(String hql, Function<TypedQuery<Y>, TypedQuery<Y>> conditionApplier) {
