@@ -23,7 +23,7 @@ pipelines:
             - gradle
           script:
             - bash ./gradlew check
-            - bash ./gradlew sonarqube
+            - bash ./gradlew jacocoMergeTest sonarqube
           after-script:
             - bash ./gradlew jacocoTestReport
             - bash <(curl -s https://codecov.io/bash) -s "*/build/reports/*" -f '*report.xml'
