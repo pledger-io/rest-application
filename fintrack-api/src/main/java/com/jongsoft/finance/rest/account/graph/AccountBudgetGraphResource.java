@@ -71,7 +71,7 @@ public class AccountBudgetGraphResource extends BudgetPieChart {
         return currencyProvider.lookup(code)
                 .map(Currency::getSymbol)
                 .map(String::valueOf)
-                .getOrSupply(() -> "");
+                .blockingGet("");
     }
 
 }

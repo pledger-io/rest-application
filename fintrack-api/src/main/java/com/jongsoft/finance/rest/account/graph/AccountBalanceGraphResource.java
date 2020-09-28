@@ -194,6 +194,6 @@ public class AccountBalanceGraphResource {
         return currencyProvider.lookup(code)
                 .map(Currency::getSymbol)
                 .map(String::valueOf)
-                .getOrSupply(() -> "");
+                .blockingGet("");
     }
 }

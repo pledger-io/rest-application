@@ -1,17 +1,16 @@
 package com.jongsoft.finance.filter;
 
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.core.CurrencyProvider;
-import com.jongsoft.lang.API;
-
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.filter.ServerFilterChain;
+import io.reactivex.Maybe;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.util.Optional;
 
 class CurrencyHeaderFilterTest {
 
@@ -35,7 +34,7 @@ class CurrencyHeaderFilterTest {
 
         Mockito.doReturn(headers).when(mockRequest).getHeaders();
         Mockito.doReturn(Optional.of("USD")).when(headers).get("X-Accept-Currency", String.class);
-        Mockito.doReturn(API.Option(currency)).when(currencyProvider).lookup("USD");
+        Mockito.doReturn(Maybe.just(currency)).when(currencyProvider).lookup("USD");
 
         subject.doFilterOnce(mockRequest, Mockito.mock(ServerFilterChain.class));
 
@@ -49,7 +48,7 @@ class CurrencyHeaderFilterTest {
 
         Mockito.doReturn(headers).when(mockRequest).getHeaders();
         Mockito.doReturn(Optional.of("USD")).when(headers).get("X-Accept-Currency", String.class);
-        Mockito.doReturn(API.Option()).when(currencyProvider).lookup("USD");
+        Mockito.doReturn(Maybe.empty()).when(currencyProvider).lookup("USD");
 
         subject.doFilterOnce(mockRequest, Mockito.mock(ServerFilterChain.class));
 
