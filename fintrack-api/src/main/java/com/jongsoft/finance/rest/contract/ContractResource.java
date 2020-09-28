@@ -35,7 +35,8 @@ public class ContractResource {
     @Get
     @Operation(
             summary = "List contracts",
-            description = "List all contracts split in both active and inactive ones"
+            description = "List all contracts split in both active and inactive ones",
+            operationId = "getAll"
     )
     ContractOverviewResponse list() {
         var contracts = contractProvider.lookup();
@@ -48,7 +49,8 @@ public class ContractResource {
     @Get("/auto-complete")
     @Operation(
             summary = "Autocomplete contracts",
-            description = "Performs a search operation based on the partial name (token)"
+            description = "Performs a search operation based on the partial name (token)",
+            operationId = "getByToken"
     )
     Flowable<ContractResponse> autocomplete(@QueryValue String token) {
         return contractProvider.search(token)
@@ -58,7 +60,8 @@ public class ContractResource {
     @Put
     @Operation(
             summary = "Create contract",
-            description = "Adds a new contract to FinTrack for the authenticated user"
+            description = "Adds a new contract to FinTrack for the authenticated user",
+            operationId = "createContract"
     )
     Single<ContractResponse> create(@Body @Valid ContractCreateRequest createRequest) {
         return Single.create(emitter -> {
@@ -136,7 +139,8 @@ public class ContractResource {
     @Operation(
             summary = "Enable warning",
             description = "This call will enable the warning 1 month before contract expires",
-            parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
+            parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
+            operationId = "warnBeforeExpireDate"
     )
     Single<ContractResponse> warnExpiry(@PathVariable long contractId, Principal principal) {
         return Single.create(emitter -> {
@@ -161,7 +165,8 @@ public class ContractResource {
     @Operation(
             summary = "Attach file",
             description = "This call will register an attachment to the contract",
-            parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
+            parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
+            operationId = "registerAttachment"
     )
     Single<ContractResponse> attachment(
             @PathVariable long contractId,
