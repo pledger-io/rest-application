@@ -1,12 +1,5 @@
 package com.jongsoft.finance.bpmn.delegate.contract;
 
-import java.time.LocalDate;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
@@ -19,8 +12,15 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.serialized.ContractJson;
 import com.jongsoft.lang.API;
-
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.reactivex.Maybe;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.time.LocalDate;
 
 class ProcessContractCreateDelegateTest {
 
@@ -73,8 +73,8 @@ class ProcessContractCreateDelegateTest {
                 .endDate(LocalDate.of(2019, 1, 1))
                 .build();
         Mockito.when(contractProvider.lookup("Test contract"))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(contract));
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(contract));
 
         subject.execute(execution);
 

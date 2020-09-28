@@ -1,12 +1,5 @@
 package com.jongsoft.finance.jpa.user;
 
-import java.util.Currency;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
@@ -15,6 +8,14 @@ import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Collectors;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.SynchronousTransactionManager;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+import java.sql.Connection;
+import java.util.Currency;
 
 @Singleton
 @Transactional
@@ -23,8 +24,10 @@ public class UserProviderJpa extends DataProviderJpa<UserAccount, UserAccountJpa
 
     private final EntityManager entityManager;
 
-    public UserProviderJpa(EntityManager entityManager) {
-        super(entityManager, UserAccountJpa.class);
+    public UserProviderJpa(
+            EntityManager entityManager,
+            SynchronousTransactionManager<Connection> transactionManager) {
+        super(entityManager, UserAccountJpa.class, transactionManager);
         this.entityManager = entityManager;
     }
 

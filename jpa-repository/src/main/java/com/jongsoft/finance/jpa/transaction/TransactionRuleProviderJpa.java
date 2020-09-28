@@ -1,13 +1,5 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import java.util.Optional;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
 import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreatedEvent;
@@ -19,8 +11,17 @@ import com.jongsoft.finance.jpa.transaction.entity.RuleGroupJpa;
 import com.jongsoft.finance.jpa.transaction.entity.RuleJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
+import io.micronaut.transaction.SynchronousTransactionManager;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+import java.sql.Connection;
+import java.util.Optional;
 
 @Singleton
 @Named("transactionRuleProvider")
@@ -29,8 +30,11 @@ public class TransactionRuleProviderJpa extends DataProviderJpa<TransactionRule,
     private final AuthenticationFacade authenticationFacade;
     private final EntityManager entityManager;
 
-    public TransactionRuleProviderJpa(AuthenticationFacade authenticationFacade, EntityManager entityManager) {
-        super(entityManager, RuleJpa.class);
+    public TransactionRuleProviderJpa(
+            AuthenticationFacade authenticationFacade,
+            EntityManager entityManager,
+            SynchronousTransactionManager<Connection> transactionManager) {
+        super(entityManager, RuleJpa.class, transactionManager);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }

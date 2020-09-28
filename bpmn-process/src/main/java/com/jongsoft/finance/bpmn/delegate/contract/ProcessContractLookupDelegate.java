@@ -1,13 +1,12 @@
 package com.jongsoft.finance.bpmn.delegate.contract;
 
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.account.ContractProvider;
-
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
@@ -27,8 +26,10 @@ public class ProcessContractLookupDelegate implements JavaDelegate {
 
         final Contract contract;
         if (execution.hasVariableLocal("name")) {
-            contract = contractProvider.lookup((String) execution.getVariableLocal("name"))
-                    .getOrSupply(() -> null);
+            var name = (String) execution.getVariableLocal("name");
+            contract = contractProvider.lookup(name)
+                    .defaultIfEmpty(Contract.builder().name(name).build())
+                    .blockingGet();
         } else {
             contract = contractProvider.lookup((Long) execution.getVariableLocal("id"))
                     .getOrSupply(() -> null);

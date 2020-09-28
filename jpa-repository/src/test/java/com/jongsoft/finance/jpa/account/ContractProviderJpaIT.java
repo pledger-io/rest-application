@@ -1,9 +1,11 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.account.ContractProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import io.reactivex.subscribers.TestSubscriber;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -39,36 +41,46 @@ public class ContractProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_name() {
         setup();
-        var check = contractProvider.lookup("Test contract");
 
-        Assertions.assertThat(check.isPresent()).isTrue();
-        Assertions.assertThat(check.get().getId()).isEqualTo(1L);
-        Assertions.assertThat(check.get().getName()).isEqualTo("Test contract");
-        Assertions.assertThat(check.get().getStartDate()).isEqualTo(LocalDate.of(2019, 2, 1));
-        Assertions.assertThat(check.get().getEndDate()).isEqualTo(LocalDate.of(2020, 2, 1));
+        var check = contractProvider.lookup("Test contract")
+                .blockingGet();
+
+        Assertions.assertThat(check.getId()).isEqualTo(1L);
+        Assertions.assertThat(check.getName()).isEqualTo("Test contract");
+        Assertions.assertThat(check.getStartDate()).isEqualTo(LocalDate.of(2019, 2, 1));
+        Assertions.assertThat(check.getEndDate()).isEqualTo(LocalDate.of(2020, 2, 1));
     }
 
     @Test
     void lookup_nameIncorrectUser() {
         setup();
-        Assertions.assertThat(contractProvider.lookup("In between").isPresent()).isFalse();
+
+        Assertions.assertThat(contractProvider.lookup("In between").isEmpty().blockingGet()).isTrue();
     }
 
     @Test
     void search() {
         setup();
-        var check = contractProvider.search("conT");
 
-        Assertions.assertThat(check).hasSize(1);
-        Assertions.assertThat(check.head().getId()).isEqualTo(1L);
+        TestSubscriber<Contract> subscriber = new TestSubscriber<>();
+
+        contractProvider.search("conT")
+                .subscribe(subscriber);
+
+        subscriber.assertValueCount(1);
+        subscriber.assertResult(Contract.builder().id(1L).build());
     }
 
     @Test
     void search_incorrectUser() {
         setup();
-        var check = contractProvider.search("betwe");
 
-        Assertions.assertThat(check).hasSize(0);
+        TestSubscriber<Contract> subscriber = new TestSubscriber<>();
+
+        contractProvider.search("betwe")
+                .subscribe(subscriber);
+
+        subscriber.assertNoValues();
     }
 
     @MockBean

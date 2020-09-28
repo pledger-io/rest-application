@@ -38,7 +38,7 @@ public class ImporterTransactionResource {
 
     @Post
     @Operation(
-            summary = "List transactions",
+            summary = "Importer transactions",
             description = "Search for transactions created by the importer job",
             parameters = @Parameter(name = "batchSlug", in = ParameterIn.PATH, schema = @Schema(implementation = String.class))
     )
@@ -59,7 +59,7 @@ public class ImporterTransactionResource {
     @Delete("/{transactionId}")
     @Post
     @Operation(
-            summary = "List transactions",
+            summary = "Delete import transactions",
             description = "Search for transactions created by the importer job",
             parameters = {
                     @Parameter(name = "batchSlug", in = ParameterIn.PATH, schema = @Schema(implementation = String.class)),

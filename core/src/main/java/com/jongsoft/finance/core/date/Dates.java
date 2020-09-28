@@ -18,6 +18,10 @@ public interface Dates {
     }
     
     static Long timestamp(LocalDate localDate) {
+        if (localDate == null) {
+            return null;
+        }
+
         return toDate(localDate).getTime();
     }
 

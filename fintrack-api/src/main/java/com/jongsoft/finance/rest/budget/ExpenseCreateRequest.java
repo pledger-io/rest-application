@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest.budget;
 
+import io.micronaut.core.annotation.Introspected;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
@@ -7,6 +8,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+@Introspected
 @NoArgsConstructor
 class ExpenseCreateRequest {
 
