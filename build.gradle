@@ -134,6 +134,11 @@ subprojects {
     }
 }
 
+task jacocoMergeTest(type: JacocoMerge) {
+    destinationFile = file("$buildDir/jacoco/allTestCoverage.exec")
+    executionData = project.fileTree(dir: '.', include:'**/build/jacoco/test.exec')
+}
+
 sonarqube {
     properties {
         property "sonar.projectKey", "FinTrack:API"
