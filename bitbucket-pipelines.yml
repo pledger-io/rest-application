@@ -6,10 +6,7 @@ pipelines:
         caches:
           - gradle
         script:
-          - bash ./gradlew check
-        after-script:
-          - bash ./gradlew jacocoTestReport
-          - bash <(curl -s https://codecov.io/bash) -s '*/build/reports/' -f '*report.xml'
+          - bash ./gradlew classes
 
   pull-requests:
     feature/*:
@@ -18,7 +15,6 @@ pipelines:
             - gradle
           script:
             - bash ./gradlew check
-            - bash ./gradlew sonarqube
 
   branches:
     master:
