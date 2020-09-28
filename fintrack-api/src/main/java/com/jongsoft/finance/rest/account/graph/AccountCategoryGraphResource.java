@@ -94,6 +94,6 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
 
     private Currency currencySymbol(String code) {
         return currencyProvider.lookup(code)
-                .getOrSupply(() -> null);
+                .blockingGet(null);
     }
 }

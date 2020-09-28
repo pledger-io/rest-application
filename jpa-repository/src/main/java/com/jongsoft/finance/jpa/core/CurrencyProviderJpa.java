@@ -7,10 +7,9 @@ import com.jongsoft.finance.domain.core.CurrencyProvider;
 import com.jongsoft.finance.domain.core.events.CurrencyPropertyEvent;
 import com.jongsoft.finance.domain.core.events.CurrencyRenameEvent;
 import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
-import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
-import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.SynchronousTransactionManager;
+import io.reactivex.Maybe;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
@@ -33,7 +32,7 @@ public class CurrencyProviderJpa extends DataProviderJpa<Currency, CurrencyJpa> 
     }
 
     @Override
-    public Optional<Currency> lookup(String code) {
+    public Maybe<Currency> lookup(String code) {
         log.trace("Currency lookup by code: {}", code);
 
         var hql = """
@@ -41,12 +40,9 @@ public class CurrencyProviderJpa extends DataProviderJpa<Currency, CurrencyJpa> 
                 where c.archived = false
                     and c.code = :code""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("code", code);
-
-        return API.Option(
-                convert(
-                        singleValue(query)));
+        return maybe(
+                hql,
+                query -> query.setParameter("code", code));
     }
 
     @Override

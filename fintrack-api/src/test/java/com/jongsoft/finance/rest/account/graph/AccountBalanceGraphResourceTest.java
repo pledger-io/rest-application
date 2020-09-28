@@ -9,6 +9,7 @@ import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.API;
 import io.micronaut.context.i18n.ResourceBundleMessageSource;
+import io.reactivex.Maybe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -48,7 +49,7 @@ class AccountBalanceGraphResourceTest extends TestSetup {
                 .currency("EUR")
                 .build();
 
-        Mockito.when(currencyProvider.lookup(Mockito.anyString())).thenReturn(API.Option());
+        Mockito.when(currencyProvider.lookup(Mockito.anyString())).thenReturn(Maybe.empty());
         Mockito.when(accountProvider.lookup(123L)).thenReturn(API.Option(account));
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(API.Option())

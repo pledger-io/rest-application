@@ -35,17 +35,18 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_eur() {
         init();
-        var check = currencyProvider.lookup("EUR");
-        Assertions.assertThat(check.isPresent()).isTrue();
-        Assertions.assertThat(check.get().getCode()).isEqualTo("EUR");
-        Assertions.assertThat(check.get().getName()).isEqualTo("Euro");
+        var check = currencyProvider.lookup("EUR").blockingGet();
+
+        Assertions.assertThat(check.getCode()).isEqualTo("EUR");
+        Assertions.assertThat(check.getName()).isEqualTo("Euro");
     }
 
     @Test
     void handleCreate() {
         init();
-        var check = currencyProvider.lookup("MST");
-        Assertions.assertThat(check.isPresent()).isFalse();
+        var check = currencyProvider.lookup("MST")
+                .isEmpty().blockingGet();
+        Assertions.assertThat(check).isTrue();
 
         eventPublisher.publishEvent(new CurrencyCreatedEvent(
                 this,
@@ -54,12 +55,11 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
                 "MST"
         ));
 
-        check = currencyProvider.lookup("MST");
-        Assertions.assertThat(check.isPresent()).isTrue();
-        Assertions.assertThat(check.get().getName()).isEqualTo("Mistral");
-        Assertions.assertThat(check.get().getCode()).isEqualTo("MST");
-        Assertions.assertThat(check.get().isEnabled()).isTrue();
-        Assertions.assertThat(check.get().getDecimalPlaces()).isEqualTo(2);
+        var currency = currencyProvider.lookup("MST").blockingGet();
+        Assertions.assertThat(currency.getName()).isEqualTo("Mistral");
+        Assertions.assertThat(currency.getCode()).isEqualTo("MST");
+        Assertions.assertThat(currency.isEnabled()).isTrue();
+        Assertions.assertThat(currency.getDecimalPlaces()).isEqualTo(2);
     }
 
     @Test
@@ -72,8 +72,8 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
                 CurrencyPropertyEvent.Type.DECIMAL_PLACES
         ));
 
-        var check = currencyProvider.lookup("EUR");
-        Assertions.assertThat(check.get().getDecimalPlaces()).isEqualTo(12);
+        var check = currencyProvider.lookup("EUR").blockingGet();
+        Assertions.assertThat(check.getDecimalPlaces()).isEqualTo(12);
     }
 
 
@@ -87,8 +87,8 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
                 CurrencyPropertyEvent.Type.ENABLED
         ));
 
-        var check = currencyProvider.lookup("EUR");
-        Assertions.assertThat(check.get().isEnabled()).isFalse();
+        var check = currencyProvider.lookup("EUR").blockingGet();
+        Assertions.assertThat(check.isEnabled()).isFalse();
     }
 
 }
