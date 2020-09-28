@@ -32,6 +32,15 @@ allprojects {
             }
         }
     }
+
+    sonarqube {
+        properties {
+            property "sonar.projectKey", "FinTrack:API"
+            property "sonar.organization", "jongsoft"
+            property "sonar.host.url", "https://sonarcloud.io"
+            property "sonar.jacoco.reportPaths", "${buildDir}/reports/jacoco/report.xml"
+        }
+    }
     
 }
 
@@ -131,18 +140,5 @@ subprojects {
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
         testCompile("org.assertj:assertj-core:3.17.1")
         testCompile("org.mockito:mockito-core:3.5.7")
-    }
-}
-
-task jacocoMergeTest(type: JacocoMerge) {
-    destinationFile = file("$buildDir/jacoco/allTestCoverage.exec")
-    executionData = project.fileTree(dir: '.', include:'**/build/jacoco/test.exec')
-}
-
-sonarqube {
-    properties {
-        property "sonar.projectKey", "FinTrack:API"
-        property "sonar.organization", "jongsoft"
-        property "sonar.host.url", "https://sonarcloud.io"
     }
 }
