@@ -3,31 +3,36 @@ package com.jongsoft.finance.jpa.user;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.ExpenseProvider;
-import com.jongsoft.finance.jpa.core.DataProviderJpa;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.ExpenseJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
-import io.micronaut.transaction.SynchronousTransactionManager;
+import com.jongsoft.lang.control.Optional;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import java.sql.Connection;
 
 @Singleton
 @Named("expenseProvider")
-public class ExpenseProviderJpa extends DataProviderJpa<Budget.Expense, ExpenseJpa> implements ExpenseProvider {
+public class ExpenseProviderJpa implements ExpenseProvider {
 
     private AuthenticationFacade authenticationFacadea;
-    private EntityManager entityManager;
+    private ReactiveEntityManager entityManager;
 
     public ExpenseProviderJpa(
             AuthenticationFacade authenticationFacade,
-            EntityManager entityManager,
-            SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, ExpenseJpa.class);
+            ReactiveEntityManager entityManager) {
         this.authenticationFacadea = authenticationFacade;
         this.entityManager = entityManager;
+    }
+
+    @Override
+    public Optional<Budget.Expense> lookup(long id) {
+        return entityManager.<ExpenseJpa>blocking()
+                .hql("from ExpenseJpa where id = :id and user.username = :username")
+                .set("id", id)
+                .set("username", authenticationFacadea.authenticated())
+                .maybe()
+                .map(this::convert);
     }
 
     @Override
@@ -35,16 +40,18 @@ public class ExpenseProviderJpa extends DataProviderJpa<Budget.Expense, ExpenseJ
         if (filter instanceof ExpenseFilterCommand delegate) {
             delegate.user(authenticationFacadea.authenticated());
 
-            return queryPage(
-                    delegate,
-                    API.Option(),
-                    API.Option());
+            return entityManager.<ExpenseJpa>blocking()
+                    .hql(delegate.generateHql())
+                    .setAll(delegate.getParameters())
+                    .limit(delegate.pageSize())
+                    .offset(delegate.page() * delegate.pageSize())
+                    .page()
+                    .map(this::convert);
         }
 
         throw new IllegalStateException("Cannot use non JPA filter on ExpenseProviderJpa");
     }
 
-    @Override
     protected Budget.Expense convert(ExpenseJpa source) {
         if (source == null) {
             return null;
