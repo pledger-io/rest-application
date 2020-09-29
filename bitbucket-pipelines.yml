@@ -22,8 +22,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew check
-            - bash ./gradlew jacocoMergeTest sonarqube
+            - bash ./gradlew check jacocoTestReport
+            - bash ./gradlew sonarqube
           after-script:
-            - bash ./gradlew jacocoTestReport
             - bash <(curl -s https://codecov.io/bash) -s "*/build/reports/*" -f '*report.xml'

@@ -55,11 +55,10 @@ class BudgetProviderJpaIT extends JpaTestSetup {
     @Test
     void first() throws IOException {
         setup();
-        var check = budgetProvider.first();
+        var check = budgetProvider.first().blockingGet();
 
-        Assertions.assertThat(check.isPresent()).isTrue();
-        Assertions.assertThat(check.get().getExpenses()).hasSize(2);
-        Assertions.assertThat(check.get().getExpectedIncome()).isEqualTo(2500);
+        Assertions.assertThat(check.getExpenses()).hasSize(2);
+        Assertions.assertThat(check.getExpectedIncome()).isEqualTo(2500);
     }
 
     @MockBean

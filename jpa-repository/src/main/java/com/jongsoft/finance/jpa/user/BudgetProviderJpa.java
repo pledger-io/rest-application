@@ -1,20 +1,19 @@
 package com.jongsoft.finance.jpa.user;
 
 import com.jongsoft.finance.core.date.DateRange;
-import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.BudgetJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
-import com.jongsoft.lang.control.Optional;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 @Singleton
@@ -23,11 +22,11 @@ import javax.transaction.Transactional;
 public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
 
     private final AuthenticationFacade authenticationFacade;
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager reactiveEntityManager;
 
-    public BudgetProviderJpa(AuthenticationFacade authenticationFacade, EntityManager entityManager) {
+    public BudgetProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager reactiveEntityManager) {
         this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
+        this.reactiveEntityManager = reactiveEntityManager;
     }
 
     @Override
@@ -37,10 +36,10 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
                 where b.user.username = :username
                 order by b.from asc""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-
-        return this.<BudgetJpa>multiValue(query)
+        return reactiveEntityManager.<BudgetJpa>blocking()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .sequence()
                 .map(this::convert);
     }
 
@@ -54,33 +53,28 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
                     and b.from <= :start
                     and (b.until is null or b.until > :end)""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-        query.setParameter("start", range.getStart());
-        query.setParameter("end", range.getEnd());
-        var budget = convert(singleValue(query));
-
-        return Single.create(emitter -> {
-            if (budget != null) {
-                emitter.onSuccess(budget);
-            } else {
-                emitter.onError(StatusException.notFound("Cannot find budget for " + year + "-" + month));
-            }
-        });
+        return reactiveEntityManager.<BudgetJpa>reactive()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .set("start", range.getStart())
+                .set("end", range.getEnd())
+                .single()
+                .map(this::convert);
     }
 
     @Override
-    public Optional<Budget> first() {
+    public Maybe<Budget> first() {
         var hql = """
                 select b from BudgetJpa b
                 where b.user.username = :username
                 order by b.from asc""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-        query.setMaxResults(1);
-
-        return API.Option(convert(singleValue(query)));
+        return reactiveEntityManager.<BudgetJpa>reactive()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .limit(1)
+                .maybe()
+                .map(this::convert);
     }
 
     private Budget convert(BudgetJpa source) {
