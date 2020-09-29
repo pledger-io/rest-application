@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest.account;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
@@ -154,22 +155,17 @@ public class AccountTransactionResource {
                     @ApiResponse(responseCode = "404", description = "No transaction found")
             }
     )
-    Single<HttpResponse<TransactionResponse>> first(@PathVariable Long accountId, @QueryValue String description) {
-        return Single.create(emitter -> {
-            var command = filterFactory.transaction()
-                    .accounts(API.List(new EntityRef(accountId)));
+    Single<TransactionResponse> first(@PathVariable Long accountId, @QueryValue String description) {
+        var command = filterFactory.transaction()
+                .accounts(API.List(new EntityRef(accountId)));
 
-            if (description != null) {
-                command.description(description, true);
-            }
+        if (description != null) {
+            command.description(description, true);
+        }
 
-            var presence = transactionProvider.first(command);
-            if (presence.isPresent()) {
-                emitter.onSuccess(HttpResponse.ok(new TransactionResponse(presence.get())));
-            } else {
-                emitter.onSuccess(HttpResponse.notFound());
-            }
-        });
+        return transactionProvider.first(command)
+                .map(TransactionResponse::new)
+                .switchIfEmpty(Single.error(StatusException.notFound("No transactions found")));
     }
 
     @Get("/{transactionId}")

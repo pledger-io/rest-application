@@ -13,6 +13,7 @@ import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
+import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -177,15 +178,12 @@ class AccountTransactionResourceTest extends TestSetup {
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
         Mockito.when(transactionProvider.first(Mockito.any(TransactionProvider.FilterCommand.class)))
-                .thenReturn(API.Option(transaction));
+                .thenReturn(Maybe.just(transaction));
 
         var response = subject.first(1L, null).blockingGet();
 
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
-
-        var content = response.body();
-        Assertions.assertThat(content.getId()).isEqualTo(1L);
-        Assertions.assertThat(content.getAmount()).isEqualTo(20D);
+        Assertions.assertThat(response.getId()).isEqualTo(1L);
+        Assertions.assertThat(response.getAmount()).isEqualTo(20D);
     }
 
     @Test

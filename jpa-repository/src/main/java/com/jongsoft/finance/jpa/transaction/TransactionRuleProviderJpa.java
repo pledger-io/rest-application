@@ -4,7 +4,7 @@ import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
 import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreatedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.jpa.core.DataProviderJpa;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.transaction.entity.RuleChangeJpa;
 import com.jongsoft.finance.jpa.transaction.entity.RuleConditionJpa;
 import com.jongsoft.finance.jpa.transaction.entity.RuleGroupJpa;
@@ -14,34 +14,25 @@ import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
-import io.micronaut.transaction.SynchronousTransactionManager;
+import io.reactivex.Single;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import java.sql.Connection;
 import java.util.Optional;
 
 @Singleton
 @Named("transactionRuleProvider")
-public class TransactionRuleProviderJpa extends DataProviderJpa<TransactionRule, RuleJpa> implements TransactionRuleProvider {
+public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 
     private final AuthenticationFacade authenticationFacade;
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
     public TransactionRuleProviderJpa(
             AuthenticationFacade authenticationFacade,
-            EntityManager entityManager,
-            SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, RuleJpa.class);
+            ReactiveEntityManager entityManager) {
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
-    }
-
-    @Override
-    public com.jongsoft.lang.control.Optional<TransactionRule> lookup(long id) {
-        return super.lookup(id);
     }
 
     @Override
@@ -52,10 +43,20 @@ public class TransactionRuleProviderJpa extends DataProviderJpa<TransactionRule,
                  and r.archived = false
                  order by r.group.sort ASC, r.sort ASC""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
+        return entityManager.<RuleJpa>blocking()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .sequence()
+                .map(this::convert);
+    }
 
-        return this.<RuleJpa>multiValue(query)
+    @Override
+    public com.jongsoft.lang.control.Optional<TransactionRule> lookup(long id) {
+        return entityManager.<RuleJpa>blocking()
+                .hql("from RuleJpa where id = :id and user.username := username")
+                .set("id", id)
+                .set("username", authenticationFacade.authenticated())
+                .maybe()
                 .map(this::convert);
     }
 
@@ -68,11 +69,11 @@ public class TransactionRuleProviderJpa extends DataProviderJpa<TransactionRule,
                  and r.archived = false
                 order by r.sort asc""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-        query.setParameter("name", group);
-
-        return this.<RuleJpa>multiValue(query)
+        return entityManager.<RuleJpa>blocking()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .set("name", group)
+                .sequence()
                 .map(this::convert);
     }
 
@@ -84,10 +85,13 @@ public class TransactionRuleProviderJpa extends DataProviderJpa<TransactionRule,
             var hql = """
                 select max(sort) + 1 from RuleJpa 
                 where user.username = :username and archived = false and group.name = :group""";
-            var query = entityManager.createQuery(hql);
-            query.setParameter("username", authenticationFacade.authenticated());
-            query.setParameter("group", rule.getGroup());
-            sortOrder = API.Option(this.<Integer>singleValue(query)).getOrSupply(() -> 1);
+
+            sortOrder = entityManager.<Integer>blocking()
+                    .hql(hql)
+                    .set("username", authenticationFacade.authenticated())
+                    .set("group", rule.getGroup())
+                    .maybe()
+                    .getOrSupply(() -> 1);
         }
 
         var ruleJpa = RuleJpa.builder()
@@ -105,11 +109,10 @@ public class TransactionRuleProviderJpa extends DataProviderJpa<TransactionRule,
         ruleJpa.setConditions(convertConditions(ruleJpa, API.List(rule.getConditions())).toJava());
         ruleJpa.setChanges(convertChanges(ruleJpa, API.List(rule.getChanges())).toJava());
 
-        entityManager.merge(ruleJpa);
+        entityManager.persist(ruleJpa);
         return convert(ruleJpa);
     }
 
-    @Override
     protected TransactionRule convert(RuleJpa source) {
         if (source == null) {
             return null;
@@ -156,24 +159,26 @@ public class TransactionRuleProviderJpa extends DataProviderJpa<TransactionRule,
     }
 
     private UserAccountJpa activeUser() {
-        var query = entityManager.createQuery("select u from UserAccountJpa u where u.username = :username");
-        query.setParameter("username", authenticationFacade.authenticated());
-        return singleValue(query);
+        return entityManager.<UserAccountJpa>blocking()
+                .hql("from UserAccountJpa where username = :username")
+                .set("username", authenticationFacade.authenticated())
+                .maybe()
+                .get();
     }
 
     private RuleGroupJpa group(String group) {
-        var query = entityManager.createQuery("select r from RuleGroupJpa r where r.user.username = :username and r.name = :group");
-        query.setParameter("username", authenticationFacade.authenticated());
-        query.setParameter("group", group);
+        return entityManager.<RuleGroupJpa>reactive()
+                .hql("from RuleGroupJpa where user.username = :username and name = :group")
+                .set("username", authenticationFacade.authenticated())
+                .set("group", group)
+                .maybe()
+                .switchIfEmpty(Single.create(emitter -> {
+                    EventBus.getBus().send(new TransactionRuleGroupCreatedEvent(
+                            this,
+                            group));
 
-        RuleGroupJpa entity = singleValue(query);
-        if (entity == null) {
-            EventBus.getBus().send(new TransactionRuleGroupCreatedEvent(
-                    this,
-                    group));
-
-            return group(group);
-        }
-        return entity;
+                    emitter.onSuccess(group(group));
+                }))
+                .blockingGet();
     }
 }

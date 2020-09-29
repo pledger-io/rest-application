@@ -14,6 +14,7 @@ import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.rest.process.RuntimeResource;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -169,7 +170,7 @@ class TransactionResourceTest extends TestSetup {
 
     @Test
     void firstTransaction() {
-        Mockito.when(transactionProvider.first(Mockito.any())).thenReturn(API.Option(
+        Mockito.when(transactionProvider.first(Mockito.any())).thenReturn(Maybe.just(
                 Transaction.builder()
                         .date(LocalDate.of(2019, 1, 1))
                         .build()));

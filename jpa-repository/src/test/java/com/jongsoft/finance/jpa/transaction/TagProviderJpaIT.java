@@ -41,9 +41,11 @@ class TagProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_name() {
         setup();
-        Assertions.assertThat(tagProvider.lookup("Sample").get().name()).isEqualTo("Sample");
-        Assertions.assertThat(tagProvider.lookup("Nono").isPresent()).isFalse();
-        Assertions.assertThat(tagProvider.lookup("Bike").isPresent()).isFalse();
+
+        tagProvider.lookup("Nono").test().assertNoValues();
+        tagProvider.lookup("Bike").test().assertNoValues();
+
+        Assertions.assertThat(tagProvider.lookup("Sample").blockingGet().name()).isEqualTo("Sample");
     }
 
     @Test

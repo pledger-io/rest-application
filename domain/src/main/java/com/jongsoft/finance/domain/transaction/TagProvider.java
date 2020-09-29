@@ -2,7 +2,7 @@ package com.jongsoft.finance.domain.transaction;
 
 import com.jongsoft.finance.domain.core.Exportable;
 import com.jongsoft.finance.domain.core.ResultPage;
-import com.jongsoft.lang.control.Optional;
+import io.reactivex.Maybe;
 
 public interface TagProvider extends Exportable<Tag> {
 
@@ -12,7 +12,7 @@ public interface TagProvider extends Exportable<Tag> {
         FilterCommand pageSize(int pageSize);
     }
 
-    Optional<Tag> lookup(String name);
+    Maybe<Tag> lookup(String name);
     ResultPage<Tag> lookup(FilterCommand filter);
 
 }

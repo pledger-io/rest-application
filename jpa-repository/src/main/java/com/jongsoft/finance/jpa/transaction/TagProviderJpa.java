@@ -3,33 +3,27 @@ package com.jongsoft.finance.jpa.transaction;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.TagProvider;
-import com.jongsoft.finance.jpa.core.DataProviderJpa;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.transaction.entity.TagJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
-import com.jongsoft.lang.control.Optional;
-import io.micronaut.transaction.SynchronousTransactionManager;
+import io.reactivex.Maybe;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import java.sql.Connection;
 
 @Slf4j
 @Singleton
 @Named("tagProvider")
-public class TagProviderJpa extends DataProviderJpa<Tag, TagJpa> implements TagProvider {
+public class TagProviderJpa implements TagProvider {
 
     private final AuthenticationFacade authenticationFacade;
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
     public TagProviderJpa(
             AuthenticationFacade authenticationFacade,
-            EntityManager entityManager,
-            SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, TagJpa.class);
+            ReactiveEntityManager entityManager) {
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }
@@ -42,15 +36,15 @@ public class TagProviderJpa extends DataProviderJpa<Tag, TagJpa> implements TagP
                 select t from TagJpa t
                 where t.user.username = :username and t.archived = false""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-
-        return this.<TagJpa>multiValue(query)
+        return entityManager.<TagJpa>blocking()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .sequence()
                 .map(this::convert);
     }
 
     @Override
-    public Optional<Tag> lookup(String name) {
+    public Maybe<Tag> lookup(String name) {
         log.trace("Tag lookup by name: {}", name);
 
         var hql = """
@@ -59,11 +53,12 @@ public class TagProviderJpa extends DataProviderJpa<Tag, TagJpa> implements TagP
                     and t.user.username = :username
                     and t.archived = false""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-        query.setParameter("name", name);
-
-        return API.Option(convert(singleValue(query)));
+        return entityManager.<TagJpa>reactive()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .set("name", name)
+                .maybe()
+                .map(this::convert);
     }
 
     @Override
@@ -74,16 +69,19 @@ public class TagProviderJpa extends DataProviderJpa<Tag, TagJpa> implements TagP
             var offset = delegate.page() * delegate.pageSize();
             delegate.user(authenticationFacade.authenticated());
 
-            return queryPage(
-                    delegate,
-                    API.Option(offset),
-                    API.Option(delegate.pageSize()));
+            return entityManager.<TagJpa>blocking()
+                    .hql(delegate.generateHql())
+                    .setAll(delegate.getParameters())
+                    .limit(delegate.pageSize())
+                    .offset(offset)
+                    .sort(delegate.sort())
+                    .page()
+                    .map(this::convert);
         }
 
         throw new IllegalStateException("Cannot use non JPA filter on TagProviderJpa");
     }
 
-    @Override
     protected Tag convert(TagJpa source) {
         if (source == null) {
             return null;

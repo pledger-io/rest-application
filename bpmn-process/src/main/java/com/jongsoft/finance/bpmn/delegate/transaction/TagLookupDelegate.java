@@ -1,15 +1,16 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.StringValue;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.TagProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
-
+import io.reactivex.Single;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.variable.value.StringValue;
+
+import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
@@ -31,7 +32,8 @@ public class TagLookupDelegate implements JavaDelegate {
 
         var name = execution.<StringValue>getVariableLocalTyped("name").getValue();
         var tag = tagProvider.lookup(name)
-                .getOrSupply(() -> this.create(name));
+                .switchIfEmpty(Single.just(this.create(name)))
+                .blockingGet();
 
         execution.setVariableLocal("id", tag.name());
     }
@@ -41,7 +43,8 @@ public class TagLookupDelegate implements JavaDelegate {
                 .createTag(name);
 
         return tagProvider.lookup(name)
-                .getOrThrow(() -> new IllegalStateException("Could not locate tag after creating it"));
+                .switchIfEmpty(Single.error(StatusException.internalError("Could not locate tag after creating it")))
+                .blockingGet();
     }
 
 }

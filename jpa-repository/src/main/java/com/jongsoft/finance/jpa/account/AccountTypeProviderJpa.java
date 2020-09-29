@@ -1,16 +1,15 @@
 package com.jongsoft.finance.jpa.account;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.jongsoft.finance.domain.account.AccountTypeProvider;
 import com.jongsoft.finance.jpa.account.entity.AccountTypeJpa;
-import com.jongsoft.lang.API;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.lang.collection.Sequence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import javax.transaction.Transactional;
 
 @Singleton
 @Transactional()
@@ -19,14 +18,13 @@ public class AccountTypeProviderJpa implements AccountTypeProvider {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(AccountTypeProvider.class);
 
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
-    public AccountTypeProviderJpa(EntityManager entityManager) {
+    public AccountTypeProviderJpa(ReactiveEntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Sequence<String> lookup(boolean hidden) {
         LOGGER.debug("Locating account types with hidden: {}", hidden);
 
@@ -35,10 +33,10 @@ public class AccountTypeProviderJpa implements AccountTypeProvider {
                 where t.hidden = :hidden
                 order by t.label ASC""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("hidden", hidden);
-
-        return ((Sequence<AccountTypeJpa>) API.List(query.getResultList()))
+        return entityManager.<AccountTypeJpa>blocking()
+                .hql(hql)
+                .set("hidden", hidden)
+                .sequence()
                 .map(AccountTypeJpa::getLabel);
     }
 
