@@ -179,7 +179,7 @@ class TransactionResourceTest extends TestSetup {
                 .description("test")
                 .build();
 
-        var response = subject.firstTransaction(request);
+        var response = subject.firstTransaction(request).blockingGet();
 
         Assertions.assertThat(response).isEqualTo(LocalDate.of(2019, 1, 1));
     }

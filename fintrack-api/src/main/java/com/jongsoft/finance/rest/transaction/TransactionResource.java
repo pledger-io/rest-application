@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.transaction;
 
 import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.account.AccountTypeProvider;
@@ -19,6 +20,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
@@ -134,7 +136,7 @@ public class TransactionResource {
     }
 
     @Post("/locate-first")
-    LocalDate firstTransaction(@Body TransactionSearchRequest request) {
+    Single<LocalDate> firstTransaction(@Body TransactionSearchRequest request) {
         var command = filterFactory.transaction();
 
         if (request.getAccount() != null) {
@@ -153,7 +155,7 @@ public class TransactionResource {
 
         return transactionProvider.first(command)
                 .map(Transaction::getDate)
-                .getOrSupply(() -> null);
+                .switchIfEmpty(Single.error(StatusException.notFound("No transaction found")));
     }
 
     @Get(value = "/export", produces = MediaType.TEXT_PLAIN)
