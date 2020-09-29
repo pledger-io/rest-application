@@ -1,10 +1,5 @@
 package com.jongsoft.finance.bpmn;
 
-import java.util.function.Consumer;
-
-import javax.inject.Singleton;
-
-import org.mockito.Mockito;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.core.MailDaemon;
 import com.jongsoft.finance.domain.FilterFactory;
@@ -15,12 +10,7 @@ import com.jongsoft.finance.domain.account.events.AccountCreatedEvent;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.importer.CSVConfigProvider;
 import com.jongsoft.finance.domain.importer.ImportProvider;
-import com.jongsoft.finance.domain.transaction.TagProvider;
-import com.jongsoft.finance.domain.transaction.TransactionCreationHandler;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
-import com.jongsoft.finance.domain.transaction.TransactionRuleGroupProvider;
-import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
-import com.jongsoft.finance.domain.transaction.TransactionScheduleProvider;
+import com.jongsoft.finance.domain.transaction.*;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.domain.user.ExpenseProvider;
@@ -30,11 +20,14 @@ import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
-
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.runtime.event.annotation.EventListener;
+import io.reactivex.Maybe;
+import org.mockito.Mockito;
+
+import javax.inject.Singleton;
+import java.util.function.Consumer;
 
 @Factory
 public class ApplicationContext {
@@ -46,7 +39,7 @@ public class ApplicationContext {
             @EventListener
             public void accept(AccountCreatedEvent accountCreatedEvent) {
                 Mockito.when(accountProvider.lookup(accountCreatedEvent.getName()))
-                        .thenReturn(API.Option(Account.builder()
+                        .thenReturn(Maybe.just(Account.builder()
                                 .name(accountCreatedEvent.getName())
                                 .currency(accountCreatedEvent.getCurrency())
                                 .type(accountCreatedEvent.getType())

@@ -1,12 +1,12 @@
 package com.jongsoft.finance.domain.account;
 
-import com.jongsoft.finance.domain.core.DataProvider;
+import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.domain.core.DataProvider;
 import com.jongsoft.finance.domain.core.Exportable;
 import com.jongsoft.finance.domain.core.ResultPage;
-import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.lang.collection.Sequence;
-import com.jongsoft.lang.control.Optional;
+import io.reactivex.Maybe;
 
 public interface AccountProvider extends DataProvider<Account>, Exportable<Account> {
 
@@ -26,11 +26,11 @@ public interface AccountProvider extends DataProvider<Account>, Exportable<Accou
         double average();
     }
 
-    Optional<Account> synonymOf(String synonym);
+    Maybe<Account> synonymOf(String synonym);
 
-    Optional<Account> lookup(String name);
+    Maybe<Account> lookup(String name);
 
-    Optional<Account> lookup(SystemAccountTypes accountType);
+    Maybe<Account> lookup(SystemAccountTypes accountType);
 
     ResultPage<Account> lookup(FilterCommand filter);
 

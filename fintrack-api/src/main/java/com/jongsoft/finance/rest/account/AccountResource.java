@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.account.AccountTypeProvider;
 import com.jongsoft.finance.domain.core.SettingProvider;
@@ -50,13 +50,13 @@ public class AccountResource {
     )
     Single<List<AccountResponse>> ownAccounts() {
         return Single.create(emitter -> {
-           var accounts = accountProvider.lookup(
-                        accountFilterFactory.account().types(accountTypeProvider.lookup(false)));
+            var accounts = accountProvider.lookup(
+                    accountFilterFactory.account().types(accountTypeProvider.lookup(false)));
 
-           var response = accounts.content()
-                   .map(AccountResponse::new);
+            var response = accounts.content()
+                    .map(AccountResponse::new);
 
-           emitter.onSuccess(response.toJava());
+            emitter.onSuccess(response.toJava());
         });
     }
 
@@ -123,29 +123,27 @@ public class AccountResource {
             description = "This operation will allow for adding new accounts to the system"
     )
     public Single<AccountResponse> create(@Valid @Body AccountEditRequest accountEditRequest) {
-        return Single.create(emitter -> {
-            if (accountProvider.lookup(accountEditRequest.getName()).isPresent()) {
-                throw new IllegalArgumentException("Account name is already taken, duplicate accounts not allowed.");
-            }
+        return accountProvider.lookup(accountEditRequest.getName())
+                .switchIfEmpty(
+                        Single.just(currentUserProvider.currentUser()
+                                .createAccount(
+                                        accountEditRequest.getName(),
+                                        accountEditRequest.getCurrency(),
+                                        accountEditRequest.getType()))
+                .flatMapMaybe(a -> accountProvider.lookup(a.getName()))
+                .map(account -> {
+                    if (accountEditRequest.getInterestPeriodicity() != null) {
+                        account.interest(accountEditRequest.getInterest(), accountEditRequest.getInterestPeriodicity());
+                    }
 
-            currentUserProvider.currentUser()
-                    .createAccount(
-                            accountEditRequest.getName(),
-                            accountEditRequest.getCurrency(),
-                            accountEditRequest.getType());
+                    account.changeAccount(
+                            accountEditRequest.getIban(),
+                            accountEditRequest.getBic(),
+                            accountEditRequest.getNumber());
 
-            final Account account = accountProvider.lookup(accountEditRequest.getName()).get();
-
-            if (accountEditRequest.getInterestPeriodicity() != null) {
-                account.interest(accountEditRequest.getInterest(), accountEditRequest.getInterestPeriodicity());
-            }
-
-            account.changeAccount(
-                    accountEditRequest.getIban(),
-                    accountEditRequest.getBic(),
-                    accountEditRequest.getNumber());
-
-            emitter.onSuccess(new AccountResponse(account));
-        });
+                    return account;
+                }))
+                .switchIfEmpty(Single.error(StatusException.badRequest("Failed to create new account")))
+                .map(AccountResponse::new);
     }
 }

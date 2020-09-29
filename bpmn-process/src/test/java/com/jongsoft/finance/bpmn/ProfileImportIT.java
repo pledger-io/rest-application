@@ -93,14 +93,14 @@ public class ProfileImportIT extends ProcessTestSetup {
                         .id(3L)
                         .build()));
         Mockito.when(accountProvider.lookup("Boss & Co."))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(accountBoss));
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(accountBoss));
         Mockito.when(accountProvider.lookup("Demo checking account"))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(accountDemo));
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(accountDemo));
         Mockito.when(accountProvider.lookup("Groceries are us"))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(accountShop));
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(accountShop));
 
         processEngine.getRuntimeService().createProcessInstanceByKey("ImportUserProfile")
                 .setVariable("storageToken", "my-sample-token")

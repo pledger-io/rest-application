@@ -158,7 +158,7 @@ class BatchImportIT extends ProcessTestSetup {
                     .currency(args.getArgument(1, String.class))
                     .type(args.getArgument(2, String.class))
                     .build();
-            Mockito.when(accountProvider.lookup(args.getArgument(0, String.class))).thenReturn(API.Option(account));
+            Mockito.when(accountProvider.lookup(args.getArgument(0, String.class))).thenReturn(Maybe.just(account));
             Mockito.when(accountProvider.lookup(account.getId())).thenReturn(API.Option(account));
             return null;
         }).when(userAccount).createAccount(Mockito.anyString(), Mockito.any(), Mockito.anyString());
@@ -198,14 +198,14 @@ class BatchImportIT extends ProcessTestSetup {
         final Account accountKabel = Account.builder().id(4L).name("KABEL TV").iban("NL31INGB0001122334").type("creditor").build();
 
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class))).thenReturn(ResultPage.empty());
-        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(API.Option());
+        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(Maybe.empty());
         Mockito.when(accountProvider.lookup(2L)).thenReturn(API.Option(pieterseAccount));
         Mockito.when(accountProvider.lookup(3L)).thenReturn(API.Option(accountPost));
 
         Mockito.when(accountProvider.lookup("MW GA Pieterse"))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(pieterseAccount));
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(pieterseAccount));
 
         Mockito.when(accountProvider.lookup(123L))
                 .thenReturn(API.Option(Account.builder()
@@ -217,7 +217,7 @@ class BatchImportIT extends ProcessTestSetup {
         Mockito.when(accountProvider.lookup(new AccountFilterTest().iban("NL69INGB0123456789", true)))
                 .thenReturn(ResultPage.of(accountPost));
         Mockito.when(accountProvider.lookup("KABEL TV"))
-                .thenReturn(API.Option(accountKabel));
+                .thenReturn(Maybe.just(accountKabel));
         Mockito.when(accountProvider.lookup(new AccountFilterTest().iban("NL31INGB0001122334", true)))
                 .thenReturn(ResultPage.empty())
                 .thenReturn(ResultPage.of(accountKabel));

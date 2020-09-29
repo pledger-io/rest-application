@@ -12,6 +12,7 @@ import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,16 +109,16 @@ class BatchImportResourceTest extends TestSetup {
 
     @Test
     void config() {
-        Mockito.when(csvConfigProvider.lookup()).thenReturn(API.List(
+        Mockito.when(csvConfigProvider.lookup()).thenReturn(Flowable.just(
                 BatchImportConfig.builder()
                         .id(1L)
                         .name("Import config test")
                         .build()));
 
-        var response = subject.config();
+        var response = subject.config().test();
 
-        Assertions.assertThat(response.get(0).getId()).isEqualTo(1L);
-        Assertions.assertThat(response.get(0).getName()).isEqualTo("Import config test");
+        response.assertValueCount(1);
+        response.assertComplete();
     }
 
     @Test

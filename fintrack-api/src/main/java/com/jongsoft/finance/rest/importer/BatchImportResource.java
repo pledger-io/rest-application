@@ -2,7 +2,6 @@ package com.jongsoft.finance.rest.importer;
 
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.SettingProvider;
-import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.importer.CSVConfigProvider;
 import com.jongsoft.finance.domain.importer.ImportProvider;
 import com.jongsoft.finance.rest.model.CSVImporterConfigResponse;
@@ -12,6 +11,7 @@ import com.jongsoft.finance.security.CurrentUserProvider;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Tag(name = "Importer")
 @Controller("/api/import")
@@ -95,8 +94,9 @@ public class BatchImportResource {
             summary = "List configurations",
             description = "List all available importer configurations in FinTrack"
     )
-    List<BatchImportConfig> config() {
-        return csvConfigProvider.lookup().toJava();
+    Flowable<CSVImporterConfigResponse> config() {
+        return csvConfigProvider.lookup()
+                .map(CSVImporterConfigResponse::new);
     }
 
     @Put("/config")

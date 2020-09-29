@@ -29,10 +29,10 @@ class CSVConfigProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup() {
         setup();
-        var check = csvConfigProvider.lookup();
+        var check = csvConfigProvider.lookup().test();
 
-        Assertions.assertThat(check).hasSize(1);
-        Assertions.assertThat(check.head().getFileCode()).isEqualTo("file-code-1");
+        check.assertValueCount(1);
+        check.assertValueAt(0, batch -> batch.getFileCode().equals("file-code-1"));
     }
 
     @Test

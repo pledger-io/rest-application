@@ -46,23 +46,23 @@ public class ProcessContractCreateDelegate implements JavaDelegate {
                 .isEmpty()
                 .blockingGet();
         if (noDuplicate) {
-            var account = accountProvider.lookup(contractJson.getCompany()).get();
+            accountProvider.lookup(contractJson.getCompany())
+                    .map(account -> account.createContract(
+                            contractJson.getName(),
+                            contractJson.getDescription(),
+                            contractJson.getStart(),
+                            contractJson.getEnd()))
+                    .subscribe(unsaved -> {
+                        contractProvider.lookup(contractJson.getName())
+                                .subscribe(contract -> {
+                                    if (contractJson.getContract() != null) {
+                                        contract.registerUpload(storageService.store(Hex.decode(contractJson.getContract())));
+                                    }
 
-            account.createContract(
-                    contractJson.getName(),
-                    contractJson.getDescription(),
-                    contractJson.getStart(),
-                    contractJson.getEnd());
-
-            contractProvider.lookup(contractJson.getName())
-                    .subscribe(contract -> {
-                        if (contractJson.getContract() != null) {
-                            contract.registerUpload(storageService.store(Hex.decode(contractJson.getContract())));
-                        }
-
-                        if (contractJson.isTerminated()) {
-                            contract.terminate();
-                        }
+                                    if (contractJson.isTerminated()) {
+                                        contract.terminate();
+                                    }
+                                });
                     });
         }
     }

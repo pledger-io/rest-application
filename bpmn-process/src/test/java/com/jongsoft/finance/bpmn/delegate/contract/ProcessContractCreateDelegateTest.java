@@ -62,7 +62,7 @@ class ProcessContractCreateDelegateTest {
     @Test
     void execute() throws Exception {
         Mockito.when(accountProvider.lookup("Telfo"))
-                .thenReturn(API.Option(Account.builder()
+                .thenReturn(Maybe.just(Account.builder()
                         .id(1L)
                         .user(USER_ACCOUNT)
                         .build()));

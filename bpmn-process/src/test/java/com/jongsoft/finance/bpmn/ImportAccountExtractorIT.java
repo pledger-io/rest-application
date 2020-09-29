@@ -123,16 +123,16 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
         Mockito.when(userProvider.lookup("test-user")).thenReturn(API.Option(userAccount));
 
         Mockito.when(accountProvider.lookup("MW GA Pieterse"))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(Account.builder()
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(Account.builder()
                         .id(2L)
                         .name("MW GA Pieterse")
                         .type("creditor")
                         .build()));
 
         Mockito.when(filterFactory.account()).thenAnswer(args -> new AccountFilterTest());
-        Mockito.when(accountProvider.synonymOf(Mockito.anyString())).thenReturn(API.Option());
-        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(API.Option());
+        Mockito.when(accountProvider.synonymOf(Mockito.anyString())).thenReturn(Maybe.empty());
+        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(Maybe.empty());
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))
                 .thenReturn(ResultPage.empty());
 
@@ -144,7 +144,7 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
                         .build()));
 
         Mockito.when(accountProvider.synonymOf("Janssen PA"))
-                .thenReturn(API.Option(Account.builder()
+                .thenReturn(Maybe.just(Account.builder()
                         .id(5L)
                         .name("Jansen PA")
                         .type("creditor")

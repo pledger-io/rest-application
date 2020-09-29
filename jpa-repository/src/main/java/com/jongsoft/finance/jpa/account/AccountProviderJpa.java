@@ -7,43 +7,37 @@ import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.account.entity.AccountJpa;
-import com.jongsoft.finance.jpa.core.DataProviderJpa;
 import com.jongsoft.finance.jpa.projections.TripleProjection;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-import io.micronaut.transaction.SynchronousTransactionManager;
+import io.reactivex.Maybe;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import java.sql.Connection;
 import java.util.Objects;
 
 @Slf4j
 @Singleton
 @Transactional
 @Named("accountProvider")
-public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> implements AccountProvider {
+public class AccountProviderJpa implements AccountProvider {
 
     private final AuthenticationFacade authenticationFacade;
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
     public AccountProviderJpa(
             AuthenticationFacade authenticationFacade,
-            EntityManager entityManager,
-            SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, AccountJpa.class);
+            ReactiveEntityManager entityManager) {
         this.authenticationFacade = authenticationFacade;
-
         this.entityManager = entityManager;
     }
 
     @Override
-    public Optional<Account> synonymOf(String synonym) {
+    public Maybe<Account> synonymOf(String synonym) {
         log.trace("Account synonym lookup with: {}", synonym);
 
         String hql = """
@@ -52,10 +46,12 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
                 and a.account.user.username = :username
                 and a.account.archived = false""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("synonym", synonym);
-        query.setParameter("username", authenticationFacade.authenticated());
-        return API.Option(convert(singleValue(query)));
+        return entityManager.<AccountJpa>reactive()
+                .hql(hql)
+                .set("synonym", synonym)
+                .set("username", authenticationFacade.authenticated())
+                .maybe()
+                .map(this::convert);
     }
 
     @Override
@@ -68,15 +64,25 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
                 where a.user.username = :username 
                   and a.archived = false""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-
-        return this.<AccountJpa>multiValue(query)
+        return entityManager.<AccountJpa>blocking()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .sequence()
                 .map(this::convert);
     }
 
     @Override
-    public Optional<Account> lookup(String name) {
+    public Optional<Account> lookup(long id) {
+        return entityManager.<AccountJpa>blocking()
+                .hql("from AccountJpa where id = :id and user.username = :username")
+                .set("username", authenticationFacade.authenticated())
+                .set("id", id)
+                .maybe()
+                .map(this::convert);
+    }
+
+    @Override
+    public Maybe<Account> lookup(String name) {
         log.trace("Account name lookup: {}", name);
 
         String hql = """
@@ -87,15 +93,16 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
                   and a.user.username = :username
                   and a.archived = false""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("name", name);
-        query.setParameter("username", authenticationFacade.authenticated());
-
-        return API.Option(convert(singleValue(query)));
+        return entityManager.<AccountJpa>reactive()
+                .hql(hql)
+                .set("name", name)
+                .set("username", authenticationFacade.authenticated())
+                .maybe()
+                .map(this::convert);
     }
 
     @Override
-    public Optional<Account> lookup(SystemAccountTypes accountType) {
+    public Maybe<Account> lookup(SystemAccountTypes accountType) {
         log.trace("Account type lookup: {}", accountType);
 
         var hql = """
@@ -105,13 +112,14 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
                     a.type.label = :label
                     and a.user.username = :username
                     and a.archived = false""";
-        var query = entityManager.createQuery(hql);
 
-        query.setParameter("label", accountType.label());
-        query.setParameter("username", authenticationFacade.authenticated());
-        query.setMaxResults(1);
-
-        return API.Option(convert(singleValue(query)));
+        return entityManager.<AccountJpa>reactive()
+                .hql(hql)
+                .set("label", accountType.label())
+                .set("username", authenticationFacade.authenticated())
+                .limit(1)
+                .maybe()
+                .map(this::convert);
     }
 
     @Override
@@ -120,12 +128,16 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
 
         if (filter instanceof AccountFilterCommand delegate) {
             var offset = delegate.page() * delegate.pageSize();
-
             delegate.user(authenticationFacade.authenticated());
-            return queryPage(
-                    delegate,
-                    API.Option(offset),
-                    API.Option(delegate.pageSize()));
+
+            return entityManager.<AccountJpa>blocking()
+                    .hql(delegate.generateHql())
+                    .setAll(delegate.getParameters())
+                    .limit(delegate.pageSize())
+                    .offset(offset)
+                    .sort(delegate.sort())
+                    .page()
+                    .map(this::convert);
         }
 
         throw new IllegalStateException("Cannot use non JPA filter on AccountProviderJpa");
@@ -150,23 +162,22 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
                      group by t.account
                      order by sum(t.amount) DESC""".formatted(delegate.generateHql());
 
-            var query = entityManager.createQuery(hql);
-            delegate.prepareQuery(query);
-            query.setParameter("start", range.getStart());
-            query.setParameter("until", range.getEnd());
-            query.setMaxResults(delegate.pageSize());
-
-            Sequence<TripleProjection<AccountJpa, Double, Double>> spendings = multiValue(query);
-            return spendings.map(projection -> new AccountSpendingImpl(
-                    convert(projection.getFirst()),
-                    projection.getSecond(),
-                    projection.getThird()));
+            return entityManager.<TripleProjection<AccountJpa, Double, Double>>blocking()
+                    .hql(hql)
+                    .setAll(delegate.getParameters())
+                    .set("start", range.getStart())
+                    .set("until", range.getEnd())
+                    .limit(delegate.pageSize())
+                    .sequence()
+                    .map(projection -> new AccountSpendingImpl(
+                            convert(projection.getFirst()),
+                            projection.getSecond(),
+                            projection.getThird()));
         }
 
         throw new IllegalStateException("Cannot use non JPA filter on AccountProviderJpa");
     }
 
-    @Override
     protected Account convert(AccountJpa source) {
         if (source == null || !Objects.equals(authenticationFacade.authenticated(), source.getUser().getUsername())) {
             return null;

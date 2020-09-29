@@ -45,18 +45,18 @@ class AccountProviderJpaIT extends JpaTestSetup {
     @Test
     void ofSynonym_accountOne() {
         setup();
-        var account = accountProvider.synonymOf("Account trial");
+        var account = accountProvider.synonymOf("Account trial").blockingGet();
 
-        Assertions.assertThat(account.isPresent()).isTrue();
-        Assertions.assertThat(account.get().getName()).isEqualTo("Account One");
+        Assertions.assertThat(account.getName()).isEqualTo("Account One");
     }
 
     @Test
     void ofSynonym_notMyAccount() {
         setup();
-        var account = accountProvider.synonymOf("Account Junk");
+        var account = accountProvider.synonymOf("Account Junk")
+                .test();
 
-        Assertions.assertThat(account.isPresent()).isFalse();
+        account.assertNoValues();
     }
 
     @Test
@@ -81,17 +81,16 @@ class AccountProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_name() {
         setup();
-        var account = accountProvider.lookup("Account One");
+        var account = accountProvider.lookup("Account One").blockingGet();
 
-        Assertions.assertThat(account.isPresent()).isTrue();
-        Assertions.assertThat(account.get().getIban()).isEqualTo("NLJND200001928233");
-        Assertions.assertThat(account.get().getDescription()).isEqualTo("Demo Account");
-        Assertions.assertThat(account.get().getName()).isEqualTo("Account One");
-        Assertions.assertThat(account.get().getCurrency()).isEqualTo("EUR");
-        Assertions.assertThat(account.get().getNumber()).isBlank();
-        Assertions.assertThat(account.get().getBic()).isBlank();
-        Assertions.assertThat(account.get().getType()).isEqualTo("default");
-        Assertions.assertThat(account.get().getUser().getUsername()).isEqualTo("demo-user");
+        Assertions.assertThat(account.getIban()).isEqualTo("NLJND200001928233");
+        Assertions.assertThat(account.getDescription()).isEqualTo("Demo Account");
+        Assertions.assertThat(account.getName()).isEqualTo("Account One");
+        Assertions.assertThat(account.getCurrency()).isEqualTo("EUR");
+        Assertions.assertThat(account.getNumber()).isBlank();
+        Assertions.assertThat(account.getBic()).isBlank();
+        Assertions.assertThat(account.getType()).isEqualTo("default");
+        Assertions.assertThat(account.getUser().getUsername()).isEqualTo("demo-user");
     }
 
     @Test
@@ -134,8 +133,10 @@ class AccountProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_systemType() {
         setup();
-        var account = accountProvider.lookup(SystemAccountTypes.RECONCILE);
-        Assertions.assertThat(account.isPresent()).isFalse();
+        var account = accountProvider.lookup(SystemAccountTypes.RECONCILE).test();
+
+        account.assertNoValues();
+        account.assertComplete();
     }
 
     @Test
