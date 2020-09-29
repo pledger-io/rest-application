@@ -24,6 +24,7 @@ import javax.validation.Valid;
 @Controller("/api/settings/currencies")
 public class CurrencyResource {
 
+    private static final String NO_CURRENCY_WITH_CODE_MESSAGE = "No currency exists with code ";
     private final CurrencyProvider currencyProvider;
 
     public CurrencyResource(CurrencyProvider currencyProvider) {
@@ -77,7 +78,7 @@ public class CurrencyResource {
     public Single<CurrencyResponse> get(@PathVariable String currencyCode) {
         return currencyProvider.lookup(currencyCode)
                 .switchIfEmpty(Single.error(
-                        StatusException.notFound("No currency with code " + currencyCode + " exists.")))
+                        StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode)))
                 .map(CurrencyResponse::new);
     }
 
@@ -101,7 +102,7 @@ public class CurrencyResource {
     public Single<CurrencyResponse> update(@PathVariable String currencyCode, @Valid @Body CurrencyRequest request) {
         return currencyProvider.lookup(currencyCode)
                 .switchIfEmpty(Single.error(
-                        StatusException.notFound("No currency with code " + currencyCode + " exists.")))
+                        StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode)))
                 .map(currency -> {
                     currency.rename(request.getName(), request.getCode(), request.getSymbol());
                     return currency;
@@ -129,7 +130,7 @@ public class CurrencyResource {
     public Single<CurrencyResponse> patch(@PathVariable String currencyCode, @Valid @Body CurrencyPatchRequest request) {
         return currencyProvider.lookup(currencyCode)
                 .switchIfEmpty(Single.error(
-                        StatusException.notFound("No currency with code " + currencyCode + " exists.")))
+                        StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode)))
                 .map(currency -> {
                     if (request.getEnabled() != null) {
                         if (request.getEnabled()) {

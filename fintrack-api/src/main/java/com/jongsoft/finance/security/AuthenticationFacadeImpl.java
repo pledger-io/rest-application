@@ -1,23 +1,19 @@
 package com.jongsoft.finance.security;
 
-import javax.inject.Singleton;
-
 import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
-
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.security.authentication.UserDetails;
 import io.micronaut.security.event.LoginSuccessfulEvent;
 import io.micronaut.security.event.LogoutEvent;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Singleton;
+
 @Slf4j
 @Singleton
 public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
     private final static ThreadLocal<String> AUTHENTICATED_USER = new ThreadLocal<>();
-
-    public AuthenticationFacadeImpl() {
-    }
 
     @EventListener
     void authenticated(LoginSuccessfulEvent event) {
