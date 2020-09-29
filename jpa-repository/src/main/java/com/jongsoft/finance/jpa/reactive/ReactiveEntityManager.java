@@ -25,4 +25,8 @@ public class ReactiveEntityManager {
         return new NonReactivePipe<T>(entityManager);
     }
 
+    public UpdatingPipe update() {
+        return new UpdatingPipe(entityManager);
+    }
+
 }

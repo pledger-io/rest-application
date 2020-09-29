@@ -6,6 +6,7 @@ import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.reactivex.Flowable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -33,7 +34,7 @@ class SettingResourceTest {
 
     @Test
     void list() {
-        Mockito.when(settingProvider.lookup()).thenReturn(API.List(
+        Mockito.when(settingProvider.lookup()).thenReturn(Flowable.just(
                 Setting.builder()
                         .name("RecordSetPageSize")
                         .type(SettingType.NUMBER)

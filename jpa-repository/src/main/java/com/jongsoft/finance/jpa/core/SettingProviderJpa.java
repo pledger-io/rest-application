@@ -5,13 +5,12 @@ import com.jongsoft.finance.domain.core.Setting;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
 import com.jongsoft.finance.jpa.core.entity.SettingJpa;
-import com.jongsoft.lang.API;
-import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.lang.control.Optional;
+import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 @Slf4j
@@ -19,18 +18,19 @@ import javax.transaction.Transactional;
 @Transactional
 public class SettingProviderJpa extends RepositoryJpa implements SettingProvider {
 
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
-    public SettingProviderJpa(EntityManager entityManager) {
+    public SettingProviderJpa(ReactiveEntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     @Override
-    public Sequence<Setting> lookup() {
+    public Flowable<Setting> lookup() {
         log.trace("Setting listing");
 
-        var query = entityManager.createQuery("select s from SettingJpa s");
-        return this.<SettingJpa>multiValue(query)
+        return entityManager.<SettingJpa>reactive()
+                .hql("select s from SettingJpa s")
+                .flow()
                 .map(this::convert);
     }
 
@@ -42,9 +42,11 @@ public class SettingProviderJpa extends RepositoryJpa implements SettingProvider
                 select s from SettingJpa s
                 where s.name = :name""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("name", name);
-        return API.Option(convert(singleValue(query)));
+        return entityManager.<SettingJpa>blocking()
+                .hql(hql)
+                .set("name", name)
+                .maybe()
+                .map(this::convert);
     }
 
     @Transactional
@@ -55,10 +57,11 @@ public class SettingProviderJpa extends RepositoryJpa implements SettingProvider
                 set value = :value
                 where name = :name""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("name", event.getSetting());
-        query.setParameter("value", event.getValue());
-        query.executeUpdate();
+        entityManager.update()
+                .hql(hql)
+                .set("name", event.getSetting())
+                .set("value", event.getValue())
+                .update();
     }
 
     private Setting convert(SettingJpa source) {
