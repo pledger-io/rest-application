@@ -3,8 +3,9 @@ package com.jongsoft.finance.jpa;
 import io.micronaut.data.model.Sort;
 
 import javax.persistence.Query;
+import java.util.Map;
 
-public interface FilterDelegate<T extends FilterDelegate> {
+public interface FilterDelegate<T extends FilterDelegate<T>> {
 
     /**
      * Generates the HQL query that belongs to the command supported by the delegate.
@@ -19,6 +20,12 @@ public interface FilterDelegate<T extends FilterDelegate> {
      * @return the sort
      */
     Sort sort();
+
+    int page();
+
+    int pageSize();
+
+    Map<String, ?> getParameters();
 
     /**
      * Append a filtering for user.
