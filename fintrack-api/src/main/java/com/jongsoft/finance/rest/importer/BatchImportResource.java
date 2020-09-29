@@ -85,12 +85,9 @@ public class BatchImportResource {
             parameters = @Parameter(name = "batchSlug", in = ParameterIn.PATH, description = "The unique identifier")
     )
     Single<ImporterResponse> get(@PathVariable String batchSlug) {
-        return Single.create(emitter -> {
-            importProvider.lookup(batchSlug)
-                    .map(ImporterResponse::new)
-                    .ifPresent(emitter::onSuccess)
-                    .elseRun(() -> emitter.onError(StatusException.notFound("CSV configuration not found")));
-        });
+        return importProvider.lookup(batchSlug)
+                .map(ImporterResponse::new)
+                .switchIfEmpty(Single.error(StatusException.notFound("CSV configuration not found")));
     }
 
     @Get("/config")

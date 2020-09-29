@@ -1,18 +1,17 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import java.util.List;
-import java.util.function.Function;
-
 import com.jongsoft.finance.core.AggregateBase;
-import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.core.SystemAccountTypes;
+import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
-
 import io.micronaut.data.model.Sort;
+
+import java.util.List;
+import java.util.function.Function;
 
 public class TransactionFilterCommand extends FilterCommandJpa implements TransactionProvider.FilterCommand {
 
@@ -162,11 +161,11 @@ public class TransactionFilterCommand extends FilterCommandJpa implements Transa
         return Sort.of(Sort.Order.desc("a.date"));
     }
 
-    int page() {
+    public int page() {
         return page;
     }
 
-    int pageSize() {
+    public int pageSize() {
         return pageSize;
     }
 

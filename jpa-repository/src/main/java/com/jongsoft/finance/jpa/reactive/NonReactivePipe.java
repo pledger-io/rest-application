@@ -46,7 +46,7 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
         var selectHql = "select distinct a " + hql() + sort();
 
         var countQuery = entityManager.createQuery(countHql, Long.class);
-        var selectQuery = entityManager.createQuery(selectHql, Long.class);
+        var selectQuery = entityManager.createQuery(selectHql);
 
         applyParameters(countQuery);
         applyParameters(selectQuery);

@@ -1,11 +1,10 @@
 package com.jongsoft.finance.jpa.user;
 
-import javax.inject.Singleton;
-
 import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
-
 import io.micronaut.data.model.Sort;
+
+import javax.inject.Singleton;
 
 @Singleton
 public class CategoryFilterCommand extends FilterCommandJpa implements CategoryProvider.FilterCommand {
@@ -61,11 +60,11 @@ public class CategoryFilterCommand extends FilterCommandJpa implements CategoryP
         return Sort.of(Sort.Order.asc("a.label"));
     }
 
-    int page() {
+    public int page() {
         return this.page;
     }
 
-    int pageSize() {
+    public int pageSize() {
         return this.pageSize;
     }
     

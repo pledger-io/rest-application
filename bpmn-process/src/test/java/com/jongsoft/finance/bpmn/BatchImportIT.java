@@ -20,6 +20,7 @@ import com.jongsoft.finance.serialized.ImportConfigJson;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.core.reflect.ReflectionUtils;
+import io.reactivex.Maybe;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -184,7 +185,7 @@ class BatchImportIT extends ProcessTestSetup {
         importConfigJson.setAccountId(1L);
 
         Mockito.when(storageService.read("sample-file-run")).thenReturn(readFile("import-test/import-test.csv"));
-        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(API.Option(batchImport));
+        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Maybe.just(batchImport));
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(Account.builder()
                 .id(1L)

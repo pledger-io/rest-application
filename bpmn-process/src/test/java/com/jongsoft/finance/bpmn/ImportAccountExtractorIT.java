@@ -16,6 +16,7 @@ import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.collection.Set;
 import com.jongsoft.lang.collection.tuple.Pair;
+import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -163,7 +164,7 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
                 .fileCode("sample-file-run")
                 .build();
 
-        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(API.Option(batchImport));
+        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Maybe.just(batchImport));
         Mockito.when(storageService.read("sample-file-run")).thenReturn(readFile("import-test/import-test.csv"));
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);

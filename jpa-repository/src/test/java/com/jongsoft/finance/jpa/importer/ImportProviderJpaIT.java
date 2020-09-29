@@ -30,9 +30,10 @@ public class ImportProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_slug() {
         setup();
-        var check = importProvider.lookup("test-import-1");
+        var check = importProvider.lookup("test-import-1").test();
 
-        Assertions.assertThat(check.isPresent()).isTrue();
+        check.assertComplete();
+        check.assertNoValues();
     }
 
     @Test

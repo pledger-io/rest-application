@@ -1,7 +1,7 @@
 package com.jongsoft.finance.domain.importer;
 
 import com.jongsoft.finance.domain.core.ResultPage;
-import com.jongsoft.lang.control.Optional;
+import io.reactivex.Maybe;
 
 public interface ImportProvider {
 
@@ -18,7 +18,7 @@ public interface ImportProvider {
         }
     }
 
-    Optional<BatchImport> lookup(String slug);
+    Maybe<BatchImport> lookup(String slug);
     ResultPage<BatchImport> lookup(FilterCommand filter);
 
 }

@@ -1,11 +1,10 @@
 package com.jongsoft.finance.jpa.user;
 
-import javax.inject.Singleton;
-
 import com.jongsoft.finance.domain.user.ExpenseProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
-
 import io.micronaut.data.model.Sort;
+
+import javax.inject.Singleton;
 
 @Singleton
 public class ExpenseFilterCommand extends FilterCommandJpa implements ExpenseProvider.FilterCommand {
@@ -38,6 +37,16 @@ public class ExpenseFilterCommand extends FilterCommandJpa implements ExpensePro
     @Override
     public Sort sort() {
         return Sort.of(Sort.Order.asc("a.name"));
+    }
+
+    @Override
+    public int page() {
+        return 0;
+    }
+
+    @Override
+    public int pageSize() {
+        return Integer.MAX_VALUE;
     }
 
 }

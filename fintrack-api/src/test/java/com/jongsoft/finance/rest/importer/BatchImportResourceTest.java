@@ -12,6 +12,7 @@ import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,7 +83,7 @@ class BatchImportResourceTest extends TestSetup {
     @Test
     void get() {
         Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
-                API.Option(BatchImport.builder()
+                Maybe.just(BatchImport.builder()
                         .created(Dates.toDate(LocalDate.of(2019, 2, 1)))
                         .fileCode("token-sample")
                         .slug("xd2rsd-2fasd-q2ff-asd")

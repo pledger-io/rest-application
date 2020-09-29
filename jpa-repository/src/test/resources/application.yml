@@ -21,4 +21,4 @@ jpa:
         hbm2ddl:
           auto: none
         physical_naming_strategy: 'com.jongsoft.finance.jpa.DefaultNamingStrategy'
-        show_sql: false
+        show_sql: true

@@ -1,17 +1,5 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.EnumMap;
-import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.ImportProvider;
@@ -21,8 +9,19 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
-
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.EnumMap;
+import java.util.Optional;
 
 @Slf4j
 abstract class CSVReaderDelegate implements JavaDelegate {
@@ -40,7 +39,7 @@ abstract class CSVReaderDelegate implements JavaDelegate {
         String batchImportSlug = (String) execution.getVariableLocal("batchImportSlug");
         ImportConfigJson importConfigJson = getFromContext(execution);
 
-        BatchImport batchImport = importProvider.lookup(batchImportSlug).get();
+        BatchImport batchImport = importProvider.lookup(batchImportSlug).blockingGet();
         log.debug("{}: Processing transaction import CSV {}", execution.getCurrentActivityName(), batchImport.getSlug());
         if (importConfigJson == null) {
             throw new IllegalStateException("Cannot run account extraction without actual configuration.");

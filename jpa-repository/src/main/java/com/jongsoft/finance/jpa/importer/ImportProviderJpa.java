@@ -4,41 +4,33 @@ import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.importer.ImportProvider;
-import com.jongsoft.finance.jpa.FilterDelegate;
-import com.jongsoft.finance.jpa.core.DataProviderJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
-import com.jongsoft.lang.control.Optional;
 import io.micronaut.data.model.Sort;
-import io.micronaut.transaction.SynchronousTransactionManager;
+import io.reactivex.Maybe;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.sql.Connection;
 
 @Slf4j
 @Singleton
 @Transactional
-public class ImportProviderJpa extends DataProviderJpa<BatchImport, ImportJpa> implements ImportProvider {
+public class ImportProviderJpa implements ImportProvider {
 
     private final AuthenticationFacade authenticationFacade;
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
     public ImportProviderJpa(
             AuthenticationFacade authenticationFacade,
-            EntityManager entityManager,
-            SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, ImportJpa.class);
+            ReactiveEntityManager entityManager) {
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }
 
     @Override
-    public Optional<BatchImport> lookup(String slug) {
+    public Maybe<BatchImport> lookup(String slug) {
         log.trace("Importer lookup by slug: {}", slug);
 
         var hql = """
@@ -46,40 +38,26 @@ public class ImportProviderJpa extends DataProviderJpa<BatchImport, ImportJpa> i
                 where b.slug = :slug
                     and b.user.username = :username""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("slug", slug);
-        query.setParameter("username", authenticationFacade.authenticated());
-
-        return API.Option(convert(singleValue(query)));
+        return entityManager.<ImportJpa>reactive()
+                .hql(hql)
+                .set("slug", slug)
+                .set("username", authenticationFacade.authenticated())
+                .maybe()
+                .map(this::convert);
     }
 
     @Override
     public ResultPage<BatchImport> lookup(FilterCommand filter) {
         log.trace("Importer lookup by filter: {}", filter);
 
-        var offset = filter.page() * filter.pageSize();
-        return queryPage(new FilterDelegate<>() {
-            @Override
-            public String generateHql() {
-                return "from ImportJpa a where a.user.username = :username";
-            }
-
-            @Override
-            public FilterDelegate user(String username) {
-                return this;
-            }
-
-            @Override
-            public FilterDelegate prepareQuery(Query query) {
-                query.setParameter("username", authenticationFacade.authenticated());
-                return this;
-            }
-
-            @Override
-            public Sort sort() {
-                return Sort.of(Sort.Order.desc("a.created"));
-            }
-        }, API.Option(offset), API.Option(filter.pageSize()));
+        return entityManager.<ImportJpa>blocking()
+                .hql("from ImportJpa a where a.user.username = :username")
+                .set("username", authenticationFacade.authenticated())
+                .limit(filter.pageSize())
+                .offset(filter.page() * filter.pageSize())
+                .sort(Sort.of(Sort.Order.desc("a.created")))
+                .page()
+                .map(this::convert);
     }
 
     protected BatchImport convert(ImportJpa source) {
