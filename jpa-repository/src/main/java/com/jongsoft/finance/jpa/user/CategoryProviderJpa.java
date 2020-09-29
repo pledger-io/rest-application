@@ -28,7 +28,7 @@ public class CategoryProviderJpa extends DataProviderJpa<Category, CategoryJpa> 
             AuthenticationFacade authenticationFacade,
             EntityManager entityManager,
             SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, CategoryJpa.class, transactionManager);
+        super(entityManager, CategoryJpa.class);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }

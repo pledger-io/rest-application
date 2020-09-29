@@ -32,7 +32,7 @@ public class ImportProviderJpa extends DataProviderJpa<BatchImport, ImportJpa> i
             AuthenticationFacade authenticationFacade,
             EntityManager entityManager,
             SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, ImportJpa.class, transactionManager);
+        super(entityManager, ImportJpa.class);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }

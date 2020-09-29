@@ -7,28 +7,33 @@ import com.jongsoft.finance.domain.core.CurrencyProvider;
 import com.jongsoft.finance.domain.core.events.CurrencyPropertyEvent;
 import com.jongsoft.finance.domain.core.events.CurrencyRenameEvent;
 import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.lang.collection.Sequence;
-import io.micronaut.transaction.SynchronousTransactionManager;
+import com.jongsoft.lang.control.Optional;
 import io.reactivex.Maybe;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import java.sql.Connection;
 
 @Slf4j
 @Singleton
 @Transactional
-public class CurrencyProviderJpa extends DataProviderJpa<Currency, CurrencyJpa> implements CurrencyProvider {
+public class CurrencyProviderJpa implements CurrencyProvider {
 
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
     public CurrencyProviderJpa(
-            EntityManager entityManager,
-            SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, CurrencyJpa.class, transactionManager);
+            ReactiveEntityManager entityManager) {
         this.entityManager = entityManager;
+    }
+
+    public Optional<Currency> lookup(long id) {
+        return entityManager.<CurrencyJpa>blocking()
+                .hql("from CurrencyJpa where id = :id")
+                .set("id", id)
+                .maybe()
+                .map(this::convert);
     }
 
     @Override
@@ -40,9 +45,11 @@ public class CurrencyProviderJpa extends DataProviderJpa<Currency, CurrencyJpa> 
                 where c.archived = false
                     and c.code = :code""";
 
-        return maybe(
-                hql,
-                query -> query.setParameter("code", code));
+        return entityManager.<CurrencyJpa>reactive()
+                .hql(hql)
+                .set("code", code)
+                .maybe()
+                .map(this::convert);
     }
 
     @Override
@@ -53,9 +60,9 @@ public class CurrencyProviderJpa extends DataProviderJpa<Currency, CurrencyJpa> 
                 select c from CurrencyJpa c 
                 where c.archived = false""";
 
-        var query = entityManager.createQuery(hql);
-
-        return this.<CurrencyJpa>multiValue(query)
+        return entityManager.<CurrencyJpa>blocking()
+                .hql(hql)
+                .sequence()
                 .map(this::convert);
     }
 
@@ -87,12 +94,13 @@ public class CurrencyProviderJpa extends DataProviderJpa<Currency, CurrencyJpa> 
                     c.symbol = :symbol
                 where c.id = :id""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("id", event.getId());
-        query.setParameter("name", event.getName());
-        query.setParameter("code", event.getCode());
-        query.setParameter("symbol", event.getSymbol());
-        query.executeUpdate();
+        entityManager.update()
+                .hql(hql)
+                .set("id", event.getId())
+                .set("name", event.getName())
+                .set("code", event.getCode())
+                .set("symbol", event.getSymbol())
+                .update();
     }
 
     @Transactional
@@ -109,13 +117,13 @@ public class CurrencyProviderJpa extends DataProviderJpa<Currency, CurrencyJpa> 
                 + updatePart
                 + " where c.code = :code";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("code", event.getCode());
-        query.setParameter("value", event.getValue());
-        query.executeUpdate();
+        entityManager.update()
+                .hql(hql)
+                .set("code", event.getCode())
+                .set("value", event.getValue())
+                .update();
     }
 
-    @Override
     protected Currency convert(CurrencyJpa source) {
         if (source == null) {
             return null;

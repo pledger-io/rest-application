@@ -7,15 +7,8 @@ import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-import io.micronaut.transaction.SynchronousTransactionManager;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import java.sql.Connection;
-import java.util.function.Function;
 
 public abstract class DataProviderJpa<T, Y extends EntityJpa>
         extends RepositoryJpa {
@@ -23,15 +16,12 @@ public abstract class DataProviderJpa<T, Y extends EntityJpa>
     private final Class<Y> forClass;
 
     private final EntityManager entityManager;
-    private final SynchronousTransactionManager<Connection> transactionManager;
 
     public DataProviderJpa(
             EntityManager entityManager,
-            Class<Y> forClass,
-            SynchronousTransactionManager<Connection> transactionManager) {
+            Class<Y> forClass) {
         this.entityManager = entityManager;
         this.forClass = forClass;
-        this.transactionManager = transactionManager;
     }
 
     public Optional<T> lookup(long id) {
@@ -40,32 +30,6 @@ public abstract class DataProviderJpa<T, Y extends EntityJpa>
         query.setParameter("id", id);
 
         return API.Option(convert(singleValue(query)));
-    }
-
-    protected Flowable<T> flow(String hql, Function<TypedQuery<Y>, TypedQuery<Y>> conditionApplier) {
-        return Flowable.create(emitter -> {
-            transactionManager.executeRead(status -> {
-                conditionApplier.apply(entityManager.createQuery(hql, forClass))
-                        .getResultStream()
-                        .map(this::convert)
-                        .forEach(emitter::onNext);
-
-                emitter.onComplete();
-
-                return null;
-            });
-        }, BackpressureStrategy.BUFFER);
-    }
-
-    protected Maybe<T> maybe(String hql, Function<TypedQuery<Y>, TypedQuery<Y>> conditionApplier) {
-        return transactionManager.executeRead(status -> {
-            var query = conditionApplier.apply(entityManager.createQuery(hql, forClass));
-
-            return API.Try(() -> Maybe.just(query.getSingleResult()))
-                    .recover(e -> Maybe.empty())
-                    .get()
-                    .map(this::convert);
-        });
     }
 
     protected ResultPage<T> queryPage(

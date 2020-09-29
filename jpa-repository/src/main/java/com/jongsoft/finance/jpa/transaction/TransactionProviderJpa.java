@@ -42,7 +42,7 @@ public class TransactionProviderJpa extends DataProviderJpa<Transaction, Transac
             AuthenticationFacade authenticationFacade,
             EntityManager entityManager,
             SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, TransactionJournal.class, transactionManager);
+        super(entityManager, TransactionJournal.class);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }

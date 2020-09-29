@@ -29,7 +29,7 @@ public class TagProviderJpa extends DataProviderJpa<Tag, TagJpa> implements TagP
             AuthenticationFacade authenticationFacade,
             EntityManager entityManager,
             SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, TagJpa.class, transactionManager);
+        super(entityManager, TagJpa.class);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }

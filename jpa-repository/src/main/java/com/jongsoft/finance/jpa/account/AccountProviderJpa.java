@@ -36,7 +36,7 @@ public class AccountProviderJpa extends DataProviderJpa<Account, AccountJpa> imp
             AuthenticationFacade authenticationFacade,
             EntityManager entityManager,
             SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, AccountJpa.class, transactionManager);
+        super(entityManager, AccountJpa.class);
         this.authenticationFacade = authenticationFacade;
 
         this.entityManager = entityManager;

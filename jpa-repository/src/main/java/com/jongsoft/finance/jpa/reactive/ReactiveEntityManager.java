@@ -17,6 +17,10 @@ public class ReactiveEntityManager {
         this.entityManager = entityManager;
     }
 
+    public <T> void persist(T entity) {
+        entityManager.persist(entity);
+    }
+
     public <T> ReactivePipe<T> reactive() {
         return new ReactivePipe<>(entityManager, transactionManager);
     }

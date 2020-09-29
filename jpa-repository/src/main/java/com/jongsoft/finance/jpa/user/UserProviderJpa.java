@@ -27,7 +27,7 @@ public class UserProviderJpa extends DataProviderJpa<UserAccount, UserAccountJpa
     public UserProviderJpa(
             EntityManager entityManager,
             SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, UserAccountJpa.class, transactionManager);
+        super(entityManager, UserAccountJpa.class);
         this.entityManager = entityManager;
     }
 

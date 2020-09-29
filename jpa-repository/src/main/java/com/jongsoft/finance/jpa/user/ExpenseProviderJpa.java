@@ -25,7 +25,7 @@ public class ExpenseProviderJpa extends DataProviderJpa<Budget.Expense, ExpenseJ
             AuthenticationFacade authenticationFacade,
             EntityManager entityManager,
             SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, ExpenseJpa.class, transactionManager);
+        super(entityManager, ExpenseJpa.class);
         this.authenticationFacadea = authenticationFacade;
         this.entityManager = entityManager;
     }

@@ -28,7 +28,7 @@ public class TransactionScheduleProviderJpa extends DataProviderJpa<ScheduledTra
             AuthenticationFacade authenticationFacade,
             EntityManager entityManager,
             SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, ScheduledTransactionJpa.class, transactionManager);
+        super(entityManager, ScheduledTransactionJpa.class);
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }
