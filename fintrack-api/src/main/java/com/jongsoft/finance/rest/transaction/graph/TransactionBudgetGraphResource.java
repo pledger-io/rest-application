@@ -43,14 +43,13 @@ public class TransactionBudgetGraphResource extends BudgetPieChart {
             TransactionProvider transactionProvider,
             BudgetProvider budgetProvider,
             AccountProvider accountProvider,
-            FilterFactory accountFilterFactory,
             CurrentUserProvider currentUserProvider,
             MessageSource messageSource,
             AccountTypeProvider accountTypeProvider,
             CurrencyProvider currencyProvider) {
         super(messageSource, filterFactory, transactionProvider, budgetProvider);
         this.accountProvider = accountProvider;
-        this.filterFactory = accountFilterFactory;
+        this.filterFactory = filterFactory;
         this.currentUserProvider = currentUserProvider;
         this.accountTypeProvider = accountTypeProvider;
         this.currencyProvider = currencyProvider;

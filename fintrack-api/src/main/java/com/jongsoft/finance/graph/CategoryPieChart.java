@@ -18,24 +18,23 @@ import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.context.MessageSource;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Locale;
 
 public class CategoryPieChart {
 
-    @Resource(name = "messageSource")
-    private MessageSource messageSource;
-
+    private final MessageSource messageSource;
     private final FilterFactory filterFactory;
     private final TransactionProvider transactionProvider;
     private final CategoryProvider categoryProvider;
 
     public CategoryPieChart(
+            MessageSource messageSource,
             FilterFactory filterFactory,
             TransactionProvider transactionProvider,
             CategoryProvider categoryProvider) {
+        this.messageSource = messageSource;
         this.filterFactory = filterFactory;
         this.transactionProvider = transactionProvider;
         this.categoryProvider = categoryProvider;

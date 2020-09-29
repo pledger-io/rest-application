@@ -10,6 +10,7 @@ import com.jongsoft.finance.filter.RequestAttributes;
 import com.jongsoft.finance.graph.CategoryPieChart;
 import com.jongsoft.highchart.Highchart;
 import com.jongsoft.lang.API;
+import io.micronaut.context.MessageSource;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -32,11 +33,13 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
     private final CurrencyProvider currencyProvider;
 
     public AccountCategoryGraphResource(
+            MessageSource messageSource,
             FilterFactory filterFactory,
             AccountProvider accountProvider,
             CategoryProvider categoryService,
-            TransactionProvider transactionService, CurrencyProvider currencyProvider) {
-        super(filterFactory, transactionService, categoryService);
+            TransactionProvider transactionService,
+            CurrencyProvider currencyProvider) {
+        super(messageSource, filterFactory, transactionService, categoryService);
 
         this.accountProvider = accountProvider;
         this.currencyProvider = currencyProvider;

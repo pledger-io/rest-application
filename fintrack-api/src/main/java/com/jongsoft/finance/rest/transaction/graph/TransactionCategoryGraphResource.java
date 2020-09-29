@@ -11,6 +11,7 @@ import com.jongsoft.finance.graph.CategoryPieChart;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.highchart.Highchart;
 import com.jongsoft.lang.API;
+import io.micronaut.context.MessageSource;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -32,12 +33,13 @@ public class TransactionCategoryGraphResource extends CategoryPieChart {
     private final CurrencyProvider currencyProvider;
 
     public TransactionCategoryGraphResource(
+            MessageSource messageSource,
             FilterFactory filterFactory,
             TransactionProvider transactionProvider,
             CategoryProvider categoryProvider,
             CurrentUserProvider currentUserProvider,
             CurrencyProvider currencyProvider) {
-        super(filterFactory, transactionProvider, categoryProvider);
+        super(messageSource, filterFactory, transactionProvider, categoryProvider);
         this.currentUserProvider = currentUserProvider;
         this.currencyProvider = currencyProvider;
     }
