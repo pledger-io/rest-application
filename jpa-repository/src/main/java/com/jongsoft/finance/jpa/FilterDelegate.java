@@ -1,8 +1,8 @@
 package com.jongsoft.finance.jpa;
 
-import javax.persistence.Query;
-
 import io.micronaut.data.model.Sort;
+
+import javax.persistence.Query;
 
 public interface FilterDelegate<T extends FilterDelegate> {
 
@@ -32,6 +32,7 @@ public interface FilterDelegate<T extends FilterDelegate> {
      *
      * @param query
      */
+    @Deprecated
     T prepareQuery(Query query);
 
 }
