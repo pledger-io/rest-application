@@ -1,7 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
 import com.jongsoft.finance.ProcessMapper;
-import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.BudgetJson;
@@ -49,17 +48,13 @@ public class ProcessBudgetCreateDelegate implements JavaDelegate {
                 execution.getCurrentActivityName(),
                 budgetJson.getStart());
 
-        Budget budget;
-        if (!budgetProvider.first().isPresent()) {
-            budget = userAccount.createBudget(
-                    budgetJson.getStart(),
-                    budgetJson.getExpectedIncome());
-        } else {
-            var original = budgetProvider.lookup(
-                    budgetJson.getStart().getYear(),
-                    budgetJson.getStart().getMonthValue()).blockingGet();
-            budget = original.indexBudget(budgetJson.getStart(), budgetJson.getExpectedIncome());
-        }
+        var year = budgetJson.getStart().getYear();
+        var month = budgetJson.getStart().getMonthValue();
+
+        var budget = budgetProvider.lookup(year, month)
+                .map(b -> b.indexBudget(budgetJson.getStart(), budgetJson.getExpectedIncome()))
+                .onErrorReturn(e -> userAccount.createBudget(budgetJson.getStart(), budgetJson.getExpectedIncome()))
+                .blockingGet();
 
         budgetJson.getExpenses().stream()
                 .filter(e -> budget.determineExpense(e.getName()) == null)

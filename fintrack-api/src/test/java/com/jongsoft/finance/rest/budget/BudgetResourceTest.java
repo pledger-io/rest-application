@@ -14,6 +14,7 @@ import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.subscribers.TestSubscriber;
 import org.assertj.core.api.Assertions;
@@ -58,6 +59,19 @@ class BudgetResourceTest extends TestSetup {
 
     @Test
     void firstBudget() {
+        Mockito.when(budgetProvider.first()).thenReturn(
+                Maybe.just(Budget.builder()
+                        .expectedIncome(200.20D)
+                        .start(LocalDate.of(2018, 2, 3))
+                        .expenses(API.List(Budget.Expense.builder()
+                                .id(1L)
+                                .name("Grocery")
+                                .lowerBound(20D)
+                                .upperBound(50D)
+                                .build()))
+                        .build()));
+
+        var response = subject.firstBudget();
     }
 
     @Test
@@ -100,7 +114,7 @@ class BudgetResourceTest extends TestSetup {
 
     @Test
     void create() {
-        Mockito.when(budgetProvider.first()).thenReturn(API.Option());
+        Mockito.when(budgetProvider.first()).thenReturn(Maybe.empty());
 
         var request = BudgetCreateRequest.builder()
                 .month(2)
@@ -167,7 +181,7 @@ class BudgetResourceTest extends TestSetup {
                         .build()))
                 .build());
 
-        Mockito.when(budgetProvider.first()).thenReturn(API.Option(Budget.builder().start(LocalDate.MIN).build()));
+        Mockito.when(budgetProvider.first()).thenReturn(Maybe.just(Budget.builder().start(LocalDate.MIN).build()));
         Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt())).thenReturn(
                 Single.just(budget));
 
@@ -199,7 +213,7 @@ class BudgetResourceTest extends TestSetup {
 
     @Test
     void computeExpense() {
-        Mockito.when(budgetProvider.first()).thenReturn(API.Option(Budget.builder().start(LocalDate.MIN).build()));
+        Mockito.when(budgetProvider.first()).thenReturn(Maybe.just(Budget.builder().start(LocalDate.MIN).build()));
         Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt())).thenReturn(
                 Single.just(Budget.builder()
                         .expectedIncome(200.20D)

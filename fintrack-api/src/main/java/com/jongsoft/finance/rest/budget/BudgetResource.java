@@ -15,6 +15,7 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -57,10 +58,9 @@ public class BudgetResource {
             summary = "First budget start",
             description = "Computes the date of the start of the first budget registered in FinTrack"
     )
-    LocalDate firstBudget() {
+    Maybe<LocalDate> firstBudget() {
         return budgetProvider.first()
-                .map(Budget::getStart)
-                .getOrSupply(() -> null);
+                .map(Budget::getStart);
     }
 
     @Get("/{year}/{month}")
@@ -84,9 +84,7 @@ public class BudgetResource {
             parameters = @Parameter(name = "token", in = ParameterIn.QUERY, schema = @Schema(implementation = String.class))
     )
     List<ExpenseResponse> autocomplete(@QueryValue String token) {
-        return expenseProvider.lookup(
-                filterFactory.expense()
-                        .name(token, false))
+        return expenseProvider.lookup(filterFactory.expense().name(token, false))
                 .content()
                 .map(ExpenseResponse::new)
                 .toJava();
