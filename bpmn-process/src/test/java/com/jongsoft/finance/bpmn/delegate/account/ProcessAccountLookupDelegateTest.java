@@ -1,14 +1,15 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.lang.API;
+import io.reactivex.Maybe;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class ProcessAccountLookupDelegateTest {
 
@@ -57,7 +58,7 @@ class ProcessAccountLookupDelegateTest {
 
         Mockito.when(execution.hasVariableLocal("name")).thenReturn(true);
         Mockito.when(execution.getVariableLocal("name")).thenReturn("Test account");
-        Mockito.when(accountProvider.lookup("Test account")).thenReturn(API.Option(account));
+        Mockito.when(accountProvider.lookup("Test account")).thenReturn(Maybe.just(account));
 
         subject.execute(execution);
 

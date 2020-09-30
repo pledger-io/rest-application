@@ -1,15 +1,14 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.account.AccountProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
-import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * This delegate accesses the {@link Account} synonym list in the system. The synonym list
@@ -44,9 +43,11 @@ public class AccountSynonymLookupDelegate implements JavaDelegate {
                 execution.getVariable("name"));
 
         var synonym = execution.<StringValue>getVariableLocalTyped("name").getValue();
-        accountProvider.synonymOf(synonym)
-                .ifPresent(account -> execution.setVariableLocal("id", account.getId()))
-                .elseRun(() -> execution.setVariableLocal("id", null));
+        var accountId = accountProvider.synonymOf(synonym)
+                .map(Account::getId)
+                .blockingGet(Long.MIN_VALUE);
+
+        execution.setVariableLocal("id", accountId.equals(Long.MIN_VALUE) ? null : accountId);
     }
 
 }

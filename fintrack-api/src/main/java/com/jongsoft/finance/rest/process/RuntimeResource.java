@@ -24,6 +24,7 @@ import java.util.Map;
 @Controller("/api/runtime-process")
 public class RuntimeResource {
 
+    private static final String KEY_USERNAME = "username";
     private final HistoryService historyService;
     private final RuntimeService runtimeService;
     private final AuthenticationFacade authenticationFacade;
@@ -52,7 +53,7 @@ public class RuntimeResource {
                 instanceBuilder.businessKey(parameters.get("businessKey").toString());
             }
 
-            instanceBuilder.setVariable("username", authenticationFacade.authenticated());
+            instanceBuilder.setVariable(KEY_USERNAME, authenticationFacade.authenticated());
 
             emitter.onSuccess(instanceBuilder.execute());
         });
@@ -70,7 +71,7 @@ public class RuntimeResource {
     public Flowable<ProcessResponse> history(@PathVariable String processDefinitionKey) {
         var result = API.List(historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
-                .variableValueEquals("username", authenticationFacade.authenticated())
+                .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
                 .orderByProcessInstanceStartTime().desc()
                 .list());
 
@@ -89,7 +90,7 @@ public class RuntimeResource {
         var result = API.List(historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .processInstanceBusinessKey(businessKey)
-                .variableValueEquals("username", authenticationFacade.authenticated())
+                .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
                 .orderByProcessInstanceStartTime().desc()
                 .list());
 

@@ -3,7 +3,7 @@ package com.jongsoft.finance.domain.user;
 import com.jongsoft.finance.domain.core.DataProvider;
 import com.jongsoft.finance.domain.core.Exportable;
 import com.jongsoft.finance.domain.core.ResultPage;
-import com.jongsoft.lang.control.Optional;
+import io.reactivex.Maybe;
 
 public interface CategoryProvider extends DataProvider<Category>, Exportable<Category> {
 
@@ -13,7 +13,7 @@ public interface CategoryProvider extends DataProvider<Category>, Exportable<Cat
         FilterCommand pageSize(int pageSize);
     }
 
-    Optional<Category> lookup(String label);
+    Maybe<Category> lookup(String label);
 
     ResultPage<Category> lookup(FilterCommand filterCommand);
 

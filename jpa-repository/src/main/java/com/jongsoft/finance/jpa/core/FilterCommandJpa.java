@@ -1,12 +1,11 @@
 package com.jongsoft.finance.jpa.core;
 
+import com.jongsoft.finance.jpa.FilterDelegate;
+
+import javax.persistence.Query;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
-import javax.persistence.Query;
-
-import com.jongsoft.finance.jpa.FilterDelegate;
 
 public abstract class FilterCommandJpa implements FilterDelegate<FilterCommandJpa> {
 
@@ -29,9 +28,14 @@ public abstract class FilterCommandJpa implements FilterDelegate<FilterCommandJp
     }
 
     @Override
+    @Deprecated
     public FilterCommandJpa prepareQuery(Query query) {
         parameters.forEach(query::setParameter);
         return this;
+    }
+
+    public Map<String, ?> getParameters() {
+        return parameters;
     }
 
     protected abstract String fromHql();

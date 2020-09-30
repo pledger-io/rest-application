@@ -1,18 +1,17 @@
 package com.jongsoft.finance.bpmn.delegate.rule;
 
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.LongValue;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
-
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.variable.value.LongValue;
+
+import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
@@ -57,6 +56,7 @@ public class TransactionRuleMatcherDelegate implements JavaDelegate {
                 case SOURCE_ACCOUNT, CHANGE_TRANSFER_FROM -> transaction.changeAccount(true, (Account) outputSet.get(column));
                 case CONTRACT -> transaction.linkToContract((String) outputSet.get(column));
                 case BUDGET -> transaction.linkToBudget((String) outputSet.get(column));
+                default -> throw new IllegalArgumentException("Unsupported rule column provided " + column);
             }
         }
     }

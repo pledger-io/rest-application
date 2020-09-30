@@ -1,14 +1,14 @@
 package com.jongsoft.finance.domain.core;
 
-import java.util.function.Function;
-
 import com.jongsoft.finance.core.SettingType;
-import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.reactivex.Flowable;
+
+import java.util.function.Function;
 
 public interface SettingProvider {
 
-    Sequence<Setting> lookup();
+    Flowable<Setting> lookup();
 
     Optional<Setting> lookup(String name);
 

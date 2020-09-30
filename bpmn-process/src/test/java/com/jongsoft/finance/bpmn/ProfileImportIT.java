@@ -6,6 +6,7 @@ import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.user.*;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
+import io.reactivex.Maybe;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,29 +78,29 @@ public class ProfileImportIT extends ProcessTestSetup {
         Mockito.when(storageService.read("my-json-token")).then((Answer<byte[]>) inv -> ruleJsonString.toString().getBytes());
 
         Mockito.when(categoryProvider.lookup("Salary")).thenReturn(
-                API.Option(),
-                API.Option(Category.builder()
+                Maybe.empty(),
+                Maybe.just(Category.builder()
                         .id(1L)
                         .build()));
         Mockito.when(categoryProvider.lookup("Groceries")).thenReturn(
-                API.Option(),
-                API.Option(Category.builder()
+                Maybe.empty(),
+                Maybe.just(Category.builder()
                         .id(2L)
                         .build()));
         Mockito.when(categoryProvider.lookup("Car")).thenReturn(
-                API.Option(),
-                API.Option(Category.builder()
+                Maybe.empty(),
+                Maybe.just(Category.builder()
                         .id(3L)
                         .build()));
         Mockito.when(accountProvider.lookup("Boss & Co."))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(accountBoss));
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(accountBoss));
         Mockito.when(accountProvider.lookup("Demo checking account"))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(accountDemo));
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(accountDemo));
         Mockito.when(accountProvider.lookup("Groceries are us"))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(accountShop));
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(accountShop));
 
         processEngine.getRuntimeService().createProcessInstanceByKey("ImportUserProfile")
                 .setVariable("storageToken", "my-sample-token")

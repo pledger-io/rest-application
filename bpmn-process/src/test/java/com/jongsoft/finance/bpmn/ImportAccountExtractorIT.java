@@ -16,6 +16,7 @@ import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.collection.Set;
 import com.jongsoft.lang.collection.tuple.Pair;
+import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -122,16 +123,16 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
         Mockito.when(userProvider.lookup("test-user")).thenReturn(API.Option(userAccount));
 
         Mockito.when(accountProvider.lookup("MW GA Pieterse"))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(Account.builder()
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(Account.builder()
                         .id(2L)
                         .name("MW GA Pieterse")
                         .type("creditor")
                         .build()));
 
         Mockito.when(filterFactory.account()).thenAnswer(args -> new AccountFilterTest());
-        Mockito.when(accountProvider.synonymOf(Mockito.anyString())).thenReturn(API.Option());
-        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(API.Option());
+        Mockito.when(accountProvider.synonymOf(Mockito.anyString())).thenReturn(Maybe.empty());
+        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(Maybe.empty());
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))
                 .thenReturn(ResultPage.empty());
 
@@ -143,7 +144,7 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
                         .build()));
 
         Mockito.when(accountProvider.synonymOf("Janssen PA"))
-                .thenReturn(API.Option(Account.builder()
+                .thenReturn(Maybe.just(Account.builder()
                         .id(5L)
                         .name("Jansen PA")
                         .type("creditor")
@@ -163,7 +164,7 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
                 .fileCode("sample-file-run")
                 .build();
 
-        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(API.Option(batchImport));
+        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Maybe.just(batchImport));
         Mockito.when(storageService.read("sample-file-run")).thenReturn(readFile("import-test/import-test.csv"));
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);

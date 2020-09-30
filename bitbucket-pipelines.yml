@@ -14,7 +14,8 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew check
+            - bash ./gradlew check jacocoTestReport
+            - bash ./gradlew sonarqube
 
   branches:
     master:

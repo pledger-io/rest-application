@@ -26,7 +26,7 @@ public class SettingResource {
             operationId = "getSettings"
     )
     Flowable<SettingResponse> list() {
-        return Flowable.fromIterable(settingProvider.lookup())
+        return settingProvider.lookup()
                 .map(setting -> new SettingResponse(
                         setting.getName(),
                         setting.getValue(),

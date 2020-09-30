@@ -10,6 +10,7 @@ import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.lang.API;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 @Builder
 @Aggregate
 @AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Category implements AggregateBase {
 
     private Long id;

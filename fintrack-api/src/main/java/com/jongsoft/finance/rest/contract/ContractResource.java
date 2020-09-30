@@ -24,6 +24,8 @@ import java.security.Principal;
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public class ContractResource {
 
+    private static final String NO_CONTRACT_FOUND_MESSAGE = "No contract can be found for ";
+
     private final AccountProvider accountProvider;
     private final ContractProvider contractProvider;
 
@@ -109,7 +111,7 @@ public class ContractResource {
                 emitter.onSuccess(response.get());
             } else {
                 emitter.onError(
-                        StatusException.notFound("No contract can be found for " + contractId));
+                        StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
             }
         });
     }
@@ -130,7 +132,7 @@ public class ContractResource {
                 emitter.onSuccess(response.get());
             } else {
                 emitter.onError(
-                        StatusException.notFound("No contract can be found for " + contractId));
+                        StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
             }
         });
     }
@@ -156,7 +158,7 @@ public class ContractResource {
                 emitter.onSuccess(response.get());
             } else {
                 emitter.onError(
-                        StatusException.notFound("No contract can be found for " + contractId));
+                        StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
             }
         });
     }
@@ -185,7 +187,7 @@ public class ContractResource {
                 emitter.onSuccess(response.get());
             } else {
                 emitter.onError(
-                        StatusException.notFound("No contract can be found for " + contractId));
+                        StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
             }
         });
     }

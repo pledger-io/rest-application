@@ -11,6 +11,7 @@ import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -157,8 +158,8 @@ class AccountResourceTest extends TestSetup {
     @Test
     void create() {
         Mockito.when(accountProvider.lookup("Sample account"))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(Account.builder()
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(Account.builder()
                         .id(1L)
                         .balance(0D)
                         .name("Sample account")

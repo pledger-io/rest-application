@@ -1,14 +1,17 @@
 package com.jongsoft.finance.jpa.account;
 
-import java.util.Objects;
-
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
 import com.jongsoft.lang.collection.Sequence;
-
 import io.micronaut.data.model.Sort;
 
+import java.util.Objects;
+
 public class AccountFilterCommand extends FilterCommandJpa implements AccountProvider.FilterCommand {
+
+    private static final String FIELD_NUMBER = "number";
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_IBAN = "iban";
 
     private int page;
     private int pageSize;
@@ -21,11 +24,11 @@ public class AccountFilterCommand extends FilterCommandJpa implements AccountPro
     @Override
     public AccountFilterCommand name(String value, boolean exact) {
         if (exact) {
-            hql("name", " and lower(a.name) = lower(:name)");
-            parameter("name", value);
+            hql(FIELD_NAME, " and lower(a.name) = lower(:name)");
+            parameter(FIELD_NAME, value);
         } else {
-            hql("name", " and lower(a.name) like lower(:name)");
-            parameter("name", "%" + value + "%");
+            hql(FIELD_NAME, " and lower(a.name) like lower(:name)");
+            parameter(FIELD_NAME, "%" + value + "%");
         }
 
         return this;
@@ -34,11 +37,11 @@ public class AccountFilterCommand extends FilterCommandJpa implements AccountPro
     @Override
     public AccountFilterCommand iban(String value, boolean exact) {
         if (exact) {
-            hql("iban", " and lower(a.iban) = lower(:iban)");
-            parameter("iban", value);
+            hql(FIELD_IBAN, " and lower(a.iban) = lower(:iban)");
+            parameter(FIELD_IBAN, value);
         } else {
-            hql("iban", " and lower(a.iban) like lower(:iban)");
-            parameter("iban", "%" + value + "%");
+            hql(FIELD_IBAN, " and lower(a.iban) like lower(:iban)");
+            parameter(FIELD_IBAN, "%" + value + "%");
         }
 
         return this;
@@ -47,11 +50,11 @@ public class AccountFilterCommand extends FilterCommandJpa implements AccountPro
     @Override
     public AccountFilterCommand number(String value, boolean exact) {
         if (exact) {
-            hql("number", " and lower(a.number) = :number");
-            parameter("number", value);
+            hql(FIELD_NUMBER, " and lower(a.number) = :number");
+            parameter(FIELD_NUMBER, value);
         } else {
-            hql("number", " and lower(a.number) like :number");
-            parameter("number", "%" + value + "%");
+            hql(FIELD_NUMBER, " and lower(a.number) like :number");
+            parameter(FIELD_NUMBER, "%" + value + "%");
         }
 
         return this;

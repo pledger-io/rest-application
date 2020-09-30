@@ -6,6 +6,7 @@ import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.reactivex.Maybe;
 
 import java.time.LocalDate;
 
@@ -36,7 +37,7 @@ public interface TransactionProvider extends DataProvider<Transaction> {
         double summary();
     }
 
-    Optional<Transaction> first(FilterCommand filter);
+    Maybe<Transaction> first(FilterCommand filter);
 
     ResultPage<Transaction> lookup(FilterCommand filter);
 

@@ -30,9 +30,9 @@ public class ImportProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_slug() {
         setup();
-        var check = importProvider.lookup("test-import-1");
+        var check = importProvider.lookup("test-import-1").blockingGet();
 
-        Assertions.assertThat(check.isPresent()).isTrue();
+        Assertions.assertThat(check.getFileCode()).isEqualTo("Large,CSV,file");
     }
 
     @Test

@@ -1,20 +1,18 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
-import java.time.LocalDate;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.DoubleValue;
-import org.camunda.bpm.engine.variable.value.StringValue;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
-
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.variable.value.DoubleValue;
+import org.camunda.bpm.engine.variable.value.StringValue;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.time.LocalDate;
 
 /**
  * This delegate will create a reconciliation transaction into a selected account. This can be used to correct missing
@@ -52,7 +50,7 @@ public class ReconcileAccountDelegate implements JavaDelegate {
                 toReconcile.getName(), isoBookDate, amount);
 
         Account reconcileAccount = accountProvider.lookup(SystemAccountTypes.RECONCILE)
-                .get();
+                .blockingGet();
 
         var transactionDate = LocalDate.parse(isoBookDate);
         Transaction.Type type = amount >= 0 ? Transaction.Type.CREDIT : Transaction.Type.DEBIT;

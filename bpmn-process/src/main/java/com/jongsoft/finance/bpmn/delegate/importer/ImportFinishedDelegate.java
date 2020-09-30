@@ -1,14 +1,13 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
-import java.util.Date;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import com.jongsoft.finance.domain.importer.ImportProvider;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
-import com.jongsoft.finance.domain.importer.ImportProvider;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Date;
 
 @Singleton
 public class ImportFinishedDelegate implements JavaDelegate {
@@ -25,7 +24,7 @@ public class ImportFinishedDelegate implements JavaDelegate {
         var slug = execution.<StringValue>getVariableLocalTyped("slug").getValue();
 
         importProvider.lookup(slug)
-                .ifPresent(entity -> entity.finish(new Date()));
+                .subscribe(entity -> entity.finish(new Date()));
     }
 
 }

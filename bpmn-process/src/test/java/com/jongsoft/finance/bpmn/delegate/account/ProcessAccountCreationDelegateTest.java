@@ -1,13 +1,5 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
-import static org.assertj.core.api.Assertions.*;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
-import org.camunda.bpm.engine.variable.value.StringValue;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.domain.account.Account;
@@ -19,8 +11,16 @@ import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.AccountJson;
 import com.jongsoft.lang.API;
-
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.reactivex.Maybe;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
+import org.camunda.bpm.engine.variable.value.StringValue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ProcessAccountCreationDelegateTest {
 
@@ -56,7 +56,7 @@ class ProcessAccountCreationDelegateTest {
 
     @Test
     void execute_alreadyExists() {
-        Mockito.when(accountProvider.lookup("Test account")).thenReturn(API.Option(Account.builder().build()));
+        Mockito.when(accountProvider.lookup("Test account")).thenReturn(Maybe.just(Account.builder().build()));
 
         subject.execute(execution);
 
@@ -67,8 +67,8 @@ class ProcessAccountCreationDelegateTest {
     void execute() {
         Account account = Account.builder().build();
         Mockito.when(accountProvider.lookup("Test account"))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(account));
+                .thenReturn(Maybe.empty())
+                .thenReturn(Maybe.just(account));
 
         subject.execute(execution);
 

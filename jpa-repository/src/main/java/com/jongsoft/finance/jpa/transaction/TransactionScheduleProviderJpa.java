@@ -4,33 +4,38 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.TransactionScheduleProvider;
-import com.jongsoft.finance.jpa.core.DataProviderJpa;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.transaction.entity.ScheduledTransactionJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
-import io.micronaut.transaction.SynchronousTransactionManager;
+import com.jongsoft.lang.control.Optional;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import java.sql.Connection;
 import java.time.LocalDate;
 
 @Singleton
 @Named("transactionScheduleProvider")
-public class TransactionScheduleProviderJpa extends DataProviderJpa<ScheduledTransaction, ScheduledTransactionJpa>
-        implements TransactionScheduleProvider {
+public class TransactionScheduleProviderJpa implements TransactionScheduleProvider {
 
     private final AuthenticationFacade authenticationFacade;
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
     public TransactionScheduleProviderJpa(
             AuthenticationFacade authenticationFacade,
-            EntityManager entityManager,
-            SynchronousTransactionManager<Connection> transactionManager) {
-        super(entityManager, ScheduledTransactionJpa.class, transactionManager);
+            ReactiveEntityManager entityManager) {
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
+    }
+
+    @Override
+    public Optional<ScheduledTransaction> lookup(long id) {
+        return entityManager.<ScheduledTransactionJpa>blocking()
+                .hql("from ScheduledTransactionJpa where id = :id and user.username = :username")
+                .set("id", id)
+                .set("username", authenticationFacade.authenticated())
+                .maybe()
+                .map(this::convert);
     }
 
     @Override
@@ -40,15 +45,14 @@ public class TransactionScheduleProviderJpa extends DataProviderJpa<ScheduledTra
                 where s.user.username = :username
                     and (s.end > :currentDate or s.end is null)""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-        query.setParameter("currentDate", LocalDate.now());
-
-        return this.<ScheduledTransactionJpa>multiValue(query)
+        return entityManager.<ScheduledTransactionJpa>blocking()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .set("currentDate", LocalDate.now())
+                .sequence()
                 .map(this::convert);
     }
 
-    @Override
     protected ScheduledTransaction convert(ScheduledTransactionJpa source) {
         if (source == null) {
             return null;

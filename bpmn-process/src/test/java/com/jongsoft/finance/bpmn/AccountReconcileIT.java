@@ -7,6 +7,7 @@ import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.lang.API;
+import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.variable.Variables;
@@ -86,7 +87,7 @@ class AccountReconcileIT extends ProcessTestSetup {
         Mockito.when(accountProvider.lookup(1L))
                 .thenReturn(API.Option(reconcileAccount));
         Mockito.when(accountProvider.lookup(SystemAccountTypes.RECONCILE))
-                .thenReturn(API.Option(reconcile));
+                .thenReturn(Maybe.just(reconcile));
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(API.Option())
                 .thenReturn(API.Option(-20.0));

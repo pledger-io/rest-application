@@ -20,9 +20,9 @@ class SettingProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup() {
         loadDataset("sql/base-setup.sql");
-        var check = settingProvider.lookup();
+        var check = settingProvider.lookup().test();
 
-        Assertions.assertThat(check).hasSize(6);
+        check.assertValueCount(6);
     }
 
     @Test

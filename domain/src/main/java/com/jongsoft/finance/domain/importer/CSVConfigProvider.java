@@ -1,11 +1,11 @@
 package com.jongsoft.finance.domain.importer;
 
-import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.reactivex.Flowable;
 
 public interface CSVConfigProvider {
 
     Optional<BatchImportConfig> lookup(String name);
-    Sequence<BatchImportConfig> lookup();
+    Flowable<BatchImportConfig> lookup();
 
 }

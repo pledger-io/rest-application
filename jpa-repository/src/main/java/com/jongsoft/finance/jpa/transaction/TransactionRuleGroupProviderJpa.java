@@ -1,29 +1,28 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
 import com.jongsoft.finance.domain.transaction.TransactionRuleGroupProvider;
-import com.jongsoft.finance.jpa.core.RepositoryJpa;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.transaction.entity.RuleGroupJpa;
-import com.jongsoft.lang.API;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-
 import lombok.extern.slf4j.Slf4j;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
 @Named("transactionRuleGroupProvider")
-public class TransactionRuleGroupProviderJpa extends RepositoryJpa implements TransactionRuleGroupProvider {
+public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProvider {
 
     private final AuthenticationFacade authenticationFacade;
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
-    public TransactionRuleGroupProviderJpa(AuthenticationFacade authenticationFacade, EntityManager entityManager) {
+    public TransactionRuleGroupProviderJpa(
+            AuthenticationFacade authenticationFacade,
+            ReactiveEntityManager entityManager) {
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }
@@ -38,9 +37,10 @@ public class TransactionRuleGroupProviderJpa extends RepositoryJpa implements Tr
                     and g.archived = false
                 order by g.sort asc""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-        return this.<RuleGroupJpa>multiValue(query)
+        return entityManager.<RuleGroupJpa>blocking()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .sequence()
                 .map(this::convert);
     }
 
@@ -54,10 +54,12 @@ public class TransactionRuleGroupProviderJpa extends RepositoryJpa implements Tr
                     and g.name = :name
                     and g.archived = false""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-        query.setParameter("name", name);
-        return API.Option(convert(singleValue(query)));
+        return entityManager.<RuleGroupJpa>blocking()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .set("name", name)
+                .maybe()
+                .map(this::convert);
     }
 
     private TransactionRuleGroup convert(RuleGroupJpa source) {

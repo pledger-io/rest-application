@@ -3,27 +3,25 @@ package com.jongsoft.finance.jpa.importer;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.importer.CSVConfigProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.jpa.core.RepositoryJpa;
 import com.jongsoft.finance.jpa.importer.entity.CSVImportConfig;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
-import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
 @Transactional
-public class CSVConfigProviderJpa extends RepositoryJpa implements CSVConfigProvider {
+public class CSVConfigProviderJpa implements CSVConfigProvider {
 
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
 
-    public CSVConfigProviderJpa(EntityManager entityManager, AuthenticationFacade authenticationFacade) {
+    public CSVConfigProviderJpa(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
         this.entityManager = entityManager;
         this.authenticationFacade = authenticationFacade;
     }
@@ -38,25 +36,26 @@ public class CSVConfigProviderJpa extends RepositoryJpa implements CSVConfigProv
                     and b.user.username = :username
                 """;
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("name", name);
-        query.setParameter("username", authenticationFacade.authenticated());
-
-        return API.Option(convert(singleValue(query)));
+        return entityManager.<CSVImportConfig>blocking()
+                .hql(hql)
+                .set("name", name)
+                .set("username", authenticationFacade.authenticated())
+                .maybe()
+                .map(this::convert);
     }
 
     @Override
-    public Sequence<BatchImportConfig> lookup() {
+    public Flowable<BatchImportConfig> lookup() {
         log.trace("CSVConfiguration listing");
 
         var hql = """
                 select b from CSVImportConfig b
                 where b.user.username = :username""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("username", authenticationFacade.authenticated());
-
-        return this.<CSVImportConfig>multiValue(query)
+        return entityManager.<CSVImportConfig>reactive()
+                .hql(hql)
+                .set("username", authenticationFacade.authenticated())
+                .flow()
                 .map(this::convert);
     }
 
