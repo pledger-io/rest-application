@@ -32,7 +32,7 @@ public class TagLookupDelegate implements JavaDelegate {
 
         var name = execution.<StringValue>getVariableLocalTyped("name").getValue();
         var tag = tagProvider.lookup(name)
-                .switchIfEmpty(Single.just(this.create(name)))
+                .switchIfEmpty(Single.create(emitter -> emitter.onSuccess(create(name))))
                 .blockingGet();
 
         execution.setVariableLocal("id", tag.name());

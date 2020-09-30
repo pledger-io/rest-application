@@ -16,10 +16,6 @@ pipelines:
           script:
             - bash ./gradlew check jacocoTestReport
             - bash ./gradlew sonarqube
-      - step:
-          name: Check Quality Gate on SonarCloud
-          script:
-            - pipe: sonarsource/sonarcloud-quality-gate:0.1.3
 
   branches:
     master:

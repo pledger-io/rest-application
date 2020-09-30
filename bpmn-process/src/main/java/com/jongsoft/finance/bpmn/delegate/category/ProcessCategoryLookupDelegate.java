@@ -46,8 +46,9 @@ public class ProcessCategoryLookupDelegate implements JavaDelegate {
 
         final Category category;
         if (execution.hasVariableLocal("name")) {
-            category = categoryProvider.lookup((String) execution.getVariableLocal("name"))
-                    .blockingGet();
+            var label = (String) execution.getVariableLocal("name");
+
+            category = categoryProvider.lookup(label).blockingGet();
         } else {
             category = categoryProvider.lookup((Long) execution.getVariableLocal("id"))
                     .get();

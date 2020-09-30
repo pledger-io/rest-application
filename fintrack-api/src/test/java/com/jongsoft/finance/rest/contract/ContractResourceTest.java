@@ -126,6 +126,22 @@ class ContractResourceTest extends TestSetup {
     }
 
     @Test
+    void create_accountNotFound() {
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option());
+
+        var request = ContractCreateRequest.builder()
+                .name("Test Contract")
+                .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
+                .start(LocalDate.of(2019, 2, 1))
+                .end(LocalDate.of(2020, 2, 1))
+                .build();
+
+        subject.create(request).test()
+                .assertError(StatusException.class)
+                .assertErrorMessage("No account can be found for 1");
+    }
+
+    @Test
     void update() {
         final Contract contract = Mockito.mock(Contract.class);
         var request = ContractCreateRequest.builder()
@@ -154,6 +170,25 @@ class ContractResourceTest extends TestSetup {
                 null,
                 LocalDate.of(2019, 2, 1),
                 LocalDate.of(2022, 2, 1));
+    }
+
+    @Test
+    void update_notFound() {
+        var request = ContractCreateRequest.builder()
+                .name("Test Contract")
+                .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
+                .start(LocalDate.of(2019, 2, 1))
+                .end(LocalDate.of(2022, 2, 1))
+                .build();
+        var principal = Mockito.mock(Principal.class);
+
+        Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option());
+        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
+
+        subject.update(1L, request, principal)
+                .test()
+                .assertError(StatusException.class)
+                .assertErrorMessage("No contract can be found for 1");
     }
 
     @Test
