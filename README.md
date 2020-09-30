@@ -1,8 +1,8 @@
 # FinTrack
 ![Image version](https://img.shields.io/docker/v/gjong/fintrack?sort=semver)
-[![SonarCloud Quality](https://sonarcloud.io/api/project_badges/measure?project=FinTrack%3AAPI&metric=alert_status&?style=flat-square)](https://sonarcloud.io/dashboard?id=com.jongsoft.finance%3Acashflow)
 ![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/jongsoftdev/fintrack-application/master)
-[![codecov](https://codecov.io/bb/jongsoftdev/fintrack-application/branch/master/graph/badge.svg)](https://codecov.io/bb/jongsoftdev/fintrack-application)
+[![SonarCloud Quality](https://sonarcloud.io/api/project_badges/measure?project=FinTrack%3AAPI&metric=alert_status&style=flat-square)](https://sonarcloud.io/dashboard?id=FinTrack%3AAPI)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=FinTrack%3AAPI&metric=coverage&style=flat-square)](https://sonarcloud.io/dashboard?id=FinTrack%3AAPI)
 ![APMLicense](https://img.shields.io/apm/l/vim-mode.svg?style=flat-square)
 
 -----------------------
