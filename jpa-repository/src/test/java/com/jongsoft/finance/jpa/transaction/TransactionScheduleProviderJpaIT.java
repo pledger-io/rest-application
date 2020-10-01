@@ -5,15 +5,17 @@ import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
 
+@Disabled
 class TransactionScheduleProviderJpaIT extends JpaTestSetup {
 
     @Inject
-    private TransactionScheduleProvider scheduleProvider;
+    private TransactionScheduleProvider transactionScheduleProvider;
 
     @Inject
     private AuthenticationFacade authenticationFacade;
@@ -30,7 +32,7 @@ class TransactionScheduleProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup() {
         setup();
-        var check = scheduleProvider.lookup();
+        var check = transactionScheduleProvider.lookup();
 
         Assertions.assertThat(check).hasSize(1);
     }
