@@ -2,8 +2,11 @@ package com.jongsoft.finance.filter;
 
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.filter.ServerFilterChain;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.subscribers.TestSubscriber;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,10 +34,14 @@ class CorrelationIdFilterTest {
         Mockito.doReturn(Optional.of("afd334d-fadf3-dfd3-dfd2s-dsf")).when(headers).get("X-Correlation-Id", String.class);
         Mockito.when(chain.proceed(mockRequest)).then(args -> {
             Assertions.assertThat(MDC.get("correlationId")).isEqualTo("afd334d-fadf3-dfd3-dfd2s-dsf");
-            return Flowable.empty();
+            return Flowable.create(emitter -> {
+                emitter.onComplete();
+            }, BackpressureStrategy.LATEST);
         });
 
-        subject.doFilterOnce(mockRequest, chain);
+        TestSubscriber<MutableHttpResponse<?>> subscriber = new TestSubscriber<>();
+        subject.doFilterOnce(mockRequest, chain).subscribe(subscriber);
+
         Assertions.assertThat(MDC.get("correlationId")).isNull();
     }
 

@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.util.Locale;
+import java.util.Optional;
 
 class TransactionCategoryGraphResourceTest extends TestSetup {
 
@@ -63,7 +64,7 @@ class TransactionCategoryGraphResourceTest extends TestSetup {
                 LocalDate.of(2019, 1, 1),
                 LocalDate.of(2019, 1, 31),
                 Locale.GERMAN,
-                Currency.builder().symbol('E').build());
+                Optional.of(Currency.builder().symbol('E').build()));
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(transactionProvider, Mockito.times(2)).balance(Mockito.any());
@@ -87,7 +88,7 @@ class TransactionCategoryGraphResourceTest extends TestSetup {
                 LocalDate.of(2019, 1, 1),
                 LocalDate.of(2019, 1, 31),
                 Locale.GERMAN,
-                Currency.builder().symbol('E').build());
+                Optional.of(Currency.builder().symbol('E').build()));
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(transactionProvider, Mockito.times(2)).balance(Mockito.any());

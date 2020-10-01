@@ -1,11 +1,5 @@
 package com.jongsoft.finance.rest.scheduler;
 
-import java.time.LocalDate;
-
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
@@ -15,9 +9,14 @@ import com.jongsoft.finance.domain.transaction.TransactionScheduleProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.lang.API;
-
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.time.LocalDate;
 
 class ScheduledTransactionResourceTest {
 
@@ -60,14 +59,10 @@ class ScheduledTransactionResourceTest {
 
     @Test
     void list() {
-        var response = subject.list()
-                .blockingGet();
-
-        Assertions.assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
-        Assertions.assertThat(response.getBody().get()).hasSize(1);
-        Assertions.assertThat(response.getBody().get().get(0).getName()).isEqualTo("Monthly gym membership");
-
-        Mockito.verify(transactionScheduleProvider).lookup();
+        subject.list().test()
+                .assertValueCount(1)
+                .assertComplete()
+                .assertValue(el -> "Monthly gym membership".equalsIgnoreCase(el.getName()));
     }
 
     @Test
