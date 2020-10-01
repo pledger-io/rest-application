@@ -6,10 +6,11 @@ import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.account.AccountTypeProvider;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.rest.model.ResultPageResponse;
+import com.jongsoft.finance.rest.model.TransactionResponse;
 import com.jongsoft.finance.rest.process.RuntimeResource;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -62,7 +63,7 @@ public class TransactionResource {
     }
 
     @Post
-    ResultPage<Transaction> search(@Valid @Body TransactionSearchRequest request) {
+    ResultPageResponse<TransactionResponse> search(@Valid @Body TransactionSearchRequest request) {
         var command = filterFactory.transaction()
                 .ownAccounts()
                 .range(request.getDateRange())
@@ -98,7 +99,10 @@ public class TransactionResource {
             command.currency(request.getCurrency());
         }
 
-        return transactionProvider.lookup(command);
+        var response = transactionProvider.lookup(command)
+                .map(TransactionResponse::new);
+
+        return new ResultPageResponse<>(response);
     }
 
     @Patch

@@ -12,8 +12,10 @@ import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.http.hateoas.Link;
 import io.micronaut.security.authentication.AuthorizationException;
 import io.reactivex.Flowable;
+import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 
+@Slf4j
 @Filter("/api/**")
 public class ExceptionFilter extends OncePerRequestHttpServerFilter {
 
@@ -26,9 +28,19 @@ public class ExceptionFilter extends OncePerRequestHttpServerFilter {
 
                     int statusCode = 500;
                     if (throwable instanceof StatusException e) {
+                        log.debug("Resource requested resolved in issues {} with message '{}'",
+                                e.getStatusCode(),
+                                e.getMessage());
                         statusCode = e.getStatusCode();
                     } else if (throwable instanceof AuthorizationException) {
+                        log.warn("{} - Attempt to access resource without proper authorization with message '{}'",
+                                request.getPath(),
+                                throwable.getMessage());
                         statusCode = HttpStatus.UNAUTHORIZED.getCode();
+                    } else {
+                        log.error("{} - Exception caught in HTTP chain execution, with message '{}'",
+                                request.getPath(),
+                                throwable.getMessage());
                     }
 
                     return HttpResponse.

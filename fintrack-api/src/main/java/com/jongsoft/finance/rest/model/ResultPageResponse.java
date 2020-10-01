@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.core.ResultPage;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class ResultPageResponse<T> {
@@ -12,6 +13,7 @@ public class ResultPageResponse<T> {
         this.wrapped = wrapped;
     }
 
+    @NotNull
     public List<T> getContent() {
         return wrapped.content().toJava();
     }

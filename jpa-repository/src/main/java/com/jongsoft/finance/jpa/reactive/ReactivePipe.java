@@ -24,15 +24,18 @@ public class ReactivePipe<T> extends JpaPipe<T, ReactivePipe<T>> {
     @SuppressWarnings("unchecked")
     public Maybe<T> maybe() {
         return Maybe.create(emitter -> {
-            var query = entityManager.createQuery(hql());
+            transactionManager.executeRead(status -> {
+                var query = entityManager.createQuery(hql());
 
-            applyParameters(query);
-            applyPaging(query);
+                applyParameters(query);
+                applyPaging(query);
 
-            API.Try(() -> (T) query.getSingleResult())
-                    .consume(emitter::onSuccess);
+                API.Try(() -> (T) query.getSingleResult())
+                        .consume(emitter::onSuccess);
 
-            emitter.onComplete();
+                emitter.onComplete();
+                return null;
+            });
         });
     }
 

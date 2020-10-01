@@ -1,18 +1,14 @@
 package com.jongsoft.finance.rest.scheduler;
 
+import com.jongsoft.finance.schedule.Periodicity;
+import io.micronaut.core.annotation.Introspected;
+import lombok.*;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.jongsoft.finance.schedule.Periodicity;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 @Setter
+@Introspected
 @NoArgsConstructor
 public class ScheduledTransactionCreateRequest {
 

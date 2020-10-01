@@ -1,12 +1,9 @@
 package com.jongsoft.finance.rest.statistic;
 
-import javax.validation.Valid;
-
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.lang.API;
-
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
@@ -15,6 +12,8 @@ import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import javax.validation.Valid;
 
 @Tag(name = "Reports")
 @Controller("/api/statistics/balance")
@@ -32,7 +31,8 @@ public class BalanceResource {
     @Post
     @Operation(
             summary = "Calculate a balance based upon request",
-            description = "This operation will calculate the balance for the current user based upon the given filters"
+            description = "This operation will calculate the balance for the current user based upon the given filters",
+            operationId = "getBalance"
     )
     public Single<BalanceResponse> calculate(@Valid @Body BalanceRequest request) {
         var filter = filterFactory.transaction();

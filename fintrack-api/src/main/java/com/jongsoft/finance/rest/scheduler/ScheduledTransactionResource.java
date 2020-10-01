@@ -1,23 +1,14 @@
 package com.jongsoft.finance.rest.scheduler;
 
-import java.time.LocalDate;
-import java.util.Objects;
-
-import javax.validation.Valid;
-
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.transaction.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.model.ScheduledTransactionResponse;
-import com.jongsoft.lang.collection.List;
-
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Delete;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Patch;
-import io.micronaut.http.annotation.PathVariable;
-import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.*;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,7 +16,12 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.Objects;
+
 @Tag(name = "Transactions")
+@Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/schedule/transaction")
 public class ScheduledTransactionResource {
 
@@ -42,17 +38,13 @@ public class ScheduledTransactionResource {
             operationId = "listTransactionSchedule",
             summary = "List all available transaction schedules"
     )
-    public Single<HttpResponse<List<ScheduledTransactionResponse>>> list() {
-        return Single.create(emitter -> {
-            var result = scheduleProvider.lookup()
-                    .map(ScheduledTransactionResponse::new);
-
-            if (result.isEmpty()) {
-                emitter.onSuccess(HttpResponse.noContent());
-            } else {
-                emitter.onSuccess(HttpResponse.ok(result));
-            }
-        });
+    public Flowable<ScheduledTransactionResponse> list() {
+        return Flowable.create(emitter -> {
+            scheduleProvider.lookup()
+                    .map(ScheduledTransactionResponse::new)
+                    .forEach(emitter::onNext);
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST);
     }
 
     @Put

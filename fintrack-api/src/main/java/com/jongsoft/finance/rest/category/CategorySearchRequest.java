@@ -1,8 +1,10 @@
 package com.jongsoft.finance.rest.category;
 
+import io.micronaut.core.annotation.Introspected;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+@Introspected
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategorySearchRequest {

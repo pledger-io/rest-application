@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest.category;
 
+import io.micronaut.core.annotation.Introspected;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Builder
+@Introspected
 @NoArgsConstructor
 @AllArgsConstructor
 class CategoryCreateRequest {

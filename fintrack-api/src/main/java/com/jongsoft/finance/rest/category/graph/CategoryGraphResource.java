@@ -16,6 +16,7 @@ import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
+import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -56,8 +57,8 @@ public class CategoryGraphResource {
             operationId = "generateCategoryExpenses"
     )
     Highchart graph(
-            @PathVariable LocalDate from,
-            @PathVariable LocalDate until,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate from,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate until,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
         var xAxis = new Axis();
         var series = (ColumnSeries) SeriesFactory.createSeries(SeriesType.COLUMN);

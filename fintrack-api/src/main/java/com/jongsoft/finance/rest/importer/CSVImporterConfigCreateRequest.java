@@ -1,10 +1,12 @@
 package com.jongsoft.finance.rest.importer;
 
+import io.micronaut.core.annotation.Introspected;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
+@Introspected
 @NoArgsConstructor
 class CSVImporterConfigCreateRequest {
 

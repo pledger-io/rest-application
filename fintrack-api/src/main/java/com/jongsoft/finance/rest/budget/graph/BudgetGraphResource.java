@@ -16,6 +16,7 @@ import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
+import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -60,8 +61,8 @@ public class BudgetGraphResource {
     )
     Highchart graph(
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
-            @PathVariable LocalDate start,
-            @PathVariable LocalDate end) {
+            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate end) {
         final Axis xAxis = new Axis();
         final ColumnSeries series = (ColumnSeries) SeriesFactory.createSeries(SeriesType.COLUMN);
         final ColumnSeries expected = (ColumnSeries) SeriesFactory.createSeries(SeriesType.COLUMN);

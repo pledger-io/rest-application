@@ -15,6 +15,7 @@ import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.highchart.Highchart;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
+import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -57,8 +58,8 @@ public class TransactionBudgetGraphResource extends BudgetPieChart {
 
     @Get
     Highchart budget(
-            @PathVariable LocalDate start,
-            @PathVariable LocalDate end,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
         var ownAccounts = accountProvider.lookup(filterFactory.account()
                 .types(accountTypeProvider.lookup(false)))

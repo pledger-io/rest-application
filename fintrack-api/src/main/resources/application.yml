@@ -27,6 +27,9 @@ micronaut:
     cors:
       enabled: true
 
+jackson:
+  serialization-inclusion: non_absent
+
 jpa:
   default:
     packages-to-scan:

@@ -1,8 +1,10 @@
 package com.jongsoft.finance.rest.profile;
 
+import io.micronaut.core.annotation.Introspected;
 import lombok.Setter;
 
 @Setter
+@Introspected
 public class PatchProfileRequest {
 
     private String theme;

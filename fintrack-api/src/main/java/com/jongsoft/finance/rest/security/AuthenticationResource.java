@@ -9,7 +9,6 @@ import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.AuthenticationProvider;
-import io.micronaut.security.authentication.UserDetails;
 import io.micronaut.security.event.LoginSuccessfulEvent;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.jwt.generator.AccessRefreshTokenGenerator;
@@ -81,9 +80,9 @@ public class AuthenticationResource {
 
     @Secured(SecurityRule.IS_AUTHENTICATED)
     @Get("/api/security/token-refresh")
-    public Single<MutableHttpResponse<?>> refresh(UserDetails userDetails) {
+    public Single<MutableHttpResponse<?>> refresh() {
         return Single.create(emitter -> {
-            var token = accessRefreshTokenGenerator.generate(userDetails);
+            var token = accessRefreshTokenGenerator.generate(null);
             if (token.isEmpty()) {
                 emitter.onSuccess(HttpResponse.unauthorized());
             } else {

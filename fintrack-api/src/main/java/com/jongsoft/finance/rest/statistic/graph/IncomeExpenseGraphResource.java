@@ -1,12 +1,5 @@
 package com.jongsoft.finance.rest.statistic.graph;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.Locale;
-
-import javax.annotation.Resource;
-
 import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.core.date.Dates;
 import com.jongsoft.finance.domain.FilterFactory;
@@ -26,8 +19,8 @@ import com.jongsoft.highchart.series.LineSeries;
 import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
 import com.jongsoft.lang.API;
-
 import io.micronaut.context.MessageSource;
+import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -41,9 +34,15 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Locale;
+
 @Tag(name = "Reports")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@Controller("/statistics/graph/income-expenses/{from}/{until}")
+@Controller("/api/statistics/graph/income-expenses/{from}/{until}")
 public class IncomeExpenseGraphResource {
 
     @Resource(name = "messageSource")
@@ -75,8 +74,8 @@ public class IncomeExpenseGraphResource {
             }
     )
     Highchart graph(
-            @PathVariable LocalDate from,
-            @PathVariable LocalDate until,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate from,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate until,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
             @RequestAttribute(RequestAttributes.CURRENCY) Currency currency) {
         var income = SeriesFactory.<BarSeries>createSeries(SeriesType.COLUMN);

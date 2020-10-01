@@ -20,9 +20,12 @@ public class CurrencyHeaderFilter extends OncePerRequestHttpServerFilter {
     @Override
     protected Publisher<MutableHttpResponse<?>> doFilterOnce(final HttpRequest<?> request, final ServerFilterChain chain) {
         var requestedCurrency = request.getHeaders().get("X-Accept-Currency", String.class);
+
         if (requestedCurrency.isPresent()) {
             currencyProvider.lookup(requestedCurrency.get())
                     .subscribe(currency -> request.setAttribute(RequestAttributes.CURRENCY, currency));
+        } else {
+            request.setAttribute(RequestAttributes.CURRENCY, "");
         }
 
         return chain.proceed(request);

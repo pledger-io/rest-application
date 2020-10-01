@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest.transaction;
 
+import io.micronaut.core.annotation.Introspected;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Builder
+@Introspected
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionBulkEditRequest {

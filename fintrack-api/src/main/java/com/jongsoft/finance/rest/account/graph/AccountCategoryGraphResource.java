@@ -11,6 +11,7 @@ import com.jongsoft.finance.graph.CategoryPieChart;
 import com.jongsoft.highchart.Highchart;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
+import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -57,8 +58,8 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
     )
     Highchart expenses(
             @PathVariable long id,
-            @PathVariable LocalDate start,
-            @PathVariable LocalDate end,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
             Principal principal) {
         var account = accountProvider.lookup(id)
@@ -82,8 +83,8 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
     )
     Highchart income(
             @PathVariable long id,
-            @PathVariable LocalDate start,
-            @PathVariable LocalDate end,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
             Principal principal) {
         var account = accountProvider.lookup(id)

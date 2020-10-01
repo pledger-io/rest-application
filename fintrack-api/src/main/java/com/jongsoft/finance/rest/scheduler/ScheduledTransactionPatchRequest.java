@@ -1,17 +1,14 @@
 package com.jongsoft.finance.rest.scheduler;
 
-import javax.validation.Valid;
-
 import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.schedule.Periodicity;
+import io.micronaut.core.annotation.Introspected;
+import lombok.*;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import javax.validation.Valid;
 
 @Builder
+@Introspected
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ScheduledTransactionPatchRequest {

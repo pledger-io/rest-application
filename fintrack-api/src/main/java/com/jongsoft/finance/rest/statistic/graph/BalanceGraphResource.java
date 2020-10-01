@@ -1,17 +1,5 @@
 package com.jongsoft.finance.rest.statistic.graph;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.stream.IntStream;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang3.mutable.MutableDouble;
 import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.core.date.Dates;
 import com.jongsoft.finance.domain.FilterFactory;
@@ -26,8 +14,8 @@ import com.jongsoft.highchart.common.SeriesType;
 import com.jongsoft.highchart.series.LineSeries;
 import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
-
 import io.micronaut.context.MessageSource;
+import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -40,23 +28,34 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.mutable.MutableDouble;
+
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.IntStream;
 
 @Tag(name = "Reports")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/statistics/balance/graph/{from}/{until}")
 public class BalanceGraphResource {
 
-    @Resource(name = "messageSource")
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
     private final CurrentUserProvider currentUserProvider;
     private final TransactionProvider transactionProvider;
 
     private final FilterFactory filterFactory;
 
     public BalanceGraphResource(
+            MessageSource messageSource,
             CurrentUserProvider currentUserProvider,
             TransactionProvider transactionProvider,
             FilterFactory filterFactory) {
+        this.messageSource = messageSource;
         this.currentUserProvider = currentUserProvider;
         this.transactionProvider = transactionProvider;
         this.filterFactory = filterFactory;
@@ -74,8 +73,8 @@ public class BalanceGraphResource {
             }
     )
     Highchart balance(
-            @PathVariable LocalDate from,
-            @PathVariable LocalDate until,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate from,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate until,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
         var chart = new Highchart();
         // @formatter:off

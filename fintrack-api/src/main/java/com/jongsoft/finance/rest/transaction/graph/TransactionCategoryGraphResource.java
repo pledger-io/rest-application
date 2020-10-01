@@ -12,6 +12,7 @@ import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.highchart.Highchart;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
+import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -23,6 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.LocalDate;
 import java.util.Locale;
+import java.util.Optional;
 
 @Tag(name = "Graph Generation")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -46,30 +48,26 @@ public class TransactionCategoryGraphResource extends CategoryPieChart {
 
     @Get("expenses/{start}/{end}")
     Highchart expenses(
-            @PathVariable LocalDate start,
-            @PathVariable LocalDate end,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
-            @RequestAttribute(RequestAttributes.CURRENCY) Currency currency) {
-        currency = currencyCode(currency);
-        return createChart(currency, locale)
-                .addSeries(createSeries(API.List(), start, end, locale, false, currency));
+            @RequestAttribute(RequestAttributes.CURRENCY) Optional<Currency> currency) {
+        var useCurrency = currency.orElseGet(this::fallbackCurrency);
+
+        return createChart(useCurrency, locale)
+                .addSeries(createSeries(API.List(), start, end, locale, false, useCurrency));
     }
 
     @Get("income/{start}/{end}")
     Highchart income(
-            @PathVariable LocalDate start,
-            @PathVariable LocalDate end,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
+            @PathVariable @Format("yyyy-MM-dd") LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
-            @RequestAttribute(RequestAttributes.CURRENCY) Currency currency) {
+            @RequestAttribute(RequestAttributes.CURRENCY) Optional<Currency> currency) {
+        var useCurrency = currency.orElseGet(this::fallbackCurrency);
 
-        currency = currencyCode(currency);
-        return createChart(currencyCode(currency), locale)
-                .addSeries(createSeries(API.List(), start, end, locale, true, currency));
-    }
-
-    private Currency currencyCode(Currency currency) {
-        return API.Option(currency)
-                .getOrSupply(this::fallbackCurrency);
+        return createChart(useCurrency, locale)
+                .addSeries(createSeries(API.List(), start, end, locale, true, useCurrency));
     }
 
     private Currency fallbackCurrency() {
