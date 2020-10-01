@@ -8,7 +8,6 @@ import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.API;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -66,11 +65,10 @@ class AccountTopResourceTest extends TestSetup {
                 Mockito.eq(DateRange.forMonth(2019, 1)));
 
 
-        var response = subject.topDebtors(
-                Dates.startOfMonth(2019, 1),
-                Dates.endOfMonth(2019, 1));
-
-        Assertions.assertThat(response).hasSize(1);
+        subject.topDebtors(Dates.startOfMonth(2019, 1), Dates.endOfMonth(2019, 1))
+                .test()
+                .assertComplete()
+                .assertValueCount(1);
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).top(Mockito.any(AccountProvider.FilterCommand.class), Mockito.eq(DateRange.forMonth(2019, 1)));
@@ -110,11 +108,10 @@ class AccountTopResourceTest extends TestSetup {
                 Mockito.any(AccountProvider.FilterCommand.class),
                 Mockito.eq(DateRange.forMonth(2019, 1)));
 
-        var response = subject.topCreditor(
-                Dates.startOfMonth(2019, 1),
-                Dates.endOfMonth(2019, 1));
-
-        Assertions.assertThat(response).hasSize(1);
+        subject.topCreditor(Dates.startOfMonth(2019, 1), Dates.endOfMonth(2019, 1))
+                .test()
+                .assertComplete()
+                .assertValueCount(1);
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).top(Mockito.any(AccountProvider.FilterCommand.class), Mockito.eq(DateRange.forMonth(2019, 1)));

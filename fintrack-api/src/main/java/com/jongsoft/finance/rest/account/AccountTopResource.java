@@ -5,13 +5,14 @@ import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.lang.API;
-import com.jongsoft.lang.collection.List;
 import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -41,14 +42,20 @@ public class AccountTopResource {
             summary = "Top debit accounts",
             description = "Calculates and returns the accounts where you spent the most for the given date range"
     )
-    List<AccountProvider.AccountSpending> topDebtors(
+    Flowable<AccountSpendingResponse> topDebtors(
             @PathVariable @Format("yyyy-MM-dd") LocalDate start,
             @PathVariable @Format("yyyy-MM-dd") LocalDate end) {
-        return accountProvider.top(
-                filterFactory.account()
-                        .types(API.List("debtor"))
-                        .pageSize(settingProvider.getAutocompleteLimit()),
-                DateRange.of(start, end));
+        return Flowable.create(emitter -> {
+            var filterCommand = filterFactory.account()
+                    .types(API.List("debtor"))
+                    .pageSize(settingProvider.getAutocompleteLimit());
+
+            accountProvider.top(filterCommand, DateRange.of(start, end))
+                    .map(AccountSpendingResponse::new)
+                    .forEach(emitter::onNext);
+
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST);
     }
 
     @Get("/creditor/{start}/{end}")
@@ -56,14 +63,20 @@ public class AccountTopResource {
             summary = "Top creditor accounts",
             description = "Calculates and returns the accounts that credited the most money for the given date range"
     )
-    List<AccountProvider.AccountSpending> topCreditor(
+    Flowable<AccountSpendingResponse> topCreditor(
             @PathVariable @Format("yyyy-MM-dd") LocalDate start,
             @PathVariable @Format("yyyy-MM-dd") LocalDate end) {
-        return accountProvider.top(
-                filterFactory.account()
-                        .types(API.List("creditor"))
-                        .pageSize(settingProvider.getAutocompleteLimit()),
-                DateRange.of(start, end));
+        return Flowable.create(emitter -> {
+            var filterCommand = filterFactory.account()
+                    .types(API.List("creditor"))
+                    .pageSize(settingProvider.getAutocompleteLimit());
+
+            accountProvider.top(filterCommand, DateRange.of(start, end))
+                    .map(AccountSpendingResponse::new)
+                    .forEach(emitter::onNext);
+
+            emitter.onComplete();
+        }, BackpressureStrategy.LATEST);
     }
 
 }

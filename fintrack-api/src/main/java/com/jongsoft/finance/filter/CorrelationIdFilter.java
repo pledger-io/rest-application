@@ -21,7 +21,7 @@ public class CorrelationIdFilter extends OncePerRequestHttpServerFilter {
 
         MDC.put("correlationId", correlationId);
         return Flowable.fromPublisher(chain.proceed(request))
-                .doOnComplete(() -> {
+                .doAfterTerminate(() -> {
                     MDC.remove("correlationId");
                 });
     }
