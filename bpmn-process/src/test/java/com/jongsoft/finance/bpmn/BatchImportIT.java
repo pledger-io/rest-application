@@ -22,6 +22,7 @@ import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.core.reflect.ReflectionUtils;
 import io.reactivex.Maybe;
 import org.apache.commons.lang3.mutable.MutableLong;
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.test.Deployment;
@@ -35,9 +36,7 @@ import javax.inject.Inject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -123,6 +122,8 @@ class BatchImportIT extends ProcessTestSetup {
     @Inject
     private FilterFactory accountFilterFactory;
 
+    private List<String> tokenCleanup;
+
     @BeforeEach
     void setup() {
         Mockito.reset(
@@ -143,10 +144,12 @@ class BatchImportIT extends ProcessTestSetup {
         Mockito.when(authenticationFacade.currentUser()).thenReturn(userAccount);
         Mockito.when(userProvider.lookup("test-user")).thenReturn(API.Option(userAccount));
 
+        tokenCleanup = new ArrayList<>();
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);
             String token = UUID.randomUUID().toString();
             Mockito.when(storageService.read(token)).thenReturn(original);
+            tokenCleanup.add(token);
             return token;
         });
 
@@ -251,12 +254,9 @@ class BatchImportIT extends ProcessTestSetup {
         Mockito.verify(accountProvider, Mockito.times(4)).lookup("MW GA Pieterse");
         Mockito.verify(accountProvider, Mockito.times(1)).lookup(new AccountFilterTest().iban("NL69INGB0123456789", true));
         Mockito.verify(accountProvider, Mockito.never()).lookup("P. Post");
-//        Mockito.verify(accountProvider, Mockito.times(2)).lookup(new AccountFilterTest() {
-//            @Override
-//            public DataProvider.TextFilter iban() {
-//                return new TextFilterTest("NL31INGB0001122334");
-//            }
-//        });
+
+        Assertions.assertThat(tokenCleanup).hasSize(4);
+        tokenCleanup.forEach(token -> Mockito.verify(storageService).remove(token));
 
         assertThat(batchImport.getFinished()).isNotNull();
     }

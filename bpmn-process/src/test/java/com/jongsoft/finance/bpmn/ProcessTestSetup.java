@@ -1,19 +1,16 @@
 package com.jongsoft.finance.bpmn;
 
-import java.util.List;
-
-import javax.inject.Inject;
-
+import com.jongsoft.finance.messaging.EventBus;
+import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.test.annotation.MicronautTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.Job;
 import org.junit.jupiter.api.BeforeEach;
 
-import com.jongsoft.finance.messaging.EventBus;
+import javax.inject.Inject;
+import java.util.List;
 
-import io.micronaut.context.event.ApplicationEventPublisher;
-import io.micronaut.test.annotation.MicronautTest;
-
-@MicronautTest(application = ApplicationContext.class)
+@MicronautTest(application = ApplicationContext.class, rollback = false)
 class ProcessTestSetup {
 
     @Inject
