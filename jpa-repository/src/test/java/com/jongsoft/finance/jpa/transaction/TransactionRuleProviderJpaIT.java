@@ -37,8 +37,9 @@ class TransactionRuleProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_group() {
         setup();
-        var check = ruleProvider.lookup("Grocery stores");
-        Assertions.assertThat(check).hasSize(1);
+
+        ruleProvider.lookup("Grocery stores").test()
+                .assertValueCount(1);
     }
 
     @MockBean

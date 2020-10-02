@@ -3,6 +3,7 @@ package com.jongsoft.finance.rest.setting;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.core.CurrencyProvider;
+import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.CurrencyResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
@@ -49,6 +50,7 @@ public class CurrencyResource {
             description = "Add a new currency to the system",
             operationId = "createCurrency"
     )
+    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)))
     public Single<CurrencyResponse> create(@Valid @Body CurrencyRequest request) {
         return currencyProvider.lookup(request.getCode())
                 .switchIfEmpty(Single.just(
@@ -75,6 +77,8 @@ public class CurrencyResource {
                             description = "The exception that occurred")
             }
     )
+    @ApiDefaults
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)), description = "The currency entity")
     public Single<CurrencyResponse> get(@PathVariable String currencyCode) {
         return currencyProvider.lookup(currencyCode)
                 .switchIfEmpty(Single.error(
@@ -99,6 +103,8 @@ public class CurrencyResource {
                             description = "The exception that occurred")
             }
     )
+    @ApiDefaults
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)), description = "The currency entity")
     public Single<CurrencyResponse> update(@PathVariable String currencyCode, @Valid @Body CurrencyRequest request) {
         return currencyProvider.lookup(currencyCode)
                 .switchIfEmpty(Single.error(
@@ -115,18 +121,10 @@ public class CurrencyResource {
     @Operation(
             summary = "Patch currency",
             description = "Partially update an existing currency in the system",
-            operationId = "patchCurrency",
-            responses = {
-                    @ApiResponse(responseCode = "200",
-                            content = @Content(
-                                    schema = @Schema(implementation = CurrencyResponse.class)),
-                            description = "The currency entity"),
-                    @ApiResponse(responseCode = "404",
-                            content = @Content(
-                                    schema = @Schema(implementation = JsonError.class)),
-                            description = "The exception that occurred")
-            }
+            operationId = "patchCurrency"
     )
+    @ApiDefaults
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)), description = "The currency entity")
     public Single<CurrencyResponse> patch(@PathVariable String currencyCode, @Valid @Body CurrencyPatchRequest request) {
         return currencyProvider.lookup(currencyCode)
                 .switchIfEmpty(Single.error(

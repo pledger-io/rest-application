@@ -5,8 +5,8 @@ import com.jongsoft.finance.domain.transaction.TransactionRuleGroupProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.transaction.entity.RuleGroupJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Named;
@@ -28,7 +28,7 @@ public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProv
     }
 
     @Override
-    public Sequence<TransactionRuleGroup> lookup() {
+    public Flowable<TransactionRuleGroup> lookup() {
         log.trace("TransactionRuleGroup listing");
 
         var hql = """
@@ -37,10 +37,10 @@ public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProv
                     and g.archived = false
                 order by g.sort asc""";
 
-        return entityManager.<RuleGroupJpa>blocking()
+        return entityManager.<RuleGroupJpa>reactive()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
-                .sequence()
+                .flow()
                 .map(this::convert);
     }
 

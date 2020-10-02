@@ -14,6 +14,7 @@ import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 import javax.inject.Named;
@@ -61,7 +62,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
     }
 
     @Override
-    public Sequence<TransactionRule> lookup(String group) {
+    public Flowable<TransactionRule> lookup(String group) {
         var hql = """
                 select r from RuleJpa r
                 where r.user.username = :username
@@ -69,11 +70,11 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
                  and r.archived = false
                 order by r.sort asc""";
 
-        return entityManager.<RuleJpa>blocking()
+        return entityManager.<RuleJpa>reactive()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
                 .set("name", group)
-                .sequence()
+                .flow()
                 .map(this::convert);
     }
 
