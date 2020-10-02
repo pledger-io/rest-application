@@ -1,0 +1,35 @@
+{
+  "groups": [
+    {
+      "name": "security",
+      "type": "com.jongsoft.finance.configuration.SecuritySettings",
+      "sourceType": "com.jongsoft.finance.configuration.SecuritySettings"
+    },
+    {
+      "name": "storage",
+      "type": "com.jongsoft.finance.configuration.StorageSettings",
+      "sourceType": "com.jongsoft.finance.configuration.StorageSettings"
+    }
+  ],
+  "properties": [
+    {
+      "name": "micronaut.application.security.secret",
+      "type": "java.lang.String",
+      "description": "The secret salt used for encrypting",
+      "sourceType": "com.jongsoft.finance.configuration.SecuritySettings"
+    },
+    {
+      "name": "micronaut.application.security.encrypt",
+      "type": "java.lang.Boolean",
+      "description": "Flag if the database secret fields should be encrypted",
+      "default": false,
+      "sourceType": "com.jongsoft.finance.configuration.SecuritySettings"
+    },
+    {
+      "name": "micronaut.application.storage.location",
+      "type": "java.lang.String",
+      "description": "The default file location for FinTrack",
+      "sourceType": "com.jongsoft.finance.configuration.StorageSettings"
+    }
+  ]
+}

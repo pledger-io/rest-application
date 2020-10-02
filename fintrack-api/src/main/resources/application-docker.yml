@@ -1,0 +1,4 @@
+micronaut:
+  application:
+    storage:
+      location: /opt/storage/
