@@ -17,11 +17,15 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
+import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
@@ -140,6 +144,7 @@ public class TransactionResource {
     }
 
     @Post("/locate-first")
+    @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = JsonError.class)))
     Single<LocalDate> firstTransaction(@Body TransactionSearchRequest request) {
         var command = filterFactory.transaction();
 

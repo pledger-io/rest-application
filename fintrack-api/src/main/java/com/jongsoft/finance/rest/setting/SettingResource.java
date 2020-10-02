@@ -6,6 +6,7 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Secured("ADMIN")
@@ -39,6 +40,7 @@ public class SettingResource {
             description = "Update a single setting in the system",
             operationId = "updateSettings"
     )
+    @ApiResponse(responseCode = "204")
     void update(@PathVariable String setting, @Body SettingUpdateRequest request) {
         settingProvider.lookup(setting)
                 .ifPresent(value -> value.update(request.getValue()));
