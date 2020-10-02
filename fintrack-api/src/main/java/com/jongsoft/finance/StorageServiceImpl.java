@@ -3,22 +3,15 @@ package com.jongsoft.finance;
 import com.jongsoft.finance.configuration.SecuritySettings;
 import com.jongsoft.finance.configuration.StorageSettings;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.finance.security.Encryption;
 import com.jongsoft.lang.API;
-import org.bouncycastle.util.encoders.Hex;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
-import java.security.GeneralSecurityException;
-import java.security.spec.KeySpec;
 import java.util.UUID;
 
 @Singleton
@@ -28,7 +21,7 @@ public class StorageServiceImpl implements StorageService {
     private final SecuritySettings securitySettings;
     private final CurrentUserProvider currentUserProvider;
     private final File uploadRootDirectory;
-    private final byte[] securitySalt;
+    private final Encryption encryption;
 
     public StorageServiceImpl(
             SecuritySettings securitySettings,
@@ -36,7 +29,7 @@ public class StorageServiceImpl implements StorageService {
             StorageSettings storageLocation) {
         this.securitySettings = securitySettings;
         this.currentUserProvider = currentUserProvider;
-        this.securitySalt = Hex.encode(securitySettings.getSecret().getBytes());
+        this.encryption = new Encryption(securitySettings);
 
         uploadRootDirectory = new File(storageLocation.getLocation(), "upload");
         if (!uploadRootDirectory.exists()) {
@@ -50,13 +43,15 @@ public class StorageServiceImpl implements StorageService {
 
         byte[] toStore;
         if (securitySettings.isEncrypt()) {
-            toStore = generateCipher(Cipher.ENCRYPT_MODE, content);
+            toStore = encryption.encrypt(
+                    content,
+                    currentUserProvider.currentUser().getSecret());
         } else {
             toStore = content;
         }
 
         var fileCreated = API.Try(() -> new FileOutputStream(new File(uploadRootDirectory, token), false))
-                .consume((os) -> {
+                .consume(os -> {
                     os.write(toStore);
                     os.close();
                 })
@@ -82,7 +77,9 @@ public class StorageServiceImpl implements StorageService {
 
         byte[] result = readResult.isSuccess() ? readResult.get() : new byte[0];
         if (securitySettings.isEncrypt()) {
-            result = generateCipher(Cipher.DECRYPT_MODE, result);
+            result = encryption.decrypt(
+                    result,
+                    currentUserProvider.currentUser().getSecret());
         }
 
         return result;
@@ -97,22 +94,6 @@ public class StorageServiceImpl implements StorageService {
         }
 
         API.Try(() -> Files.delete(file.toPath()));
-    }
-
-    private byte[] generateCipher(int opmode, byte[] raw) {
-        var security = currentUserProvider.currentUser().getSecret().toCharArray();
-        try {
-            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            KeySpec spec = new PBEKeySpec(security, securitySalt, 65536, 256);
-            SecretKey tmp = factory.generateSecret(spec);
-            SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
-
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(opmode, secret);
-            return cipher.doFinal(raw);
-        } catch (GeneralSecurityException e) {
-            throw new IllegalStateException("Could not setup storage encryption", e);
-        }
     }
 
 }
