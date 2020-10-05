@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 @Tag(name = "Contract")
 @Controller("/api/contracts")
@@ -92,11 +91,9 @@ public class ContractResource {
     )
     Single<ContractResponse> update(
             @PathVariable long contractId,
-            @Body @Valid ContractCreateRequest updateRequest,
-            Principal principal) {
+            @Body @Valid ContractCreateRequest updateRequest) {
         return Single.create(emitter -> {
             var response = contractProvider.lookup(contractId)
-                    .filter(c -> c.getCompany().getUser().getUsername().equals(principal.getName()))
                     .map(contract -> {
                         contract.change(
                                 updateRequest.getName(),
@@ -122,10 +119,9 @@ public class ContractResource {
             description = "Get a single contract from FinTrack",
             parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
     )
-    Single<ContractResponse> get(@PathVariable long contractId, Principal principal) {
+    Single<ContractResponse> get(@PathVariable long contractId) {
         return Single.create(emitter -> {
             var response = contractProvider.lookup(contractId)
-                    .filter(contract -> contract.getCompany().getUser().getUsername().equals(principal.getName()))
                     .map(ContractResponse::new);
 
             if (response.isPresent()) {
@@ -144,10 +140,9 @@ public class ContractResource {
             parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
             operationId = "warnBeforeExpireDate"
     )
-    Single<ContractResponse> warnExpiry(@PathVariable long contractId, Principal principal) {
+    Single<ContractResponse> warnExpiry(@PathVariable long contractId) {
         return Single.create(emitter -> {
             var response = contractProvider.lookup(contractId)
-                    .filter(c -> c.getCompany().getUser().getUsername().equals(principal.getName()))
                     .map(contract -> {
                         contract.warnBeforeExpires();
                         return contract;
@@ -172,11 +167,9 @@ public class ContractResource {
     )
     Single<ContractResponse> attachment(
             @PathVariable long contractId,
-            @Body @Valid ContractAttachmentRequest attachmentRequest,
-            Principal principal) {
+            @Body @Valid ContractAttachmentRequest attachmentRequest) {
         return Single.create(emitter -> {
             var response = contractProvider.lookup(contractId)
-                    .filter(c -> c.getCompany().getUser().getUsername().equals(principal.getName()))
                     .map(contract -> {
                         contract.registerUpload(attachmentRequest.getFileCode());
                         return contract;
@@ -198,9 +191,8 @@ public class ContractResource {
             description = "Archives an existing contract",
             parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
     )
-    void delete(@PathVariable long contractId, Principal principal) {
+    void delete(@PathVariable long contractId) {
         contractProvider.lookup(contractId)
-                .filter(c -> c.getCompany().getUser().getUsername().equals(principal.getName()))
                 .ifPresent(Contract::terminate);
     }
 

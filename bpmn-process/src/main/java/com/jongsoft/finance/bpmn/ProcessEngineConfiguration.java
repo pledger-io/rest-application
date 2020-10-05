@@ -1,21 +1,20 @@
 package com.jongsoft.finance.bpmn;
 
-import java.io.IOException;
-import java.util.List;
-
+import com.jongsoft.finance.bpmn.camunda.ApplicationContextElResolver;
+import com.jongsoft.finance.bpmn.camunda.CamundaDatasourceConfiguration;
+import com.jongsoft.finance.bpmn.camunda.MicronautExpressionManager;
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.context.annotation.Context;
+import io.micronaut.context.annotation.Factory;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import com.jongsoft.finance.bpmn.camunda.ApplicationContextElResolver;
-import com.jongsoft.finance.bpmn.camunda.CamundaDatasourceConfiguration;
-import com.jongsoft.finance.bpmn.camunda.MicronautExpressionManager;
 
-import io.micronaut.context.ApplicationContext;
-import io.micronaut.context.annotation.Context;
-import io.micronaut.context.annotation.Factory;
+import java.io.IOException;
+import java.util.List;
 
 @Factory
 public class ProcessEngineConfiguration {

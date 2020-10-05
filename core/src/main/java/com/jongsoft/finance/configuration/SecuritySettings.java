@@ -1,9 +1,9 @@
-package com.jongsoft.finance.security;
-
-import javax.validation.constraints.NotNull;
+package com.jongsoft.finance.configuration;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.core.bind.annotation.Bindable;
+
+import javax.validation.constraints.NotNull;
 
 @ConfigurationProperties("micronaut.application.security")
 public interface SecuritySettings {

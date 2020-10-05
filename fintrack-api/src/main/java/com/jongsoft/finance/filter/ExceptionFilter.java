@@ -1,11 +1,10 @@
 package com.jongsoft.finance.filter;
 
-import com.jongsoft.finance.core.exception.StatusException;
+import io.micronaut.core.order.Ordered;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MutableHttpResponse;
-import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.OncePerRequestHttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.hateoas.JsonError;
@@ -16,8 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 
 @Slf4j
-@Filter("/api/**")
+//@Filter("/api/**")
 public class ExceptionFilter extends OncePerRequestHttpServerFilter {
+
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
+    }
 
     @Override
     protected Publisher<MutableHttpResponse<?>> doFilterOnce(HttpRequest<?> request, ServerFilterChain chain) {
@@ -27,12 +31,7 @@ public class ExceptionFilter extends OncePerRequestHttpServerFilter {
                     error.link(Link.SELF, Link.of(request.getUri()));
 
                     int statusCode = 500;
-                    if (throwable instanceof StatusException e) {
-                        log.debug("Resource requested resolved in issues {} with message '{}'",
-                                e.getStatusCode(),
-                                e.getMessage());
-                        statusCode = e.getStatusCode();
-                    } else if (throwable instanceof AuthorizationException) {
+                    if (throwable instanceof AuthorizationException) {
                         log.warn("{} - Attempt to access resource without proper authorization with message '{}'",
                                 request.getPath(),
                                 throwable.getMessage());
@@ -43,8 +42,8 @@ public class ExceptionFilter extends OncePerRequestHttpServerFilter {
                                 throwable.getMessage());
                     }
 
-                    return HttpResponse.
-                            status(HttpStatus.valueOf(statusCode))
+                    return HttpResponse
+                            .status(HttpStatus.valueOf(statusCode))
                             .body(error);
                 });
     }

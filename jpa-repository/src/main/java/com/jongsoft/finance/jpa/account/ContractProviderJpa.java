@@ -51,8 +51,9 @@ public class ContractProviderJpa implements ContractProvider {
     @Override
     public Optional<Contract> lookup(long id) {
         return entityManager.<ContractJpa>blocking()
-                .hql("from ContractJpa where id = :id")
+                .hql("from ContractJpa where id = :id and user.username = :username")
                 .set("id", id)
+                .set("username", authenticationFacade.authenticated())
                 .maybe()
                 .map(this::convert);
     }
