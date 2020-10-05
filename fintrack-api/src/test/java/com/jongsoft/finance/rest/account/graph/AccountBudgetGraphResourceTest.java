@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.security.Principal;
 import java.util.Locale;
 
 public class AccountBudgetGraphResourceTest extends TestSetup {
@@ -63,8 +62,6 @@ public class AccountBudgetGraphResourceTest extends TestSetup {
                 .name("Demo Expense")
                 .build();
 
-        var principal = Mockito.mock(Principal.class);
-
         Mockito.when(currencyProvider.lookup(Mockito.anyString())).thenReturn(Maybe.empty());
         Mockito.when(transactionService.balance(Mockito.any())).thenReturn(API.Option());
         Mockito.when(accountProvider.lookup(123L)).thenReturn(API.Option(account));
@@ -72,14 +69,12 @@ public class AccountBudgetGraphResourceTest extends TestSetup {
                 Single.just(Budget.builder()
                         .expenses(API.List(expense))
                         .build()));
-        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
 
         subject.budget(
                 123L,
                 Dates.startOfMonth(2019, 1),
                 Dates.endOfMonth(2019, 1),
-                Locale.GERMAN,
-                principal);
+                Locale.GERMAN);
 
         var filterCommand = filterFactory.transaction();
         Mockito.verify(accountProvider).lookup(123L);

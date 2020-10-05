@@ -56,7 +56,7 @@ public class CategoryGraphResource {
             description = "Generates a bar graph for category expenses",
             operationId = "generateCategoryExpenses"
     )
-    Highchart graph(
+    String graph(
             @PathVariable @Format("yyyy-MM-dd") LocalDate from,
             @PathVariable @Format("yyyy-MM-dd") LocalDate until,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
@@ -104,7 +104,8 @@ public class CategoryGraphResource {
                     .build()
                 .addSeries(series)
                 .addYAxis(createBalanceAxis(locale))
-                .addXAxis(xAxis);
+                .addXAxis(xAxis)
+                .toJson();
         // @formatter:on
     }
 

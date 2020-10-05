@@ -59,7 +59,7 @@ public class BudgetGraphResource {
             description = "Generate a month budget income graph",
             parameters = @Parameter(name = "year", in = ParameterIn.PATH, schema = @Schema(implementation = Integer.class))
     )
-    Highchart graph(
+    String graph(
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
             @PathVariable @Format("yyyy-MM-dd") LocalDate start,
             @PathVariable @Format("yyyy-MM-dd") LocalDate end) {
@@ -118,7 +118,8 @@ public class BudgetGraphResource {
                 .addXAxis(xAxis)
                 .addYAxis(createBalanceAxis(locale))
                 .addSeries(expected)
-                .addSeries(series);
+                .addSeries(series)
+                .toJson();
         // @formatter:on
     }
 

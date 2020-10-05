@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.LocalDate;
 import java.util.Locale;
+import java.util.Optional;
 
 @Tag(name = "Graph Generation")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -56,13 +57,11 @@ public class CategoryYearGraphResource {
             description = "Generate a category yearly income vs expenses graph",
             operationId = "generateCategoryYearGraph"
     )
-    Highchart chart(
+    String chart(
             @PathVariable int year,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
-            @RequestAttribute(RequestAttributes.CURRENCY) Currency currency) {
-        if (currency == null) {
-            currency = Currency.builder().build();
-        }
+            @RequestAttribute(RequestAttributes.CURRENCY) Optional<Currency> currencyOpt) {
+        var currency = currencyOpt.orElseGet(() -> Currency.builder().build());
         var incomeSeries = SeriesFactory.<BarSeries>createSeries(SeriesType.COLUMN);
         var expenseSeries = SeriesFactory.<BarSeries>createSeries(SeriesType.COLUMN);
 
@@ -131,7 +130,8 @@ public class CategoryYearGraphResource {
                 .getCredits()
                     .setText("FinTrack")
                     .setEnabled(false)
-                    .build();
+                    .build()
+                .toJson();
     }
 
     private Axis createDateAxis(LocalDate start, LocalDate end) {

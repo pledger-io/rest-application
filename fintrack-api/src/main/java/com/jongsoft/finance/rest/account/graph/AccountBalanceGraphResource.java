@@ -77,7 +77,7 @@ public class AccountBalanceGraphResource {
                     @Parameter(name = "end", in = ParameterIn.PATH, description = "The end date", schema = @Schema(implementation = LocalDate.class))
             }
     )
-    Highchart balance(
+    String balance(
             @PathVariable long id,
             @PathVariable @Format("yyyy-MM-dd") LocalDate start,
             @PathVariable @Format("yyyy-MM-dd") LocalDate end,
@@ -113,7 +113,7 @@ public class AccountBalanceGraphResource {
                         .setEnabled(false)
                         .build();
         // @formatter:on
-        return chart;
+        return chart.toJson();
     }
 
     private Axis createDateAxis(LocalDate start, LocalDate end, Locale locale) {

@@ -34,28 +34,28 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Locale;
+import java.util.Optional;
 
 @Tag(name = "Reports")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/statistics/graph/income-expenses/{from}/{until}")
 public class IncomeExpenseGraphResource {
 
-    @Resource(name = "messageSource")
-    private MessageSource messageSource;
-
+    private final MessageSource messageSource;
     private final FilterFactory filterFactory;
     private final CurrentUserProvider currentUserProvider;
     private final TransactionProvider transactionProvider;
 
     public IncomeExpenseGraphResource(
+            MessageSource messageSource,
             FilterFactory filterFactory,
             CurrentUserProvider currentUserProvider,
             TransactionProvider transactionProvider) {
+        this.messageSource = messageSource;
         this.filterFactory = filterFactory;
         this.currentUserProvider = currentUserProvider;
         this.transactionProvider = transactionProvider;
@@ -73,11 +73,12 @@ public class IncomeExpenseGraphResource {
                     @Parameter(name = "X-Accept-Currency", in = ParameterIn.HEADER, required = true, example = "USD")
             }
     )
-    Highchart graph(
+    String graph(
             @PathVariable @Format("yyyy-MM-dd") LocalDate from,
             @PathVariable @Format("yyyy-MM-dd") LocalDate until,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
-            @RequestAttribute(RequestAttributes.CURRENCY) Currency currency) {
+            @RequestAttribute(RequestAttributes.CURRENCY) Optional<Currency> currencyOpt) {
+        var currency = currencyOpt.orElseGet(() -> Currency.builder().build());
         var income = SeriesFactory.<BarSeries>createSeries(SeriesType.COLUMN);
         var expenses = SeriesFactory.<BarSeries>createSeries(SeriesType.COLUMN);
         var movingAverageExpense = SeriesFactory.<LineSeries>createSeries(SeriesType.LINE);
@@ -169,7 +170,8 @@ public class IncomeExpenseGraphResource {
                 .getCredits()
                     .setText("FinTrack")
                     .setEnabled(false)
-                    .build();
+                    .build()
+                .toJson();
         // @formatter:on
     }
 

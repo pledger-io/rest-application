@@ -72,7 +72,7 @@ public class BalanceGraphResource {
                     @Parameter(name = HttpHeaders.ACCEPT_LANGUAGE, in = ParameterIn.HEADER, required = true, example = "en")
             }
     )
-    Highchart balance(
+    String balance(
             @PathVariable @Format("yyyy-MM-dd") LocalDate from,
             @PathVariable @Format("yyyy-MM-dd") LocalDate until,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
@@ -106,7 +106,7 @@ public class BalanceGraphResource {
                 .setEnabled(false)
                 .build();
         // @formatter:on
-        return chart;
+        return chart.toJson();
     }
 
     private LineSeries createSeries(LocalDate start, LocalDate end, Locale locale) {

@@ -66,7 +66,7 @@ public class BudgetYearGraphResource {
             description = "Generate a yearly budget expense graph",
             parameters = @Parameter(name = "year", in = ParameterIn.PATH, schema = @Schema(implementation = Integer.class))
     )
-    Highchart expense(
+    String expense(
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
             @PathVariable int year) {
         Function<Budget, TransactionProvider.FilterCommand> request =
@@ -74,7 +74,8 @@ public class BudgetYearGraphResource {
                         .expenses(b.getExpenses().map(e -> new EntityRef(e.getId())))
                         .onlyIncome(false);
 
-        return createChart(locale, year, new GraphColor("#de7370"), request, Budget::computeExpenses);
+        return createChart(locale, year, new GraphColor("#de7370"), request, Budget::computeExpenses)
+                .toJson();
     }
 
     @Get("/income")
@@ -83,13 +84,14 @@ public class BudgetYearGraphResource {
             description = "Generate a yearly budget income graph",
             parameters = @Parameter(name = "year", in = ParameterIn.PATH, schema = @Schema(implementation = Integer.class))
     )
-    Highchart income(
+    String income(
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
             @PathVariable int year) {
         Function<Budget, TransactionProvider.FilterCommand> request =
                 b -> filterFactory.transaction().onlyIncome(true);
 
-        return createChart(locale, year, new GraphColor("#6996b2"), request, Budget::getExpectedIncome);
+        return createChart(locale, year, new GraphColor("#6996b2"), request, Budget::getExpectedIncome)
+                .toJson();
     }
 
     private Highchart createChart(Locale locale, int year, GraphColor graphColor,

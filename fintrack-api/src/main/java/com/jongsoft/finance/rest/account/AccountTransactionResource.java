@@ -5,11 +5,11 @@ import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.transaction.SplitRecord;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
 import com.jongsoft.lang.API;
 import io.micronaut.http.HttpResponse;
@@ -27,12 +27,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.security.Principal;
 import java.util.function.Consumer;
 
 @Tag(name = "Transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@Controller("/accounts/{accountId}/transactions")
+@Controller("/api/accounts/{accountId}/transactions")
 public class AccountTransactionResource {
 
     private final FilterFactory filterFactory;
@@ -65,17 +64,14 @@ public class AccountTransactionResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Single<HttpResponse<ResultPage<TransactionResponse>>> search(
+    Single<HttpResponse<ResultPageResponse<TransactionResponse>>> search(
             @PathVariable long accountId,
-            @Valid @Body AccountTransactionSearchRequest request,
-            Principal principal) {
+            @Valid @Body AccountTransactionSearchRequest request) {
         return Single.create(emitter -> {
             var accountOption = accountProvider.lookup(accountId);
 
             if (!accountOption.isPresent()) {
                 emitter.onSuccess(HttpResponse.notFound());
-            } else if (!accountOption.get().getUser().getUsername().equals(principal.getName())) {
-                emitter.onSuccess(HttpResponse.unauthorized());
             } else {
                 var command = filterFactory.transaction()
                         .accounts(API.List(new EntityRef(accountId)))
@@ -90,7 +86,7 @@ public class AccountTransactionResource {
                 var results = transactionProvider.lookup(command)
                         .map(TransactionResponse::new);
 
-                emitter.onSuccess(HttpResponse.ok(results));
+                emitter.onSuccess(HttpResponse.ok(new ResultPageResponse<>(results)));
             }
         });
     }
@@ -189,14 +185,12 @@ public class AccountTransactionResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Single<HttpResponse<TransactionResponse>> get(@PathVariable long transactionId, Principal principal) {
+    Single<HttpResponse<TransactionResponse>> get(@PathVariable long transactionId) {
         return Single.create(emitter -> {
             var transaction = transactionProvider.lookup(transactionId);
 
             if (!transaction.isPresent()) {
                 emitter.onSuccess(HttpResponse.notFound());
-            } else if (!transaction.get().getUser().getUsername().equals(principal.getName())) {
-                emitter.onSuccess(HttpResponse.unauthorized());
             } else {
                 emitter.onSuccess(HttpResponse.ok(new TransactionResponse(transaction.get())));
             }
@@ -226,14 +220,11 @@ public class AccountTransactionResource {
     )
     Single<HttpResponse<TransactionResponse>> update(
             @PathVariable long transactionId,
-            @Valid @Body AccountTransactionCreateRequest request,
-            Principal principal) {
+            @Valid @Body AccountTransactionCreateRequest request) {
         return Single.create(emitter -> {
             var presence = transactionProvider.lookup(transactionId);
             if (!presence.isPresent()) {
                 emitter.onSuccess(HttpResponse.notFound());
-            } else if (!presence.get().getUser().getUsername().equals(principal.getName())) {
-                emitter.onSuccess(HttpResponse.unauthorized());
             } else {
                 var fromAccount = accountProvider.lookup(request.getSource().getId()).get();
                 var toAccount = accountProvider.lookup(request.getDestination().getId()).get();
@@ -271,14 +262,11 @@ public class AccountTransactionResource {
     @Patch("/{transactionId}")
     Single<HttpResponse<TransactionResponse>> split(
             @PathVariable long transactionId,
-            @Valid @Body AccountTransactionSplitRequest request,
-            Principal principal) {
+            @Valid @Body AccountTransactionSplitRequest request) {
         return Single.create(emitter -> {
             var presence = transactionProvider.lookup(transactionId);
             if (!presence.isPresent()) {
                 emitter.onSuccess(HttpResponse.notFound());
-            } else if (!presence.get().getUser().getUsername().equals(principal.getName())) {
-                emitter.onSuccess(HttpResponse.unauthorized());
             } else {
                 presence.get().split(
                         API.List(request.getSplits())
@@ -290,13 +278,11 @@ public class AccountTransactionResource {
     }
 
     @Delete("/{transactionId}")
-    Single<HttpResponse<Void>> delete(@PathVariable long transactionId, Principal principal) {
+    Single<HttpResponse<Void>> delete(@PathVariable long transactionId) {
         return Single.create(emitter -> {
             var presence = transactionProvider.lookup(transactionId);
             if (!presence.isPresent()) {
                 emitter.onSuccess(HttpResponse.notFound());
-            } else if (!presence.get().getUser().getUsername().equals(principal.getName())) {
-                emitter.onSuccess(HttpResponse.unauthorized());
             } else {
                 presence.get().delete();
                 emitter.onSuccess(HttpResponse.noContent());

@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.util.Locale;
+import java.util.Optional;
 
 class CategoryYearGraphResourceTest extends TestSetup {
 
@@ -53,7 +54,7 @@ class CategoryYearGraphResourceTest extends TestSetup {
         Mockito.when(categoryProvider.lookup()).thenReturn(API.List(category));
         Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(API.Option());
 
-        subject.chart(2019, Locale.GERMAN, Currency.builder().symbol('E').build());
+        subject.chart(2019, Locale.GERMAN, Optional.of(Currency.builder().symbol('E').build()));
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(mockFilter).ownAccounts();

@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -33,8 +32,6 @@ class AccountTransactionResourceTest extends TestSetup {
     private FilterFactory filterFactory;
     private TransactionProvider transactionProvider;
 
-    private Principal principal;
-
     @BeforeEach
     void setup() {
         accountProvider = Mockito.mock(AccountProvider.class);
@@ -42,12 +39,10 @@ class AccountTransactionResourceTest extends TestSetup {
         filterFactory = generateFilterMock();
         transactionProvider = Mockito.mock(TransactionProvider.class);
         settingProvider = Mockito.mock(SettingProvider.class);
-        principal = Mockito.mock(Principal.class);
 
         subject = new AccountTransactionResource(filterFactory, transactionProvider, accountProvider, settingProvider);
 
         Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
-        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
 
         var applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         new EventBus(applicationEventPublisher);
@@ -97,7 +92,7 @@ class AccountTransactionResourceTest extends TestSetup {
         var request = AccountTransactionSearchRequest.builder()
                 .build();
 
-        var response = subject.search(1L, request, principal).blockingGet();
+        var response = subject.search(1L, request).blockingGet();
 
         Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
 
@@ -109,7 +104,7 @@ class AccountTransactionResourceTest extends TestSetup {
     void search_notfound() {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option());
 
-        var response = subject.search(1L, new AccountTransactionSearchRequest(), principal).blockingGet();
+        var response = subject.search(1L, new AccountTransactionSearchRequest()).blockingGet();
 
         Assertions.assertThat(response.code()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
     }
@@ -220,7 +215,7 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(API.Option(transaction));
 
-        var response = subject.get(123L, principal).blockingGet();
+        var response = subject.get(123L).blockingGet();
 
         Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
 
@@ -282,7 +277,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .budget(new AccountTransactionCreateRequest.EntityRef(3L, null))
                 .build();
 
-        subject.update(123L, request, principal).blockingGet();
+        subject.update(123L, request).blockingGet();
 
         Mockito.verify(transaction).changeAmount(20.2D, "EUR");
         Mockito.verify(transaction).changeAccount(true, account);
@@ -343,7 +338,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 ))
                 .build();
 
-        var response = subject.split(123L, request, principal).blockingGet();
+        var response = subject.split(123L, request).blockingGet();
 
         Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
 
@@ -370,7 +365,7 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(API.Option(transaction));
 
-        subject.delete(123L, principal).blockingGet();
+        subject.delete(123L).blockingGet();
 
         Mockito.verify(transaction).delete();
     }

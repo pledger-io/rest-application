@@ -12,7 +12,6 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.filter.RequestAttributes;
 import com.jongsoft.finance.graph.BudgetPieChart;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.highchart.Highchart;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
 import io.micronaut.core.convert.format.Format;
@@ -57,7 +56,7 @@ public class TransactionBudgetGraphResource extends BudgetPieChart {
     }
 
     @Get
-    Highchart budget(
+    String budget(
             @PathVariable @Format("yyyy-MM-dd") LocalDate start,
             @PathVariable @Format("yyyy-MM-dd") LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
@@ -66,7 +65,8 @@ public class TransactionBudgetGraphResource extends BudgetPieChart {
                 .content();
 
         return createChart(currencySymbol(), locale)
-                .addSeries(createSeries(ownAccounts, start, end, locale));
+                .addSeries(createSeries(ownAccounts, start, end, locale))
+                .toJson();
     }
 
     private String currencySymbol() {

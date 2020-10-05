@@ -8,7 +8,6 @@ import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
 import com.jongsoft.finance.graph.CategoryPieChart;
-import com.jongsoft.highchart.Highchart;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
 import io.micronaut.core.convert.format.Format;
@@ -16,17 +15,19 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.RequestAttribute;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Locale;
 
 @Tag(name = "Graph Generation")
+@Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/accounts/{id}/transactions/graph/category")
 public class AccountCategoryGraphResource extends CategoryPieChart {
 
@@ -56,19 +57,18 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
                     @Parameter(name = "end", in = ParameterIn.PATH, description = "The end date", schema = @Schema(implementation = LocalDate.class))
             }
     )
-    Highchart expenses(
+    String expenses(
             @PathVariable long id,
             @PathVariable @Format("yyyy-MM-dd") LocalDate start,
             @PathVariable @Format("yyyy-MM-dd") LocalDate end,
-            @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
-            Principal principal) {
+            @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
         var account = accountProvider.lookup(id)
-                .filter(a -> a.getUser().getUsername().equals(principal.getName()))
                 .get();
 
         var currency = currencySymbol(account.getCurrency());
         return createChart(currencySymbol(account.getCurrency()), locale)
-                .addSeries(createSeries(API.List(account), start, end, locale, false, currency));
+                .addSeries(createSeries(API.List(account), start, end, locale, false, currency))
+                .toJson();
     }
 
     @Get("income/{start}/{end}")
@@ -81,23 +81,28 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
                     @Parameter(name = "end", in = ParameterIn.PATH, description = "The end date", schema = @Schema(implementation = LocalDate.class))
             }
     )
-    Highchart income(
+    String income(
             @PathVariable long id,
             @PathVariable @Format("yyyy-MM-dd") LocalDate start,
             @PathVariable @Format("yyyy-MM-dd") LocalDate end,
-            @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
-            Principal principal) {
+            @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
         var account = accountProvider.lookup(id)
-                .filter(a -> a.getUser().getUsername().equals(principal.getName()))
                 .get();
 
         var currency = currencySymbol(account.getCurrency());
         return createChart(currencySymbol(account.getCurrency()), locale)
-                .addSeries(createSeries(API.List(account), start, end, locale, true, currency));
+                .addSeries(createSeries(API.List(account), start, end, locale, true, currency))
+                .toJson();
     }
 
     private Currency currencySymbol(String code) {
-        return currencyProvider.lookup(code)
-                .blockingGet(null);
+        var currency = currencyProvider.lookup(code)
+                .blockingGet(Currency.builder().build());
+
+        if (currency.getId() == null) {
+            return null;
+        } else {
+            return currency;
+        }
     }
 }

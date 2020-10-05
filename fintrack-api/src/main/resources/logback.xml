@@ -9,6 +9,7 @@
         </encoder>
     </appender>
 
+    <logger name="timing" level="error" />
     <logger name="com.jongsoft.finance" level="debug" />
     <root level="info">
         <appender-ref ref="STDOUT" />

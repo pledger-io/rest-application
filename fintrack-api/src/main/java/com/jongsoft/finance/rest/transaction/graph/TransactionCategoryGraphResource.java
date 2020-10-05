@@ -9,7 +9,6 @@ import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
 import com.jongsoft.finance.graph.CategoryPieChart;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.highchart.Highchart;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
 import io.micronaut.core.convert.format.Format;
@@ -47,7 +46,7 @@ public class TransactionCategoryGraphResource extends CategoryPieChart {
     }
 
     @Get("expenses/{start}/{end}")
-    Highchart expenses(
+    String expenses(
             @PathVariable @Format("yyyy-MM-dd") LocalDate start,
             @PathVariable @Format("yyyy-MM-dd") LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
@@ -55,11 +54,12 @@ public class TransactionCategoryGraphResource extends CategoryPieChart {
         var useCurrency = currency.orElseGet(this::fallbackCurrency);
 
         return createChart(useCurrency, locale)
-                .addSeries(createSeries(API.List(), start, end, locale, false, useCurrency));
+                .addSeries(createSeries(API.List(), start, end, locale, false, useCurrency))
+                .toJson();
     }
 
     @Get("income/{start}/{end}")
-    Highchart income(
+    String income(
             @PathVariable @Format("yyyy-MM-dd") LocalDate start,
             @PathVariable @Format("yyyy-MM-dd") LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
@@ -67,7 +67,8 @@ public class TransactionCategoryGraphResource extends CategoryPieChart {
         var useCurrency = currency.orElseGet(this::fallbackCurrency);
 
         return createChart(useCurrency, locale)
-                .addSeries(createSeries(API.List(), start, end, locale, true, useCurrency));
+                .addSeries(createSeries(API.List(), start, end, locale, true, useCurrency))
+                .toJson();
     }
 
     private Currency fallbackCurrency() {

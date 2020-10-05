@@ -37,9 +37,11 @@ public class ExceptionFilter extends OncePerRequestHttpServerFilter {
                                 throwable.getMessage());
                         statusCode = HttpStatus.UNAUTHORIZED.getCode();
                     } else {
-                        log.error("{} - Exception caught in HTTP chain execution, with message '{}'",
+                        var message = "%s - Exception caught in HTTP chain execution, with message '%s'".formatted(
                                 request.getPath(),
                                 throwable.getMessage());
+
+                        log.error(message, throwable);
                     }
 
                     return HttpResponse
