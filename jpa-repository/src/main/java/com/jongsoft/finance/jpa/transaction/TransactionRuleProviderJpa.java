@@ -23,6 +23,7 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Singleton
+@Transactional
 @Named("transactionRuleProvider")
 public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 

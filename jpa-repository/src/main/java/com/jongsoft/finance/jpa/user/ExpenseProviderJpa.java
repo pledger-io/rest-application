@@ -10,8 +10,10 @@ import com.jongsoft.lang.control.Optional;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.transaction.Transactional;
 
 @Singleton
+@Transactional
 @Named("expenseProvider")
 public class ExpenseProviderJpa implements ExpenseProvider {
 

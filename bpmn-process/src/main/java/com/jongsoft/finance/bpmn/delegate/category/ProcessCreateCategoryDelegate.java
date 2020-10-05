@@ -50,16 +50,19 @@ public class ProcessCreateCategoryDelegate implements JavaDelegate {
                 execution.getCurrentActivityName(),
                 categoryJson.getLabel());
 
-
         categoryProvider.lookup(categoryJson.getLabel())
                 .switchIfEmpty(Single.create(emitter -> {
                     currentUserProvider.currentUser()
                             .createCategory(categoryJson.getLabel());
 
                     categoryProvider.lookup(categoryJson.getLabel())
-                            .subscribe(category -> category.rename(
-                                    categoryJson.getLabel(),
-                                    categoryJson.getDescription()));
+                            .subscribe(category -> {
+                                category.rename(
+                                        categoryJson.getLabel(),
+                                        categoryJson.getDescription());
+
+                                emitter.onSuccess(category);
+                            });
                 })).blockingGet();
     }
 

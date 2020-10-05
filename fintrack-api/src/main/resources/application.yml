@@ -46,13 +46,3 @@ jpa:
           auto: none
         physical_naming_strategy: 'com.jongsoft.finance.jpa.DefaultNamingStrategy'
         show_sql: false
-flyway:
-  datasources:
-    default:
-      enabled: true
-      baseline-on-migrate: true
-      locations: ["classpath:db/camunda", "classpath:db/migration"]
-      java-migrations:
-        - db.migration.V20200429151821__MigrateEncryptedStorage
-        - db.migration.V20200430171321__MigrateToEncryptedDatabase
-        - db.migration.V20200503171321__MigrateToDecryptDatabase

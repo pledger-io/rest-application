@@ -2,7 +2,7 @@ package com.jongsoft.finance.security;
 
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
-import io.micronaut.security.utils.SecurityService;
+import com.jongsoft.lang.API;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -11,21 +11,21 @@ import javax.inject.Singleton;
 @Named("currentUserProvider")
 public class CurrentUserProviderImpl implements CurrentUserProvider {
 
-    private final SecurityService securityService;
+    private final AuthenticationFacade authenticationFacade;
     private final UserProvider userProvider;
 
-    public CurrentUserProviderImpl(final SecurityService securityService, final UserProvider userProvider) {
-        this.securityService = securityService;
+    public CurrentUserProviderImpl(final AuthenticationFacade AuthenticationFacade, final UserProvider userProvider) {
+        this.authenticationFacade = AuthenticationFacade;
         this.userProvider = userProvider;
     }
 
     @Override
     public UserAccount currentUser() {
-        var username = securityService.username();
+        var username = API.Option(authenticationFacade.authenticated());
         return username.map(s ->
                 userProvider.lookup(s)
                         .getOrSupply(() -> null))
-                .orElse(null);
+                .getOrSupply(() -> null);
 
     }
 

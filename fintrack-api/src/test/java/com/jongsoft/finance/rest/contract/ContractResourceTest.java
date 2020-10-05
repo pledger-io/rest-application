@@ -20,10 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.security.Principal;
 import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ContractResourceTest extends TestSetup {
 
@@ -150,11 +147,9 @@ class ContractResourceTest extends TestSetup {
                 .start(LocalDate.of(2019, 2, 1))
                 .end(LocalDate.of(2022, 2, 1))
                 .build();
-        var principal = Mockito.mock(Principal.class);
 
         Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(contract));
         Mockito.when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
-        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
         Mockito.when(contract.getCompany()).thenReturn(Account.builder()
                 .id(1L)
                 .balance(0D)
@@ -163,7 +158,7 @@ class ContractResourceTest extends TestSetup {
                 .currency("EUR")
                 .build());
 
-        subject.update(1L, request, principal).blockingGet();
+        subject.update(1L, request).blockingGet();
 
         Mockito.verify(contract).change(
                 "Test Contract",
@@ -180,12 +175,10 @@ class ContractResourceTest extends TestSetup {
                 .start(LocalDate.of(2019, 2, 1))
                 .end(LocalDate.of(2022, 2, 1))
                 .build();
-        var principal = Mockito.mock(Principal.class);
 
         Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option());
-        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
 
-        subject.update(1L, request, principal)
+        subject.update(1L, request)
                 .test()
                 .assertError(StatusException.class)
                 .assertErrorMessage("No contract can be found for 1");
@@ -209,36 +202,9 @@ class ContractResourceTest extends TestSetup {
                         .endDate(LocalDate.now().plusMonths(1))
                         .build()));
 
-        var principal = Mockito.mock(Principal.class);
-        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
-
-        var response = subject.get(1L, principal).blockingGet();
+        var response = subject.get(1L).blockingGet();
 
         Assertions.assertThat(response.getId()).isEqualTo(1L);
-    }
-
-    @Test
-    void get_incorrectUser() {
-        Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(
-                Contract.builder()
-                        .id(1L)
-                        .name("Test contract")
-                        .company(Account.builder()
-                                .id(1L)
-                                .balance(0D)
-                                .name("Sample account")
-                                .user(ACTIVE_USER)
-                                .currency("EUR")
-                                .build())
-                        .description("Sample contract")
-                        .startDate(LocalDate.of(2019, 1, 1))
-                        .endDate(LocalDate.now().plusMonths(1))
-                        .build()));
-
-        var principal = Mockito.mock(Principal.class);
-        Mockito.when(principal.getName()).thenReturn("no-no");
-
-        assertThrows(StatusException.class, () -> subject.get(1L, principal).blockingGet());
     }
 
     @Test
@@ -248,10 +214,7 @@ class ContractResourceTest extends TestSetup {
         Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(contract));
         Mockito.when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
 
-        var principal = Mockito.mock(Principal.class);
-        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
-
-        subject.warnExpiry(1L, principal).blockingGet();
+        subject.warnExpiry(1L).blockingGet();
 
         Mockito.verify(contract).warnBeforeExpires();
     }
@@ -263,13 +226,10 @@ class ContractResourceTest extends TestSetup {
         Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(contract));
         Mockito.when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
 
-        var principal = Mockito.mock(Principal.class);
-        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
-
         var request = new ContractAttachmentRequest();
         request.setFileCode("file-code-1");
 
-        subject.attachment(1L, request, principal).blockingGet();
+        subject.attachment(1L, request).blockingGet();
 
         Mockito.verify(contract).registerUpload("file-code-1");
     }
@@ -281,10 +241,7 @@ class ContractResourceTest extends TestSetup {
         Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(contract));
         Mockito.when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
 
-        var principal = Mockito.mock(Principal.class);
-        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
-
-        subject.delete(1L, principal);
+        subject.delete(1L);
 
         Mockito.verify(contract).terminate();
     }

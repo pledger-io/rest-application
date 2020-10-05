@@ -25,7 +25,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
     @EventListener
     void internalAuthenticated(InternalAuthenticationEvent event) {
-        log.debug("Setting internal authentication for {} on thread", event.getUsername());
+        log.trace("Setting internal authentication for {} on thread", event.getUsername());
         AUTHENTICATED_USER.set(event.getUsername());
     }
 

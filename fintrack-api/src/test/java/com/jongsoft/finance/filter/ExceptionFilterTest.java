@@ -35,7 +35,7 @@ class ExceptionFilterTest {
         var response = Single.fromPublisher(subject.doFilterOnce(mockRequest, chain))
                 .blockingGet();
 
-        Assertions.assertThat(response.getStatus().getCode()).isEqualTo(404);
+        Assertions.assertThat(response.getStatus().getCode()).isEqualTo(500);
         Assertions.assertThat(response.getBody(JsonError.class).get().getMessage()).isEqualTo("Cannot find exception");
     }
 

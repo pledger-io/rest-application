@@ -1,15 +1,14 @@
 package com.jongsoft.finance.bpmn.listeners;
 
-import javax.inject.Singleton;
-
+import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
+import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.context.event.ApplicationEventPublisher;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.variable.value.StringValue;
-import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
-import com.jongsoft.finance.security.AuthenticationFacade;
 
-import io.micronaut.context.event.ApplicationEventPublisher;
-import lombok.extern.slf4j.Slf4j;
+import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
@@ -27,10 +26,14 @@ public class StartProcessListener implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution execution) throws Exception {
-        log.info("[{}] Starting business process", execution.getProcessDefinitionId());
-
         if (execution.hasVariable("username") && authenticationFacade.authenticated() == null) {
             var username = execution.<StringValue>getVariableTyped("username").getValue();
+
+            log.info("[{}-{}] Correcting authentication to user {}",
+                    execution.getProcessDefinitionId(),
+                    execution.getCurrentActivityName(),
+                    username);
+
 
             log.debug("[{}] Setting up security credentials for {}", execution.getProcessDefinitionId(), username);
 

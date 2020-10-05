@@ -11,9 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
+@Transactional
 @Named("transactionRuleGroupProvider")
 public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProvider {
 
