@@ -116,6 +116,8 @@ public class ProfileImportIT extends ProcessTestSetup {
         assertThat(accountShop.getName()).isEqualTo("Groceries are us");
         assertThat(accountShop.getCurrency()).isEqualTo("EUR");
         assertThat(accountShop.getType()).isEqualTo("creditor");
+
+        Mockito.verify(storageService).remove("my-sample-token");
     }
 
 }
