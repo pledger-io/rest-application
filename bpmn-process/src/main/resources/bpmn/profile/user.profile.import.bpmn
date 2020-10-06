@@ -31,9 +31,9 @@
     <bpmn:sequenceFlow id="SequenceFlow_1jzerv7" sourceRef="processAccountsTask" targetRef="joiningGW" />
     <bpmn:sequenceFlow id="SequenceFlow_0b3kjo9" sourceRef="joiningGW" targetRef="processTransactionRuleTask" />
     <bpmn:endEvent id="endImportProfile">
-      <bpmn:incoming>SequenceFlow_1tsyjeh</bpmn:incoming>
+      <bpmn:incoming>Flow_02hh0zq</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_1tsyjeh" sourceRef="processTransactionRuleTask" targetRef="endImportProfile" />
+    <bpmn:sequenceFlow id="SequenceFlow_1tsyjeh" sourceRef="processTransactionRuleTask" targetRef="st_cleanp_storage" />
     <bpmn:callActivity id="processTransactionRuleTask" name="Process transaction rules" camunda:asyncBefore="true" calledElement="ImportTransactionRules">
       <bpmn:extensionElements>
         <camunda:in source="ruleStorageToken" target="storageToken" />
@@ -99,6 +99,11 @@
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_1qqsxik" sourceRef="parallelProcessGW" targetRef="st_process_tags" />
     <bpmn:sequenceFlow id="SequenceFlow_01bdvbn" sourceRef="st_process_tags" targetRef="joiningGW" />
+    <bpmn:serviceTask id="st_cleanp_storage" name="Cleanup storage" camunda:asyncBefore="true" camunda:expression="${storageService.remove(storageToken)}">
+      <bpmn:incoming>SequenceFlow_1tsyjeh</bpmn:incoming>
+      <bpmn:outgoing>Flow_02hh0zq</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_02hh0zq" sourceRef="st_cleanp_storage" targetRef="endImportProfile" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ImportUserProfile">
@@ -122,7 +127,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1tsyjeh_di" bpmnElement="SequenceFlow_1tsyjeh">
         <di:waypoint x="941" y="222" />
-        <di:waypoint x="988" y="222" />
+        <di:waypoint x="1010" y="222" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0b3kjo9_di" bpmnElement="SequenceFlow_0b3kjo9">
         <di:waypoint x="782" y="222" />
@@ -159,6 +164,10 @@
         <di:waypoint x="187" y="222" />
         <di:waypoint x="235" y="222" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02hh0zq_di" bpmnElement="Flow_02hh0zq">
+        <di:waypoint x="1110" y="222" />
+        <di:waypoint x="1172" y="222" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startImportProfile">
         <dc:Bounds x="151" y="204" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -167,9 +176,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ParallelGateway_0aaqrmw_di" bpmnElement="joiningGW">
         <dc:Bounds x="732" y="197" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_1inyou0_di" bpmnElement="endImportProfile">
-        <dc:Bounds x="988" y="204" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="CallActivity_1yk1l2i_di" bpmnElement="processTransactionRuleTask">
         <dc:Bounds x="841" y="182" width="100" height="80" />
@@ -191,6 +197,12 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_153d03l_di" bpmnElement="st_process_tags">
         <dc:Bounds x="549" y="401" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_168vk1t_di" bpmnElement="st_cleanp_storage">
+        <dc:Bounds x="1010" y="182" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1inyou0_di" bpmnElement="endImportProfile">
+        <dc:Bounds x="1172" y="204" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

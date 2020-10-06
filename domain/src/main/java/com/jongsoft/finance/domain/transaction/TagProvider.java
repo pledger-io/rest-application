@@ -15,4 +15,8 @@ public interface TagProvider extends Exportable<Tag> {
     Maybe<Tag> lookup(String name);
     ResultPage<Tag> lookup(FilterCommand filter);
 
+    @Override
+    default boolean supports(Class<Tag> supportingClass) {
+        return Tag.class.equals(supportingClass);
+    }
 }
