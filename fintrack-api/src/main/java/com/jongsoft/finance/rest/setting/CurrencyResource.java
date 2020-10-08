@@ -86,7 +86,7 @@ public class CurrencyResource {
                 .map(CurrencyResponse::new);
     }
 
-    @Secured("ADMIN")
+    @Secured("admin")
     @Post("/{currencyCode}")
     @Operation(
             summary = "Update currency",
@@ -116,7 +116,7 @@ public class CurrencyResource {
                 .map(CurrencyResponse::new);
     }
 
-    @Secured("ADMIN")
+    @Secured("admin")
     @Patch("/{currencyCode}")
     @Operation(
             summary = "Patch currency",
