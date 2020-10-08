@@ -18,6 +18,7 @@ import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 
 @Tag(name = "Category")
@@ -69,13 +70,13 @@ public class CategoryResource {
         return new ResultPageResponse<>(response.map(CategoryResponse::new));
     }
 
-    @Get("/auto-complete")
+    @Get("/auto-complete{?token}")
     @Operation(
             summary = "Autocomplete",
             description = "List all categories matching the provided token",
             operationId = "getCategoriesByToken"
     )
-    Flowable<CategoryResponse> autocomplete(@QueryValue String token) {
+    Flowable<CategoryResponse> autocomplete(@Nullable String token) {
         var response = categoryService.lookup(
                 filterFactory.category()
                         .label(token, false)

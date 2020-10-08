@@ -7,6 +7,7 @@ import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
 import com.jongsoft.finance.math.MovingAverage;
+import com.jongsoft.finance.rest.DateFormat;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.highchart.Highchart;
 import com.jongsoft.highchart.axis.Axis;
@@ -20,7 +21,6 @@ import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
-import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -74,8 +74,8 @@ public class IncomeExpenseGraphResource {
             }
     )
     String graph(
-            @PathVariable @Format("yyyy-MM-dd") LocalDate from,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate until,
+            @PathVariable @DateFormat LocalDate from,
+            @PathVariable @DateFormat LocalDate until,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
             @RequestAttribute(RequestAttributes.CURRENCY) Optional<Currency> currencyOpt) {
         var currency = currencyOpt.orElseGet(() -> Currency.builder().build());

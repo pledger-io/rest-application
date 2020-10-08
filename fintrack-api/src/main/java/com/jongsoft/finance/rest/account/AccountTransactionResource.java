@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.function.Consumer;
@@ -137,7 +138,7 @@ public class AccountTransactionResource {
         });
     }
 
-    @Get("/first")
+    @Get("/first{?description}")
     @Operation(
             summary = "Get the first transaction",
             description = "Returns the first transaction found for the given account",
@@ -151,7 +152,7 @@ public class AccountTransactionResource {
                     @ApiResponse(responseCode = "404", description = "No transaction found")
             }
     )
-    Single<TransactionResponse> first(@PathVariable Long accountId, @QueryValue String description) {
+    Single<TransactionResponse> first(@PathVariable Long accountId, @Nullable String description) {
         var command = filterFactory.transaction()
                 .accounts(API.List(new EntityRef(accountId)));
 

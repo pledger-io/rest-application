@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactivestreams.Publisher;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
@@ -77,13 +78,13 @@ public class BudgetResource {
                 .map(BudgetResponse::new);
     }
 
-    @Get("/auto-complete")
+    @Get("/auto-complete{?token}")
     @Operation(
             summary = "Lookup expense",
             description = "Search in FinTrack for expenses that match the provided token",
             parameters = @Parameter(name = "token", in = ParameterIn.QUERY, schema = @Schema(implementation = String.class))
     )
-    List<ExpenseResponse> autocomplete(@QueryValue String token) {
+    List<ExpenseResponse> autocomplete(@Nullable String token) {
         return expenseProvider.lookup(filterFactory.expense().name(token, false))
                 .content()
                 .map(ExpenseResponse::new)

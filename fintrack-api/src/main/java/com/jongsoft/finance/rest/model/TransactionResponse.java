@@ -43,6 +43,14 @@ public class TransactionResponse {
         return new Dates();
     }
 
+    public AccountResponse getDestination() {
+        return new AccountResponse(wrapped.computeTo());
+    }
+
+    public AccountResponse getSource() {
+        return new AccountResponse(wrapped.computeFrom());
+    }
+
     public List<SplitAmount> getSplit() {
         if (!wrapped.isSplit()) {
             return null;

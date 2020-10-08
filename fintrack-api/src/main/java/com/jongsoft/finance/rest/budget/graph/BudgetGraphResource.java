@@ -6,6 +6,7 @@ import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
+import com.jongsoft.finance.rest.DateFormat;
 import com.jongsoft.highchart.Highchart;
 import com.jongsoft.highchart.axis.Axis;
 import com.jongsoft.highchart.axis.AxisType;
@@ -16,7 +17,6 @@ import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
-import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -61,8 +61,8 @@ public class BudgetGraphResource {
     )
     String graph(
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate end) {
+            @PathVariable @DateFormat LocalDate start,
+            @PathVariable @DateFormat LocalDate end) {
         final Axis xAxis = new Axis();
         final ColumnSeries series = (ColumnSeries) SeriesFactory.createSeries(SeriesType.COLUMN);
         final ColumnSeries expected = (ColumnSeries) SeriesFactory.createSeries(SeriesType.COLUMN);

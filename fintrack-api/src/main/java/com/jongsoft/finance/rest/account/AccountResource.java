@@ -16,6 +16,7 @@ import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -75,12 +76,12 @@ public class AccountResource {
         });
     }
 
-    @Get("/auto-complete")
+    @Get("/auto-complete{?token,type}")
     @Operation(
             summary = "Autocomplete accounts",
             description = "Performs a search operation based on the partial name (token) of the given account type"
     )
-    Single<List<AccountResponse>> autocomplete(@QueryValue String token, @QueryValue String type) {
+    Single<List<AccountResponse>> autocomplete(@Nullable String token, @Nullable String type) {
         return Single.create(emitter -> {
             var accounts = accountProvider.lookup(
                     accountFilterFactory.account()

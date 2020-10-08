@@ -7,6 +7,7 @@ import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
+import com.jongsoft.finance.rest.DateFormat;
 import com.jongsoft.highchart.Highchart;
 import com.jongsoft.highchart.axis.Axis;
 import com.jongsoft.highchart.axis.AxisType;
@@ -16,7 +17,6 @@ import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
-import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -57,8 +57,8 @@ public class CategoryGraphResource {
             operationId = "generateCategoryExpenses"
     )
     String graph(
-            @PathVariable @Format("yyyy-MM-dd") LocalDate from,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate until,
+            @PathVariable @DateFormat LocalDate from,
+            @PathVariable @DateFormat LocalDate until,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
         var xAxis = new Axis();
         var series = (ColumnSeries) SeriesFactory.createSeries(SeriesType.COLUMN);

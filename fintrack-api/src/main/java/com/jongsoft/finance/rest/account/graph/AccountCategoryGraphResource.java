@@ -8,9 +8,9 @@ import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
 import com.jongsoft.finance.graph.CategoryPieChart;
+import com.jongsoft.finance.rest.DateFormat;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
-import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -59,8 +59,8 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
     )
     String expenses(
             @PathVariable long id,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate end,
+            @PathVariable @DateFormat LocalDate start,
+            @PathVariable @DateFormat LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
         var account = accountProvider.lookup(id)
                 .get();
@@ -83,8 +83,8 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
     )
     String income(
             @PathVariable long id,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate end,
+            @PathVariable @DateFormat LocalDate start,
+            @PathVariable @DateFormat LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
         var account = accountProvider.lookup(id)
                 .get();

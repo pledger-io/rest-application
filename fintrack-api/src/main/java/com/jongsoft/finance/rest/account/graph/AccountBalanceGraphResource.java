@@ -10,6 +10,7 @@ import com.jongsoft.finance.domain.core.CurrencyProvider;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
+import com.jongsoft.finance.rest.DateFormat;
 import com.jongsoft.highchart.Highchart;
 import com.jongsoft.highchart.axis.Axis;
 import com.jongsoft.highchart.axis.AxisType;
@@ -20,7 +21,6 @@ import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
 import com.jongsoft.lang.API;
 import io.micronaut.context.MessageSource;
-import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -79,8 +79,8 @@ public class AccountBalanceGraphResource {
     )
     String balance(
             @PathVariable long id,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate end,
+            @PathVariable @DateFormat LocalDate start,
+            @PathVariable @DateFormat LocalDate end,
             @RequestAttribute(RequestAttributes.LOCALIZATION) Locale locale) {
         var account = accountProvider.lookup(id).get();
 

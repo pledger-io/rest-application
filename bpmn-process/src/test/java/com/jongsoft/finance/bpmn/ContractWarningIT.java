@@ -68,7 +68,7 @@ public class ContractWarningIT extends ProcessTestSetup {
                 .setVariable("warnAt", convert(LocalDate.now().plusDays(1)))
                 .execute();
 
-        Thread.sleep(50);
+        Thread.sleep(100);
 
         var jobs = processEngine.getManagementService()
                 .createJobQuery()

@@ -10,11 +10,12 @@ import com.jongsoft.lang.API;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
-import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import javax.annotation.Nullable;
 
 @Tag(name = "Transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -34,14 +35,14 @@ public class ContractTransactionResource {
         this.settingProvider = settingProvider;
     }
 
-    @Get
+    @Get("{?page}")
     @Operation(
             summary = "Contract transactions",
             description = "Paged listing of all transactions that belong to a contract"
     )
     ResultPageResponse<TransactionResponse> transactions(
             @PathVariable long contractId,
-            @QueryValue(defaultValue = "1") Integer page) {
+            @Nullable Integer page) {
         var filter = filterFactory.transaction()
                 .ownAccounts()
                 .onlyIncome(false)

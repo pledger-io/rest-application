@@ -4,8 +4,8 @@ import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.rest.DateFormat;
 import com.jongsoft.lang.API;
-import io.micronaut.core.convert.format.Format;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -43,8 +43,8 @@ public class AccountTopResource {
             description = "Calculates and returns the accounts where you spent the most for the given date range"
     )
     Flowable<AccountSpendingResponse> topDebtors(
-            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate end) {
+            @PathVariable @DateFormat LocalDate start,
+            @PathVariable @DateFormat LocalDate end) {
         return Flowable.create(emitter -> {
             var filterCommand = filterFactory.account()
                     .types(API.List("debtor"))
@@ -64,8 +64,8 @@ public class AccountTopResource {
             description = "Calculates and returns the accounts that credited the most money for the given date range"
     )
     Flowable<AccountSpendingResponse> topCreditor(
-            @PathVariable @Format("yyyy-MM-dd") LocalDate start,
-            @PathVariable @Format("yyyy-MM-dd") LocalDate end) {
+            @PathVariable @DateFormat LocalDate start,
+            @PathVariable @DateFormat LocalDate end) {
         return Flowable.create(emitter -> {
             var filterCommand = filterFactory.account()
                     .types(API.List("creditor"))
@@ -76,7 +76,7 @@ public class AccountTopResource {
                     .forEach(emitter::onNext);
 
             emitter.onComplete();
-        }, BackpressureStrategy.LATEST);
+        }, BackpressureStrategy.ERROR);
     }
 
 }

@@ -24,7 +24,7 @@ public class TransactionSearchRequest {
     private String description;
     private String account;
     private String currency;
-    private boolean onlyExpenses;
+    private boolean onlyExpense;
     private boolean onlyIncome;
 
     private EntityRef category;
@@ -50,8 +50,8 @@ public class TransactionSearchRequest {
         return currency;
     }
 
-    public boolean isOnlyExpenses() {
-        return onlyExpenses;
+    public boolean isOnlyExpense() {
+        return onlyExpense;
     }
 
     public boolean isOnlyIncome() {

@@ -95,7 +95,7 @@ public class TransactionResource {
 
         if (request.isOnlyIncome()) {
             command.onlyIncome(true);
-        } else if (request.isOnlyExpenses()) {
+        } else if (request.isOnlyExpense()) {
             command.onlyIncome(false);
         }
 
