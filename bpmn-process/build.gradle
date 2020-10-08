@@ -1,5 +1,3 @@
-apply plugin: 'application'
-
 dependencies {
     implementation 'com.jongsoft.lang:language:1.0.0'
     implementation 'com.jongsoft.lang:language-fasterxml:0.0.7'
@@ -10,8 +8,4 @@ dependencies {
     implementation project(':core'), project(':domain'), project(':rule-engine')
 
     runtimeOnly("com.h2database:h2")
-}
-
-run.doFirst {
-
 }

@@ -105,7 +105,7 @@ class TransactionResourceTest extends TestSetup {
                 .page(0)
                 .dateRange(DateRange.forMonth(2019, 1))
                 .onlyIncome(false)
-                .onlyExpenses(false)
+                .onlyExpense(false)
                 .description("samp")
                 .build();
 

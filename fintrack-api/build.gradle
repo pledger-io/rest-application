@@ -1,9 +1,4 @@
-apply plugin: 'application'
-apply plugin: 'com.github.johnrengelman.shadow'
-
 dependencies {
-    annotationProcessor("io.micronaut.configuration:micronaut-openapi")
-
     implementation("io.swagger.core.v3:swagger-annotations")
     implementation("io.micronaut.security:micronaut-security")
     implementation("io.micronaut.security:micronaut-security-jwt")
@@ -21,9 +16,3 @@ dependencies {
 
     implementation project(':core'), project(':domain'), project(':jpa-repository'), project(':bpmn-process')
 };
-
-mainClassName = "com.jongsoft.finance.Application"
-
-shadowJar {
-    mergeServiceFiles()
-}

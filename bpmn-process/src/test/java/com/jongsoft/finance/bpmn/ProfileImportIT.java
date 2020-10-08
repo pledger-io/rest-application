@@ -107,7 +107,7 @@ public class ProfileImportIT extends ProcessTestSetup {
                 .setVariable("username", authenticationFacade.currentUser().getUsername())
                 .execute();
 
-        waitUntilNoActiveJobs(processEngine, 1000);
+        waitUntilNoActiveJobs(processEngine, 1500);
 
         assertThat(accountDemo.getName()).isEqualTo("Demo checking account");
         assertThat(accountDemo.getCurrency()).isEqualTo("EUR");

@@ -1,10 +1,4 @@
-apply plugin: 'application'
-
 dependencies {
     implementation('com.jongsoft.lang:language:1.0.0')
     implementation project(':core')
-}
-
-run.doFirst {
-
 }
