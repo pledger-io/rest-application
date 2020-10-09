@@ -1,15 +1,14 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
-import java.util.Comparator;
-import java.util.List;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Set;
 import com.jongsoft.lang.collection.tuple.Pair;
-
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * The account reducer is a utility delegate used to generate a unique result of a list of {@link Pair} containing
@@ -44,6 +43,8 @@ public class AccountReducerDelegate implements JavaDelegate {
             }
 
             execution.setVariableLocal("extractionResult", reducedTransactions);
+        } else {
+            execution.setVariableLocal("extractionResult", API.List());
         }
 
     }

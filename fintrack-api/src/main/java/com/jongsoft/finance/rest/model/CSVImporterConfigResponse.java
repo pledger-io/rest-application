@@ -10,7 +10,7 @@ public class CSVImporterConfigResponse {
         this.wrapped = wrapped;
     }
 
-    public long getId() {
+    public Long getId() {
         return wrapped.getId();
     }
 

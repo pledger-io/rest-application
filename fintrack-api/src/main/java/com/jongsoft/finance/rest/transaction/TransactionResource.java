@@ -12,6 +12,7 @@ import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
 import com.jongsoft.finance.rest.process.RuntimeResource;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
@@ -29,11 +30,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 @Tag(name = "Transactions")
 @Controller("/api/transactions")
@@ -46,6 +45,7 @@ public class TransactionResource {
     private final FilterFactory filterFactory;
     private final AccountTypeProvider accountTypeProvider;
     private final RuntimeResource runtimeResource;
+    private final AuthenticationFacade authenticationFacade;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -56,6 +56,7 @@ public class TransactionResource {
             FilterFactory filterFactory,
             AccountTypeProvider accountTypeProvider,
             RuntimeResource runtimeResource,
+            AuthenticationFacade authenticationFacade,
             ApplicationEventPublisher eventPublisher) {
         this.settingProvider = settingProvider;
         this.transactionProvider = transactionProvider;
@@ -63,6 +64,7 @@ public class TransactionResource {
         this.filterFactory = filterFactory;
         this.accountTypeProvider = accountTypeProvider;
         this.runtimeResource = runtimeResource;
+        this.authenticationFacade = authenticationFacade;
         this.eventPublisher = eventPublisher;
     }
 
@@ -111,10 +113,9 @@ public class TransactionResource {
 
     @Patch
     @Status(HttpStatus.NO_CONTENT)
-    void patch(@Body TransactionBulkEditRequest request, Principal principal) {
+    void patch(@Body TransactionBulkEditRequest request) {
         for (var id : request.getTransactions()) {
-            var isPresent = transactionProvider.lookup(id)
-                    .filter(t -> t.getUser().getUsername().equals(principal.getName()));
+            var isPresent = transactionProvider.lookup(id);
             if (!isPresent.isPresent()) {
                 continue;
             }
@@ -170,8 +171,8 @@ public class TransactionResource {
     @Get(value = "/export", produces = MediaType.TEXT_PLAIN)
     Flowable<String> export() {
         return Flowable.create(emitter -> {
-           emitter.onNext("Date,Booking Date,Interest Date,From name,From IBAN," +
-                   "To name,To IBAN,Description,Category,Budget,Contract,Amount");
+            emitter.onNext("Date,Booking Date,Interest Date,From name,From IBAN," +
+                    "To name,To IBAN,Description,Category,Budget,Contract,Amount");
 
             var filterCommand = filterFactory.transaction()
                     .accounts(accountProvider.lookup(filterFactory.account()
@@ -197,15 +198,13 @@ public class TransactionResource {
     }
 
     @Get("/apply-all-rules")
-    void applyRules(Principal principal) {
+    void applyRules() {
         var executors = Executors.newFixedThreadPool(25);
 
-        Consumer<Long> ruleRunner = (id) -> runtimeResource.startProcess(
-                "analyzeRule",
-                Map.of("transactionId", id));
-
         executors.execute(() -> {
-            eventPublisher.publishEvent(new InternalAuthenticationEvent(this, principal.getName()));
+            eventPublisher.publishEvent(new InternalAuthenticationEvent(
+                    this,
+                    authenticationFacade.authenticated()));
 
             var filterCommand = filterFactory.transaction()
                     .accounts(accountProvider.lookup(filterFactory.account()
@@ -223,7 +222,7 @@ public class TransactionResource {
                             eventPublisher.publishEvent(
                                     new InternalAuthenticationEvent(
                                             this,
-                                            principal.getName()));
+                                            authenticationFacade.authenticated()));
 
                             runtimeResource.startProcess(
                                     "analyzeRule",

@@ -12,6 +12,7 @@ import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.rest.process.RuntimeResource;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Maybe;
@@ -22,7 +23,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -42,6 +42,8 @@ class TransactionResourceTest extends TestSetup {
     private RuntimeResource runtimeResource;
     @Mock
     private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private AuthenticationFacade authenticationFacade;
 
     private FilterFactory filterFactory;
 
@@ -58,7 +60,7 @@ class TransactionResourceTest extends TestSetup {
                 filterFactory,
                 accountTypeProvider,
                 runtimeResource,
-                eventPublisher);
+                authenticationFacade, eventPublisher);
 
         new EventBus(eventPublisher);
     }
@@ -147,8 +149,7 @@ class TransactionResourceTest extends TestSetup {
                 ))
                 .build());
 
-        var principal = Mockito.mock(Principal.class);
-        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
+        Mockito.when(authenticationFacade.authenticated()).thenReturn(ACTIVE_USER.getUsername());
         Mockito.when(transactionProvider.lookup(Mockito.anyLong())).thenReturn(API.Option());
         Mockito.when(transactionProvider.lookup(1L)).thenReturn(API.Option(transaction));
 
@@ -160,7 +161,7 @@ class TransactionResourceTest extends TestSetup {
                 .tags(List.of("sample"))
                 .build();
 
-        subject.patch(request, principal);
+        subject.patch(request);
 
         Mockito.verify(transaction).linkToCategory("Category");
         Mockito.verify(transaction).linkToBudget("Groceries");
