@@ -185,15 +185,20 @@
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="flowToAnalysis" sourceRef="parseConfigurationJson" targetRef="AnalyzeRuleSubProcess" />
     <bpmn:endEvent id="ruleImportEnd">
-      <bpmn:incoming>SequenceFlow_06gj8mj</bpmn:incoming>
+      <bpmn:incoming>Flow_1ljyi7f</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_06gj8mj" sourceRef="AnalyzeRuleSubProcess" targetRef="ruleImportEnd" />
+    <bpmn:sequenceFlow id="SequenceFlow_06gj8mj" sourceRef="AnalyzeRuleSubProcess" targetRef="Activity_1oc51kv" />
+    <bpmn:serviceTask id="Activity_1oc51kv" name="Cleanup storage" camunda:asyncBefore="true" camunda:expression="${storageService.remove(storageToken)}">
+      <bpmn:incoming>SequenceFlow_06gj8mj</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ljyi7f</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1ljyi7f" sourceRef="Activity_1oc51kv" targetRef="ruleImportEnd" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ImportTransactionRules">
       <bpmndi:BPMNEdge id="SequenceFlow_06gj8mj_di" bpmnElement="SequenceFlow_06gj8mj">
         <di:waypoint x="639" y="1438" />
-        <di:waypoint x="639" y="1494" />
+        <di:waypoint x="639" y="1480" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_07h2ql1_di" bpmnElement="flowToAnalysis">
         <di:waypoint x="639" y="239" />
@@ -203,11 +208,21 @@
         <di:waypoint x="639" y="105" />
         <di:waypoint x="639" y="159" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ljyi7f_di" bpmnElement="Flow_1ljyi7f">
+        <di:waypoint x="639" y="1560" />
+        <di:waypoint x="639" y="1592" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="ruleImportStart">
         <dc:Bounds x="621" y="69" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_1soyf7y_di" bpmnElement="parseConfigurationJson">
         <dc:Bounds x="589" y="159" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_08xlec5_di" bpmnElement="ruleImportEnd">
+        <dc:Bounds x="621" y="1592" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1oc51kv_di" bpmnElement="Activity_1oc51kv">
+        <dc:Bounds x="589" y="1480" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="SubProcess_1j88oj3_di" bpmnElement="AnalyzeRuleSubProcess" isExpanded="true">
         <dc:Bounds x="189" y="311" width="898" height="1127" />
@@ -390,9 +405,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_06jdu6r_di" bpmnElement="task_link_group">
         <dc:Bounds x="670" y="599" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_08xlec5_di" bpmnElement="ruleImportEnd">
-        <dc:Bounds x="621" y="1494" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
