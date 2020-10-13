@@ -262,7 +262,6 @@ class TransactionRuleResourceTest extends TestSetup {
                 .build();
 
         Mockito.when(ruleProvider.lookup(1L)).thenReturn(API.Option(transactionRule));
-        Mockito.when(ruleProvider.save(transactionRule)).thenReturn(transactionRule);
 
         subject.updateRule("Group 1", 1L, request).blockingGet();
 

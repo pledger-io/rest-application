@@ -9,7 +9,7 @@ public interface TransactionRuleProvider extends DataProvider<TransactionRule>, 
     Flowable<TransactionRule> lookup(String group);
 
     @Deprecated
-    TransactionRule save(TransactionRule rule);
+    void save(TransactionRule rule);
 
     @Override
     default boolean supports(Class<TransactionRule> supportingClass) {

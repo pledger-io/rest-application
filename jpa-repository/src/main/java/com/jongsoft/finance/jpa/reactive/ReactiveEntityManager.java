@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.reactive;
 
+import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import io.micronaut.transaction.SynchronousTransactionManager;
 
 import javax.inject.Singleton;
@@ -17,8 +18,12 @@ public class ReactiveEntityManager {
         this.entityManager = entityManager;
     }
 
-    public <T> void persist(T entity) {
-        entityManager.persist(entity);
+    public <T extends EntityJpa> void persist(T entity) {
+        if (entity.getId() == null) {
+            entityManager.persist(entity);
+        } else{
+            entityManager.merge(entity);
+        }
     }
 
     public <T> ReactivePipe<T> reactive() {

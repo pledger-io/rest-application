@@ -31,11 +31,15 @@ public class ScheduledTransactionResponse {
         return new ScheduleResponse(wrapped.getSchedule());
     }
 
-    private AccountResponse getSource() {
+    public double getAmount() {
+        return wrapped.getAmount();
+    }
+
+    public AccountResponse getSource() {
         return new AccountResponse(wrapped.getSource());
     }
 
-    private AccountResponse getDestination() {
+    public AccountResponse getDestination() {
         return new AccountResponse(wrapped.getDestination());
     }
 

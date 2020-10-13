@@ -55,7 +55,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
     @Override
     public com.jongsoft.lang.control.Optional<TransactionRule> lookup(long id) {
         return entityManager.<RuleJpa>blocking()
-                .hql("from RuleJpa where id = :id and user.username := username")
+                .hql("from RuleJpa where id = :id and user.username = :username")
                 .set("id", id)
                 .set("username", authenticationFacade.authenticated())
                 .maybe()
@@ -81,7 +81,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 
     @Override
     @Transactional
-    public TransactionRule save(TransactionRule rule) {
+    public void save(TransactionRule rule) {
         int sortOrder= rule.getSort();
         if (rule.getId() == null || rule.getSort() == 0) {
             var hql = """
@@ -112,7 +112,6 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
         ruleJpa.setChanges(convertChanges(ruleJpa, API.List(rule.getChanges())).toJava());
 
         entityManager.persist(ruleJpa);
-        return convert(ruleJpa);
     }
 
     protected TransactionRule convert(RuleJpa source) {

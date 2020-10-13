@@ -129,7 +129,7 @@ public class TransactionRuleResource {
             operationId = "createTransactionRule"
     )
     @ApiResponse(responseCode = "201", description = "Rule successfully created", content = @Content(schema = @Schema(implementation = TransactionRuleResponse.class)))
-    TransactionRuleResponse create(@PathVariable String group, @Valid @Body CreateRuleRequest request) {
+    void create(@PathVariable String group, @Valid @Body CreateRuleRequest request) {
         var rule = currentUserProvider.currentUser().createRule(request.getName(),
                 request.isRestrictive());
 
@@ -151,7 +151,7 @@ public class TransactionRuleResource {
                         condition.getOperation(),
                         condition.getValue()));
 
-        return new TransactionRuleResponse(ruleProvider.save(rule));
+        ruleProvider.save(rule);
     }
 
     @Get("/groups/{group}/{id}")
@@ -233,12 +233,11 @@ public class TransactionRuleResource {
                                         condition.getOperation(),
                                         condition.getValue()));
 
-                        emitter.onSuccess(rule);
+                        ruleProvider.save(rule);
+                        emitter.onSuccess(ruleProvider.lookup(id).get());
                     })
                     .elseRun(() -> emitter.onError(StatusException.notFound("Rule not found with id " + id)));
-        })
-                .map(ruleProvider::save)
-                .map(TransactionRuleResponse::new);
+        }).map(TransactionRuleResponse::new);
     }
 
     @Status(HttpStatus.NO_CONTENT)
