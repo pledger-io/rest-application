@@ -21,6 +21,9 @@
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_0egzvf9" sourceRef="se_process" targetRef="st_read_csv" />
     <bpmn:subProcess id="sp_extract_accounts" name="Locate accounts" camunda:asyncBefore="true">
+      <bpmn:extensionElements>
+        <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0wegpol</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0wp67ry</bpmn:outgoing>
       <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="accountLookups" camunda:elementVariable="accountLookup" />
@@ -110,36 +113,21 @@
       <bpmn:sequenceFlow id="SequenceFlow_0ifb8gk" sourceRef="Task_16w3kks" targetRef="st_generate_pair" />
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="SequenceFlow_0wegpol" sourceRef="st_read_csv" targetRef="sp_extract_accounts" />
-    <bpmn:sequenceFlow id="SequenceFlow_0wp67ry" sourceRef="sp_extract_accounts" targetRef="st_account_reducer" />
+    <bpmn:sequenceFlow id="SequenceFlow_0wp67ry" sourceRef="sp_extract_accounts" targetRef="EndEvent_0dzor1o" />
     <bpmn:endEvent id="EndEvent_0dzor1o">
       <bpmn:extensionElements>
         <camunda:inputOutput>
-          <camunda:inputParameter name="transactions">${resultSet}</camunda:inputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>SequenceFlow_0o2pfu4</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_0o2pfu4" sourceRef="st_account_reducer" targetRef="EndEvent_0dzor1o" />
-    <bpmn:serviceTask id="st_account_reducer" name="Result reducer" camunda:asyncBefore="true" camunda:class="com.jongsoft.finance.bpmn.delegate.account.AccountReducerDelegate">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="transactions">${resultSet}</camunda:inputParameter>
-          <camunda:outputParameter name="extractionResult">${extractionResult}</camunda:outputParameter>
+          <camunda:inputParameter name="transactions">${extractionResult}</camunda:inputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0wp67ry</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_0o2pfu4</bpmn:outgoing>
-    </bpmn:serviceTask>
+    </bpmn:endEvent>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ImportExtractAccounts">
-      <bpmndi:BPMNEdge id="SequenceFlow_0o2pfu4_di" bpmnElement="SequenceFlow_0o2pfu4">
-        <di:waypoint x="1520" y="277" />
-        <di:waypoint x="1563" y="277" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0wp67ry_di" bpmnElement="SequenceFlow_0wp67ry">
         <di:waypoint x="1356" y="277" />
-        <di:waypoint x="1420" y="277" />
+        <di:waypoint x="1452" y="277" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0wegpol_di" bpmnElement="SequenceFlow_0wegpol">
         <di:waypoint x="399" y="277" />
@@ -154,6 +142,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_1tjiemj_di" bpmnElement="st_read_csv">
         <dc:Bounds x="299" y="237" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0dzor1o_di" bpmnElement="EndEvent_0dzor1o">
+        <dc:Bounds x="1452" y="259" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="SubProcess_0aoz6d4_di" bpmnElement="sp_extract_accounts" isExpanded="true">
         <dc:Bounds x="478" y="113" width="878" height="327" />
@@ -241,12 +232,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_11nngh1_di" bpmnElement="Task_16w3kks">
         <dc:Bounds x="1060" y="329" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_0dzor1o_di" bpmnElement="EndEvent_0dzor1o">
-        <dc:Bounds x="1563" y="259" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_05wobgt_di" bpmnElement="st_account_reducer">
-        <dc:Bounds x="1420" y="237" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -1,14 +1,11 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
-import java.util.List;
-
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
-import com.jongsoft.lang.API;
-import com.jongsoft.lang.collection.tuple.Pair;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.Set;
 
 @Slf4j
 public class ImportAccountExtractorDelegate implements JavaDelegate {
@@ -21,11 +18,13 @@ public class ImportAccountExtractorDelegate implements JavaDelegate {
                 execution.getVariable("account"));
 
         @SuppressWarnings("unchecked")
-        var results = (List<Pair<String, Number>>) execution.getVariable("resultSet");
+        var results = (Set<ExtractionMapping>) execution.getVariable("extractionResult");
 
-        results.add(API.Tuple(
+        var mapping = new ExtractionMapping(
                 execution.<StringValue>getVariableLocalTyped("name").getValue(),
-                (Long) execution.getVariableLocal("account")));
+                (Long) execution.getVariableLocal("account"));
+
+        results.add(mapping);
     }
 
 }

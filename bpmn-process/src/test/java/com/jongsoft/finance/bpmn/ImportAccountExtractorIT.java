@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.bpmn.delegate.importer.ExtractionMapping;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
@@ -15,7 +16,6 @@ import com.jongsoft.finance.serialized.ImportConfigJson;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.collection.Set;
-import com.jongsoft.lang.collection.tuple.Pair;
 import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -190,16 +190,15 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
         final List<HistoricVariableInstance> variables = processEngine.getHistoryService()
                 .createHistoricVariableInstanceQuery()
                 .processInstanceId(response.getProcessInstanceId())
-                .variableName("extractionResult")
+                .variableName("transactions")
                 .list();
 
         Assertions.assertThat(variables).hasSize(1);
-        Assertions.assertThat(variables.get(0).getValue()).isInstanceOf(Set.class);
 
-        Set transactions = (Set) variables.get(0).getValue();
-        Assertions.assertThat(transactions.get(0)).isInstanceOf(Pair.class);
-        Assertions.assertThat(transactions.get(1)).isInstanceOf(Pair.class);
-        Assertions.assertThat(transactions.get(2)).isInstanceOf(Pair.class);
+        Set transactions = API.Set((Iterable) variables.get(0).getValue());
+        Assertions.assertThat(transactions.get(0)).isInstanceOf(ExtractionMapping.class);
+        Assertions.assertThat(transactions.get(1)).isInstanceOf(ExtractionMapping.class);
+        Assertions.assertThat(transactions.get(2)).isInstanceOf(ExtractionMapping.class);
     }
 
     private byte[] readFile(String file) {

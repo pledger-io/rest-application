@@ -1,17 +1,16 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
-import java.util.ArrayList;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.importer.ImportProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
 import com.jongsoft.lang.API;
-import com.jongsoft.lang.collection.tuple.Pair;
 import com.jongsoft.lang.collection.tuple.Triplet;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 @Singleton
 public class ExtractAccountDetailsDelegate extends CSVReaderDelegate {
@@ -42,6 +41,6 @@ public class ExtractAccountDetailsDelegate extends CSVReaderDelegate {
 
     @Override
     protected void afterProcess(DelegateExecution execution) {
-        execution.setVariable("resultSet", new ArrayList<Pair<String, Number>>());
+        execution.setVariable("extractionResult", new HashSet<>());
     }
 }
