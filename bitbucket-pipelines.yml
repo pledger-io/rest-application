@@ -8,6 +8,23 @@ pipelines:
         script:
           - bash ./gradlew classes
 
+  tags:
+    release-*:
+      - step:
+          name: Prepare signing key
+          script:
+            - echo "$SIGNING_KEY" > private-key.gpg.enc
+            - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
+            - gpg --import signing-key
+            - shred signing-key
+      - step:
+          name: Build
+          caches:
+            - gradle
+          script:
+            - bash ./gradlew clean build
+            - bash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
+
   pull-requests:
     feature/*:
       - step:
@@ -24,6 +41,6 @@ pipelines:
             - gradle
           script:
             - bash ./gradlew check jacocoTestReport
-            - bash ./gradlew sonarqube
+            - bash ./gradlew sonarqube publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
           after-script:
             - bash <(curl -s https://codecov.io/bash) -s "*/build/reports/*" -f '*report.xml'
