@@ -21,14 +21,16 @@ public class Encryption {
     private final static int PBKDF2_SALT_SIZE = 16;
     private final static int PBKDF2_ITERATIONS = 32767;
 
-    public Encryption(SecuritySettings securitySettings) {
+    private final byte[] securitySalt = new byte[PBKDF2_SALT_SIZE];
+    private final byte[] nonce = new byte[ALGORITHM_NONCE_SIZE];
+
+    public Encryption(SecuritySettings securitySettings) throws GeneralSecurityException {
+        SecureRandom rand = new SecureRandom();
+        rand.nextBytes(securitySalt);
+        rand.nextBytes(nonce);
     }
 
-    public byte[] encrypt(byte[] data, String password) {
-        SecureRandom rand = new SecureRandom();
-        byte[] securitySalt = new byte[PBKDF2_SALT_SIZE];
-        rand.nextBytes(securitySalt);
-
+    public synchronized byte[] encrypt(byte[] data, String password) {
         try {
             // Create an instance of PBKDF2 and derive a key.
             var pwSpec = new PBEKeySpec(password.toCharArray(), securitySalt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
@@ -58,7 +60,7 @@ public class Encryption {
         }
     }
 
-    public byte[] decrypt(byte[] base64CiphertextAndNonceAndSalt, String password) {
+    public synchronized byte[] decrypt(byte[] base64CiphertextAndNonceAndSalt, String password) {
         try {
             // Decode the base64.
             var cipherTextAndNonceAndSalt = Base64.getDecoder().decode(base64CiphertextAndNonceAndSalt);
@@ -96,20 +98,15 @@ public class Encryption {
     }
 
     private byte[] encrypt(byte[] plaintext, byte[] key) throws GeneralSecurityException {
-        // Generate a 96-bit nonce using a CSPRNG.
-        var rand = new SecureRandom();
-        var nonce = new byte[ALGORITHM_NONCE_SIZE];
-        rand.nextBytes(nonce);
-
         // Create the cipher instance and initialize.
-        var cipher = Cipher.getInstance(ALGORITHM_NAME);
-        cipher.init(
+        var encryptCipher = Cipher.getInstance(ALGORITHM_NAME);
+        encryptCipher.init(
                 Cipher.ENCRYPT_MODE,
                 new SecretKeySpec(key, "AES"),
                 new GCMParameterSpec(ALGORITHM_TAG_SIZE, nonce));
 
         // Encrypt and prepend nonce.
-        var cipherText = cipher.doFinal(plaintext);
+        var cipherText = encryptCipher.doFinal(plaintext);
         var cipherTextAndNonce = new byte[nonce.length + cipherText.length];
         System.arraycopy(nonce, 0, cipherTextAndNonce, 0, nonce.length);
         System.arraycopy(cipherText, 0, cipherTextAndNonce, nonce.length, cipherText.length);
@@ -118,7 +115,6 @@ public class Encryption {
     }
 
     private byte[] decrypt(byte[] cipherTextAndNonce, byte[] key) throws GeneralSecurityException {
-        var nonce = new byte[ALGORITHM_NONCE_SIZE];
         var ciphertext = new byte[cipherTextAndNonce.length - ALGORITHM_NONCE_SIZE];
         System.arraycopy(
                 cipherTextAndNonce,
@@ -134,13 +130,13 @@ public class Encryption {
                 ciphertext.length);
 
         // Create the cipher instance and initialize.
-        var cipher = Cipher.getInstance(ALGORITHM_NAME);
-        cipher.init(
+        var decryptCipher = Cipher.getInstance(ALGORITHM_NAME);
+        decryptCipher.init(
                 Cipher.DECRYPT_MODE,
                 new SecretKeySpec(key, "AES"),
                 new GCMParameterSpec(ALGORITHM_TAG_SIZE, nonce));
 
         // Decrypt and return result.
-        return cipher.doFinal(ciphertext);
+        return decryptCipher.doFinal(ciphertext);
     }
 }

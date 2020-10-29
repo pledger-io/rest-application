@@ -8,10 +8,11 @@ import com.jongsoft.lang.API;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.security.GeneralSecurityException;
 import java.util.UUID;
 
 @Singleton
@@ -20,20 +21,20 @@ public class StorageServiceImpl implements StorageService {
 
     private final SecuritySettings securitySettings;
     private final CurrentUserProvider currentUserProvider;
-    private final File uploadRootDirectory;
+    private final Path uploadRootDirectory;
     private final Encryption encryption;
 
     public StorageServiceImpl(
             SecuritySettings securitySettings,
             CurrentUserProvider currentUserProvider,
-            StorageSettings storageLocation) {
+            StorageSettings storageLocation) throws GeneralSecurityException {
         this.securitySettings = securitySettings;
         this.currentUserProvider = currentUserProvider;
         this.encryption = new Encryption(securitySettings);
 
-        uploadRootDirectory = new File(storageLocation.getLocation(), "upload");
-        if (!uploadRootDirectory.exists()) {
-            API.Try(() -> Files.createDirectory(uploadRootDirectory.toPath()));
+        uploadRootDirectory = Path.of(storageLocation.getLocation(), "upload");
+        if (Files.notExists(uploadRootDirectory)) {
+            API.Try(() -> Files.createDirectory(uploadRootDirectory));
         }
     }
 
@@ -50,50 +51,42 @@ public class StorageServiceImpl implements StorageService {
             toStore = content;
         }
 
-        var fileCreated = API.Try(() -> new FileOutputStream(new File(uploadRootDirectory, token), false))
-                .consume(os -> {
-                    os.write(toStore);
-                    os.close();
-                })
-                .isSuccess();
-
-        return fileCreated ? token : null;
+        try {
+            Files.write(
+                    uploadRootDirectory.resolve(token),
+                    toStore,
+                    StandardOpenOption.WRITE,
+                    StandardOpenOption.CREATE_NEW);
+            return token;
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     @Override
     public byte[] read(String token) {
-        var file = new File(uploadRootDirectory, token);
+        try {
+            var readResult = Files.readAllBytes(uploadRootDirectory.resolve(token));
 
-        if (!file.isFile()) {
+            if (securitySettings.isEncrypt()) {
+                readResult = encryption.decrypt(
+                        readResult,
+                        currentUserProvider.currentUser().getSecret());
+            }
+
+            return readResult;
+        } catch (IOException e) {
             throw new IllegalStateException("Cannot locate content for token " + token);
         }
-
-        var readResult = API.Try(() -> {
-            FileInputStream fis = new FileInputStream(file);
-            byte[] content = fis.readAllBytes();
-            fis.close();
-            return content;
-        });
-
-        byte[] result = readResult.isSuccess() ? readResult.get() : new byte[0];
-        if (securitySettings.isEncrypt()) {
-            result = encryption.decrypt(
-                    result,
-                    currentUserProvider.currentUser().getSecret());
-        }
-
-        return result;
     }
 
     @Override
     public void remove(String token) {
-        var file = new File(uploadRootDirectory, token);
-
-        if (!file.isFile()) {
+        try {
+            Files.deleteIfExists(uploadRootDirectory.resolve(token));
+        } catch (IOException e) {
             throw new IllegalStateException("Cannot locate content for token " + token);
         }
-
-        API.Try(() -> Files.delete(file.toPath()));
     }
 
 }

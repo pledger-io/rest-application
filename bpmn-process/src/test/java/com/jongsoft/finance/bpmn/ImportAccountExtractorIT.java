@@ -199,6 +199,16 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
         Assertions.assertThat(transactions.get(0)).isInstanceOf(ExtractionMapping.class);
         Assertions.assertThat(transactions.get(1)).isInstanceOf(ExtractionMapping.class);
         Assertions.assertThat(transactions.get(2)).isInstanceOf(ExtractionMapping.class);
+
+        var pieterse = (ExtractionMapping) transactions.get(0);
+        Assertions.assertThat(pieterse.getAccountId()).isNull();
+        Assertions.assertThat(pieterse.getName()).isEqualTo("MW GA Pieterse");
+        var janssen = (ExtractionMapping) transactions.get(1);
+        Assertions.assertThat(janssen.getAccountId()).isEqualTo(5L);
+        Assertions.assertThat(janssen.getName()).isEqualTo("Janssen PA");
+        var ppost = (ExtractionMapping) transactions.get(2);
+        Assertions.assertThat(ppost.getAccountId()).isEqualTo(3L);
+        Assertions.assertThat(ppost.getName()).isEqualTo("P. Post");
     }
 
     private byte[] readFile(String file) {

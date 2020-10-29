@@ -2,13 +2,11 @@ package com.jongsoft.finance.rest.importer;
 
 import io.micronaut.core.annotation.Introspected;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Introspected
-@NoArgsConstructor
 class ImporterCreateRequest {
 
     @NotNull
@@ -18,6 +16,10 @@ class ImporterCreateRequest {
     @NotNull
     @NotBlank
     private String uploadToken;
+
+    public ImporterCreateRequest() {
+        // left blank intentionally for deserializer
+    }
 
     @Builder
     private ImporterCreateRequest(String configuration, String uploadToken) {

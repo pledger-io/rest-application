@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.io.File;
+import java.security.GeneralSecurityException;
 
 class StorageServiceImplTest {
 
@@ -26,7 +27,7 @@ class StorageServiceImplTest {
     private CurrentUserProvider currentUserProvider;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws GeneralSecurityException {
         MockitoAnnotations.openMocks(this);
         Mockito.when(securitySettings.getSecret()).thenReturn("mySalt");
         Mockito.when(storageSettings.getLocation()).thenReturn(System.getProperty("java.io.tmpdir"));
@@ -57,5 +58,6 @@ class StorageServiceImplTest {
 
         Assertions.assertThat(new String(read)).isEqualTo("My private text");
         Assertions.assertThat(new File(System.getProperty("java.io.tmpdir") + "/upload/" + storageKey)).exists();
+        subject.remove(storageKey);
     }
 }
