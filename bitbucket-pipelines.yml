@@ -1,4 +1,4 @@
-image: openjdk:14
+image: openjdk:15-alpine
 
 pipelines:
   default:
@@ -13,6 +13,7 @@ pipelines:
       - step:
           name: Prepare signing key
           script:
+            - apk add openssl
             - echo "$SIGNING_KEY" > private-key.gpg.enc
             - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
             - gpg --import signing-key
@@ -28,27 +29,41 @@ pipelines:
   pull-requests:
     feature/*:
       - step:
-          caches:
-            - gradle
-          script:
-            - bash ./gradlew check jacocoTestReport
-            - bash ./gradlew sonarqube
-
-  branches:
-    master:
-      - step:
+          name: Build software
           caches:
             - gradle
           script:
             - bash ./gradlew check jacocoTestReport
           artifacts:
+            - ./.gradle/**
+            - ./**/build/**
+      - step:
+          name: Quality Gate
+          caches:
+            - gradle
+          script:
+            - bash ./gradlew sonarqube
+
+  branches:
+    master:
+      - step:
+          name: Build software
+          caches:
+            - gradle
+          script:
+            - bash ./gradlew check jacocoTestReport
+          artifacts:
+            - ./.gradle/**
             - ./**/build/**
           after-script:
             - bash <(curl -s https://codecov.io/bash) -s "*/build/reports/*" -f '*report.xml'
       - parallel:
           - step:
               name: Deploy snapshot
+              caches:
+                - gradle
               script:
+                - apk add openssl
                 - echo "$SIGNING_KEY" > private-key.gpg.enc
                 - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
                 - gpg --import signing-key
@@ -56,5 +71,7 @@ pipelines:
                 - bash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
           - step:
               name: Quality gate
+              caches:
+                - gradle
               script:
                 - bash ./gradlew sonarqube
