@@ -74,8 +74,8 @@ subprojects {
     }
 
     java {
-        sourceCompatibility = JavaVersion.toVersion('14')
-        targetCompatibility = JavaVersion.toVersion('14')
+        sourceCompatibility = JavaVersion.toVersion('15')
+        targetCompatibility = JavaVersion.toVersion('15')
     }
 
     micronaut {
@@ -104,7 +104,7 @@ subprojects {
 
         options.addBooleanOption('html5', true)
         options.addBooleanOption('-enable-preview', true)
-        options.addStringOption('-release', '14')
+        options.addStringOption('-release', '15')
     }
 
     publishing {
