@@ -6,7 +6,7 @@ pipelines:
         caches:
           - gradle
         script:
-          - bash ./gradlew classes
+          - ./gradlew classes
 
   tags:
     release-*:
@@ -23,8 +23,8 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew clean build
-            - bash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
+            - ./gradlew clean build
+            - ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
 
   pull-requests:
     feature/*:
@@ -33,7 +33,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew check jacocoTestReport
+            - ./gradlew check jacocoTestReport
           artifacts:
             - ./.gradle/**
             - ./**/build/**
@@ -42,7 +42,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew sonarqube
+            - ./gradlew sonarqube
 
   branches:
     master:
@@ -51,12 +51,10 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew check jacocoTestReport
+            - ./gradlew check jacocoTestReport
           artifacts:
             - ./.gradle/**
             - ./**/build/**
-          after-script:
-            - bash <(curl -s https://codecov.io/bash) -s "*/build/reports/*" -f '*report.xml'
       - parallel:
           - step:
               name: Deploy snapshot
@@ -68,10 +66,10 @@ pipelines:
                 - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
                 - gpg --import signing-key
                 - shred signing-key
-                - bash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
+                - ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
           - step:
               name: Quality gate
               caches:
                 - gradle
               script:
-                - bash ./gradlew sonarqube
+                - ./gradlew sonarqube
