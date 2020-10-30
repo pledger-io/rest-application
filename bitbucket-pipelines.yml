@@ -6,25 +6,30 @@ pipelines:
         caches:
           - gradle
         script:
-          - ./gradlew classes
+          - ash ./gradlew classes
 
   tags:
     release-*:
       - step:
-          name: Prepare signing key
+          name: Build
+          caches:
+            - gradle
+          script:
+            - ash ./gradlew clean build
+          artifacts:
+            - ./.gradle/**
+            - ./**/build/**
+      - step:
+          name: Publish release
+          caches:
+            - gradle
           script:
             - apk add openssl
             - echo "$SIGNING_KEY" > private-key.gpg.enc
             - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
             - gpg --import signing-key
             - shred signing-key
-      - step:
-          name: Build
-          caches:
-            - gradle
-          script:
-            - ./gradlew clean build
-            - ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
+            - ash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
 
   pull-requests:
     feature/*:
@@ -33,7 +38,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - ./gradlew check jacocoTestReport
+            - ash ./gradlew check jacocoTestReport
           artifacts:
             - ./.gradle/**
             - ./**/build/**
@@ -42,7 +47,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - ./gradlew sonarqube
+            - ash ./gradlew sonarqube
 
   branches:
     master:
@@ -51,7 +56,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - ./gradlew check jacocoTestReport
+            - ash ./gradlew check jacocoTestReport
           artifacts:
             - ./.gradle/**
             - ./**/build/**
@@ -66,10 +71,10 @@ pipelines:
                 - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
                 - gpg --import signing-key
                 - shred signing-key
-                - ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
+                - ash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
           - step:
               name: Quality gate
               caches:
                 - gradle
               script:
-                - ./gradlew sonarqube
+                - ash ./gradlew sonarqube
