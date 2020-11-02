@@ -6,7 +6,7 @@ pipelines:
         caches:
           - gradle
         script:
-          - ash ./gradlew classes
+          - bash ./gradlew classes
 
   tags:
     release-*:
@@ -28,7 +28,7 @@ pipelines:
             - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
             - gpg --import signing-key
             - shred signing-key
-            - ash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
+            - bash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
 
   pull-requests:
     feature/*:
@@ -37,7 +37,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - ash ./gradlew check #jacocoTestReport -- jacoco does not work with java 15 and gradle yet
+            - bash ./gradlew check #jacocoTestReport -- jacoco does not work with java 15 and gradle yet
           artifacts:
             - ./.gradle/**
             - ./**/build/**
@@ -46,7 +46,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - ash ./gradlew sonarqube
+            - bash ./gradlew sonarqube
 
   branches:
     master:
@@ -55,7 +55,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - ash ./gradlew check #jacocoTestReport -- jacoco does not work with java 15 and gradle yet
+            - bash ./gradlew check #jacocoTestReport -- jacoco does not work with java 15 and gradle yet
           artifacts:
             - ./.gradle/**
             - ./**/build/**
@@ -69,10 +69,10 @@ pipelines:
                 - openssl aes-256-cbc -a -k "$SIGNING_PWD" -in private-key.gpg.enc -out signing-key -d
                 - gpg --import signing-key
                 - shred signing-key
-                - ash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
+                - bash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
           - step:
               name: Quality gate
               caches:
                 - gradle
               script:
-                - ash ./gradlew sonarqube
+                - bash ./gradlew sonarqube
