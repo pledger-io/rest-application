@@ -68,7 +68,7 @@ pipelines:
               script:
                 - apk add openssl
                 - echo "$SIGNING_KEY" > private-key.gpg.enc
-                - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
+                - openssl aes-256-cbc -a -k "$SIGNING_PWD" -in private-key.gpg.enc -out signing-key -d
                 - gpg --import signing-key
                 - shred signing-key
                 - ash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
