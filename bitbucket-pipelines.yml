@@ -24,6 +24,7 @@ pipelines:
           caches:
             - gradle
           script:
+            - export GPG_TTY=$(tty)
             - apt-get update && apt-get install gnupg -y
             - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
             - gpg --import signing-key
@@ -65,6 +66,7 @@ pipelines:
               caches:
                 - gradle
               script:
+                - export GPG_TTY=$(tty)
                 - apt-get update && apt-get install gnupg -y
                 - openssl aes-256-cbc -a -k "$SIGNING_PWD" -in private-key.gpg.enc -out signing-key -d
                 - gpg --import signing-key
