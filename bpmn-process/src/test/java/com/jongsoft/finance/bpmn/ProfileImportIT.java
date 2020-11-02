@@ -3,6 +3,7 @@ package com.jongsoft.finance.bpmn;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
 import com.jongsoft.finance.domain.user.*;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
@@ -36,11 +37,19 @@ public class ProfileImportIT extends ProcessTestSetup {
     @Inject
     private CategoryProvider categoryProvider;
     @Inject
+    private TransactionRuleProvider transactionRuleProvider;
+    @Inject
     private StorageService storageService;
 
     @BeforeEach
     void setup() {
-        Mockito.reset(accountProvider, authenticationFacade, categoryProvider, storageService, userProvider);
+        Mockito.reset(
+                accountProvider,
+                authenticationFacade,
+                categoryProvider,
+                storageService,
+                userProvider,
+                transactionRuleProvider);
 
         UserAccount userAccount = UserAccount.builder()
                 .id(1L)
@@ -50,6 +59,7 @@ public class ProfileImportIT extends ProcessTestSetup {
                 .build();
         Mockito.when(authenticationFacade.currentUser()).thenReturn(userAccount);
         Mockito.when(userProvider.lookup("test-user")).thenReturn(API.Option(userAccount));
+        Mockito.when(transactionRuleProvider.lookup()).thenReturn(API.List());
     }
 
     @Test

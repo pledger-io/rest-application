@@ -1,4 +1,4 @@
-image: openjdk:15-alpine
+image: openjdk:15-slim-buster
 
 pipelines:
   default:
@@ -24,7 +24,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - apk add openssl gnupg
+            - apt-get update && apt-get install gnupg -y
             - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
             - gpg --import signing-key
             - shred signing-key
@@ -65,7 +65,7 @@ pipelines:
               caches:
                 - gradle
               script:
-                - apk add openssl gnupg
+                - apt-get update && apt-get install gnupg -y
                 - openssl aes-256-cbc -a -k "$SIGNING_PWD" -in private-key.gpg.enc -out signing-key -d
                 - gpg --import signing-key
                 - shred signing-key
