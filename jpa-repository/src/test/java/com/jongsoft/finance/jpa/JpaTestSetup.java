@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa;
 
 import io.micronaut.core.io.IOUtils;
-import io.micronaut.test.annotation.MicronautTest;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

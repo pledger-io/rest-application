@@ -58,7 +58,7 @@ subprojects {
     apply plugin: 'io.micronaut.application'
     apply plugin: "com.diffplug.eclipse.apt"
     apply plugin: 'java'
-    apply plugin: 'jacoco'
+    //apply plugin: 'jacoco'
     apply plugin: 'io.franzbecker.gradle-lombok'
 
     task delombok(type: DelombokTask, dependsOn: compileJava) {
