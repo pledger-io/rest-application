@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0n4xljl" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.0.1">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_0n4xljl" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
   <bpmn:process id="AccountReconcile" name="Reconcile account balance" isExecutable="true" camunda:versionTag="1.0.0" camunda:historyTimeToLive="P100D">
     <bpmn:documentation>The flow requires the following to be present to start:
 
@@ -19,7 +19,7 @@ It will then compute if there is a difference between the open en end balance pr
       <bpmn:outgoing>SequenceFlow_0tkye8j</bpmn:outgoing>
       <bpmn:outgoing>SequenceFlow_0ml350v</bpmn:outgoing>
     </bpmn:parallelGateway>
-    <bpmn:sequenceFlow id="SequenceFlow_0tkye8j" sourceRef="split_balance_calc" targetRef="tsk_convert_openbalance" />
+    <bpmn:sequenceFlow id="SequenceFlow_0tkye8j" sourceRef="split_balance_calc" targetRef="st_compute_start" />
     <bpmn:sequenceFlow id="SequenceFlow_0ml350v" sourceRef="split_balance_calc" targetRef="st_compute_end" />
     <bpmn:exclusiveGateway id="xg_start_differs" name="difference" default="sf_start_differs">
       <bpmn:incoming>SequenceFlow_0foh2sn</bpmn:incoming>
@@ -82,7 +82,7 @@ It will then compute if there is a difference between the open en end balance pr
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0xk0fdf</bpmn:incoming>
-      <bpmn:incoming>SequenceFlow_0i565uu</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0tkye8j</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0foh2sn</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="Task_164ln8n" name="Compute difference" camunda:expression="${computedEndBalance - endBalance}" camunda:resultVariable="balanceDifference">
@@ -101,47 +101,55 @@ It will then compute if there is a difference between the open en end balance pr
       <bpmn:incoming>sf_to_reconcile</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0zwupj1</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:scriptTask id="tsk_convert_openbalance" name="Prepare open balance" scriptFormat="javascript" camunda:resultVariable="openBalance">
-      <bpmn:documentation>We need to correct for the possibility of the end-user entering 0, which will be interpreted by the client as a Integer. 
-
-This causes issues as the openBalance should be a Double.
-</bpmn:documentation>
-      <bpmn:incoming>SequenceFlow_0tkye8j</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_0i565uu</bpmn:outgoing>
-      <bpmn:script>openBalance + 0.0</bpmn:script>
-    </bpmn:scriptTask>
-    <bpmn:sequenceFlow id="SequenceFlow_0i565uu" sourceRef="tsk_convert_openbalance" targetRef="st_compute_start" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="AccountReconcile">
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="190" y="287" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0evdqx1_di" bpmnElement="SequenceFlow_0evdqx1">
-        <di:waypoint x="226" y="305" />
-        <di:waypoint x="315" y="305" />
+      <bpmndi:BPMNEdge id="SequenceFlow_16hoisl_di" bpmnElement="SequenceFlow_16hoisl">
+        <di:waypoint x="595" y="418" />
+        <di:waypoint x="845" y="418" />
+        <di:waypoint x="845" y="330" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ParallelGateway_13kwojd_di" bpmnElement="split_balance_calc">
-        <dc:Bounds x="315" y="280" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0tkye8j_di" bpmnElement="SequenceFlow_0tkye8j">
-        <di:waypoint x="340" y="280" />
-        <di:waypoint x="340" y="248" />
+      <bpmndi:BPMNEdge id="SequenceFlow_0zwupj1_di" bpmnElement="SequenceFlow_0zwupj1">
+        <di:waypoint x="1286" y="248" />
+        <di:waypoint x="1286" y="400" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0ml350v_di" bpmnElement="SequenceFlow_0ml350v">
-        <di:waypoint x="340" y="330" />
-        <di:waypoint x="340" y="418" />
-        <di:waypoint x="495" y="418" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ExclusiveGateway_0mtfk06_di" bpmnElement="xg_start_differs" isMarkerVisible="true">
-        <dc:Bounds x="695" y="183" width="50" height="50" />
+      <bpmndi:BPMNEdge id="SequenceFlow_0gkppz8_di" bpmnElement="sf_no_difference">
+        <di:waypoint x="1140" y="330" />
+        <di:waypoint x="1140" y="418" />
+        <di:waypoint x="1268" y="418" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="751" y="201" width="49" height="14" />
+          <dc:Bounds x="1149" y="371" width="13" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0foh2sn_di" bpmnElement="SequenceFlow_0foh2sn">
-        <di:waypoint x="595" y="208" />
-        <di:waypoint x="695" y="208" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_063tj7e_di" bpmnElement="sf_to_reconcile">
+        <di:waypoint x="1140" y="280" />
+        <di:waypoint x="1140" y="208" />
+        <di:waypoint x="1236" y="208" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1147" y="241" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0iupet2_di" bpmnElement="SequenceFlow_0iupet2">
+        <di:waypoint x="1044" y="305" />
+        <di:waypoint x="1115" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0oy3day_di" bpmnElement="SequenceFlow_0oy3day">
+        <di:waypoint x="870" y="305" />
+        <di:waypoint x="944" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0xk0fdf_di" bpmnElement="SequenceFlow_0xk0fdf">
+        <di:waypoint x="845" y="102" />
+        <di:waypoint x="845" y="81" />
+        <di:waypoint x="545" y="81" />
+        <di:waypoint x="545" y="168" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_15kgmtr_di" bpmnElement="sf_start_differs">
+        <di:waypoint x="720" y="183" />
+        <di:waypoint x="720" y="142" />
+        <di:waypoint x="795" y="142" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="726" y="144" width="17" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_19ech98_di" bpmnElement="sf_no_start_diff">
         <di:waypoint x="720" y="233" />
@@ -152,60 +160,48 @@ This causes issues as the openBalance should be a Double.
           <dc:Bounds x="724" y="236" width="13" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0foh2sn_di" bpmnElement="SequenceFlow_0foh2sn">
+        <di:waypoint x="595" y="208" />
+        <di:waypoint x="695" y="208" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ml350v_di" bpmnElement="SequenceFlow_0ml350v">
+        <di:waypoint x="340" y="330" />
+        <di:waypoint x="340" y="418" />
+        <di:waypoint x="495" y="418" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0tkye8j_di" bpmnElement="SequenceFlow_0tkye8j">
+        <di:waypoint x="340" y="280" />
+        <di:waypoint x="340" y="208" />
+        <di:waypoint x="495" y="208" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0evdqx1_di" bpmnElement="SequenceFlow_0evdqx1">
+        <di:waypoint x="226" y="305" />
+        <di:waypoint x="315" y="305" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="190" y="287" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ParallelGateway_13kwojd_di" bpmnElement="split_balance_calc">
+        <dc:Bounds x="315" y="280" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0mtfk06_di" bpmnElement="xg_start_differs" isMarkerVisible="true">
+        <dc:Bounds x="695" y="183" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="751" y="201" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ParallelGateway_0kwsdn7_di" bpmnElement="join_balance_calc">
         <dc:Bounds x="820" y="280" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_15kgmtr_di" bpmnElement="sf_start_differs">
-        <di:waypoint x="720" y="183" />
-        <di:waypoint x="720" y="142" />
-        <di:waypoint x="795" y="142" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="726" y="144" width="17" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0xk0fdf_di" bpmnElement="SequenceFlow_0xk0fdf">
-        <di:waypoint x="845" y="102" />
-        <di:waypoint x="845" y="81" />
-        <di:waypoint x="545" y="81" />
-        <di:waypoint x="545" y="168" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0oy3day_di" bpmnElement="SequenceFlow_0oy3day">
-        <di:waypoint x="870" y="305" />
-        <di:waypoint x="944" y="305" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ExclusiveGateway_0gbp59c_di" bpmnElement="xg_has_difference" isMarkerVisible="true">
         <dc:Bounds x="1115" y="280" width="50" height="50" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1161" y="312" width="69" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0iupet2_di" bpmnElement="SequenceFlow_0iupet2">
-        <di:waypoint x="1044" y="305" />
-        <di:waypoint x="1115" y="305" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_063tj7e_di" bpmnElement="sf_to_reconcile">
-        <di:waypoint x="1140" y="280" />
-        <di:waypoint x="1140" y="208" />
-        <di:waypoint x="1236" y="208" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1147" y="241" width="17" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_002t7o1_di" bpmnElement="EndEvent_002t7o1">
         <dc:Bounds x="1268" y="400" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0gkppz8_di" bpmnElement="sf_no_difference">
-        <di:waypoint x="1140" y="330" />
-        <di:waypoint x="1140" y="418" />
-        <di:waypoint x="1268" y="418" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1149" y="371" width="13" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0zwupj1_di" bpmnElement="SequenceFlow_0zwupj1">
-        <di:waypoint x="1286" y="248" />
-        <di:waypoint x="1286" y="400" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="UserTask_08j15r1_di" bpmnElement="task_reconcile_before">
         <dc:Bounds x="795" y="102" width="100" height="80" />
       </bpmndi:BPMNShape>
@@ -218,21 +214,9 @@ This causes issues as the openBalance should be a Double.
       <bpmndi:BPMNShape id="ServiceTask_1jglnyp_di" bpmnElement="Task_164ln8n">
         <dc:Bounds x="944" y="265" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_16hoisl_di" bpmnElement="SequenceFlow_16hoisl">
-        <di:waypoint x="595" y="418" />
-        <di:waypoint x="845" y="418" />
-        <di:waypoint x="845" y="330" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_178oshr_di" bpmnElement="Task_0octqvk">
         <dc:Bounds x="1236" y="168" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ScriptTask_1yigf6f_di" bpmnElement="tsk_convert_openbalance">
-        <dc:Bounds x="290" y="168" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0i565uu_di" bpmnElement="SequenceFlow_0i565uu">
-        <di:waypoint x="390" y="208" />
-        <di:waypoint x="495" y="208" />
-      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
