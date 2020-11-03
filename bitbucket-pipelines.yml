@@ -1,4 +1,4 @@
-image: maven:3.6-openjdk-15
+image: maven:3.6.3-amazoncorretto-15
 
 pipelines:
   default:
@@ -65,7 +65,7 @@ pipelines:
                 - gradle
               script:
                 - export GPG_TTY=$(tty)
-                - yum install openssl -y
+                - yum install openssl gnupg -y
                 - openssl aes-256-cbc -a -k "$SIGNING_PWD" -in private-key.gpg.enc -out private-key.gpg -d
                 - gpg --import private-key.gpg
                 - bash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
