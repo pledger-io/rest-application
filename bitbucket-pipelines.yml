@@ -17,8 +17,8 @@ pipelines:
           script:
             - ash ./gradlew clean build
           artifacts:
-            - ./.gradle/**
-            - ./**/build/**
+            - .gradle/**
+            - "**/build/**"
       - step:
           name: Publish release
           caches:
@@ -40,8 +40,8 @@ pipelines:
           script:
             - bash ./gradlew check #jacocoTestReport -- jacoco does not work with java 15 and gradle yet
           artifacts:
-            - ./.gradle/**
-            - ./**/build/**
+            - .gradle/**
+            - "**/build/**"
       - step:
           name: Quality Gate
           caches:
@@ -58,8 +58,8 @@ pipelines:
           script:
             - bash ./gradlew check #jacocoTestReport -- jacoco does not work with java 15 and gradle yet
           artifacts:
-            - ./.gradle/**
-            - ./**/build/**
+            - .gradle/**
+            - "**/build/**"
       - parallel:
           - step:
               name: Deploy snapshot
