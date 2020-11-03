@@ -1,4 +1,4 @@
-image: openjdk:15-slim-buster
+image: maven:3.6-openjdk-15
 
 pipelines:
   default:
@@ -25,10 +25,8 @@ pipelines:
             - gradle
           script:
             - export GPG_TTY=$(tty)
-            - apt-get update && apt-get install gnupg -y
-            - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out signing-key -d
-            - gpg --import signing-key
-            - shred signing-key
+            - openssl aes-256-cbc -a -k $SIGNING_PWD -in private-key.gpg.enc -out private-key.gpg -d
+            - gpg --import private-key.gpg
             - bash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
 
   pull-requests:
@@ -67,11 +65,8 @@ pipelines:
                 - gradle
               script:
                 - export GPG_TTY=$(tty)
-                - apt-get update && apt-get install gnupg -y
-                - gpgconf --kill gpg-agent
-                - openssl aes-256-cbc -a -k "$SIGNING_PWD" -in private-key.gpg.enc -out signing-key -d
-                - gpg --import signing-key
-                - shred signing-key
+                - openssl aes-256-cbc -a -k "$SIGNING_PWD" -in private-key.gpg.enc -out private-key.gpg -d
+                - gpg --import private-key.gpg
                 - bash ./gradlew publish -Psigning.keyId=$GPG_KEY -Psigning.password=$GPG_PASSWORD
           - step:
               name: Quality gate
