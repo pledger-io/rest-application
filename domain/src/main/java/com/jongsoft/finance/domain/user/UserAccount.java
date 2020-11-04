@@ -1,10 +1,5 @@
 package com.jongsoft.finance.domain.user;
 
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Currency;
-import java.util.Objects;
-
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
@@ -18,12 +13,17 @@ import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountPasswordChangedEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountSettingEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.Currency;
+import java.util.Objects;
 
 @Getter
 @Builder
@@ -46,6 +46,7 @@ public class UserAccount implements AggregateBase, Serializable {
     public UserAccount(String username, String password) {
         this.username = username;
         this.password = password;
+        this.roles = API.List(new Role("accountant"));
         EventBus.getBus().send(new UserAccountCreatedEvent(this, this.username, this.password));
     }
 

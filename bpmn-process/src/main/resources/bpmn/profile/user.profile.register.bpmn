@@ -14,16 +14,17 @@
     <bpmn:sequenceFlow id="sf_account_free" name="yes" sourceRef="eg_account_exists" targetRef="st_create_account">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${usernameAvailable}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="sf_wait_for_mail" sourceRef="st_create_account" targetRef="te_mail_delay" />
-    <bpmn:sendTask id="st_send_welcome_mail" name="Send welcome mail" camunda:expression="${mailDaemon.send(username, &#39;user-registered&#39;, mailProperties)}">
+    <bpmn:sequenceFlow id="sf_wait_for_mail" sourceRef="st_create_account" targetRef="st_create_reconcile_account" />
+    <bpmn:sendTask id="st_send_welcome_mail" name="Send welcome mail" camunda:asyncBefore="true" camunda:expression="${mailDaemon.send(username, &#39;user-registered&#39;, mailProperties)}">
       <bpmn:incoming>SequenceFlow_1q5pqa4</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_102zsei</bpmn:outgoing>
     </bpmn:sendTask>
-    <bpmn:serviceTask id="st_create_account" name="Create account" camunda:class="com.jongsoft.finance.bpmn.delegate.user.CreateUserDelegate">
+    <bpmn:serviceTask id="st_create_account" name="Create account" camunda:asyncBefore="true" camunda:class="com.jongsoft.finance.bpmn.delegate.user.CreateUserDelegate">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="username">${username}</camunda:inputParameter>
           <camunda:inputParameter name="password">${passwordHash}</camunda:inputParameter>
+          <camunda:outputParameter name="accountJson">${account}</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>sf_account_free</bpmn:incoming>
@@ -34,8 +35,8 @@
       <bpmn:outgoing>sf_decide_exists</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_191lcjy" sourceRef="te_mail_delay" targetRef="st_convert_mail_properties" />
-    <bpmn:intermediateCatchEvent id="te_mail_delay" name="Delay timer">
-      <bpmn:incoming>sf_wait_for_mail</bpmn:incoming>
+    <bpmn:intermediateCatchEvent id="te_mail_delay" name="Delay timer" camunda:asyncBefore="true">
+      <bpmn:incoming>Flow_0nf51zz</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_191lcjy</bpmn:outgoing>
       <bpmn:timerEventDefinition>
         <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT5S</bpmn:timeDuration>
@@ -51,7 +52,7 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_102zsei" sourceRef="st_send_welcome_mail" targetRef="ee_register_complete" />
     <bpmn:sequenceFlow id="SequenceFlow_1q5pqa4" sourceRef="st_convert_mail_properties" targetRef="st_send_welcome_mail" />
-    <bpmn:serviceTask id="st_convert_mail_properties" name="Prepare mail contents" camunda:delegateExpression="${propertyConversionDelegate}">
+    <bpmn:serviceTask id="st_convert_mail_properties" name="Prepare mail contents" camunda:asyncBefore="true" camunda:delegateExpression="${propertyConversionDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="user">${currentUserProvider.currentUser()}</camunda:inputParameter>
@@ -62,18 +63,21 @@
       <bpmn:incoming>SequenceFlow_191lcjy</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1q5pqa4</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:serviceTask id="st_create_reconcile_account" name="Create Reconcile account" camunda:asyncBefore="true" camunda:delegateExpression="${processAccountCreationDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="account">${accountJson}</camunda:inputParameter>
+        </camunda:inputOutput>
+        <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>sf_wait_for_mail</bpmn:incoming>
+      <bpmn:outgoing>Flow_0nf51zz</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0nf51zz" sourceRef="st_create_reconcile_account" targetRef="te_mail_delay" />
   </bpmn:process>
   <bpmn:error id="Error_1kt8lal" name="DuplicateAccountException" errorCode="400" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="RegisterUserAccount">
-      <bpmndi:BPMNEdge id="SequenceFlow_1q5pqa4_di" bpmnElement="SequenceFlow_1q5pqa4">
-        <di:waypoint x="997" y="113" />
-        <di:waypoint x="1070" y="113" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_102zsei_di" bpmnElement="SequenceFlow_102zsei">
-        <di:waypoint x="1170" y="113" />
-        <di:waypoint x="1231" y="113" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1ai6in3_di" bpmnElement="sf_account_taken">
         <di:waypoint x="505" y="249" />
         <di:waypoint x="505" y="336" />
@@ -82,18 +86,14 @@
           <dc:Bounds x="514" y="290" width="13" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_191lcjy_di" bpmnElement="SequenceFlow_191lcjy">
-        <di:waypoint x="838" y="113" />
-        <di:waypoint x="897" y="113" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1if5hip_di" bpmnElement="sf_wait_for_mail">
-        <di:waypoint x="718" y="113" />
-        <di:waypoint x="802" y="113" />
+        <di:waypoint x="700" y="113" />
+        <di:waypoint x="770" y="113" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1mnsywe_di" bpmnElement="sf_account_free">
         <di:waypoint x="505" y="199" />
         <di:waypoint x="505" y="113" />
-        <di:waypoint x="618" y="113" />
+        <di:waypoint x="600" y="113" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="512" y="153" width="17" height="14" />
         </bpmndi:BPMNLabel>
@@ -106,6 +106,22 @@
         <di:waypoint x="217" y="224" />
         <di:waypoint x="301" y="224" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1q5pqa4_di" bpmnElement="SequenceFlow_1q5pqa4">
+        <di:waypoint x="1124" y="113" />
+        <di:waypoint x="1197" y="113" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_102zsei_di" bpmnElement="SequenceFlow_102zsei">
+        <di:waypoint x="1297" y="113" />
+        <di:waypoint x="1358" y="113" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_191lcjy_di" bpmnElement="SequenceFlow_191lcjy">
+        <di:waypoint x="965" y="113" />
+        <di:waypoint x="1024" y="113" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nf51zz_di" bpmnElement="Flow_0nf51zz">
+        <di:waypoint x="870" y="113" />
+        <di:waypoint x="929" y="113" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="se_register_account">
         <dc:Bounds x="181" y="206" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -115,20 +131,8 @@
           <dc:Bounds x="528" y="206" width="73" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="SendTask_00cdvq2_di" bpmnElement="st_send_welcome_mail">
-        <dc:Bounds x="1070" y="73" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_0wbbt3m_di" bpmnElement="st_create_account">
-        <dc:Bounds x="618" y="73" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_01rat76_di" bpmnElement="tk_locate_account">
         <dc:Bounds x="301" y="184" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="IntermediateCatchEvent_16rxar0_di" bpmnElement="te_mail_delay">
-        <dc:Bounds x="802" y="95" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="792" y="138" width="57" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_0maa9fz_di" bpmnElement="EndEvent_08ovygi">
         <dc:Bounds x="650" y="318" width="36" height="36" />
@@ -136,14 +140,29 @@
           <dc:Bounds x="630" y="361" width="77" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_0v11pke_di" bpmnElement="ee_register_complete">
-        <dc:Bounds x="1231" y="95" width="36" height="36" />
+      <bpmndi:BPMNShape id="SendTask_00cdvq2_di" bpmnElement="st_send_welcome_mail">
+        <dc:Bounds x="1197" y="73" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_16rxar0_di" bpmnElement="te_mail_delay">
+        <dc:Bounds x="929" y="95" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1228" y="138" width="42" height="14" />
+          <dc:Bounds x="919" y="138" width="57" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0v11pke_di" bpmnElement="ee_register_complete">
+        <dc:Bounds x="1358" y="95" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1355" y="138" width="42" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0qfxdyj_di" bpmnElement="st_convert_mail_properties">
-        <dc:Bounds x="897" y="73" width="100" height="80" />
+        <dc:Bounds x="1024" y="73" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0wg14v9_di" bpmnElement="st_create_reconcile_account">
+        <dc:Bounds x="770" y="73" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0wbbt3m_di" bpmnElement="st_create_account">
+        <dc:Bounds x="600" y="73" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
