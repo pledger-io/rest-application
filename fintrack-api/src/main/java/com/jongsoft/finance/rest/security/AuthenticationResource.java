@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 
 import javax.validation.Valid;
 import java.util.Map;
+import java.util.UUID;
 
 @Tag(name = "Authentication")
 @Controller(consumes = MediaType.APPLICATION_JSON)
@@ -81,9 +82,10 @@ public class AuthenticationResource {
         return response.map(authenticated -> {
             if (authenticated.isAuthenticated() && authenticated.getUserDetails().isPresent()) {
                 var userDetails = authenticated.getUserDetails().get();
+                var refresh = UUID.randomUUID().toString();
 
                 eventPublisher.publishEvent(new LoginSuccessfulEvent(userDetails));
-                var refreshToken = accessRefreshTokenGenerator.generate(userDetails);
+                var refreshToken = accessRefreshTokenGenerator.generate(refresh, userDetails);
                 if (refreshToken.isPresent()) {
                     var actualToken = refreshToken.get();
                     FinTrack.registerToken(
@@ -118,7 +120,7 @@ public class AuthenticationResource {
 
     @ApiDefaults
     @Secured(SecurityRule.IS_AUTHENTICATED)
-    @Get("/api/security/token-refresh")
+    @Post("/api/security/token-refresh")
     @Operation(
             summary = "Refresh authorization",
             description = "Renew the JWT token if it is about to expire",
@@ -130,8 +132,9 @@ public class AuthenticationResource {
                     var userDetails = new UserDetails(
                             user.getUsername(),
                             API.List(user.getRoles()).map(Role::getName).toJava());
+                    var refresh = UUID.randomUUID().toString();
 
-                    return accessRefreshTokenGenerator.generate(request.getToken(), userDetails)
+                    return accessRefreshTokenGenerator.generate(refresh, userDetails)
                             .stream()
                             .peek(token -> FinTrack.registerToken(
                                     user.getUsername(),

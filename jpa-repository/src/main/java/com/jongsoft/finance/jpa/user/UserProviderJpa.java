@@ -61,11 +61,12 @@ public class UserProviderJpa implements UserProvider {
                 where u.refreshToken = :refreshToken
                     and u.expires > :now""";
 
-        return entityManager.<UserAccount>reactive()
+        return entityManager.<UserAccountJpa>reactive()
                 .hql(hql)
                 .set("refreshToken", refreshToken)
                 .set("now", LocalDateTime.now())
-                .maybe();
+                .maybe()
+                .map(this::convert);
     }
 
     protected UserAccount convert(UserAccountJpa source) {
