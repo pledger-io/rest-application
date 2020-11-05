@@ -18,7 +18,7 @@ class ProcessSchedulerIT extends ProcessTestSetup {
 
     @Test
     void runSchedule() {
-        processEngine.getRuntimeService().createProcessInstanceByKey("ProcessScheduler")
+        var process = processEngine.getRuntimeService().createProcessInstanceByKey("ProcessScheduler")
                 .setVariable("subProcess", "EmptyProcess")
                 .setVariable("start", "2019-01-02")
                 .setVariable("end", LocalDate.now().plusMonths(5).toString())
@@ -26,7 +26,7 @@ class ProcessSchedulerIT extends ProcessTestSetup {
                 .setVariable("periodicity", Periodicity.MONTHS)
                 .execute();
 
-        waitUntilNoActiveJobs(processEngine, 100);
+        waitForSuspended(processEngine, process.getProcessInstanceId());
 
         var subProcess = processEngine.getHistoryService()
                 .createHistoricProcessInstanceQuery()
@@ -48,7 +48,7 @@ class ProcessSchedulerIT extends ProcessTestSetup {
                 .setVariable("EmptyProcess", Map.of("subProcess-1", 1, "variable-2", "test"))
                 .execute();
 
-        Thread.sleep(50);
+        waitForSuspended(processEngine, process.getProcessInstanceId());
 
         var nextRun = processEngine.getHistoryService()
                 .createHistoricVariableInstanceQuery()
@@ -65,7 +65,7 @@ class ProcessSchedulerIT extends ProcessTestSetup {
         processEngine.getManagementService()
                 .executeJob(jobs.getId());
 
-        Thread.sleep(100);
+        waitForSuspended(processEngine, process.getProcessInstanceId());
 
         var subProcess = processEngine.getHistoryService()
                 .createHistoricProcessInstanceQuery()

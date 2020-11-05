@@ -4,11 +4,10 @@ import com.jongsoft.finance.messaging.EventBus;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MicronautTest;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.junit.jupiter.api.BeforeEach;
 
 import javax.inject.Inject;
-import java.util.List;
 
 @MicronautTest(application = ApplicationContext.class, rollback = false)
 class ProcessTestSetup {
@@ -21,21 +20,38 @@ class ProcessTestSetup {
         new EventBus(eventPublisher);
     }
 
-    protected boolean waitUntilNoActiveJobs(ProcessEngine processEngine, long wait) {
-        long timeout = System.currentTimeMillis() + wait;
+    protected boolean waitForSuspended(ProcessEngine processEngine, String processId) {
+        long timeout = System.currentTimeMillis() + 2500;
 
         while (System.currentTimeMillis() < timeout) {
-            sleep();
-            long jobCount = processEngine.getManagementService().createJobQuery().active().count();
-            if (jobCount == 0) {
+            var process = processEngine.getHistoryService()
+                    .createHistoricProcessInstanceQuery()
+                    .processInstanceId(processId)
+                    .singleResult();
+
+            var activities = processEngine.getHistoryService()
+                    .createHistoricActivityInstanceQuery()
+                    .processInstanceId(processId)
+                    .unfinished()
+                    .list();
+
+            if (!HistoricProcessInstance.STATE_ACTIVE.equals(process.getState())) {
                 return true;
             }
-            final List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
-            jobs.stream()
-                    .filter(Job::isSuspended)
-                    .forEach(job -> processEngine.getManagementService().executeJob(job.getId()));
+
+            var tasks = activities.stream()
+                    .filter(activity ->
+                            activity.getActivityType().contains("Task")
+                                    || activity.getActivityType().equals("intermediateTimer"))
+                    .count();
+            if (tasks > 0) {
+                return true;
+            }
+
+            sleep();
         }
 
+        System.out.println("Wait for process finish timeout!");
         return false;
     }
 

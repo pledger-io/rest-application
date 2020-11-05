@@ -239,7 +239,7 @@ class BatchImportIT extends ProcessTestSetup {
             return transactionId;
         });
 
-        processEngine.getRuntimeService().createProcessInstanceByKey("BatchTransactionImport")
+        var process = processEngine.getRuntimeService().createProcessInstanceByKey("BatchTransactionImport")
                 .setVariable("slug", batchImport.getSlug())
                 .setVariable("importConfig", importConfigJson.write())
                 .setVariable("accountMapping", "account-mapping-token")
@@ -247,7 +247,7 @@ class BatchImportIT extends ProcessTestSetup {
                 .businessKey("sample-key")
                 .execute();
 
-        waitUntilNoActiveJobs(processEngine, 2500);
+        waitForSuspended(processEngine, process.getProcessInstanceId());
 
         Mockito.verify(importProvider, Mockito.times(2)).lookup("account-test-import");
         Mockito.verify(accountProvider, Mockito.times(6)).lookup(123L);

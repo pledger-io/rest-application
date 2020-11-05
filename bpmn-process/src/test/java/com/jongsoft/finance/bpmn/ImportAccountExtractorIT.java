@@ -180,7 +180,8 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
                 .businessKey("sample-key")
                 .executeWithVariablesInReturn();
 
-        waitUntilNoActiveJobs(processEngine, 1000);
+        waitForSuspended(processEngine, response.getProcessInstanceId());
+
         Mockito.verify(importProvider).lookup("account-test-import");
         Mockito.verify(accountProvider).lookup("MW GA Pieterse");
         Mockito.verify(accountProvider).lookup(new AccountFilterTest().iban("NL69INGB0123456789", true));

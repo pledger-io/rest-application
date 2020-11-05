@@ -112,12 +112,12 @@ public class ProfileImportIT extends ProcessTestSetup {
                 .thenReturn(Maybe.empty())
                 .thenReturn(Maybe.just(accountShop));
 
-        processEngine.getRuntimeService().createProcessInstanceByKey("ImportUserProfile")
+        var process = processEngine.getRuntimeService().createProcessInstanceByKey("ImportUserProfile")
                 .setVariable("storageToken", "my-sample-token")
                 .setVariable("username", authenticationFacade.currentUser().getUsername())
                 .execute();
 
-        waitUntilNoActiveJobs(processEngine, 2500);
+        waitForSuspended(processEngine, process.getProcessInstanceId());
 
         assertThat(accountDemo.getName()).isEqualTo("Demo checking account");
         assertThat(accountDemo.getCurrency()).isEqualTo("EUR");

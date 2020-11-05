@@ -68,7 +68,7 @@ public class ContractWarningIT extends ProcessTestSetup {
                 .setVariable("warnAt", convert(LocalDate.now().plusDays(1)))
                 .execute();
 
-        Thread.sleep(100);
+        waitForSuspended(processEngine, process.getProcessInstanceId());
 
         var jobs = processEngine.getManagementService()
                 .createJobQuery()
@@ -78,7 +78,7 @@ public class ContractWarningIT extends ProcessTestSetup {
         processEngine.getManagementService()
                 .executeJob(jobs.getId());
 
-        Thread.sleep(100);
+        waitForSuspended(processEngine, process.getProcessInstanceId());
 
         ArgumentCaptor<Properties> propertiesCaptor = ArgumentCaptor.forClass(Properties.class);
         Mockito.verify(mailDaemon).send(Mockito.eq("test-user"), Mockito.eq("contract-expiring"), propertiesCaptor.capture());
@@ -108,7 +108,7 @@ public class ContractWarningIT extends ProcessTestSetup {
                 .setVariable("warnAt", convert(LocalDate.now().minusDays(1)))
                 .execute();
 
-        waitUntilNoActiveJobs(processEngine, 1000);
+        waitForSuspended(processEngine, process.getProcessInstanceId());
 
         Mockito.verify(mailDaemon, Mockito.never()).send(Mockito.eq("test-user"), Mockito.eq("contract-expiring"), Mockito.any());
     }

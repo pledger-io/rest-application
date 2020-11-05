@@ -56,7 +56,7 @@ class AccountReconcileIT extends ProcessTestSetup {
                         .putValue("accountId", 1L)
         );
 
-        waitUntilNoActiveJobs(processEngine, 2500);
+        waitForSuspended(processEngine, response.getProcessInstanceId());
 
         var computedStartBalance = processEngine.getHistoryService()
                 .createHistoricVariableInstanceQuery()
@@ -106,7 +106,7 @@ class AccountReconcileIT extends ProcessTestSetup {
                         .putValue("endBalance", 100.2)
                         .putValue("accountId", 1L));
 
-        waitUntilNoActiveJobs(processEngine, 2500);
+        waitForSuspended(processEngine, response.getProcessInstanceId());
 
         var computedStartBalance = processEngine.getHistoryService()
                 .createHistoricVariableInstanceQuery()
