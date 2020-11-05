@@ -1,24 +1,17 @@
 package com.jongsoft.finance.jpa.user;
 
-import java.util.Arrays;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import com.jongsoft.finance.annotation.BusinessEventListener;
+import com.jongsoft.finance.domain.user.events.*;
+import com.jongsoft.finance.jpa.core.RepositoryJpa;
+import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
+import com.jongsoft.finance.jpa.user.entity.RoleJpa;
+import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
+import org.jboss.aerogear.security.otp.api.Base32;
 
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-
-import org.jboss.aerogear.security.otp.api.Base32;
-import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.domain.user.events.UserAccountCreatedEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountPasswordChangedEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountSettingEvent;
-import com.jongsoft.finance.jpa.core.RepositoryJpa;
-import com.jongsoft.finance.jpa.user.entity.RoleJpa;
-import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
+import java.util.*;
 
 @Singleton
 @Transactional
@@ -95,6 +88,23 @@ public class UserEventListener extends RepositoryJpa {
         query.setParameter("username", event.getUsername());
         params.forEach(query::setParameter);
         query.executeUpdate();
+    }
+
+    @BusinessEventListener
+    public void handleTokenRegistrationEvent(TokenRegisteredEvent event) {
+        var userAccountJpa = entityManager.createQuery(
+                "select u from UserAccountJpa u where u.username = :username",
+                UserAccountJpa.class)
+                .setParameter("username", event.getUsername())
+                .getSingleResult();
+
+        var refreshJpa = AccountTokenJpa.builder()
+                .user(userAccountJpa)
+                .refreshToken(event.getRefreshToken())
+                .expires(event.getExpires())
+                .build();
+
+        entityManager.persist(refreshJpa);
     }
 
 }

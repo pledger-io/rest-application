@@ -1,10 +1,8 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.domain.user.events.UserAccountCreatedEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountPasswordChangedEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountSettingEvent;
+import com.jongsoft.finance.domain.user.events.*;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.jpa.user.entity.RoleJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -13,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
 import java.util.Currency;
 
 class UserEventListenerIT extends JpaTestSetup {
@@ -91,6 +90,23 @@ class UserEventListenerIT extends JpaTestSetup {
 
         var check = entityManager.find(UserAccountJpa.class, 1L);
         Assertions.assertThat(check.getCurrency()).isEqualTo(Currency.getInstance("USD"));
+    }
+
+    @Test
+    void handleTokenRegistrationEvent() {
+        loadDataset("sql/base-setup.sql");
+        eventPublisher.publishEvent(new TokenRegisteredEvent(
+                "demo-user",
+                "my-refresh-token",
+                LocalDateTime.of(2019, 1, 1, 12, 33)));
+
+        var check = entityManager.createQuery("select t from AccountTokenJpa t where t.refreshToken = :token", AccountTokenJpa.class)
+                .setParameter("token", "my-refresh-token")
+                .getSingleResult();
+        Assertions.assertThat(check).isNotNull();
+        Assertions.assertThat(check.getExpires()).isEqualTo(LocalDateTime.of(2019, 1, 1, 12, 33));
+        Assertions.assertThat(check.getRefreshToken()).isEqualTo("my-refresh-token");
+        Assertions.assertThat(check.getUser().getId()).isEqualTo(1L);
     }
 
 }

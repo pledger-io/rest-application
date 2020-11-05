@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest.security;
 
+import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.security.PasswordEncoder;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -70,15 +71,24 @@ public class AuthenticationResource {
         var response = Flowable.fromPublisher(
                 authenticationProvider.authenticate(request, authenticationRequest));
 
-        return response.<MutableHttpResponse<?>>map(authenticated -> {
+        return response.map(authenticated -> {
             if (authenticated.isAuthenticated() && authenticated.getUserDetails().isPresent()) {
                 var userDetails = authenticated.getUserDetails().get();
 
                 eventPublisher.publishEvent(new LoginSuccessfulEvent(userDetails));
-                return HttpResponse.ok(accessRefreshTokenGenerator.generate(userDetails).get());
-            } else {
-                return HttpResponse.unauthorized();
+                var refreshToken = accessRefreshTokenGenerator.generate(userDetails);
+                if (refreshToken.isPresent()) {
+                    var actualToken = refreshToken.get();
+                    FinTrack.registerToken(
+                            userDetails.getUsername(),
+                            actualToken.getRefreshToken(),
+                            actualToken.getExpiresIn());
+
+                    return HttpResponse.ok(actualToken);
+                }
             }
+
+            return HttpResponse.unauthorized();
         }).first(HttpResponse.unauthorized());
     }
 
