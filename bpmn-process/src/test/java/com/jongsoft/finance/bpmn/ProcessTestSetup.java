@@ -25,6 +25,7 @@ class ProcessTestSetup {
         long timeout = System.currentTimeMillis() + wait;
 
         while (System.currentTimeMillis() < timeout) {
+            sleep();
             long jobCount = processEngine.getManagementService().createJobQuery().active().count();
             if (jobCount == 0) {
                 return true;
@@ -36,6 +37,14 @@ class ProcessTestSetup {
         }
 
         return false;
+    }
+
+    private void sleep() {
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }

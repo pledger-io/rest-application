@@ -41,17 +41,22 @@ class AccountReconcileIT extends ProcessTestSetup {
     }
 
     @Test
-    void run_differentStartBalance() {
+    void run_differentStartBalance() throws InterruptedException {
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(API.Option())
                 .thenReturn(API.Option(-20.0));
 
-        var response = processEngine.getRuntimeService().startProcessInstanceByKey("AccountReconcile", Variables.createVariables()
-                .putValue("startDate", "2019-01-01")
-                .putValue("endDate", "2019-12-31")
-                .putValue("openBalance", 10.0)
-                .putValue("endBalance", 100.2)
-                .putValue("accountId", 1L));
+        var response = processEngine.getRuntimeService().startProcessInstanceByKey(
+                "AccountReconcile",
+                Variables.createVariables()
+                        .putValue("startDate", "2019-01-01")
+                        .putValue("endDate", "2019-12-31")
+                        .putValue("openBalance", 10.0)
+                        .putValue("endBalance", 100.2)
+                        .putValue("accountId", 1L)
+        );
+
+        waitUntilNoActiveJobs(processEngine, 2500);
 
         var computedStartBalance = processEngine.getHistoryService()
                 .createHistoricVariableInstanceQuery()
@@ -74,7 +79,7 @@ class AccountReconcileIT extends ProcessTestSetup {
                 .taskId("task_reconcile_before");
 
         Assertions.assertThat(computedStartBalance.getValue()).isEqualTo(0.0);
-        Assertions.assertThat(computedEndBalance.getValue()).isEqualTo(-20.0);
+        Assertions.assertThat(computedEndBalance).isNull();
         Assertions.assertThat(hasDifference).isNull();
         Assertions.assertThat(task).isNotNull();
     }
@@ -92,12 +97,16 @@ class AccountReconcileIT extends ProcessTestSetup {
                 .thenReturn(API.Option())
                 .thenReturn(API.Option(-20.0));
 
-        var response = processEngine.getRuntimeService().startProcessInstanceByKey("AccountReconcile", Variables.createVariables()
-                .putValue("startDate", "2019-01-01")
-                .putValue("endDate", "2019-12-31")
-                .putValue("openBalance", 0)
-                .putValue("endBalance", 100.2)
-                .putValue("accountId", 1L));
+        var response = processEngine.getRuntimeService().startProcessInstanceByKey(
+                "AccountReconcile",
+                Variables.createVariables()
+                        .putValue("startDate", "2019-01-01")
+                        .putValue("endDate", "2019-12-31")
+                        .putValue("openBalance", 0)
+                        .putValue("endBalance", 100.2)
+                        .putValue("accountId", 1L));
+
+        waitUntilNoActiveJobs(processEngine, 2500);
 
         var computedStartBalance = processEngine.getHistoryService()
                 .createHistoricVariableInstanceQuery()
