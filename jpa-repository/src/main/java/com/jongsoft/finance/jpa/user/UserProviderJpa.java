@@ -8,10 +8,12 @@ import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Collectors;
 import com.jongsoft.lang.control.Optional;
+import io.reactivex.Maybe;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.Currency;
 
 @Singleton
@@ -50,6 +52,20 @@ public class UserProviderJpa implements UserProvider {
                 .set("username", username)
                 .maybe()
                 .map(this::convert);
+    }
+
+    @Override
+    public Maybe<UserAccount> refreshToken(String refreshToken) {
+        var hql = """
+                select u.user from AccountTokenJpa u
+                where u.refreshToken = :refreshToken
+                    and u.expires > :now""";
+
+        return entityManager.<UserAccount>reactive()
+                .hql(hql)
+                .set("refreshToken", refreshToken)
+                .set("now", LocalDateTime.now())
+                .maybe();
     }
 
     protected UserAccount convert(UserAccountJpa source) {

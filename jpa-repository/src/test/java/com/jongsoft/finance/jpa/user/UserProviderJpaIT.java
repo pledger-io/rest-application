@@ -43,4 +43,13 @@ class UserProviderJpaIT extends JpaTestSetup {
         Assertions.assertFalse(userProvider.lookup("user@account").isPresent());
     }
 
+    @Test
+    void lookup_refreshToken() {
+        init();
+
+        var check = userProvider.refreshToken("refresh-token-1")
+                .blockingGet();
+
+    }
+
 }
