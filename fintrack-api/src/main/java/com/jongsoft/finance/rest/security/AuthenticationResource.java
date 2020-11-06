@@ -1,12 +1,17 @@
 package com.jongsoft.finance.rest.security;
 
+import com.jongsoft.finance.domain.FinTrack;
+import com.jongsoft.finance.domain.user.Role;
+import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.security.PasswordEncoder;
+import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.*;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.AuthenticationProvider;
+import io.micronaut.security.authentication.UserDetails;
 import io.micronaut.security.event.LoginSuccessfulEvent;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.jwt.generator.AccessRefreshTokenGenerator;
@@ -24,6 +29,7 @@ import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 
 import javax.validation.Valid;
 import java.util.Map;
+import java.util.UUID;
 
 @Tag(name = "Authentication")
 @Controller(consumes = MediaType.APPLICATION_JSON)
@@ -33,6 +39,7 @@ public class AuthenticationResource {
     private final AuthenticationProvider authenticationProvider;
     private final RSASignatureConfiguration rsaSignatureConfiguration;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserProvider userProvider;
 
     private final PasswordEncoder passwordEncoder;
     private final ProcessEngine processEngine;
@@ -42,12 +49,14 @@ public class AuthenticationResource {
             final AuthenticationProvider authenticationProvider,
             final RSASignatureConfiguration rsaSignatureConfiguration,
             final ApplicationEventPublisher eventPublisher,
+            final UserProvider userProvider,
             final PasswordEncoder passwordEncoder,
             final ProcessEngine processEngine) {
         this.accessRefreshTokenGenerator = accessRefreshTokenGenerator;
         this.authenticationProvider = authenticationProvider;
         this.rsaSignatureConfiguration = rsaSignatureConfiguration;
         this.eventPublisher = eventPublisher;
+        this.userProvider = userProvider;
         this.passwordEncoder = passwordEncoder;
         this.processEngine = processEngine;
     }
@@ -70,15 +79,25 @@ public class AuthenticationResource {
         var response = Flowable.fromPublisher(
                 authenticationProvider.authenticate(request, authenticationRequest));
 
-        return response.<MutableHttpResponse<?>>map(authenticated -> {
+        return response.map(authenticated -> {
             if (authenticated.isAuthenticated() && authenticated.getUserDetails().isPresent()) {
                 var userDetails = authenticated.getUserDetails().get();
+                var refresh = UUID.randomUUID().toString();
 
                 eventPublisher.publishEvent(new LoginSuccessfulEvent(userDetails));
-                return HttpResponse.ok(accessRefreshTokenGenerator.generate(userDetails).get());
-            } else {
-                return HttpResponse.unauthorized();
+                var refreshToken = accessRefreshTokenGenerator.generate(refresh, userDetails);
+                if (refreshToken.isPresent()) {
+                    var actualToken = refreshToken.get();
+                    FinTrack.registerToken(
+                            userDetails.getUsername(),
+                            actualToken.getRefreshToken(),
+                            actualToken.getExpiresIn());
+
+                    return HttpResponse.ok(actualToken);
+                }
             }
+
+            return HttpResponse.unauthorized();
         }).first(HttpResponse.unauthorized());
     }
 
@@ -101,21 +120,31 @@ public class AuthenticationResource {
 
     @ApiDefaults
     @Secured(SecurityRule.IS_AUTHENTICATED)
-    @Get("/api/security/token-refresh")
+    @Post("/api/security/token-refresh")
     @Operation(
             summary = "Refresh authorization",
             description = "Renew the JWT token if it is about to expire",
             operationId = "refreshToken"
     )
-    public Single<MutableHttpResponse<?>> refresh() {
-        return Single.create(emitter -> {
-            var token = accessRefreshTokenGenerator.generate(null);
-            if (token.isEmpty()) {
-                emitter.onSuccess(HttpResponse.unauthorized());
-            } else {
-                emitter.onSuccess(HttpResponse.ok(token.get()));
-            }
-        });
+    public Single<MutableHttpResponse<AccessRefreshToken>> refresh(@Body @Valid TokenRefreshRequest request) {
+        return userProvider.refreshToken(request.getToken())
+                .map(user -> {
+                    var userDetails = new UserDetails(
+                            user.getUsername(),
+                            API.List(user.getRoles()).map(Role::getName).toJava());
+                    var refresh = UUID.randomUUID().toString();
+
+                    return accessRefreshTokenGenerator.generate(refresh, userDetails)
+                            .stream()
+                            .peek(token -> FinTrack.registerToken(
+                                    user.getUsername(),
+                                    token.getRefreshToken(),
+                                    token.getExpiresIn()))
+                            .map(HttpResponse::ok)
+                            .findFirst()
+                            .orElseGet(HttpResponse::unauthorized);
+                })
+                .switchIfEmpty(Single.just(HttpResponse.unauthorized()));
     }
 
     @Secured(SecurityRule.IS_ANONYMOUS)
