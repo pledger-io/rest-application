@@ -3,9 +3,11 @@ package com.jongsoft.finance.bpmn;
 import com.jongsoft.finance.bpmn.camunda.ApplicationContextElResolver;
 import com.jongsoft.finance.bpmn.camunda.CamundaDatasourceConfiguration;
 import com.jongsoft.finance.bpmn.camunda.MicronautExpressionManager;
+import com.jongsoft.finance.core.DataSourceMigration;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Factory;
+import io.micronaut.context.annotation.Requires;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Factory
+@Requires(beans = DataSourceMigration.class)
 public class ProcessEngineConfiguration {
 
     private final Logger log;

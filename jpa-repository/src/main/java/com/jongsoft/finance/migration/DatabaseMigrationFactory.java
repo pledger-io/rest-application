@@ -7,8 +7,8 @@ import io.micronaut.context.annotation.Factory;
 public class DatabaseMigrationFactory {
 
     @Context
-    public DatasourceMigration datasourceMigration(MigrationDatasourceConfiguration configuration) {
-        return new DatasourceMigration(configuration);
+    public DatasourceMigrationJpa datasourceMigration(MigrationDatasourceConfiguration configuration) {
+        return new DatasourceMigrationJpa(configuration);
     }
 
 }

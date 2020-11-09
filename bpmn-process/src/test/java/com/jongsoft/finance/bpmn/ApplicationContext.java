@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.DataSourceMigration;
 import com.jongsoft.finance.core.MailDaemon;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
@@ -162,6 +163,11 @@ public class ApplicationContext {
     @Singleton
     MailDaemon mailDaemon() {
         return Mockito.mock(MailDaemon.class);
+    }
+
+    @Singleton
+    DataSourceMigration dataSourceMigration() {
+        return Mockito.mock(DataSourceMigration.class);
     }
 
 }
