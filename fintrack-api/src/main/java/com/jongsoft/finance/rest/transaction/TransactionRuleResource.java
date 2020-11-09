@@ -25,7 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
 
-@Tag(name = "Transactions")
+@Tag(name = "Transaction Rules")
 @Controller("/api/transaction-rules")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public class TransactionRuleResource {

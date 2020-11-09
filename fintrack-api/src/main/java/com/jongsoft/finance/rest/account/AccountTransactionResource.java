@@ -261,6 +261,11 @@ public class AccountTransactionResource {
     }
 
     @Patch("/{transactionId}")
+    @Operation(
+            summary = "Split transactions",
+            description = "Split the transaction into smaller pieces, all belonging to the same actual transaction.",
+            parameters = @Parameter(name = "transactionId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
+    )
     Single<HttpResponse<TransactionResponse>> split(
             @PathVariable long transactionId,
             @Valid @Body AccountTransactionSplitRequest request) {
@@ -279,6 +284,11 @@ public class AccountTransactionResource {
     }
 
     @Delete("/{transactionId}")
+    @Operation(
+            summary = "Delete transaction",
+            description = "Delete a transaction from the account",
+            parameters = @Parameter(name = "transactionId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
+    )
     Single<HttpResponse<Void>> delete(@PathVariable long transactionId) {
         return Single.create(emitter -> {
             var presence = transactionProvider.lookup(transactionId);
