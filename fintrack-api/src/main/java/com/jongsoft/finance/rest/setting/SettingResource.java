@@ -4,6 +4,7 @@ import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.rest.model.SettingResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,6 +27,7 @@ public class SettingResource {
             description = "List all available settings in the system",
             operationId = "getSettings"
     )
+    @Secured({SecurityRule.IS_ANONYMOUS, SecurityRule.IS_AUTHENTICATED})
     Flowable<SettingResponse> list() {
         return settingProvider.lookup()
                 .map(setting -> new SettingResponse(
