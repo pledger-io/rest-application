@@ -1,5 +1,6 @@
 # FinTrack
-![Image version](https://img.shields.io/docker/v/gjong/fintrack?sort=semver)
+![Sonatype Nexus (Releases)](https://img.shields.io/nexus/r/com.jongsoft.finance/fintrack-api?server=https%3A%2F%2Foss.sonatype.org)
+![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.jongsoft.finance/fintrack-api?server=https%3A%2F%2Foss.sonatype.org)
 ![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/jongsoftdev/fintrack-application/master)
 [![SonarCloud Quality](https://sonarcloud.io/api/project_badges/measure?project=FinTrack%3AAPI&metric=alert_status&style=flat-square)](https://sonarcloud.io/dashboard?id=FinTrack%3AAPI)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=FinTrack%3AAPI&metric=coverage&style=flat-square)](https://sonarcloud.io/dashboard?id=FinTrack%3AAPI)
@@ -27,7 +28,7 @@ following features:
 
 ## Get started
 
-**Note:** the front-end application can be found in the [fintrack-ui](https://bitbucket.org/jongsoftdev/fintrack-ui) repository.
+**Note:** the front-end application can be found in the [fintrack-ui](https://bitbucket.org/jongsoftdev/fintrack-ui) repository. The [deployment](https://bitbucket.org/jongsoftdev/fintrack-deployment) build will bundle the front-end with this backend system.
 
 In this repository you will find the backend REST application needed to run FinTrack.
 
@@ -35,7 +36,7 @@ In this repository you will find the backend REST application needed to run FinT
 
 To build the application the following needs to be present on your local PC:
 
-* JDK 14 or higher
+* JDK 15 or higher
 * GIT for completing the checkout
 
 You can build the application using the Gradle command:
