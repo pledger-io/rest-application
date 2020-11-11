@@ -27,6 +27,11 @@ public class ResultPageImpl<T> implements ResultPage<T> {
     }
 
     @Override
+    public int pageSize() {
+        return limit;
+    }
+
+    @Override
     public long total() {
         return totalRecords;
     }

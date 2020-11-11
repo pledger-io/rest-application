@@ -1,27 +1,22 @@
 package com.jongsoft.finance.rest.profile;
 
-import java.io.ByteArrayOutputStream;
-import java.net.URL;
-import java.util.Currency;
-
-import javax.validation.Valid;
-
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.TwoFactorHelper;
-
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Patch;
-import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import javax.validation.Valid;
+import java.io.ByteArrayOutputStream;
+import java.net.URL;
+import java.util.Currency;
 
 @Tag(name = "User profile")
 @Controller("/api/profile")
@@ -100,7 +95,7 @@ public class ProfileResource {
     void enableMfa(@Body @Valid MultiFactorRequest multiFactorRequest) {
         var userAccount = currentUserProvider.currentUser();
         if (!TwoFactorHelper.verifySecurityCode(userAccount.getSecret(), multiFactorRequest.getVerificationCode())) {
-            throw new IllegalArgumentException("Invalid verification code provided.");
+            throw StatusException.badRequest("Invalid verification code provided.");
         }
 
         userAccount.enableMultiFactorAuthentication();

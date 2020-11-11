@@ -36,5 +36,13 @@ public class ResultPageResponse<T> {
             return null;
         }
 
+        public Integer getPageSize() {
+            if (wrapped.hasPages()) {
+                return wrapped.pageSize();
+            }
+
+            return null;
+        }
+
     }
 }

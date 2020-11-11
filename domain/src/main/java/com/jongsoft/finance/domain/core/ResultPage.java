@@ -7,6 +7,10 @@ import java.util.function.Function;
 
 public interface ResultPage<T> {
 
+    default int pageSize() {
+        return 20;
+    }
+
     default int pages() {
         return 0;
     }
