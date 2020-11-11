@@ -125,7 +125,7 @@ subprojects {
             mavenJava(MavenPublication) {
                 from components.java
                 pom {
-                    description: 'The REST-API for FinTrack'
+                    description = 'The REST-API for FinTrack'
                     url = 'https://fintrack.jongsoft.com/'
                     scm {
                         connection = 'scm:git:git@bitbucket.org:jongsoftdev/fintrack-application.git'
