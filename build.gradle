@@ -125,6 +125,8 @@ subprojects {
             mavenJava(MavenPublication) {
                 from components.java
                 pom {
+                    description: 'The REST-API for FinTrack'
+                    url = 'https://fintrack.jongsoft.com/'
                     scm {
                         connection = 'scm:git:git@bitbucket.org:jongsoftdev/fintrack-application.git'
                         developerConnection = 'scm:git:git@bitbucket.org:jongsoftdev/fintrack-application.git'
@@ -134,6 +136,13 @@ subprojects {
                         license {
                             name = 'MIT License'
                             url = 'http://www.opensource.org/licenses/mit-license.php'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'gjong'
+                            name = 'Gerben Jongerius'
+                            email = 'g.jongerius@jong-soft.com'
                         }
                     }
                 }
