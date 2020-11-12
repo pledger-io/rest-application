@@ -74,6 +74,8 @@ subprojects {
     }
 
     java {
+        withJavadocJar()
+        withSourcesJar()
         sourceCompatibility = JavaVersion.toVersion('15')
         targetCompatibility = JavaVersion.toVersion('15')
     }
@@ -125,8 +127,9 @@ subprojects {
             mavenJava(MavenPublication) {
                 from components.java
                 pom {
-                    description: 'The REST-API for FinTrack'
+                    description = 'The REST-API for FinTrack'
                     url = 'https://fintrack.jongsoft.com/'
+                    name = project.name
                     scm {
                         connection = 'scm:git:git@bitbucket.org:jongsoftdev/fintrack-application.git'
                         developerConnection = 'scm:git:git@bitbucket.org:jongsoftdev/fintrack-application.git'

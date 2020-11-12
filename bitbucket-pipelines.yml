@@ -62,7 +62,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - ash ./gradlew clean build
+            - bash ./gradlew clean build
           artifacts:
             - .gradle/**
             - "**/build/**"
