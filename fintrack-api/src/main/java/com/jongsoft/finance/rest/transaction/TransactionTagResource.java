@@ -46,8 +46,8 @@ public class TransactionTagResource {
             description = "Creates a new tag into the system",
             operationId = "createTag"
     )
-    Single<TagResponse> create(@Valid @Body String tag) {
-        return Single.just(currentUserProvider.currentUser().createTag(tag))
+    Single<TagResponse> create(@Valid @Body TagCreateRequest tag) {
+        return Single.just(currentUserProvider.currentUser().createTag(tag.getTag()))
                 .map(TagResponse::new);
     }
 

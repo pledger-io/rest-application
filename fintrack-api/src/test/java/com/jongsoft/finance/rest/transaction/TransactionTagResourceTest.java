@@ -51,7 +51,7 @@ class TransactionTagResourceTest extends TestSetup {
 
     @Test
     void create() {
-        var response = subject.create("Sample tag").blockingGet();
+        var response = subject.create(new TagCreateRequest("Sample tag")).blockingGet();
 
         Assertions.assertThat(response.getName()).isEqualTo("Sample tag");
 
