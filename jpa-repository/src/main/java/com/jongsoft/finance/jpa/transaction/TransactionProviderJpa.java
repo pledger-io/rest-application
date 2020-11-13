@@ -116,7 +116,7 @@ public class TransactionProviderJpa implements TransactionProvider {
 
     @Override
     public Optional<Double> balance(FilterCommand filter) {
-        log.trace("Transaction balance with filter: {}", filter);
+        log.trace("Transaction balance with filter: {}", filter.toString());
 
         if (filter instanceof TransactionFilterCommand delegate) {
             delegate.user(authenticationFacade.authenticated());

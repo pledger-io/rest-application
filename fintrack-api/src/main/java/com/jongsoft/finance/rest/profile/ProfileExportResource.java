@@ -75,7 +75,7 @@ public class ProfileExportResource {
 
             var response = HttpResponse.ok(exportJson)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + exportFileName + "\"")
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN);
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 
             emitter.onSuccess(response);
         });

@@ -146,7 +146,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
                 .types(ownTypes)
                 .pageSize(2);
 
-        var result = accountProvider.top(filter, DateRange.forMonth(2019, 1));
+        var result = accountProvider.top(filter, DateRange.forMonth(2019, 1), false);
 
         Assertions.assertThat(result).hasSize(1);
         Assertions.assertThat(result.head().total()).isEqualTo(20.2);

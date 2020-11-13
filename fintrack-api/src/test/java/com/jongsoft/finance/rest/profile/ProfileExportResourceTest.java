@@ -77,7 +77,7 @@ class ProfileExportResourceTest {
         var response = subject.export().blockingGet();
 
         Assertions.assertThat(response.status().getCode()).isEqualTo(200);
-        Assertions.assertThat(response.header(HttpHeaders.CONTENT_TYPE)).isEqualTo("text/plain");
+        Assertions.assertThat(response.header(HttpHeaders.CONTENT_TYPE)).isEqualTo("application/json");
         Assertions.assertThat(response.header(HttpHeaders.CONTENT_DISPOSITION)).isEqualTo("attachment; filename=\"sample@gmail.com-profile.json\"");
     }
 }

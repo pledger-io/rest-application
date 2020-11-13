@@ -32,7 +32,7 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
 
     @SuppressWarnings("unchecked")
     public Sequence<T> sequence() {
-        var query = entityManager.createQuery(hql());
+        var query = entityManager.createQuery(hql() + sort());
 
         applyParameters(query);
         applyPaging(query);

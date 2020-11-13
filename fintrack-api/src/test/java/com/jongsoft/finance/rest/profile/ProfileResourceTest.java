@@ -1,17 +1,16 @@
 package com.jongsoft.finance.rest.profile;
 
+import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
+import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.rest.TestSetup;
+import com.jongsoft.finance.security.CurrentUserProvider;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
 import org.jboss.aerogear.security.otp.Totp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
-import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.finance.security.CurrentUserProvider;
-
-import io.micronaut.context.event.ApplicationEventPublisher;
 
 class ProfileResourceTest extends TestSetup {
 
@@ -37,7 +36,7 @@ class ProfileResourceTest extends TestSetup {
         Assertions.assertThat(result.getCurrency()).isEqualTo("EUR");
         Assertions.assertThat(result.getProfilePicture()).isNull();
         Assertions.assertThat(result.getTheme()).isEqualTo("dark");
-        Assertions.assertThat(result.hasMfa()).isEqualTo(false);
+        Assertions.assertThat(result.isMfa()).isEqualTo(false);
     }
 
     @Test

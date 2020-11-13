@@ -172,7 +172,7 @@ public class TransactionResource {
     Flowable<String> export() {
         return Flowable.create(emitter -> {
             emitter.onNext("Date,Booking Date,Interest Date,From name,From IBAN," +
-                    "To name,To IBAN,Description,Category,Budget,Contract,Amount");
+                    "To name,To IBAN,Description,Category,Budget,Contract,Amount\n");
 
             var filterCommand = filterFactory.transaction()
                     .accounts(accountProvider.lookup(filterFactory.account()
@@ -250,6 +250,7 @@ public class TransactionResource {
         builder.append(valueOrEmpty(transaction.getBudget())).append(",");
         builder.append(valueOrEmpty(transaction.getContract())).append(",");
         builder.append(transaction.computeAmount(transaction.computeFrom()));
+        builder.append("\n");
 
         return builder.toString();
     }

@@ -1,13 +1,13 @@
 package com.jongsoft.finance.serialized;
 
-import java.io.Serializable;
-
 import com.jongsoft.finance.domain.account.Account;
-
+import com.jongsoft.finance.schedule.Periodicity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
 @Builder
@@ -18,6 +18,9 @@ public class AccountJson implements Serializable {
     private String name;
     private String description;
     private String currency;
+
+    private double interest;
+    private Periodicity periodicity;
 
     private String iban;
     private String bic;
@@ -33,6 +36,8 @@ public class AccountJson implements Serializable {
                 .number(account.getNumber())
                 .type(account.getType())
                 .name(account.getName())
+                .periodicity(account.getInterestPeriodicity())
+                .interest(account.getInterest())
                 .build();
     }
 }

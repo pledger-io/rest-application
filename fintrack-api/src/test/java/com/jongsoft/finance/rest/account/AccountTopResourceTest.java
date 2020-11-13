@@ -62,7 +62,8 @@ class AccountTopResourceTest extends TestSetup {
             }
         })).when(accountProvider).top(
                 Mockito.any(AccountProvider.FilterCommand.class),
-                Mockito.eq(DateRange.forMonth(2019, 1)));
+                Mockito.eq(DateRange.forMonth(2019, 1)),
+                Mockito.eq(true));
 
 
         subject.topDebtors(Dates.startOfMonth(2019, 1), Dates.endOfMonth(2019, 1))
@@ -71,7 +72,10 @@ class AccountTopResourceTest extends TestSetup {
                 .assertValueCount(1);
 
         var mockCommand = filterFactory.account();
-        Mockito.verify(accountProvider).top(Mockito.any(AccountProvider.FilterCommand.class), Mockito.eq(DateRange.forMonth(2019, 1)));
+        Mockito.verify(accountProvider).top(
+                Mockito.any(AccountProvider.FilterCommand.class),
+                Mockito.eq(DateRange.forMonth(2019, 1)),
+                Mockito.eq(true));
         Mockito.verify(mockCommand).types(API.List("debtor"));
     }
 
@@ -106,7 +110,8 @@ class AccountTopResourceTest extends TestSetup {
             }
         })).when(accountProvider).top(
                 Mockito.any(AccountProvider.FilterCommand.class),
-                Mockito.eq(DateRange.forMonth(2019, 1)));
+                Mockito.eq(DateRange.forMonth(2019, 1)),
+                Mockito.eq(false));
 
         subject.topCreditor(Dates.startOfMonth(2019, 1), Dates.endOfMonth(2019, 1))
                 .test()
@@ -114,7 +119,10 @@ class AccountTopResourceTest extends TestSetup {
                 .assertValueCount(1);
 
         var mockCommand = filterFactory.account();
-        Mockito.verify(accountProvider).top(Mockito.any(AccountProvider.FilterCommand.class), Mockito.eq(DateRange.forMonth(2019, 1)));
+        Mockito.verify(accountProvider).top(
+                Mockito.any(AccountProvider.FilterCommand.class),
+                Mockito.eq(DateRange.forMonth(2019, 1)),
+                Mockito.eq(false));
         Mockito.verify(mockCommand).types(API.List("creditor"));
     }
 

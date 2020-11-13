@@ -34,7 +34,7 @@ public interface AccountProvider extends DataProvider<Account>, Exportable<Accou
 
     ResultPage<Account> lookup(FilterCommand filter);
 
-    Sequence<AccountSpending> top(FilterCommand filter, DateRange range);
+    Sequence<AccountSpending> top(FilterCommand filter, DateRange range, boolean asc);
 
     @Override
     default boolean supports(Class<Account> supportingClass) {
