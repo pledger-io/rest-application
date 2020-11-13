@@ -8,6 +8,7 @@ import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
+import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -157,25 +158,30 @@ class AccountResourceTest extends TestSetup {
 
     @Test
     void create() {
+        var account = Mockito.spy(Account.builder()
+                .id(1L)
+                .balance(0D)
+                .name("Sample account")
+                .type("checking")
+                .currency("EUR")
+                .build());
+
         Mockito.when(accountProvider.lookup("Sample account"))
                 .thenReturn(Maybe.empty())
-                .thenReturn(Maybe.just(Account.builder()
-                        .id(1L)
-                        .balance(0D)
-                        .name("Sample account")
-                        .type("checking")
-                        .currency("EUR")
-                        .build()));
+                .thenReturn(Maybe.just(account));
 
         var request = AccountEditRequest.builder()
                 .name("Sample account")
                 .currency("EUR")
                 .type("checking")
+                .interest(0.22)
+                .interestPeriodicity(Periodicity.MONTHS)
                 .build();
 
         subject.create(request).blockingGet();
 
         Mockito.verify(accountProvider, Mockito.times(2)).lookup("Sample account");
+        Mockito.verify(account).interest(0.22, Periodicity.MONTHS);
     }
 
 }

@@ -124,14 +124,18 @@ public class AccountResource {
             description = "This operation will allow for adding new accounts to the system"
     )
     public Single<AccountResponse> create(@Valid @Body AccountEditRequest accountEditRequest) {
+        accountProvider.lookup(accountEditRequest.getName())
+                .test()
+                .assertNoValues();
+
+        currentUserProvider.currentUser()
+                .createAccount(
+                        accountEditRequest.getName(),
+                        accountEditRequest.getCurrency(),
+                        accountEditRequest.getType());
+
         return accountProvider.lookup(accountEditRequest.getName())
-                .switchIfEmpty(
-                        Single.just(currentUserProvider.currentUser()
-                                .createAccount(
-                                        accountEditRequest.getName(),
-                                        accountEditRequest.getCurrency(),
-                                        accountEditRequest.getType()))
-                .flatMapMaybe(a -> accountProvider.lookup(a.getName()))
+                .switchIfEmpty(Single.error(StatusException.badRequest("Failed to create new account")))
                 .map(account -> {
                     if (accountEditRequest.getInterestPeriodicity() != null) {
                         account.interest(accountEditRequest.getInterest(), accountEditRequest.getInterestPeriodicity());
@@ -143,8 +147,8 @@ public class AccountResource {
                             accountEditRequest.getNumber());
 
                     return account;
-                }))
-                .switchIfEmpty(Single.error(StatusException.badRequest("Failed to create new account")))
+                })
                 .map(AccountResponse::new);
     }
+
 }
