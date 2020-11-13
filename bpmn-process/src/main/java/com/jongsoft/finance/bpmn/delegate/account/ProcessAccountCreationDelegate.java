@@ -69,6 +69,10 @@ public class ProcessAccountCreationDelegate implements JavaDelegate {
                                         accountJson.getCurrency(),
                                         accountJson.getType());
 
+                                if (accountJson.getPeriodicity() != null) {
+                                    account.interest(accountJson.getInterest(), accountJson.getPeriodicity());
+                                }
+
                                 emitter.onSuccess(account);
                             });
                 })).blockingGet();
