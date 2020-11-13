@@ -39,7 +39,7 @@ public class ResultPageImpl<T> implements ResultPage<T> {
     @Override
     public boolean hasNext() {
         if (pages() > 1) {
-            return limit > elements.size();
+            return limit == elements.size();
         } else {
             return false;
         }
