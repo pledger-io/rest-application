@@ -211,7 +211,7 @@ subprojects {
         implementation("javax.annotation:javax.annotation-api")
         implementation("io.micronaut:micronaut-http-client")
 
-        runtimeOnly("ch.qos.logback:logback-classic")
+        implementation("ch.qos.logback:logback-classic")
         implementation('com.jongsoft.lang:language:1.0.0')
         compileOnly "org.projectlombok:lombok:$lombokVersion"
 

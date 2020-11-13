@@ -13,6 +13,7 @@ dependencies {
     implementation("io.micronaut.security:micronaut-security")
     implementation("io.micronaut.security:micronaut-security-jwt")
     implementation("io.micronaut.servlet:micronaut-http-server-jetty")
+    implementation("io.micronaut:micronaut-tracing")
 
     implementation("at.favre.lib:bcrypt:0.9.0")
     implementation("org.bouncycastle:bcprov-jdk15on:1.66")
