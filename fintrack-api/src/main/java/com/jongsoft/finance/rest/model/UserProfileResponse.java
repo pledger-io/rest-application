@@ -1,9 +1,9 @@
 package com.jongsoft.finance.rest.model;
 
-import java.util.Currency;
-
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.lang.API;
+
+import java.util.Currency;
 
 public class UserProfileResponse {
 
@@ -27,7 +27,7 @@ public class UserProfileResponse {
         return wrappedModel.getProfilePicture();
     }
 
-    public boolean hasMfa() {
+    public boolean isMfa() {
         return wrappedModel.isTwoFactorEnabled();
     }
 
