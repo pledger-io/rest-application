@@ -2,9 +2,12 @@ package com.jongsoft.finance.rest.security;
 
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.Role;
+import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.PasswordEncoder;
+import com.jongsoft.finance.security.TwoFactorHelper;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.*;
@@ -40,6 +43,7 @@ public class AuthenticationResource {
     private final RSASignatureConfiguration rsaSignatureConfiguration;
     private final ApplicationEventPublisher eventPublisher;
     private final UserProvider userProvider;
+    private final AuthenticationFacade authenticationFacade;
 
     private final PasswordEncoder passwordEncoder;
     private final ProcessEngine processEngine;
@@ -50,6 +54,7 @@ public class AuthenticationResource {
             final RSASignatureConfiguration rsaSignatureConfiguration,
             final ApplicationEventPublisher eventPublisher,
             final UserProvider userProvider,
+            final AuthenticationFacade authenticationFacade,
             final PasswordEncoder passwordEncoder,
             final ProcessEngine processEngine) {
         this.accessRefreshTokenGenerator = accessRefreshTokenGenerator;
@@ -57,6 +62,7 @@ public class AuthenticationResource {
         this.rsaSignatureConfiguration = rsaSignatureConfiguration;
         this.eventPublisher = eventPublisher;
         this.userProvider = userProvider;
+        this.authenticationFacade = authenticationFacade;
         this.passwordEncoder = passwordEncoder;
         this.processEngine = processEngine;
     }
@@ -118,6 +124,15 @@ public class AuthenticationResource {
                         "passwordHash", passwordEncoder.encrypt(authenticationRequest.getSecret())));
     }
 
+    @Post("/api/security/2-factor")
+    @Secured("PRE_VERIFICATION_USER")
+    public Single<MutableHttpResponse<AccessRefreshToken>> mfaValidate(@Valid @Body MultiFactorRequest request) {
+        return Single.just(userProvider.lookup(authenticationFacade.authenticated())
+                .filter(user -> TwoFactorHelper.verifySecurityCode(user.getSecret(), request.getVerificationCode()))
+                .map(this::createAccessToken)
+                .getOrSupply(HttpResponse::unauthorized));
+    }
+
     @ApiDefaults
     @Secured(SecurityRule.IS_AUTHENTICATED)
     @Post("/api/security/token-refresh")
@@ -128,22 +143,7 @@ public class AuthenticationResource {
     )
     public Single<MutableHttpResponse<AccessRefreshToken>> refresh(@Body @Valid TokenRefreshRequest request) {
         return userProvider.refreshToken(request.getToken())
-                .map(user -> {
-                    var userDetails = new UserDetails(
-                            user.getUsername(),
-                            API.List(user.getRoles()).map(Role::getName).toJava());
-                    var refresh = UUID.randomUUID().toString();
-
-                    return accessRefreshTokenGenerator.generate(refresh, userDetails)
-                            .stream()
-                            .peek(token -> FinTrack.registerToken(
-                                    user.getUsername(),
-                                    token.getRefreshToken(),
-                                    token.getExpiresIn()))
-                            .map(HttpResponse::ok)
-                            .findFirst()
-                            .orElseGet(HttpResponse::unauthorized);
-                })
+                .map(this::createAccessToken)
                 .switchIfEmpty(Single.just(HttpResponse.unauthorized()));
     }
 
@@ -154,4 +154,20 @@ public class AuthenticationResource {
         return Base64.encodeBase64String(rsaSignatureConfiguration.getPublicKey().getEncoded());
     }
 
+    private MutableHttpResponse<AccessRefreshToken> createAccessToken(UserAccount user) {
+        var userDetails = new UserDetails(
+                user.getUsername(),
+                API.List(user.getRoles()).map(Role::getName).toJava());
+        var refresh = UUID.randomUUID().toString();
+
+        return accessRefreshTokenGenerator.generate(refresh, userDetails)
+                .stream()
+                .peek(token -> FinTrack.registerToken(
+                        user.getUsername(),
+                        token.getRefreshToken(),
+                        token.getExpiresIn()))
+                .map(HttpResponse::ok)
+                .findFirst()
+                .orElseGet(HttpResponse::unauthorized);
+    }
 }
