@@ -12,6 +12,7 @@ import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.data.model.Sort;
 import io.reactivex.Maybe;
 import lombok.extern.slf4j.Slf4j;
 
@@ -144,7 +145,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Sequence<AccountSpending> top(FilterCommand filter, DateRange range) {
+    public Sequence<AccountSpending> top(FilterCommand filter, DateRange range, boolean asc) {
         log.trace("Account top listing by filter: {}", filter);
 
         if (filter instanceof AccountFilterCommand delegate) {
@@ -160,7 +161,7 @@ public class AccountProviderJpa implements AccountProvider {
                         and t.journal.user.username = :username
                         and t.account.id in (select distinct a.id %s)
                      group by t.account
-                     order by sum(t.amount) DESC""".formatted(delegate.generateHql());
+                     having sum(t.amount) %s 0""".formatted(delegate.generateHql(), asc ? "<=" : ">=");
 
             return entityManager.<TripleProjection<AccountJpa, Double, Double>>blocking()
                     .hql(hql)
@@ -168,6 +169,7 @@ public class AccountProviderJpa implements AccountProvider {
                     .set("start", range.getStart())
                     .set("until", range.getEnd())
                     .limit(delegate.pageSize())
+                    .sort(Sort.of(asc ? Sort.Order.asc("sum(t.amount)") : Sort.Order.desc("sum(t.amount)")))
                     .sequence()
                     .map(projection -> new AccountSpendingImpl(
                             convert(projection.getFirst()),

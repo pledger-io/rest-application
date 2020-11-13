@@ -50,7 +50,7 @@ public class AccountTopResource {
                     .types(API.List("debtor"))
                     .pageSize(settingProvider.getAutocompleteLimit());
 
-            accountProvider.top(filterCommand, DateRange.of(start, end))
+            accountProvider.top(filterCommand, DateRange.of(start, end), true)
                     .map(AccountSpendingResponse::new)
                     .forEach(emitter::onNext);
 
@@ -71,7 +71,7 @@ public class AccountTopResource {
                     .types(API.List("creditor"))
                     .pageSize(settingProvider.getAutocompleteLimit());
 
-            accountProvider.top(filterCommand, DateRange.of(start, end))
+            accountProvider.top(filterCommand, DateRange.of(start, end), false)
                     .map(AccountSpendingResponse::new)
                     .forEach(emitter::onNext);
 
