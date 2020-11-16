@@ -194,6 +194,7 @@ public class AccountProviderJpa implements AccountProvider {
                 .iban(source.getIban())
                 .bic(source.getBic())
                 .balance(java.util.Optional.ofNullable(source.getBalance()).orElse(0D))
+                .imageFileToken(source.getImageFileToken())
                 .firstTransaction(source.getFirstTransaction())
                 .lastTransaction(source.getLastTransaction())
                 .number(source.getNumber())
