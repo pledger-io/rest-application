@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.file;
 
 import com.jongsoft.finance.StorageService;
 import io.micronaut.http.multipart.CompletedFileUpload;
+import io.reactivex.Single;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,9 +40,10 @@ class FileResourceTest {
 
     @Test
     void download() {
-        Mockito.when(storageService.read("fasjkdh8nfasd8")).thenReturn("sample-token".getBytes());
+        Mockito.when(storageService.read("fasjkdh8nfasd8")).thenReturn(Single.just("sample-token".getBytes()));
 
-        var response = subject.download("fasjkdh8nfasd8");
+        var response = subject.download("fasjkdh8nfasd8")
+                .blockingGet();
 
         Assertions.assertThat(response).isEqualTo("sample-token".getBytes());
         Mockito.verify(storageService).read("fasjkdh8nfasd8");

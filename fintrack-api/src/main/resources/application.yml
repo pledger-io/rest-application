@@ -31,6 +31,7 @@ micronaut:
       location: "${micronaut.application.storage.location}/temp"
       max-file-size: 10MB
 
+
 jackson:
   serialization-inclusion: non_absent
 

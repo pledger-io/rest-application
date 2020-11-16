@@ -1,19 +1,17 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
-import java.io.IOException;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
-
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * This delegate is responsible for locating the mapping between account names and {@link Account#getId()} during the
@@ -79,7 +77,8 @@ public class LookupAccountMappingDelegate implements JavaDelegate {
     private Map retrieveMappings(DelegateExecution execution) throws IOException {
         var fileCode = execution.getVariable("accountMapping").toString();
 
-        var rawValue = storageService.read(fileCode);
+        var rawValue = storageService.read(fileCode)
+                .blockingGet();
         return ProcessMapper.INSTANCE.readValue(rawValue, Map.class);
     }
 

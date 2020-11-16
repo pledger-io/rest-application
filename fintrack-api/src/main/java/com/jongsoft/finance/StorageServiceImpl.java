@@ -2,9 +2,11 @@ package com.jongsoft.finance;
 
 import com.jongsoft.finance.configuration.SecuritySettings;
 import com.jongsoft.finance.configuration.StorageSettings;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.Encryption;
 import com.jongsoft.lang.API;
+import io.reactivex.Single;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -64,20 +66,24 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public byte[] read(String token) {
-        try {
-            var readResult = Files.readAllBytes(uploadRootDirectory.resolve(token));
+    public Single<byte[]> read(String token) {
+        return Single.create(emitter -> {
+            try {
+                var readResult = Files.readAllBytes(uploadRootDirectory.resolve(token));
 
-            if (securitySettings.isEncrypt()) {
-                readResult = encryption.decrypt(
-                        readResult,
-                        currentUserProvider.currentUser().getSecret());
+                if (securitySettings.isEncrypt()) {
+                    readResult = encryption.decrypt(
+                            readResult,
+                            currentUserProvider.currentUser().getSecret());
+                }
+
+                emitter.onSuccess(readResult);
+            } catch (IOException e) {
+                emitter.onError(StatusException.notFound("Cannot locate content for token " + token));
+            } catch (IllegalStateException e) {
+                emitter.onError(StatusException.notAuthorized("Cannot access file with token " + token));
             }
-
-            return readResult;
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot locate content for token " + token);
-        }
+        });
     }
 
     @Override

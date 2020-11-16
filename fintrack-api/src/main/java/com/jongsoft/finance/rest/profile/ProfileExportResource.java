@@ -64,7 +64,7 @@ public class ProfileExportResource {
                     .contracts(lookupAllOf(Contract.class)
                             .map(c -> ContractJson.fromDomain(
                                     c,
-                                    () -> storageService.read(c.getFileToken())))
+                                    () -> storageService.read(c.getFileToken()).blockingGet()))
                             .toJava())
                     .rules(lookupAllOf(TransactionRule.class)
                             .map(rule -> RuleConfigJson.RuleJson.fromDomain(

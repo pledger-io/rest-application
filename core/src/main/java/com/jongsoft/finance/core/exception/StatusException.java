@@ -21,6 +21,10 @@ public class StatusException extends RuntimeException {
         return new StatusException(400, message);
     }
 
+    public static StatusException notAuthorized(String message) {
+        return new StatusException(401, message);
+    }
+
     public static StatusException internalError(String message) {
         return new StatusException(500, message);
     }

@@ -6,6 +6,7 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.io.IOUtils;
@@ -40,7 +41,7 @@ public class FileResource {
             description = "Download an existing attachment, if file encryption is enabled this will" +
                     " throw an exception if the current user did not upload the file."
     )
-    byte[] download(@PathVariable String fileCode) {
+    Single<byte[]> download(@PathVariable String fileCode) {
         return storageService.read(fileCode);
     }
 
