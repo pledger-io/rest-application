@@ -4,12 +4,7 @@ import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.SystemAccountTypes;
-import com.jongsoft.finance.domain.account.events.AccountChangedEvent;
-import com.jongsoft.finance.domain.account.events.AccountCreatedEvent;
-import com.jongsoft.finance.domain.account.events.AccountInterestEvent;
-import com.jongsoft.finance.domain.account.events.AccountRenamedEvent;
-import com.jongsoft.finance.domain.account.events.AccountSynonymEvent;
-import com.jongsoft.finance.domain.account.events.AccountTerminatedEvent;
+import com.jongsoft.finance.domain.account.events.*;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.user.UserAccount;
@@ -17,11 +12,7 @@ import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedule;
 import com.jongsoft.lang.API;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -45,6 +36,8 @@ public class Account implements AggregateBase, Serializable {
     private String bic;
     private String number;
     private String type;
+
+    private String imageFileToken;
 
     private double balance;
     private LocalDate lastTransaction;
@@ -95,6 +88,16 @@ public class Account implements AggregateBase, Serializable {
                             description,
                             currency));
         }
+    }
+
+    @BusinessMethod
+    public void registerIcon(String fileCode) {
+        this.imageFileToken = fileCode;
+
+        EventBus.getBus().send(
+                new AccountIconAttachedEvent(
+                        id,
+                        fileCode));
     }
 
     @BusinessMethod

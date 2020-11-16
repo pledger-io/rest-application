@@ -1,28 +1,22 @@
 package com.jongsoft.finance.domain.account;
 
-import static org.assertj.core.api.Assertions.*;
-
-import java.time.LocalDate;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import com.jongsoft.finance.domain.account.events.AccountChangedEvent;
-import com.jongsoft.finance.domain.account.events.AccountInterestEvent;
-import com.jongsoft.finance.domain.account.events.AccountRenamedEvent;
-import com.jongsoft.finance.domain.account.events.AccountSynonymEvent;
-import com.jongsoft.finance.domain.account.events.AccountTerminatedEvent;
-import com.jongsoft.finance.domain.account.events.ContractCreatedEvent;
+import com.jongsoft.finance.domain.account.events.*;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.transaction.events.TransactionCreatedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.schedule.Periodicity;
-
 import io.micronaut.context.event.ApplicationEventPublisher;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AccountTest {
 
@@ -73,6 +67,17 @@ class AccountTest {
         assertThat(account).hasToString("New account name");
         assertThat(account.getDescription()).isEqualTo("Updated account");
         assertThat(account.getCurrency()).isEqualTo("USD");
+    }
+
+    @Test
+    void registerIcon() {
+        ArgumentCaptor<AccountIconAttachedEvent> changeCaptor = ArgumentCaptor.forClass(AccountIconAttachedEvent.class);
+
+        account.registerIcon("file-code");
+
+        Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
+        assertThat(changeCaptor.getValue().getFileCode()).isEqualTo("file-code");
+        assertThat(changeCaptor.getValue().getAccountId()).isEqualTo(account.getId());
     }
 
     @Test
