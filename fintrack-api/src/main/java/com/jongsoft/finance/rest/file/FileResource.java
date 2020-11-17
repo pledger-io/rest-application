@@ -8,7 +8,6 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 
@@ -30,7 +29,7 @@ public class FileResource {
             description = "Upload a file so that it can be attached to one of the entities in FinTrack"
     )
     UploadResponse upload(@Body CompletedFileUpload upload) throws IOException {
-        var token = storageService.store(IOUtils.toByteArray(upload.getInputStream()));
+        var token = storageService.store(upload.getBytes());
         return new UploadResponse(token);
     }
 

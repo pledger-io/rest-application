@@ -14,7 +14,6 @@ import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -75,9 +74,7 @@ public class StaticResource {
         var streamedFile = new StreamedFile(uri);
 
         return HttpResponse.ok(
-                IOUtils.readFully(
-                        streamedFile.getInputStream(),
-                        (int) streamedFile.getLength()))
+                streamedFile.getInputStream().readAllBytes())
                 .contentType(streamedFile.getMediaType())
                 .characterEncoding("utf-8");
     }
