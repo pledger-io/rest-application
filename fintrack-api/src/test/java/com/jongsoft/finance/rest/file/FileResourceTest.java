@@ -42,8 +42,7 @@ class FileResourceTest {
     void download() {
         Mockito.when(storageService.read("fasjkdh8nfasd8")).thenReturn(Single.just("sample-token".getBytes()));
 
-        var response = subject.download("fasjkdh8nfasd8")
-                .blockingGet();
+        var response = subject.download("fasjkdh8nfasd8");
 
         Assertions.assertThat(response).isEqualTo("sample-token".getBytes());
         Mockito.verify(storageService).read("fasjkdh8nfasd8");
