@@ -1,16 +1,15 @@
 package com.jongsoft.finance.serialized;
 
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.function.Supplier;
-
-import org.bouncycastle.util.encoders.Hex;
 import com.jongsoft.finance.domain.account.Contract;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bouncycastle.util.encoders.Hex;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.function.Supplier;
 
 @Data
 @Builder
@@ -26,7 +25,7 @@ public class ContractJson implements Serializable {
     private LocalDate start;
     private LocalDate end;
 
-    public static ContractJson fromDomain(Contract contract, Supplier<byte[]> attachementSupplier) {
+    public static ContractJson fromDomain(Contract contract, Supplier<byte[]> attachmentSupplier) {
         ContractJsonBuilder builder = ContractJson.builder()
                 .name(contract.getName())
                 .description(contract.getDescription())
@@ -36,7 +35,7 @@ public class ContractJson implements Serializable {
                 .terminated(contract.isTerminated());
 
         if (contract.isUploaded()) {
-            builder.contract(Hex.toHexString(attachementSupplier.get()));
+            builder.contract(Hex.toHexString(attachmentSupplier.get()));
         }
 
         return builder.build();

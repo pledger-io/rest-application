@@ -57,7 +57,11 @@ public class ProfileExportResource {
         return Single.create(emitter -> {
             var exportFileName = authenticationFacade.authenticated() + "-profile.json";
             var exportJson = ExportJson.builder()
-                    .accounts(lookupAllOf(Account.class).map(AccountJson::fromDomain).toJava())
+                    .accounts(lookupAllOf(Account.class)
+                            .map(account -> AccountJson.fromDomain(
+                                    account,
+                                    () -> storageService.read(account.getImageFileToken()).blockingGet()))
+                            .toJava())
                     .budgetPeriods(lookupAllOf(Budget.class).map(BudgetJson::fromDomain).toJava())
                     .categories(lookupAllOf(Category.class).map(CategoryJson::fromDomain).toJava())
                     .tags(lookupAllOf(Tag.class).map(Tag::name).toJava())
