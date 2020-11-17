@@ -39,8 +39,13 @@ public class AccountEditResource {
     @Get
     @Operation(
             summary = "Get Account",
-            description = "Look in the system for an account with matching account id",
-            parameters = @Parameter(name = "accountId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
+            description = "Attempts to get the account with matching account id. If no account is found or you are not" +
+                    "authorized an exception will be returned.",
+            parameters = @Parameter(
+                    name = "accountId",
+                    description = "The unique account id",
+                    in = ParameterIn.PATH,
+                    schema = @Schema(implementation = Long.class)),
             responses = {
                     @ApiResponse(responseCode = "200", description = "The resulting account",
                             content = @Content(schema = @Schema(implementation = AccountResponse.class))),
@@ -60,7 +65,13 @@ public class AccountEditResource {
     @Post
     @Operation(
             summary = "Update Account",
-            parameters = @Parameter(name = "accountId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
+            description = "Update an existing account with the new details provided in the body. The updated account will" +
+                    " be returned, or if no account is found an exception.",
+            parameters = @Parameter(
+                    name = "accountId",
+                    description = "The unique account id",
+                    in = ParameterIn.PATH,
+                    schema = @Schema(implementation = Long.class)),
             responses = {
                     @ApiResponse(responseCode = "200", description = "The updated account",
                             content = @Content(schema = @Schema(implementation = AccountResponse.class))),
@@ -97,10 +108,42 @@ public class AccountEditResource {
         });
     }
 
+    @Post(value = "/image")
+    @Operation(
+            summary = "Attach icon",
+            description = "Attach an icon to the account. If any icon was previously registered it will be removed " +
+                    "from the system.",
+            parameters = @Parameter(
+                    name = "accountId",
+                    description = "The unique account id",
+                    in = ParameterIn.PATH,
+                    schema = @Schema(implementation = Long.class))
+    )
+    Single<AccountResponse> persistImage(
+            @PathVariable long accountId,
+            @Body @Valid AccountImageRequest imageRequest) {
+        return Single.create(emitter -> {
+            var accountPromise = accountProvider.lookup(accountId);
+
+            if (accountPromise.isPresent()) {
+                accountPromise.get()
+                        .registerIcon(imageRequest.getFileCode());
+
+                emitter.onSuccess(new AccountResponse(accountPromise.get()));
+            } else {
+                emitter.onError(StatusException.notFound("Could not find account"));
+            }
+        });
+    }
+
     @Delete
     @Operation(
             summary = "Delete Account",
-            parameters = @Parameter(name = "accountId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
+            parameters = @Parameter(
+                    name = "accountId",
+                    description = "The unique account id",
+                    in = ParameterIn.PATH,
+                    schema = @Schema(implementation = Long.class)),
             responses = {
                     @ApiResponse(responseCode = "204", description = "Account successfully deleted"),
                     @ApiResponse(responseCode = "404", description = "No account can be located")

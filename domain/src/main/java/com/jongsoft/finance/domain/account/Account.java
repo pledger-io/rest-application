@@ -92,12 +92,13 @@ public class Account implements AggregateBase, Serializable {
 
     @BusinessMethod
     public void registerIcon(String fileCode) {
-        this.imageFileToken = fileCode;
-
         EventBus.getBus().send(
                 new AccountIconAttachedEvent(
                         id,
-                        fileCode));
+                        fileCode,
+                        this.imageFileToken));
+
+        this.imageFileToken = fileCode;
     }
 
     @BusinessMethod

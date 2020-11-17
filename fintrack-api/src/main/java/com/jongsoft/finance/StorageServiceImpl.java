@@ -1,8 +1,10 @@
 package com.jongsoft.finance;
 
+import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.configuration.SecuritySettings;
 import com.jongsoft.finance.configuration.StorageSettings;
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.core.events.StorageReplacedEvent;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.Encryption;
 import com.jongsoft.lang.API;
@@ -92,6 +94,13 @@ public class StorageServiceImpl implements StorageService {
             Files.deleteIfExists(uploadRootDirectory.resolve(token));
         } catch (IOException e) {
             throw new IllegalStateException("Cannot locate content for token " + token);
+        }
+    }
+
+    @BusinessEventListener
+    public void onStorageChangeEvent(StorageReplacedEvent event) {
+        if (event.getOldFileCode() != null) {
+            this.remove(event.getOldFileCode());
         }
     }
 

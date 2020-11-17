@@ -1,17 +1,16 @@
 package com.jongsoft.finance.domain.account.events;
 
-import com.jongsoft.finance.core.ApplicationEvent;
+import com.jongsoft.finance.domain.core.events.StorageReplacedEvent;
 import lombok.Getter;
 
 @Getter
-public class AccountIconAttachedEvent implements ApplicationEvent {
+public class AccountIconAttachedEvent extends StorageReplacedEvent {
 
     private final long accountId;
-    private final String fileCode;
 
-    public AccountIconAttachedEvent(long accountId, String fileCode) {
+    public AccountIconAttachedEvent(long accountId, String fileCode, String oldFileCode) {
+        super(fileCode, oldFileCode);
         this.accountId = accountId;
-        this.fileCode = fileCode;
     }
 
 }
