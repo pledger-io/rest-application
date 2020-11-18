@@ -112,7 +112,8 @@ class AccountEventListenerIT extends JpaTestSetup {
         setup();
         eventPublisher.publishEvent(new AccountIconAttachedEvent(
                 3L,
-                "file-code"));
+                "file-code",
+                null));
 
         var check = entityManager.find(AccountJpa.class, 3L);
         Assertions.assertThat(check.getImageFileToken()).isEqualTo("file-code");
