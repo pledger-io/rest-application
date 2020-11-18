@@ -2,6 +2,7 @@ package com.jongsoft.finance;
 
 import com.jongsoft.finance.configuration.SecuritySettings;
 import com.jongsoft.finance.configuration.StorageSettings;
+import com.jongsoft.finance.domain.core.events.StorageReplacedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import org.assertj.core.api.Assertions;
@@ -17,7 +18,7 @@ import java.security.GeneralSecurityException;
 
 class StorageServiceImplTest {
 
-    private StorageService subject;
+    private StorageServiceImpl subject;
 
     @Mock
     private SecuritySettings securitySettings;
@@ -43,7 +44,8 @@ class StorageServiceImplTest {
     @Test
     void unencryptedStore() {
         var storageKey = subject.store("My private text".getBytes());
-        var read = subject.read(storageKey);
+        var read = subject.read(storageKey)
+                .blockingGet();
 
         Assertions.assertThat(new String(read)).isEqualTo("My private text");
         Assertions.assertThat(new File(System.getProperty("java.io.tmpdir") + "/upload/" + storageKey)).exists();
@@ -54,10 +56,18 @@ class StorageServiceImplTest {
         Mockito.when(securitySettings.isEncrypt()).thenReturn(true);
 
         var storageKey = subject.store("My private text".getBytes());
-        var read = subject.read(storageKey);
+        var read = subject.read(storageKey).blockingGet();
 
         Assertions.assertThat(new String(read)).isEqualTo("My private text");
         Assertions.assertThat(new File(System.getProperty("java.io.tmpdir") + "/upload/" + storageKey)).exists();
         subject.remove(storageKey);
+    }
+
+    @Test
+    void storageChange() {
+        var storageKey = subject.store("My private text".getBytes());
+
+        subject.onStorageChangeEvent(new StorageReplacedEvent("new-code", storageKey));
+        Assertions.assertThat(new File(System.getProperty("java.io.tmpdir") + "/upload/" + storageKey)).doesNotExist();
     }
 }

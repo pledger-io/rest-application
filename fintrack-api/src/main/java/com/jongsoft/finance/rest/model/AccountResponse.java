@@ -29,6 +29,10 @@ public class AccountResponse {
         return wrapped.getType();
     }
 
+    public String getIconFileCode() {
+        return wrapped.getImageFileToken();
+    }
+
     public NumberInformation getAccount() {
         return new NumberInformation();
     }

@@ -1,13 +1,13 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import com.jongsoft.finance.StorageService;
+import com.jongsoft.lang.collection.tuple.Triplet;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
-import com.jongsoft.finance.StorageService;
-import com.jongsoft.lang.collection.tuple.Triplet;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 public class PrepareTransactionForExtractionDelegate implements JavaDelegate {
@@ -30,7 +30,7 @@ public class PrepareTransactionForExtractionDelegate implements JavaDelegate {
         } else {
             String transactionToken = execution.<StringValue>getVariableLocalTyped("transactionToken").getValue();
 
-            ParsedTransaction transaction = ParsedTransaction.parse(storageService.read(transactionToken));
+            ParsedTransaction transaction = ParsedTransaction.parse(storageService.read(transactionToken).blockingGet());
 
             execution.setVariableLocal("iban", transaction.getOpposingIBAN());
             execution.setVariableLocal("name", transaction.getOpposingName());

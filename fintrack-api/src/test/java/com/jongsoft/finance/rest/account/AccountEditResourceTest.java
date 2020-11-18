@@ -89,6 +89,25 @@ class AccountEditResourceTest extends TestSetup {
     }
 
     @Test
+    void updateIcon() {
+        Account account = Mockito.spy(Account.builder()
+                .id(1L)
+                .user(ACTIVE_USER)
+                .balance(0D)
+                .name("Sample account")
+                .currency("EUR")
+                .build());
+
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
+
+        var response = subject.persistImage(1L, new AccountImageRequest("file-code"))
+                .blockingGet();
+
+        Assertions.assertThat(response.getIconFileCode()).isEqualTo("file-code");
+        Mockito.verify(account).registerIcon("file-code");
+    }
+
+    @Test
     void delete() {
         Account account = Mockito.spy(Account.builder()
                 .id(1L)

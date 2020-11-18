@@ -199,6 +199,7 @@ public class TransactionProviderJpa implements TransactionProvider {
                                 .id(transaction.getAccount().getId())
                                 .name(transaction.getAccount().getName())
                                 .type(transaction.getAccount().getType().getLabel())
+                                .imageFileToken(transaction.getAccount().getImageFileToken())
                                 .build())
                 .amount(transaction.getAmount())
                 .description(transaction.getDescription())

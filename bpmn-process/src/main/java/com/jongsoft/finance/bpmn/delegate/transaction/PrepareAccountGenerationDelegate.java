@@ -1,13 +1,13 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.StringValue;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.variable.value.StringValue;
+
+import javax.inject.Singleton;
 
 @Singleton
 public class PrepareAccountGenerationDelegate implements JavaDelegate {
@@ -22,7 +22,7 @@ public class PrepareAccountGenerationDelegate implements JavaDelegate {
     public void execute(DelegateExecution execution) throws Exception {
         String transactionToken = execution.<StringValue>getVariableLocalTyped("transactionToken").getValue();
 
-        ParsedTransaction transaction = ParsedTransaction.parse(storageService.read(transactionToken));
+        ParsedTransaction transaction = ParsedTransaction.parse(storageService.read(transactionToken).blockingGet());
 
         execution.setVariableLocal(
                 "accountJson",

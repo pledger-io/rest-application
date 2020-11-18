@@ -1,14 +1,13 @@
 package com.jongsoft.finance.bpmn.delegate.rule;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.serialized.RuleConfigJson;
-
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
@@ -28,7 +27,7 @@ public class ParseTransactionRuleDelegate implements JavaDelegate {
                 execution.getActivityInstanceId());
 
         String storageToken = (String) execution.getVariableLocal("storageToken");
-        final byte[] rawRuleConfig = storageService.read(storageToken);
+        final byte[] rawRuleConfig = storageService.read(storageToken).blockingGet();
 
         var configJson = RuleConfigJson.read(new String(rawRuleConfig));
 

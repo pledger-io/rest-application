@@ -7,6 +7,7 @@ import com.jongsoft.finance.domain.transaction.*;
 import com.jongsoft.finance.domain.transaction.events.TransactionCreatedEvent;
 import com.jongsoft.lang.API;
 import io.micronaut.core.reflect.ReflectionUtils;
+import io.reactivex.Single;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.assertj.core.api.Assertions;
@@ -73,7 +74,7 @@ public class ScheduledTransactionIT extends ProcessTestSetup {
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);
             String token = UUID.randomUUID().toString();
-            Mockito.when(storageService.read(token)).thenReturn(original);
+            Mockito.when(storageService.read(token)).thenReturn(Single.just(original));
             return token;
         });
     }

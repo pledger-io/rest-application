@@ -8,6 +8,7 @@ import com.jongsoft.finance.domain.user.*;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.API;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,13 +80,14 @@ public class ProfileImportIT extends ProcessTestSetup {
 
         StringBuilder ruleJsonString = new StringBuilder();
 
-        Mockito.when(storageService.read("my-sample-token")).thenReturn(configContent.getBytes());
+        Mockito.when(storageService.read("my-sample-token")).thenReturn(
+                Single.just(configContent.getBytes()));
         Mockito.when(storageService.store(Mockito.any())).then((Answer<String>) invocation -> {
             byte[] param = invocation.getArgument(0);
             ruleJsonString.append(new String(param));
             return "my-json-token";
         });
-        Mockito.when(storageService.read("my-json-token")).then((Answer<byte[]>) inv -> ruleJsonString.toString().getBytes());
+        Mockito.when(storageService.read("my-json-token")).thenAnswer(invocation -> Single.just(ruleJsonString.toString().getBytes()));
 
         Mockito.when(categoryProvider.lookup("Salary")).thenReturn(
                 Maybe.empty(),

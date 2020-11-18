@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.account;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jongsoft.finance.ProcessMapper;
+import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.account.events.AccountCreatedEvent;
@@ -18,27 +19,31 @@ import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
 import org.camunda.bpm.engine.variable.value.StringValue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ProcessAccountCreationDelegateTest {
 
+    @Mock
     private AccountProvider accountProvider;
+    @Mock
     private CurrentUserProvider userService;
-    private ProcessAccountCreationDelegate subject;
-
+    @Mock
+    private StorageService storageService;
+    @Mock
     private DelegateExecution execution;
-
+    @Mock
     private ApplicationEventPublisher eventPublisher;
+
+    private ProcessAccountCreationDelegate subject;
 
     @BeforeEach
     void setup() throws JsonProcessingException {
-        accountProvider = Mockito.mock(AccountProvider.class);
-        execution = Mockito.mock(DelegateExecution.class);
-        eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        userService = Mockito.mock(CurrentUserProvider.class);
-        subject = new ProcessAccountCreationDelegate(userService, accountProvider);
+        MockitoAnnotations.openMocks(this);
+        subject = new ProcessAccountCreationDelegate(userService, accountProvider, storageService);
 
         final AccountJson accountJson = new AccountJson();
         accountJson.setName("Test account");

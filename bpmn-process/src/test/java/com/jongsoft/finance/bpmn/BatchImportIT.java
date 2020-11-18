@@ -21,6 +21,7 @@ import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.core.reflect.ReflectionUtils;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -148,7 +149,7 @@ class BatchImportIT extends ProcessTestSetup {
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);
             String token = UUID.randomUUID().toString();
-            Mockito.when(storageService.read(token)).thenReturn(original);
+            Mockito.when(storageService.read(token)).thenReturn(Single.just(original));
             tokenCleanup.add(token);
             return token;
         });
@@ -187,7 +188,7 @@ class BatchImportIT extends ProcessTestSetup {
 
         importConfigJson.setAccountId(1L);
 
-        Mockito.when(storageService.read("sample-file-run")).thenReturn(readFile("import-test/import-test.csv"));
+        Mockito.when(storageService.read("sample-file-run")).thenReturn(Single.just(readFile("import-test/import-test.csv")));
         Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Maybe.just(batchImport));
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(Account.builder()
@@ -225,7 +226,7 @@ class BatchImportIT extends ProcessTestSetup {
                 .thenReturn(ResultPage.empty())
                 .thenReturn(ResultPage.of(accountKabel));
 
-        Mockito.when(storageService.read("account-mapping-token")).thenReturn("{\"Janssen PA\": 123}".getBytes());
+        Mockito.when(storageService.read("account-mapping-token")).thenReturn(Single.just("{\"Janssen PA\": 123}".getBytes()));
 
         MutableLong id = new MutableLong(1);
         Mockito.when(transactionCreationHandler.handleCreatedEvent(Mockito.any())).thenAnswer((Answer<Long>) invocation -> {

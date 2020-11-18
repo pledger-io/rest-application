@@ -151,6 +151,22 @@ public class AccountEventListener extends RepositoryJpa implements AccountListen
         }
     }
 
+    @BusinessEventListener
+    public void handleIconRegisterEvent(AccountIconAttachedEvent event) {
+        logger.trace("[{}] - Processing icon registration event", event.getAccountId());
+
+        var hql = """
+                update AccountJpa
+                set imageFileToken = :fileCode
+                where id = :id""";
+
+        entityManager.update()
+                .hql(hql)
+                .set("fileCode", event.getFileCode())
+                .set("id", event.getAccountId())
+                .update();
+    }
+
     private AccountJpa locate(long id) {
         return entityManager.<AccountJpa>blocking()
                 .hql("select a from AccountJpa a where a.id = :id")

@@ -1,19 +1,17 @@
 package com.jongsoft.finance.jpa.account.entity;
 
-import java.time.LocalDate;
-
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Formula;
 import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.schedule.Periodicity;
-
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.Formula;
+
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import java.time.LocalDate;
 
 @Getter
 @Entity
@@ -26,6 +24,8 @@ public class AccountJpa extends EntityJpa {
     private String iban;
     private String bic;
     private String number;
+
+    private String imageFileToken;
 
     private double interest;
     private Periodicity interestPeriodicity;
@@ -61,6 +61,7 @@ public class AccountJpa extends EntityJpa {
             String iban,
             String bic,
             String number,
+            String imageFileToken,
             double interest,
             Periodicity interestPeriodicity,
             AccountTypeJpa type,
@@ -74,6 +75,7 @@ public class AccountJpa extends EntityJpa {
         this.iban = iban;
         this.bic = bic;
         this.number = number;
+        this.imageFileToken = imageFileToken;
         this.interest = interest;
         this.interestPeriodicity = interestPeriodicity;
         this.type = type;

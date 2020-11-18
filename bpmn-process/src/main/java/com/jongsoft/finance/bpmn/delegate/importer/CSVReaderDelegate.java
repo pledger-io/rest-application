@@ -5,19 +5,16 @@ import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.ImportProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.serialized.ImportConfigJson;
-import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
-import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumMap;
@@ -45,76 +42,31 @@ abstract class CSVReaderDelegate implements JavaDelegate {
             throw new IllegalStateException("Cannot run account extraction without actual configuration.");
         }
 
-        EnumMap<ImportConfigJson.MappingRole, Integer> mappingIndices = computeIndices(importConfigJson.getColumnRoles());
-
-        CSVParser parserConfig = new CSVParserBuilder()
+        var mappingIndices = computeIndices(importConfigJson.getColumnRoles());
+        var parserConfig = new CSVParserBuilder()
                 .withSeparator(importConfigJson.getDelimiter())
                 .build();
 
-        Reader inputStreamReader = new InputStreamReader(new ByteArrayInputStream(storageService.read(batchImport.getFileCode())));
-        CSVReader csvReader = new CSVReaderBuilder(inputStreamReader)
-                .withSkipLines(importConfigJson.isHeaders() ? 1 : 0)
-                .withCSVParser(parserConfig)
-                .build();
-
         beforeProcess(execution, importConfigJson);
-        try {
-            String[] line;
-            while ((line = csvReader.readNext()) != null) {
-                if (line.length == 1) {
-                    log.trace("Skipping blank line for batch {}", batchImport.getSlug());
-                    continue;
-                } else if (line.length <= mappingIndices.size()) {
-                    throw new IllegalStateException("Cannot run import CSV contains less columns then configured.");
-                }
 
-                var amount = parseAmount(mappingIndices, line);
-                var date = parseDate(
-                        mappingIndices,
-                        line,
-                        importConfigJson.getDateFormat(),
-                        ImportConfigJson.MappingRole.DATE);
-                var bookDate = parseDate(
-                        mappingIndices,
-                        line,
-                        importConfigJson.getDateFormat(),
-                        ImportConfigJson.MappingRole.BOOK_DATE);
-                var interestDate = parseDate(
-                        mappingIndices,
-                        line,
-                        importConfigJson.getDateFormat(),
-                        ImportConfigJson.MappingRole.INTEREST_DATE);
-                var opposingName = locateColumn(line, mappingIndices, ImportConfigJson.MappingRole.OPPOSING_NAME);
-                var opposingIBAN = locateColumn(line, mappingIndices, ImportConfigJson.MappingRole.OPPOSING_IBAN);
-                var description = locateColumn(line, mappingIndices, ImportConfigJson.MappingRole.DESCRIPTION);
-
-                Transaction.Type type = amount >= 0 ? Transaction.Type.DEBIT : Transaction.Type.CREDIT;
-                if (mappingIndices.containsKey(ImportConfigJson.MappingRole.CUSTOM_INDICATOR)) {
-                    type = parseType(line, mappingIndices, importConfigJson.getCustomIndicator());
-                }
-
-                lineRead(
-                        execution,
-                        new ParsedTransaction(
-                                amount,
-                                type,
-                                description,
-                                date,
-                                interestDate,
-                                bookDate,
-                                opposingIBAN,
-                                opposingName));
-            }
-        } catch (IOException e) {
-            log.warn("Failed to parse the CSV file for batch " + batchImport.getSlug(), e);
-            throw new IllegalStateException("Failed to parse provided import.");
-        }
+        storageService.read(batchImport.getFileCode())
+                .map(bytes -> new InputStreamReader(new ByteArrayInputStream(bytes)))
+                .flatMapPublisher(stream -> Flowable.fromIterable(
+                        new CSVReaderBuilder(stream)
+                                .withSkipLines(importConfigJson.isHeaders() ? 1 : 0)
+                                .withCSVParser(parserConfig)
+                                .build()))
+                .filter(line -> line.length > 1 || line.length <= mappingIndices.size())
+                .map(csvLine -> this.transform(csvLine, mappingIndices, importConfigJson))
+                .forEach(transaction -> this.lineRead(execution, transaction));
 
         afterProcess(execution);
     }
 
     protected abstract void beforeProcess(DelegateExecution execution, ImportConfigJson configJson);
+
     protected abstract void lineRead(DelegateExecution execution, ParsedTransaction parsedTransaction);
+
     protected abstract void afterProcess(DelegateExecution execution);
 
     private ImportConfigJson getFromContext(DelegateExecution execution) {
@@ -126,6 +78,46 @@ abstract class CSVReaderDelegate implements JavaDelegate {
         }
 
         throw new IllegalArgumentException("Unsupported import configuration provided.");
+    }
+
+    private ParsedTransaction transform(
+            String[] csvLine,
+            EnumMap<ImportConfigJson.MappingRole, Integer> mappings,
+            ImportConfigJson configJson) {
+        var amount = parseAmount(mappings, csvLine);
+        var date = parseDate(
+                mappings,
+                csvLine,
+                configJson.getDateFormat(),
+                ImportConfigJson.MappingRole.DATE);
+        var bookDate = parseDate(
+                mappings,
+                csvLine,
+                configJson.getDateFormat(),
+                ImportConfigJson.MappingRole.BOOK_DATE);
+        var interestDate = parseDate(
+                mappings,
+                csvLine,
+                configJson.getDateFormat(),
+                ImportConfigJson.MappingRole.INTEREST_DATE);
+        var opposingName = locateColumn(csvLine, mappings, ImportConfigJson.MappingRole.OPPOSING_NAME);
+        var opposingIBAN = locateColumn(csvLine, mappings, ImportConfigJson.MappingRole.OPPOSING_IBAN);
+        var description = locateColumn(csvLine, mappings, ImportConfigJson.MappingRole.DESCRIPTION);
+
+        Transaction.Type type = amount >= 0 ? Transaction.Type.DEBIT : Transaction.Type.CREDIT;
+        if (mappings.containsKey(ImportConfigJson.MappingRole.CUSTOM_INDICATOR)) {
+            type = parseType(csvLine, mappings, configJson.getCustomIndicator());
+        }
+
+        return new ParsedTransaction(
+                amount,
+                type,
+                description,
+                date,
+                interestDate,
+                bookDate,
+                opposingIBAN,
+                opposingName);
     }
 
     private EnumMap<ImportConfigJson.MappingRole, Integer> computeIndices(

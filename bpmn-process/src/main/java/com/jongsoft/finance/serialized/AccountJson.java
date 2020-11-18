@@ -6,8 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.Serializable;
+import java.util.function.Supplier;
 
 @Data
 @Builder
@@ -19,6 +21,8 @@ public class AccountJson implements Serializable {
     private String description;
     private String currency;
 
+    private String icon;
+
     private double interest;
     private Periodicity periodicity;
 
@@ -27,8 +31,8 @@ public class AccountJson implements Serializable {
     private String number;
     private String type;
 
-    public static AccountJson fromDomain(Account account) {
-        return AccountJson.builder()
+    public static AccountJson fromDomain(Account account, Supplier<byte[]> iconSupplier) {
+        var builder = AccountJson.builder()
                 .bic(account.getBic())
                 .currency(account.getCurrency())
                 .description(account.getDescription())
@@ -37,7 +41,12 @@ public class AccountJson implements Serializable {
                 .type(account.getType())
                 .name(account.getName())
                 .periodicity(account.getInterestPeriodicity())
-                .interest(account.getInterest())
-                .build();
+                .interest(account.getInterest());
+
+        if (account.getImageFileToken() != null) {
+            builder.icon(Hex.toHexString(iconSupplier.get()));
+        }
+
+        return builder.build();
     }
 }

@@ -1,21 +1,19 @@
 package com.jongsoft.finance.bpmn.delegate.user;
 
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.serialized.ExportJson;
 import com.jongsoft.finance.serialized.RuleConfigJson;
-
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -36,7 +34,7 @@ public class ParseUserConfigurationDelegate implements JavaDelegate {
 
         String storageToken = (String) execution.getVariable("storageToken");
 
-        byte[] rawJsonContent = storageService.read(storageToken);
+        byte[] rawJsonContent = storageService.read(storageToken).blockingGet();
         ExportJson profileJson = ExportJson.read(new String(rawJsonContent, StandardCharsets.UTF_8));
 
         String ruleStorageToken = storageService.store(RuleConfigJson.builder()
