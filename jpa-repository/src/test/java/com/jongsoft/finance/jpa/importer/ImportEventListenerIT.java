@@ -2,6 +2,7 @@ package com.jongsoft.finance.jpa.importer;
 
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.importer.events.BatchImportCreatedEvent;
+import com.jongsoft.finance.domain.importer.events.BatchImportDeletedEvent;
 import com.jongsoft.finance.domain.importer.events.BatchImportFinishedEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
@@ -59,5 +60,14 @@ class ImportEventListenerIT extends JpaTestSetup {
 
         var check = entityManager.find(ImportJpa.class, 1L);
         Assertions.assertThat(check.getFinished()).isNotNull();
+    }
+
+    @Test
+    void handleDeletedEvent() {
+        setup();
+        eventPublisher.publishEvent(new BatchImportDeletedEvent(1L));
+
+        var check = entityManager.find(ImportJpa.class, 1L);
+        Assertions.assertThat(check.isArchived()).isTrue();
     }
 }

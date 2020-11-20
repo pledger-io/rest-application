@@ -36,6 +36,7 @@ public class ImportProviderJpa implements ImportProvider {
         var hql = """
                 select b from ImportJpa b
                 where b.slug = :slug
+                    and b.archived = false
                     and b.user.username = :username""";
 
         return entityManager.<ImportJpa>reactive()
@@ -51,7 +52,7 @@ public class ImportProviderJpa implements ImportProvider {
         log.trace("Importer lookup by filter: {}", filter);
 
         return entityManager.<ImportJpa>blocking()
-                .hql("from ImportJpa a where a.user.username = :username")
+                .hql("from ImportJpa a where a.user.username = :username and a.archived = false")
                 .set("username", authenticationFacade.authenticated())
                 .limit(filter.pageSize())
                 .offset(filter.page() * filter.pageSize())

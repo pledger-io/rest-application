@@ -1,18 +1,19 @@
 package com.jongsoft.finance.domain.importer;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.Date;
-
+import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.importer.events.BatchImportDeletedEvent;
+import com.jongsoft.finance.domain.importer.events.BatchImportFinishedEvent;
+import com.jongsoft.finance.messaging.EventBus;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.importer.events.BatchImportFinishedEvent;
-import com.jongsoft.finance.messaging.EventBus;
 
-import io.micronaut.context.event.ApplicationEventPublisher;
+import java.util.Date;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BatchImportTest {
 
@@ -22,6 +23,31 @@ class BatchImportTest {
     void setup() {
         applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         new EventBus(applicationEventPublisher);
+    }
+
+    @Test
+    void delete() {
+        var captor = ArgumentCaptor.forClass(BatchImportDeletedEvent.class);
+
+        BatchImport.builder()
+                .id(1L)
+                .build()
+                .archive();
+
+        Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
+        assertThat(captor.getValue().getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void delete_alreadyFinished() {
+        assertThrows(
+                StatusException.class,
+                () -> BatchImport.builder()
+                        .id(1L)
+                        .finished(new Date(2019, 1, 2))
+                        .build()
+                        .archive(),
+                "Cannot archive an import job that has finished running.");
     }
 
     @Test
@@ -40,7 +66,7 @@ class BatchImportTest {
     @Test
     void finish_AlreadyFinished() {
         assertThrows(
-                IllegalStateException.class,
+                StatusException.class,
                 () -> BatchImport.builder()
                         .id(1L)
                         .finished(new Date(2019, 1, 2))

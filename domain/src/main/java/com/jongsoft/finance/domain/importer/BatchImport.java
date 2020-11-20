@@ -1,20 +1,21 @@
 package com.jongsoft.finance.domain.importer;
 
-import java.util.Date;
-import java.util.UUID;
-
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.importer.events.BatchImportCreatedEvent;
+import com.jongsoft.finance.domain.importer.events.BatchImportDeletedEvent;
 import com.jongsoft.finance.domain.importer.events.BatchImportFinishedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
+import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Builder
@@ -46,10 +47,18 @@ public class BatchImport implements AggregateBase {
         EventBus.getBus().send(new BatchImportCreatedEvent(this, config, user, slug, fileCode));
     }
 
+    public void archive() {
+        if (this.finished != null) {
+            throw StatusException.badRequest("Cannot archive an import job that has finished running.");
+        }
+
+        EventBus.getBus().send(new BatchImportDeletedEvent(this.id));
+    }
+
     @BusinessMethod
     public void finish(Date date) {
         if (this.finished != null) {
-            throw new IllegalStateException("Cannot finish an import which has already completed.");
+            throw StatusException.badRequest("Cannot finish an import which has already completed.");
         }
 
         this.finished = date;

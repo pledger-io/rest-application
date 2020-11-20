@@ -22,16 +22,22 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 class BatchImportResourceTest extends TestSetup {
 
     private BatchImportResource subject;
 
-    @Mock private ImportProvider importProvider;
-    @Mock private CurrentUserProvider currentUserProvider;
-    @Mock private CSVConfigProvider csvConfigProvider;
-    @Mock private SettingProvider settingProvider;
-    @Mock private ApplicationEventPublisher applicationEventPublisher;
+    @Mock
+    private ImportProvider importProvider;
+    @Mock
+    private CurrentUserProvider currentUserProvider;
+    @Mock
+    private CSVConfigProvider csvConfigProvider;
+    @Mock
+    private SettingProvider settingProvider;
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @BeforeEach
     void setup() {
@@ -45,7 +51,7 @@ class BatchImportResourceTest extends TestSetup {
 
     @Test
     void list() {
-        var resultPage= ResultPage.of(BatchImport.builder()
+        var resultPage = ResultPage.of(BatchImport.builder()
                 .id(1L)
                 .created(Dates.toDate(LocalDate.of(2019, 1, 1)))
                 .slug("batch-import-slug")
@@ -105,6 +111,50 @@ class BatchImportResourceTest extends TestSetup {
         Assertions.assertThat(response.getConfig().getName()).isEqualTo("sample-config.json");
         Assertions.assertThat(response.getBalance().getTotalExpense()).isEqualTo(200.2D);
         Assertions.assertThat(response.getBalance().getTotalIncome()).isEqualTo(303.4D);
+    }
+
+    @Test
+    void delete_success() {
+        Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
+                Maybe.just(BatchImport.builder()
+                        .id(1L)
+                        .created(Dates.toDate(LocalDate.of(2019, 2, 1)))
+                        .fileCode("token-sample")
+                        .slug("xd2rsd-2fasd-q2ff-asd")
+                        .config(BatchImportConfig.builder()
+                                .id(1L)
+                                .fileCode("xd2rsd-2fasd-33dfd-ddfa")
+                                .name("sample-config.json")
+                                .build())
+                        .totalExpense(200.2D)
+                        .totalIncome(303.40D)
+                        .build()));
+
+        subject.delete("xd2rsd-2fasd-q2ff-asd")
+                .blockingGet();
+    }
+
+    @Test
+    void delete_alreadyFinished() {
+        Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
+                Maybe.just(BatchImport.builder()
+                        .created(Dates.toDate(LocalDate.of(2019, 2, 1)))
+                        .fileCode("token-sample")
+                        .slug("xd2rsd-2fasd-q2ff-asd")
+                        .config(BatchImportConfig.builder()
+                                .id(1L)
+                                .fileCode("xd2rsd-2fasd-33dfd-ddfa")
+                                .name("sample-config.json")
+                                .build())
+                        .finished(new Date())
+                        .totalExpense(200.2D)
+                        .totalIncome(303.40D)
+                        .build()));
+
+        subject.delete("xd2rsd-2fasd-q2ff-asd")
+                .test()
+                .assertNoValues()
+                .assertErrorMessage("Cannot archive an import job that has finished running.");
     }
 
     @Test

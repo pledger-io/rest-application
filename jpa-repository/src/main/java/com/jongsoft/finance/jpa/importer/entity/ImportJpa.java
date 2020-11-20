@@ -1,22 +1,14 @@
 package com.jongsoft.finance.jpa.importer.entity;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.finance.jpa.transaction.entity.TransactionJournal;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
-
 import lombok.Builder;
 import lombok.Getter;
+
+import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -26,6 +18,7 @@ public class ImportJpa extends EntityJpa {
     private Date created;
     private Date finished;
     private String slug;
+    private boolean archived;
 
     @Column
     private String fileCode;
@@ -49,6 +42,7 @@ public class ImportJpa extends EntityJpa {
             String fileCode,
             CSVImportConfig config,
             UserAccountJpa user,
+            boolean archived,
             List<TransactionJournal> transactions) {
         this.created = created;
         this.finished = finished;
@@ -56,6 +50,7 @@ public class ImportJpa extends EntityJpa {
         this.fileCode = fileCode;
         this.config = config;
         this.user = user;
+        this.archived = archived;
         this.transactions = transactions;
     }
 

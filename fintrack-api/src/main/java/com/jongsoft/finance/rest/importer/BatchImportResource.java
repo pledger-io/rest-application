@@ -8,6 +8,7 @@ import com.jongsoft.finance.rest.model.CSVImporterConfigResponse;
 import com.jongsoft.finance.rest.model.ImporterResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -87,6 +88,22 @@ public class BatchImportResource {
         return importProvider.lookup(batchSlug)
                 .map(ImporterResponse::new)
                 .switchIfEmpty(Single.error(StatusException.notFound("CSV configuration not found")));
+    }
+
+    @Delete("/{batchSlug}")
+    @Operation(
+            summary = "Delete importer job",
+            description = "Removes an unfinished job from the system. Note that already completed jobs cannot be removed.",
+            parameters = @Parameter(name = "batchSlug", in = ParameterIn.PATH, description = "The unique identifier")
+    )
+    @Status(value = HttpStatus.NO_CONTENT)
+    Single<String> delete(@PathVariable String batchSlug) {
+        return importProvider.lookup(batchSlug)
+                .switchIfEmpty(Single.error(StatusException.notFound("Cannot delete import with slug " + batchSlug)))
+                .map(job -> {
+                    job.archive();
+                    return "";
+                });
     }
 
     @Get("/config")

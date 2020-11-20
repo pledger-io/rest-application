@@ -1,28 +1,29 @@
 package com.jongsoft.finance.jpa.importer;
 
-import java.util.Date;
-
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.jongsoft.finance.annotation.BusinessEventListener;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.importer.events.BatchImportCreatedEvent;
+import com.jongsoft.finance.domain.importer.events.BatchImportDeletedEvent;
 import com.jongsoft.finance.domain.importer.events.BatchImportFinishedEvent;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
 import com.jongsoft.finance.jpa.importer.entity.CSVImportConfig;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Singleton;
+import javax.transaction.Transactional;
+import java.util.Date;
 
 @Singleton
 @Transactional
 public class ImportEventListener extends RepositoryJpa {
 
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
     private final Logger logger;
 
-    public ImportEventListener(EntityManager entityManager) {
+    public ImportEventListener(ReactiveEntityManager entityManager) {
         this.entityManager = entityManager;
         this.logger = LoggerFactory.getLogger(getClass());
     }
@@ -31,7 +32,14 @@ public class ImportEventListener extends RepositoryJpa {
     public void handleCreatedEvent(BatchImportCreatedEvent event) {
         logger.trace("[{}] - Processing import create event", event.getSlug());
 
-        var configJpa = entityManager.find(CSVImportConfig.class, event.getConfig().getId());
+        var configJpa = entityManager.<CSVImportConfig>blocking()
+                .hql("from CSVImportConfig where id = :id")
+                .set("id", event.getConfig().getId())
+                .maybe()
+                .getOrThrow(() ->
+                        StatusException.notFound(
+                                "Could not find the configuration for id " + event.getConfig().getId()));
+
         var importJpa = ImportJpa.builder()
                 .slug(event.getSlug())
                 .config(configJpa)
@@ -51,10 +59,26 @@ public class ImportEventListener extends RepositoryJpa {
                 set finished = :finished 
                 where id = :id""";
 
-        var query = entityManager.createQuery(hql);
-        query.setParameter("id", event.getImportId());
-        query.setParameter("finished", new Date());
-        query.executeUpdate();
+        entityManager.update()
+                .hql(hql)
+                .set("id", event.getImportId())
+                .set("finished", new Date())
+                .update();
+    }
+
+    @BusinessEventListener
+    public void handleDeletedEvent(BatchImportDeletedEvent event) {
+        logger.trace("[{}] - Processing import deleted event", event.getId());
+
+        var hql = """
+                update ImportJpa
+                set archived = true
+                where id = :id""";
+
+        entityManager.update()
+                .hql(hql)
+                .set("id", event.getId())
+                .update();
     }
 
 }
