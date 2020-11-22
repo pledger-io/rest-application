@@ -12,6 +12,7 @@ import com.jongsoft.finance.rest.model.ContractResponse;
 import com.jongsoft.lang.API;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.subscribers.TestSubscriber;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,12 +97,22 @@ class ContractResourceTest extends TestSetup {
 
     @Test
     void create() {
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(Account.builder()
+        var account = Account.builder()
                 .id(1L)
                 .balance(0D)
                 .name("Sample account")
                 .currency("EUR")
-                .build()));
+                .build();
+
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
+        Mockito.when(contractProvider.lookup("Test Contract"))
+                .thenReturn(Maybe.just(Contract.builder()
+                        .id(1L)
+                        .name("Test Contract")
+                        .company(account)
+                        .startDate(LocalDate.of(2019, 2, 1))
+                        .endDate(LocalDate.of(2020, 2, 1))
+                        .build()));
 
         var request = ContractCreateRequest.builder()
                 .name("Test Contract")
