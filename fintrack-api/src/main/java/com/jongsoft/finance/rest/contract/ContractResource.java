@@ -74,7 +74,12 @@ public class ContractResource {
                             createRequest.getEnd()));
 
             if (result.isPresent()) {
-                emitter.onSuccess(new ContractResponse(result.get()));
+                contractProvider.lookup(createRequest.getName())
+                        .switchIfEmpty(Single.error(
+                                StatusException.internalError("Error creating contract")))
+                        .subscribe(
+                                contract -> emitter.onSuccess(new ContractResponse(contract)),
+                                emitter::onError);
             } else {
                 emitter.onError(
                         StatusException.notFound(
