@@ -9,7 +9,7 @@ import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
 import com.jongsoft.finance.graph.BudgetPieChart;
 import com.jongsoft.finance.rest.DateFormat;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -64,7 +64,7 @@ public class AccountBudgetGraphResource extends BudgetPieChart {
                 .get();
 
         return createChart(currencySymbol(account.getCurrency()), locale)
-                .addSeries(createSeries(API.List(account), start, end, locale))
+                .addSeries(createSeries(Collections.List(account), start, end, locale))
                 .toJson();
     }
 

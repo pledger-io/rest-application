@@ -1,11 +1,11 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.rest.DateFormat;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Dates;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -47,10 +47,10 @@ public class AccountTopResource {
             @PathVariable @DateFormat LocalDate end) {
         return Flowable.create(emitter -> {
             var filterCommand = filterFactory.account()
-                    .types(API.List("debtor"))
+                    .types(Collections.List("debtor"))
                     .pageSize(settingProvider.getAutocompleteLimit());
 
-            accountProvider.top(filterCommand, DateRange.of(start, end), true)
+            accountProvider.top(filterCommand, Dates.range(start, end), true)
                     .map(AccountSpendingResponse::new)
                     .forEach(emitter::onNext);
 
@@ -68,10 +68,10 @@ public class AccountTopResource {
             @PathVariable @DateFormat LocalDate end) {
         return Flowable.create(emitter -> {
             var filterCommand = filterFactory.account()
-                    .types(API.List("creditor"))
+                    .types(Collections.List("creditor"))
                     .pageSize(settingProvider.getAutocompleteLimit());
 
-            accountProvider.top(filterCommand, DateRange.of(start, end), false)
+            accountProvider.top(filterCommand, Dates.range(start, end), false)
                     .map(AccountSpendingResponse::new)
                     .forEach(emitter::onNext);
 

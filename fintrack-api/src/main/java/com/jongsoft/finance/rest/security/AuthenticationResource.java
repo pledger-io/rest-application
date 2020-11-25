@@ -8,7 +8,7 @@ import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.PasswordEncoder;
 import com.jongsoft.finance.security.TwoFactorHelper;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.*;
 import io.micronaut.http.annotation.*;
@@ -157,7 +157,7 @@ public class AuthenticationResource {
     private MutableHttpResponse<AccessRefreshToken> createAccessToken(UserAccount user) {
         var userDetails = new UserDetails(
                 user.getUsername(),
-                API.List(user.getRoles()).map(Role::getName).toJava());
+                Collections.List(user.getRoles()).map(Role::getName).toJava());
         var refresh = UUID.randomUUID().toString();
 
         return accessRefreshTokenGenerator.generate(refresh, userDetails)

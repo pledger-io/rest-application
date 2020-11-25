@@ -29,7 +29,7 @@ allprojects {
         jcenter()
 
         maven {
-            url 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            url 'https://oss.sonatype.org/service/local/repositories/releases/content/'
             mavenContent{
                 releasesOnly()
             }
@@ -212,7 +212,7 @@ subprojects {
         implementation("io.micronaut:micronaut-http-client")
 
         implementation("ch.qos.logback:logback-classic")
-        implementation('com.jongsoft.lang:language:1.0.0')
+        implementation('com.jongsoft.lang:language:1.1.0')
         compileOnly "org.projectlombok:lombok:$lombokVersion"
 
         testImplementation("org.junit.jupiter:junit-jupiter-api")

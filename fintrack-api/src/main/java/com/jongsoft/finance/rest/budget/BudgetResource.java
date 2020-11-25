@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.budget;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
@@ -10,7 +10,7 @@ import com.jongsoft.finance.domain.user.ExpenseProvider;
 import com.jongsoft.finance.rest.model.BudgetResponse;
 import com.jongsoft.finance.rest.model.ExpenseResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -142,7 +142,7 @@ public class BudgetResource {
             description = "Computes the expense for the provided year and month"
     )
     Publisher<ComputedExpenseResponse> computeExpense(@PathVariable long id, @PathVariable int year, @PathVariable int month) {
-        var dateRange = DateRange.forMonth(year, month);
+        var dateRange = DateRangeOld.forMonth(year, month);
 
         return budgetProvider.lookup(year, month)
                 .flatMapPublisher(budget -> Flowable.fromIterable(budget.getExpenses()))
@@ -151,7 +151,7 @@ public class BudgetResource {
                     var filter = filterFactory.transaction()
                             .ownAccounts()
                             .range(dateRange)
-                            .expenses(API.List(new EntityRef(expense.getId())));
+                            .expenses(Collections.List(new EntityRef(expense.getId())));
 
                     return new ComputedExpenseResponse(
                             expense.computeBudget(),

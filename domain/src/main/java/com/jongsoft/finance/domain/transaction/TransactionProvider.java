@@ -1,6 +1,6 @@
 package com.jongsoft.finance.domain.transaction;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.core.DataProvider;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.core.ResultPage;
@@ -20,7 +20,7 @@ public interface TransactionProvider extends DataProvider<Transaction> {
 
         FilterCommand name(String value, boolean exact);
         FilterCommand description(String value, boolean exact);
-        FilterCommand range(DateRange range);
+        FilterCommand range(DateRangeOld range);
         FilterCommand importSlug(String value);
         FilterCommand currency(String currency);
 

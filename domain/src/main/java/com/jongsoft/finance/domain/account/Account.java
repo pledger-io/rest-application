@@ -11,7 +11,8 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedule;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import lombok.*;
 
 import java.io.Serializable;
@@ -66,7 +67,7 @@ public class Account implements AggregateBase, Serializable {
 
     @BusinessMethod
     public void rename(String name, String description, String currency, String type) {
-        var noChanges = API.Equal(this.name, name)
+        var noChanges = Control.Equal(this.name, name)
                 .append(this.description, description)
                 .append(this.currency, currency)
                 .append(this.type, type)
@@ -107,7 +108,7 @@ public class Account implements AggregateBase, Serializable {
             throw new IllegalArgumentException("Highly improbable interest of more than 200%.");
         }
 
-        var changes = API.Equal(this.interest, interest)
+        var changes = Control.Equal(this.interest, interest)
                 .append(this.interestPeriodicity, periodicity)
                 .isNotEqual();
 
@@ -143,7 +144,7 @@ public class Account implements AggregateBase, Serializable {
      */
     @BusinessMethod
     public void changeAccount(String iban, String bic, String number) {
-        var noChanges = API.Equal(this.iban, iban)
+        var noChanges = Control.Equal(this.iban, iban)
                 .append(this.bic, bic)
                 .append(this.number, number)
                 .isEqual();
@@ -245,7 +246,7 @@ public class Account implements AggregateBase, Serializable {
      * @return true if managed
      */
     public boolean isManaged() {
-        return !API.List(SystemAccountTypes.values())
+        return !Collections.List(SystemAccountTypes.values())
                 .map(SystemAccountTypes::label)
                 .contains(type.toLowerCase());
     }

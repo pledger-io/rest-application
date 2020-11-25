@@ -3,7 +3,7 @@ package com.jongsoft.finance.rest.statistic;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
@@ -38,19 +38,19 @@ public class BalanceResource {
         var filter = filterFactory.transaction();
 
         if (!request.getAccounts().isEmpty()) {
-            filter.accounts(API.List(request.getAccounts())
+            filter.accounts(Collections.List(request.getAccounts())
                     .map(a -> new EntityRef(a.getId())));
         } else {
             filter.ownAccounts();
         }
 
         if (!request.getCategories().isEmpty()) {
-            filter.categories(API.List(request.getCategories())
+            filter.categories(Collections.List(request.getCategories())
                     .map(a -> new EntityRef(a.getId())));
         }
 
         if (!request.getExpenses().isEmpty()) {
-            filter.expenses(API.List(request.getExpenses())
+            filter.expenses(Collections.List(request.getExpenses())
                     .map(a -> new EntityRef(a.getId())));
         }
 

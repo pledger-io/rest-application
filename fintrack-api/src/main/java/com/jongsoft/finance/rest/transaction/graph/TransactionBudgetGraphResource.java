@@ -13,7 +13,7 @@ import com.jongsoft.finance.filter.RequestAttributes;
 import com.jongsoft.finance.graph.BudgetPieChart;
 import com.jongsoft.finance.rest.DateFormat;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -70,7 +70,7 @@ public class TransactionBudgetGraphResource extends BudgetPieChart {
     }
 
     private String currencySymbol() {
-        var code = API.Option(currentUserProvider.currentUser())
+        var code = Control.Option(currentUserProvider.currentUser())
                 .map(UserAccount::getPrimaryCurrency)
                 .map(java.util.Currency::getCurrencyCode)
                 .getOrSupply(() -> "EUR");

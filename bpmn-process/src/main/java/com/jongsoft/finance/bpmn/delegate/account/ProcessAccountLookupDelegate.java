@@ -3,7 +3,7 @@ package com.jongsoft.finance.bpmn.delegate.account;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Single;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ public class ProcessAccountLookupDelegate implements JavaDelegate {
                 execution.getVariableLocal("iban"),
                 execution.getVariableLocal("id"));
 
-        Optional<Account> matchedAccount = API.Option();
+        Optional<Account> matchedAccount = Control.Option();
         if (execution.hasVariableLocal("id") && execution.getVariableLocal("id") != null) {
             matchedAccount = accountProvider.lookup((Long) execution.getVariableLocal("id"));
         }
@@ -67,8 +67,8 @@ public class ProcessAccountLookupDelegate implements JavaDelegate {
         if (!matchedAccount.isPresent() && execution.hasVariableLocal("name")) {
             final String accountName = (String) execution.getVariableLocal("name");
             matchedAccount = accountProvider.lookup(accountName)
-                    .map(API::Option)
-                    .switchIfEmpty(Single.just(API.Option()))
+                    .map(Control::Option)
+                    .switchIfEmpty(Single.just(Control.Option()))
                     .blockingGet();
         }
 

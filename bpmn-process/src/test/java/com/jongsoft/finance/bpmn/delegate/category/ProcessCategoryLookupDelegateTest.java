@@ -2,7 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.category;
 
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.domain.user.CategoryProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import io.reactivex.Maybe;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +46,7 @@ class ProcessCategoryLookupDelegateTest {
 
         BDDMockito.given(execution.hasVariableLocal("id")).willReturn(true);
         BDDMockito.given(execution.getVariableLocal("id")).willReturn(1L);
-        BDDMockito.given(categoryProvider.lookup(1L)).willReturn(API.Option(category));
+        BDDMockito.given(categoryProvider.lookup(1L)).willReturn(Control.Option(category));
 
         subject.execute(execution);
 

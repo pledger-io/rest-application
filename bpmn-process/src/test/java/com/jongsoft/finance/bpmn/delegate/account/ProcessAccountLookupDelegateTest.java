@@ -4,7 +4,8 @@ import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.core.ResultPage;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.reactivex.Maybe;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +42,7 @@ class ProcessAccountLookupDelegateTest {
 
         Mockito.when(execution.hasVariableLocal("id")).thenReturn(true);
         Mockito.when(execution.getVariableLocal("id")).thenReturn(1L);
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
 
         subject.execute(execution);
 
@@ -75,7 +76,7 @@ class ProcessAccountLookupDelegateTest {
 
         var resultPage = Mockito.mock(ResultPage.class);
 
-        Mockito.when(resultPage.content()).thenReturn(API.List(account));
+        Mockito.when(resultPage.content()).thenReturn(Collections.List(account));
         Mockito.when(execution.hasVariableLocal("iban")).thenReturn(true);
         Mockito.when(execution.getVariableLocal("iban")).thenReturn("NL123723712");
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))

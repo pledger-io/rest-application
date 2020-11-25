@@ -6,7 +6,7 @@ import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
 import org.assertj.core.api.Assertions;
@@ -29,7 +29,7 @@ class AccountEditResourceTest extends TestSetup {
         subject = new AccountEditResource(currentUserProvider, accountProvider);
 
         Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
-        Mockito.when(accountProvider.lookup(Mockito.anyLong())).thenReturn(API.Option());
+        Mockito.when(accountProvider.lookup(Mockito.anyLong())).thenReturn(Control.Option());
 
         var applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         new EventBus(applicationEventPublisher);
@@ -44,7 +44,7 @@ class AccountEditResourceTest extends TestSetup {
     @Test
     void get() {
         Mockito.when(accountProvider.lookup(123L))
-                .thenReturn(API.Option(Account.builder()
+                .thenReturn(Control.Option(Account.builder()
                         .id(1L)
                         .user(ACTIVE_USER)
                         .balance(0D)
@@ -68,7 +68,7 @@ class AccountEditResourceTest extends TestSetup {
     @Test
     void update() {
         Mockito.when(accountProvider.lookup(123L))
-                .thenReturn(API.Option(Account.builder()
+                .thenReturn(Control.Option(Account.builder()
                         .id(1L)
                         .user(ACTIVE_USER)
                         .balance(0D)
@@ -98,7 +98,7 @@ class AccountEditResourceTest extends TestSetup {
                 .currency("EUR")
                 .build());
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
 
         var response = subject.persistImage(1L, new AccountImageRequest("file-code"))
                 .blockingGet();
@@ -117,7 +117,7 @@ class AccountEditResourceTest extends TestSetup {
                 .currency("EUR")
                 .build());
         Mockito.when(accountProvider.lookup(123L))
-                .thenReturn(API.Option(account));
+                .thenReturn(Control.Option(account));
 
         var response = subject.delete(123L).blockingGet();
 

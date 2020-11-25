@@ -1,6 +1,6 @@
 package com.jongsoft.finance.graph;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.Currency;
@@ -14,7 +14,7 @@ import com.jongsoft.highchart.common.SeriesType;
 import com.jongsoft.highchart.series.PieSeries;
 import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.context.MessageSource;
 
@@ -80,7 +80,7 @@ public class CategoryPieChart {
         var filter = filterFactory.transaction()
                 .onlyIncome(income)
                 .currency(currency.getCode())
-                .range(DateRange.of(start, end));
+                .range(DateRangeOld.of(start, end));
         if (accounts.isEmpty()) {
             filter.ownAccounts();
         } else {
@@ -91,7 +91,7 @@ public class CategoryPieChart {
 
         for (Category category : categoryProvider.lookup()) {
             double balance = transactionProvider.balance(
-                    filter.categories(API.List(new EntityRef(category.getId()))))
+                    filter.categories(Collections.List(new EntityRef(category.getId()))))
                     .getOrSupply(() -> 0D);
 
             totalBalance = totalBalance.subtract(BigDecimal.valueOf(balance));

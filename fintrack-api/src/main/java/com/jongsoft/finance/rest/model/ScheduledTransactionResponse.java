@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.model;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 
 public class ScheduledTransactionResponse {
@@ -24,7 +24,7 @@ public class ScheduledTransactionResponse {
     }
 
     public DateRangeResponse getRange() {
-        return new DateRangeResponse(DateRange.of(wrapped.getStart(), wrapped.getEnd()));
+        return new DateRangeResponse(DateRangeOld.of(wrapped.getStart(), wrapped.getEnd()));
     }
 
     public ScheduleResponse getSchedule() {

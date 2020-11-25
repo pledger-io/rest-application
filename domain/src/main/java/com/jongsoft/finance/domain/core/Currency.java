@@ -7,12 +7,8 @@ import com.jongsoft.finance.domain.account.events.CurrencyCreatedEvent;
 import com.jongsoft.finance.domain.core.events.CurrencyPropertyEvent;
 import com.jongsoft.finance.domain.core.events.CurrencyRenameEvent;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.lang.API;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import com.jongsoft.lang.Control;
+import lombok.*;
 
 @Getter
 @Builder
@@ -47,7 +43,7 @@ public class Currency implements AggregateBase {
 
     @BusinessMethod
     public void rename(String name, String code, char symbol) {
-        var changed = API.Equal(this.name, name)
+        var changed = Control.Equal(this.name, name)
                 .append(this.code, code)
                 .append(this.symbol, symbol)
                 .isNotEqual();

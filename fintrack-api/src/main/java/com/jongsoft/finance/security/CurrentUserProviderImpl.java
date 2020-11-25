@@ -2,7 +2,7 @@ package com.jongsoft.finance.security;
 
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -21,7 +21,7 @@ public class CurrentUserProviderImpl implements CurrentUserProvider {
 
     @Override
     public UserAccount currentUser() {
-        var username = API.Option(authenticationFacade.authenticated());
+        var username = Control.Option(authenticationFacade.authenticated());
         return username.map(s ->
                 userProvider.lookup(s)
                         .getOrSupply(() -> null))

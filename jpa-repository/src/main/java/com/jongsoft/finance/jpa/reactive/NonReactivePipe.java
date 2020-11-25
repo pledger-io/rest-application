@@ -2,7 +2,8 @@ package com.jongsoft.finance.jpa.reactive;
 
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.jpa.ResultPageImpl;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 
@@ -24,9 +25,9 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
         applyParameters(query);
         applyPaging(query);
 
-        return API.Try(() -> (T) query.getSingleResult())
-                .map(API::Option)
-                .recover(e -> API.Option())
+        return Control.Try(() -> (T) query.getSingleResult())
+                .map(Control::Option)
+                .recover(e -> Control.Option())
                 .get();
     }
 
@@ -37,7 +38,7 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
         applyParameters(query);
         applyPaging(query);
 
-        return API.List(query.getResultList());
+        return Collections.List(query.getResultList());
     }
 
     @SuppressWarnings("unchecked")
@@ -55,7 +56,7 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
         long hits = countQuery.getSingleResult();
 
         return new ResultPageImpl<>(
-                API.List((List<T>) selectQuery.getResultList()),
+                Collections.List((List<T>) selectQuery.getResultList()),
                 limit(),
                 hits);
     }

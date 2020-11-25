@@ -1,6 +1,6 @@
 package com.jongsoft.finance.domain.core;
 
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 
 import java.util.function.Function;
@@ -20,7 +20,7 @@ public interface ResultPage<T> {
     }
 
     default Sequence<T> content() {
-        return API.List();
+        return Collections.List();
     }
 
     default boolean hasPages() {
@@ -33,6 +33,7 @@ public interface ResultPage<T> {
 
     <R> ResultPage<R> map(Function<T, R> mapper);
 
+    @SuppressWarnings("unchecked")
     static <T> ResultPage<T> empty() {
         return ResultPage.of();
     }
@@ -41,12 +42,13 @@ public interface ResultPage<T> {
         return new ResultPage<T>() {
             @Override
             public Sequence<T> content() {
-                return API.List(elements);
+                return Collections.List(elements);
             }
 
             @Override
+            @SuppressWarnings("unchecked")
             public <R> ResultPage<R> map(Function<T, R> mapper) {
-                return (ResultPage<R>) ResultPage.of(API.List(elements).map(mapper).iterator().toNativeArray());
+                return (ResultPage<R>) ResultPage.of(Collections.List(elements).map(mapper).iterator().toNativeArray());
             }
         };
     }

@@ -5,19 +5,11 @@ import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.transaction.events.TransactionAccountChangedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionAmountChangedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionBookedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionCreatedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionDeletedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionDescribeEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionFailureEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionRelationEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionSplitEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionTaggingEvent;
+import com.jongsoft.finance.domain.transaction.events.*;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.List;
 import com.jongsoft.lang.collection.Sequence;
 import lombok.AllArgsConstructor;
@@ -96,7 +88,7 @@ public class Transaction implements AggregateBase, Serializable {
         var toAmount = Math.abs(amount);
         var fromAmount = 0 - Math.abs(amount);
 
-        this.transactions = API.List(
+        this.transactions = Collections.List(
                 Part.builder().account(from).amount(fromAmount).build(),
                 Part.builder().account(to).amount(toAmount).build()
         );
@@ -104,7 +96,7 @@ public class Transaction implements AggregateBase, Serializable {
 
     @BusinessMethod
     public void book(LocalDate date, LocalDate bookDate, LocalDate interestDate) {
-        var hasChanged = API.Equal(date, this.date)
+        var hasChanged = Control.Equal(date, this.date)
                 .append(bookDate, this.bookDate)
                 .append(interestDate, this.interestDate)
                 .isNotEqual();
@@ -120,7 +112,7 @@ public class Transaction implements AggregateBase, Serializable {
 
     @BusinessMethod
     public void describe(String description) {
-        if (API.Equal(this.description, description).isNotEqual()) {
+        if (Control.Equal(this.description, description).isNotEqual()) {
             this.description = description;
             EventBus.getBus().send(
                     new TransactionDescribeEvent(
@@ -132,7 +124,7 @@ public class Transaction implements AggregateBase, Serializable {
 
     @BusinessMethod
     public void changeAmount(double amount, String currency) {
-        var hasChanged = API.Equal(Math.abs(this.computeAmount(this.computeTo())), amount)
+        var hasChanged = Control.Equal(Math.abs(this.computeAmount(this.computeTo())), amount)
                 .append(this.currency, currency)
                 .isNotEqual();
 

@@ -6,7 +6,7 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -43,8 +43,8 @@ class AccountReconcileIT extends ProcessTestSetup {
     @Test
     void run_differentStartBalance() throws InterruptedException {
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(-20.0));
+                .thenReturn(Control.Option())
+                .thenReturn(Control.Option(-20.0));
 
         var response = processEngine.getRuntimeService().startProcessInstanceByKey(
                 "AccountReconcile",
@@ -90,12 +90,12 @@ class AccountReconcileIT extends ProcessTestSetup {
         Account reconcile = Account.builder().id(3L).type("reconcile").build();
 
         Mockito.when(accountProvider.lookup(1L))
-                .thenReturn(API.Option(reconcileAccount));
+                .thenReturn(Control.Option(reconcileAccount));
         Mockito.when(accountProvider.lookup(SystemAccountTypes.RECONCILE))
                 .thenReturn(Maybe.just(reconcile));
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
-                .thenReturn(API.Option())
-                .thenReturn(API.Option(-20.0));
+                .thenReturn(Control.Option())
+                .thenReturn(Control.Option(-20.0));
 
         var response = processEngine.getRuntimeService().startProcessInstanceByKey(
                 "AccountReconcile",

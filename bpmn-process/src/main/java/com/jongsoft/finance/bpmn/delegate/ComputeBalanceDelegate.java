@@ -1,20 +1,18 @@
 package com.jongsoft.finance.bpmn.delegate;
 
-import java.time.LocalDate;
-
-import javax.inject.Singleton;
-
+import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.domain.FilterFactory;
+import com.jongsoft.finance.domain.core.EntityRef;
+import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.lang.Collections;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.BooleanValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
-import com.jongsoft.finance.core.date.DateRange;
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
-import com.jongsoft.lang.API;
 
-import lombok.extern.slf4j.Slf4j;
+import javax.inject.Singleton;
+import java.time.LocalDate;
 
 @Slf4j
 @Singleton
@@ -34,14 +32,14 @@ public class ComputeBalanceDelegate implements JavaDelegate {
 
         if (execution.hasVariableLocal("accountId")) {
             Long accountId = ((Number) execution.getVariableLocal("accountId")).longValue();
-            requestBuilder.accounts(API.List(new EntityRef(accountId)));
+            requestBuilder.accounts(Collections.List(new EntityRef(accountId)));
         }
 
         if (execution.hasVariableLocal("date")) {
             String isoDate = execution.<StringValue>getVariableLocalTyped("date").getValue();
-            requestBuilder.range(DateRange.of(LocalDate.of(1900, 1, 1), LocalDate.parse(isoDate)));
+            requestBuilder.range(DateRangeOld.of(LocalDate.of(1900, 1, 1), LocalDate.parse(isoDate)));
         } else {
-            requestBuilder.range(DateRange.of(LocalDate.of(1900, 1, 1), LocalDate.of(2900, 1, 1)));
+            requestBuilder.range(DateRangeOld.of(LocalDate.of(1900, 1, 1), LocalDate.of(2900, 1, 1)));
         }
 
         if (execution.hasVariableLocal("onlyIncome")) {

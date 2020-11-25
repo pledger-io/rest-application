@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.budget;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.ResultPage;
@@ -12,7 +12,8 @@ import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -63,7 +64,7 @@ class BudgetResourceTest extends TestSetup {
                 Maybe.just(Budget.builder()
                         .expectedIncome(200.20D)
                         .start(LocalDate.of(2018, 2, 3))
-                        .expenses(API.List(Budget.Expense.builder()
+                        .expenses(Collections.List(Budget.Expense.builder()
                                 .id(1L)
                                 .name("Grocery")
                                 .lowerBound(20D)
@@ -80,7 +81,7 @@ class BudgetResourceTest extends TestSetup {
                 Single.just(Budget.builder()
                         .expectedIncome(200.20D)
                         .start(LocalDate.of(2018, 2, 3))
-                        .expenses(API.List(Budget.Expense.builder()
+                        .expenses(Collections.List(Budget.Expense.builder()
                                 .id(1L)
                                 .name("Grocery")
                                 .lowerBound(20D)
@@ -149,7 +150,7 @@ class BudgetResourceTest extends TestSetup {
                 .start(LocalDate.of(2018, 1, 1))
                 .expectedIncome(2200)
                 .id(1L)
-                .expenses(API.List(Budget.Expense.builder()
+                .expenses(Collections.List(Budget.Expense.builder()
                         .lowerBound(22)
                         .upperBound(44)
                         .build())).build());
@@ -173,7 +174,7 @@ class BudgetResourceTest extends TestSetup {
         Budget budget = Mockito.spy(Budget.builder()
                 .expectedIncome(200.20D)
                 .start(LocalDate.of(2018, 2, 3))
-                .expenses(API.List(Budget.Expense.builder()
+                .expenses(Collections.List(Budget.Expense.builder()
                         .id(1L)
                         .name("Grocery")
                         .lowerBound(20D)
@@ -218,14 +219,14 @@ class BudgetResourceTest extends TestSetup {
                 Single.just(Budget.builder()
                         .expectedIncome(200.20D)
                         .start(LocalDate.of(2018, 2, 3))
-                        .expenses(API.List(Budget.Expense.builder()
+                        .expenses(Collections.List(Budget.Expense.builder()
                                 .id(1L)
                                 .name("Grocery")
                                 .lowerBound(20D)
                                 .upperBound(50D)
                                 .build()))
                         .build()));
-        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(API.Option(200D));
+        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option(200D));
 
         TestSubscriber<ComputedExpenseResponse> testSubscriber = new TestSubscriber<>();
 
@@ -234,6 +235,6 @@ class BudgetResourceTest extends TestSetup {
 
         testSubscriber.assertComplete();
         testSubscriber.assertValueCount(1);
-        testSubscriber.assertResult(new ComputedExpenseResponse(35, 200, DateRange.forMonth(2019, 1)));
+        testSubscriber.assertResult(new ComputedExpenseResponse(35, 200, DateRangeOld.forMonth(2019, 1)));
     }
 }

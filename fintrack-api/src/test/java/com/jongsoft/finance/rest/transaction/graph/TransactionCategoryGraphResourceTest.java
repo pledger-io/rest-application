@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.transaction.graph;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.core.CurrencyProvider;
@@ -10,7 +10,8 @@ import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.i18n.ResourceBundleMessageSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,8 +58,8 @@ class TransactionCategoryGraphResourceTest extends TestSetup {
                 .description("Sample 1")
                 .build();
 
-        Mockito.when(categoryProvider.lookup()).thenReturn(API.List(category));
-        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(API.Option());
+        Mockito.when(categoryProvider.lookup()).thenReturn(Collections.List(category));
+        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option());
 
         subject.expenses(
                 LocalDate.of(2019, 1, 1),
@@ -70,8 +71,8 @@ class TransactionCategoryGraphResourceTest extends TestSetup {
         Mockito.verify(transactionProvider, Mockito.times(2)).balance(Mockito.any());
         Mockito.verify(mockFilter).ownAccounts();
         Mockito.verify(mockFilter).onlyIncome(false);
-        Mockito.verify(mockFilter).range(DateRange.forMonth(2019, 1));
-        Mockito.verify(mockFilter).categories(API.List(new EntityRef(1L)));
+        Mockito.verify(mockFilter).range(DateRangeOld.forMonth(2019, 1));
+        Mockito.verify(mockFilter).categories(Collections.List(new EntityRef(1L)));
     }
 
     @Test
@@ -81,8 +82,8 @@ class TransactionCategoryGraphResourceTest extends TestSetup {
                 .description("Sample 1")
                 .build();
 
-        Mockito.when(categoryProvider.lookup()).thenReturn(API.List(category));
-        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(API.Option());
+        Mockito.when(categoryProvider.lookup()).thenReturn(Collections.List(category));
+        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option());
 
         subject.income(
                 LocalDate.of(2019, 1, 1),
@@ -94,7 +95,7 @@ class TransactionCategoryGraphResourceTest extends TestSetup {
         Mockito.verify(transactionProvider, Mockito.times(2)).balance(Mockito.any());
         Mockito.verify(mockFilter).ownAccounts();
         Mockito.verify(mockFilter).onlyIncome(true);
-        Mockito.verify(mockFilter).range(DateRange.forMonth(2019, 1));
-        Mockito.verify(mockFilter).categories(API.List(new EntityRef(1L)));
+        Mockito.verify(mockFilter).range(DateRangeOld.forMonth(2019, 1));
+        Mockito.verify(mockFilter).categories(Collections.List(new EntityRef(1L)));
     }
 }

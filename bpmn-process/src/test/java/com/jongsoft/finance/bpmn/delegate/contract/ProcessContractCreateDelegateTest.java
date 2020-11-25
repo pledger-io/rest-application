@@ -11,7 +11,7 @@ import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.serialized.ContractJson;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Maybe;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -24,7 +24,7 @@ import java.time.LocalDate;
 
 class ProcessContractCreateDelegateTest {
 
-    private static final UserAccount USER_ACCOUNT = UserAccount.builder().roles(API.List(new Role("admin"))).build();
+    private static final UserAccount USER_ACCOUNT = UserAccount.builder().roles(Collections.List(new Role("admin"))).build();
     private AccountProvider accountProvider;
     private ContractProvider contractProvider;
     private StorageService storageService;

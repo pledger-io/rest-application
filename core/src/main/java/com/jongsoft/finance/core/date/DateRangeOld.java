@@ -1,5 +1,8 @@
 package com.jongsoft.finance.core.date;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -9,19 +12,17 @@ import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 /**
  * A date range is a value class that contains an upper and lower bound date, both bounds are to be included in the range.
  * A date range does not encompass the time element.
  */
+@Deprecated
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DateRange {
+public class DateRangeOld {
     private LocalDate start;
     private LocalDate end;
 
-    private DateRange(final LocalDate start, final LocalDate end) {
+    private DateRangeOld(final LocalDate start, final LocalDate end) {
         this.start = start;
         this.end = end;
     }
@@ -86,24 +87,24 @@ public class DateRange {
      *
      * @return the stream
      */
-    public Stream<DateRange> months() {
+    public Stream<DateRangeOld> months() {
         var firstMonth = start.withDayOfMonth(1);
         var amountOfMonth = ChronoUnit.MONTHS.between(firstMonth, end.withDayOfMonth(1));
 
         return IntStream.range(0, (int) amountOfMonth)
                 .mapToObj(firstMonth::plusMonths)
-                .map(startOfMonth -> DateRange.forMonth(startOfMonth.getYear(), startOfMonth.getMonthValue()));
+                .map(startOfMonth -> DateRangeOld.forMonth(startOfMonth.getYear(), startOfMonth.getMonthValue()));
     }
 
-    public DateRange previous(ChronoUnit unit) {
+    public DateRangeOld previous(ChronoUnit unit) {
         var previousStart = start.minus(1, unit);
         var previousEnd = start.minusDays(1);
 
-        return DateRange.of(previousStart, previousEnd);
+        return DateRangeOld.of(previousStart, previousEnd);
     }
 
-    public DateRange next(ChronoUnit unit) {
-        return DateRange.of(start.plus(1, unit), end.plus(1, unit));
+    public DateRangeOld next(ChronoUnit unit) {
+        return DateRangeOld.of(start.plus(1, unit), end.plus(1, unit));
     }
 
     @Override
@@ -114,7 +115,7 @@ public class DateRange {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof DateRange other) {
+        if (obj instanceof DateRangeOld other) {
             return Objects.equals(other.start, start)
                     && Objects.equals(other.end, end);
         }
@@ -132,10 +133,10 @@ public class DateRange {
      *
      * @return the created date range
      */
-    public static DateRange currentMonth() {
+    public static DateRangeOld currentMonth() {
         var start = LocalDate.now();
 
-        return DateRange.forMonth(start.getYear(), start.getMonthValue());
+        return DateRangeOld.forMonth(start.getYear(), start.getMonthValue());
     }
 
     /**
@@ -146,18 +147,18 @@ public class DateRange {
      * @param month the month
      * @return      the created date range
      */
-    public static DateRange forMonth(int year, int month) {
+    public static DateRangeOld forMonth(int year, int month) {
         var start = LocalDate.of(year, month, 1);
         var end = start.plusMonths(1).minusDays(1);
 
-        return DateRange.of(start, end);
+        return DateRangeOld.of(start, end);
     }
 
-    public static DateRange forYear(int year) {
+    public static DateRangeOld forYear(int year) {
         var startDate = LocalDate.ofYearDay(year, 1);
         var endDate = startDate.plusYears(1).minusDays(1);
 
-        return DateRange.of(startDate, endDate);
+        return DateRangeOld.of(startDate, endDate);
     }
 
     /**
@@ -165,8 +166,8 @@ public class DateRange {
      *
      * @return
      */
-    public static DateRange currentYear() {
-        return DateRange.forYear(LocalDate.now().getYear());
+    public static DateRangeOld currentYear() {
+        return DateRangeOld.forYear(LocalDate.now().getYear());
     }
 
     /**
@@ -176,8 +177,8 @@ public class DateRange {
      * @param end   the end date
      * @return      the created date range
      */
-    public static DateRange of(LocalDate start, LocalDate end) {
-        return new DateRange(start, end);
+    public static DateRangeOld of(LocalDate start, LocalDate end) {
+        return new DateRangeOld(start, end);
     }
 
 }

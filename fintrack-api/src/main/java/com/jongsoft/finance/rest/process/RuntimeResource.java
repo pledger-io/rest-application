@@ -2,7 +2,7 @@ package com.jongsoft.finance.rest.process;
 
 import com.jongsoft.finance.rest.model.ProcessResponse;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
@@ -69,7 +69,7 @@ public class RuntimeResource {
             operationId = "getProcessHistory"
     )
     public Flowable<ProcessResponse> history(@PathVariable String processDefinitionKey) {
-        var result = API.List(historyService.createHistoricProcessInstanceQuery()
+        var result = Collections.List(historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
                 .orderByProcessInstanceStartTime().desc()
@@ -87,7 +87,7 @@ public class RuntimeResource {
     public Flowable<ProcessResponse> history(
             @PathVariable String processDefinitionKey,
             @PathVariable String businessKey) {
-        var result = API.List(historyService.createHistoricProcessInstanceQuery()
+        var result = Collections.List(historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .processInstanceBusinessKey(businessKey)
                 .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())

@@ -1,14 +1,14 @@
 package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
-import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.account.AccountTypeProvider;
 import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
+import java.time.LocalDate;
 
 class AccountProviderJpaIT extends JpaTestSetup {
 
@@ -32,7 +33,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
     private FilterFactory filterFactory = new FilterFactoryJpa();
 
     void setup() {
-        ownTypes = API.List(accountTypeProvider.lookup(false));
+        ownTypes = Collections.List(accountTypeProvider.lookup(false));
 
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
 
@@ -146,7 +147,12 @@ class AccountProviderJpaIT extends JpaTestSetup {
                 .types(ownTypes)
                 .pageSize(2);
 
-        var result = accountProvider.top(filter, DateRange.forMonth(2019, 1), false);
+        var result = accountProvider.top(
+                filter,
+                Dates.range(
+                        LocalDate.of(2019, 1, 1),
+                        LocalDate.of(2020, 1, 1)),
+                false);
 
         Assertions.assertThat(result).hasSize(1);
         Assertions.assertThat(result.head().total()).isEqualTo(20.2);

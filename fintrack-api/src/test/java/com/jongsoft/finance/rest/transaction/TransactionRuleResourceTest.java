@@ -10,7 +10,8 @@ import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreate
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Flowable;
 import org.assertj.core.api.Assertions;
@@ -72,7 +73,7 @@ class TransactionRuleResourceTest extends TestSetup {
 
     @Test
     void createGroup() {
-        Mockito.when(ruleGroupProvider.lookup("Group setting")).thenReturn(API.Option());
+        Mockito.when(ruleGroupProvider.lookup("Group setting")).thenReturn(Control.Option());
 
         subject.createGroup(new GroupRenameRequest("Group setting"));
 
@@ -87,8 +88,8 @@ class TransactionRuleResourceTest extends TestSetup {
                 .active(true)
                 .restrictive(false)
                 .group("Grocery")
-                .conditions(API.List())
-                .changes(API.List())
+                .conditions(Collections.List())
+                .changes(Collections.List())
                 .user(ACTIVE_USER)
                 .build();
         transactionRule.new Condition(1L, RuleColumn.TO_ACCOUNT, RuleOperation.CONTAINS, "Store");
@@ -112,7 +113,7 @@ class TransactionRuleResourceTest extends TestSetup {
                 .sort(1)
                 .build());
 
-        Mockito.when(ruleGroupProvider.lookup("Grocery stores")).thenReturn(API.Option(ruleGroup));
+        Mockito.when(ruleGroupProvider.lookup("Grocery stores")).thenReturn(Control.Option(ruleGroup));
 
         subject.groupUp("Grocery stores");
 
@@ -127,7 +128,7 @@ class TransactionRuleResourceTest extends TestSetup {
                 .sort(1)
                 .build());
 
-        Mockito.when(ruleGroupProvider.lookup("Grocery stores")).thenReturn(API.Option(ruleGroup));
+        Mockito.when(ruleGroupProvider.lookup("Grocery stores")).thenReturn(Control.Option(ruleGroup));
 
         subject.groupDown("Grocery stores");
 
@@ -142,7 +143,7 @@ class TransactionRuleResourceTest extends TestSetup {
                 .sort(1)
                 .build());
 
-        Mockito.when(ruleGroupProvider.lookup("Grocery stores")).thenReturn(API.Option(ruleGroup));
+        Mockito.when(ruleGroupProvider.lookup("Grocery stores")).thenReturn(Control.Option(ruleGroup));
 
         subject.rename("Grocery stores", new GroupRenameRequest("updated"));
 
@@ -182,8 +183,8 @@ class TransactionRuleResourceTest extends TestSetup {
                 .active(true)
                 .restrictive(false)
                 .group("Grocery")
-                .conditions(API.List())
-                .changes(API.List())
+                .conditions(Collections.List())
+                .changes(Collections.List())
                 .user(ACTIVE_USER)
                 .build();
         transactionRule.new Condition(1L, RuleColumn.TO_ACCOUNT, RuleOperation.CONTAINS, "Store");
@@ -191,7 +192,7 @@ class TransactionRuleResourceTest extends TestSetup {
         transactionRule.new Change(1L, RuleColumn.TO_ACCOUNT, "2");
         transactionRule.new Change(2L, RuleColumn.CATEGORY, "3");
 
-        Mockito.when(ruleProvider.lookup(1L)).thenReturn(API.Option(transactionRule));
+        Mockito.when(ruleProvider.lookup(1L)).thenReturn(Control.Option(transactionRule));
 
         var response = subject.getRule("Grocery", 1L).blockingGet();
 
@@ -206,7 +207,7 @@ class TransactionRuleResourceTest extends TestSetup {
                 .sort(1)
                 .build());
 
-        Mockito.when(ruleProvider.lookup(1L)).thenReturn(API.Option(transactionRule));
+        Mockito.when(ruleProvider.lookup(1L)).thenReturn(Control.Option(transactionRule));
 
         subject.ruleUp("Group", 1L);
         Mockito.verify(transactionRule).changeOrder(0);
@@ -220,7 +221,7 @@ class TransactionRuleResourceTest extends TestSetup {
                 .sort(1)
                 .build());
 
-        Mockito.when(ruleProvider.lookup(1L)).thenReturn(API.Option(transactionRule));
+        Mockito.when(ruleProvider.lookup(1L)).thenReturn(Control.Option(transactionRule));
 
         subject.ruleDown("Group", 1L);
         Mockito.verify(transactionRule).changeOrder(2);
@@ -234,8 +235,8 @@ class TransactionRuleResourceTest extends TestSetup {
                 .active(true)
                 .restrictive(false)
                 .group("Grocery")
-                .conditions(API.List())
-                .changes(API.List())
+                .conditions(Collections.List())
+                .changes(Collections.List())
                 .user(ACTIVE_USER)
                 .build());
         transactionRule.new Condition(1L, RuleColumn.TO_ACCOUNT, RuleOperation.CONTAINS, "Store");
@@ -261,7 +262,7 @@ class TransactionRuleResourceTest extends TestSetup {
                                 "2")))
                 .build();
 
-        Mockito.when(ruleProvider.lookup(1L)).thenReturn(API.Option(transactionRule));
+        Mockito.when(ruleProvider.lookup(1L)).thenReturn(Control.Option(transactionRule));
 
         subject.updateRule("Group 1", 1L, request).blockingGet();
 
@@ -278,11 +279,11 @@ class TransactionRuleResourceTest extends TestSetup {
                 .active(true)
                 .restrictive(false)
                 .group("Grocery")
-                .conditions(API.List())
-                .changes(API.List())
+                .conditions(Collections.List())
+                .changes(Collections.List())
                 .build();
 
-        Mockito.when(ruleProvider.lookup(1L)).thenReturn(API.Option(transactionRule));
+        Mockito.when(ruleProvider.lookup(1L)).thenReturn(Control.Option(transactionRule));
 
         subject.deleteRule("Group", 1L);
 

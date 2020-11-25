@@ -9,7 +9,8 @@ import com.jongsoft.finance.domain.account.events.ContractCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.rest.model.ContractResponse;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -45,7 +46,7 @@ class ContractResourceTest extends TestSetup {
 
     @Test
     void list() {
-        Mockito.when(contractProvider.lookup()).thenReturn(API.List(
+        Mockito.when(contractProvider.lookup()).thenReturn(Collections.List(
                 Contract.builder()
                         .id(1L)
                         .name("Contract 1")
@@ -104,7 +105,7 @@ class ContractResourceTest extends TestSetup {
                 .currency("EUR")
                 .build();
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(contractProvider.lookup("Test Contract"))
                 .thenReturn(Maybe.just(Contract.builder()
                         .id(1L)
@@ -135,7 +136,7 @@ class ContractResourceTest extends TestSetup {
 
     @Test
     void create_accountNotFound() {
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option());
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option());
 
         var request = ContractCreateRequest.builder()
                 .name("Test Contract")
@@ -159,7 +160,7 @@ class ContractResourceTest extends TestSetup {
                 .end(LocalDate.of(2022, 2, 1))
                 .build();
 
-        Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(contract));
+        Mockito.when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
         Mockito.when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
         Mockito.when(contract.getCompany()).thenReturn(Account.builder()
                 .id(1L)
@@ -187,7 +188,7 @@ class ContractResourceTest extends TestSetup {
                 .end(LocalDate.of(2022, 2, 1))
                 .build();
 
-        Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option());
+        Mockito.when(contractProvider.lookup(1L)).thenReturn(Control.Option());
 
         subject.update(1L, request)
                 .test()
@@ -197,7 +198,7 @@ class ContractResourceTest extends TestSetup {
 
     @Test
     void get() {
-        Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(
+        Mockito.when(contractProvider.lookup(1L)).thenReturn(Control.Option(
                 Contract.builder()
                         .id(1L)
                         .name("Test contract")
@@ -222,7 +223,7 @@ class ContractResourceTest extends TestSetup {
     void warnExpiry() {
         final Contract contract = Mockito.mock(Contract.class);
 
-        Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(contract));
+        Mockito.when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
         Mockito.when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
 
         subject.warnExpiry(1L).blockingGet();
@@ -234,7 +235,7 @@ class ContractResourceTest extends TestSetup {
     void attachment() {
         final Contract contract = Mockito.mock(Contract.class);
 
-        Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(contract));
+        Mockito.when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
         Mockito.when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
 
         var request = new ContractAttachmentRequest();
@@ -249,7 +250,7 @@ class ContractResourceTest extends TestSetup {
     void delete() {
         final Contract contract = Mockito.mock(Contract.class);
 
-        Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(contract));
+        Mockito.when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
         Mockito.when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
 
         subject.delete(1L);

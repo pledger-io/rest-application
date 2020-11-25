@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.scheduler;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
@@ -8,7 +8,8 @@ import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.TransactionScheduleProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.schedule.Periodicity;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
 import org.assertj.core.api.Assertions;
@@ -53,8 +54,8 @@ class ScheduledTransactionResourceTest {
         var applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         new EventBus(applicationEventPublisher);
 
-        Mockito.when(accountProvider.lookup(Mockito.anyLong())).thenReturn(API.Option());
-        Mockito.when(transactionScheduleProvider.lookup()).thenReturn(API.List(scheduledTransaction));
+        Mockito.when(accountProvider.lookup(Mockito.anyLong())).thenReturn(Control.Option());
+        Mockito.when(transactionScheduleProvider.lookup()).thenReturn(Collections.List(scheduledTransaction));
     }
 
     @Test
@@ -75,10 +76,10 @@ class ScheduledTransactionResourceTest {
                 .source(ScheduledTransactionCreateRequest.EntityRef.builder().id(2L).build())
                 .build();
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(Account.builder().id(1L).build()));
-        Mockito.when(accountProvider.lookup(2L)).thenReturn(API.Option(Account.builder().id(2L).build()));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(Account.builder().id(1L).build()));
+        Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(Account.builder().id(2L).build()));
         Mockito.when(transactionScheduleProvider.lookup())
-                .thenReturn(API.List(scheduledTransaction, ScheduledTransaction.builder()
+                .thenReturn(Collections.List(scheduledTransaction, ScheduledTransaction.builder()
                         .name("Sample schedule")
                         .build()));
 
@@ -108,7 +109,7 @@ class ScheduledTransactionResourceTest {
         var request = ScheduledTransactionPatchRequest.builder()
                 .description("Updated description")
                 .name("New name")
-                .range(DateRange.forYear(2021))
+                .range(DateRangeOld.forYear(2021))
                 .build();
 
         var response = subject.patch(1L, request).blockingGet();

@@ -1,6 +1,6 @@
 package com.jongsoft.finance.graph;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -13,7 +13,7 @@ import com.jongsoft.highchart.common.SeriesType;
 import com.jongsoft.highchart.series.PieSeries;
 import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.context.MessageSource;
 
@@ -64,7 +64,7 @@ public abstract class BudgetPieChart {
     protected PieSeries createSeries(Sequence<Account> accounts, LocalDate start, LocalDate end, Locale locale) {
         PieSeries series = SeriesFactory.createSeries(SeriesType.PIE);
 
-        DateRange dateRange = DateRange.of(start, end);
+        DateRangeOld dateRange = DateRangeOld.of(start, end);
         Budget budget = budgetProvider.lookup(start.getYear(), start.getMonthValue())
                 .blockingGet();
 
@@ -78,7 +78,7 @@ public abstract class BudgetPieChart {
             for (Budget.Expense expense : budget.getExpenses()) {
                 double balance = transactionProvider.balance(
                         request.expenses(
-                                API.List(new EntityRef(expense.getId()))))
+                                Collections.List(new EntityRef(expense.getId()))))
                         .getOrSupply(() -> 0D);
 
                 totalBalance = totalBalance.subtract(BigDecimal.valueOf(balance));

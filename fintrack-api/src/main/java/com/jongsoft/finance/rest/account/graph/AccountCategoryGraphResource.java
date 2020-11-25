@@ -9,7 +9,7 @@ import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
 import com.jongsoft.finance.graph.CategoryPieChart;
 import com.jongsoft.finance.rest.DateFormat;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -67,7 +67,7 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
 
         var currency = currencySymbol(account.getCurrency());
         return createChart(currencySymbol(account.getCurrency()), locale)
-                .addSeries(createSeries(API.List(account), start, end, locale, false, currency))
+                .addSeries(createSeries(Collections.List(account), start, end, locale, false, currency))
                 .toJson();
     }
 
@@ -91,7 +91,7 @@ public class AccountCategoryGraphResource extends CategoryPieChart {
 
         var currency = currencySymbol(account.getCurrency());
         return createChart(currencySymbol(account.getCurrency()), locale)
-                .addSeries(createSeries(API.List(account), start, end, locale, true, currency))
+                .addSeries(createSeries(Collections.List(account), start, end, locale, true, currency))
                 .toJson();
     }
 

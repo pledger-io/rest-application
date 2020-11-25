@@ -11,7 +11,7 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.AccountJson;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Maybe;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -53,7 +53,7 @@ class ProcessAccountCreationDelegateTest {
 
         StringValue value = new PrimitiveTypeValueImpl.StringValueImpl(ProcessMapper.INSTANCE.writeValueAsString(accountJson));
 
-        Mockito.when(userService.currentUser()).thenReturn(UserAccount.builder().roles(API.List(new Role("admin"))).build());
+        Mockito.when(userService.currentUser()).thenReturn(UserAccount.builder().roles(Collections.List(new Role("admin"))).build());
         Mockito.when(execution.getVariableLocalTyped("account")).thenReturn(value);
 
         new EventBus(eventPublisher);

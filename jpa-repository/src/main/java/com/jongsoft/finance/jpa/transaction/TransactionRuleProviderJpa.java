@@ -12,7 +12,7 @@ import com.jongsoft.finance.jpa.transaction.entity.RuleJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -108,8 +108,8 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
                 .sort(sortOrder)
                 .build();
 
-        ruleJpa.setConditions(convertConditions(ruleJpa, API.List(rule.getConditions())).toJava());
-        ruleJpa.setChanges(convertChanges(ruleJpa, API.List(rule.getChanges())).toJava());
+        ruleJpa.setConditions(convertConditions(ruleJpa, Collections.List(rule.getConditions())).toJava());
+        ruleJpa.setChanges(convertChanges(ruleJpa, Collections.List(rule.getChanges())).toJava());
 
         entityManager.persist(ruleJpa);
     }

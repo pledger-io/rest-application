@@ -1,25 +1,23 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.lang.API;
-
+import com.jongsoft.lang.Collections;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate analyzes the transactions recorded with a specific budget type in the past 3 months to determine if
@@ -56,10 +54,10 @@ public class ProcessBudgetAnalysisDelegate implements JavaDelegate {
         runningDate = runningDate.minusMonths(1);
 
         var deviation = 0;
-        var dateRange = DateRange.forMonth(runningDate.getYear(), runningDate.getMonthValue());
+        var dateRange = DateRangeOld.forMonth(runningDate.getYear(), runningDate.getMonthValue());
         var budgetAnalysisMonths = settingProvider.getBudgetAnalysisMonths();
         var searchCommand = filterFactory.transaction()
-                .expenses(API.List(new EntityRef(forExpense.getId())));
+                .expenses(Collections.List(new EntityRef(forExpense.getId())));
 
         for (int i = budgetAnalysisMonths; i > 0; i--) {
             var transactions = transactionProvider.lookup(searchCommand.range(dateRange));

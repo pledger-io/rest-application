@@ -7,7 +7,8 @@ import com.jongsoft.finance.domain.account.ContractProvider;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +45,7 @@ public class ContractWarningIT extends ProcessTestSetup {
                         .id(1L)
                         .username("test-user")
                         .password("12345")
-                        .roles(API.List(new Role("admin")))
+                        .roles(Collections.List(new Role("admin")))
                         .build());
     }
 
@@ -60,7 +61,7 @@ public class ContractWarningIT extends ProcessTestSetup {
                 .notifyBeforeEnd(false)
                 .build();
 
-        Mockito.when(contractProvider.lookup(1L)).thenReturn(API.Option(contract));
+        Mockito.when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
 
         var process = processEngine.getRuntimeService().createProcessInstanceByKey("ContractEndWarning")
                 .setVariable("username", currentUserProvider.currentUser().getUsername())

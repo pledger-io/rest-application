@@ -2,7 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.contract;
 
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.account.ContractProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import io.reactivex.Maybe;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +41,7 @@ class ProcessContractLookupDelegateTest {
     void execute_byId() throws Exception {
         Contract contract = Contract.builder().build();
 
-        Mockito.when(contractProvider.lookup(2L)).thenReturn(API.Option(contract));
+        Mockito.when(contractProvider.lookup(2L)).thenReturn(Control.Option(contract));
         Mockito.when(execution.hasVariableLocal("name")).thenReturn(false);
         Mockito.when(execution.getVariableLocal("id")).thenReturn(2L);
 

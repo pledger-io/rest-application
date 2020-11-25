@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DateRangeTest {
+class DateRangeOldTest {
 
     @Test
     void forMonth() {
-        final DateRange dateRange = DateRange.forMonth(2012, 1);
+        final DateRangeOld dateRange = DateRangeOld.forMonth(2012, 1);
 
         assertThat(dateRange.computeStartMonth()).isEqualTo(1);
         assertThat(dateRange.computeStartYear()).isEqualTo(2012);
@@ -30,7 +30,7 @@ class DateRangeTest {
         LocalDate now = LocalDate.now();
         int year = now.getYear();
 
-        final DateRange dateRange = DateRange.currentYear();
+        final DateRangeOld dateRange = DateRangeOld.currentYear();
 
         assertThat(dateRange).hasToString(year + "-01-01/" + year + "-12-31");
     }
@@ -39,14 +39,14 @@ class DateRangeTest {
     void currentMonth() {
         LocalDate now = LocalDate.now();
 
-        final DateRange dateRange = DateRange.currentMonth();
-        assertThat(dateRange).isEqualTo(DateRange.forMonth(now.getYear(), now.getMonthValue()));
+        final DateRangeOld dateRange = DateRangeOld.currentMonth();
+        assertThat(dateRange).isEqualTo(DateRangeOld.forMonth(now.getYear(), now.getMonthValue()));
     }
 
     @Test
     void isSame() {
-        final DateRange dateRange = DateRange.forMonth(2012, 1);
-        final DateRange dateRange2 = DateRange.of(LocalDate.of(2012, 1, 1), LocalDate.of(2012, 1, 31));
+        final DateRangeOld dateRange = DateRangeOld.forMonth(2012, 1);
+        final DateRangeOld dateRange2 = DateRangeOld.of(LocalDate.of(2012, 1, 1), LocalDate.of(2012, 1, 31));
 
         assertThat(dateRange).isEqualTo(dateRange2);
         assertThat(dateRange).hasSameHashCodeAs(dateRange2.hashCode());
@@ -54,8 +54,8 @@ class DateRangeTest {
 
     @Test
     void isDifferent() {
-        final DateRange dateRange = DateRange.forMonth(2012, 1);
-        final DateRange dateRange2 = DateRange.of(LocalDate.of(2012, 1, 1), LocalDate.of(2012, 1, 30));
+        final DateRangeOld dateRange = DateRangeOld.forMonth(2012, 1);
+        final DateRangeOld dateRange2 = DateRangeOld.of(LocalDate.of(2012, 1, 1), LocalDate.of(2012, 1, 30));
 
         assertThat(dateRange).isNotEqualTo(dateRange2);
         assertThat(dateRange.hashCode()).isNotEqualTo(dateRange2.hashCode());
@@ -63,37 +63,37 @@ class DateRangeTest {
 
     @Test
     void amountOfDays() {
-        assertThat(DateRange.forMonth(2012, 1).amountOfDays()).isEqualTo(30);
+        assertThat(DateRangeOld.forMonth(2012, 1).amountOfDays()).isEqualTo(30);
     }
 
     @Test
     void months() {
-        final List<DateRange> dateRanges = DateRange.of(LocalDate.of(2012, 1, 1), LocalDate.of(2013, 1, 1))
+        final List<DateRangeOld> dateRanges = DateRangeOld.of(LocalDate.of(2012, 1, 1), LocalDate.of(2013, 1, 1))
                 .months()
                 .collect(Collectors.toList());
 
         assertThat(dateRanges)
                 .hasSize(12)
                 .contains(
-                        DateRange.forMonth(2012, 1),
-                        DateRange.forMonth(2012, 2),
-                        DateRange.forMonth(2012, 3),
-                        DateRange.forMonth(2012, 4),
-                        DateRange.forMonth(2012, 5),
-                        DateRange.forMonth(2012, 6),
-                        DateRange.forMonth(2012, 7),
-                        DateRange.forMonth(2012, 8),
-                        DateRange.forMonth(2012, 9),
-                        DateRange.forMonth(2012, 10),
-                        DateRange.forMonth(2012, 11),
-                        DateRange.forMonth(2012, 12));
+                        DateRangeOld.forMonth(2012, 1),
+                        DateRangeOld.forMonth(2012, 2),
+                        DateRangeOld.forMonth(2012, 3),
+                        DateRangeOld.forMonth(2012, 4),
+                        DateRangeOld.forMonth(2012, 5),
+                        DateRangeOld.forMonth(2012, 6),
+                        DateRangeOld.forMonth(2012, 7),
+                        DateRangeOld.forMonth(2012, 8),
+                        DateRangeOld.forMonth(2012, 9),
+                        DateRangeOld.forMonth(2012, 10),
+                        DateRangeOld.forMonth(2012, 11),
+                        DateRangeOld.forMonth(2012, 12));
     }
 
     @Test
     void previous() {
-        var range = DateRange.forMonth(2019, 1).previous(ChronoUnit.MONTHS);
+        var range = DateRangeOld.forMonth(2019, 1).previous(ChronoUnit.MONTHS);
 
-        assertThat(range).isEqualTo(DateRange.forMonth(2018, 12));
+        assertThat(range).isEqualTo(DateRangeOld.forMonth(2018, 12));
     }
 
 }

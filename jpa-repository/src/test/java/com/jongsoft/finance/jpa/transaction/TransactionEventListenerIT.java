@@ -9,7 +9,7 @@ import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.transaction.entity.TransactionJournal;
 import com.jongsoft.finance.jpa.transaction.entity.TransactionJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
@@ -49,7 +49,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
                         .currency("EUR")
                         .user(UserAccount.builder().username("dem-user").build())
                         .description("My demo transaction")
-                        .transactions(API.List(
+                        .transactions(Collections.List(
                                 Transaction.Part.builder()
                                         .amount(25.5)
                                         .account(
@@ -148,7 +148,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
         eventPublisher.publishEvent(new TransactionTaggingEvent(
                 this,
                 1L,
-                API.List("Food")));
+                Collections.List("Food")));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
         Assertions.assertThat(check.getTags()).hasSize(1);
@@ -161,7 +161,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
         eventPublisher.publishEvent(new TransactionSplitEvent(
                 this,
                 1L,
-                API.List(
+                Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
                                 .amount(20.2)
@@ -181,7 +181,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
         var check = entityManager.find(TransactionJournal.class, 1L);
 
-        var parts = API.List(check.getTransactions());
+        var parts = Collections.List(check.getTransactions());
         Assertions.assertThat(parts.filter(part -> Objects.isNull(part.getDeleted()))).hasSize(3);
     }
 

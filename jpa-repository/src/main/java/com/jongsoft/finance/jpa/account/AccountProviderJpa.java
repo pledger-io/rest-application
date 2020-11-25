@@ -1,7 +1,6 @@
 package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
-import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.core.ResultPage;
@@ -12,6 +11,7 @@ import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import com.jongsoft.lang.time.Range;
 import io.micronaut.data.model.Sort;
 import io.reactivex.Maybe;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Slf4j
@@ -145,7 +146,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Sequence<AccountSpending> top(FilterCommand filter, DateRange range, boolean asc) {
+    public Sequence<AccountSpending> top(FilterCommand filter, Range<LocalDate> range, boolean asc) {
         log.trace("Account top listing by filter: {}", filter);
 
         if (filter instanceof AccountFilterCommand delegate) {
@@ -156,7 +157,7 @@ public class AccountProviderJpa implements AccountProvider {
                                 t.account, sum(t.amount), avg(t.amount))
                      from TransactionJpa t 
                      where
-                        t.journal.date between :start and :until
+                        t.journal.date >= :start and t.journal.date < :until
                         and t.deleted is null
                         and t.journal.user.username = :username
                         and t.account.id in (select distinct a.id %s)
@@ -166,8 +167,8 @@ public class AccountProviderJpa implements AccountProvider {
             return entityManager.<TripleProjection<AccountJpa, Double, Double>>blocking()
                     .hql(hql)
                     .setAll(delegate.getParameters())
-                    .set("start", range.getStart())
-                    .set("until", range.getEnd())
+                    .set("start", range.from())
+                    .set("until", range.until())
                     .limit(delegate.pageSize())
                     .sort(Sort.of(asc ? Sort.Order.asc("sum(t.amount)") : Sort.Order.desc("sum(t.amount)")))
                     .sequence()

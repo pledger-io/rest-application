@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.transaction.graph;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
@@ -14,7 +14,8 @@ import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.i18n.ResourceBundleMessageSource;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -80,11 +81,11 @@ class TransactionBudgetGraphResourceTest extends TestSetup {
                 .name("Demo Expense")
                 .build();
 
-        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(API.Option());
+        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option());
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))
                 .thenReturn(ResultPage.of(account));
         Mockito.when(budgetProvider.lookup(2019, 1)).thenReturn(Single.just(Budget.builder()
-                .expenses(API.List(expense))
+                .expenses(Collections.List(expense))
                 .build()));
 
         subject.budget(
@@ -95,8 +96,8 @@ class TransactionBudgetGraphResourceTest extends TestSetup {
         var mockFilter = filterFactory.transaction();
         Mockito.verify(accountProvider).lookup(Mockito.any(AccountProvider.FilterCommand.class));
         Mockito.verify(mockFilter).onlyIncome(false);
-        Mockito.verify(mockFilter).range(DateRange.forMonth(2019, 1));
-        Mockito.verify(mockFilter).accounts(API.List(new EntityRef(123L)));
-        Mockito.verify(mockFilter).expenses(API.List(new EntityRef(1L)));
+        Mockito.verify(mockFilter).range(DateRangeOld.forMonth(2019, 1));
+        Mockito.verify(mockFilter).accounts(Collections.List(new EntityRef(123L)));
+        Mockito.verify(mockFilter).expenses(Collections.List(new EntityRef(1L)));
     }
 }

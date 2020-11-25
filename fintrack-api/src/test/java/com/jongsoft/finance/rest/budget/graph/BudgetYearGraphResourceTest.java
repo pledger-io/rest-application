@@ -6,7 +6,8 @@ import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.i18n.ResourceBundleMessageSource;
 import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,7 @@ class BudgetYearGraphResourceTest extends TestSetup {
                 Single.just(Budget.builder()
                         .expectedIncome(200.20D)
                         .start(LocalDate.of(2018, 2, 3))
-                        .expenses(API.List(Budget.Expense.builder()
+                        .expenses(Collections.List(Budget.Expense.builder()
                                 .id(1L)
                                 .name("Grocery")
                                 .lowerBound(20D)
@@ -58,7 +59,7 @@ class BudgetYearGraphResourceTest extends TestSetup {
 
     @Test
     void expense() {
-        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(API.Option());
+        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option());
 
         subject.expense(Locale.GERMAN, 2019);
 
@@ -68,7 +69,7 @@ class BudgetYearGraphResourceTest extends TestSetup {
 
     @Test
     void income() {
-        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(API.Option());
+        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option());
 
         subject.income(Locale.GERMAN, 2019);
 

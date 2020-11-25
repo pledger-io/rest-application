@@ -1,14 +1,14 @@
 package com.jongsoft.finance.rest.model;
 
-import java.time.LocalDate;
+import com.jongsoft.finance.core.date.DateRangeOld;
 
-import com.jongsoft.finance.core.date.DateRange;
+import java.time.LocalDate;
 
 public class DateRangeResponse {
 
-    private final DateRange wrapped;
+    private final DateRangeOld wrapped;
 
-    public DateRangeResponse(final DateRange wrapped) {
+    public DateRangeResponse(final DateRangeOld wrapped) {
         this.wrapped = wrapped;
     }
 

@@ -11,7 +11,7 @@ import com.jongsoft.finance.domain.user.events.BudgetExpenseCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.BudgetJson;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Single;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -59,7 +59,7 @@ class ProcessBudgetCreateDelegateTest {
 
         StringValue value = new PrimitiveTypeValueImpl.StringValueImpl(ProcessMapper.writeSafe(budgetJson));
 
-        Mockito.when(currentUserFacade.currentUser()).thenReturn(UserAccount.builder().roles(API.List(new Role("admin"))).build());
+        Mockito.when(currentUserFacade.currentUser()).thenReturn(UserAccount.builder().roles(Collections.List(new Role("admin"))).build());
         Mockito.when(execution.getVariableLocalTyped("budget")).thenReturn(value);
 
         new EventBus(eventPublisher);
@@ -81,7 +81,7 @@ class ProcessBudgetCreateDelegateTest {
                 .id(1L)
                 .start(LocalDate.of(2018, 1, 1))
                 .expectedIncome(1100)
-                .expenses(API.List(
+                .expenses(Collections.List(
                         Budget.Expense.builder()
                                 .id(1L)
                                 .name("Expense 1")

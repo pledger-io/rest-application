@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 
 import java.util.Currency;
 
@@ -18,7 +18,7 @@ public class UserProfileResponse {
     }
 
     public String getCurrency() {
-        return API.Option(wrappedModel.getPrimaryCurrency())
+        return Control.Option(wrappedModel.getPrimaryCurrency())
                 .map(Currency::getCurrencyCode)
                 .getOrSupply(() -> null);
     }

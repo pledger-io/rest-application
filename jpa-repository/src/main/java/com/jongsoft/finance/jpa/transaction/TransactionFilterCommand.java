@@ -2,11 +2,11 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.SystemAccountTypes;
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.data.model.Sort;
 
@@ -16,7 +16,7 @@ import java.util.function.Function;
 public class TransactionFilterCommand extends FilterCommandJpa implements TransactionProvider.FilterCommand {
 
     private static Function<Iterable<? extends AggregateBase>, List<Long>> ID_REDUCER =
-            input -> API.List(input).map(AggregateBase::getId).toJava();
+            input -> Collections.List(input).map(AggregateBase::getId).toJava();
 
     private int pageSize;
     private int page;
@@ -89,7 +89,7 @@ public class TransactionFilterCommand extends FilterCommandJpa implements Transa
     }
 
     @Override
-    public TransactionProvider.FilterCommand range(DateRange range) {
+    public TransactionProvider.FilterCommand range(DateRangeOld range) {
         hql("date", " AND a.date between :startDate and :endDate");
         parameter("startDate", range.getStart());
         parameter("endDate", range.getEnd());
@@ -129,7 +129,7 @@ public class TransactionFilterCommand extends FilterCommandJpa implements Transa
                                 where j.journal = t.journal
                                 and j.deleted is null
                                 and j.account.type.label in (:systemAccountTypes)) """);
-        parameter("systemAccountTypes", API.List(SystemAccountTypes.values()).map(SystemAccountTypes::label).toJava());
+        parameter("systemAccountTypes", Collections.List(SystemAccountTypes.values()).map(SystemAccountTypes::label).toJava());
         return this;
     }
 
@@ -140,7 +140,7 @@ public class TransactionFilterCommand extends FilterCommandJpa implements Transa
                                 where j.journal = t.journal
                                 and j.deleted is null
                                 and j.account.type.label in (:systemAccountTypes)) """);
-        parameter("systemAccountTypes", API.List(SystemAccountTypes.values()).map(SystemAccountTypes::label).toJava());
+        parameter("systemAccountTypes", Collections.List(SystemAccountTypes.values()).map(SystemAccountTypes::label).toJava());
         return this;
     }
 

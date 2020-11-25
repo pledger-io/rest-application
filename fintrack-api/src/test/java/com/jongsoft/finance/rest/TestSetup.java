@@ -8,7 +8,7 @@ import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.domain.user.ExpenseProvider;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import org.jboss.aerogear.security.otp.api.Base32;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -24,7 +24,7 @@ public class TestSetup {
             .theme("dark")
             .primaryCurrency(Currency.getInstance("EUR"))
             .secret(Base32.random())
-            .roles(API.List(new Role("admin")))
+            .roles(Collections.List(new Role("admin")))
             .build();
 
     protected FilterFactory generateFilterMock() {

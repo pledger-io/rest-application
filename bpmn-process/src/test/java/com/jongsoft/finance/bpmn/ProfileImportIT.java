@@ -6,7 +6,8 @@ import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
 import com.jongsoft.finance.domain.user.*;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -56,11 +57,11 @@ public class ProfileImportIT extends ProcessTestSetup {
                 .id(1L)
                 .username("test-user")
                 .password("12345")
-                .roles(API.List(new Role("admin")))
+                .roles(Collections.List(new Role("admin")))
                 .build();
         Mockito.when(authenticationFacade.currentUser()).thenReturn(userAccount);
-        Mockito.when(userProvider.lookup("test-user")).thenReturn(API.Option(userAccount));
-        Mockito.when(transactionRuleProvider.lookup()).thenReturn(API.List());
+        Mockito.when(userProvider.lookup("test-user")).thenReturn(Control.Option(userAccount));
+        Mockito.when(transactionRuleProvider.lookup()).thenReturn(Collections.List());
     }
 
     @Test

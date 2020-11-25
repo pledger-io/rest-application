@@ -1,13 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
-import java.time.LocalDate;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.ResultPage;
@@ -17,7 +10,14 @@ import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+
+import java.time.LocalDate;
 
 class ProcessBudgetAnalysisDelegateTest {
 
@@ -44,7 +44,7 @@ class ProcessBudgetAnalysisDelegateTest {
         Mockito.when(applicationSettings.getBudgetAnalysisMonths()).thenReturn(3);
         Mockito.when(applicationSettings.getMaximumBudgetDeviation()).thenReturn(0.25);
         Mockito.when(execution.getVariable("user")).thenReturn(UserAccount.builder()
-                .roles(API.List(new Role("admin")))
+                .roles(Collections.List(new Role("admin")))
                 .build());
 
         Mockito.when(execution.getVariableLocal("date")).thenReturn(LocalDate.of(2019, 1, 23));
@@ -73,9 +73,9 @@ class ProcessBudgetAnalysisDelegateTest {
         subject.execute(execution);
 
         Mockito.verify(transactionProvider, Mockito.times(3)).lookup(Mockito.any(TransactionProvider.FilterCommand.class));
-        Mockito.verify(filterCommand).range(DateRange.forMonth(2018, 12));
-        Mockito.verify(filterCommand).range(DateRange.forMonth(2018, 11));
-        Mockito.verify(filterCommand).range(DateRange.forMonth(2018, 10));
+        Mockito.verify(filterCommand).range(DateRangeOld.forMonth(2018, 12));
+        Mockito.verify(filterCommand).range(DateRangeOld.forMonth(2018, 11));
+        Mockito.verify(filterCommand).range(DateRangeOld.forMonth(2018, 10));
 
         Mockito.verify(execution).setVariableLocal("deviates", true);
         Mockito.verify(execution).setVariableLocal("deviation", -35.0d);

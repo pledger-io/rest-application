@@ -1,29 +1,21 @@
 package com.jongsoft.finance.domain.transaction;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.LocalDate;
-import java.util.Date;
-
+import com.jongsoft.finance.core.FailureCode;
+import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.transaction.events.*;
+import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.lang.Collections;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import com.jongsoft.finance.core.FailureCode;
-import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.transaction.events.TransactionAccountChangedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionAmountChangedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionBookedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionCreatedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionDeletedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionDescribeEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionRelationEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionTaggingEvent;
-import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.lang.API;
 
-import io.micronaut.context.event.ApplicationEventPublisher;
+import java.time.LocalDate;
+import java.util.Date;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TransactionTest {
 
@@ -53,7 +45,7 @@ class TransactionTest {
                 .created(new Date(2018, 1, 1))
                 .description("Transaction into savings")
                 .currency("EUR")
-                .transactions(API.List(
+                .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
                                 .amount(-25.5)
@@ -87,7 +79,7 @@ class TransactionTest {
         transaction = Transaction.builder()
                 .description("Transaction into savings")
                 .currency("EUR")
-                .transactions(API.List(
+                .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
                                 .amount(-25.5)
@@ -111,7 +103,7 @@ class TransactionTest {
         transaction = Transaction.builder()
                 .description("Transaction into savings")
                 .currency("EUR")
-                .transactions(API.List(
+                .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
                                 .amount(-25.5)
@@ -195,11 +187,11 @@ class TransactionTest {
     void tag() {
         ArgumentCaptor<TransactionTaggingEvent> captor = ArgumentCaptor.forClass(TransactionTaggingEvent.class);
 
-        transaction.tag(API.List("tag 1", "tag 2"));
+        transaction.tag(Collections.List("tag 1", "tag 2"));
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
         assertThat(captor.getValue().getId()).isEqualTo(1L);
-        assertThat(captor.getValue().getTags()).isEqualTo(API.List("tag 1", "tag 2"));
+        assertThat(captor.getValue().getTags()).isEqualTo(Collections.List("tag 1", "tag 2"));
     }
 
     @Test
@@ -275,7 +267,7 @@ class TransactionTest {
 
     @Test
     void split() {
-        transaction.split(API.List(
+        transaction.split(Collections.List(
                 new SplitRecord("Split part 1", 12),
                 new SplitRecord("Split part 2", 13.5)));
 
@@ -284,7 +276,7 @@ class TransactionTest {
 
     @Test
     void split_amountChanged() {
-        transaction.split(API.List(
+        transaction.split(Collections.List(
                 new SplitRecord("Split part 1", 12),
                 new SplitRecord("Split part 2", 13)));
 

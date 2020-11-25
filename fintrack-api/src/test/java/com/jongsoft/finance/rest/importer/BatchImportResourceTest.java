@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.importer;
 
-import com.jongsoft.finance.core.date.Dates;
+import com.jongsoft.finance.core.date.DateUtils;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.importer.BatchImport;
@@ -10,7 +10,7 @@ import com.jongsoft.finance.domain.importer.ImportProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
@@ -53,7 +53,7 @@ class BatchImportResourceTest extends TestSetup {
     void list() {
         var resultPage = ResultPage.of(BatchImport.builder()
                 .id(1L)
-                .created(Dates.toDate(LocalDate.of(2019, 1, 1)))
+                .created(DateUtils.toDate(LocalDate.of(2019, 1, 1)))
                 .slug("batch-import-slug")
                 .fileCode("sample big content")
                 .build());
@@ -69,10 +69,10 @@ class BatchImportResourceTest extends TestSetup {
     void create() {
         var mockConfig = Mockito.mock(BatchImportConfig.class);
 
-        Mockito.when(csvConfigProvider.lookup("sample-configuration")).thenReturn(API.Option(mockConfig));
+        Mockito.when(csvConfigProvider.lookup("sample-configuration")).thenReturn(Control.Option(mockConfig));
         Mockito.when(mockConfig.createImport("token-sample")).thenReturn(
                 BatchImport.builder()
-                        .created(Dates.toDate(LocalDate.of(2019, 2, 1)))
+                        .created(DateUtils.toDate(LocalDate.of(2019, 2, 1)))
                         .fileCode("token-sample")
                         .slug("xd2rsd-2fasd-q2ff-asd")
                         .build());
@@ -91,7 +91,7 @@ class BatchImportResourceTest extends TestSetup {
     void get() {
         Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
                 Maybe.just(BatchImport.builder()
-                        .created(Dates.toDate(LocalDate.of(2019, 2, 1)))
+                        .created(DateUtils.toDate(LocalDate.of(2019, 2, 1)))
                         .fileCode("token-sample")
                         .slug("xd2rsd-2fasd-q2ff-asd")
                         .config(BatchImportConfig.builder()
@@ -99,7 +99,7 @@ class BatchImportResourceTest extends TestSetup {
                                 .fileCode("xd2rsd-2fasd-33dfd-ddfa")
                                 .name("sample-config.json")
                                 .build())
-                        .finished(Dates.toDate(LocalDate.of(2019, 2, 2)))
+                        .finished(DateUtils.toDate(LocalDate.of(2019, 2, 2)))
                         .totalExpense(200.2D)
                         .totalIncome(303.40D)
                         .build()));
@@ -118,7 +118,7 @@ class BatchImportResourceTest extends TestSetup {
         Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
                 Maybe.just(BatchImport.builder()
                         .id(1L)
-                        .created(Dates.toDate(LocalDate.of(2019, 2, 1)))
+                        .created(DateUtils.toDate(LocalDate.of(2019, 2, 1)))
                         .fileCode("token-sample")
                         .slug("xd2rsd-2fasd-q2ff-asd")
                         .config(BatchImportConfig.builder()
@@ -138,7 +138,7 @@ class BatchImportResourceTest extends TestSetup {
     void delete_alreadyFinished() {
         Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
                 Maybe.just(BatchImport.builder()
-                        .created(Dates.toDate(LocalDate.of(2019, 2, 1)))
+                        .created(DateUtils.toDate(LocalDate.of(2019, 2, 1)))
                         .fileCode("token-sample")
                         .slug("xd2rsd-2fasd-q2ff-asd")
                         .config(BatchImportConfig.builder()
@@ -173,7 +173,7 @@ class BatchImportResourceTest extends TestSetup {
 
     @Test
     void createConfig() {
-        Mockito.when(csvConfigProvider.lookup("sample-configuration")).thenReturn(API.Option());
+        Mockito.when(csvConfigProvider.lookup("sample-configuration")).thenReturn(Control.Option());
 
         var request = CSVImporterConfigCreateRequest.builder()
                 .name("sample-configuration")

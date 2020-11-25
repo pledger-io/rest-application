@@ -7,7 +7,7 @@ import com.jongsoft.finance.domain.user.events.BudgetExpenseCreatedEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.user.entity.BudgetJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
@@ -46,7 +46,7 @@ class BudgetEventListenerIT extends JpaTestSetup {
                 Budget.builder()
                         .expectedIncome(2500)
                         .start(LocalDate.of(2018, 1, 1))
-                        .expenses(API.List(Budget.Expense.builder()
+                        .expenses(Collections.List(Budget.Expense.builder()
                                 .id(2L)
                                 .name("Groceries")
                                 .upperBound(200)

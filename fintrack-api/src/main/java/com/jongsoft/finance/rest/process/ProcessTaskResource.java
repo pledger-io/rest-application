@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.process;
 
 import com.jongsoft.finance.rest.model.ProcessTaskResponse;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
 import io.micronaut.http.annotation.Get;
@@ -32,7 +32,7 @@ public class ProcessTaskResource {
             operationId = "getTasks"
     )
     public Flowable<ProcessTaskResponse> tasks(@PathVariable String processDefinitionKey, @PathVariable String instanceId) {
-        var tasks = API.List(taskService.createTaskQuery()
+        var tasks = Collections.List(taskService.createTaskQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .processInstanceId(instanceId)
                 .initializeFormKeys()

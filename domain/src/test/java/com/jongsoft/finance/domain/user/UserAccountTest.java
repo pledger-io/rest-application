@@ -1,15 +1,5 @@
 package com.jongsoft.finance.domain.user;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.LocalDate;
-import java.util.Currency;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.events.AccountCreatedEvent;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
@@ -20,9 +10,18 @@ import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountPasswordChangedEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountSettingEvent;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.lang.API;
-
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+
+import java.time.LocalDate;
+import java.util.Currency;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UserAccountTest {
 
@@ -40,13 +39,13 @@ class UserAccountTest {
                 .id(1L)
                 .username("demo-user")
                 .password("1234567")
-                .roles(API.List(new Role("accountant")))
+                .roles(Collections.List(new Role("accountant")))
                 .build();
         readOnlyAccount = UserAccount.builder()
                 .id(2L)
                 .username("demo-user")
                 .password("1234567")
-                .roles(API.List(new Role("reader")))
+                .roles(Collections.List(new Role("reader")))
                 .build();
     }
 

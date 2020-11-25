@@ -13,7 +13,8 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.collection.Set;
 import io.reactivex.Maybe;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 public class ImportAccountExtractorIT extends ProcessTestSetup {
     private class AccountFilterTest implements AccountProvider.FilterCommand {
 
-        private Sequence<String> calls = API.List();
+        private Sequence<String> calls = Collections.List();
 
         @Override
         public boolean equals(Object obj) {
@@ -118,10 +119,10 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
                 .id(1L)
                 .username("test-user")
                 .password("12345")
-                .roles(API.List(new Role("admin")))
+                .roles(Collections.List(new Role("admin")))
                 .build();
         Mockito.when(userService.currentUser()).thenReturn(userAccount);
-        Mockito.when(userProvider.lookup("test-user")).thenReturn(API.Option(userAccount));
+        Mockito.when(userProvider.lookup("test-user")).thenReturn(Control.Option(userAccount));
 
         Mockito.when(accountProvider.lookup("MW GA Pieterse"))
                 .thenReturn(Maybe.empty())
@@ -197,7 +198,7 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
 
         Assertions.assertThat(variables).hasSize(1);
 
-        Set transactions = API.Set((Iterable) variables.get(0).getValue());
+        Set transactions = Collections.Set((Iterable) variables.get(0).getValue());
         Assertions.assertThat(transactions.get(0)).isInstanceOf(ExtractionMapping.class);
         Assertions.assertThat(transactions.get(1)).isInstanceOf(ExtractionMapping.class);
         Assertions.assertThat(transactions.get(2)).isInstanceOf(ExtractionMapping.class);

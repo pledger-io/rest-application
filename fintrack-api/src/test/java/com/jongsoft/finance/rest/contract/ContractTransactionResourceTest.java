@@ -6,7 +6,7 @@ import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -44,6 +44,6 @@ class ContractTransactionResourceTest extends TestSetup {
         Mockito.verify(transactionProvider).lookup(Mockito.any());
         Mockito.verify(mockFilter).onlyIncome(false);
         Mockito.verify(mockFilter).ownAccounts();
-        Mockito.verify(mockFilter).contracts(API.List(new EntityRef(1L)));
+        Mockito.verify(mockFilter).contracts(Collections.List(new EntityRef(1L)));
     }
 }

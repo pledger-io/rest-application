@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.rest.model.SessionResponse;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.TwoFactorHelper;
@@ -9,6 +10,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -64,10 +66,20 @@ public class ProfileResource {
         });
     }
 
+    @Get(value = "/sessions")
+    @Operation(
+            operationId = "getActiveSessions",
+            summary = "Active Sessions",
+            description = "Get a list of active session for the current user."
+    )
+    Flowable<SessionResponse> sessions() {
+        return Flowable.empty();
+    }
+
     @Get(value = "/multi-factor/qr-code", produces = MediaType.IMAGE_PNG)
     @Operation(
             operationId = "getQrCode",
-            summary = "Generate a QR code for the 2-factor",
+            summary = "QR Code",
             description = "Use this API to obtain a QR code that can be used to scan in a 2-factor application")
     Single<byte[]> qrCode() {
         return Single.create(emitter -> {

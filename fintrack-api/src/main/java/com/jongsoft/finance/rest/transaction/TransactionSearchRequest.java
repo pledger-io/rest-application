@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.transaction;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import io.micronaut.core.annotation.Introspected;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,7 +36,7 @@ public class TransactionSearchRequest {
     private boolean transfers;
 
     @NotNull
-    private DateRange dateRange;
+    private DateRangeOld dateRange;
 
     public String getDescription() {
         return description;
@@ -70,7 +70,7 @@ public class TransactionSearchRequest {
         return transfers;
     }
 
-    public DateRange getDateRange() {
+    public DateRangeOld getDateRange() {
         return dateRange;
     }
 

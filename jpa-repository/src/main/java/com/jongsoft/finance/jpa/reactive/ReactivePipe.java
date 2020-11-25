@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.reactive;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import io.micronaut.transaction.SynchronousTransactionManager;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -30,7 +30,7 @@ public class ReactivePipe<T> extends JpaPipe<T, ReactivePipe<T>> {
                 applyParameters(query);
                 applyPaging(query);
 
-                API.Try(() -> (T) query.getSingleResult())
+                Control.Try(() -> (T) query.getSingleResult())
                         .consume(emitter::onSuccess);
 
                 emitter.onComplete();
@@ -65,7 +65,7 @@ public class ReactivePipe<T> extends JpaPipe<T, ReactivePipe<T>> {
                 applyParameters(query);
                 applyPaging(query);
 
-                var result = API.Try(() -> (T) query.getSingleResult());
+                var result = Control.Try(() -> (T) query.getSingleResult());
                 if (result.isSuccess()) {
                     emitter.onSuccess(result.get());
                 } else {

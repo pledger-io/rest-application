@@ -1,6 +1,6 @@
 package com.jongsoft.finance.jpa.reactive;
 
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.data.model.Sort;
 
@@ -19,9 +19,9 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
 
     JpaPipe() {
         this.parameters = new HashMap<>();
-        this.limit = API.Option();
-        this.offset = API.Option();
-        this.sort = API.Option();
+        this.limit = Control.Option();
+        this.offset = Control.Option();
+        this.sort = Control.Option();
     }
 
     public <Y> R set(String parameter, Y value) {
@@ -40,17 +40,17 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
     }
 
     public R limit(int limit) {
-        this.limit = API.Option(limit);
+        this.limit = Control.Option(limit);
         return self();
     }
 
     public R offset(int offset) {
-        this.offset = API.Option(offset);
+        this.offset = Control.Option(offset);
         return self();
     }
 
     public R sort(Sort sort) {
-        this.sort = API.Option(sort);
+        this.sort = Control.Option(sort);
         return self();
     }
 

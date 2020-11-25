@@ -7,7 +7,7 @@ import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.transaction.entity.DailySummaryImpl;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
     void lookup() {
         setup();
         var filter = filterFactory.transaction()
-                .accounts(API.List(new EntityRef(2L)))
+                .accounts(Collections.List(new EntityRef(2L)))
                 .description("tran", false)
                 .onlyIncome(false);
 

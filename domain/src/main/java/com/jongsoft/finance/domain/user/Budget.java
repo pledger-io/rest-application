@@ -7,7 +7,7 @@ import com.jongsoft.finance.domain.user.events.BudgetClosedEvent;
 import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
 import com.jongsoft.finance.domain.user.events.BudgetExpenseCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -103,7 +103,7 @@ public class Budget implements AggregateBase {
 
         this.start = start;
         this.expectedIncome = expectedIncome;
-        this.expenses = API.List();
+        this.expenses = Collections.List();
     }
 
     @BusinessMethod

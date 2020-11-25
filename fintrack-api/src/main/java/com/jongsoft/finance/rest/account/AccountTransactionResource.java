@@ -11,7 +11,8 @@ import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
@@ -75,7 +76,7 @@ public class AccountTransactionResource {
                 emitter.onSuccess(HttpResponse.notFound());
             } else {
                 var command = filterFactory.transaction()
-                        .accounts(API.List(new EntityRef(accountId)))
+                        .accounts(Collections.List(new EntityRef(accountId)))
                         .range(request.getDateRange())
                         .pageSize(settingProvider.getPageSize())
                         .page(request.getPage());
@@ -113,19 +114,19 @@ public class AccountTransactionResource {
             final Consumer<Transaction.TransactionBuilder> builderConsumer =
                     transactionBuilder -> transactionBuilder.currency(request.getCurrency())
                             .description(request.getDescription())
-                            .budget(API.Option(request.getBudget())
+                            .budget(Control.Option(request.getBudget())
                                     .map(AccountTransactionCreateRequest.EntityRef::getName)
                                     .getOrSupply(() -> null))
-                            .category(API.Option(request.getCategory())
+                            .category(Control.Option(request.getCategory())
                                     .map(AccountTransactionCreateRequest.EntityRef::getName)
                                     .getOrSupply(() -> null))
-                            .contract(API.Option(request.getContract())
+                            .contract(Control.Option(request.getContract())
                                     .map(AccountTransactionCreateRequest.EntityRef::getName)
                                     .getOrSupply(() -> null))
                             .date(request.getDate())
                             .bookDate(request.getBookDate())
                             .interestDate(request.getInterestDate())
-                            .tags(API.Option(request.getTags()).map(API::List).getOrSupply(API::List));
+                            .tags(Control.Option(request.getTags()).map(Collections::List).getOrSupply(Collections::List));
 
             final Transaction transaction = fromAccount.createTransaction(
                     toAccount,
@@ -154,7 +155,7 @@ public class AccountTransactionResource {
     )
     Single<TransactionResponse> first(@PathVariable Long accountId, @Nullable String description) {
         var command = filterFactory.transaction()
-                .accounts(API.List(new EntityRef(accountId)));
+                .accounts(Collections.List(new EntityRef(accountId)));
 
         if (description != null) {
             command.description(description, true);
@@ -241,18 +242,18 @@ public class AccountTransactionResource {
                 }
 
                 // update meta-data
-                transaction.linkToBudget(API.Option(request.getBudget())
+                transaction.linkToBudget(Control.Option(request.getBudget())
                         .map(AccountTransactionCreateRequest.EntityRef::getName)
                         .getOrSupply(() -> null));
-                transaction.linkToCategory(API.Option(request.getCategory())
+                transaction.linkToCategory(Control.Option(request.getCategory())
                         .map(AccountTransactionCreateRequest.EntityRef::getName)
                         .getOrSupply(() -> null));
-                transaction.linkToContract(API.Option(request.getContract())
+                transaction.linkToContract(Control.Option(request.getContract())
                         .map(AccountTransactionCreateRequest.EntityRef::getName)
                         .getOrSupply(() -> null));
 
-                API.Option(request.getTags())
-                        .map(API::List)
+                Control.Option(request.getTags())
+                        .map(Collections::List)
                         .ifPresent(transaction::tag);
 
                 emitter.onSuccess(HttpResponse.ok(new TransactionResponse(transaction)));
@@ -275,7 +276,7 @@ public class AccountTransactionResource {
                 emitter.onSuccess(HttpResponse.notFound());
             } else {
                 presence.get().split(
-                        API.List(request.getSplits())
+                        Collections.List(request.getSplits())
                                 .map(split -> new SplitRecord(split.getDescription(), split.getAmount())));
 
                 emitter.onSuccess(HttpResponse.ok(new TransactionResponse(presence.get())));

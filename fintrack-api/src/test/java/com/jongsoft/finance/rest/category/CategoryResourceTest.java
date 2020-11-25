@@ -10,7 +10,8 @@ import com.jongsoft.finance.domain.user.events.CategoryCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
@@ -55,7 +56,7 @@ class CategoryResourceTest extends TestSetup {
 
     @Test
     void list() {
-        Mockito.when(categoryProvider.lookup()).thenReturn(API.List(
+        Mockito.when(categoryProvider.lookup()).thenReturn(Collections.List(
                 Category.builder()
                         .id(1L)
                         .label("grocery")
@@ -125,7 +126,7 @@ class CategoryResourceTest extends TestSetup {
     @Test
     void get() {
         Mockito.when(categoryProvider.lookup(1L)).thenReturn(
-                API.Option(Category.builder()
+                Control.Option(Category.builder()
                         .id(1L)
                         .user(ACTIVE_USER)
                         .label("grocery")
@@ -143,7 +144,7 @@ class CategoryResourceTest extends TestSetup {
 
     @Test
     void get_notFound() {
-        Mockito.when(categoryProvider.lookup(1L)).thenReturn(API.Option());
+        Mockito.when(categoryProvider.lookup(1L)).thenReturn(Control.Option());
 
         subject.get(1L).test()
                 .assertError(StatusException.class)
@@ -160,7 +161,7 @@ class CategoryResourceTest extends TestSetup {
                 .lastActivity(LocalDate.of(2019, 1, 2))
                 .build());
 
-        Mockito.when(categoryProvider.lookup(1L)).thenReturn(API.Option(category));
+        Mockito.when(categoryProvider.lookup(1L)).thenReturn(Control.Option(category));
 
         var request = CategoryCreateRequest.builder()
                 .name("grocery")
@@ -179,7 +180,7 @@ class CategoryResourceTest extends TestSetup {
 
     @Test
     void update_notFound() {
-        Mockito.when(categoryProvider.lookup(1L)).thenReturn(API.Option());
+        Mockito.when(categoryProvider.lookup(1L)).thenReturn(Control.Option());
 
         var request = CategoryCreateRequest.builder()
                 .name("grocery")
@@ -196,7 +197,7 @@ class CategoryResourceTest extends TestSetup {
         Category category = Mockito.mock(Category.class);
 
         Mockito.when(category.getUser()).thenReturn(ACTIVE_USER);
-        Mockito.when(categoryProvider.lookup(1L)).thenReturn(API.Option(category));
+        Mockito.when(categoryProvider.lookup(1L)).thenReturn(Control.Option(category));
 
         subject.delete(1L);
 

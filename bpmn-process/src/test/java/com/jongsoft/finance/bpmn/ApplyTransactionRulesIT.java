@@ -12,7 +12,8 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +48,7 @@ class ApplyTransactionRulesIT extends ProcessTestSetup {
                 UserAccount.builder()
                         .id(1L)
                         .username("test-user")
-                        .roles(API.List(new Role("admin")))
+                        .roles(Collections.List(new Role("admin")))
                         .build());
 
         final TransactionRule sample_rule = TransactionRule.builder()
@@ -59,8 +60,8 @@ class ApplyTransactionRulesIT extends ProcessTestSetup {
         sample_rule.registerCondition(RuleColumn.DESCRIPTION, RuleOperation.CONTAINS, "salary");
         sample_rule.registerCondition(RuleColumn.AMOUNT, RuleOperation.MORE_THAN, "2000");
         sample_rule.registerChange(RuleColumn.CATEGORY, "1");
-        Mockito.when(ruleProvider.lookup()).thenReturn(API.List(sample_rule));
-        Mockito.when(ruleProvider.lookup(1L)).thenReturn(API.Option(sample_rule));
+        Mockito.when(ruleProvider.lookup()).thenReturn(Collections.List(sample_rule));
+        Mockito.when(ruleProvider.lookup(1L)).thenReturn(Control.Option(sample_rule));
     }
 
     @Test
@@ -68,7 +69,7 @@ class ApplyTransactionRulesIT extends ProcessTestSetup {
         Transaction transaction = Transaction.builder()
                 .id(1L)
                 .currency("EUR")
-                .transactions(API.List(
+                .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .amount(2100)
                                 .account(Account.builder().id(1L).type("checking").build())
@@ -84,7 +85,7 @@ class ApplyTransactionRulesIT extends ProcessTestSetup {
         final RuleDataSet mockSet = new RuleDataSet();
         mockSet.put(RuleColumn.CATEGORY, "Sample category");
 
-        Mockito.when(transactionProvider.lookup(1L)).thenReturn(API.Option(transaction));
+        Mockito.when(transactionProvider.lookup(1L)).thenReturn(Control.Option(transaction));
         Mockito.when(ruleEngine.run(Mockito.any())).thenReturn(mockSet);
 
         runtimeService.getRuntimeService().startProcessInstanceByKey("analyzeRule", Variables.createVariables()

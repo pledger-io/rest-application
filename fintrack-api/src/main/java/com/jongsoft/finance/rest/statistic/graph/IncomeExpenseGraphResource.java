@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.statistic.graph;
 
-import com.jongsoft.finance.core.date.DateRange;
-import com.jongsoft.finance.core.date.Dates;
+import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.date.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
@@ -19,7 +19,7 @@ import com.jongsoft.highchart.series.BarSeries;
 import com.jongsoft.highchart.series.LineSeries;
 import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.annotation.Controller;
@@ -100,8 +100,8 @@ public class IncomeExpenseGraphResource {
                 .setColor(new GraphColor("#7fc6a5"));
 
         var currentStart = from;
-        var currencyCode = API.Option(currency).map(Currency::getCode).getOrSupply(() -> "EUR");
-        var currentEnd = Dates.endOfMonth(currentStart.getYear(), currentStart.getMonthValue());
+        var currencyCode = Control.Option(currency).map(Currency::getCode).getOrSupply(() -> "EUR");
+        var currentEnd = DateUtils.endOfMonth(currentStart.getYear(), currentStart.getMonthValue());
         var avgExpense = new MovingAverage(4);
         var avgIncome = new MovingAverage(4);
 
@@ -110,14 +110,14 @@ public class IncomeExpenseGraphResource {
                     .ownAccounts()
                     .onlyIncome(true)
                     .currency(currencyCode)
-                    .range(DateRange.of(currentStart, currentEnd)))
+                    .range(DateRangeOld.of(currentStart, currentEnd)))
                     .getOrSupply(() -> 0D);
 
             var expense = transactionProvider.balance(filterFactory.transaction()
                     .ownAccounts()
                     .onlyIncome(false)
                     .currency(currencyCode)
-                    .range(DateRange.of(currentStart, currentEnd)))
+                    .range(DateRangeOld.of(currentStart, currentEnd)))
                     .getOrSupply(() -> 0D);
 
             avgExpense.add(BigDecimal.valueOf(expense).abs());
@@ -138,7 +138,7 @@ public class IncomeExpenseGraphResource {
                     .setX(timestamp));
 
             currentStart = currentStart.plusMonths(1);
-            currentEnd = Dates.endOfMonth(currentStart.getYear(), currentStart.getMonthValue());
+            currentEnd = DateUtils.endOfMonth(currentStart.getYear(), currentStart.getMonthValue());
         }
 
         // @formatter:off

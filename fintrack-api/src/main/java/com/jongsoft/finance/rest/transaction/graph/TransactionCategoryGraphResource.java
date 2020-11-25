@@ -10,7 +10,7 @@ import com.jongsoft.finance.filter.RequestAttributes;
 import com.jongsoft.finance.graph.CategoryPieChart;
 import com.jongsoft.finance.rest.DateFormat;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -54,7 +54,7 @@ public class TransactionCategoryGraphResource extends CategoryPieChart {
         var useCurrency = currency.orElseGet(this::fallbackCurrency);
 
         return createChart(useCurrency, locale)
-                .addSeries(createSeries(API.List(), start, end, locale, false, useCurrency))
+                .addSeries(createSeries(Collections.List(), start, end, locale, false, useCurrency))
                 .toJson();
     }
 
@@ -67,7 +67,7 @@ public class TransactionCategoryGraphResource extends CategoryPieChart {
         var useCurrency = currency.orElseGet(this::fallbackCurrency);
 
         return createChart(useCurrency, locale)
-                .addSeries(createSeries(API.List(), start, end, locale, true, useCurrency))
+                .addSeries(createSeries(Collections.List(), start, end, locale, true, useCurrency))
                 .toJson();
     }
 

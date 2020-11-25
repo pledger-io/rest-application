@@ -10,7 +10,8 @@ import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
 import io.reactivex.Maybe;
@@ -58,7 +59,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .currency("EUR")
                 .build();
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
 
         Mockito.when(transactionProvider.lookup(Mockito.any()))
                 .thenReturn(ResultPage.of(
@@ -69,7 +70,7 @@ class AccountTransactionResourceTest extends TestSetup {
                                 .currency("EUR")
                                 .budget("Household")
                                 .date(LocalDate.of(2019, 1, 15))
-                                .transactions(API.List(
+                                .transactions(Collections.List(
                                         Transaction.Part.builder()
                                                 .id(1L)
                                                 .account(account)
@@ -102,7 +103,7 @@ class AccountTransactionResourceTest extends TestSetup {
 
     @Test
     void search_notfound() {
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option());
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option());
 
         var response = subject.search(1L, new AccountTransactionSearchRequest()).blockingGet();
 
@@ -114,8 +115,8 @@ class AccountTransactionResourceTest extends TestSetup {
         final Account myAccount = Mockito.spy(Account.builder().id(1L).currency("EUR").type("checking").name("My account").build());
         final Account toAccount = Account.builder().id(2L).currency("EUR").type("creditor").name("Target account").build();
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(myAccount));
-        Mockito.when(accountProvider.lookup(2L)).thenReturn(API.Option(toAccount));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(myAccount));
+        Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(toAccount));
 
         var request = AccountTransactionCreateRequest.builder()
                 .date(LocalDate.of(2019, 1, 1))
@@ -157,7 +158,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
-                .transactions(API.List(
+                .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
                                 .account(account)
@@ -171,7 +172,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 ))
                 .build();
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(transactionProvider.first(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(Maybe.just(transaction));
 
@@ -198,7 +199,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
-                .transactions(API.List(
+                .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
                                 .account(account)
@@ -212,8 +213,8 @@ class AccountTransactionResourceTest extends TestSetup {
                 ))
                 .build();
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
-        Mockito.when(transactionProvider.lookup(123L)).thenReturn(API.Option(transaction));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
+        Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
         var response = subject.get(123L).blockingGet();
 
@@ -248,7 +249,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
                 .user(ACTIVE_USER)
-                .transactions(API.List(
+                .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
                                 .account(account)
@@ -262,9 +263,9 @@ class AccountTransactionResourceTest extends TestSetup {
                 ))
                 .build());
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
-        Mockito.when(accountProvider.lookup(2L)).thenReturn(API.Option(toAccount));
-        Mockito.when(transactionProvider.lookup(123L)).thenReturn(API.Option(transaction));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
+        Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(toAccount));
+        Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
         var request = AccountTransactionCreateRequest.builder()
                 .date(LocalDate.of(2019, 1, 1))
@@ -308,7 +309,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
-                .transactions(API.List(
+                .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
                                 .account(account)
@@ -322,8 +323,8 @@ class AccountTransactionResourceTest extends TestSetup {
                 ))
                 .build());
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
-        Mockito.when(transactionProvider.lookup(123L)).thenReturn(API.Option(transaction));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
+        Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
         var request = AccountTransactionSplitRequest.builder()
                 .splits(List.of(
@@ -362,8 +363,8 @@ class AccountTransactionResourceTest extends TestSetup {
                 .currency("EUR")
                 .build();
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(account));
-        Mockito.when(transactionProvider.lookup(123L)).thenReturn(API.Option(transaction));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
+        Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
         subject.delete(123L).blockingGet();
 

@@ -5,7 +5,7 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Collectors;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Maybe;
@@ -78,7 +78,7 @@ public class UserProviderJpa implements UserProvider {
                 .id(source.getId())
                 .username(source.getUsername())
                 .password(source.getPassword())
-                .primaryCurrency(API.Option(source.getCurrency()).getOrSupply(() -> Currency.getInstance("EUR")))
+                .primaryCurrency(Control.Option(source.getCurrency()).getOrSupply(() -> Currency.getInstance("EUR")))
                 .secret(source.getTwoFactorSecret())
                 .theme(source.getTheme())
                 .twoFactorEnabled(source.isTwoFactorEnabled())

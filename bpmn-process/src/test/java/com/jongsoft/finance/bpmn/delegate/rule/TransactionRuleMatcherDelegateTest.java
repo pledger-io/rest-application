@@ -1,14 +1,5 @@
 package com.jongsoft.finance.bpmn.delegate.rule;
 
-import java.time.LocalDate;
-
-import org.assertj.core.api.Assertions;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.account.Account;
@@ -18,7 +9,17 @@ import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
+import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+
+import java.time.LocalDate;
 
 class TransactionRuleMatcherDelegateTest {
     private static final Account TO_ACCOUNT = Account.builder().id(1L).type("checking").name("To Account").build();
@@ -44,7 +45,7 @@ class TransactionRuleMatcherDelegateTest {
                 .id(1L)
                 .date(TRANSACTION_DATE)
                 .currency("EUR")
-                .transactions(API.List(
+                .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .amount(2100)
                                 .account(TO_ACCOUNT)
@@ -60,7 +61,7 @@ class TransactionRuleMatcherDelegateTest {
 
         Mockito.when(delegateExecution.getVariableLocalTyped("transactionId"))
                 .thenReturn(new PrimitiveTypeValueImpl.LongValueImpl(1L));
-        Mockito.when(transactionProvider.lookup(1L)).thenReturn(API.Option(transaction));
+        Mockito.when(transactionProvider.lookup(1L)).thenReturn(Control.Option(transaction));
     }
 
     @Test
@@ -70,7 +71,7 @@ class TransactionRuleMatcherDelegateTest {
         Mockito.when(ruleEngine.run(Mockito.any()))
                 .thenReturn(new RuleDataSet());
         Mockito.when(transactionRuleProvider.lookup(2L))
-                .thenReturn(API.Option(rule));
+                .thenReturn(Control.Option(rule));
 
         subject.execute(delegateExecution);
 

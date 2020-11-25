@@ -7,7 +7,7 @@ import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.events.StorageReplacedEvent;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.Encryption;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import io.reactivex.Single;
 
 import javax.inject.Named;
@@ -38,7 +38,7 @@ public class StorageServiceImpl implements StorageService {
 
         uploadRootDirectory = Path.of(storageLocation.getLocation(), "upload");
         if (Files.notExists(uploadRootDirectory)) {
-            API.Try(() -> Files.createDirectory(uploadRootDirectory));
+            Control.Try(() -> Files.createDirectory(uploadRootDirectory));
         }
     }
 

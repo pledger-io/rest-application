@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.statistic.graph;
 
-import com.jongsoft.finance.core.date.DateRange;
-import com.jongsoft.finance.core.date.Dates;
+import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.date.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
@@ -119,15 +119,15 @@ public class BalanceGraphResource {
         var startBalance = transactionProvider.balance(
                 filterFactory.transaction()
                         .ownAccounts()
-                        .range(DateRange.of(LocalDate.of(1900, 1, 1), start)));
+                        .range(DateRangeOld.of(LocalDate.of(1900, 1, 1), start)));
         var endBalance = transactionProvider.balance(
                 filterFactory.transaction()
                 .ownAccounts()
-                .range(DateRange.of(LocalDate.of(1900, 1, 1), end)));
+                .range(DateRangeOld.of(LocalDate.of(1900, 1, 1), end)));
 
         var dataRequest = filterFactory.transaction()
                 .ownAccounts()
-                .range(DateRange.of(start, end));
+                .range(DateRangeOld.of(start, end));
 
         MutableDouble mutableDouble = new MutableDouble(startBalance.getOrSupply(() -> 0D));
 
@@ -149,7 +149,7 @@ public class BalanceGraphResource {
 
         monthBalance.entrySet().stream()
                 .map(entry -> new SeriesPoint()
-                        .setX(Dates.timestamp(entry.getKey()))
+                        .setX(DateUtils.timestamp(entry.getKey()))
                         .setY(entry.getValue()))
                 .forEach(series::addPoint);
 

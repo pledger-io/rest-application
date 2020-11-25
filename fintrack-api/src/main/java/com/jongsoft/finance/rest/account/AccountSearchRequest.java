@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.core.annotation.Introspected;
 import lombok.*;
@@ -19,9 +20,9 @@ public class AccountSearchRequest {
     private String name;
 
     public Sequence<String> accountTypes() {
-        return API.Option(accountTypes)
-                .map(API::List)
-                .getOrSupply(API::List);
+        return Control.Option(accountTypes)
+                .map(Collections::List)
+                .getOrSupply(Collections::List);
     }
 
     public int page() {

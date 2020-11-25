@@ -7,7 +7,7 @@ import com.jongsoft.finance.domain.user.events.CategoryCreatedEvent;
 import com.jongsoft.finance.domain.user.events.CategoryRemovedEvent;
 import com.jongsoft.finance.domain.user.events.CategoryRenamedEvent;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -40,7 +40,7 @@ public class Category implements AggregateBase {
 
     @BusinessMethod
     public void rename(String label, String description) {
-        var hasChanged = API.Equal(this.label, label)
+        var hasChanged = Control.Equal(this.label, label)
                 .append(this.description, description)
                 .isNotEqual();
 

@@ -1,12 +1,14 @@
 package com.jongsoft.finance.domain.account;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
-import com.jongsoft.finance.core.date.DateRange;
 import com.jongsoft.finance.domain.core.DataProvider;
 import com.jongsoft.finance.domain.core.Exportable;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.lang.time.Range;
 import io.reactivex.Maybe;
+
+import java.time.LocalDate;
 
 public interface AccountProvider extends DataProvider<Account>, Exportable<Account> {
 
@@ -34,7 +36,7 @@ public interface AccountProvider extends DataProvider<Account>, Exportable<Accou
 
     ResultPage<Account> lookup(FilterCommand filter);
 
-    Sequence<AccountSpending> top(FilterCommand filter, DateRange range, boolean asc);
+    Sequence<AccountSpending> top(FilterCommand filter, Range<LocalDate> range, boolean asc);
 
     @Override
     default boolean supports(Class<Account> supportingClass) {

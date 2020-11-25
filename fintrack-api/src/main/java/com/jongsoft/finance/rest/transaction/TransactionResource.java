@@ -13,7 +13,8 @@ import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
 import com.jongsoft.finance.rest.process.RuntimeResource;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
@@ -76,12 +77,12 @@ public class TransactionResource {
                 .pageSize(settingProvider.getPageSize())
                 .page(request.getPage());
 
-        API.Option(request.getCategory())
+        Control.Option(request.getCategory())
                 .map(e -> new EntityRef(e.getId()))
-                .ifPresent(category -> command.categories(API.List(category)));
-        API.Option(request.getBudget())
+                .ifPresent(category -> command.categories(Collections.List(category)));
+        Control.Option(request.getBudget())
                 .map(e -> new EntityRef(e.getId()))
-                .ifPresent(category -> command.expenses(API.List(category)));
+                .ifPresent(category -> command.expenses(Collections.List(category)));
 
         if (request.getDescription() != null && !request.getDescription().isBlank()) {
             command.description(request.getDescription(), false);
@@ -121,22 +122,22 @@ public class TransactionResource {
             }
 
             var transaction = isPresent.get();
-            API.Option(request.getBudget())
+            Control.Option(request.getBudget())
                     .map(TransactionBulkEditRequest.EntityRef::getName)
                     .ifPresent(transaction::linkToBudget);
 
-            API.Option(request.getCategory())
+            Control.Option(request.getCategory())
                     .map(TransactionBulkEditRequest.EntityRef::getName)
                     .ifPresent(transaction::linkToCategory);
 
-            API.Option(request.getContract())
+            Control.Option(request.getContract())
                     .map(TransactionBulkEditRequest.EntityRef::getName)
                     .ifPresent(transaction::linkToContract);
 
-            API.Option(request.getTags())
+            Control.Option(request.getTags())
                     .ifPresent(adding -> {
-                        var tags = API.Option(transaction.getTags())
-                                .getOrSupply(API::List)
+                        var tags = Control.Option(transaction.getTags())
+                                .getOrSupply(Collections::List)
                                 .union(adding);
 
                         transaction.tag(tags);

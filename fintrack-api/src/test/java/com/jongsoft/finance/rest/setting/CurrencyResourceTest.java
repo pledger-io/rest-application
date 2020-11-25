@@ -4,7 +4,7 @@ import com.jongsoft.finance.domain.account.events.CurrencyCreatedEvent;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.core.CurrencyProvider;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
@@ -35,7 +35,7 @@ class CurrencyResourceTest {
     @Test
     void available() {
         Mockito.when(currencyProvider.lookup()).thenReturn(
-                API.List(
+                Collections.List(
                         Currency.builder()
                                 .id(1L)
                                 .name("Euro")

@@ -17,7 +17,8 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.core.reflect.ReflectionUtils;
 import io.reactivex.Maybe;
@@ -46,7 +47,7 @@ class BatchImportIT extends ProcessTestSetup {
 
     private class AccountFilterTest implements AccountProvider.FilterCommand {
 
-        private Sequence<String> calls = API.List();
+        private Sequence<String> calls = Collections.List();
 
         @Override
         public String toString() {
@@ -140,10 +141,10 @@ class BatchImportIT extends ProcessTestSetup {
                 .id(1L)
                 .username("test-user")
                 .password("12345")
-                .roles(API.List(new Role("admin")))
+                .roles(Collections.List(new Role("admin")))
                 .build());
         Mockito.when(authenticationFacade.currentUser()).thenReturn(userAccount);
-        Mockito.when(userProvider.lookup("test-user")).thenReturn(API.Option(userAccount));
+        Mockito.when(userProvider.lookup("test-user")).thenReturn(Control.Option(userAccount));
 
         tokenCleanup = new ArrayList<>();
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
@@ -163,14 +164,14 @@ class BatchImportIT extends ProcessTestSetup {
                     .type(args.getArgument(2, String.class))
                     .build();
             Mockito.when(accountProvider.lookup(args.getArgument(0, String.class))).thenReturn(Maybe.just(account));
-            Mockito.when(accountProvider.lookup(account.getId())).thenReturn(API.Option(account));
+            Mockito.when(accountProvider.lookup(account.getId())).thenReturn(Control.Option(account));
             return null;
         }).when(userAccount).createAccount(Mockito.anyString(), Mockito.any(), Mockito.anyString());
 
-        Mockito.when(transactionRuleProvider.lookup()).thenReturn(API.List());
+        Mockito.when(transactionRuleProvider.lookup()).thenReturn(Collections.List());
         Mockito.when(accountFilterFactory.account()).thenAnswer(args -> new AccountFilterTest());
         Mockito.when(transactionProvider.similar(Mockito.any(), Mockito.any(), Mockito.anyDouble(), Mockito.any()))
-                .thenReturn(API.List());
+                .thenReturn(Collections.List());
     }
 
     @Test
@@ -191,7 +192,7 @@ class BatchImportIT extends ProcessTestSetup {
         Mockito.when(storageService.read("sample-file-run")).thenReturn(Single.just(readFile("import-test/import-test.csv")));
         Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Maybe.just(batchImport));
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(Account.builder()
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(Account.builder()
                 .id(1L)
                 .name("Checking account")
                 .type("checking")
@@ -203,8 +204,8 @@ class BatchImportIT extends ProcessTestSetup {
 
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class))).thenReturn(ResultPage.empty());
         Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(Maybe.empty());
-        Mockito.when(accountProvider.lookup(2L)).thenReturn(API.Option(pieterseAccount));
-        Mockito.when(accountProvider.lookup(3L)).thenReturn(API.Option(accountPost));
+        Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(pieterseAccount));
+        Mockito.when(accountProvider.lookup(3L)).thenReturn(Control.Option(accountPost));
 
         Mockito.when(accountProvider.lookup("MW GA Pieterse"))
                 .thenReturn(Maybe.empty())
@@ -212,7 +213,7 @@ class BatchImportIT extends ProcessTestSetup {
                 .thenReturn(Maybe.just(pieterseAccount));
 
         Mockito.when(accountProvider.lookup(123L))
-                .thenReturn(API.Option(Account.builder()
+                .thenReturn(Control.Option(Account.builder()
                         .id(123L)
                         .name("Janssen PA")
                         .type("creditor")
@@ -236,7 +237,7 @@ class BatchImportIT extends ProcessTestSetup {
             var field = ReflectionUtils.getRequiredField(Transaction.class, "id");
             field.setAccessible(true);
             field.set(event.getTransaction(), transactionId);
-            Mockito.when(transactionProvider.lookup(transactionId)).thenReturn(API.Option(event.getTransaction()));
+            Mockito.when(transactionProvider.lookup(transactionId)).thenReturn(Control.Option(event.getTransaction()));
             return transactionId;
         });
 

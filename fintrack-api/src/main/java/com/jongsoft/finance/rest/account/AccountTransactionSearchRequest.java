@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Builder;
 import lombok.Generated;
@@ -19,14 +19,14 @@ class AccountTransactionSearchRequest {
     private int page;
 
     @NotNull
-    private DateRange dateRange;
+    private DateRangeOld dateRange;
 
     @Generated
     public AccountTransactionSearchRequest() {
     }
 
     @Builder
-    private AccountTransactionSearchRequest(String text, @Min(0) int page, @NotNull DateRange dateRange) {
+    private AccountTransactionSearchRequest(String text, @Min(0) int page, @NotNull DateRangeOld dateRange) {
         this.text = text;
         this.page = page;
         this.dateRange = dateRange;
@@ -36,7 +36,7 @@ class AccountTransactionSearchRequest {
         return text;
     }
 
-    public DateRange getDateRange() {
+    public DateRangeOld getDateRange() {
         return dateRange;
     }
 

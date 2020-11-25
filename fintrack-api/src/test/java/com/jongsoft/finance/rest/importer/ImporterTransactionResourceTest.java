@@ -7,7 +7,8 @@ import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ class ImporterTransactionResourceTest extends TestSetup {
                                 .currency("EUR")
                                 .budget("Household")
                                 .date(LocalDate.of(2019, 1, 15))
-                                .transactions(API.List(
+                                .transactions(Collections.List(
                                         Transaction.Part.builder()
                                                 .id(1L)
                                                 .account(Account.builder()
@@ -81,7 +82,7 @@ class ImporterTransactionResourceTest extends TestSetup {
         Transaction transaction = Mockito.mock(Transaction.class);
 
         Mockito.when(transaction.getUser()).thenReturn(ACTIVE_USER);
-        Mockito.when(transactionProvider.lookup(123L)).thenReturn(API.Option(transaction));
+        Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
         subject.delete(123L, principal);
 

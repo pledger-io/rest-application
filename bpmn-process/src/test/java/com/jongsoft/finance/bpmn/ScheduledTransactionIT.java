@@ -5,7 +5,8 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.transaction.*;
 import com.jongsoft.finance.domain.transaction.events.TransactionCreatedEvent;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.core.reflect.ReflectionUtils;
 import io.reactivex.Single;
 import org.apache.commons.lang3.mutable.MutableLong;
@@ -48,7 +49,7 @@ public class ScheduledTransactionIT extends ProcessTestSetup {
     void setup() {
         Mockito.reset(transactionProvider, storageService, accountProvider, transactionCreationHandler, transactionScheduleProvider, transactionRuleProvider);
 
-        Mockito.when(transactionScheduleProvider.lookup()).thenReturn(API.List(
+        Mockito.when(transactionScheduleProvider.lookup()).thenReturn(Collections.List(
                 ScheduledTransaction.builder()
                         .id(1L)
                         .amount(29.99)
@@ -57,15 +58,15 @@ public class ScheduledTransactionIT extends ProcessTestSetup {
                         .destination(Account.builder().id(2L).build())
                         .build()));
         Mockito.when(transactionProvider.similar(Mockito.any(), Mockito.any(), Mockito.anyDouble(), Mockito.any()))
-                .thenReturn(API.List());
-        Mockito.when(transactionRuleProvider.lookup()).thenReturn(API.List());
+                .thenReturn(Collections.List());
+        Mockito.when(transactionRuleProvider.lookup()).thenReturn(Collections.List());
 
-        Mockito.when(accountProvider.lookup(1L)).thenReturn(API.Option(Account.builder()
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(Account.builder()
                 .id(1L)
                 .name("Source account")
                 .type("checking")
                 .build()));
-        Mockito.when(accountProvider.lookup(2L)).thenReturn(API.Option(Account.builder()
+        Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(Account.builder()
                 .id(2L)
                 .name("Cable Company")
                 .type("creditor")
@@ -90,7 +91,7 @@ public class ScheduledTransactionIT extends ProcessTestSetup {
             var field = ReflectionUtils.getRequiredField(Transaction.class, "id");
             field.setAccessible(true);
             field.set(event.getTransaction(), transactionId);
-            Mockito.when(transactionProvider.lookup(transactionId)).thenReturn(API.Option(event.getTransaction()));
+            Mockito.when(transactionProvider.lookup(transactionId)).thenReturn(Control.Option(event.getTransaction()));
             transaction.setValue(event.getTransaction());
             return transactionId;
         });

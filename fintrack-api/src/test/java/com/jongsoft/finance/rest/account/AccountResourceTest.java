@@ -10,7 +10,7 @@ import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
@@ -50,7 +50,7 @@ class AccountResourceTest extends TestSetup {
     @Test
     void ownAccounts() {
         var resultPage = Mockito.mock(ResultPage.class);
-        Mockito.when(resultPage.content()).thenReturn(API.List(
+        Mockito.when(resultPage.content()).thenReturn(Collections.List(
                 Account.builder()
                         .id(1L)
                         .name("Sample account")
@@ -63,7 +63,7 @@ class AccountResourceTest extends TestSetup {
                         .type("checking")
                         .build()));
 
-        Mockito.when(accountTypeProvider.lookup(false)).thenReturn(API.List("default", "savings"));
+        Mockito.when(accountTypeProvider.lookup(false)).thenReturn(Collections.List("default", "savings"));
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))
                 .thenReturn(resultPage);
 
@@ -77,12 +77,12 @@ class AccountResourceTest extends TestSetup {
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).lookup(Mockito.any(AccountProvider.FilterCommand.class));
-        Mockito.verify(mockCommand).types(Mockito.eq(API.List("default", "savings")));
+        Mockito.verify(mockCommand).types(Mockito.eq(Collections.List("default", "savings")));
     }
 
     @Test
     void allAccounts() {
-        var resultPage = API.List(Account.builder()
+        var resultPage = Collections.List(Account.builder()
                 .id(1L)
                 .name("Sample account")
                 .description("Long description")
@@ -105,7 +105,7 @@ class AccountResourceTest extends TestSetup {
     @Test
     void autocomplete() {
         var resultPage = Mockito.mock(ResultPage.class);
-        Mockito.when(resultPage.content()).thenReturn(API.List(
+        Mockito.when(resultPage.content()).thenReturn(Collections.List(
                 Account.builder()
                         .id(1L)
                         .name("Sample account")
@@ -126,7 +126,7 @@ class AccountResourceTest extends TestSetup {
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).lookup(Mockito.any(AccountProvider.FilterCommand.class));
         Mockito.verify(mockCommand).name("sampl", false);
-        Mockito.verify(mockCommand).types(API.List("creditor"));
+        Mockito.verify(mockCommand).types(Collections.List("creditor"));
     }
 
     @Test
@@ -153,7 +153,7 @@ class AccountResourceTest extends TestSetup {
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).lookup(Mockito.any(AccountProvider.FilterCommand.class));
-        Mockito.verify(mockCommand).types(API.List("creditor"));
+        Mockito.verify(mockCommand).types(Collections.List("creditor"));
     }
 
     @Test

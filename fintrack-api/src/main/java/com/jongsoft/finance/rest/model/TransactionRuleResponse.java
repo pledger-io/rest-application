@@ -3,7 +3,7 @@ package com.jongsoft.finance.rest.model;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 
 import java.util.List;
 
@@ -36,13 +36,13 @@ public class TransactionRuleResponse {
     }
 
     public List<Change> getChanges() {
-        return API.List(wrapped.getChanges()
+        return Collections.List(wrapped.getChanges()
                 .map(Change::new))
                 .toJava();
     }
 
     public List<Condition> getConditions() {
-        return API.List(wrapped.getConditions())
+        return Collections.List(wrapped.getConditions())
                 .map(Condition::new)
                 .toJava();
     }

@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.process;
 
 import com.jongsoft.finance.rest.model.ProcessVariableResponse;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -33,7 +33,7 @@ public class ProcessVariableResource {
     public Flowable<ProcessVariableResponse> variables(
             @PathVariable String processDefinitionKey,
             @PathVariable String instanceId) {
-        var result = API.List(historyService.createHistoricVariableInstanceQuery()
+        var result = Collections.List(historyService.createHistoricVariableInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .processInstanceId(instanceId)
                 .list());
@@ -51,7 +51,7 @@ public class ProcessVariableResource {
             @PathVariable String processDefinitionKey,
             @PathVariable String instanceId,
             @PathVariable String variable) {
-        var result = API.List(historyService.createHistoricVariableInstanceQuery()
+        var result = Collections.List(historyService.createHistoricVariableInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .processInstanceId(instanceId)
                 .variableName(variable)

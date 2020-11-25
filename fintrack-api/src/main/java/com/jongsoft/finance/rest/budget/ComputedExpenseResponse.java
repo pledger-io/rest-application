@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.budget;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import io.micronaut.core.annotation.Introspected;
 import lombok.EqualsAndHashCode;
 
@@ -14,9 +14,9 @@ class ComputedExpenseResponse {
 
     private double allowed;
     private double spent;
-    private DateRange dateRange;
+    private DateRangeOld dateRange;
 
-    public ComputedExpenseResponse(double allowed, double spent, DateRange dateRange) {
+    public ComputedExpenseResponse(double allowed, double spent, DateRangeOld dateRange) {
         this.allowed = allowed;
         this.spent = spent;
         this.dateRange = dateRange;

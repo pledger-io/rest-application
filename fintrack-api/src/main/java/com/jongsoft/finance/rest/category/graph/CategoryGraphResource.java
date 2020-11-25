@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.category.graph;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
@@ -15,7 +15,7 @@ import com.jongsoft.highchart.common.SeriesType;
 import com.jongsoft.highchart.series.ColumnSeries;
 import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -70,8 +70,8 @@ public class CategoryGraphResource {
             var amount = transactionProvider.balance(filterFactory.transaction()
                     .onlyIncome(false)
                     .ownAccounts()
-                    .range(DateRange.of(from, until))
-                    .categories(API.List(new EntityRef(category.getId()))));
+                    .range(DateRangeOld.of(from, until))
+                    .categories(Collections.List(new EntityRef(category.getId()))));
 
             series.addPoint(new SeriesPoint()
                     .setName(category.getLabel())

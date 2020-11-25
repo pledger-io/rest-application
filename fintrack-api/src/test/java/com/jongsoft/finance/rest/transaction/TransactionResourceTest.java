@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.transaction;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
@@ -13,7 +13,8 @@ import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.rest.process.RuntimeResource;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
@@ -83,7 +84,7 @@ class TransactionResourceTest extends TestSetup {
                                 .currency("EUR")
                                 .budget("Household")
                                 .date(LocalDate.of(2019, 1, 15))
-                                .transactions(API.List(
+                                .transactions(Collections.List(
                                         Transaction.Part.builder()
                                                 .id(1L)
                                                 .account(account)
@@ -105,7 +106,7 @@ class TransactionResourceTest extends TestSetup {
 
         var request = TransactionSearchRequest.builder()
                 .page(0)
-                .dateRange(DateRange.forMonth(2019, 1))
+                .dateRange(DateRangeOld.forMonth(2019, 1))
                 .onlyIncome(false)
                 .onlyExpense(false)
                 .description("samp")
@@ -117,7 +118,7 @@ class TransactionResourceTest extends TestSetup {
         Mockito.verify(transactionProvider).lookup(Mockito.any());
         Mockito.verify(mockFilter).description("samp", false);
         Mockito.verify(mockFilter).ownAccounts();
-        Mockito.verify(mockFilter).range(DateRange.forMonth(2019, 1));
+        Mockito.verify(mockFilter).range(DateRangeOld.forMonth(2019, 1));
     }
 
     @Test
@@ -130,7 +131,7 @@ class TransactionResourceTest extends TestSetup {
                 .budget("Household")
                 .user(ACTIVE_USER)
                 .date(LocalDate.of(2019, 1, 15))
-                .transactions(API.List(
+                .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
                                 .account(Account.builder()
@@ -150,8 +151,8 @@ class TransactionResourceTest extends TestSetup {
                 .build());
 
         Mockito.when(authenticationFacade.authenticated()).thenReturn(ACTIVE_USER.getUsername());
-        Mockito.when(transactionProvider.lookup(Mockito.anyLong())).thenReturn(API.Option());
-        Mockito.when(transactionProvider.lookup(1L)).thenReturn(API.Option(transaction));
+        Mockito.when(transactionProvider.lookup(Mockito.anyLong())).thenReturn(Control.Option());
+        Mockito.when(transactionProvider.lookup(1L)).thenReturn(Control.Option(transaction));
 
         var request = TransactionBulkEditRequest.builder()
                 .transactions(List.of(1L, 2L))
@@ -166,7 +167,7 @@ class TransactionResourceTest extends TestSetup {
         Mockito.verify(transaction).linkToCategory("Category");
         Mockito.verify(transaction).linkToBudget("Groceries");
         Mockito.verify(transaction).linkToContract("Wallmart");
-        Mockito.verify(transaction).tag(API.List("sample"));
+        Mockito.verify(transaction).tag(Collections.List("sample"));
     }
 
     @Test
@@ -194,7 +195,7 @@ class TransactionResourceTest extends TestSetup {
                 .currency("EUR")
                 .build();
 
-        Mockito.when(accountTypeProvider.lookup(false)).thenReturn(API.List());
+        Mockito.when(accountTypeProvider.lookup(false)).thenReturn(Collections.List());
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))
                 .thenReturn(ResultPage.empty());
         Mockito.when(transactionProvider.lookup(Mockito.any()))
@@ -206,7 +207,7 @@ class TransactionResourceTest extends TestSetup {
                                 .currency("EUR")
                                 .budget("Household")
                                 .date(LocalDate.of(2019, 1, 15))
-                                .transactions(API.List(
+                                .transactions(Collections.List(
                                         Transaction.Part.builder()
                                                 .id(1L)
                                                 .account(account)

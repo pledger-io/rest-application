@@ -1,13 +1,13 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.BudgetJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -45,7 +45,7 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
 
     @Override
     public Single<Budget> lookup(int year, int month) {
-        var range = DateRange.forMonth(year, month);
+        var range = DateRangeOld.forMonth(year, month);
 
         var hql = """
                 select b from BudgetJpa b
@@ -87,7 +87,7 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
                 .start(source.getFrom())
                 .end(source.getUntil())
                 .expectedIncome(source.getExpectedIncome())
-                .expenses(API.List(source.getExpenses())
+                .expenses(Collections.List(source.getExpenses())
                         .map(e -> Budget.Expense.builder()
                                 .lowerBound(e.getLowerBound())
                                 .upperBound(e.getUpperBound())

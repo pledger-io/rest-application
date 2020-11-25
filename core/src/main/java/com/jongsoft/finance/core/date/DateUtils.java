@@ -1,11 +1,14 @@
 package com.jongsoft.finance.core.date;
 
+import com.jongsoft.lang.Dates;
+import com.jongsoft.lang.time.Range;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
 
-public interface Dates {
+public interface DateUtils {
 
     static LocalDate startOfMonth(int year, int month) {
         return LocalDate.of(year, month, 1);
@@ -38,6 +41,13 @@ public interface Dates {
         }
 
         return Date.from(localDate.atStartOfDay().toInstant(ZoneOffset.UTC));
+    }
+
+    static Range<LocalDate> forMonth(int year, int month) {
+        var start = LocalDate.of(year, month, 1);
+        var end = start.plusMonths(1);
+
+        return Dates.range(start, end);
     }
 
 }

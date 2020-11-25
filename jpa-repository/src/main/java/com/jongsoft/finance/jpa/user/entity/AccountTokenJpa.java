@@ -16,8 +16,14 @@ public class AccountTokenJpa extends EntityJpa {
     @JoinColumn
     private UserAccountJpa user;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "refresh_token")
     private String refreshToken;
+
+    @Column(name = "created")
+    private LocalDateTime created;
 
     @Column(name = "expires")
     private LocalDateTime expires;
@@ -27,11 +33,24 @@ public class AccountTokenJpa extends EntityJpa {
     }
 
     @Builder
-    public AccountTokenJpa(Long id, UserAccountJpa user, String refreshToken, LocalDateTime expires) {
+    public AccountTokenJpa(Long id, UserAccountJpa user, String refreshToken, LocalDateTime expires, String description) {
         super(id);
         this.user = user;
         this.refreshToken = refreshToken;
         this.expires = expires;
+        this.description = description;
+    }
+
+    @PreUpdate
+    @PrePersist
+    void initialize() {
+        if (created == null) {
+            created = LocalDateTime.now();
+        }
+
+        if (description == null) {
+            description = "FinTrack Web Session";
+        }
     }
 
 }

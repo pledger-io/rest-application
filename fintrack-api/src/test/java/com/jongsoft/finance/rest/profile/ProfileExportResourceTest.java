@@ -8,7 +8,7 @@ import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.domain.user.ExpenseProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.http.HttpHeaders;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,15 +45,15 @@ class ProfileExportResourceTest {
         MockitoAnnotations.openMocks(this);
 
         Mockito.when(accountProvider.supports(Mockito.any())).thenCallRealMethod();
-        Mockito.when(accountProvider.lookup()).thenReturn(API.List());
+        Mockito.when(accountProvider.lookup()).thenReturn(Collections.List());
         Mockito.when(categoryProvider.supports(Mockito.any())).thenCallRealMethod();
-        Mockito.when(categoryProvider.lookup()).thenReturn(API.List());
+        Mockito.when(categoryProvider.lookup()).thenReturn(Collections.List());
         Mockito.when(budgetProvider.supports(Mockito.any())).thenCallRealMethod();
-        Mockito.when(budgetProvider.lookup()).thenReturn(API.List());
+        Mockito.when(budgetProvider.lookup()).thenReturn(Collections.List());
         Mockito.when(tagProvider.supports(Mockito.any())).thenCallRealMethod();
-        Mockito.when(tagProvider.lookup()).thenReturn(API.List());
+        Mockito.when(tagProvider.lookup()).thenReturn(Collections.List());
         Mockito.when(transactionRuleProvider.supports(Mockito.any())).thenCallRealMethod();
-        Mockito.when(transactionRuleProvider.lookup()).thenReturn(API.List());
+        Mockito.when(transactionRuleProvider.lookup()).thenReturn(Collections.List());
 
         subject = new ProfileExportResource(
                 authenticationFacade,

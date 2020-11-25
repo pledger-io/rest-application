@@ -1,20 +1,19 @@
 package com.jongsoft.finance.domain.user;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.LocalDate;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import com.jongsoft.finance.domain.user.events.BudgetClosedEvent;
 import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
 import com.jongsoft.finance.domain.user.events.BudgetExpenseCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.lang.API;
-
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BudgetTest {
 
@@ -32,7 +31,7 @@ class BudgetTest {
                 .id(1L)
                 .start(LocalDate.of(2019, 1, 1))
                 .expectedIncome(2300)
-                .expenses(API.List())
+                .expenses(Collections.List())
                 .build();
 
         budget.createExpense("Grocery", 200, 400);
@@ -51,7 +50,7 @@ class BudgetTest {
                 .id(1L)
                 .start(LocalDate.of(2019, 1, 1))
                 .expectedIncome(50)
-                .expenses(API.List())
+                .expenses(Collections.List())
                 .build();
 
         final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> budget.createExpense("Grocery", 200, 400));
@@ -66,7 +65,7 @@ class BudgetTest {
                 .start(LocalDate.of(2019, 1, 1))
                 .end(LocalDate.of(2019, 1, 31))
                 .expectedIncome(50)
-                .expenses(API.List())
+                .expenses(Collections.List())
                 .build();
 
         final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> budget.createExpense("Grocery", 200, 400));
@@ -80,7 +79,7 @@ class BudgetTest {
                 .id(1L)
                 .start(LocalDate.of(2019, 1, 1))
                 .expectedIncome(2300)
-                .expenses(API.List(
+                .expenses(Collections.List(
                         Budget.Expense.builder()
                                 .id(1L)
                                 .lowerBound(250)
@@ -118,7 +117,7 @@ class BudgetTest {
                 .id(1L)
                 .start(LocalDate.of(2019, 1, 1))
                 .expectedIncome(2300)
-                .expenses(API.List(
+                .expenses(Collections.List(
                         Budget.Expense.builder()
                                 .id(1L)
                                 .lowerBound(250)

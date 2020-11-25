@@ -6,7 +6,7 @@ import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
@@ -46,7 +46,7 @@ public class ContractTransactionResource {
         var filter = filterFactory.transaction()
                 .ownAccounts()
                 .onlyIncome(false)
-                .contracts(API.List(new EntityRef(contractId)))
+                .contracts(Collections.List(new EntityRef(contractId)))
                 .page(page)
                 .pageSize(settingProvider.getPageSize());
 

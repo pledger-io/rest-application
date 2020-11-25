@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.scheduler;
 
-import com.jongsoft.finance.core.date.DateRange;
+import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.core.annotation.Introspected;
 import lombok.*;
@@ -20,7 +20,7 @@ public class ScheduledTransactionPatchRequest {
     }
 
     @Valid
-    private DateRange range;
+    private DateRangeOld range;
 
     @Valid
     private ScheduleValue schedule;
@@ -36,7 +36,7 @@ public class ScheduledTransactionPatchRequest {
         return null;
     }
 
-    public DateRange getRange() {
+    public DateRangeOld getRange() {
         return range;
     }
 

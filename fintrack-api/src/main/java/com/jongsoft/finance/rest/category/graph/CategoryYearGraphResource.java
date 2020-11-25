@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.category.graph;
 
-import com.jongsoft.finance.core.date.DateRange;
-import com.jongsoft.finance.core.date.Dates;
+import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.date.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -84,12 +84,12 @@ public class CategoryYearGraphResource {
                 .setColor(new GraphColor("#7fc6a5"));
 
         while (currentStart.isBefore(totalEnd)) {
-            builder.range(DateRange.forMonth(currentStart.getYear(), currentStart.getMonthValue()));
+            builder.range(DateRangeOld.forMonth(currentStart.getYear(), currentStart.getMonthValue()));
 
             var income = transactionService.balance(builder.onlyIncome(true));
             var expense = transactionService.balance(builder.onlyIncome(false));
 
-            var timestamp = Dates.timestamp(currentStart);
+            var timestamp = DateUtils.timestamp(currentStart);
             incomeSeries.addPoint(new SeriesPoint().setX(timestamp).setY(income.getOrSupply(() -> 0D)));
             expenseSeries.addPoint(new SeriesPoint().setX(timestamp).setY(expense.getOrSupply(() -> 0D)));
 
@@ -140,8 +140,8 @@ public class CategoryYearGraphResource {
                 .getTitle()
                     .setText("")
                     .build()
-                .setMin(Dates.timestamp(start))
-                .setMax(Dates.timestamp(end))
+                .setMin(DateUtils.timestamp(start))
+                .setMax(DateUtils.timestamp(end))
                 .setMinTickInterval(3600000 * 24)
                 .setType(AxisType.DATETIME);
         // @formatter:om

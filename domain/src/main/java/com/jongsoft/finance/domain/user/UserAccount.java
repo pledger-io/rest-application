@@ -13,7 +13,7 @@ import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountPasswordChangedEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountSettingEvent;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,7 +46,7 @@ public class UserAccount implements AggregateBase, Serializable {
     public UserAccount(String username, String password) {
         this.username = username;
         this.password = password;
-        this.roles = API.List(new Role("accountant"));
+        this.roles = Collections.List(new Role("accountant"));
         EventBus.getBus().send(new UserAccountCreatedEvent(this, this.username, this.password));
     }
 

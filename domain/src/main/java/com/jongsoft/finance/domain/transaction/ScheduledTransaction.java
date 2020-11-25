@@ -11,7 +11,7 @@ import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedulable;
 import com.jongsoft.finance.schedule.Schedule;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Control;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,7 +54,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
             throw new IllegalArgumentException("Start of scheduled transaction cannot be after end date.");
         }
 
-        var hasChanged = API.Equal(this.start, start)
+        var hasChanged = Control.Equal(this.start, start)
                 .append(this.end, end)
                 .isNotEqual();
 
@@ -68,7 +68,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
     @BusinessMethod
     public void adjustSchedule(Periodicity periodicity, int interval) {
         var hasChanged = this.schedule == null ||
-                API.Equal(this.schedule.interval(), interval)
+                Control.Equal(this.schedule.interval(), interval)
                 .append(this.schedule.periodicity(), periodicity)
                 .isNotEqual();
 
@@ -80,7 +80,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
 
     @BusinessMethod
     public void describe(String name, String description) {
-        var hasChanged = API.Equal(this.name, name)
+        var hasChanged = Control.Equal(this.name, name)
                 .append(this.description, description)
                 .isNotEqual();
 

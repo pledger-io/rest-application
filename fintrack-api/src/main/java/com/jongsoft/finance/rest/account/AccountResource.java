@@ -8,7 +8,7 @@ import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.rest.model.AccountResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -87,7 +87,7 @@ public class AccountResource {
                     accountFilterFactory.account()
                             .name(token, false)
                             .pageSize(settingProvider.getAutocompleteLimit())
-                            .types(API.List(type)));
+                            .types(Collections.List(type)));
 
             var response = accounts.content()
                     .map(AccountResponse::new);

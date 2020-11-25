@@ -1,12 +1,13 @@
 package com.jongsoft.finance.rest.budget.graph;
 
-import com.jongsoft.finance.core.date.Dates;
+import com.jongsoft.finance.core.date.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.i18n.ResourceBundleMessageSource;
 import io.reactivex.Single;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,7 +45,7 @@ class BudgetGraphResourceTest extends TestSetup {
                 Single.just(Budget.builder()
                         .expectedIncome(200.20D)
                         .start(LocalDate.of(2018, 2, 3))
-                        .expenses(API.List(Budget.Expense.builder()
+                        .expenses(Collections.List(Budget.Expense.builder()
                                 .id(1L)
                                 .name("Grocery")
                                 .lowerBound(20D)
@@ -52,12 +53,12 @@ class BudgetGraphResourceTest extends TestSetup {
                                 .build()))
                         .build()));
 
-        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(API.Option());
+        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option());
 
         var response = subject.graph(
                 Locale.GERMAN,
-                Dates.startOfMonth(2019, 1),
-                Dates.endOfMonth(2019, 1));
+                DateUtils.startOfMonth(2019, 1),
+                DateUtils.endOfMonth(2019, 1));
 
         Mockito.verify(budgetProvider).lookup(2019, 1);
         Mockito.verify(transactionProvider).balance(Mockito.any(TransactionProvider.FilterCommand.class));

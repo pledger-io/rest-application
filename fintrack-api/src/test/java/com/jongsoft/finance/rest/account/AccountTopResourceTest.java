@@ -1,13 +1,12 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.core.date.DateRange;
-import com.jongsoft.finance.core.date.Dates;
+import com.jongsoft.finance.core.date.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -45,7 +44,7 @@ class AccountTopResourceTest extends TestSetup {
                 .type("checking")
                 .build();
 
-        Mockito.doReturn(API.List(new AccountProvider.AccountSpending() {
+        Mockito.doReturn(Collections.List(new AccountProvider.AccountSpending() {
             @Override
             public Account account() {
                 return account;
@@ -62,11 +61,11 @@ class AccountTopResourceTest extends TestSetup {
             }
         })).when(accountProvider).top(
                 Mockito.any(AccountProvider.FilterCommand.class),
-                Mockito.eq(DateRange.forMonth(2019, 1)),
+                Mockito.eq(DateUtils.forMonth(2019, 1)),
                 Mockito.eq(true));
 
 
-        subject.topDebtors(Dates.startOfMonth(2019, 1), Dates.endOfMonth(2019, 1))
+        subject.topDebtors(DateUtils.startOfMonth(2019, 1), DateUtils.endOfMonth(2019, 1))
                 .test()
                 .assertComplete()
                 .assertValueCount(1);
@@ -74,9 +73,9 @@ class AccountTopResourceTest extends TestSetup {
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).top(
                 Mockito.any(AccountProvider.FilterCommand.class),
-                Mockito.eq(DateRange.forMonth(2019, 1)),
+                Mockito.eq(DateUtils.forMonth(2019, 1)),
                 Mockito.eq(true));
-        Mockito.verify(mockCommand).types(API.List("debtor"));
+        Mockito.verify(mockCommand).types(Collections.List("debtor"));
     }
 
     @Test
@@ -93,7 +92,7 @@ class AccountTopResourceTest extends TestSetup {
                 .type("checking")
                 .build();
 
-        Mockito.doReturn(API.List(new AccountProvider.AccountSpending() {
+        Mockito.doReturn(Collections.List(new AccountProvider.AccountSpending() {
             @Override
             public Account account() {
                 return account;
@@ -110,10 +109,10 @@ class AccountTopResourceTest extends TestSetup {
             }
         })).when(accountProvider).top(
                 Mockito.any(AccountProvider.FilterCommand.class),
-                Mockito.eq(DateRange.forMonth(2019, 1)),
+                Mockito.eq(DateUtils.forMonth(2019, 1)),
                 Mockito.eq(false));
 
-        subject.topCreditor(Dates.startOfMonth(2019, 1), Dates.endOfMonth(2019, 1))
+        subject.topCreditor(DateUtils.startOfMonth(2019, 1), DateUtils.endOfMonth(2019, 1))
                 .test()
                 .assertComplete()
                 .assertValueCount(1);
@@ -121,9 +120,9 @@ class AccountTopResourceTest extends TestSetup {
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).top(
                 Mockito.any(AccountProvider.FilterCommand.class),
-                Mockito.eq(DateRange.forMonth(2019, 1)),
+                Mockito.eq(DateUtils.forMonth(2019, 1)),
                 Mockito.eq(false));
-        Mockito.verify(mockCommand).types(API.List("creditor"));
+        Mockito.verify(mockCommand).types(Collections.List("creditor"));
     }
 
 }

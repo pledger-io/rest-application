@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.account.graph;
 
-import com.jongsoft.finance.core.date.DateRange;
-import com.jongsoft.finance.core.date.Dates;
+import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.date.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
@@ -11,7 +11,8 @@ import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.i18n.ResourceBundleMessageSource;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -63,24 +64,24 @@ public class AccountBudgetGraphResourceTest extends TestSetup {
                 .build();
 
         Mockito.when(currencyProvider.lookup(Mockito.anyString())).thenReturn(Maybe.empty());
-        Mockito.when(transactionService.balance(Mockito.any())).thenReturn(API.Option());
-        Mockito.when(accountProvider.lookup(123L)).thenReturn(API.Option(account));
+        Mockito.when(transactionService.balance(Mockito.any())).thenReturn(Control.Option());
+        Mockito.when(accountProvider.lookup(123L)).thenReturn(Control.Option(account));
         Mockito.when(budgetService.lookup(2019, 1)).thenReturn(
                 Single.just(Budget.builder()
-                        .expenses(API.List(expense))
+                        .expenses(Collections.List(expense))
                         .build()));
 
         subject.budget(
                 123L,
-                Dates.startOfMonth(2019, 1),
-                Dates.endOfMonth(2019, 1),
+                DateUtils.startOfMonth(2019, 1),
+                DateUtils.endOfMonth(2019, 1),
                 Locale.GERMAN);
 
         var filterCommand = filterFactory.transaction();
         Mockito.verify(accountProvider).lookup(123L);
-        Mockito.verify(filterCommand).accounts(API.List(new EntityRef(account.getId())));
+        Mockito.verify(filterCommand).accounts(Collections.List(new EntityRef(account.getId())));
         Mockito.verify(filterCommand).onlyIncome(false);
-        Mockito.verify(filterCommand).range(DateRange.forMonth(2019, 1));
+        Mockito.verify(filterCommand).range(DateRangeOld.forMonth(2019, 1));
 
         Mockito.verify(transactionService, Mockito.times(2)).balance(Mockito.any());
     }

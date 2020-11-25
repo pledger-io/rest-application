@@ -1,30 +1,10 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-
-import javax.inject.Singleton;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.core.TransactionType;
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.transaction.TransactionCreationHandler;
-import com.jongsoft.finance.domain.transaction.events.TransactionAccountChangedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionAmountChangedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionBookedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionCreatedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionDeletedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionDescribeEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionFailureEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionRelationEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionSplitEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionTaggingEvent;
+import com.jongsoft.finance.domain.transaction.events.*;
 import com.jongsoft.finance.jpa.account.entity.AccountJpa;
 import com.jongsoft.finance.jpa.account.entity.ContractJpa;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
@@ -36,7 +16,18 @@ import com.jongsoft.finance.jpa.transaction.entity.TransactionJpa;
 import com.jongsoft.finance.jpa.user.entity.CategoryJpa;
 import com.jongsoft.finance.jpa.user.entity.ExpenseJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
-import com.jongsoft.lang.API;
+import com.jongsoft.finance.security.AuthenticationFacade;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.inject.Singleton;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Objects;
 
 @Singleton
 @Transactional
@@ -67,18 +58,18 @@ public class TransactionEventListener extends RepositoryJpa implements Transacti
                 .failureCode(event.getTransaction().getFailureCode())
                 .transactions(new HashSet<>())
                 .category(
-                        API.Option(event.getTransaction().getCategory())
+                        Control.Option(event.getTransaction().getCategory())
                                 .map(this::category)
                                 .getOrSupply(() -> null))
                 .budget(
-                        API.Option(event.getTransaction().getBudget())
+                        Control.Option(event.getTransaction().getBudget())
                                 .map(this::expense)
                                 .getOrSupply(() -> null))
                 .contract(
-                        API.Option(event.getTransaction().getContract())
+                        Control.Option(event.getTransaction().getContract())
                                 .map(this::contract)
                                 .getOrSupply(() -> null))
-                .batchImport(API.Option(event.getTransaction().getImportSlug())
+                .batchImport(Control.Option(event.getTransaction().getImportSlug())
                         .map(this::job)
                         .getOrSupply(() -> null))
                 .build();
@@ -234,7 +225,7 @@ public class TransactionEventListener extends RepositoryJpa implements Transacti
                 .reject(Objects::isNull);
 
         // Mark all old parts as deleted
-        var deletedIds = API.List(transaction.getTransactions())
+        var deletedIds = Collections.List(transaction.getTransactions())
                 .reject(t -> survivors.contains(t.getId()))
                 .map(TransactionJpa::getId);
         var deleteHql = """

@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.budget.graph;
 
-import com.jongsoft.finance.core.date.DateRange;
-import com.jongsoft.finance.core.date.Dates;
+import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.date.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
@@ -110,7 +110,7 @@ public class BudgetYearGraphResource {
                         MessageSource.MessageContext.of(locale)).get());
 
         LocalDate currentStart = LocalDate.of(year, 1, 1);
-        LocalDate currentEnd = Dates.endOfMonth(currentStart.getYear(), currentStart.getMonthValue());
+        LocalDate currentEnd = DateUtils.endOfMonth(currentStart.getYear(), currentStart.getMonthValue());
 
         LocalDate totalEnd = LocalDate.of(year, 12, 31);
         while (currentStart.isBefore(totalEnd)) {
@@ -118,11 +118,11 @@ public class BudgetYearGraphResource {
 
             double expected = expectation.apply(budget);
             double actual = transactionProvider.balance(request.apply(budget)
-                    .range(DateRange.of(currentStart, currentEnd))
+                    .range(DateRangeOld.of(currentStart, currentEnd))
                     .ownAccounts())
                     .getOrSupply(() -> 0D);
 
-            final long timestamp = Dates.timestamp(currentStart);
+            final long timestamp = DateUtils.timestamp(currentStart);
             budgetSeries.addPoint(new SeriesPoint()
                     .setY(expected)
                     .setX(timestamp));
@@ -132,7 +132,7 @@ public class BudgetYearGraphResource {
                     .setX(timestamp));
 
             currentStart = currentStart.plusMonths(1);
-            currentEnd = Dates.endOfMonth(currentStart.getYear(), currentStart.getMonthValue());
+            currentEnd = DateUtils.endOfMonth(currentStart.getYear(), currentStart.getMonthValue());
         }
 
         // @formatter:off
@@ -159,8 +159,8 @@ public class BudgetYearGraphResource {
                     .setEnabled(true)
                     .build()
                 .addXAxis(createDateAxis(
-                        Dates.toDate(LocalDate.of(year, 1, 1)),
-                        Dates.toDate(LocalDate.of(year, 12, 31))))
+                        DateUtils.toDate(LocalDate.of(year, 1, 1)),
+                        DateUtils.toDate(LocalDate.of(year, 12, 31))))
                 .addYAxis(createBalanceAxis(locale))
                 .addSeries(budgetSeries)
                 .addSeries(actualSeries);

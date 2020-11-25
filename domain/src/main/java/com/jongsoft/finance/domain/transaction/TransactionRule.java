@@ -6,12 +6,13 @@ import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.Removable;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleSortedEvent;
-import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.transaction.events.RuleChangeUpdatedEvent;
 import com.jongsoft.finance.domain.transaction.events.RuleConditionUpdatedEvent;
+import com.jongsoft.finance.domain.transaction.events.TransactionRuleSortedEvent;
+import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.lang.API;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.List;
 import lombok.Builder;
 import lombok.Generated;
@@ -44,7 +45,7 @@ public class TransactionRule implements AggregateBase {
         }
 
         public void update(RuleColumn field, RuleOperation operation, String condition) {
-            var hasChanged = API.Equal(this.field, field)
+            var hasChanged = Control.Equal(this.field, field)
                     .append(this.operation, operation)
                     .append(this.condition, condition)
                     .isNotEqual();
@@ -79,7 +80,7 @@ public class TransactionRule implements AggregateBase {
         }
 
         public void update(RuleColumn ruleColumn, String change) {
-            var hasChanged = API.Equal(ruleColumn, this.field)
+            var hasChanged = Control.Equal(ruleColumn, this.field)
                     .append(change, this.change)
                     .isNotEqual();
 
@@ -116,8 +117,8 @@ public class TransactionRule implements AggregateBase {
         this.user = user;
         this.name = name;
         this.restrictive = restrictive;
-        this.conditions = API.List();
-        this.changes = API.List();
+        this.conditions = Collections.List();
+        this.changes = Collections.List();
     }
 
     @Generated
@@ -132,8 +133,8 @@ public class TransactionRule implements AggregateBase {
         this.deleted = deleted;
         this.group = group;
         this.sort = sort;
-        this.conditions = API.Option(conditions).getOrSupply(API::List);
-        this.changes = API.Option(changes).getOrSupply(API::List);
+        this.conditions = Control.Option(conditions).getOrSupply(Collections::List);
+        this.changes = Control.Option(changes).getOrSupply(Collections::List);
         this.user = user;
     }
 
@@ -163,7 +164,7 @@ public class TransactionRule implements AggregateBase {
 
     public void registerCondition(RuleColumn field, RuleOperation operation, String condition) {
         if (conditions == null) {
-            conditions = API.List();
+            conditions = Collections.List();
         }
 
         new Condition(null, field, operation, condition);
@@ -171,7 +172,7 @@ public class TransactionRule implements AggregateBase {
 
     public void registerChange(RuleColumn field, String value) {
         if (changes == null) {
-            changes = API.List();
+            changes = Collections.List();
         }
 
         changes = changes.reject(c -> Objects.equals(c.getField(), field));

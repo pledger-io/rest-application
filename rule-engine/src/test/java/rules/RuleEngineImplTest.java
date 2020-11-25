@@ -1,11 +1,5 @@
 package rules;
 
-import java.util.List;
-
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.account.Account;
@@ -20,9 +14,15 @@ import com.jongsoft.finance.rule.impl.RuleEngineImpl;
 import com.jongsoft.finance.rule.locator.AccountLocator;
 import com.jongsoft.finance.rule.locator.NoopLocator;
 import com.jongsoft.finance.rule.locator.RelationLocator;
-import com.jongsoft.lang.API;
-
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.ApplicationContext;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import java.util.List;
 
 class RuleEngineImplTest {
 
@@ -66,11 +66,11 @@ class RuleEngineImplTest {
         transactionRule2.new Condition(1L, RuleColumn.DESCRIPTION, RuleOperation.CONTAINS, "trans");
         transactionRule2.new Change(3L, RuleColumn.CATEGORY, "4");
 
-        Mockito.when(transactionRuleProvider.lookup()).thenReturn(API.List(transactionRule1, transactionRule2));
+        Mockito.when(transactionRuleProvider.lookup()).thenReturn(Collections.List(transactionRule1, transactionRule2));
         Mockito.when(categoryProvider.lookup(4L))
-                .thenReturn(API.Option(Category.builder().label("Category 1").build()));
+                .thenReturn(Control.Option(Category.builder().label("Category 1").build()));
         Mockito.when(accountProvider.lookup(2L))
-                .thenReturn(API.Option(changeAccount));
+                .thenReturn(Control.Option(changeAccount));
 
         RuleDataSet inputSet = new RuleDataSet();
         inputSet.put(RuleColumn.AMOUNT, 20.22);
@@ -104,9 +104,9 @@ class RuleEngineImplTest {
         inputSet.put(RuleColumn.DESCRIPTION, "This is a Sample");
 
         Mockito.when(categoryProvider.lookup(4L))
-                .thenReturn(API.Option(Category.builder().label("Category 1").build()));
+                .thenReturn(Control.Option(Category.builder().label("Category 1").build()));
         Mockito.when(accountProvider.lookup(2L))
-                .thenReturn(API.Option(changeAccount));
+                .thenReturn(Control.Option(changeAccount));
 
         var output = engine.run(inputSet, transactionRule);
 
@@ -157,9 +157,9 @@ class RuleEngineImplTest {
         inputSet.put(RuleColumn.DESCRIPTION, "This is a Sample");
 
         Mockito.when(categoryProvider.lookup(4L))
-                .thenReturn(API.Option(Category.builder().label("Category 1").build()));
+                .thenReturn(Control.Option(Category.builder().label("Category 1").build()));
         Mockito.when(accountProvider.lookup(2L))
-                .thenReturn(API.Option(changeAccount));
+                .thenReturn(Control.Option(changeAccount));
 
         var output = engine.run(inputSet, transactionRule);
 
