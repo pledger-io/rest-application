@@ -81,7 +81,7 @@
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${account == null}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="SequenceFlow_1foqzxr" sourceRef="st_locate_synonym" targetRef="ExclusiveGateway_0w5d9dn" />
-      <bpmn:serviceTask id="st_locate_synonym" name="Find by synonym" camunda:delegateExpression="${accountSynonymLookupDelegate}">
+      <bpmn:serviceTask id="st_locate_synonym" name="Find by synonym" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.SynonymLookup" camunda:delegateExpression="${accountSynonymLookupDelegate}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
             <camunda:inputParameter name="name">${name}</camunda:inputParameter>
@@ -142,9 +142,6 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_1tjiemj_di" bpmnElement="st_read_csv">
         <dc:Bounds x="299" y="237" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_0dzor1o_di" bpmnElement="EndEvent_0dzor1o">
-        <dc:Bounds x="1452" y="259" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="SubProcess_0aoz6d4_di" bpmnElement="sp_extract_accounts" isExpanded="true">
         <dc:Bounds x="478" y="113" width="878" height="327" />
@@ -232,6 +229,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_11nngh1_di" bpmnElement="Task_16w3kks">
         <dc:Bounds x="1060" y="329" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0dzor1o_di" bpmnElement="EndEvent_0dzor1o">
+        <dc:Bounds x="1452" y="259" width="36" height="36" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

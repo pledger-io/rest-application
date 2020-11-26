@@ -1,6 +1,6 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.BudgetProvider;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
@@ -45,19 +45,19 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
 
     @Override
     public Single<Budget> lookup(int year, int month) {
-        var range = DateRangeOld.forMonth(year, month);
+        var range = DateUtils.forMonth(year, month);
 
         var hql = """
                 select b from BudgetJpa b
                 where b.user.username = :username
                     and b.from <= :start
-                    and (b.until is null or b.until > :end)""";
+                    and (b.until is null or b.until >= :end)""";
 
         return reactiveEntityManager.<BudgetJpa>reactive()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
-                .set("start", range.getStart())
-                .set("end", range.getEnd())
+                .set("start", range.from())
+                .set("end", range.until())
                 .single()
                 .map(this::convert);
     }

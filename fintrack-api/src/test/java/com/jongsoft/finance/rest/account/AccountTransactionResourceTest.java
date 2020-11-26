@@ -91,6 +91,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 ));
 
         var request = AccountTransactionSearchRequest.builder()
+                .dateRange(new AccountTransactionSearchRequest.Range())
                 .build();
 
         var response = subject.search(1L, request).blockingGet();

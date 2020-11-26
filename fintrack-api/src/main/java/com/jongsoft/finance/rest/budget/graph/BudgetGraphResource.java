@@ -1,6 +1,5 @@
 package com.jongsoft.finance.rest.budget.graph;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
@@ -16,6 +15,7 @@ import com.jongsoft.highchart.series.ColumnSeries;
 import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Dates;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -73,7 +73,7 @@ public class BudgetGraphResource {
                     double amount = transactionProvider.balance(filterFactory.transaction()
                             .expenses(Collections.List(new EntityRef(e.getId())))
                             .ownAccounts()
-                            .range(DateRangeOld.of(start, end))).getOrSupply(() -> 0D);
+                            .range(Dates.range(start, end))).getOrSupply(() -> 0D);
                     series.addPoint(new SeriesPoint()
                             .setName(e.getName())
                             .setY(Math.abs(amount)));

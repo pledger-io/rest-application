@@ -1,11 +1,11 @@
 package com.jongsoft.finance.security;
 
+import com.jongsoft.finance.domain.user.UserAccount;
+import org.jboss.aerogear.security.otp.Totp;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
-
-import org.jboss.aerogear.security.otp.Totp;
-import com.jongsoft.finance.domain.user.UserAccount;
 
 public class TwoFactorHelper {
 

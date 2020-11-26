@@ -1,11 +1,11 @@
 package com.jongsoft.finance.domain.transaction;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.core.DataProvider;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import com.jongsoft.lang.time.Range;
 import io.reactivex.Maybe;
 
 import java.time.LocalDate;
@@ -20,7 +20,7 @@ public interface TransactionProvider extends DataProvider<Transaction> {
 
         FilterCommand name(String value, boolean exact);
         FilterCommand description(String value, boolean exact);
-        FilterCommand range(DateRangeOld range);
+        FilterCommand range(Range<LocalDate> range);
         FilterCommand importSlug(String value);
         FilterCommand currency(String currency);
 

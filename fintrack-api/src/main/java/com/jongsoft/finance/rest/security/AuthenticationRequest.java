@@ -1,9 +1,9 @@
 package com.jongsoft.finance.rest.security;
 
+import io.micronaut.core.annotation.Introspected;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-
-import io.micronaut.core.annotation.Introspected;
 
 @Introspected
 class AuthenticationRequest implements io.micronaut.security.authentication.AuthenticationRequest<String, String> {

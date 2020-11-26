@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.transaction.graph;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.core.CurrencyProvider;
@@ -63,7 +63,7 @@ class TransactionCategoryGraphResourceTest extends TestSetup {
 
         subject.expenses(
                 LocalDate.of(2019, 1, 1),
-                LocalDate.of(2019, 1, 31),
+                LocalDate.of(2019, 2, 1),
                 Locale.GERMAN,
                 Optional.of(Currency.builder().symbol('E').build()));
 
@@ -71,7 +71,7 @@ class TransactionCategoryGraphResourceTest extends TestSetup {
         Mockito.verify(transactionProvider, Mockito.times(2)).balance(Mockito.any());
         Mockito.verify(mockFilter).ownAccounts();
         Mockito.verify(mockFilter).onlyIncome(false);
-        Mockito.verify(mockFilter).range(DateRangeOld.forMonth(2019, 1));
+        Mockito.verify(mockFilter).range(DateUtils.forMonth(2019, 1));
         Mockito.verify(mockFilter).categories(Collections.List(new EntityRef(1L)));
     }
 
@@ -87,7 +87,7 @@ class TransactionCategoryGraphResourceTest extends TestSetup {
 
         subject.income(
                 LocalDate.of(2019, 1, 1),
-                LocalDate.of(2019, 1, 31),
+                LocalDate.of(2019, 2, 1),
                 Locale.GERMAN,
                 Optional.of(Currency.builder().symbol('E').build()));
 
@@ -95,7 +95,7 @@ class TransactionCategoryGraphResourceTest extends TestSetup {
         Mockito.verify(transactionProvider, Mockito.times(2)).balance(Mockito.any());
         Mockito.verify(mockFilter).ownAccounts();
         Mockito.verify(mockFilter).onlyIncome(true);
-        Mockito.verify(mockFilter).range(DateRangeOld.forMonth(2019, 1));
+        Mockito.verify(mockFilter).range(DateUtils.forMonth(2019, 1));
         Mockito.verify(mockFilter).categories(Collections.List(new EntityRef(1L)));
     }
 }

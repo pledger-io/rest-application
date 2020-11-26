@@ -1,10 +1,10 @@
 package com.jongsoft.finance.bpmn.delegate;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Dates;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -37,9 +37,14 @@ public class ComputeBalanceDelegate implements JavaDelegate {
 
         if (execution.hasVariableLocal("date")) {
             String isoDate = execution.<StringValue>getVariableLocalTyped("date").getValue();
-            requestBuilder.range(DateRangeOld.of(LocalDate.of(1900, 1, 1), LocalDate.parse(isoDate)));
+            requestBuilder.range(
+                    Dates.range(
+                            LocalDate.of(1900, 1, 1),
+                            LocalDate.parse(isoDate)));
         } else {
-            requestBuilder.range(DateRangeOld.of(LocalDate.of(1900, 1, 1), LocalDate.of(2900, 1, 1)));
+            requestBuilder.range(Dates.range(
+                    LocalDate.of(1900, 1, 1),
+                    LocalDate.of(2900, 1, 1)));
         }
 
         if (execution.hasVariableLocal("onlyIncome")) {

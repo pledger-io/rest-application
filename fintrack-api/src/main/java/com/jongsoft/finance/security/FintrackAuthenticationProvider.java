@@ -1,25 +1,18 @@
 package com.jongsoft.finance.security;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.inject.Singleton;
-
+import com.jongsoft.finance.domain.user.Role;
+import com.jongsoft.finance.domain.user.UserProvider;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.security.authentication.*;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.jongsoft.finance.domain.user.Role;
-import com.jongsoft.finance.domain.user.UserProvider;
 
-import io.micronaut.http.HttpRequest;
-import io.micronaut.security.authentication.AuthenticationFailed;
-import io.micronaut.security.authentication.AuthenticationFailureReason;
-import io.micronaut.security.authentication.AuthenticationProvider;
-import io.micronaut.security.authentication.AuthenticationRequest;
-import io.micronaut.security.authentication.AuthenticationResponse;
-import io.micronaut.security.authentication.UserDetails;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
+import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 
 @Singleton
 public class FintrackAuthenticationProvider implements AuthenticationProvider {

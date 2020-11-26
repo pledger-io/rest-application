@@ -1,4 +1,4 @@
-package com.jongsoft.finance.core.date;
+package com.jongsoft.finance.core;
 
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.time.Range;
@@ -6,6 +6,7 @@ import com.jongsoft.lang.time.Range;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public interface DateUtils {
@@ -45,9 +46,7 @@ public interface DateUtils {
 
     static Range<LocalDate> forMonth(int year, int month) {
         var start = LocalDate.of(year, month, 1);
-        var end = start.plusMonths(1);
-
-        return Dates.range(start, end);
+        return Dates.range(start, ChronoUnit.MONTHS);
     }
 
 }

@@ -1,7 +1,6 @@
 package com.jongsoft.finance.rest.category.graph;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
-import com.jongsoft.finance.core.date.DateUtils;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -84,7 +83,7 @@ public class CategoryYearGraphResource {
                 .setColor(new GraphColor("#7fc6a5"));
 
         while (currentStart.isBefore(totalEnd)) {
-            builder.range(DateRangeOld.forMonth(currentStart.getYear(), currentStart.getMonthValue()));
+            builder.range(DateUtils.forMonth(currentStart.getYear(), currentStart.getMonthValue()));
 
             var income = transactionService.balance(builder.onlyIncome(true));
             var expense = transactionService.balance(builder.onlyIncome(false));

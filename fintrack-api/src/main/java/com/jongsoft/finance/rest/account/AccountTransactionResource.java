@@ -13,6 +13,7 @@ import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
+import com.jongsoft.lang.Dates;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
@@ -77,7 +78,9 @@ public class AccountTransactionResource {
             } else {
                 var command = filterFactory.transaction()
                         .accounts(Collections.List(new EntityRef(accountId)))
-                        .range(request.getDateRange())
+                        .range(Dates.range(
+                                request.getDateRange().getStart(),
+                                request.getDateRange().getEnd()))
                         .pageSize(settingProvider.getPageSize())
                         .page(request.getPage());
 

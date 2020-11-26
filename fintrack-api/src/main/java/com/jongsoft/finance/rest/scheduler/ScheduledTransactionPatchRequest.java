@@ -1,17 +1,40 @@
 package com.jongsoft.finance.rest.scheduler;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.core.annotation.Introspected;
 import lombok.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 
 @Builder
 @Introspected
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ScheduledTransactionPatchRequest {
+
+    @Introspected
+    public static class DateRange {
+        private LocalDate start;
+        private LocalDate end;
+
+        public DateRange() {
+        }
+
+        public DateRange(LocalDate start, LocalDate end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public LocalDate getEnd() {
+            return end;
+        }
+
+        public LocalDate getStart() {
+            return start;
+        }
+
+    }
 
     @Data
     static class ScheduleValue {
@@ -20,7 +43,7 @@ public class ScheduledTransactionPatchRequest {
     }
 
     @Valid
-    private DateRangeOld range;
+    private DateRange range;
 
     @Valid
     private ScheduleValue schedule;
@@ -36,7 +59,7 @@ public class ScheduledTransactionPatchRequest {
         return null;
     }
 
-    public DateRangeOld getRange() {
+    public DateRange getRange() {
         return range;
     }
 

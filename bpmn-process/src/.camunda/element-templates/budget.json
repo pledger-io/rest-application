@@ -1,0 +1,70 @@
+[
+  {
+    "name": "Budget Lookup",
+    "id": "com.jongsoft.finance.bpmn.budget.BudgetLookup",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${processBudgetLookupDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Name",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "name"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Resolved budget",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${budget}"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Budget Create",
+    "id": "com.jongsoft.finance.bpmn.budget.BudgetCreate",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${processBudgetCreateDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Budget JSON",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "budget"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      }
+    ]
+  }
+]

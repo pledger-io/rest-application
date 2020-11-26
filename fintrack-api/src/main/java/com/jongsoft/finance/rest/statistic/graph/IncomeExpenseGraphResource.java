@@ -1,7 +1,6 @@
 package com.jongsoft.finance.rest.statistic.graph;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
-import com.jongsoft.finance.core.date.DateUtils;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
@@ -20,6 +19,7 @@ import com.jongsoft.highchart.series.LineSeries;
 import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
 import com.jongsoft.lang.Control;
+import com.jongsoft.lang.Dates;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.annotation.Controller;
@@ -110,14 +110,14 @@ public class IncomeExpenseGraphResource {
                     .ownAccounts()
                     .onlyIncome(true)
                     .currency(currencyCode)
-                    .range(DateRangeOld.of(currentStart, currentEnd)))
+                    .range(Dates.range(currentStart, currentEnd)))
                     .getOrSupply(() -> 0D);
 
             var expense = transactionProvider.balance(filterFactory.transaction()
                     .ownAccounts()
                     .onlyIncome(false)
                     .currency(currencyCode)
-                    .range(DateRangeOld.of(currentStart, currentEnd)))
+                    .range(Dates.range(currentStart, currentEnd)))
                     .getOrSupply(() -> 0D);
 
             avgExpense.add(BigDecimal.valueOf(expense).abs());

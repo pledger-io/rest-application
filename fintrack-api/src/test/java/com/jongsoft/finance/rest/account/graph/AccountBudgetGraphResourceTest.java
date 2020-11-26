@@ -1,7 +1,6 @@
 package com.jongsoft.finance.rest.account.graph;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
-import com.jongsoft.finance.core.date.DateUtils;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
@@ -74,14 +73,14 @@ public class AccountBudgetGraphResourceTest extends TestSetup {
         subject.budget(
                 123L,
                 DateUtils.startOfMonth(2019, 1),
-                DateUtils.endOfMonth(2019, 1),
+                DateUtils.startOfMonth(2019, 2),
                 Locale.GERMAN);
 
         var filterCommand = filterFactory.transaction();
         Mockito.verify(accountProvider).lookup(123L);
         Mockito.verify(filterCommand).accounts(Collections.List(new EntityRef(account.getId())));
         Mockito.verify(filterCommand).onlyIncome(false);
-        Mockito.verify(filterCommand).range(DateRangeOld.forMonth(2019, 1));
+        Mockito.verify(filterCommand).range(DateUtils.forMonth(2019, 1));
 
         Mockito.verify(transactionService, Mockito.times(2)).balance(Mockito.any());
     }

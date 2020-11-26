@@ -1,6 +1,5 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Builder;
 import lombok.Generated;
@@ -8,10 +7,26 @@ import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Setter
 @Introspected
 class AccountTransactionSearchRequest {
+
+    @Setter
+    @Introspected
+    public static class Range {
+        private LocalDate start;
+        private LocalDate end;
+
+        public LocalDate getStart() {
+            return start;
+        }
+
+        public LocalDate getEnd() {
+            return end;
+        }
+    }
 
     private String text;
 
@@ -19,14 +34,14 @@ class AccountTransactionSearchRequest {
     private int page;
 
     @NotNull
-    private DateRangeOld dateRange;
+    private Range dateRange;
 
     @Generated
     public AccountTransactionSearchRequest() {
     }
 
     @Builder
-    private AccountTransactionSearchRequest(String text, @Min(0) int page, @NotNull DateRangeOld dateRange) {
+    private AccountTransactionSearchRequest(String text, @Min(0) int page, @NotNull Range dateRange) {
         this.text = text;
         this.page = page;
         this.dateRange = dateRange;
@@ -36,11 +51,12 @@ class AccountTransactionSearchRequest {
         return text;
     }
 
-    public DateRangeOld getDateRange() {
+    public Range getDateRange() {
         return dateRange;
     }
 
     public int getPage() {
         return Math.max(0, page - 1);
     }
+
 }

@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.budget;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.ResultPage;
@@ -235,6 +235,6 @@ class BudgetResourceTest extends TestSetup {
 
         testSubscriber.assertComplete();
         testSubscriber.assertValueCount(1);
-        testSubscriber.assertResult(new ComputedExpenseResponse(35, 200, DateRangeOld.forMonth(2019, 1)));
+        testSubscriber.assertResult(new ComputedExpenseResponse(35, 200, DateUtils.forMonth(2019, 1)));
     }
 }

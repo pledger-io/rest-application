@@ -1,22 +1,45 @@
 package com.jongsoft.finance.rest.statistic;
 
 import com.jongsoft.finance.core.AggregateBase;
-import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.lang.Control;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Setter
 @Introspected
 public class BalanceRequest {
 
+    @Introspected
+    public static class DateRange {
+        private LocalDate start;
+        private LocalDate end;
+
+        public DateRange() {
+        }
+
+        public DateRange(LocalDate start, LocalDate end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public LocalDate getEnd() {
+            return end;
+        }
+
+        public LocalDate getStart() {
+            return start;
+        }
+
+    }
+
     private List<EntityRef> accounts;
     private List<EntityRef> categories;
     private List<EntityRef> contracts;
     private List<EntityRef> expenses;
-    private DateRangeOld dateRange;
+    private DateRange dateRange;
     private boolean onlyIncome;
     private boolean allMoney;
     private String currency;
@@ -51,7 +74,7 @@ public class BalanceRequest {
         return Control.Option(expenses).getOrSupply(List::of);
     }
 
-    public DateRangeOld dateRange() {
+    public DateRange getDateRange() {
         return dateRange;
     }
 

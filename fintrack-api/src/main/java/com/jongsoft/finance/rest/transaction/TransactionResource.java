@@ -15,6 +15,7 @@ import com.jongsoft.finance.rest.process.RuntimeResource;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
+import com.jongsoft.lang.Dates;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
@@ -73,7 +74,9 @@ public class TransactionResource {
     ResultPageResponse<TransactionResponse> search(@Valid @Body TransactionSearchRequest request) {
         var command = filterFactory.transaction()
                 .ownAccounts()
-                .range(request.getDateRange())
+                .range(Dates.range(
+                        request.getDateRange().getStart(),
+                        request.getDateRange().getEnd()))
                 .pageSize(settingProvider.getPageSize())
                 .page(request.getPage());
 
@@ -157,7 +160,9 @@ public class TransactionResource {
         }
 
         if (request.getDateRange() != null) {
-            command.range(request.getDateRange());
+            command.range(Dates.range(
+                    request.getDateRange().getStart(),
+                    request.getDateRange().getEnd()));
         }
 
         if (request.isTransfers()) {

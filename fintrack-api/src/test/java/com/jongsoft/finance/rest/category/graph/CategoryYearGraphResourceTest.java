@@ -1,6 +1,5 @@
 package com.jongsoft.finance.rest.category.graph;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -10,6 +9,7 @@ import com.jongsoft.finance.domain.user.CategoryProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
+import com.jongsoft.lang.Dates;
 import io.micronaut.context.i18n.ResourceBundleMessageSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -62,9 +63,9 @@ class CategoryYearGraphResourceTest extends TestSetup {
         Mockito.verify(mockFilter).categories(Collections.List(new EntityRef(category.getId())));
         Mockito.verify(mockFilter, Mockito.times(12)).onlyIncome(true);
         Mockito.verify(mockFilter, Mockito.times(12)).onlyIncome(false);
-        DateRangeOld.forYear(2019).months().forEach(range -> {
-            Mockito.verify(mockFilter).range(range);
-        });
+        Dates.range(LocalDate.of(2019, 1, 1), ChronoUnit.YEARS)
+                .slice(ChronoUnit.MONTHS)
+                .forEach(range -> Mockito.verify(mockFilter).range(range));
         Mockito.verify(transactionProvider, Mockito.times(24)).balance(Mockito.any());
     }
 

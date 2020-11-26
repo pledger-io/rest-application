@@ -1,6 +1,5 @@
 package com.jongsoft.finance.graph;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.Currency;
@@ -15,6 +14,7 @@ import com.jongsoft.highchart.series.PieSeries;
 import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.context.MessageSource;
 
@@ -80,7 +80,7 @@ public class CategoryPieChart {
         var filter = filterFactory.transaction()
                 .onlyIncome(income)
                 .currency(currency.getCode())
-                .range(DateRangeOld.of(start, end));
+                .range(Dates.range(start, end));
         if (accounts.isEmpty()) {
             filter.ownAccounts();
         } else {

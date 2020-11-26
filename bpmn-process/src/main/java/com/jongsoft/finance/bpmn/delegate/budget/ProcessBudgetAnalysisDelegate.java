@@ -1,6 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.core.SettingProvider;
@@ -17,7 +17,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate analyzes the transactions recorded with a specific budget type in the past 3 months to determine if
@@ -54,7 +53,7 @@ public class ProcessBudgetAnalysisDelegate implements JavaDelegate {
         runningDate = runningDate.minusMonths(1);
 
         var deviation = 0;
-        var dateRange = DateRangeOld.forMonth(runningDate.getYear(), runningDate.getMonthValue());
+        var dateRange = DateUtils.forMonth(runningDate.getYear(), runningDate.getMonthValue());
         var budgetAnalysisMonths = settingProvider.getBudgetAnalysisMonths();
         var searchCommand = filterFactory.transaction()
                 .expenses(Collections.List(new EntityRef(forExpense.getId())));
@@ -68,7 +67,7 @@ public class ProcessBudgetAnalysisDelegate implements JavaDelegate {
                     .get();
 
             deviation += forExpense.computeBudget() - spentInMonth;
-            dateRange = dateRange.previous(ChronoUnit.MONTHS);
+            dateRange = dateRange.previous();
         }
 
         var averageDeviation = BigDecimal.valueOf(deviation)

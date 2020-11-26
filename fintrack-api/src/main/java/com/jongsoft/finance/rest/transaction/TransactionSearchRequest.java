@@ -1,6 +1,5 @@
 package com.jongsoft.finance.rest.transaction;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
 import io.micronaut.core.annotation.Introspected;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Builder
 @Introspected
@@ -16,7 +16,31 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class TransactionSearchRequest {
 
+    @Introspected
+    public static class DateRange {
+        private LocalDate start;
+        private LocalDate end;
+
+        public DateRange() {
+        }
+
+        public DateRange(LocalDate start, LocalDate end) {
+            this.start = start;
+            this.end = end;
+        }
+
+        public LocalDate getEnd() {
+            return end;
+        }
+
+        public LocalDate getStart() {
+            return start;
+        }
+
+    }
+
     @Data
+    @Introspected
     public static class EntityRef {
         private long id;
     }
@@ -36,7 +60,7 @@ public class TransactionSearchRequest {
     private boolean transfers;
 
     @NotNull
-    private DateRangeOld dateRange;
+    private DateRange dateRange;
 
     public String getDescription() {
         return description;
@@ -70,7 +94,7 @@ public class TransactionSearchRequest {
         return transfers;
     }
 
-    public DateRangeOld getDateRange() {
+    public DateRange getDateRange() {
         return dateRange;
     }
 

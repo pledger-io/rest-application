@@ -1,7 +1,6 @@
 package com.jongsoft.finance.rest.category.graph;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
-import com.jongsoft.finance.core.date.DateUtils;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
@@ -54,12 +53,12 @@ class CategoryGraphResourceTest extends TestSetup {
         Mockito.when(categoryProvider.lookup()).thenReturn(Collections.List(category));
         Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option());
 
-        subject.graph(DateUtils.startOfMonth(2019, 1), DateUtils.endOfMonth(2019, 1), Locale.GERMAN);
+        subject.graph(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2), Locale.GERMAN);
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(mockFilter).onlyIncome(false);
         Mockito.verify(mockFilter).ownAccounts();
-        Mockito.verify(mockFilter).range(DateRangeOld.forMonth(2019, 1));
+        Mockito.verify(mockFilter).range(DateUtils.forMonth(2019, 1));
         Mockito.verify(mockFilter).categories(Collections.List(new EntityRef(category.getId())));
     }
 }

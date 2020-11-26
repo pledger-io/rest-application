@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.transaction;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
@@ -106,7 +106,9 @@ class TransactionResourceTest extends TestSetup {
 
         var request = TransactionSearchRequest.builder()
                 .page(0)
-                .dateRange(DateRangeOld.forMonth(2019, 1))
+                .dateRange(new TransactionSearchRequest.DateRange(
+                        LocalDate.of(2019, 1, 1),
+                        LocalDate.of(2019, 2, 1)))
                 .onlyIncome(false)
                 .onlyExpense(false)
                 .description("samp")
@@ -118,7 +120,7 @@ class TransactionResourceTest extends TestSetup {
         Mockito.verify(transactionProvider).lookup(Mockito.any());
         Mockito.verify(mockFilter).description("samp", false);
         Mockito.verify(mockFilter).ownAccounts();
-        Mockito.verify(mockFilter).range(DateRangeOld.forMonth(2019, 1));
+        Mockito.verify(mockFilter).range(DateUtils.forMonth(2019, 1));
     }
 
     @Test

@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.core.date.DateUtils;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
@@ -65,7 +65,7 @@ class AccountTopResourceTest extends TestSetup {
                 Mockito.eq(true));
 
 
-        subject.topDebtors(DateUtils.startOfMonth(2019, 1), DateUtils.endOfMonth(2019, 1))
+        subject.topDebtors(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2))
                 .test()
                 .assertComplete()
                 .assertValueCount(1);
@@ -112,7 +112,7 @@ class AccountTopResourceTest extends TestSetup {
                 Mockito.eq(DateUtils.forMonth(2019, 1)),
                 Mockito.eq(false));
 
-        subject.topCreditor(DateUtils.startOfMonth(2019, 1), DateUtils.endOfMonth(2019, 1))
+        subject.topCreditor(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2))
                 .test()
                 .assertComplete()
                 .assertValueCount(1);

@@ -1,6 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.ResultPage;
@@ -73,9 +73,9 @@ class ProcessBudgetAnalysisDelegateTest {
         subject.execute(execution);
 
         Mockito.verify(transactionProvider, Mockito.times(3)).lookup(Mockito.any(TransactionProvider.FilterCommand.class));
-        Mockito.verify(filterCommand).range(DateRangeOld.forMonth(2018, 12));
-        Mockito.verify(filterCommand).range(DateRangeOld.forMonth(2018, 11));
-        Mockito.verify(filterCommand).range(DateRangeOld.forMonth(2018, 10));
+        Mockito.verify(filterCommand).range(DateUtils.forMonth(2018, 12));
+        Mockito.verify(filterCommand).range(DateUtils.forMonth(2018, 11));
+        Mockito.verify(filterCommand).range(DateUtils.forMonth(2018, 10));
 
         Mockito.verify(execution).setVariableLocal("deviates", true);
         Mockito.verify(execution).setVariableLocal("deviation", -35.0d);

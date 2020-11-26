@@ -1,29 +1,48 @@
 package com.jongsoft.finance.rest.budget;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.lang.time.Range;
 import io.micronaut.core.annotation.Introspected;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Introspected
 @EqualsAndHashCode
 class ComputedExpenseResponse {
 
+    @EqualsAndHashCode
+    @AllArgsConstructor
+    public static class DateRange {
+
+        private Range<LocalDate> range;
+
+        public LocalDate getStart() {
+            return range.from();
+        }
+
+        public LocalDate getEnd() {
+            return range.until();
+        }
+    }
+
     private double allowed;
     private double spent;
-    private DateRangeOld dateRange;
+    private DateRange dateRange;
 
-    public ComputedExpenseResponse(double allowed, double spent, DateRangeOld dateRange) {
+    public ComputedExpenseResponse(double allowed, double spent, Range<LocalDate> dateRange) {
         this.allowed = allowed;
         this.spent = spent;
-        this.dateRange = dateRange;
+        this.dateRange = new DateRange(dateRange);
     }
 
     public double getDailySpent() {
-        return calculateDaily(spent, dateRange.amountOfDays() + 1).doubleValue();
+        var days = (int) ChronoUnit.DAYS.between(dateRange.getStart(), dateRange.getEnd());
+        return calculateDaily(spent, days).doubleValue();
     }
 
     public double getLeft() {
@@ -31,8 +50,12 @@ class ComputedExpenseResponse {
     }
 
     public double getDailyLeft() {
-        return calculateDaily(BigDecimal.valueOf(allowed).subtract(BigDecimal.valueOf(Math.abs(spent))).doubleValue(),
-                dateRange.amountOfDays() + 1).doubleValue();
+        var days = (int) ChronoUnit.DAYS.between(dateRange.getStart(), dateRange.getEnd());
+        return calculateDaily(
+                BigDecimal.valueOf(allowed)
+                        .subtract(BigDecimal.valueOf(Math.abs(spent)))
+                        .doubleValue(),
+                days).doubleValue();
     }
 
     private BigDecimal calculateDaily(double spent, int days) {

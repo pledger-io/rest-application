@@ -1,11 +1,10 @@
 package com.jongsoft.finance.security;
 
-import java.security.SecureRandom;
-
-import javax.inject.Singleton;
-
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import at.favre.lib.crypto.bcrypt.LongPasswordStrategies;
+
+import javax.inject.Singleton;
+import java.security.SecureRandom;
 
 @Singleton
 public class PasswordEncoder {

@@ -2,14 +2,15 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.SystemAccountTypes;
-import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.lang.time.Range;
 import io.micronaut.data.model.Sort;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
 
@@ -89,10 +90,10 @@ public class TransactionFilterCommand extends FilterCommandJpa implements Transa
     }
 
     @Override
-    public TransactionProvider.FilterCommand range(DateRangeOld range) {
-        hql("date", " AND a.date between :startDate and :endDate");
-        parameter("startDate", range.getStart());
-        parameter("endDate", range.getEnd());
+    public TransactionProvider.FilterCommand range(Range<LocalDate> range) {
+        hql("date", " AND a.date >= :startDate and a.date < :endDate");
+        parameter("startDate", range.from());
+        parameter("endDate", range.until());
         return this;
     }
 

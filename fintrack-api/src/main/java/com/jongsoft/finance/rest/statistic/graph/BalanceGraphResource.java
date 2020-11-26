@@ -1,7 +1,6 @@
 package com.jongsoft.finance.rest.statistic.graph;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
-import com.jongsoft.finance.core.date.DateUtils;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.finance.filter.RequestAttributes;
@@ -15,6 +14,7 @@ import com.jongsoft.highchart.common.SeriesType;
 import com.jongsoft.highchart.series.LineSeries;
 import com.jongsoft.highchart.series.SeriesFactory;
 import com.jongsoft.highchart.series.SeriesPoint;
+import com.jongsoft.lang.Dates;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.annotation.Controller;
@@ -119,15 +119,19 @@ public class BalanceGraphResource {
         var startBalance = transactionProvider.balance(
                 filterFactory.transaction()
                         .ownAccounts()
-                        .range(DateRangeOld.of(LocalDate.of(1900, 1, 1), start)));
+                        .range(Dates.range(
+                                LocalDate.of(1900, 1, 1),
+                                start)));
         var endBalance = transactionProvider.balance(
                 filterFactory.transaction()
                 .ownAccounts()
-                .range(DateRangeOld.of(LocalDate.of(1900, 1, 1), end)));
+                .range(Dates.range(
+                        LocalDate.of(1900, 1, 1),
+                        end)));
 
         var dataRequest = filterFactory.transaction()
                 .ownAccounts()
-                .range(DateRangeOld.of(start, end));
+                .range(Dates.range(start, end));
 
         MutableDouble mutableDouble = new MutableDouble(startBalance.getOrSupply(() -> 0D));
 

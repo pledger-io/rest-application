@@ -1,6 +1,5 @@
 package com.jongsoft.finance.rest.scheduler;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
@@ -109,7 +108,9 @@ class ScheduledTransactionResourceTest {
         var request = ScheduledTransactionPatchRequest.builder()
                 .description("Updated description")
                 .name("New name")
-                .range(DateRangeOld.forYear(2021))
+                .range(new ScheduledTransactionPatchRequest.DateRange(
+                        LocalDate.of(2021, 1, 1),
+                        LocalDate.of(2022, 1, 1)))
                 .build();
 
         var response = subject.patch(1L, request).blockingGet();
@@ -117,7 +118,7 @@ class ScheduledTransactionResourceTest {
         Assertions.assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
 
         Mockito.verify(scheduledTransaction).describe("New name", "Updated description");
-        Mockito.verify(scheduledTransaction).limit(LocalDate.of(2021, 1, 1), LocalDate.of(2021, 12, 31));
+        Mockito.verify(scheduledTransaction).limit(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1));
     }
 
     @Test

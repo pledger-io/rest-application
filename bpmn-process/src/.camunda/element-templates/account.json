@@ -1,0 +1,173 @@
+[
+  {
+    "name": "Account Synonym Lookup",
+    "id": "com.jongsoft.finance.bpmn.account.SynonymLookup",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${accountSynonymLookupDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Account name",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "name"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Account Id",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${id}"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Account Lookup",
+    "id": "com.jongsoft.finance.bpmn.account.AccountLookup",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${processAccountLookupDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Account name",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "name"
+        }
+      },
+      {
+        "label": "IBAN",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "iban"
+        }
+      },
+      {
+        "label": "Identifier",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "id"
+        }
+      },
+      {
+        "label": "Resolved account",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${id}"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Account Reconcile",
+    "id": "com.jongsoft.finance.bpmn.account.AccountReconcile",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${reconcileAccountDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Identifier",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "id"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Amount",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "amount"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Booking date",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "bookDate"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      }
+    ]
+  },
+  {
+    "name": "Account Create",
+    "id": "com.jongsoft.finance.bpmn.account.AccountReconcile",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${processAccountCreationDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Account JSON",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "account"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      }
+    ]
+  }
+]

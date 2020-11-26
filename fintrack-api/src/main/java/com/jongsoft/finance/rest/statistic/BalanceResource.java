@@ -4,6 +4,7 @@ import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Dates;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
@@ -54,8 +55,13 @@ public class BalanceResource {
                     .map(a -> new EntityRef(a.getId())));
         }
 
-        if (request.dateRange() != null) {
-            filter.range(request.dateRange());
+        if (request.getDateRange() != null) {
+            filter.range(
+                    Dates.range(
+                            request.getDateRange().getStart(),
+                            request.getDateRange().getEnd()
+                    )
+            );
         }
 
         if (!request.allMoney()) {

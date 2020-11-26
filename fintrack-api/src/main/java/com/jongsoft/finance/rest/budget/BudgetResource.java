@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.budget;
 
-import com.jongsoft.finance.core.date.DateRangeOld;
+import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
@@ -142,7 +142,7 @@ public class BudgetResource {
             description = "Computes the expense for the provided year and month"
     )
     Publisher<ComputedExpenseResponse> computeExpense(@PathVariable long id, @PathVariable int year, @PathVariable int month) {
-        var dateRange = DateRangeOld.forMonth(year, month);
+        var dateRange = DateUtils.forMonth(year, month);
 
         return budgetProvider.lookup(year, month)
                 .flatMapPublisher(budget -> Flowable.fromIterable(budget.getExpenses()))
