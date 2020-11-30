@@ -47,9 +47,10 @@ class UserProviderJpaIT extends JpaTestSetup {
     void lookup_refreshToken() {
         init();
 
-        var check = userProvider.refreshToken("refresh-token-1")
-                .blockingGet();
-
+        userProvider.refreshToken("refresh-token-1")
+                .test()
+                .assertComplete()
+                .assertValue(a -> "demo-user".equals(a.getUsername()));
     }
 
 }

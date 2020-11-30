@@ -59,7 +59,7 @@ public class UserProviderJpa implements UserProvider {
         var hql = """
                 select u.user from AccountTokenJpa u
                 where u.refreshToken = :refreshToken
-                    and u.expires > :now""";
+                    and u.expires >= :now""";
 
         return entityManager.<UserAccountJpa>reactive()
                 .hql(hql)
