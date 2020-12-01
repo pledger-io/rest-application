@@ -4,15 +4,15 @@ import com.jongsoft.finance.domain.FilterFactory;
 import com.jongsoft.finance.domain.account.AccountProvider;
 import com.jongsoft.finance.domain.transaction.TagProvider;
 import com.jongsoft.finance.domain.transaction.TransactionProvider;
-import com.jongsoft.finance.domain.user.CategoryProvider;
-import com.jongsoft.finance.domain.user.ExpenseProvider;
-import com.jongsoft.finance.domain.user.Role;
-import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.*;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Dates;
 import org.jboss.aerogear.security.otp.api.Base32;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Currency;
 
 public class TestSetup {
@@ -25,6 +25,12 @@ public class TestSetup {
             .primaryCurrency(Currency.getInstance("EUR"))
             .secret(Base32.random())
             .roles(Collections.List(new Role("admin")))
+            .activeTokens(Collections.List(
+                    SessionToken.builder()
+                            .id(1L)
+                            .description("Sample session token")
+                            .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
+                            .build()))
             .build();
 
     protected FilterFactory generateFilterMock() {

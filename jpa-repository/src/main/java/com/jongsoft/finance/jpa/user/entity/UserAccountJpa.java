@@ -1,20 +1,14 @@
 package com.jongsoft.finance.jpa.user.entity;
 
-import java.util.Currency;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinTable;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.Where;
 
 @Getter
 @Entity
@@ -40,6 +34,10 @@ public class UserAccountJpa extends EntityJpa {
     @ManyToMany
     @JoinTable(name = "user_roles")
     private Set<RoleJpa> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    @Where(clause = "expires > now()")
+    private List<AccountTokenJpa> tokens = new ArrayList<>();
 
     public UserAccountJpa() {
         super();

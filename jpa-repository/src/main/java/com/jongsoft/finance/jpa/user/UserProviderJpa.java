@@ -1,11 +1,14 @@
 package com.jongsoft.finance.jpa.user;
 
 import com.jongsoft.finance.domain.user.Role;
+import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
+import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Collectors;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Maybe;
@@ -86,6 +89,14 @@ public class UserProviderJpa implements UserProvider {
                         source.getRoles().stream()
                                 .map(role -> new Role(role.getName()))
                                 .collect(Collectors.toList()))
+                .activeTokens(
+                        Collections.List(source.getTokens())
+                                .map(token ->
+                                        SessionToken.builder()
+                                                .id(token.getId())
+                                                .description(token.getDescription())
+                                                .validity(Dates.range(token.getCreated(), token.getExpires()))
+                                                .build()))
                 .build();
     }
 

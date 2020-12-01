@@ -10,6 +10,7 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,7 +74,15 @@ public class ProfileResource {
             description = "Get a list of active session for the current user."
     )
     Flowable<SessionResponse> sessions() {
-        return Flowable.empty();
+        return Flowable.create(emitter -> {
+            currentUserProvider.currentUser()
+                    .getActiveTokens()
+                    .map(SessionResponse::new)
+                    .forEach(emitter::onNext);
+
+            emitter.onComplete();
+        }, BackpressureStrategy.MISSING);
+
     }
 
     @Get(value = "/multi-factor/qr-code", produces = MediaType.IMAGE_PNG)

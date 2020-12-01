@@ -12,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 class ProfileResourceTest extends TestSetup {
 
     private ProfileResource subject;
@@ -50,6 +53,18 @@ class ProfileResourceTest extends TestSetup {
 
         Assertions.assertThat(result.getTheme()).isEqualTo("light");
         Assertions.assertThat(result.getCurrency()).isEqualTo("USD");
+    }
+
+    @Test
+    public void sessions() {
+        subject.sessions()
+                .test()
+                .assertComplete()
+                .assertValue(token -> "Sample session token".equals(token.getDescription()))
+                .assertValue(token -> LocalDateTime.now()
+                        .plusDays(1)
+                        .truncatedTo(ChronoUnit.MINUTES)
+                        .equals(token.getValidUntil().truncatedTo(ChronoUnit.MINUTES)));
     }
 
     @Test
