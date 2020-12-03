@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.rest.model.SessionResponse;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -27,9 +28,11 @@ import java.util.Currency;
 public class ProfileResource {
 
     private final CurrentUserProvider currentUserProvider;
+    private final UserProvider userProvider;
 
-    public ProfileResource(final CurrentUserProvider currentUserProvider) {
+    public ProfileResource(final CurrentUserProvider currentUserProvider, UserProvider userProvider) {
         this.currentUserProvider = currentUserProvider;
+        this.userProvider = userProvider;
     }
 
     @Get
@@ -74,15 +77,8 @@ public class ProfileResource {
             description = "Get a list of active session for the current user."
     )
     Flowable<SessionResponse> sessions() {
-        return Flowable.create(emitter -> {
-            currentUserProvider.currentUser()
-                    .getActiveTokens()
-                    .map(SessionResponse::new)
-                    .forEach(emitter::onNext);
-
-            emitter.onComplete();
-        }, BackpressureStrategy.MISSING);
-
+        return userProvider.tokens(currentUserProvider.currentUser().getUsername())
+                .map(SessionResponse::new);
     }
 
     @Get(value = "/multi-factor/qr-code", produces = MediaType.IMAGE_PNG)

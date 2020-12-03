@@ -36,7 +36,6 @@ public class UserAccount implements AggregateBase, Serializable {
     private String username;
     private String password;
     private List<Role> roles;
-    private List<SessionToken> activeTokens;
 
     private String theme;
     private Currency primaryCurrency;

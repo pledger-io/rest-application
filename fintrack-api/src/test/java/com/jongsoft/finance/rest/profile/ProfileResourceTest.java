@@ -1,10 +1,14 @@
 package com.jongsoft.finance.rest.profile;
 
+import com.jongsoft.finance.domain.user.SessionToken;
+import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.lang.Dates;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.reactivex.Flowable;
 import org.assertj.core.api.Assertions;
 import org.jboss.aerogear.security.otp.Totp;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,13 +23,15 @@ class ProfileResourceTest extends TestSetup {
 
     private ProfileResource subject;
     private CurrentUserProvider currentUserProvider;
+    private UserProvider userProvider;
     private ApplicationEventPublisher eventPublisher;
 
     @BeforeEach
     void setup() {
         eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         currentUserProvider = Mockito.mock(CurrentUserProvider.class);
-        subject = new ProfileResource(currentUserProvider);
+        userProvider = Mockito.mock(UserProvider.class);
+        subject = new ProfileResource(currentUserProvider, userProvider);
 
         Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
 
@@ -57,6 +63,14 @@ class ProfileResourceTest extends TestSetup {
 
     @Test
     public void sessions() {
+        Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername()))
+                .thenReturn(Flowable.just(
+                        SessionToken.builder()
+                                .id(1L)
+                                .description("Sample session token")
+                                .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
+                                .build()));
+
         subject.sessions()
                 .test()
                 .assertComplete()

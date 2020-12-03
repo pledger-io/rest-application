@@ -25,12 +25,6 @@ public class TestSetup {
             .primaryCurrency(Currency.getInstance("EUR"))
             .secret(Base32.random())
             .roles(Collections.List(new Role("admin")))
-            .activeTokens(Collections.List(
-                    SessionToken.builder()
-                            .id(1L)
-                            .description("Sample session token")
-                            .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
-                            .build()))
             .build();
 
     protected FilterFactory generateFilterMock() {

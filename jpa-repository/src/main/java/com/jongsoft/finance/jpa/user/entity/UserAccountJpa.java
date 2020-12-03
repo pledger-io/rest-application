@@ -1,6 +1,8 @@
 package com.jongsoft.finance.jpa.user.entity;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.persistence.*;
 
@@ -35,10 +37,6 @@ public class UserAccountJpa extends EntityJpa {
     @JoinTable(name = "user_roles")
     private Set<RoleJpa> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user")
-    @Where(clause = "expires > now()")
-    private List<AccountTokenJpa> tokens = new ArrayList<>();
-
     public UserAccountJpa() {
         super();
     }
@@ -62,4 +60,5 @@ public class UserAccountJpa extends EntityJpa {
         this.gravatar = gravatar;
         this.roles = roles;
     }
+
 }

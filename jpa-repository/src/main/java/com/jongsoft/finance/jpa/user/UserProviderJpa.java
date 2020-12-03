@@ -5,12 +5,14 @@ import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Collectors;
 import com.jongsoft.lang.control.Optional;
+import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 
 import javax.inject.Named;
@@ -72,6 +74,32 @@ public class UserProviderJpa implements UserProvider {
                 .map(this::convert);
     }
 
+    @Override
+    public Flowable<SessionToken> tokens(String username) {
+        var hql = """
+                from AccountTokenJpa
+                where user.username = :username
+                      and expires > :now""";
+
+        return entityManager.<AccountTokenJpa>reactive()
+                .hql(hql)
+                .set("username", username)
+                .set("now", LocalDateTime.now())
+                .flow()
+                .map(this::convert);
+    }
+
+    protected SessionToken convert(AccountTokenJpa source) {
+        return SessionToken.builder()
+                .id(source.getId())
+                .description(source.getDescription())
+                .token(source.getRefreshToken())
+                .validity(Dates.range(
+                        source.getCreated(),
+                        source.getExpires()))
+                .build();
+    }
+
     protected UserAccount convert(UserAccountJpa source) {
         if (source == null) {
             return null;
@@ -89,14 +117,6 @@ public class UserProviderJpa implements UserProvider {
                         source.getRoles().stream()
                                 .map(role -> new Role(role.getName()))
                                 .collect(Collectors.toList()))
-                .activeTokens(
-                        Collections.List(source.getTokens())
-                                .map(token ->
-                                        SessionToken.builder()
-                                                .id(token.getId())
-                                                .description(token.getDescription())
-                                                .validity(Dates.range(token.getCreated(), token.getExpires()))
-                                                .build()))
                 .build();
     }
 
