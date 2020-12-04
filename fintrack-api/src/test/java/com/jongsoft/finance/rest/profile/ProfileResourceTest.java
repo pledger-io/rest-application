@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.domain.user.UserProvider;
+import com.jongsoft.finance.domain.user.events.TokenRegisterEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -79,6 +81,36 @@ class ProfileResourceTest extends TestSetup {
                         .plusDays(1)
                         .truncatedTo(ChronoUnit.MINUTES)
                         .equals(token.getValidUntil().truncatedTo(ChronoUnit.MINUTES)));
+    }
+
+    @Test
+    public void createSession() {
+        Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername()))
+                .thenReturn(Flowable.just(
+                        SessionToken.builder()
+                                .id(1L)
+                                .description("Sample session token")
+                                .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
+                                .build()));
+
+        subject.createSession(new TokenCreateRequest("sample description", LocalDate.now().plusDays(1)));
+
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(TokenRegisterEvent.class));
+    }
+
+    @Test
+    public void revokeSession() {
+        var token = Mockito.spy(SessionToken.builder()
+                .id(1L)
+                .description("Sample session token")
+                .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
+                .build());
+
+        Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername())).thenReturn(Flowable.just(token));
+
+        subject.deleteSession(1L);
+
+        Mockito.verify(token).revoke();
     }
 
     @Test

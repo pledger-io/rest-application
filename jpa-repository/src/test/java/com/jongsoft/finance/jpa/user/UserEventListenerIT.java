@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Currency;
 
 class UserEventListenerIT extends JpaTestSetup {
@@ -95,7 +96,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleTokenRegistrationEvent() {
         loadDataset("sql/base-setup.sql");
-        eventPublisher.publishEvent(new TokenRegisteredEvent(
+        eventPublisher.publishEvent(new TokenRegisterEvent(
                 "demo-user",
                 "my-refresh-token",
                 LocalDateTime.of(2019, 1, 1, 12, 33)));
@@ -107,6 +108,18 @@ class UserEventListenerIT extends JpaTestSetup {
         Assertions.assertThat(check.getExpires()).isEqualTo(LocalDateTime.of(2019, 1, 1, 12, 33));
         Assertions.assertThat(check.getRefreshToken()).isEqualTo("my-refresh-token");
         Assertions.assertThat(check.getUser().getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void handleTokenRevokedEvent() {
+        loadDataset("sql/base-setup.sql");
+        eventPublisher.publishEvent(new TokenRevokeEvent(
+                "refresh-token-1"
+        ));
+
+        var check = entityManager.find(AccountTokenJpa.class, 1L);
+        Assertions.assertThat(check.getExpires().truncatedTo(ChronoUnit.MINUTES))
+                .isEqualTo(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
     }
 
 }

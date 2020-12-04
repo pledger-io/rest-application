@@ -11,6 +11,7 @@ import org.jboss.aerogear.security.otp.api.Base32;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Singleton
@@ -91,7 +92,7 @@ public class UserEventListener extends RepositoryJpa {
     }
 
     @BusinessEventListener
-    public void handleTokenRegistrationEvent(TokenRegisteredEvent event) {
+    public void handleTokenRegistrationEvent(TokenRegisterEvent event) {
         var userAccountJpa = entityManager.createQuery(
                 "select u from UserAccountJpa u where u.username = :username",
                 UserAccountJpa.class)
@@ -105,6 +106,20 @@ public class UserEventListener extends RepositoryJpa {
                 .build();
 
         entityManager.persist(refreshJpa);
+    }
+
+    @BusinessEventListener
+    public void handleTokenRevokeEvent(TokenRevokeEvent event) {
+        var hql = """
+                update AccountTokenJpa
+                set expires = :now 
+                where refreshToken = :token
+                    and expires > :now""";
+
+        entityManager.createQuery(hql)
+                .setParameter("token", event.getToken())
+                .setParameter("now", LocalDateTime.now())
+                .executeUpdate();
     }
 
 }

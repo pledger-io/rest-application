@@ -1,6 +1,8 @@
 package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.FinTrack;
+import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.rest.model.SessionResponse;
@@ -20,7 +22,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Currency;
+import java.util.UUID;
 
 @Tag(name = "User profile")
 @Controller("/api/profile")
@@ -79,6 +85,30 @@ public class ProfileResource {
     Flowable<SessionResponse> sessions() {
         return userProvider.tokens(currentUserProvider.currentUser().getUsername())
                 .map(SessionResponse::new);
+    }
+
+    @Put(value = "/sessions")
+    @Operation(
+            operationId = "createToken",
+            summary = "Create session token",
+            description = "Create a new session token that has a longer validity then default authentication tokens."
+    )
+    Flowable<SessionResponse> createSession(@Body @Valid TokenCreateRequest request) {
+        FinTrack.registerToken(
+                currentUserProvider.currentUser().getUsername(),
+                UUID.randomUUID().toString(),
+                (int) ChronoUnit.SECONDS.between(
+                        LocalDateTime.now(),
+                        request.getExpires().atTime(LocalTime.MIN)));
+
+        return sessions();
+    }
+
+    @Delete(value = "/sessions/{id}")
+    void deleteSession(@PathVariable long id) {
+        userProvider.tokens(currentUserProvider.currentUser().getUsername())
+                .filter(token -> token.getId() == id)
+                .forEach(SessionToken::revoke);
     }
 
     @Get(value = "/multi-factor/qr-code", produces = MediaType.IMAGE_PNG)
