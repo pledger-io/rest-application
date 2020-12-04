@@ -20,6 +20,10 @@ public class SessionResponse {
         return wrapped.getDescription();
     }
 
+    public String getToken() {
+        return wrapped.getToken();
+    }
+
     public LocalDateTime getValidFrom() {
         return wrapped.getValidity().from();
     }
