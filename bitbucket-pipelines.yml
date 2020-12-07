@@ -59,16 +59,16 @@ pipelines:
     release/*:
       - step:
           name: Build
-          trigger: manual
           caches:
             - gradle
           script:
             - bash ./gradlew clean build
           artifacts:
             - .gradle/**
-            - "**/build/**"
+            - "**/build/libs/*.jar"
       - step:
           name: Publish release
+          trigger: manual
           caches:
             - gradle
           script:
@@ -77,4 +77,4 @@ pipelines:
             - openssl11 aes-256-cbc -a -k "$SIGNING_PWD" -in private-key.gpg.enc -out private-key.gpg -d
             - gpg --import private-key.gpg
             - printf "signing.keyId=$GPG_KEY\nsigning.password=$GPG_PASSWORD\nsigning.secretKeyRingFile=$BITBUCKET_CLONE_DIR/private-key.gpg" > ~/.gradle/gradle.properties
-            - bash ./gradlew publish
+            - bash ./gradlew -x jar publish
