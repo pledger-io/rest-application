@@ -59,7 +59,6 @@ pipelines:
     release/*:
       - step:
           name: Build
-          trigger: manual
           caches:
             - gradle
           script:
@@ -69,6 +68,7 @@ pipelines:
             - "**/build/**"
       - step:
           name: Publish release
+          trigger: manual
           caches:
             - gradle
           script:
