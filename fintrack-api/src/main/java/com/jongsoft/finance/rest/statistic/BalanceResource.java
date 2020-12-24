@@ -10,6 +10,8 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,6 +38,29 @@ public class BalanceResource {
             operationId = "getBalance"
     )
     public Single<BalanceResponse> calculate(@Valid @Body BalanceRequest request) {
+        TransactionProvider.FilterCommand filter = buildFilterCommand(request);
+
+        return Single.create(emitter -> {
+            var balance = transactionProvider.balance(filter)
+                    .getOrSupply(() -> 0D);
+
+            emitter.onSuccess(new BalanceResponse(balance));
+        });
+    }
+
+    @Post("/daily")
+    public Flowable<?> daily(@Valid @Body BalanceRequest request) {
+        return Flowable.create(emitter -> {
+            transactionProvider.daily(buildFilterCommand(request))
+                    .map(DailyResponse::new)
+                    .forEach(emitter::onNext);
+
+            emitter.onComplete();
+        }, BackpressureStrategy.DROP);
+
+    }
+
+    private TransactionProvider.FilterCommand buildFilterCommand(BalanceRequest request) {
         var filter = filterFactory.transaction();
 
         if (!request.getAccounts().isEmpty()) {
@@ -75,13 +100,7 @@ public class BalanceResource {
         if (request.importSlug() != null) {
             filter.importSlug(request.importSlug());
         }
-
-        return Single.create(emitter -> {
-            var balance = transactionProvider.balance(filter)
-                    .getOrSupply(() -> 0D);
-
-            emitter.onSuccess(new BalanceResponse(balance));
-        });
+        return filter;
     }
 
 }

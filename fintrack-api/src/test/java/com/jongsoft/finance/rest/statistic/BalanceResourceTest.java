@@ -43,4 +43,20 @@ class BalanceResourceTest extends TestSetup {
         Mockito.verify(mockFilter).range(DateUtils.forMonth(2019, 1));
     }
 
+    @Test
+    void daily() {
+        var request = new BalanceRequest();
+        request.setOnlyIncome(false);
+        request.setDateRange(new BalanceRequest.DateRange(
+                LocalDate.of(2019, 1, 1),
+                LocalDate.of(2019, 2, 1)));
+
+        subject.daily(request).blockingFirst();
+
+        var mockFilter = filterFactory.transaction();
+        Mockito.verify(transactionProvider).daily(Mockito.any());
+        Mockito.verify(mockFilter).onlyIncome(false);
+        Mockito.verify(mockFilter).range(DateUtils.forMonth(2019, 1));
+    }
+
 }
