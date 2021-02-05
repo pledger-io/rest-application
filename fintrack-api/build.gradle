@@ -23,7 +23,5 @@ dependencies {
 
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
 
-    implementation("com.jongsoft.utils:highchart-core:2.3.2")
-
     implementation project(':core'), project(':domain'), project(':jpa-repository'), project(':bpmn-process')
 };
