@@ -15,7 +15,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew -x javadoc check #jacocoTestReport -- jacoco does not work with java 15 and gradle yet
+            - bash ./gradlew -x javadoc check jacocoTestReport
           artifacts:
             - .gradle/**
             - "**/build/**"
@@ -33,7 +33,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew -x javadoc check #jacocoTestReport -- jacoco does not work with java 15 and gradle yet
+            - bash ./gradlew -x javadoc check jacocoTestReport
           artifacts:
             - .gradle/**
             - "**/build/**"
