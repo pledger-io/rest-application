@@ -26,7 +26,7 @@ abstract class CSVReaderDelegate implements JavaDelegate {
     private final ImportProvider importProvider;
     private final StorageService storageService;
 
-    public CSVReaderDelegate(ImportProvider importProvider, StorageService storageService) {
+    protected CSVReaderDelegate(ImportProvider importProvider, StorageService storageService) {
         this.importProvider = importProvider;
         this.storageService = storageService;
     }

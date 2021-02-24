@@ -38,7 +38,7 @@ class TransactionRuleMatcherDelegateTest {
         transactionProvider = Mockito.mock(TransactionProvider.class);
         transactionRuleProvider = Mockito.mock(TransactionRuleProvider.class);
         ruleEngine = Mockito.mock(RuleEngine.class);
-        subject = new TransactionRuleMatcherDelegate(ruleEngine, transactionProvider, transactionRuleProvider);
+        subject = new TransactionRuleMatcherDelegate(ruleEngine, transactionProvider);
 
         delegateExecution = Mockito.mock(DelegateExecution.class);
         transaction = Transaction.builder()

@@ -16,7 +16,7 @@ public abstract class SchedulerEvent implements ApplicationEvent {
      *               which the event is associated (never {@code null})
      * @param processDefinition
      */
-    public SchedulerEvent(Object source, String processDefinition) {
+    protected SchedulerEvent(Object source, String processDefinition) {
         this.processDefinition = processDefinition;
     }
 

@@ -1,6 +1,7 @@
 dependencies {
     implementation "com.jongsoft.lang:language:$jongsoftLangVersion"
     implementation 'com.jongsoft.lang:language-fasterxml:1.1.0'
+    implementation "org.camunda.bpm:camunda-engine:$camundaVersion"
 
     implementation("org.bouncycastle:bcprov-jdk15on:$bouncyCastleVersion")
     implementation("com.opencsv:opencsv:$openCSVVersion")

@@ -12,6 +12,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.LongValue;
 
 import javax.inject.Singleton;
+import java.util.Map;
 
 @Slf4j
 @Singleton
@@ -19,15 +20,12 @@ public class TransactionRuleMatcherDelegate implements JavaDelegate {
 
     private final RuleEngine ruleEngine;
     private final TransactionProvider transactionProvider;
-    private final TransactionRuleProvider ruleProvider;
 
     public TransactionRuleMatcherDelegate(
             RuleEngine ruleEngine,
-            TransactionProvider transactionProvider,
-            TransactionRuleProvider ruleProvider) {
+            TransactionProvider transactionProvider) {
         this.ruleEngine = ruleEngine;
         this.transactionProvider = transactionProvider;
-        this.ruleProvider = ruleProvider;
     }
 
     @Override
@@ -49,14 +47,14 @@ public class TransactionRuleMatcherDelegate implements JavaDelegate {
 
         var outputSet = ruleEngine.run(inputSet);
 
-        for (RuleColumn column : outputSet.keySet()) {
-            switch (column) {
-                case CATEGORY -> transaction.linkToCategory((String) outputSet.get(column));
-                case TO_ACCOUNT, CHANGE_TRANSFER_TO -> transaction.changeAccount(false, (Account) outputSet.get(column));
-                case SOURCE_ACCOUNT, CHANGE_TRANSFER_FROM -> transaction.changeAccount(true, (Account) outputSet.get(column));
-                case CONTRACT -> transaction.linkToContract((String) outputSet.get(column));
-                case BUDGET -> transaction.linkToBudget((String) outputSet.get(column));
-                default -> throw new IllegalArgumentException("Unsupported rule column provided " + column);
+        for (Map.Entry<RuleColumn, ?> entry : outputSet.entrySet()) {
+            switch (entry.getKey()) {
+                case CATEGORY -> transaction.linkToCategory((String) entry.getValue());
+                case TO_ACCOUNT, CHANGE_TRANSFER_TO -> transaction.changeAccount(false, (Account) entry.getValue());
+                case SOURCE_ACCOUNT, CHANGE_TRANSFER_FROM -> transaction.changeAccount(true, (Account) entry.getValue());
+                case CONTRACT -> transaction.linkToContract((String) entry.getValue());
+                case BUDGET -> transaction.linkToBudget((String) entry.getValue());
+                default -> throw new IllegalArgumentException("Unsupported rule column provided " + entry.getKey());
             }
         }
     }
