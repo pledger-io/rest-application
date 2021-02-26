@@ -109,6 +109,7 @@ public class TransactionProviderJpa implements TransactionProvider {
             return entityManager.<DailySummary>blocking()
                     .hql(hql)
                     .setAll(delegate.getParameters())
+                    .sort(delegate.sort())
                     .sequence();
         }
 
