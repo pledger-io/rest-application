@@ -19,6 +19,7 @@ import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
+import com.jongsoft.lang.collection.Sequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +69,11 @@ public class TransactionEventListener extends RepositoryJpa implements Transacti
                 .contract(
                         Control.Option(event.getTransaction().getContract())
                                 .map(this::contract)
+                                .getOrSupply(() -> null))
+                .tags(
+                        Control.Option(event.getTransaction().getTags())
+                                .map(Sequence::distinct)
+                                .map(set -> set.map(this::tag).toJava())
                                 .getOrSupply(() -> null))
                 .batchImport(Control.Option(event.getTransaction().getImportSlug())
                         .map(this::job)
