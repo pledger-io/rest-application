@@ -9,6 +9,7 @@ import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import java.util.Objects;
 
 class TransactionTagResourceTest extends TestSetup {
 
@@ -56,6 +59,21 @@ class TransactionTagResourceTest extends TestSetup {
         Assertions.assertThat(response.getName()).isEqualTo("Sample tag");
 
         Mockito.verify(eventPublisher).publishEvent(Mockito.any(TagCreatedEvent.class));
+    }
+
+    @Test
+    void list() {
+        Mockito.when(tagProvider.lookup())
+                .thenReturn(Collections.List(
+                        new Tag("Sample"),
+                        new Tag("Description")));
+
+        subject.list()
+                .test()
+                .assertComplete()
+                .assertValueCount(2)
+                .assertValueAt(0, value -> Objects.equals("Sample", value.getName()))
+                .assertValueAt(1, value -> Objects.equals("Description", value.getName()));
     }
 
     @Test

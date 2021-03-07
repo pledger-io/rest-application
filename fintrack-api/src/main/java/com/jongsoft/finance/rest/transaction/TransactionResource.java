@@ -26,6 +26,7 @@ import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -71,6 +72,11 @@ public class TransactionResource {
     }
 
     @Post
+    @Operation(
+            operationId = "searchTransactions",
+            summary = "Search transactions",
+            description = "Search in all transactions using the given search request."
+    )
     ResultPageResponse<TransactionResponse> search(@Valid @Body TransactionSearchRequest request) {
         var command = filterFactory.transaction()
                 .ownAccounts()
@@ -117,6 +123,11 @@ public class TransactionResource {
 
     @Patch
     @Status(HttpStatus.NO_CONTENT)
+    @Operation(
+            operationId = "patchTransactions",
+            summary = "Patch given transactions",
+            description = "Update the transactions with the given transaction ids using the request."
+    )
     void patch(@Body TransactionBulkEditRequest request) {
         for (var id : request.getTransactions()) {
             var isPresent = transactionProvider.lookup(id);
@@ -149,6 +160,11 @@ public class TransactionResource {
     }
 
     @Post("/locate-first")
+    @Operation(
+            operationId = "getFirstTransactionDate",
+            summary = "Get oldest date",
+            description = "Get the oldest transaction in the system based upon the provided request."
+    )
     @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = JsonError.class)))
     Single<LocalDate> firstTransaction(@Body TransactionSearchRequest request) {
         var command = filterFactory.transaction();
@@ -175,6 +191,11 @@ public class TransactionResource {
     }
 
     @Get(value = "/export", produces = MediaType.TEXT_PLAIN)
+    @Operation(
+            operationId = "exportTransactions",
+            summary = "Export transactions",
+            description = "Creates a CSV export of all transactions in the system."
+    )
     Flowable<String> export() {
         return Flowable.create(emitter -> {
             emitter.onNext("Date,Booking Date,Interest Date,From name,From IBAN," +
@@ -204,6 +225,7 @@ public class TransactionResource {
     }
 
     @Get("/apply-all-rules")
+    @Operation(hidden = true)
     void applyRules() {
         var executors = Executors.newFixedThreadPool(25);
 

@@ -11,6 +11,7 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,6 +50,22 @@ public class TransactionTagResource {
     Single<TagResponse> create(@Valid @Body TagCreateRequest tag) {
         return Single.just(currentUserProvider.currentUser().createTag(tag.getTag()))
                 .map(TagResponse::new);
+    }
+
+    @Get
+    @Operation(
+            operationId = "getTags",
+            summary = "List tags",
+            description = "Get all tags available in the system."
+    )
+    Flowable<TagResponse> list() {
+        return Flowable.create(emitter -> {
+            tagProvider.lookup()
+                    .map(TagResponse::new)
+                    .forEach(emitter::onNext);
+
+            emitter.onComplete();
+        }, BackpressureStrategy.DROP);
     }
 
     @Get("/auto-complete{?token}")
