@@ -104,12 +104,12 @@ public class TransactionProviderJpa implements TransactionProvider {
                        a.date,
                        sum(t.amount))
                        %s
-                       group by a.date""".formatted(delegate.generateHql());
+                       group by a.date
+                       order by a.date asc""".formatted(delegate.generateHql());
 
             return entityManager.<DailySummary>blocking()
                     .hql(hql)
                     .setAll(delegate.getParameters())
-                    .sort(delegate.sort())
                     .sequence();
         }
 

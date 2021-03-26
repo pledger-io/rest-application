@@ -1,0 +1,81 @@
+[
+  {
+    "name": "Contract Lookup",
+    "id": "com.jongsoft.finance.bpmn.contract.ContractLookup",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${processContractLookupDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Name",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "name"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Identifier",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "id"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Resolved contract",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${contract}"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Contract Create",
+    "id": "com.jongsoft.finance.bpmn.contract.ContractCreate",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${processContractCreateDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Contract JSON",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "category"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      }
+    ]
+  }
+]

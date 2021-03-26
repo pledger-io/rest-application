@@ -29,7 +29,7 @@ public class ExceptionFilter extends OncePerRequestHttpServerFilter {
         return Flowable.fromPublisher(chain.proceed(request))
                 .onErrorReturn(throwable -> {
                     var error = new JsonError(throwable.getMessage());
-                    error.link(Link.SELF, Link.of(request.getUri()));
+                    //error.link(Link.SELF, Link.of(request.getUri()));
 
                     int statusCode = 500;
                     if (throwable instanceof AuthorizationException) {

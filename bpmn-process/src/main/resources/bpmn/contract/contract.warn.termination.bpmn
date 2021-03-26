@@ -50,7 +50,7 @@ This flow expects the following variables to be present:
     </bpmn:sendTask>
     <bpmn:sequenceFlow id="SequenceFlow_0b6wb04" sourceRef="StartEvent_1" targetRef="gw_in_past" />
     <bpmn:sequenceFlow id="SequenceFlow_1sl1wtb" sourceRef="st_contract_lookup" targetRef="tsk_prepare_mail_properties" />
-    <bpmn:serviceTask id="st_contract_lookup" name="Look up contract" camunda:delegateExpression="${processContractLookupDelegate}">
+    <bpmn:serviceTask id="st_contract_lookup" name="Look up contract" camunda:modelerTemplate="com.jongsoft.finance.bpmn.contract.ContractLookup" camunda:delegateExpression="${processContractLookupDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="id">${contractId}</camunda:inputParameter>

@@ -1,0 +1,81 @@
+[
+  {
+    "name": "Category Lookup",
+    "id": "com.jongsoft.finance.bpmn.category.CategoryLookup",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${processCategoryLookupDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Name",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "name"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Identifier",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "id"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Resolved category",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${category}"
+        }
+      }
+    ]
+  },
+  {
+    "name": "Category Create",
+    "id": "com.jongsoft.finance.bpmn.category.CategoryCreate",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${processCreateCategoryDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Category JSON",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "category"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      }
+    ]
+  }
+]

@@ -9,7 +9,6 @@ import javax.validation.constraints.NotNull;
 
 @Setter
 @Introspected
-@NoArgsConstructor
 public class ScheduledTransactionCreateRequest {
 
     @Builder
@@ -48,6 +47,9 @@ public class ScheduledTransactionCreateRequest {
 
     @NotNull
     private ScheduleValue schedule;
+
+    public ScheduledTransactionCreateRequest() {
+    }
 
     @Builder
     private ScheduledTransactionCreateRequest(@NotBlank final String name, final double amount, @NotNull final EntityRef source,
