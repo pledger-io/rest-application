@@ -8,12 +8,12 @@ import com.jongsoft.finance.domain.user.UserProvider;
 import com.jongsoft.finance.rest.model.SessionResponse;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.finance.security.PasswordEncoder;
 import com.jongsoft.finance.security.TwoFactorHelper;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,7 +69,7 @@ public class ProfileResource {
             }
 
             if (request.password() != null) {
-                userAccount.changePassword(request.password());
+                userAccount.changePassword(PasswordEncoder.getInstance().encrypt(request.password()));
             }
 
             emitter.onSuccess(new UserProfileResponse(userAccount));

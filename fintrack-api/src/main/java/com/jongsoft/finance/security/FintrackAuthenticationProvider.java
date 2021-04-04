@@ -21,10 +21,10 @@ public class FintrackAuthenticationProvider implements AuthenticationProvider {
     private final UserProvider userProvider;
     private final Logger log;
 
-    public FintrackAuthenticationProvider(final PasswordEncoder passwordEncoder, final UserProvider userProvider) {
-        this.passwordEncoder = passwordEncoder;
+    public FintrackAuthenticationProvider(final UserProvider userProvider) {
         this.userProvider = userProvider;
         this.log = LoggerFactory.getLogger(getClass());
+        this.passwordEncoder = PasswordEncoder.getInstance();
     }
 
     @Override

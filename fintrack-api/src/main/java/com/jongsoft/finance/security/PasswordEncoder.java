@@ -9,6 +9,8 @@ import java.security.SecureRandom;
 @Singleton
 public class PasswordEncoder {
 
+    private static final PasswordEncoder INSTANCE = new PasswordEncoder();
+
     private static final int HASHER_STRENGTH = 10;
 
     private final BCrypt.Hasher hasher;
@@ -29,6 +31,10 @@ public class PasswordEncoder {
                 .verify(password.toCharArray(), hash);
 
         return result.verified;
+    }
+
+    public static PasswordEncoder getInstance() {
+        return INSTANCE;
     }
 
 }

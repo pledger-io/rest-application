@@ -57,7 +57,7 @@ public class UserAccount implements AggregateBase, Serializable {
      */
     @BusinessMethod
     public void changePassword(String password) {
-        //this.password = new BCryptPasswordEncoder().encode(password);
+        this.password = password;
         EventBus.getBus().send(new UserAccountPasswordChangedEvent(this, username, this.password));
     }
 
