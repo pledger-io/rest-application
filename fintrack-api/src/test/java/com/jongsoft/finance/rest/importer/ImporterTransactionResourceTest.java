@@ -1,11 +1,11 @@
 package com.jongsoft.finance.rest.importer;
 
-import com.jongsoft.finance.domain.FilterFactory;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.core.ResultPage;
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;

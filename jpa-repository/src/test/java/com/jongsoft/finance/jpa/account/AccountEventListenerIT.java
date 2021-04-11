@@ -1,10 +1,9 @@
 package com.jongsoft.finance.jpa.account;
 
-import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.events.*;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.account.entity.AccountJpa;
 import com.jongsoft.finance.jpa.account.entity.AccountSynonymJpa;
+import com.jongsoft.finance.messaging.commands.account.*;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -39,9 +38,7 @@ class AccountEventListenerIT extends JpaTestSetup {
     void handleAccountCreate() {
         setup();
         eventPublisher.publishEvent(
-                new AccountCreatedEvent(
-                        this,
-                        null,
+                new CreateAccountCommand(
                         "New account",
                         "USD",
                         "default"));
@@ -58,9 +55,7 @@ class AccountEventListenerIT extends JpaTestSetup {
     void handleAccountRename() {
         setup();
         eventPublisher.publishEvent(
-                new AccountRenamedEvent(
-                        this,
-                        null,
+                new RenameAccountCommand(
                         1L,
                         "default",
                         "Updated name",
@@ -78,9 +73,7 @@ class AccountEventListenerIT extends JpaTestSetup {
     void handleAccountChange() {
         setup();
         eventPublisher.publishEvent(
-                new AccountChangedEvent(
-                        this,
-                        null,
+                new ChangeAccountCommand(
                         1L,
                         "NLUPDATED-IBAN",
                         "BIC",
@@ -96,8 +89,7 @@ class AccountEventListenerIT extends JpaTestSetup {
     void handleAccountInterestChange() {
         setup();
         eventPublisher.publishEvent(
-                new AccountInterestEvent(
-                        this,
+                new ChangeInterestCommand(
                         3L,
                         1.23,
                         Periodicity.MONTHS));
@@ -110,7 +102,7 @@ class AccountEventListenerIT extends JpaTestSetup {
     @Test
     void handleAccountIconEvent() {
         setup();
-        eventPublisher.publishEvent(new AccountIconAttachedEvent(
+        eventPublisher.publishEvent(new RegisterAccountIconCommand(
                 3L,
                 "file-code",
                 null));
@@ -122,10 +114,7 @@ class AccountEventListenerIT extends JpaTestSetup {
     @Test
     void handleAccountTerminate() {
         setup();
-        eventPublisher.publishEvent(
-                new AccountTerminatedEvent(
-                        this,
-                        Account.builder().id(1L).build()));
+        eventPublisher.publishEvent(new TerminateAccountCommand(1L));
 
         var check = entityManager.find(AccountJpa.class, 1L);
         Assertions.assertThat(check.isArchived()).isTrue();
@@ -134,12 +123,7 @@ class AccountEventListenerIT extends JpaTestSetup {
     @Test
     void handleRegisterSynonym_update() {
         setup();
-        eventPublisher.publishEvent(
-                new AccountSynonymEvent(
-                        this,
-                        null,
-                        "Test account",
-                        1L));
+        eventPublisher.publishEvent(new RegisterSynonymCommand(1L, "Test account"));
 
         var query = entityManager.createQuery("select a from AccountSynonymJpa a where a.synonym = 'Test account'");
         var check = (AccountSynonymJpa) query.getSingleResult();

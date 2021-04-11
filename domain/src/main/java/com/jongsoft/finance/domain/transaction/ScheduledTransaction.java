@@ -3,10 +3,8 @@ package com.jongsoft.finance.domain.transaction;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionCreatedEvent;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionDescribeEvent;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionLimitEvent;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionRescheduleEvent;
+import com.jongsoft.finance.domain.account.Contract;
+import com.jongsoft.finance.domain.transaction.events.*;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedulable;
@@ -32,6 +30,8 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
 
     private Account source;
     private Account destination;
+
+    private Contract contract;
 
     private Schedule schedule;
     private LocalDate start;
@@ -88,6 +88,14 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
             this.name = name;
             this.description = description;
             EventBus.getBus().send(new ScheduledTransactionDescribeEvent(this, id, description, name));
+        }
+    }
+
+    @BusinessMethod
+    public void linkToContract(Contract contract) {
+        if (Control.Equal(this.contract, contract).isNotEqual()) {
+            this.contract = contract;
+            EventBus.getBus().send(new ScheduledTransactionContractLinkedEvent(id, contract.getId()));
         }
     }
 }

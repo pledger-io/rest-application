@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
+import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreatedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;

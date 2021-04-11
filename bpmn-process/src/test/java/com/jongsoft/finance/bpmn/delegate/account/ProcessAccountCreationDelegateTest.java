@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.account.events.AccountCreatedEvent;
+import com.jongsoft.finance.messaging.commands.account.CreateAccountCommand;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
@@ -78,7 +78,7 @@ class ProcessAccountCreationDelegateTest {
         subject.execute(execution);
 
         Mockito.verify(accountProvider, Mockito.times(2)).lookup("Test account");
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(AccountCreatedEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateAccountCommand.class));
 
         assertThat(account.getNumber()).isEqualTo("9123");
         assertThat(account.getBic()).isEqualTo("1234");

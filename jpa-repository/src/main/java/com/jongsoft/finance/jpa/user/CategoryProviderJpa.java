@@ -1,8 +1,8 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.domain.core.ResultPage;
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.domain.user.CategoryProvider;
+import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.CategoryJpa;

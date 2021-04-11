@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.importer;
 
 import com.jongsoft.finance.core.DateUtils;
-import com.jongsoft.finance.domain.core.ResultPage;
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
-import com.jongsoft.finance.domain.importer.CSVConfigProvider;
-import com.jongsoft.finance.domain.importer.ImportProvider;
+import com.jongsoft.finance.providers.CSVConfigProvider;
+import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;

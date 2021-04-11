@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.scheduler;
 
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.transaction.TransactionScheduleProvider;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.model.ScheduledTransactionResponse;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;

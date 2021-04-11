@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.user;
 
 import com.jongsoft.finance.domain.account.events.CurrencyCreatedEvent;
-import com.jongsoft.finance.domain.core.CurrencyProvider;
+import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.finance.domain.core.events.CurrencyPropertyEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import io.micronaut.context.event.ApplicationEventPublisher;

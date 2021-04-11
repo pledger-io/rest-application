@@ -1,20 +1,18 @@
 package com.jongsoft.finance.rest.statistic;
 
 import com.jongsoft.finance.core.DateUtils;
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import com.jongsoft.lang.collection.Collection;
 import io.micronaut.context.ApplicationContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
-import java.util.List;
 
 class BalanceResourceTest extends TestSetup {
 

@@ -1,6 +1,6 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import io.micronaut.context.event.ApplicationEventPublisher;

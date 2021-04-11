@@ -1,7 +1,7 @@
 package com.jongsoft.finance.security;
 
 import com.jongsoft.finance.domain.user.Role;
-import com.jongsoft.finance.domain.user.UserProvider;
+import com.jongsoft.finance.providers.UserProvider;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.security.authentication.*;
 import io.reactivex.BackpressureStrategy;

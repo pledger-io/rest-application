@@ -5,9 +5,9 @@ import javax.inject.Singleton;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import com.jongsoft.finance.domain.FilterFactory;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.domain.user.ExpenseProvider;
+import com.jongsoft.finance.providers.ExpenseProvider;
 
 import lombok.extern.slf4j.Slf4j;
 

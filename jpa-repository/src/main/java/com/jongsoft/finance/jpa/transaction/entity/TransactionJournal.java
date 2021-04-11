@@ -19,7 +19,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.Where;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.core.TransactionType;
-import com.jongsoft.finance.jpa.account.entity.ContractJpa;
+import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.core.entity.AuditedJpa;
 import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;

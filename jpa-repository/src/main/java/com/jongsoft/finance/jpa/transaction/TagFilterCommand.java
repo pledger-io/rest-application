@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.transaction;
 
 import java.util.Objects;
 
-import com.jongsoft.finance.domain.transaction.TagProvider;
+import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
 
 import io.micronaut.data.model.Sort;

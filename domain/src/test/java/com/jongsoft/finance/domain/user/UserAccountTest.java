@@ -1,7 +1,6 @@
 package com.jongsoft.finance.domain.user;
 
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.events.AccountCreatedEvent;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
@@ -10,6 +9,7 @@ import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountPasswordChangedEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountSettingEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.account.CreateAccountCommand;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,11 +51,9 @@ class UserAccountTest {
 
     @Test
     void createAccount() {
-        ArgumentCaptor<AccountCreatedEvent> changeCaptor = ArgumentCaptor.forClass(AccountCreatedEvent.class);
-
         Account account = fullAccount.createAccount("Demo account", "EUR", "checking");
 
-        Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
+        Mockito.verify(applicationEventPublisher).publishEvent(CreateAccountCommand.class);
         assertThat(account.getUser()).isEqualTo(fullAccount);
         assertThat(account.getName()).isEqualTo("Demo account");
         assertThat(account.getCurrency()).isEqualTo("EUR");
@@ -64,12 +62,10 @@ class UserAccountTest {
 
     @Test
     void createAccount_NotAllowed() {
-        ArgumentCaptor<AccountCreatedEvent> changeCaptor = ArgumentCaptor.forClass(AccountCreatedEvent.class);
-
         IllegalStateException thrown = assertThrows(IllegalStateException.class,
                 () -> readOnlyAccount.createAccount("Demo account", "EUR", "checking"));
 
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(changeCaptor.capture());
+        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(CreateAccountCommand.class);
 
         assertThat(thrown.getMessage()).isEqualTo("User cannot create accounts, incorrect privileges.");
     }

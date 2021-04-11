@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.StorageService;
-import com.jongsoft.finance.domain.importer.ImportProvider;
+import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
 
 import lombok.extern.slf4j.Slf4j;

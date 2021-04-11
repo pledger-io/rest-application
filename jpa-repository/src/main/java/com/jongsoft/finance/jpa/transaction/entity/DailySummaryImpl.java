@@ -3,7 +3,7 @@ package com.jongsoft.finance.jpa.transaction.entity;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 
 public class DailySummaryImpl implements TransactionProvider.DailySummary {
     private LocalDate day;

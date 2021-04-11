@@ -1,10 +1,10 @@
 package com.jongsoft.finance.rest.category;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.domain.user.CategoryProvider;
+import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.rest.model.CategoryResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;

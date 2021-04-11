@@ -1,9 +1,9 @@
 package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.account.AccountTypeProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.security.AuthenticationFacade;

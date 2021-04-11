@@ -2,7 +2,7 @@ package com.jongsoft.finance.rest.setting;
 
 import com.jongsoft.finance.domain.account.events.CurrencyCreatedEvent;
 import com.jongsoft.finance.domain.core.Currency;
-import com.jongsoft.finance.domain.core.CurrencyProvider;
+import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;

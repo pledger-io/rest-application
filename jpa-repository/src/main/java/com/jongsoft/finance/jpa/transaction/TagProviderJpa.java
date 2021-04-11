@@ -1,8 +1,8 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import com.jongsoft.finance.domain.core.ResultPage;
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Tag;
-import com.jongsoft.finance.domain.transaction.TagProvider;
+import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.transaction.entity.TagJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;

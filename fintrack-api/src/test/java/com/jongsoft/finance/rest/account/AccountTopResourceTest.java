@@ -1,10 +1,10 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.core.DateUtils;
-import com.jongsoft.finance.domain.FilterFactory;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import org.junit.jupiter.api.BeforeEach;

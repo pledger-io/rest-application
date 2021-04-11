@@ -8,7 +8,7 @@ import org.camunda.bpm.engine.variable.value.LongValue;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.lang.collection.List;
 
 import lombok.extern.slf4j.Slf4j;

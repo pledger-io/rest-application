@@ -1,7 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.contract;
 
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.account.ContractProvider;
+import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.lang.Control;
 import io.reactivex.Maybe;
 import org.camunda.bpm.engine.delegate.DelegateExecution;

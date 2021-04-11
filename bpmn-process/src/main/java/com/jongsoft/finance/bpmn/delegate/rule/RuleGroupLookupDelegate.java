@@ -5,7 +5,7 @@ import javax.inject.Singleton;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
-import com.jongsoft.finance.domain.transaction.TransactionRuleGroupProvider;
+import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
 import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 

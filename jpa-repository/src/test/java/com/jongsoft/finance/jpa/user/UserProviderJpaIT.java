@@ -1,6 +1,6 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.domain.user.UserProvider;
+import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

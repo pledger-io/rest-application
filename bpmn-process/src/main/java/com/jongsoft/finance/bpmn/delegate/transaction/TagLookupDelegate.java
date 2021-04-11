@@ -2,7 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.transaction;
 
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.Tag;
-import com.jongsoft.finance.domain.transaction.TagProvider;
+import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import io.reactivex.Single;
 import lombok.extern.slf4j.Slf4j;

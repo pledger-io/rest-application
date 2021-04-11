@@ -2,11 +2,11 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.domain.core.ResultPage;
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.jpa.account.entity.ContractJpa;
+import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.transaction.entity.TagJpa;

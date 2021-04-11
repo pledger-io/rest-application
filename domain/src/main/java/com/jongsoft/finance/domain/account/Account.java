@@ -9,6 +9,7 @@ import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.account.*;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedule;
 import com.jongsoft.lang.Collections;
@@ -57,9 +58,7 @@ public class Account implements AggregateBase, Serializable {
         this.type = type;
 
         EventBus.getBus().send(
-                new AccountCreatedEvent(
-                        user,
-                        user,
+                new CreateAccountCommand(
                         name,
                         currency,
                         type));
@@ -80,9 +79,7 @@ public class Account implements AggregateBase, Serializable {
             this.type = type;
 
             EventBus.getBus().send(
-                    new AccountRenamedEvent(
-                            this,
-                            user,
+                    new RenameAccountCommand(
                             id,
                             type,
                             name,
@@ -94,7 +91,7 @@ public class Account implements AggregateBase, Serializable {
     @BusinessMethod
     public void registerIcon(String fileCode) {
         EventBus.getBus().send(
-                new AccountIconAttachedEvent(
+                new RegisterAccountIconCommand(
                         id,
                         fileCode,
                         this.imageFileToken));
@@ -117,8 +114,7 @@ public class Account implements AggregateBase, Serializable {
             this.interestPeriodicity = periodicity;
 
             EventBus.getBus().send(
-                    new AccountInterestEvent(
-                            this,
+                    new ChangeInterestCommand(
                             id,
                             interest,
                             interestPeriodicity));
@@ -127,12 +123,7 @@ public class Account implements AggregateBase, Serializable {
 
     @BusinessMethod
     public void registerSynonym(String synonym) {
-        EventBus.getBus().send(
-                new AccountSynonymEvent(
-                        this,
-                        user,
-                        synonym,
-                        id));
+        EventBus.getBus().send(new RegisterSynonymCommand(id, synonym));
     }
 
     /**
@@ -154,9 +145,7 @@ public class Account implements AggregateBase, Serializable {
             this.bic = bic;
             this.number = number;
             EventBus.getBus().send(
-                    new AccountChangedEvent(
-                            this,
-                            user,
+                    new ChangeAccountCommand(
                             id,
                             iban,
                             bic,
@@ -170,7 +159,7 @@ public class Account implements AggregateBase, Serializable {
     @BusinessMethod
     public void terminate() {
         remove = true;
-        EventBus.getBus().send(new AccountTerminatedEvent(this, this));
+        EventBus.getBus().send(new TerminateAccountCommand(id));
     }
 
     @BusinessMethod

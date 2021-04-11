@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.model;
 
-import com.jongsoft.finance.domain.core.ResultPage;
+import com.jongsoft.finance.ResultPage;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;

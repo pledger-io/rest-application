@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.user;
 
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.domain.user.BudgetProvider;
+import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.BudgetJpa;

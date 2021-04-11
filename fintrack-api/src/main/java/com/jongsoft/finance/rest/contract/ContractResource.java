@@ -1,9 +1,9 @@
 package com.jongsoft.finance.rest.contract;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.account.ContractProvider;
+import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.rest.model.ContractResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;

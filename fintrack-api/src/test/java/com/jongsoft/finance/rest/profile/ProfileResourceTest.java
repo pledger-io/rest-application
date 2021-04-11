@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.domain.user.SessionToken;
-import com.jongsoft.finance.domain.user.UserProvider;
+import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.domain.user.events.TokenRegisterEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
 import com.jongsoft.finance.messaging.EventBus;

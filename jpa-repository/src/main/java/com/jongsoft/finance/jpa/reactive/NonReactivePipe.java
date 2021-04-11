@@ -1,6 +1,6 @@
 package com.jongsoft.finance.jpa.reactive;
 
-import com.jongsoft.finance.domain.core.ResultPage;
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.jpa.ResultPageImpl;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;

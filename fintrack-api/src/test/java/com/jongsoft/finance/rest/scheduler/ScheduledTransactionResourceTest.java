@@ -1,10 +1,10 @@
 package com.jongsoft.finance.rest.scheduler;
 
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
-import com.jongsoft.finance.domain.transaction.TransactionScheduleProvider;
+import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.lang.Collections;

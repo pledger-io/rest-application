@@ -2,9 +2,11 @@ package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.CategoryProvider;
+import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.domain.user.*;
+import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;

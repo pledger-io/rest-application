@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 
+import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
+import com.jongsoft.finance.messaging.commands.contract.TerminateContract;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.account.events.ContractChangedEvent;
-import com.jongsoft.finance.domain.account.events.ContractTerminatedEvent;
 import com.jongsoft.finance.domain.account.events.ContractUploadEvent;
 import com.jongsoft.finance.domain.account.events.ContractWarningEvent;
 import com.jongsoft.finance.messaging.EventBus;
@@ -89,7 +89,7 @@ class ContractTest {
 
     @Test
     void change() {
-        ArgumentCaptor<ContractChangedEvent> changeCaptor = ArgumentCaptor.forClass(ContractChangedEvent.class);
+        ArgumentCaptor<ChangeContractCommand> changeCaptor = ArgumentCaptor.forClass(ChangeContractCommand.class);
 
         LocalDate start = LocalDate.now();
         LocalDate end = start.plusYears(1);
@@ -103,11 +103,11 @@ class ContractTest {
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
 
-        assertThat(changeCaptor.getValue().getId()).isEqualTo(1L);
-        assertThat(changeCaptor.getValue().getName()).isEqualTo("Updated");
-        assertThat(changeCaptor.getValue().getDescription()).isEqualTo("description update");
-        assertThat(changeCaptor.getValue().getStart()).isEqualTo(start.plusDays(1));
-        assertThat(changeCaptor.getValue().getEnd()).isEqualTo(end.plusDays(1));
+        assertThat(changeCaptor.getValue().id()).isEqualTo(1L);
+        assertThat(changeCaptor.getValue().name()).isEqualTo("Updated");
+        assertThat(changeCaptor.getValue().description()).isEqualTo("description update");
+        assertThat(changeCaptor.getValue().start()).isEqualTo(start.plusDays(1));
+        assertThat(changeCaptor.getValue().end()).isEqualTo(end.plusDays(1));
     }
 
     @Test
@@ -124,7 +124,7 @@ class ContractTest {
         IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> contract.change("Updated", "", end.plusDays(1), end));
 
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any(ContractChangedEvent.class));
+        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any(ChangeContractCommand.class));
 
         assertThat(exception.getMessage()).isEqualTo("Start cannot be after end of contract.");
     }
@@ -146,7 +146,7 @@ class ContractTest {
 
     @Test
     void terminate() {
-        ArgumentCaptor<ContractTerminatedEvent> changeCaptor = ArgumentCaptor.forClass(ContractTerminatedEvent.class);
+        ArgumentCaptor<TerminateContract> changeCaptor = ArgumentCaptor.forClass(TerminateContract.class);
 
         Contract.builder()
                 .id(1L)
@@ -156,7 +156,7 @@ class ContractTest {
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
 
-        assertThat(changeCaptor.getValue().getId()).isEqualTo(1L);
+        assertThat(changeCaptor.getValue().id()).isEqualTo(1L);
     }
 
     @Test
@@ -168,7 +168,7 @@ class ContractTest {
                         .build()
                         .terminate());
 
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any(ContractTerminatedEvent.class));
+        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any(TerminateContract.class));
 
         assertThat(exception.getMessage()).isEqualTo("Contract has not yet expired.");
     }
@@ -184,7 +184,7 @@ class ContractTest {
                         .build()
                         .terminate());
 
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any(ContractTerminatedEvent.class));
+        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any(TerminateContract.class));
 
         assertThat(exception.getMessage()).isEqualTo("Contract is already terminated.");
     }

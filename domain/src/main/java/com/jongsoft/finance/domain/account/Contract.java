@@ -3,12 +3,12 @@ package com.jongsoft.finance.domain.account;
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
-import com.jongsoft.finance.domain.account.events.ContractChangedEvent;
-import com.jongsoft.finance.domain.account.events.ContractCreatedEvent;
-import com.jongsoft.finance.domain.account.events.ContractTerminatedEvent;
 import com.jongsoft.finance.domain.account.events.ContractUploadEvent;
 import com.jongsoft.finance.domain.account.events.ContractWarningEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
+import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
+import com.jongsoft.finance.messaging.commands.contract.TerminateContract;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -49,7 +49,7 @@ public class Contract implements AggregateBase, Serializable {
         this.company = company;
         this.description = description;
 
-        EventBus.getBus().send(new ContractCreatedEvent(this, company, name, description, start, end));
+        EventBus.getBus().send(new CreateContractCommand(company.getId(), name, description, start, end));
     }
 
     @BusinessMethod
@@ -63,7 +63,7 @@ public class Contract implements AggregateBase, Serializable {
         this.endDate = end;
         this.description = description;
 
-        EventBus.getBus().send(new ContractChangedEvent(this, id, name, description, start, end));
+        EventBus.getBus().send(new ChangeContractCommand(id, name, description, start, end));
     }
 
     @BusinessMethod
@@ -103,7 +103,7 @@ public class Contract implements AggregateBase, Serializable {
         }
 
         this.terminated = true;
-        EventBus.getBus().send(new ContractTerminatedEvent(this, id));
+        EventBus.getBus().send(new TerminateContract(id));
     }
 
     @Override

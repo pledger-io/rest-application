@@ -1,6 +1,6 @@
 package com.jongsoft.finance.jpa.account;
 
-import com.jongsoft.finance.domain.account.AccountTypeProvider;
+import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.finance.jpa.account.entity.AccountTypeJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.lang.collection.Sequence;

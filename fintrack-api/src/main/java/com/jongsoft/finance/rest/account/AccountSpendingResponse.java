@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.rest.model.AccountResponse;
 
 public class AccountSpendingResponse {

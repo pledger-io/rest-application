@@ -4,7 +4,7 @@ import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;

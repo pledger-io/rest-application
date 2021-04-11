@@ -1,7 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
 import com.jongsoft.finance.ProcessMapper;
-import com.jongsoft.finance.domain.user.BudgetProvider;
+import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.BudgetJson;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package com.jongsoft.finance.filter;
 
 import com.jongsoft.finance.domain.core.Currency;
-import com.jongsoft.finance.domain.core.CurrencyProvider;
+import com.jongsoft.finance.providers.CurrencyProvider;
 import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.filter.ServerFilterChain;

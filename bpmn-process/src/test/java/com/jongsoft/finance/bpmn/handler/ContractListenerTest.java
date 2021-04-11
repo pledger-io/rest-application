@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Date;
 
+import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
@@ -15,7 +16,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.account.events.ContractChangedEvent;
 import com.jongsoft.finance.domain.account.events.ContractWarningEvent;
 import com.jongsoft.finance.security.AuthenticationFacade;
 
@@ -63,8 +63,7 @@ class ContractListenerTest {
         Mockito.doReturn(job).when(jobQuery).singleResult();
         Mockito.when(instance.getProcessInstanceId()).thenReturn("test_instance_1");
 
-        subject.handleContractEnd(new ContractChangedEvent(
-                this,
+        subject.handleContractEnd(new ChangeContractCommand(
                 1L,
                 "",
                 "",

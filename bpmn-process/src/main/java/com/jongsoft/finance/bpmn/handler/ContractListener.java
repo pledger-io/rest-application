@@ -6,9 +6,9 @@ import java.util.Date;
 
 import javax.inject.Singleton;
 
+import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
 import org.camunda.bpm.engine.ProcessEngine;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.domain.account.events.ContractChangedEvent;
 import com.jongsoft.finance.domain.account.events.ContractWarningEvent;
 import com.jongsoft.finance.security.AuthenticationFacade;
 
@@ -25,11 +25,11 @@ public class ContractListener {
     }
 
     @BusinessEventListener
-    public void handleContractEnd(ContractChangedEvent event) {
+    public void handleContractEnd(ChangeContractCommand event) {
         var runningProcess = processEngine.getRuntimeService()
                 .createProcessInstanceQuery()
                 .processDefinitionKey(BUSINESS_KEY)
-                .processInstanceBusinessKey("contract_term_" + event.getId())
+                .processInstanceBusinessKey("contract_term_" + event.id())
                 .singleResult();
 
 
@@ -40,7 +40,7 @@ public class ContractListener {
                     .processInstanceId(runningProcess.getProcessInstanceId())
                     .singleResult();
 
-            var newDueDate = event.getEnd().minusMonths(1);
+            var newDueDate = event.end().minusMonths(1);
             processEngine.getManagementService()
                     .setJobDuedate(
                             timerJob.getId(),

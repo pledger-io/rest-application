@@ -1,10 +1,10 @@
 package com.jongsoft.finance.rest.transaction;
 
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.core.ResultPage;
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.domain.transaction.Tag;
-import com.jongsoft.finance.domain.transaction.TagProvider;
+import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;

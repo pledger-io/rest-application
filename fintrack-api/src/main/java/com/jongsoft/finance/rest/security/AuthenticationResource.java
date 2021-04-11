@@ -3,7 +3,7 @@ package com.jongsoft.finance.rest.security;
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.domain.user.UserProvider;
+import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.PasswordEncoder;

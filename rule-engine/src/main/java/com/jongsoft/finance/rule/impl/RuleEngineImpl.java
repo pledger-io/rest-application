@@ -6,7 +6,7 @@ import javax.inject.Singleton;
 
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
+import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
 import com.jongsoft.finance.rule.locator.ChangeLocator;

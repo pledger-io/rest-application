@@ -3,7 +3,7 @@ package com.jongsoft.finance.jpa.core;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.account.events.CurrencyCreatedEvent;
 import com.jongsoft.finance.domain.core.Currency;
-import com.jongsoft.finance.domain.core.CurrencyProvider;
+import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.finance.domain.core.events.CurrencyPropertyEvent;
 import com.jongsoft.finance.domain.core.events.CurrencyRenameEvent;
 import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;

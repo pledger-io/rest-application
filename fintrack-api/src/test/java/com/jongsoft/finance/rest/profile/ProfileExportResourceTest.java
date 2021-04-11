@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.StorageService;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.transaction.TagProvider;
-import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
-import com.jongsoft.finance.domain.user.BudgetProvider;
-import com.jongsoft.finance.domain.user.CategoryProvider;
-import com.jongsoft.finance.domain.user.ExpenseProvider;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.TagProvider;
+import com.jongsoft.finance.providers.TransactionRuleProvider;
+import com.jongsoft.finance.providers.BudgetProvider;
+import com.jongsoft.finance.providers.CategoryProvider;
+import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import io.micronaut.http.HttpHeaders;

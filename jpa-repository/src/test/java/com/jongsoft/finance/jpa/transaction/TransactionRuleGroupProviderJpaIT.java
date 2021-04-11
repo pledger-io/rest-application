@@ -1,6 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import com.jongsoft.finance.domain.transaction.TransactionRuleGroupProvider;
+import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;

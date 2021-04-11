@@ -1,7 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
 import com.jongsoft.finance.domain.transaction.Tag;
-import com.jongsoft.finance.domain.transaction.TagProvider;
+import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;

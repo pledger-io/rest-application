@@ -13,7 +13,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.TransactionScheduleProvider;
+import com.jongsoft.finance.providers.TransactionScheduleProvider;
 
 @Singleton
 public class GenerateTransactionJsonDelegate implements JavaDelegate {

@@ -1,8 +1,8 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.domain.core.ResultPage;
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.domain.user.ExpenseProvider;
+import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.ExpenseJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;

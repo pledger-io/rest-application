@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.providers.AccountProvider;
 
 public class AccountSpendingImpl implements AccountProvider.AccountSpending {
 

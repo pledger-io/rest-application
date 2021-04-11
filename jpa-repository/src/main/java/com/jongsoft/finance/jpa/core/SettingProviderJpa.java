@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.core;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.core.Setting;
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
 import com.jongsoft.finance.jpa.core.entity.SettingJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;

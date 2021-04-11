@@ -6,7 +6,7 @@ import javax.inject.Singleton;
 
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.core.DataProvider;
+import com.jongsoft.finance.providers.DataProvider;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Category;
 

@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.setting;
 
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.model.SettingResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;

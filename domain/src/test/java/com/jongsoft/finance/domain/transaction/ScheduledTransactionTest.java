@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 
+import com.jongsoft.finance.domain.account.Contract;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,5 +65,15 @@ class ScheduledTransactionTest {
 
         assertThat(scheduledTransaction.getSchedule().interval()).isEqualTo(3);
         assertThat(scheduledTransaction.getSchedule().periodicity()).isEqualTo(Periodicity.WEEKS);
+    }
+
+    @Test
+    void linkToContract() {
+        scheduledTransaction.linkToContract(Contract.builder()
+                .id(2L)
+                .build());
+
+        assertThat(scheduledTransaction.getContract()).isNotNull();
+        assertThat(scheduledTransaction.getContract().getId()).isEqualTo(2L);
     }
 }

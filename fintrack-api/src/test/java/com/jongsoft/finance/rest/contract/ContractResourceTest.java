@@ -2,10 +2,10 @@ package com.jongsoft.finance.rest.contract;
 
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.account.ContractProvider;
-import com.jongsoft.finance.domain.account.events.ContractCreatedEvent;
+import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.rest.model.ContractResponse;
@@ -131,7 +131,7 @@ class ContractResourceTest extends TestSetup {
         Assertions.assertThat(response.getStart()).isEqualTo(LocalDate.of(2019, 2, 1));
         Assertions.assertThat(response.getEnd()).isEqualTo(LocalDate.of(2020, 2, 1));
 
-        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(ContractCreatedEvent.class));
+        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateContractCommand.class));
     }
 
     @Test
