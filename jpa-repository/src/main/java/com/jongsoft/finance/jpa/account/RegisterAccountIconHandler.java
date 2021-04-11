@@ -34,7 +34,7 @@ public class RegisterAccountIconHandler implements CommandHandler<RegisterAccoun
                 .hql(hql)
                 .set("fileCode", command.fileCode())
                 .set("id", command.id())
-                .update();
+                .execute();
     }
 
 }

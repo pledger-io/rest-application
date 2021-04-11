@@ -2,12 +2,12 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionCreatedEvent;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionDescribeEvent;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionLimitEvent;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionRescheduleEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.jpa.transaction.entity.ScheduledTransactionJpa;
+import com.jongsoft.finance.jpa.schedule.ScheduledTransactionJpa;
+import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleCommand;
+import com.jongsoft.finance.messaging.commands.schedule.DescribeScheduleCommand;
+import com.jongsoft.finance.messaging.commands.schedule.LimitScheduleCommand;
+import com.jongsoft.finance.messaging.commands.schedule.RescheduleCommand;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -45,8 +45,7 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
         setup();
         var schedule = new ScheduleValue(Periodicity.MONTHS, 3);
 
-        eventPublisher.publishEvent(new ScheduledTransactionCreatedEvent(
-                this,
+        eventPublisher.publishEvent(new CreateScheduleCommand(
                 "Schedule",
                 schedule,
                 Account.builder().id(1L).build(),
@@ -58,8 +57,7 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
     @Test
     void handleDescribe() {
         setup();
-        eventPublisher.publishEvent(new ScheduledTransactionDescribeEvent(
-                this,
+        eventPublisher.publishEvent(new DescribeScheduleCommand(
                 2L,
                 "My description",
                 "My name"));
@@ -72,9 +70,9 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
     @Test
     void handleLimit() {
         setup();
-        eventPublisher.publishEvent(new ScheduledTransactionLimitEvent(
-                this,
+        eventPublisher.publishEvent(new LimitScheduleCommand(
                 2L,
+                null,
                 LocalDate.of(2019, 1, 1),
                 LocalDate.of(2022, 1, 1)));
 
@@ -86,9 +84,9 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
     @Test
     void handleReschedule() {
         setup();
-        eventPublisher.publishEvent(new ScheduledTransactionRescheduleEvent(
-                this,
+        eventPublisher.publishEvent(new RescheduleCommand(
                 2L,
+                null,
                 new ScheduleValue(Periodicity.WEEKS, 3)));
 
         var check = entityManager.find(ScheduledTransactionJpa.class, 2L);

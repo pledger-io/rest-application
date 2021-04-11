@@ -38,7 +38,7 @@ public class ChangeAccountHandler implements CommandHandler<ChangeAccountCommand
                 .set("bic", command.bic())
                 .set("number", command.number())
                 .set("id", command.id())
-                .update();
+                .execute();
     }
 
 }

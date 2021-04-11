@@ -38,7 +38,7 @@ public class RenameCurrencyHandler implements CommandHandler<RenameCurrencyComma
                 .set("name", command.name())
                 .set("code", command.isoCode())
                 .set("symbol", command.symbol())
-                .update();
+                .execute();
     }
 
 }

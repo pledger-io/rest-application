@@ -36,7 +36,7 @@ public class ChangeAccountInterestHandler implements CommandHandler<ChangeIntere
                 .set("id", command.id())
                 .set("interest", command.interest())
                 .set("periodicity", command.periodicity())
-                .update();
+                .execute();
     }
 
 }

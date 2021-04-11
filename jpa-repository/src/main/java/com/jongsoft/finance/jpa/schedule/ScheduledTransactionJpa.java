@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.transaction.entity;
+package com.jongsoft.finance.jpa.schedule;
 
 import com.jongsoft.finance.jpa.account.AccountJpa;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;

@@ -36,7 +36,7 @@ public class ChangeCurrencyPropertyHandler implements CommandHandler<ChangeCurre
                 .hql(hql)
                 .set("code", command.code())
                 .set("value", command.value())
-                .update();
+                .execute();
     }
 
 }

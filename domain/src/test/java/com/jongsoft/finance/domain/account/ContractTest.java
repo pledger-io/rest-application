@@ -42,7 +42,7 @@ class ContractTest {
         LocalDate start = LocalDate.of(2009, 1, 1);
         LocalDate end = LocalDate.of(2010, 1, 1);
 
-        final Contract contract = new Contract(null, "Sample", "", start, end);
+        final Contract contract = new Contract(Account.builder().id(1L).build(), "Sample", "", start, end);
         IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
                 contract::warnBeforeExpires);
 

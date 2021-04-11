@@ -31,7 +31,7 @@ public class TerminateContractHandler implements CommandHandler<TerminateContrac
         entityManager.update()
                 .hql(hql)
                 .set("id", command.id())
-                .update();
+                .execute();
     }
 
 }

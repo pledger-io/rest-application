@@ -40,7 +40,7 @@ public class ChangeContractHandler implements CommandHandler<ChangeContractComma
                 .set("endDate", command.end())
                 .set("description", command.description())
                 .set("id", command.id())
-                .update();
+                .execute();
     }
 
 }

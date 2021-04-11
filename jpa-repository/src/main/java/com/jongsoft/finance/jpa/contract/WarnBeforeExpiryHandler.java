@@ -33,7 +33,7 @@ public class WarnBeforeExpiryHandler implements CommandHandler<WarnBeforeExpiryC
                 .hql(hql)
                 .set("id", command.id())
                 .set("endDate", command.endDate())
-                .update();
+                .execute();
     }
 
 }

@@ -1,17 +1,13 @@
 package com.jongsoft.finance.bpmn.handler;
 
-import java.util.Objects;
+import com.jongsoft.finance.annotation.BusinessEventListener;
+import com.jongsoft.finance.messaging.commands.schedule.ScheduleCommand;
+import com.jongsoft.finance.security.AuthenticationFacade;
+import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.ProcessEngine;
 
 import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.ProcessEngine;
-import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.domain.core.events.ScheduledLimitEvent;
-import com.jongsoft.finance.domain.core.events.ScheduledRescheduleEvent;
-import com.jongsoft.finance.domain.core.events.SchedulerEvent;
-import com.jongsoft.finance.security.AuthenticationFacade;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.Objects;
 
 @Slf4j
 @Singleton
@@ -26,49 +22,42 @@ public class ProcessSchedulerListener {
     }
 
     @BusinessEventListener
-    public void handleScheduleLimit(ScheduledLimitEvent event) {
-        log.info("Processing scheduler {} limit change", event.getBusinessKey());
-        deleteAnyActiveProcess(event);
-        startNewActivity(event);
+    public void handleScheduleCommand(ScheduleCommand command) {
+        log.info("Processing scheduler {} command", command.businessKey());
+        deleteAnyActiveProcess(command);
+        startNewActivity(command);
     }
 
-    @BusinessEventListener
-    public void handleReschedule(ScheduledRescheduleEvent event) {
-        log.info("Processing scheduler {} schedule change", event.getBusinessKey());
-        deleteAnyActiveProcess(event);
-        startNewActivity(event);
-    }
-
-    private void startNewActivity(SchedulerEvent event) {
-        Objects.requireNonNull(event.schedulable(), "Entity to be scheduled cannot be null.");
+    private void startNewActivity(ScheduleCommand command) {
+        Objects.requireNonNull(command.schedulable(), "Entity to be scheduled cannot be null.");
 
         var starter = processEngine.getRuntimeService()
                 .createProcessInstanceByKey("ProcessScheduler")
-                .businessKey(event.getBusinessKey())
+                .businessKey(command.businessKey())
                 .setVariable("username", authenticationFacade.authenticated())
-                .setVariable("subProcess", event.getProcessDefinition())
-                .setVariable(event.getProcessDefinition(), event.variables());
+                .setVariable("subProcess", command.processDefinition())
+                .setVariable(command.processDefinition(), command.variables());
 
-        if (Objects.nonNull(event.schedulable().getStart())) {
-            starter.setVariable("start", event.schedulable().getStart().toString());
+        if (Objects.nonNull(command.schedulable().getStart())) {
+            starter.setVariable("start", command.schedulable().getStart().toString());
         }
 
-        if (Objects.nonNull(event.schedulable().getEnd())) {
-            starter.setVariable("end", event.schedulable().getEnd().toString());
+        if (Objects.nonNull(command.schedulable().getEnd())) {
+            starter.setVariable("end", command.schedulable().getEnd().toString());
         }
 
-        if (Objects.nonNull(event.schedulable().getSchedule())) {
-            starter.setVariable("interval", event.schedulable().getSchedule().interval())
-                    .setVariable("periodicity", event.schedulable().getSchedule().periodicity());
+        if (Objects.nonNull(command.schedulable().getSchedule())) {
+            starter.setVariable("interval", command.schedulable().getSchedule().interval())
+                    .setVariable("periodicity", command.schedulable().getSchedule().periodicity());
         }
 
         starter.execute();
     }
 
-    private void deleteAnyActiveProcess(SchedulerEvent event) {
+    private void deleteAnyActiveProcess(ScheduleCommand command) {
         var runningProcess = processEngine.getRuntimeService()
                 .createProcessInstanceQuery()
-                .processInstanceBusinessKey(event.getBusinessKey())
+                .processInstanceBusinessKey(command.businessKey())
                 .singleResult();
         if (runningProcess != null) {
             processEngine.getRuntimeService()

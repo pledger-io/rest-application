@@ -55,7 +55,7 @@ public class RegisterSynonymHandler implements CommandHandler<RegisterSynonymCom
                     .hql(updateHql)
                     .set("account", account)
                     .set("id", existingId.get())
-                    .update();
+                    .execute();
         } else {
             var entity = AccountSynonymJpa.builder()
                     .account(account)

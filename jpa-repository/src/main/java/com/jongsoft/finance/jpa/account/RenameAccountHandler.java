@@ -46,7 +46,7 @@ public class RenameAccountHandler implements CommandHandler<RenameAccountCommand
                         CurrencyJpa.class,
                         Collections.Map("code", command.currency())))
                 .set("id", command.id())
-                .update();
+                .execute();
     }
 
 }

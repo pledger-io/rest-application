@@ -53,7 +53,7 @@ class UserAccountTest {
     void createAccount() {
         Account account = fullAccount.createAccount("Demo account", "EUR", "checking");
 
-        Mockito.verify(applicationEventPublisher).publishEvent(CreateAccountCommand.class);
+        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateAccountCommand.class));
         assertThat(account.getUser()).isEqualTo(fullAccount);
         assertThat(account.getName()).isEqualTo("Demo account");
         assertThat(account.getCurrency()).isEqualTo("EUR");
@@ -65,7 +65,7 @@ class UserAccountTest {
         IllegalStateException thrown = assertThrows(IllegalStateException.class,
                 () -> readOnlyAccount.createAccount("Demo account", "EUR", "checking"));
 
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(CreateAccountCommand.class);
+        Mockito.verifyNoInteractions(applicationEventPublisher);
 
         assertThat(thrown.getMessage()).isEqualTo("User cannot create accounts, incorrect privileges.");
     }

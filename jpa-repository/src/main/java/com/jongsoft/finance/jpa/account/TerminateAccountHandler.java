@@ -28,7 +28,7 @@ public class TerminateAccountHandler implements CommandHandler<TerminateAccountC
         entityManager.update()
                 .hql("update AccountJpa a set a.archived = true where a.id = :id")
                 .set("id", command.id())
-                .update();
+                .execute();
     }
 
 }

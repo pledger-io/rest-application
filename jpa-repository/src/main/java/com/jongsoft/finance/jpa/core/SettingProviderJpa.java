@@ -2,10 +2,10 @@ package com.jongsoft.finance.jpa.core;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.core.Setting;
-import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
 import com.jongsoft.finance.jpa.core.entity.SettingJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +61,7 @@ public class SettingProviderJpa extends RepositoryJpa implements SettingProvider
                 .hql(hql)
                 .set("name", event.getSetting())
                 .set("value", event.getValue())
-                .update();
+                .execute();
     }
 
     private Setting convert(SettingJpa source) {

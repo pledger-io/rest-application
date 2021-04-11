@@ -1,19 +1,17 @@
 package com.jongsoft.finance.domain.transaction;
 
-import static org.assertj.core.api.Assertions.*;
-
-import java.time.LocalDate;
-
-import com.jongsoft.finance.domain.account.Contract;
+import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.schedule.Periodicity;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.schedule.Periodicity;
 
-import io.micronaut.context.event.ApplicationEventPublisher;
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ScheduledTransactionTest {
 
@@ -67,13 +65,4 @@ class ScheduledTransactionTest {
         assertThat(scheduledTransaction.getSchedule().periodicity()).isEqualTo(Periodicity.WEEKS);
     }
 
-    @Test
-    void linkToContract() {
-        scheduledTransaction.linkToContract(Contract.builder()
-                .id(2L)
-                .build());
-
-        assertThat(scheduledTransaction.getContract()).isNotNull();
-        assertThat(scheduledTransaction.getContract().getId()).isEqualTo(2L);
-    }
 }

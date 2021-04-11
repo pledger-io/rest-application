@@ -1,7 +1,11 @@
 package com.jongsoft.finance.bpmn.handler;
 
-import java.time.LocalDate;
-
+import com.jongsoft.finance.domain.transaction.ScheduleValue;
+import com.jongsoft.finance.messaging.commands.schedule.ScheduleCommand;
+import com.jongsoft.finance.schedule.Periodicity;
+import com.jongsoft.finance.schedule.Schedulable;
+import com.jongsoft.finance.schedule.Schedule;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -9,13 +13,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.core.events.ScheduledLimitEvent;
-import com.jongsoft.finance.domain.core.events.ScheduledRescheduleEvent;
-import com.jongsoft.finance.domain.transaction.ScheduleValue;
-import com.jongsoft.finance.schedule.Periodicity;
-import com.jongsoft.finance.schedule.Schedulable;
-import com.jongsoft.finance.schedule.Schedule;
-import com.jongsoft.finance.security.AuthenticationFacade;
+
+import java.time.LocalDate;
 
 class ProcessSchedulerListenerTest {
 
@@ -75,25 +74,12 @@ class ProcessSchedulerListenerTest {
 
     @Test
     void handleScheduleLimit() {
-        subject.handleScheduleLimit(new ScheduledLimitEvent(this, "EmptyProcess", schedulable.getStart(), schedulable.getEnd()) {
+        subject.handleScheduleCommand(new ScheduleCommand() {
             @Override
-            public Schedulable schedulable() {
-                return schedulable;
+            public String processDefinition() {
+                return "EmptyProcess";
             }
-        });
 
-        Mockito.verify(processInstantiationBuilder).setVariable("subProcess", "EmptyProcess");
-        Mockito.verify(processInstantiationBuilder).setVariable("start", schedulable.getStart().toString());
-        Mockito.verify(processInstantiationBuilder).setVariable("end", schedulable.getEnd().toString());
-        Mockito.verify(processInstantiationBuilder).setVariable("interval", 1);
-        Mockito.verify(processInstantiationBuilder).setVariable("username", "test-user");
-        Mockito.verify(processInstantiationBuilder).setVariable("periodicity", Periodicity.MONTHS);
-        Mockito.verify(processInstantiationBuilder).execute();
-    }
-
-    @Test
-    void handleReschedule() {
-        subject.handleReschedule(new ScheduledRescheduleEvent(this, "EmptyProcess", schedulable.getSchedule()) {
             @Override
             public Schedulable schedulable() {
                 return schedulable;

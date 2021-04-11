@@ -63,7 +63,7 @@ public class ImportEventListener extends RepositoryJpa {
                 .hql(hql)
                 .set("id", event.getImportId())
                 .set("finished", new Date())
-                .update();
+                .execute();
     }
 
     @BusinessEventListener
@@ -78,7 +78,7 @@ public class ImportEventListener extends RepositoryJpa {
         entityManager.update()
                 .hql(hql)
                 .set("id", event.getId())
-                .update();
+                .execute();
     }
 
 }
