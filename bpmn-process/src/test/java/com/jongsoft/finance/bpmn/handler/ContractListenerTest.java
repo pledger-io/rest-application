@@ -1,23 +1,19 @@
 package com.jongsoft.finance.bpmn.handler;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.Date;
-
 import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
+import com.jongsoft.finance.messaging.commands.contract.WarnBeforeExpiryCommand;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.JobQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
+import org.camunda.bpm.engine.runtime.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.account.events.ContractWarningEvent;
-import com.jongsoft.finance.security.AuthenticationFacade;
+
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Date;
 
 class ContractListenerTest {
 
@@ -79,7 +75,7 @@ class ContractListenerTest {
 
     @Test
     void handleShouldWarn() {
-        subject.handleShouldWarn(new ContractWarningEvent(this, 1L, LocalDate.now().plusMonths(2)));
+        subject.handleShouldWarn(new WarnBeforeExpiryCommand(1L, LocalDate.now().plusMonths(2)));
 
         Mockito.verify(processEngine).getRuntimeService();
         Mockito.verify(processInstantiationBuilder).businessKey("contract_term_" + 1);

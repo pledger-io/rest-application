@@ -1,9 +1,9 @@
-package com.jongsoft.finance.jpa.account.handler;
+package com.jongsoft.finance.jpa.contract;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
-import com.jongsoft.finance.messaging.commands.account.RegisterAccountIconCommand;
+import com.jongsoft.finance.messaging.commands.contract.AttachFileToContractCommand;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
@@ -12,27 +12,27 @@ import javax.transaction.Transactional;
 @Slf4j
 @Singleton
 @Transactional
-public class RegisterAccountIconHandler implements CommandHandler<RegisterAccountIconCommand> {
+public class AttacheFileToContractHandler implements CommandHandler<AttachFileToContractCommand> {
 
     private final ReactiveEntityManager entityManager;
 
-    public RegisterAccountIconHandler(ReactiveEntityManager entityManager) {
+    public AttacheFileToContractHandler(ReactiveEntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     @Override
     @BusinessEventListener
-    public void handle(RegisterAccountIconCommand command) {
-        log.trace("[{}] - Processing icon registration event", command.id());
+    public void handle(AttachFileToContractCommand command) {
+        log.trace("[{}] - Processing contract upload event", command.id());
 
         var hql = """
-                update AccountJpa
-                set imageFileToken = :fileCode
+                update ContractJpa
+                set fileToken = :token
                 where id = :id""";
 
         entityManager.update()
                 .hql(hql)
-                .set("fileCode", command.fileCode())
+                .set("token", command.fileCode())
                 .set("id", command.id())
                 .update();
     }

@@ -1,8 +1,6 @@
 package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.jpa.account.entity.AccountJpa;
-import com.jongsoft.finance.jpa.account.entity.AccountSynonymJpa;
 import com.jongsoft.finance.messaging.commands.account.*;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.security.AuthenticationFacade;

@@ -1,21 +1,20 @@
 package com.jongsoft.finance.domain.account;
 
-import static org.assertj.core.api.Assertions.*;
-
-import java.time.LocalDate;
-
+import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.contract.AttachFileToContractCommand;
 import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
 import com.jongsoft.finance.messaging.commands.contract.TerminateContract;
+import com.jongsoft.finance.messaging.commands.contract.WarnBeforeExpiryCommand;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.account.events.ContractUploadEvent;
-import com.jongsoft.finance.domain.account.events.ContractWarningEvent;
-import com.jongsoft.finance.messaging.EventBus;
 
-import io.micronaut.context.event.ApplicationEventPublisher;
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ContractTest {
 
@@ -64,14 +63,14 @@ class ContractTest {
         IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
                 contract::warnBeforeExpires);
 
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(ContractWarningEvent.class);
+        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(WarnBeforeExpiryCommand.class);
 
         assertThat(exception.getMessage()).isEqualTo("Cannot activate contract warning if contract has expired.");
     }
 
     @Test
     void warnBeforeExpires() {
-        ArgumentCaptor<ContractWarningEvent> changeCaptor = ArgumentCaptor.forClass(ContractWarningEvent.class);
+        ArgumentCaptor<WarnBeforeExpiryCommand> changeCaptor = ArgumentCaptor.forClass(WarnBeforeExpiryCommand.class);
 
         LocalDate start = LocalDate.now();
         LocalDate end = start.plusYears(1);
@@ -84,7 +83,8 @@ class ContractTest {
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
 
-        assertThat(changeCaptor.getValue().getContractId()).isEqualTo(1L);
+        assertThat(changeCaptor.getValue().id()).isEqualTo(1L);
+        assertThat(changeCaptor.getValue().endDate()).isEqualTo(end);
     }
 
     @Test
@@ -131,7 +131,7 @@ class ContractTest {
 
     @Test
     void registerUpload() {
-        ArgumentCaptor<ContractUploadEvent> changeCaptor = ArgumentCaptor.forClass(ContractUploadEvent.class);
+        ArgumentCaptor<AttachFileToContractCommand> changeCaptor = ArgumentCaptor.forClass(AttachFileToContractCommand.class);
 
         Contract.builder()
                 .id(1L)
@@ -140,8 +140,8 @@ class ContractTest {
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
 
-        assertThat(changeCaptor.getValue().getId()).isEqualTo(1L);
-        assertThat(changeCaptor.getValue().getStorageToken()).isEqualTo("1234-dsfasd");
+        assertThat(changeCaptor.getValue().id()).isEqualTo(1L);
+        assertThat(changeCaptor.getValue().fileCode()).isEqualTo("1234-dsfasd");
     }
 
     @Test

@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.contract;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.account.entity.AccountJpa;
+import com.jongsoft.finance.jpa.account.AccountJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;

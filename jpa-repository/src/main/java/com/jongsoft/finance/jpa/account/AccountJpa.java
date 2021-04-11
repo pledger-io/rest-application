@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.account.entity;
+package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;

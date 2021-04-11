@@ -1,12 +1,8 @@
 package com.jongsoft.finance.jpa.account;
 
-import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.events.*;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
-import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
-import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
-import com.jongsoft.finance.messaging.commands.contract.TerminateContract;
+import com.jongsoft.finance.messaging.commands.contract.*;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
@@ -71,8 +67,7 @@ class ContractEventListenerIT extends JpaTestSetup {
     void handleContractWarning() {
         setup();
         eventPublisher.publishEvent(
-                new ContractWarningEvent(
-                        this,
+                new WarnBeforeExpiryCommand(
                         1L,
                         LocalDate.of(2022, 4, 3)));
 
@@ -85,8 +80,7 @@ class ContractEventListenerIT extends JpaTestSetup {
     void handleContractUpload() {
         setup();
         eventPublisher.publishEvent(
-                new ContractUploadEvent(
-                        this,
+                new AttachFileToContractCommand(
                         1L,
                         "file-token"));
 

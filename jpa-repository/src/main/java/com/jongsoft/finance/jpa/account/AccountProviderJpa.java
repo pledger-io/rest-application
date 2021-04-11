@@ -1,13 +1,12 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.jpa.account.entity.AccountJpa;
 import com.jongsoft.finance.jpa.projections.TripleProjection;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;

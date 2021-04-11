@@ -1,16 +1,15 @@
 package com.jongsoft.finance.bpmn.handler;
 
+import com.jongsoft.finance.annotation.BusinessEventListener;
+import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
+import com.jongsoft.finance.messaging.commands.contract.WarnBeforeExpiryCommand;
+import com.jongsoft.finance.security.AuthenticationFacade;
+import org.camunda.bpm.engine.ProcessEngine;
+
+import javax.inject.Singleton;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Date;
-
-import javax.inject.Singleton;
-
-import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
-import org.camunda.bpm.engine.ProcessEngine;
-import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.domain.account.events.ContractWarningEvent;
-import com.jongsoft.finance.security.AuthenticationFacade;
 
 @Singleton
 public class ContractListener {
@@ -49,12 +48,12 @@ public class ContractListener {
     }
 
     @BusinessEventListener
-    public void handleShouldWarn(ContractWarningEvent event) {
-        var newDueDate = event.getEndDate().minusMonths(1);
+    public void handleShouldWarn(WarnBeforeExpiryCommand event) {
+        var newDueDate = event.endDate().minusMonths(1);
 
         processEngine.getRuntimeService()
                 .createProcessInstanceByKey(BUSINESS_KEY)
-                .businessKey("contract_term_" + event.getContractId())
+                .businessKey("contract_term_" + event.id())
                 .setVariable("warnAt", convert(newDueDate))
                 .setVariable("username", authenticationFacade.authenticated())
                 .execute();

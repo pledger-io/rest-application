@@ -1,21 +1,14 @@
 package com.jongsoft.finance.jpa.transaction.entity;
 
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
-import com.jongsoft.finance.jpa.account.entity.AccountJpa;
+import com.jongsoft.finance.jpa.account.AccountJpa;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.schedule.Periodicity;
-
 import lombok.Builder;
 import lombok.Getter;
+
+import javax.persistence.*;
+import java.time.LocalDate;
 
 @Getter
 @Entity

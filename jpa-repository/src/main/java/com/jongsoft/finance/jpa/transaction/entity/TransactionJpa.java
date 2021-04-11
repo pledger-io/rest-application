@@ -1,17 +1,15 @@
 package com.jongsoft.finance.jpa.transaction.entity;
 
-import java.util.Date;
+import com.jongsoft.finance.jpa.account.AccountJpa;
+import com.jongsoft.finance.jpa.core.entity.AuditedJpa;
+import lombok.Builder;
+import lombok.Getter;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import com.jongsoft.finance.jpa.account.entity.AccountJpa;
-import com.jongsoft.finance.jpa.core.entity.AuditedJpa;
-
-import lombok.Builder;
-import lombok.Getter;
+import java.util.Date;
 
 /**
  * A TransactionJpa is a part of a transaction journal. Usually a transaction journal contains two transactions, being:

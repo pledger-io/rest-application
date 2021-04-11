@@ -1,7 +1,6 @@
-package com.jongsoft.finance.jpa.account.handler;
+package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.account.entity.AccountTypeJpa;
 import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;

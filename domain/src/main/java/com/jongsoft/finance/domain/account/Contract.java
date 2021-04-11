@@ -3,12 +3,8 @@ package com.jongsoft.finance.domain.account;
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
-import com.jongsoft.finance.domain.account.events.ContractUploadEvent;
-import com.jongsoft.finance.domain.account.events.ContractWarningEvent;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
-import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
-import com.jongsoft.finance.messaging.commands.contract.TerminateContract;
+import com.jongsoft.finance.messaging.commands.contract.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -78,7 +74,7 @@ public class Contract implements AggregateBase, Serializable {
 
         if (!notifyBeforeEnd) {
             this.notifyBeforeEnd = true;
-            EventBus.getBus().send(new ContractWarningEvent(this, id, endDate));
+            EventBus.getBus().send(new WarnBeforeExpiryCommand(id, endDate));
         }
     }
 
@@ -89,7 +85,7 @@ public class Contract implements AggregateBase, Serializable {
         }
 
         this.uploaded = true;
-        EventBus.getBus().send(new ContractUploadEvent(this, id, storageToken));
+        EventBus.getBus().send(new AttachFileToContractCommand(id, storageToken));
     }
 
     @BusinessMethod
