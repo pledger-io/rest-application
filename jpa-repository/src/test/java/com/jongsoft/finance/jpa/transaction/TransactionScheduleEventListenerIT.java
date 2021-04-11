@@ -1,13 +1,11 @@
 package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.schedule.ScheduledTransactionJpa;
-import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleCommand;
-import com.jongsoft.finance.messaging.commands.schedule.DescribeScheduleCommand;
-import com.jongsoft.finance.messaging.commands.schedule.LimitScheduleCommand;
-import com.jongsoft.finance.messaging.commands.schedule.RescheduleCommand;
+import com.jongsoft.finance.messaging.commands.schedule.*;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -52,6 +50,28 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
                 Account.builder().id(2L).build(),
                 20.2));
 
+    }
+
+    @Test
+    void handleCreateByContract() {
+        setup();
+        eventPublisher.publishEvent(new CreateScheduleForContractCommand(
+                "ut_create_by_contract",
+                new ScheduleValue(Periodicity.MONTHS, 3),
+                Contract.builder().id(1L).company(Account.builder().id(1L).build()).build(),
+                Account.builder().id(1L).build(),
+                500));
+
+        var created = entityManager.createQuery(
+                "from ScheduledTransactionJpa where name = :name", ScheduledTransactionJpa.class)
+                .setParameter("name", "ut_create_by_contract")
+                .getSingleResult();
+
+        Assertions.assertThat(created).isNotNull();
+        Assertions.assertThat(created.getContract().getId()).isEqualTo(1L);
+        Assertions.assertThat(created.getName()).isEqualTo("ut_create_by_contract");
+        Assertions.assertThat(created.getInterval()).isEqualTo(3);
+        Assertions.assertThat(created.getPeriodicity()).isEqualTo(Periodicity.MONTHS);
     }
 
     @Test

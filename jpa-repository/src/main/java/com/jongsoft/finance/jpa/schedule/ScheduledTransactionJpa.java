@@ -1,6 +1,7 @@
 package com.jongsoft.finance.jpa.schedule;
 
 import com.jongsoft.finance.jpa.account.AccountJpa;
+import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.schedule.Periodicity;
@@ -39,6 +40,9 @@ public class ScheduledTransactionJpa extends EntityJpa {
     @ManyToOne
     private AccountJpa destination;
 
+    @ManyToOne
+    private ContractJpa contract;
+
     @Builder
     public ScheduledTransactionJpa(
             LocalDate start,
@@ -50,7 +54,8 @@ public class ScheduledTransactionJpa extends EntityJpa {
             int interval,
             UserAccountJpa user,
             AccountJpa source,
-            AccountJpa destination) {
+            AccountJpa destination,
+            ContractJpa contract) {
         this.start = start;
         this.end = end;
         this.amount = amount;
@@ -61,6 +66,7 @@ public class ScheduledTransactionJpa extends EntityJpa {
         this.user = user;
         this.source = source;
         this.destination = destination;
+        this.contract = contract;
     }
 
     public ScheduledTransactionJpa() {

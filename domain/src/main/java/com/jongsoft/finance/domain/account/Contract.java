@@ -5,6 +5,8 @@ import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.contract.*;
+import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleForContractCommand;
+import com.jongsoft.finance.schedule.Schedule;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -46,6 +48,16 @@ public class Contract implements AggregateBase, Serializable {
         this.description = description;
 
         EventBus.getBus().send(new CreateContractCommand(company.getId(), name, description, start, end));
+    }
+
+    @BusinessMethod
+    public void createSchedule(Schedule schedule, Account source, double amount) {
+        EventBus.getBus().send(new CreateScheduleForContractCommand(
+                this.name,
+                schedule,
+                this,
+                source,
+                amount));
     }
 
     @BusinessMethod

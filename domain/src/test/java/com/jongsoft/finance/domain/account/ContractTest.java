@@ -1,10 +1,13 @@
 package com.jongsoft.finance.domain.account;
 
+import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.contract.AttachFileToContractCommand;
 import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
 import com.jongsoft.finance.messaging.commands.contract.TerminateContract;
 import com.jongsoft.finance.messaging.commands.contract.WarnBeforeExpiryCommand;
+import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleForContractCommand;
+import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +38,31 @@ class ContractTest {
                 () -> new Contract(null, "Sample", "", start, end));
 
         assertThat(exception.getMessage()).isEqualTo("Start cannot be after end of contract.");
+    }
+
+    @Test
+    void createSchedule()  {
+        Contract.builder()
+                .id(1L)
+                .company(Account.builder().id(1L).build())
+                .name("Transaction scheduled")
+                .description("Test contract")
+                .startDate(LocalDate.of(2019, 1, 1))
+                .endDate(LocalDate.of(2020, 1, 1))
+                .build()
+                .createSchedule(
+                        new ScheduleValue(Periodicity.MONTHS, 1),
+                        Account.builder().id(2L).build(),
+                        22.50);
+
+        var captor = ArgumentCaptor.forClass(CreateScheduleForContractCommand.class);
+        Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
+
+        assertThat(captor.getValue().amount()).isEqualTo(22.50);
+        assertThat(captor.getValue().contract().getDescription()).isEqualTo("Test contract");
+        assertThat(captor.getValue().name()).isEqualTo("Transaction scheduled");
+        assertThat(captor.getValue().source().getId()).isEqualTo(2L);
+        assertThat(captor.getValue().schedule()).isEqualTo(new ScheduleValue(Periodicity.MONTHS, 1));
     }
 
     @Test
