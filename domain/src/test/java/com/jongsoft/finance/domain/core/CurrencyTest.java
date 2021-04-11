@@ -1,16 +1,16 @@
 package com.jongsoft.finance.domain.core;
 
+import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.currency.ChangeCurrencyPropertyCommand;
+import com.jongsoft.finance.messaging.commands.currency.CreateCurrencyCommand;
+import com.jongsoft.finance.messaging.commands.currency.CurrencyCommandType;
+import com.jongsoft.finance.messaging.commands.currency.RenameCurrencyCommand;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.account.events.CurrencyCreatedEvent;
-import com.jongsoft.finance.domain.core.events.CurrencyPropertyEvent;
-import com.jongsoft.finance.domain.core.events.CurrencyRenameEvent;
-import com.jongsoft.finance.messaging.EventBus;
-
-import io.micronaut.context.event.ApplicationEventPublisher;
 
 class CurrencyTest {
 
@@ -27,12 +27,12 @@ class CurrencyTest {
     void newTest() {
         new Currency("Euro", "EUR", 'E');
 
-        var captor = ArgumentCaptor.forClass(CurrencyCreatedEvent.class);
+        var captor = ArgumentCaptor.forClass(CreateCurrencyCommand.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());
 
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo("EUR");
-        Assertions.assertThat(captor.getValue().getName()).isEqualTo("Euro");
-        Assertions.assertThat(captor.getValue().getSymbol()).isEqualTo('E');
+        Assertions.assertThat(captor.getValue().isoCode()).isEqualTo("EUR");
+        Assertions.assertThat(captor.getValue().name()).isEqualTo("Euro");
+        Assertions.assertThat(captor.getValue().symbol()).isEqualTo('E');
     }
 
     @Test
@@ -46,12 +46,12 @@ class CurrencyTest {
 
         currency.rename("Dollar", "USD", 'U');
 
-        var captor = ArgumentCaptor.forClass(CurrencyRenameEvent.class);
+        var captor = ArgumentCaptor.forClass(RenameCurrencyCommand.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());
 
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo("USD");
-        Assertions.assertThat(captor.getValue().getName()).isEqualTo("Dollar");
-        Assertions.assertThat(captor.getValue().getSymbol()).isEqualTo('U');
+        Assertions.assertThat(captor.getValue().isoCode()).isEqualTo("USD");
+        Assertions.assertThat(captor.getValue().name()).isEqualTo("Dollar");
+        Assertions.assertThat(captor.getValue().symbol()).isEqualTo('U');
     }
 
     @Test
@@ -66,12 +66,12 @@ class CurrencyTest {
 
         currency.enable();
 
-        var captor = ArgumentCaptor.forClass(CurrencyPropertyEvent.class);
+        var captor = ArgumentCaptor.forClass(ChangeCurrencyPropertyCommand.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());
 
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo("EUR");
-        Assertions.assertThat(captor.getValue().getValue()).isEqualTo(true);
-        Assertions.assertThat(captor.getValue().getType()).isEqualTo(CurrencyPropertyEvent.Type.ENABLED);
+        Assertions.assertThat(captor.getValue().code()).isEqualTo("EUR");
+        Assertions.assertThat(captor.getValue().value()).isEqualTo(true);
+        Assertions.assertThat(captor.getValue().type()).isEqualTo(CurrencyCommandType.ENABLED);
     }
 
     @Test
@@ -86,7 +86,7 @@ class CurrencyTest {
 
         currency.enable();
 
-        Mockito.verify(eventPublisher, Mockito.never()).publishEvent(CurrencyPropertyEvent.class);
+        Mockito.verify(eventPublisher, Mockito.never()).publishEvent(ChangeCurrencyPropertyCommand.class);
     }
 
     @Test
@@ -101,12 +101,12 @@ class CurrencyTest {
 
         currency.disable();
 
-        var captor = ArgumentCaptor.forClass(CurrencyPropertyEvent.class);
+        var captor = ArgumentCaptor.forClass(ChangeCurrencyPropertyCommand.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());
 
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo("EUR");
-        Assertions.assertThat(captor.getValue().getValue()).isEqualTo(false);
-        Assertions.assertThat(captor.getValue().getType()).isEqualTo(CurrencyPropertyEvent.Type.ENABLED);
+        Assertions.assertThat(captor.getValue().code()).isEqualTo("EUR");
+        Assertions.assertThat(captor.getValue().value()).isEqualTo(false);
+        Assertions.assertThat(captor.getValue().type()).isEqualTo(CurrencyCommandType.ENABLED);
     }
 
     @Test
@@ -121,7 +121,7 @@ class CurrencyTest {
 
         currency.disable();
 
-        Mockito.verify(eventPublisher, Mockito.never()).publishEvent(CurrencyPropertyEvent.class);
+        Mockito.verify(eventPublisher, Mockito.never()).publishEvent(ChangeCurrencyPropertyCommand.class);
     }
 
     @Test
@@ -137,11 +137,11 @@ class CurrencyTest {
 
         currency.accuracy(12);
 
-        var captor = ArgumentCaptor.forClass(CurrencyPropertyEvent.class);
+        var captor = ArgumentCaptor.forClass(ChangeCurrencyPropertyCommand.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());
 
-        Assertions.assertThat(captor.getValue().getCode()).isEqualTo("EUR");
-        Assertions.assertThat(captor.getValue().getValue()).isEqualTo(12);
-        Assertions.assertThat(captor.getValue().getType()).isEqualTo(CurrencyPropertyEvent.Type.DECIMAL_PLACES);
+        Assertions.assertThat(captor.getValue().code()).isEqualTo("EUR");
+        Assertions.assertThat(captor.getValue().value()).isEqualTo(12);
+        Assertions.assertThat(captor.getValue().type()).isEqualTo(CurrencyCommandType.DECIMAL_PLACES);
     }
 }

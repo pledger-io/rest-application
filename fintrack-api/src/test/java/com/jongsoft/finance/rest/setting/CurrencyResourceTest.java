@@ -1,9 +1,9 @@
 package com.jongsoft.finance.rest.setting;
 
-import com.jongsoft.finance.domain.account.events.CurrencyCreatedEvent;
 import com.jongsoft.finance.domain.core.Currency;
-import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.currency.CreateCurrencyCommand;
+import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Maybe;
@@ -79,7 +79,7 @@ class CurrencyResourceTest {
         Assertions.assertThat(response.getName()).isEqualTo("Test currency");
         Assertions.assertThat(response.getSymbol()).isEqualTo('S');
 
-        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CurrencyCreatedEvent.class));
+        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateCurrencyCommand.class));
     }
 
     @Test

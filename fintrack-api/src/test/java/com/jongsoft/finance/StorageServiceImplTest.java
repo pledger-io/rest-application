@@ -2,8 +2,8 @@ package com.jongsoft.finance;
 
 import com.jongsoft.finance.configuration.SecuritySettings;
 import com.jongsoft.finance.configuration.StorageSettings;
-import com.jongsoft.finance.domain.core.events.StorageReplacedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.messaging.commands.storage.ReplaceFileCommand;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import org.assertj.core.api.Assertions;
 import org.jboss.aerogear.security.otp.api.Base32;
@@ -67,7 +67,9 @@ class StorageServiceImplTest {
     void storageChange() {
         var storageKey = subject.store("My private text".getBytes());
 
-        subject.onStorageChangeEvent(new StorageReplacedEvent("new-code", storageKey));
+        var command = Mockito.mock(ReplaceFileCommand.class);
+        Mockito.when(command.oldFileCode()).thenReturn(storageKey);
+        subject.onStorageChangeEvent(command);
         Assertions.assertThat(new File(System.getProperty("java.io.tmpdir") + "/upload/" + storageKey)).doesNotExist();
     }
 }

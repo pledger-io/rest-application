@@ -3,10 +3,11 @@ package com.jongsoft.finance.domain.core;
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
-import com.jongsoft.finance.domain.account.events.CurrencyCreatedEvent;
-import com.jongsoft.finance.domain.core.events.CurrencyPropertyEvent;
-import com.jongsoft.finance.domain.core.events.CurrencyRenameEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.currency.ChangeCurrencyPropertyCommand;
+import com.jongsoft.finance.messaging.commands.currency.CreateCurrencyCommand;
+import com.jongsoft.finance.messaging.commands.currency.CurrencyCommandType;
+import com.jongsoft.finance.messaging.commands.currency.RenameCurrencyCommand;
 import com.jongsoft.lang.Control;
 import lombok.*;
 
@@ -32,8 +33,7 @@ public class Currency implements AggregateBase {
         this.enabled = true;
 
         EventBus.getBus().send(
-                new CurrencyCreatedEvent(
-                        this,
+                new CreateCurrencyCommand(
                         name,
                         symbol,
                         code
@@ -54,8 +54,7 @@ public class Currency implements AggregateBase {
             this.symbol = symbol;
 
             EventBus.getBus().send(
-                    new CurrencyRenameEvent(
-                            this,
+                    new RenameCurrencyCommand(
                             id,
                             name,
                             symbol,
@@ -71,11 +70,10 @@ public class Currency implements AggregateBase {
             enabled = false;
 
             EventBus.getBus().send(
-                    new CurrencyPropertyEvent<>(
-                            this,
+                    new ChangeCurrencyPropertyCommand<>(
                             code,
                             false,
-                            CurrencyPropertyEvent.Type.ENABLED
+                            CurrencyCommandType.ENABLED
                     )
             );
         }
@@ -87,11 +85,10 @@ public class Currency implements AggregateBase {
             enabled = true;
 
             EventBus.getBus().send(
-                    new CurrencyPropertyEvent<>(
-                            this,
+                    new ChangeCurrencyPropertyCommand<>(
                             code,
                             true,
-                            CurrencyPropertyEvent.Type.ENABLED
+                            CurrencyCommandType.ENABLED
                     )
             );
         }
@@ -104,11 +101,10 @@ public class Currency implements AggregateBase {
 
 
             EventBus.getBus().send(
-                    new CurrencyPropertyEvent<>(
-                            this,
+                    new ChangeCurrencyPropertyCommand<>(
                             code,
                             decimalPlaces,
-                            CurrencyPropertyEvent.Type.DECIMAL_PLACES
+                            CurrencyCommandType.DECIMAL_PLACES
                     )
             );
         }

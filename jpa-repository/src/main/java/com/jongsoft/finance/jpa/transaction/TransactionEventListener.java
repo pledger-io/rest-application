@@ -7,7 +7,7 @@ import com.jongsoft.finance.domain.transaction.events.*;
 import com.jongsoft.finance.jpa.account.AccountJpa;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
-import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
+import com.jongsoft.finance.jpa.currency.CurrencyJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.transaction.entity.TagJpa;
 import com.jongsoft.finance.jpa.transaction.entity.TransactionJournal;

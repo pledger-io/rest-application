@@ -1,34 +1,22 @@
 package com.jongsoft.finance.jpa.transaction.entity;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.Set;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.Where;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.core.TransactionType;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.core.entity.AuditedJpa;
-import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
+import com.jongsoft.finance.jpa.currency.CurrencyJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.user.entity.CategoryJpa;
 import com.jongsoft.finance.jpa.user.entity.ExpenseJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
-
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.Where;
+
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Getter

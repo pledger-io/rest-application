@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.account;
 
-import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
+import com.jongsoft.finance.jpa.currency.CurrencyJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.schedule.Periodicity;
 import lombok.Builder;

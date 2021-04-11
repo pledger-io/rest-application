@@ -4,7 +4,7 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.configuration.SecuritySettings;
 import com.jongsoft.finance.configuration.StorageSettings;
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.core.events.StorageReplacedEvent;
+import com.jongsoft.finance.messaging.commands.storage.ReplaceFileCommand;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.Encryption;
 import com.jongsoft.lang.Control;
@@ -98,9 +98,9 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @BusinessEventListener
-    public void onStorageChangeEvent(StorageReplacedEvent event) {
-        if (event.getOldFileCode() != null) {
-            this.remove(event.getOldFileCode());
+    public void onStorageChangeEvent(ReplaceFileCommand event) {
+        if (event.oldFileCode() != null) {
+            this.remove(event.oldFileCode());
         }
     }
 

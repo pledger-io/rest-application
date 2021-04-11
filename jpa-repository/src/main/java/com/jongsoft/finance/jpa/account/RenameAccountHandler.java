@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.core.entity.CurrencyJpa;
+import com.jongsoft.finance.jpa.currency.CurrencyJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.account.RenameAccountCommand;

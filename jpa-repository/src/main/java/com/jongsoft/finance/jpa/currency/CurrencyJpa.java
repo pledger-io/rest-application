@@ -1,10 +1,11 @@
-package com.jongsoft.finance.jpa.core.entity;
+package com.jongsoft.finance.jpa.currency;
+
+import com.jongsoft.finance.jpa.core.entity.EntityJpa;
+import lombok.Builder;
+import lombok.Getter;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import lombok.Builder;
-import lombok.Getter;
 
 @Getter
 @Entity

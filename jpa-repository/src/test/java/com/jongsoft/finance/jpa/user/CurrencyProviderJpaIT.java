@@ -1,9 +1,10 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.domain.account.events.CurrencyCreatedEvent;
-import com.jongsoft.finance.providers.CurrencyProvider;
-import com.jongsoft.finance.domain.core.events.CurrencyPropertyEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.messaging.commands.currency.ChangeCurrencyPropertyCommand;
+import com.jongsoft.finance.messaging.commands.currency.CreateCurrencyCommand;
+import com.jongsoft.finance.messaging.commands.currency.CurrencyCommandType;
+import com.jongsoft.finance.providers.CurrencyProvider;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,8 +49,7 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
                 .isEmpty().blockingGet();
         Assertions.assertThat(check).isTrue();
 
-        eventPublisher.publishEvent(new CurrencyCreatedEvent(
-                this,
+        eventPublisher.publishEvent(new CreateCurrencyCommand(
                 "Mistral",
                 'D',
                 "MST"
@@ -65,11 +65,10 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
     @Test
     void handleProperty_decimalPlaces() {
         init();
-        eventPublisher.publishEvent(new CurrencyPropertyEvent<>(
-                this,
+        eventPublisher.publishEvent(new ChangeCurrencyPropertyCommand<>(
                 "EUR",
                 12,
-                CurrencyPropertyEvent.Type.DECIMAL_PLACES
+                CurrencyCommandType.DECIMAL_PLACES
         ));
 
         var check = currencyProvider.lookup("EUR").blockingGet();
@@ -80,11 +79,10 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
     @Test
     void handleProperty_enable() {
         init();
-        eventPublisher.publishEvent(new CurrencyPropertyEvent<>(
-                this,
+        eventPublisher.publishEvent(new ChangeCurrencyPropertyCommand<>(
                 "EUR",
                 false,
-                CurrencyPropertyEvent.Type.ENABLED
+                CurrencyCommandType.ENABLED
         ));
 
         var check = currencyProvider.lookup("EUR").blockingGet();
