@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.transaction.entity;
+package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.jpa.account.AccountJpa;
 import com.jongsoft.finance.jpa.core.entity.AuditedJpa;
@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -34,7 +35,7 @@ public class TransactionJpa extends AuditedJpa {
     @JoinColumn(nullable = false, updatable = false)
     private TransactionJournal journal;
 
-    private double amount;
+    private BigDecimal amount;
     private String description;
 
     public TransactionJpa() {
@@ -48,7 +49,7 @@ public class TransactionJpa extends AuditedJpa {
             Date deleted,
             AccountJpa account,
             TransactionJournal journal,
-            double amount,
+            BigDecimal amount,
             String description) {
         super(id, created, updated, deleted);
 

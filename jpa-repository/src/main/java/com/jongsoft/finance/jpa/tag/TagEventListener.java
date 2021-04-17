@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.transaction;
+package com.jongsoft.finance.jpa.tag;
 
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -10,7 +10,6 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
-import com.jongsoft.finance.jpa.transaction.entity.TagJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 
 @Singleton

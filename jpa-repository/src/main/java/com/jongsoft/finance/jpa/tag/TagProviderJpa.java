@@ -1,10 +1,9 @@
-package com.jongsoft.finance.jpa.transaction;
+package com.jongsoft.finance.jpa.tag;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
-import com.jongsoft.finance.jpa.transaction.entity.TagJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import io.reactivex.Maybe;

@@ -5,7 +5,6 @@ import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.jpa.transaction.entity.DailySummaryImpl;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import io.micronaut.test.annotation.MockBean;

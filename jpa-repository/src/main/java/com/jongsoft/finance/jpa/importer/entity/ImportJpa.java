@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.importer.entity;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
-import com.jongsoft.finance.jpa.transaction.entity.TransactionJournal;
+import com.jongsoft.finance.jpa.transaction.TransactionJournal;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import lombok.Builder;
 import lombok.Getter;

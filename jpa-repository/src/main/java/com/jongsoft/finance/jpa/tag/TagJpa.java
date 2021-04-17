@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.transaction.entity;
+package com.jongsoft.finance.jpa.tag;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;

@@ -8,7 +8,7 @@ import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.jpa.account.AccountFilterCommand;
-import com.jongsoft.finance.jpa.transaction.TagFilterCommand;
+import com.jongsoft.finance.jpa.tag.TagFilterCommand;
 import com.jongsoft.finance.jpa.transaction.TransactionFilterCommand;
 import com.jongsoft.finance.jpa.user.CategoryFilterCommand;
 import com.jongsoft.finance.jpa.user.ExpenseFilterCommand;

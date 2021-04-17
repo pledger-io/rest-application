@@ -9,9 +9,7 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
-import com.jongsoft.finance.jpa.transaction.entity.TagJpa;
-import com.jongsoft.finance.jpa.transaction.entity.TransactionJournal;
-import com.jongsoft.finance.jpa.transaction.entity.TransactionJpa;
+import com.jongsoft.finance.jpa.tag.TagJpa;
 import com.jongsoft.finance.jpa.user.entity.CategoryJpa;
 import com.jongsoft.finance.jpa.user.entity.ExpenseJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -100,12 +98,12 @@ public class TransactionProviderJpa implements TransactionProvider {
             delegate.user(authenticationFacade.authenticated());
 
             var hql = """
-                    select new com.jongsoft.finance.jpa.transaction.entity.DailySummaryImpl(
+                    select new %s(
                        a.date,
                        sum(t.amount))
                        %s
                        group by a.date
-                       order by a.date asc""".formatted(delegate.generateHql());
+                       order by a.date asc""".formatted(DailySummaryImpl.class.getName(), delegate.generateHql());
 
             return entityManager.<DailySummary>blocking()
                     .hql(hql)
@@ -203,7 +201,7 @@ public class TransactionProviderJpa implements TransactionProvider {
                                 .type(transaction.getAccount().getType().getLabel())
                                 .imageFileToken(transaction.getAccount().getImageFileToken())
                                 .build())
-                .amount(transaction.getAmount())
+                .amount(transaction.getAmount().doubleValue())
                 .description(transaction.getDescription())
                 .build();
     }

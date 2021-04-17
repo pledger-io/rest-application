@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.transaction;
+package com.jongsoft.finance.jpa.rule;
 
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.domain.transaction.events.TransactionRuleSortedEvent;
-import com.jongsoft.finance.jpa.transaction.entity.RuleJpa;
 
 @Singleton
 @Transactional

@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.transaction.entity;
+package com.jongsoft.finance.jpa.transaction;
 
 import java.time.LocalDate;
 import java.util.Objects;

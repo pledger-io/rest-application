@@ -35,6 +35,12 @@ public class ReactiveEntityManager {
         return new NonReactivePipe<T>(entityManager);
     }
 
+    public <T> T getDetached(Class<T> type, Map<String, Object> filter) {
+        var value = get(type, filter);
+        entityManager.detach(value);
+        return value;
+    }
+
     public <T> T get(Class<T> type, Map<String, Object> filter) {
         String hql = "from " + type.getName() +
                 filter.foldLeft(

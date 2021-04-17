@@ -1,11 +1,10 @@
-package com.jongsoft.finance.jpa.transaction;
+package com.jongsoft.finance.jpa.rule;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreatedEvent;
 import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupRenamedEvent;
 import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupSortedEvent;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
-import com.jongsoft.finance.jpa.transaction.entity.RuleGroupJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Control;

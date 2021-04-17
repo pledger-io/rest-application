@@ -2,11 +2,11 @@ package com.jongsoft.finance.domain.account;
 
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.events.TransactionCreatedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.account.*;
 import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
+import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.Assertions;
@@ -157,7 +157,7 @@ class AccountTest {
 
     @Test
     void createTransaction_debit() {
-        ArgumentCaptor<TransactionCreatedEvent> changeCaptor = ArgumentCaptor.forClass(TransactionCreatedEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(CreateTransactionCommand.class);
 
         final Transaction transaction = account.createTransaction(account2, 2500, Transaction.Type.DEBIT, t -> {});
         transaction.register();
@@ -174,7 +174,7 @@ class AccountTest {
 
     @Test
     void createTransaction_credit() {
-        ArgumentCaptor<TransactionCreatedEvent> changeCaptor = ArgumentCaptor.forClass(TransactionCreatedEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(CreateTransactionCommand.class);
 
         final Transaction transaction = account.createTransaction(account2, 2500, Transaction.Type.CREDIT, t -> {});
         transaction.register();

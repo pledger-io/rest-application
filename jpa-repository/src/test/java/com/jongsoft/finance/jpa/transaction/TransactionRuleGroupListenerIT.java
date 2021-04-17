@@ -4,7 +4,7 @@ import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreate
 import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupRenamedEvent;
 import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupSortedEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.jpa.transaction.entity.RuleGroupJpa;
+import com.jongsoft.finance.jpa.rule.RuleGroupJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;

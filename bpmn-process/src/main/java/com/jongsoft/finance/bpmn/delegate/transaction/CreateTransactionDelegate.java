@@ -3,10 +3,10 @@ package com.jongsoft.finance.bpmn.delegate.transaction;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
-import com.jongsoft.finance.domain.transaction.events.TransactionCreatedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -57,7 +57,7 @@ public class CreateTransactionDelegate implements JavaDelegate {
                         .description(parsedTransaction.getDescription())
                         .importSlug(batchImportSlug));
 
-        long transactionId = creationHandler.handleCreatedEvent(new TransactionCreatedEvent(transaction));
+        long transactionId = creationHandler.handleCreatedEvent(new CreateTransactionCommand(transaction));
 
         execution.setVariable("transactionId", transactionId);
     }

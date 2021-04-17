@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.transaction;
+package com.jongsoft.finance.jpa.tag;
 
 import java.util.Objects;
 
