@@ -2,15 +2,15 @@ package com.jongsoft.finance.domain.transaction;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.jongsoft.finance.messaging.commands.rule.ChangeConditionCommand;
+import com.jongsoft.finance.messaging.commands.rule.ChangeRuleCommand;
+import com.jongsoft.finance.messaging.commands.rule.ReorderRuleCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
-import com.jongsoft.finance.domain.transaction.events.RuleChangeUpdatedEvent;
-import com.jongsoft.finance.domain.transaction.events.RuleConditionUpdatedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleSortedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -42,7 +42,7 @@ class TransactionRuleTest {
 
     @Test
     void changeOrder() {
-        ArgumentCaptor<TransactionRuleSortedEvent> captor = ArgumentCaptor.forClass(TransactionRuleSortedEvent.class);
+        var captor = ArgumentCaptor.forClass(ReorderRuleCommand.class);
         final TransactionRule rule = TransactionRule.builder()
                 .id(1L)
                 .sort(1)
@@ -55,8 +55,8 @@ class TransactionRuleTest {
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
 
         assertThat(rule.getSort()).isEqualTo(4);
-        assertThat(captor.getValue().getSort()).isEqualTo(4);
-        assertThat(captor.getValue().getRuleId()).isEqualTo(1L);
+        assertThat(captor.getValue().sort()).isEqualTo(4);
+        assertThat(captor.getValue().id()).isEqualTo(1L);
     }
 
     @Test
@@ -125,7 +125,7 @@ class TransactionRuleTest {
 
     @Test
     void ruleConditionUpdate() {
-        ArgumentCaptor<RuleConditionUpdatedEvent> captor = ArgumentCaptor.forClass(RuleConditionUpdatedEvent.class);
+        var captor = ArgumentCaptor.forClass(ChangeConditionCommand.class);
 
         final TransactionRule rule = TransactionRule.builder().build();
 
@@ -134,15 +134,15 @@ class TransactionRuleTest {
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
 
-        assertThat(captor.getValue().getRuleConditionId()).isEqualTo(1L);
-        assertThat(captor.getValue().getCondition()).isEqualTo("salary");
-        assertThat(captor.getValue().getField()).isEqualTo(RuleColumn.CATEGORY);
-        assertThat(captor.getValue().getOperation()).isEqualTo(RuleOperation.EQUALS);
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().condition()).isEqualTo("salary");
+        assertThat(captor.getValue().field()).isEqualTo(RuleColumn.CATEGORY);
+        assertThat(captor.getValue().operation()).isEqualTo(RuleOperation.EQUALS);
     }
 
     @Test
     void ruleChangeUpdate() {
-        ArgumentCaptor<RuleChangeUpdatedEvent> captor = ArgumentCaptor.forClass(RuleChangeUpdatedEvent.class);
+        var captor = ArgumentCaptor.forClass(ChangeRuleCommand.class);
 
         final TransactionRule rule = TransactionRule.builder().build();
         rule.new Change(1L, RuleColumn.AMOUNT, "20.3")
@@ -150,9 +150,9 @@ class TransactionRuleTest {
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
 
-        assertThat(captor.getValue().getRuleChangeId()).isEqualTo(1L);
-        assertThat(captor.getValue().getColumn()).isEqualTo(RuleColumn.TO_ACCOUNT);
-        assertThat(captor.getValue().getChange()).isEqualTo("3");
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().column()).isEqualTo(RuleColumn.TO_ACCOUNT);
+        assertThat(captor.getValue().change()).isEqualTo("3");
     }
 
 }

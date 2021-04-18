@@ -6,11 +6,11 @@ import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.Removable;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
-import com.jongsoft.finance.domain.transaction.events.RuleChangeUpdatedEvent;
-import com.jongsoft.finance.domain.transaction.events.RuleConditionUpdatedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleSortedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.rule.ChangeConditionCommand;
+import com.jongsoft.finance.messaging.commands.rule.ChangeRuleCommand;
+import com.jongsoft.finance.messaging.commands.rule.ReorderRuleCommand;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.List;
@@ -55,7 +55,7 @@ public class TransactionRule implements AggregateBase {
                 this.operation = operation;
                 this.condition = condition;
 
-                EventBus.getBus().send(new RuleConditionUpdatedEvent(this, id, field, operation, condition));
+                EventBus.getBus().send(new ChangeConditionCommand(id, field, operation, condition));
             }
         }
 
@@ -88,7 +88,7 @@ public class TransactionRule implements AggregateBase {
                 this.field = ruleColumn;
                 this.change = change;
 
-                EventBus.getBus().send(new RuleChangeUpdatedEvent(this, id, ruleColumn, change));
+                EventBus.getBus().send(new ChangeRuleCommand(id, ruleColumn, change));
             }
         }
 
@@ -149,7 +149,7 @@ public class TransactionRule implements AggregateBase {
         if (this.sort != sort) {
             this.sort = sort;
             if (id != null) {
-                EventBus.getBus().send(new TransactionRuleSortedEvent(this, id, sort));
+                EventBus.getBus().send(new ReorderRuleCommand(id, sort));
             }
         }
     }
