@@ -1,8 +1,8 @@
 package com.jongsoft.finance.jpa.importer;
 
-import com.jongsoft.finance.domain.importer.events.BatchImportConfigCreatedEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.importer.entity.CSVImportConfig;
+import com.jongsoft.finance.messaging.commands.importer.CreateConfigurationCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
@@ -36,11 +36,7 @@ class CSVConfigEventListenerIT extends JpaTestSetup {
     void handleCreatedEvent() {
         setup();
         eventPublisher.publishEvent(
-                new BatchImportConfigCreatedEvent(
-                        this,
-                        null,
-                        "test-config",
-                        "file-code-3"));
+                new CreateConfigurationCommand("test-config", "file-code-3"));
 
         var query = entityManager.createQuery("select c from CSVImportConfig c where c.name = 'test-config'");
         var check = (CSVImportConfig) query.getSingleResult();

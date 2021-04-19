@@ -4,11 +4,11 @@ import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.importer.events.BatchImportCreatedEvent;
-import com.jongsoft.finance.domain.importer.events.BatchImportDeletedEvent;
-import com.jongsoft.finance.domain.importer.events.BatchImportFinishedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.importer.CompleteImportJobCommand;
+import com.jongsoft.finance.messaging.commands.importer.CreateImportJobCommand;
+import com.jongsoft.finance.messaging.commands.importer.DeleteImportJobCommand;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -44,7 +44,7 @@ public class BatchImport implements AggregateBase {
         this.config = config;
         this.fileCode = fileCode;
 
-        EventBus.getBus().send(new BatchImportCreatedEvent(this, config, user, slug, fileCode));
+        EventBus.getBus().send(new CreateImportJobCommand(config.getId(), slug, fileCode));
     }
 
     public void archive() {
@@ -52,7 +52,7 @@ public class BatchImport implements AggregateBase {
             throw StatusException.badRequest("Cannot archive an import job that has finished running.");
         }
 
-        EventBus.getBus().send(new BatchImportDeletedEvent(this.id));
+        EventBus.getBus().send(new DeleteImportJobCommand(id));
     }
 
     @BusinessMethod
@@ -62,7 +62,7 @@ public class BatchImport implements AggregateBase {
         }
 
         this.finished = date;
-        EventBus.getBus().send(new BatchImportFinishedEvent(this, id));
+        EventBus.getBus().send(new CompleteImportJobCommand(id));
     }
 
 }

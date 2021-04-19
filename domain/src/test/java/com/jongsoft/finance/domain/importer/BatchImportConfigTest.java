@@ -1,16 +1,15 @@
 package com.jongsoft.finance.domain.importer;
 
-import static org.assertj.core.api.Assertions.*;
-
+import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.importer.CreateConfigurationCommand;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.importer.events.BatchImportCreatedEvent;
-import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.messaging.EventBus;
 
-import io.micronaut.context.event.ApplicationEventPublisher;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class BatchImportConfigTest {
 
@@ -35,13 +34,12 @@ class BatchImportConfigTest {
 
     @Test
     void createImport() {
-        ArgumentCaptor<BatchImportCreatedEvent> changeCaptor = ArgumentCaptor.forClass(BatchImportCreatedEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(CreateConfigurationCommand.class);
 
         subject.createImport("sample content");
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
 
-        assertThat(changeCaptor.getValue().getConfig()).isEqualTo(subject);
-        assertThat(changeCaptor.getValue().getUser()).isEqualTo(subject.getUser());
+        assertThat(changeCaptor.getValue().fileCode()).isEqualTo("sample content");
     }
 }

@@ -1,9 +1,9 @@
 package com.jongsoft.finance.domain.importer;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.importer.events.BatchImportDeletedEvent;
-import com.jongsoft.finance.domain.importer.events.BatchImportFinishedEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.importer.CompleteImportJobCommand;
+import com.jongsoft.finance.messaging.commands.importer.DeleteImportJobCommand;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class BatchImportTest {
 
     @Test
     void delete() {
-        var captor = ArgumentCaptor.forClass(BatchImportDeletedEvent.class);
+        var captor = ArgumentCaptor.forClass(DeleteImportJobCommand.class);
 
         BatchImport.builder()
                 .id(1L)
@@ -35,7 +35,7 @@ class BatchImportTest {
                 .archive();
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getId()).isEqualTo(1L);
+        assertThat(captor.getValue().id()).isEqualTo(1L);
     }
 
     @Test
@@ -52,7 +52,7 @@ class BatchImportTest {
 
     @Test
     void finish() {
-        ArgumentCaptor<BatchImportFinishedEvent> captor = ArgumentCaptor.forClass(BatchImportFinishedEvent.class);
+        var captor = ArgumentCaptor.forClass(CompleteImportJobCommand.class);
 
         BatchImport.builder()
                 .id(1L)
@@ -60,7 +60,7 @@ class BatchImportTest {
                 .finish(new Date(2019, 1, 1));
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getImportId()).isEqualTo(1L);
+        assertThat(captor.getValue().id()).isEqualTo(1L);
     }
 
     @Test
