@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.contract;
 
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.account.Contract;
@@ -9,6 +10,7 @@ import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.rest.model.ContractResponse;
+import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -217,6 +219,22 @@ class ContractResourceTest extends TestSetup {
         var response = subject.get(1L).blockingGet();
 
         Assertions.assertThat(response.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void schedule() {
+        final Contract contract = Mockito.mock(Contract.class);
+        final Account account = Account.builder().id(1L).build();
+
+        Mockito.when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
+
+        subject.schedule(1L, new CreateScheduleRequest(
+                new CreateScheduleRequest.ScheduleValueJson(Periodicity.MONTHS, 3),
+                new CreateScheduleRequest.EntityRef(1L, null),
+                20.2));
+
+        Mockito.verify(contract).createSchedule(new ScheduleValue(Periodicity.MONTHS, 3), account, 20.2);
     }
 
     @Test

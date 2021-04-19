@@ -138,6 +138,24 @@ public class ContractResource {
         });
     }
 
+    @Put("/{contractId}/schedule")
+    @Operation(
+            summary = "Schedule transaction",
+            description = "Create a new schedule for creating transaction under this contract.",
+            parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
+    )
+    void schedule(@PathVariable long contractId, @Body @Valid CreateScheduleRequest request) {
+        var account = accountProvider.lookup(request.getSource().getId())
+                .getOrThrow(() -> StatusException.badRequest("No source account found with provided id."));
+
+        contractProvider.lookup(contractId)
+                .ifPresent(contract -> contract.createSchedule(
+                        request.getSchedule(),
+                        account,
+                        request.getAmount()))
+                .elseThrow(() -> StatusException.badRequest("No contract found with provided id."));
+    }
+
     @Get("/{contractId}/expire-warning")
     @Operation(
             summary = "Enable warning",
