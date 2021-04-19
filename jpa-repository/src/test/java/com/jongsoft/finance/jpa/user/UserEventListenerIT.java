@@ -1,14 +1,10 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.domain.user.events.*;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.jpa.user.entity.RoleJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
-import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
-import com.jongsoft.finance.messaging.commands.user.ChangePasswordCommand;
-import com.jongsoft.finance.messaging.commands.user.ChangeUserSettingCommand;
-import com.jongsoft.finance.messaging.commands.user.CreateUserCommand;
+import com.jongsoft.finance.messaging.commands.user.*;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -89,7 +85,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleTokenRegistrationEvent() {
         loadDataset("sql/base-setup.sql");
-        eventPublisher.publishEvent(new TokenRegisterEvent(
+        eventPublisher.publishEvent(new RegisterTokenCommand(
                 "demo-user",
                 "my-refresh-token",
                 LocalDateTime.of(2019, 1, 1, 12, 33)));
@@ -106,7 +102,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleTokenRevokedEvent() {
         loadDataset("sql/base-setup.sql");
-        eventPublisher.publishEvent(new TokenRevokeEvent(
+        eventPublisher.publishEvent(new RevokeTokenCommand(
                 "refresh-token-1"
         ));
 

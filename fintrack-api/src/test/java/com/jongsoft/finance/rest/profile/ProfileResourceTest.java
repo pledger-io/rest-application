@@ -2,8 +2,8 @@ package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
+import com.jongsoft.finance.messaging.commands.user.RevokeTokenCommand;
 import com.jongsoft.finance.providers.UserProvider;
-import com.jongsoft.finance.domain.user.events.TokenRegisterEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -95,7 +95,7 @@ class ProfileResourceTest extends TestSetup {
 
         subject.createSession(new TokenCreateRequest("sample description", LocalDate.now().plusDays(1)));
 
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(TokenRegisterEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(RevokeTokenCommand.class));
     }
 
     @Test
