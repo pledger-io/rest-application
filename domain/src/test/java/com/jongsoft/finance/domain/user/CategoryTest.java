@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 
+import com.jongsoft.finance.messaging.commands.category.DeleteCategoryCommand;
+import com.jongsoft.finance.messaging.commands.category.RenameCategoryCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.user.events.CategoryRemovedEvent;
-import com.jongsoft.finance.domain.user.events.CategoryRenamedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -35,7 +35,7 @@ class CategoryTest {
 
     @Test
     void rename() {
-        ArgumentCaptor<CategoryRenamedEvent> captor = ArgumentCaptor.forClass(CategoryRenamedEvent.class);
+        var captor = ArgumentCaptor.forClass(RenameCategoryCommand.class);
 
         category.rename("New category", "New description");
 
@@ -43,9 +43,9 @@ class CategoryTest {
         assertThat(category.getLabel()).isEqualTo("New category");
         assertThat(category.getDescription()).isEqualTo("New description");
 
-        assertThat(captor.getValue().getCategoryId()).isEqualTo(1L);
-        assertThat(captor.getValue().getDescription()).isEqualTo("New description");
-        assertThat(captor.getValue().getLabel()).isEqualTo("New category");
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().description()).isEqualTo("New description");
+        assertThat(captor.getValue().name()).isEqualTo("New category");
     }
 
     @Test
@@ -56,11 +56,11 @@ class CategoryTest {
 
     @Test
     void remove() {
-        ArgumentCaptor<CategoryRemovedEvent> captor = ArgumentCaptor.forClass(CategoryRemovedEvent.class);
+        var captor = ArgumentCaptor.forClass(DeleteCategoryCommand.class);
 
         category.remove();
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getId()).isEqualTo(category.getId());
+        assertThat(captor.getValue().id()).isEqualTo(category.getId());
     }
 }

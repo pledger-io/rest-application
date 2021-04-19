@@ -9,7 +9,7 @@ import com.jongsoft.finance.jpa.currency.CurrencyJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.tag.TagJpa;
-import com.jongsoft.finance.jpa.user.entity.CategoryJpa;
+import com.jongsoft.finance.jpa.category.CategoryJpa;
 import com.jongsoft.finance.jpa.budget.ExpenseJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;

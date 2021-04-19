@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.user;
+package com.jongsoft.finance.jpa.category;
 
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;

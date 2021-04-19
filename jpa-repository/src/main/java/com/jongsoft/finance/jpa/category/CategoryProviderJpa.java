@@ -1,11 +1,10 @@
-package com.jongsoft.finance.jpa.user;
+package com.jongsoft.finance.jpa.category;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
-import com.jongsoft.finance.jpa.user.entity.CategoryJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
