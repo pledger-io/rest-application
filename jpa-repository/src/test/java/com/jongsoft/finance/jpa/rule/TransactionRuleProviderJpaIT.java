@@ -1,6 +1,6 @@
-package com.jongsoft.finance.jpa.transaction;
+package com.jongsoft.finance.jpa.rule;
 
-import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
+import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
@@ -10,39 +10,41 @@ import org.mockito.Mockito;
 
 import javax.inject.Inject;
 
-class TransactionRuleGroupProviderJpaIT extends JpaTestSetup {
+class TransactionRuleProviderJpaIT extends JpaTestSetup {
 
     @Inject
     private AuthenticationFacade authenticationFacade;
 
     @Inject
-    private TransactionRuleGroupProvider ruleGroupProvider;
+    private TransactionRuleProvider ruleProvider;
 
     void setup() {
         Mockito.doReturn("demo-user").when(authenticationFacade).authenticated();
         loadDataset(
                 "sql/base-setup.sql",
-                "sql/transaction/rule-group-provider.sql"
+                "sql/transaction/rule-group-provider.sql",
+                "sql/transaction/rule-provider.sql"
         );
     }
 
     @Test
     void lookup() {
         setup();
-        ruleGroupProvider.lookup()
-                .test()
-                .assertValueCount(2);
+        var check = ruleProvider.lookup();
+        Assertions.assertThat(check).hasSize(1);
     }
 
     @Test
-    void lookup_name() {
+    void lookup_group() {
         setup();
-        var check = ruleGroupProvider.lookup("Grocery stores");
-        Assertions.assertThat(check.isPresent()).isTrue();
+
+        ruleProvider.lookup("Grocery stores").test()
+                .assertValueCount(1);
     }
 
     @MockBean
     AuthenticationFacade authenticationFacade() {
         return Mockito.mock(AuthenticationFacade.class);
     }
+
 }

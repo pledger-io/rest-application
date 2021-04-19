@@ -7,12 +7,12 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountCreatedEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountPasswordChangedEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountSettingEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.List;
 import lombok.AllArgsConstructor;
@@ -153,7 +153,7 @@ public class UserAccount implements AggregateBase, Serializable {
             throw new IllegalStateException("User cannot create tags, incorrect privileges.");
         }
 
-        EventBus.getBus().send(new TagCreatedEvent(this, this, label));
+        EventBus.getBus().send(new CreateTagCommand(label));
         return new Tag(label);
     }
 

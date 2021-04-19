@@ -2,10 +2,10 @@ package com.jongsoft.finance.rest.transaction;
 
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.providers.TagProvider;
-import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -58,7 +58,7 @@ class TransactionTagResourceTest extends TestSetup {
 
         Assertions.assertThat(response.getName()).isEqualTo("Sample tag");
 
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(TagCreatedEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateTagCommand.class));
     }
 
     @Test

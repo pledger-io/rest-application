@@ -11,7 +11,7 @@ import com.jongsoft.finance.jpa.account.AccountFilterCommand;
 import com.jongsoft.finance.jpa.tag.TagFilterCommand;
 import com.jongsoft.finance.jpa.transaction.TransactionFilterCommand;
 import com.jongsoft.finance.jpa.user.CategoryFilterCommand;
-import com.jongsoft.finance.jpa.user.ExpenseFilterCommand;
+import com.jongsoft.finance.jpa.budget.ExpenseFilterCommand;
 
 @Singleton
 public class FilterFactoryJpa implements FilterFactory {

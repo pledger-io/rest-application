@@ -1,11 +1,10 @@
-package com.jongsoft.finance.jpa.user;
+package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.domain.user.events.BudgetClosedEvent;
-import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
-import com.jongsoft.finance.domain.user.events.BudgetExpenseCreatedEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.jpa.user.entity.BudgetJpa;
+import com.jongsoft.finance.messaging.commands.budget.CloseBudgetCommand;
+import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
+import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -16,6 +15,7 @@ import org.mockito.Mockito;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 class BudgetEventListenerIT extends JpaTestSetup {
@@ -41,8 +41,7 @@ class BudgetEventListenerIT extends JpaTestSetup {
         init();
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user-not");
 
-        eventPublisher.publishEvent(new BudgetCreatedEvent(
-                this,
+        eventPublisher.publishEvent(new CreateBudgetCommand(
                 Budget.builder()
                         .expectedIncome(2500)
                         .start(LocalDate.of(2018, 1, 1))
@@ -67,10 +66,7 @@ class BudgetEventListenerIT extends JpaTestSetup {
         init();
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
 
-        eventPublisher.publishEvent(new BudgetClosedEvent(
-                this,
-                2L,
-                LocalDate.of(2020, 1, 1)));
+        eventPublisher.publishEvent(new CloseBudgetCommand(2L, LocalDate.of(2020, 1, 1)));
 
         var check = entityManager.find(BudgetJpa.class, 2L);
         Assertions.assertThat(check.getUntil()).isEqualTo(LocalDate.of(2020, 1, 1));
@@ -81,12 +77,10 @@ class BudgetEventListenerIT extends JpaTestSetup {
         init();
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
 
-        eventPublisher.publishEvent(new BudgetExpenseCreatedEvent(
-                this,
+        eventPublisher.publishEvent(new CreateExpenseCommand(
                 "Created expense",
                 LocalDate.of(2019, 2, 1),
-                400,
-                500));
+                BigDecimal.valueOf(500)));
 
         var check = entityManager.find(BudgetJpa.class, 2L);
         Assertions.assertThat(check.getExpenses()).hasSize(3);

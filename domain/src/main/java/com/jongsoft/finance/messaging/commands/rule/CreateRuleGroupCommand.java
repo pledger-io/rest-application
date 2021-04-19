@@ -1,4 +1,6 @@
 package com.jongsoft.finance.messaging.commands.rule;
 
-public record CreateRuleGroupCommand(String name) {
+import com.jongsoft.finance.core.ApplicationEvent;
+
+public record CreateRuleGroupCommand(String name) implements ApplicationEvent {
 }

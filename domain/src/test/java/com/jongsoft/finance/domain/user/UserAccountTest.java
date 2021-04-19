@@ -3,13 +3,13 @@ package com.jongsoft.finance.domain.user;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
-import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountPasswordChangedEvent;
 import com.jongsoft.finance.domain.user.events.UserAccountSettingEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.account.CreateAccountCommand;
+import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
+import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,12 +74,11 @@ class UserAccountTest {
     void createTag() {
         var tag = fullAccount.createTag("Tag 1");
 
-        ArgumentCaptor<TagCreatedEvent> changeCaptor = ArgumentCaptor.forClass(TagCreatedEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(CreateTagCommand.class);
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
 
         assertThat(tag.name()).isEqualTo("Tag 1");
-        assertThat(changeCaptor.getValue().getTag()).isEqualTo("Tag 1");
-        assertThat(changeCaptor.getValue().getUser()).isEqualTo(fullAccount);
+        assertThat(changeCaptor.getValue().tag()).isEqualTo("Tag 1");
     }
 
     @Test
@@ -143,7 +142,7 @@ class UserAccountTest {
 
     @Test
     void createBudget() {
-        ArgumentCaptor<BudgetCreatedEvent> captor = ArgumentCaptor.forClass(BudgetCreatedEvent.class);
+        var captor = ArgumentCaptor.forClass(CreateBudgetCommand.class);
 
         Budget budget = fullAccount.createBudget(LocalDate.of(2019, 1, 1), 2500);
 

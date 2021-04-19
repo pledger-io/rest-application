@@ -4,11 +4,11 @@ import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.providers.ExpenseProvider;
-import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -126,7 +126,7 @@ class BudgetResourceTest extends TestSetup {
         var response = subject.create(request).blockingGet();
 
         Assertions.assertThat(response.getPeriod().getFrom()).isEqualTo(LocalDate.of(2019, 2, 1));
-        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(BudgetCreatedEvent.class));
+        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateBudgetCommand.class));
     }
 
     @Test

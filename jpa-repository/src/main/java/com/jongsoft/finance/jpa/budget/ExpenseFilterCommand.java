@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.user;
+package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;

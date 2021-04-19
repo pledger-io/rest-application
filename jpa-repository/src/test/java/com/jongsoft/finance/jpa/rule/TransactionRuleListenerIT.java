@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.transaction;
+package com.jongsoft.finance.jpa.rule;
 
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;

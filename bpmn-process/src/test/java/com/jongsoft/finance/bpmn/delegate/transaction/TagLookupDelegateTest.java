@@ -1,8 +1,8 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
 import com.jongsoft.finance.domain.transaction.Tag;
+import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.finance.providers.TagProvider;
-import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
@@ -74,6 +74,6 @@ class TagLookupDelegateTest {
         subject.execute(execution);
 
         BDDMockito.verify(execution).setVariableLocal("id", "Auto");
-        BDDMockito.verify(eventPublisher).publishEvent(Mockito.any(TagCreatedEvent.class));
+        BDDMockito.verify(eventPublisher).publishEvent(Mockito.any(CreateTagCommand.class));
     }
 }

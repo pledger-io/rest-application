@@ -1,8 +1,8 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.tag.TagJpa;
+import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
@@ -35,10 +35,7 @@ class TagEventListenerIT extends JpaTestSetup {
     @Test
     void handleTagCreated() {
         setup();
-        eventPublisher.publishEvent(new TagCreatedEvent(
-                this,
-                null,
-                "created-tag"));
+        eventPublisher.publishEvent(new CreateTagCommand("created-tag"));
 
         var query = entityManager.createQuery("select t from TagJpa t where t.name = 'created-tag'");
         var check = (TagJpa) query.getSingleResult();

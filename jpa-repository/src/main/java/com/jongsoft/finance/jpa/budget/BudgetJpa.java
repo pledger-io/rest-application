@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.user.entity;
+package com.jongsoft.finance.jpa.budget;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -12,6 +12,7 @@ import javax.persistence.Table;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 
+import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import lombok.Builder;
 import lombok.Getter;
 

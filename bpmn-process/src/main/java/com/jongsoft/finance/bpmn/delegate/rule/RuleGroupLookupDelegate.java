@@ -2,11 +2,11 @@ package com.jongsoft.finance.bpmn.delegate.rule;
 
 import javax.inject.Singleton;
 
+import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +36,7 @@ public class RuleGroupLookupDelegate implements JavaDelegate {
     }
 
     private TransactionRuleGroup createRuleGroup(String name) {
-        EventBus.getBus().send(new TransactionRuleGroupCreatedEvent(
-                this,
-                name));
+        EventBus.getBus().send(new CreateRuleGroupCommand(name));
 
         return ruleGroupProvider.lookup(name)
                 .getOrThrow(() -> new IllegalStateException("Failed to create rule group with name " + name));

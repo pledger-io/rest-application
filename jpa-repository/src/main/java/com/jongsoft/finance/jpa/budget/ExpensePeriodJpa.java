@@ -1,4 +1,4 @@
-package com.jongsoft.finance.jpa.user.entity;
+package com.jongsoft.finance.jpa.budget;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,16 +11,18 @@ import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Entity
 @Table(name = "budget_period")
 public class ExpensePeriodJpa extends EntityJpa {
 
     @Column(name = "bp_lower_bound")
-    private double lowerBound;
+    private BigDecimal lowerBound;
 
     @Column(name = "bp_upper_bound")
-    private double upperBound;
+    private BigDecimal upperBound;
 
     @ManyToOne
     @JoinColumn
@@ -31,7 +33,7 @@ public class ExpensePeriodJpa extends EntityJpa {
     private BudgetJpa budget;
 
     @Builder
-    private ExpensePeriodJpa(double lowerBound, double upperBound, ExpenseJpa expense, BudgetJpa budget) {
+    private ExpensePeriodJpa(BigDecimal lowerBound, BigDecimal upperBound, ExpenseJpa expense, BudgetJpa budget) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         this.expense = expense;

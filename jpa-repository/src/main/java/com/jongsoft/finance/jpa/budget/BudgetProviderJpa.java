@@ -1,11 +1,11 @@
-package com.jongsoft.finance.jpa.user;
+package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.jpa.core.RepositoryJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
-import com.jongsoft.finance.jpa.user.entity.BudgetJpa;
+import com.jongsoft.finance.jpa.budget.BudgetJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
@@ -89,8 +89,8 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
                 .expectedIncome(source.getExpectedIncome())
                 .expenses(Collections.List(source.getExpenses())
                         .map(e -> Budget.Expense.builder()
-                                .lowerBound(e.getLowerBound())
-                                .upperBound(e.getUpperBound())
+                                .lowerBound(e.getLowerBound().doubleValue())
+                                .upperBound(e.getUpperBound().doubleValue())
                                 .name(e.getExpense().getName())
                                 .id(e.getExpense().getId())
                                 .build()))

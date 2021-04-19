@@ -1,8 +1,8 @@
 package com.jongsoft.finance.jpa.rule;
 
 import com.jongsoft.finance.domain.transaction.TransactionRule;
+import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
 import com.jongsoft.finance.providers.TransactionRuleProvider;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreatedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
@@ -170,10 +170,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
                 .set("group", group)
                 .maybe()
                 .switchIfEmpty(Single.create(emitter -> {
-                    EventBus.getBus().send(new TransactionRuleGroupCreatedEvent(
-                            this,
-                            group));
-
+                    EventBus.getBus().send(new CreateRuleGroupCommand(group));
                     emitter.onSuccess(group(group));
                 }))
                 .blockingGet();

@@ -1,9 +1,9 @@
 package com.jongsoft.finance.domain.user;
 
-import com.jongsoft.finance.domain.user.events.BudgetClosedEvent;
-import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
-import com.jongsoft.finance.domain.user.events.BudgetExpenseCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.budget.CloseBudgetCommand;
+import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
+import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +41,7 @@ class BudgetTest {
         assertThat(budget.getExpenses().get(0).getLowerBound()).isEqualTo(200D);
         assertThat(budget.getExpenses().get(0).getUpperBound()).isEqualTo(400D);
 
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(BudgetExpenseCreatedEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateExpenseCommand.class));
     }
 
     @Test
@@ -107,8 +107,8 @@ class BudgetTest {
         assertThat(indexedBudget.getExpenses().get(1).getUpperBound()).isEqualTo(943D);
         assertThat(budget.getEnd()).isEqualTo(LocalDate.of(2019, 3, 1));
 
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(BudgetClosedEvent.class));
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(BudgetCreatedEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CloseBudgetCommand.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateBudgetCommand.class));
     }
 
     @Test

@@ -1,10 +1,9 @@
-package com.jongsoft.finance.jpa.transaction;
+package com.jongsoft.finance.jpa.rule;
 
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreatedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupRenamedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupSortedEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.jpa.rule.RuleGroupJpa;
+import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
+import com.jongsoft.finance.messaging.commands.rule.RenameRuleGroupCommand;
+import com.jongsoft.finance.messaging.commands.rule.ReorderRuleGroupCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
@@ -37,9 +36,7 @@ class TransactionRuleGroupListenerIT extends JpaTestSetup {
     @Test
     void handleCreateEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionRuleGroupCreatedEvent(
-                this,
-                "group-name"));
+        eventPublisher.publishEvent(new CreateRuleGroupCommand("group-name"));
 
         var query = entityManager.createQuery("select t from RuleGroupJpa t where t.name = 'group-name'");
         var check = (RuleGroupJpa) query.getSingleResult();
@@ -50,10 +47,7 @@ class TransactionRuleGroupListenerIT extends JpaTestSetup {
     @Test
     void handleRenamedEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionRuleGroupRenamedEvent(
-                this,
-                2L,
-                "updated-name"));
+        eventPublisher.publishEvent(new RenameRuleGroupCommand(2L, "updated-name"));
 
         var check = entityManager.find(RuleGroupJpa.class, 2L);
         Assertions.assertThat(check.getName()).isEqualTo("updated-name");
@@ -62,10 +56,7 @@ class TransactionRuleGroupListenerIT extends JpaTestSetup {
     @Test
     void handleSortedEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionRuleGroupSortedEvent(
-                this,
-                2L,
-                0));
+        eventPublisher.publishEvent(new ReorderRuleGroupCommand(2L, 0));
 
         var check = entityManager.find(RuleGroupJpa.class, 2L);
         Assertions.assertThat(check.getSort()).isEqualTo(0);
