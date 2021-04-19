@@ -70,7 +70,7 @@ class ProcessAccountCreationDelegateTest {
 
     @Test
     void execute() {
-        Account account = Account.builder().build();
+        Account account = Account.builder().id(1L).build();
         Mockito.when(accountProvider.lookup("Test account"))
                 .thenReturn(Maybe.empty())
                 .thenReturn(Maybe.just(account));

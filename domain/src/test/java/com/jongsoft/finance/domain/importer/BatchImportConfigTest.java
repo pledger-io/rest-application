@@ -3,6 +3,7 @@ package com.jongsoft.finance.domain.importer;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.importer.CreateConfigurationCommand;
+import com.jongsoft.finance.messaging.commands.importer.CreateImportJobCommand;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class BatchImportConfigTest {
 
     @Test
     void createImport() {
-        var changeCaptor = ArgumentCaptor.forClass(CreateConfigurationCommand.class);
+        var changeCaptor = ArgumentCaptor.forClass(CreateImportJobCommand.class);
 
         subject.createImport("sample content");
 
