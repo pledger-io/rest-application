@@ -1,9 +1,9 @@
 package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.domain.user.SessionToken;
+import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.domain.user.events.TokenRegisterEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -121,11 +121,11 @@ class ProfileResourceTest extends TestSetup {
 
         subject.enableMfa(request);
 
-        var captor = ArgumentCaptor.forClass(UserAccountMultiFactorEvent.class);
+        var captor = ArgumentCaptor.forClass(ChangeMultiFactorCommand.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());
 
-        Assertions.assertThat(captor.getValue().getUsername()).isEqualTo(ACTIVE_USER.getUsername());
-        Assertions.assertThat(captor.getValue().isEnabled()).isEqualTo(true);
+        Assertions.assertThat(captor.getValue().username()).isEqualTo(ACTIVE_USER.getUsername());
+        Assertions.assertThat(captor.getValue().enabled()).isEqualTo(true);
     }
 
 //    @Test
