@@ -4,6 +4,7 @@ import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
+import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.lang.Collections;
@@ -18,9 +19,9 @@ import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 public class CreateTagHandler implements CommandHandler<CreateTagCommand> {
 
     private final AuthenticationFacade authenticationFacade;
-    private final EntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
-    public CreateTagHandler(AuthenticationFacade authenticationFacade, EntityManager entityManager) {
+    public CreateTagHandler(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }
@@ -32,7 +33,7 @@ public class CreateTagHandler implements CommandHandler<CreateTagCommand> {
 
         var toCreate = TagJpa.builder()
                 .name(command.tag())
-                .user(entityManager.find(UserAccountJpa.class, Collections.Map("username", authenticationFacade.authenticated())))
+                .user(entityManager.get(UserAccountJpa.class, Collections.Map("username", authenticationFacade.authenticated())))
                 .archived(false)
                 .build();
 

@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.currency;
 
+import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.currency.ChangeCurrencyPropertyCommand;
@@ -20,6 +21,7 @@ public class ChangeCurrencyPropertyHandler implements CommandHandler<ChangeCurre
     }
 
     @Override
+    @BusinessEventListener
     public void handle(ChangeCurrencyPropertyCommand<?> command) {
         log.trace("[{}] - Processing currency property {} event", command.code(), command.type());
 

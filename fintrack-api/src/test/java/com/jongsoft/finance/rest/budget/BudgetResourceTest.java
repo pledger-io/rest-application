@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -226,7 +227,7 @@ class BudgetResourceTest extends TestSetup {
                                 .upperBound(50D)
                                 .build()))
                         .build()));
-        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option(200D));
+        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option(BigDecimal.valueOf(200)));
 
         TestSubscriber<ComputedExpenseResponse> testSubscriber = new TestSubscriber<>();
 

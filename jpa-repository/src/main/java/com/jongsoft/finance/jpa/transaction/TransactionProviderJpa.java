@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -115,13 +116,13 @@ public class TransactionProviderJpa implements TransactionProvider {
     }
 
     @Override
-    public Optional<Double> balance(FilterCommand filter) {
+    public Optional<BigDecimal> balance(FilterCommand filter) {
         log.trace("Transaction balance with filter: {}", filter.toString());
 
         if (filter instanceof TransactionFilterCommand delegate) {
             delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<Double>blocking()
+            return entityManager.<BigDecimal>blocking()
                     .hql("select sum(t.amount) " + delegate.generateHql())
                     .setAll(delegate.getParameters())
                     .maybe();

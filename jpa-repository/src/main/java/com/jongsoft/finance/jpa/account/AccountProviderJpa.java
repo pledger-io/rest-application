@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -154,7 +155,7 @@ public class AccountProviderJpa implements AccountProvider {
             var hql = """
                     select new com.jongsoft.finance.jpa.projections.TripleProjection(
                                 t.account, sum(t.amount), avg(t.amount))
-                     from TransactionJpa t 
+                     from TransactionJpa t
                      where
                         t.journal.date >= :start and t.journal.date < :until
                         and t.deleted is null
@@ -163,7 +164,7 @@ public class AccountProviderJpa implements AccountProvider {
                      group by t.account
                      having sum(t.amount) %s 0""".formatted(delegate.generateHql(), asc ? "<=" : ">=");
 
-            return entityManager.<TripleProjection<AccountJpa, Double, Double>>blocking()
+            return entityManager.<TripleProjection<AccountJpa, BigDecimal, Double>>blocking()
                     .hql(hql)
                     .setAll(delegate.getParameters())
                     .set("start", range.from())

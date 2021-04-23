@@ -55,7 +55,7 @@ public class CreateBudgetHandler implements CommandHandler<CreateBudgetCommand> 
                 ExpensePeriodJpa.builder()
                         .budget(budget)
                         .expense(entityManager.get(ExpenseJpa.class, Collections.Map("id", expense.getId())))
-                        .lowerBound(BigDecimal.valueOf(expense.getLowerBound()))
+                        .lowerBound(BigDecimal.valueOf(expense.getLowerBound()).subtract(new BigDecimal("0.001")))
                         .upperBound(BigDecimal.valueOf(expense.getUpperBound()))
                         .build())
                 .map(this::persist)

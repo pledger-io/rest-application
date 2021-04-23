@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 
 @Slf4j
 @Singleton
@@ -30,7 +31,7 @@ public class CreateExpenseHandler implements CommandHandler<CreateExpenseCommand
 
         var hql = """
                 select b from BudgetJpa b
-                where b.user.username = :username 
+                where b.user.username = :username
                 and b.from = :from""";
 
         var activeBudget = entityManager.<BudgetJpa>blocking()
@@ -47,7 +48,7 @@ public class CreateExpenseHandler implements CommandHandler<CreateExpenseCommand
         entityManager.persist(expenseJpa);
 
         var expensePeriodJpa = ExpensePeriodJpa.builder()
-                .lowerBound(command.budget())
+                .lowerBound(command.budget().subtract(new BigDecimal("0.01")))
                 .upperBound(command.budget())
                 .expense(expenseJpa)
                 .budget(activeBudget)

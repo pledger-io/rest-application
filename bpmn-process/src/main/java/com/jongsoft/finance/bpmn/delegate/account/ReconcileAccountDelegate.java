@@ -12,6 +12,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -41,7 +42,7 @@ public class ReconcileAccountDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         Long accountId = ((Number) execution.getVariableLocal("accountId")).longValue();
-        Double amount = execution.<DoubleValue>getVariableLocalTyped("amount").getValue();
+        BigDecimal amount = (BigDecimal) execution.getVariableLocal("amount");
         String isoBookDate = execution.<StringValue>getVariableLocalTyped("bookDate").getValue();
 
         Account toReconcile = accountProvider.lookup(accountId).get();
@@ -53,10 +54,10 @@ public class ReconcileAccountDelegate implements JavaDelegate {
                 .blockingGet();
 
         var transactionDate = LocalDate.parse(isoBookDate);
-        Transaction.Type type = amount >= 0 ? Transaction.Type.CREDIT : Transaction.Type.DEBIT;
+        Transaction.Type type = amount.compareTo(BigDecimal.ZERO) >= 0 ? Transaction.Type.CREDIT : Transaction.Type.DEBIT;
         Transaction transaction = toReconcile.createTransaction(
                 reconcileAccount,
-                Math.abs(amount),
+                amount.abs().doubleValue(),
                 type,
                 t -> t.description("Reconcile transaction")
                         .currency(toReconcile.getCurrency())

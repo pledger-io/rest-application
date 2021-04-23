@@ -9,6 +9,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.sql.Connection;
 
 public class ReactivePipe<T> extends JpaPipe<T, ReactivePipe<T>> {

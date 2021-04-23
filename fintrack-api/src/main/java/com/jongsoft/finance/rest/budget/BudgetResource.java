@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reactivestreams.Publisher;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -155,7 +156,7 @@ public class BudgetResource {
 
                     return new ComputedExpenseResponse(
                             expense.computeBudget(),
-                            transactionProvider.balance(filter).getOrSupply(() -> 0D),
+                            transactionProvider.balance(filter).getOrSupply(() -> BigDecimal.ZERO).doubleValue(),
                             dateRange
                     );
                 });

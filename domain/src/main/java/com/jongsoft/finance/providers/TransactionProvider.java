@@ -8,6 +8,7 @@ import com.jongsoft.lang.control.Optional;
 import com.jongsoft.lang.time.Range;
 import io.reactivex.Maybe;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public interface TransactionProvider extends DataProvider<Transaction> {
@@ -42,7 +43,7 @@ public interface TransactionProvider extends DataProvider<Transaction> {
     ResultPage<Transaction> lookup(FilterCommand filter);
 
     Sequence<DailySummary> daily(FilterCommand filter);
-    Optional<Double> balance(FilterCommand filter);
+    Optional<BigDecimal> balance(FilterCommand filter);
 
     Sequence<Transaction> similar(EntityRef from, EntityRef to, double amount, LocalDate date);
 

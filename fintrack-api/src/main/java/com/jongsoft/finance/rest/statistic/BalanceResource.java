@@ -56,9 +56,9 @@ public class BalanceResource {
 
         return Single.create(emitter -> {
             var balance = transactionProvider.balance(filter)
-                    .getOrSupply(() -> 0D);
+                    .getOrSupply(() -> BigDecimal.ZERO);
 
-            emitter.onSuccess(new BalanceResponse(balance));
+            emitter.onSuccess(new BalanceResponse(balance.doubleValue()));
         });
     }
 
@@ -85,7 +85,6 @@ public class BalanceResource {
 
         return Flowable.create(flowableEmitter -> {
             var total = transactionProvider.balance(buildFilterCommand(request))
-                    .map(BigDecimal::valueOf)
                     .getOrSupply(() -> BigDecimal.ZERO);
 
             for (AggregateBase entity : entityProvider) {
@@ -93,10 +92,10 @@ public class BalanceResource {
                         Collections.List(
                                 new EntityRef(entity.getId())));
                 var balance = transactionProvider.balance(filter)
-                        .getOrSupply(() -> 0D);
+                        .getOrSupply(() -> BigDecimal.ZERO);
 
-                flowableEmitter.onNext(new BalancePartitionResponse(entity.toString(), balance));
-                total = total.subtract(BigDecimal.valueOf(balance));
+                flowableEmitter.onNext(new BalancePartitionResponse(entity.toString(), balance.doubleValue()));
+                total = total.subtract(BigDecimal.valueOf(balance.doubleValue()));
             }
 
             flowableEmitter.onNext(new BalancePartitionResponse("", total.doubleValue()));

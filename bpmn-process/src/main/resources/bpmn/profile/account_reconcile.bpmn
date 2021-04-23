@@ -70,7 +70,7 @@ It will then compute if there is a difference between the open en end balance pr
       <bpmn:incoming>Flow_1i4lt7y</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0foh2sn</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_164ln8n" name="Compute difference" camunda:expression="${computedEndBalance - endBalance}" camunda:resultVariable="balanceDifference">
+    <bpmn:serviceTask id="Task_164ln8n" name="Compute difference" camunda:expression="${computedEndBalance.subtract(endBalance)}" camunda:resultVariable="balanceDifference">
       <bpmn:incoming>SequenceFlow_16hoisl</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0iupet2</bpmn:outgoing>
     </bpmn:serviceTask>

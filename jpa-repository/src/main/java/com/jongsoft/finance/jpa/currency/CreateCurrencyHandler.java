@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.currency;
 
+import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.currency.CreateCurrencyCommand;
@@ -20,6 +21,7 @@ public class CreateCurrencyHandler implements CommandHandler<CreateCurrencyComma
     }
 
     @Override
+    @BusinessEventListener
     public void handle(CreateCurrencyCommand command) {
         log.trace("[{}] - Processing currency create event", command.isoCode());
 

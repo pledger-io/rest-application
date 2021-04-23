@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.contract;
 
+import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.WarnBeforeExpiryCommand;
@@ -20,6 +21,7 @@ public class WarnBeforeExpiryHandler implements CommandHandler<WarnBeforeExpiryC
     }
 
     @Override
+    @BusinessEventListener
     public void handle(WarnBeforeExpiryCommand command) {
         log.trace("[{}] - Processing contract warning event", command.id());
 
