@@ -6,3 +6,10 @@ datasources:
     password: ${DATABASE_PASSWORD:fintrack}
     dialect: mysql
     migration-locations: ["classpath:db/camunda/mysql", "classpath:db/migration"]
+
+r2dbc:
+  datasources:
+    default:
+      url: r2dbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT:3306}/${DATABASE_SCHEMA:fintrack}?serverTimezone=UTC
+      username: ${datasources.default.username}
+      password: ${datasources.default.password}

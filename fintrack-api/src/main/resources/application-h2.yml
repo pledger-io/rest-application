@@ -7,3 +7,9 @@ datasources:
     dialect: mysql
     migration-locations: ["classpath:db/camunda/h2", "classpath:db/migration"]
 
+r2dbc:
+  datasources:
+    default:
+      url: r2dbc:h2:file://localhost/${micronaut.application.storage.location}/db/personal_finance_db;MODE=MYSQL;AUTO_SERVER=TRUE
+      username: ${datasources.default.username}
+      password: ${datasources.default.password}
