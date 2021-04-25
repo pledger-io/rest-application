@@ -97,8 +97,6 @@ subprojects {
 
     test {
         useJUnitPlatform()
-
-        jvmArgs("--enable-preview")
     }
 
     configurations {
@@ -113,7 +111,6 @@ subprojects {
         source = delombok.outputDir
 
         options.addBooleanOption('html5', true)
-        options.addBooleanOption('-enable-preview', true)
         options.addStringOption('-release', '16')
     }
 
@@ -174,7 +171,7 @@ subprojects {
         options.encoding = "UTF-8"
         options.compilerArgs.addAll([
                 '-parameters',
-                '--enable-preview',
+                //'--enable-preview',
                 // enables incremental compilation
                 '-Amicronaut.processing.incremental=true',
                 '-Amicronaut.processing.annotations=com.jongsoft.finance.*',
@@ -185,7 +182,7 @@ subprojects {
 
     tasks.withType(JavaExec) {
         classpath += configurations.developmentOnly
-        jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote', '--enable-preview')
+        jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote')
         if (gradle.startParameter.continuous) {
             systemProperties(
                     'micronaut.io.watch.restart':'true',

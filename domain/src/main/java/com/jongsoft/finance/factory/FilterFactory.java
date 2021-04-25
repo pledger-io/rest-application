@@ -1,10 +1,6 @@
 package com.jongsoft.finance.factory;
 
-import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.providers.TagProvider;
-import com.jongsoft.finance.providers.TransactionProvider;
-import com.jongsoft.finance.providers.CategoryProvider;
-import com.jongsoft.finance.providers.ExpenseProvider;
+import com.jongsoft.finance.providers.*;
 
 public interface FilterFactory {
 
@@ -17,5 +13,7 @@ public interface FilterFactory {
     ExpenseProvider.FilterCommand expense();
 
     CategoryProvider.FilterCommand category();
+
+    TransactionScheduleProvider.FilterCommand schedule();
 
 }

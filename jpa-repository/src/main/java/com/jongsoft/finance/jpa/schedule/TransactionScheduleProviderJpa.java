@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.schedule;
 
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
@@ -37,6 +38,25 @@ public class TransactionScheduleProviderJpa implements TransactionScheduleProvid
                 .set("username", authenticationFacade.authenticated())
                 .maybe()
                 .map(this::convert);
+    }
+
+    @Override
+    public ResultPage<ScheduledTransaction> lookup(FilterCommand filterCommand) {
+        if (filterCommand instanceof ScheduleFilterCommand delegate) {
+            var offset = delegate.page() * delegate.pageSize();
+            delegate.user(authenticationFacade.authenticated());
+
+            return entityManager.<ScheduledTransactionJpa>blocking()
+                    .hql(delegate.generateHql())
+                    .setAll(delegate.getParameters())
+                    .limit(delegate.pageSize())
+                    .offset(offset)
+                    .sort(delegate.sort())
+                    .page()
+                    .map(this::convert);
+        }
+
+        throw new IllegalStateException("Cannot use non JPA filter on TransactionScheduleProviderJpa");
     }
 
     @Override
