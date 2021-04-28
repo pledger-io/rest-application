@@ -35,7 +35,7 @@ public class StartProcessListener implements ExecutionListener {
                     username);
 
 
-            log.debug("[{}] Setting up security credentials for {}", execution.getProcessDefinitionId(), username);
+            log.trace("[{}] Setting up security credentials for {}", execution.getProcessDefinitionId(), username);
 
             eventPublisher.publishEvent(new InternalAuthenticationEvent(this, username));
         }

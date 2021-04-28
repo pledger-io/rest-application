@@ -1,6 +1,8 @@
 package com.jongsoft.finance.bpmn.handler;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
+import com.jongsoft.finance.bpmn.KnownProcesses;
+import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.schedule.ScheduleCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import lombok.extern.slf4j.Slf4j;
@@ -11,18 +13,18 @@ import java.util.Objects;
 
 @Slf4j
 @Singleton
-public class ProcessSchedulerListener {
+public class ScheduleHandler implements CommandHandler<ScheduleCommand> {
 
     private final AuthenticationFacade authenticationFacade;
     private final ProcessEngine processEngine;
 
-    public ProcessSchedulerListener(AuthenticationFacade authenticationFacade, ProcessEngine processEngine) {
+    public ScheduleHandler(AuthenticationFacade authenticationFacade, ProcessEngine processEngine) {
         this.authenticationFacade = authenticationFacade;
         this.processEngine = processEngine;
     }
 
     @BusinessEventListener
-    public void handleScheduleCommand(ScheduleCommand command) {
+    public void handle(ScheduleCommand command) {
         log.info("Processing scheduler {} command", command.businessKey());
         deleteAnyActiveProcess(command);
         startNewActivity(command);
@@ -32,7 +34,7 @@ public class ProcessSchedulerListener {
         Objects.requireNonNull(command.schedulable(), "Entity to be scheduled cannot be null.");
 
         var starter = processEngine.getRuntimeService()
-                .createProcessInstanceByKey("ProcessScheduler")
+                .createProcessInstanceByKey(KnownProcesses.PROCESS_SCHEDULE)
                 .businessKey(command.businessKey())
                 .setVariable("username", authenticationFacade.authenticated())
                 .setVariable("subProcess", command.processDefinition())

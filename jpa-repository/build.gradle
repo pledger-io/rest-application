@@ -10,7 +10,6 @@ dependencies {
     implementation project(':core')
     implementation project(':domain')
 
-    compileOnly("io.r2dbc:r2dbc-h2")
     runtimeOnly("io.r2dbc:r2dbc-h2")
     runtimeOnly("com.h2database:h2")
 

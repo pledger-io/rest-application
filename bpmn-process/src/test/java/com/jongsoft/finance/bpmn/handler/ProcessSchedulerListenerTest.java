@@ -19,7 +19,7 @@ import java.time.LocalDate;
 class ProcessSchedulerListenerTest {
 
     private ProcessEngine processEngine;
-    private ProcessSchedulerListener subject;
+    private ScheduleHandler subject;
 
     private Schedulable schedulable;
 
@@ -69,12 +69,12 @@ class ProcessSchedulerListenerTest {
         Mockito.when(processInstantiationBuilder.setVariable(Mockito.anyString(), Mockito.any())).thenReturn(processInstantiationBuilder);
         Mockito.when(authenticationFacade.authenticated()).thenReturn("test-user");
 
-        subject = new ProcessSchedulerListener(authenticationFacade, processEngine);
+        subject = new ScheduleHandler(authenticationFacade, processEngine);
     }
 
     @Test
     void handleScheduleLimit() {
-        subject.handleScheduleCommand(new ScheduleCommand() {
+        subject.handle(new ScheduleCommand() {
             @Override
             public String processDefinition() {
                 return "EmptyProcess";
