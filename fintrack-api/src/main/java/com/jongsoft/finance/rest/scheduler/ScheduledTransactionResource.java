@@ -1,9 +1,11 @@
 package com.jongsoft.finance.rest.scheduler;
 
+import com.jongsoft.finance.domain.core.EntityRef;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.model.ScheduledTransactionResponse;
-import com.jongsoft.lang.Control;
+import com.jongsoft.lang.Collections;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
@@ -18,7 +20,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Objects;
 
 @Tag(name = "Transactions")
@@ -28,10 +29,15 @@ public class ScheduledTransactionResource {
 
     private final AccountProvider accountProvider;
     private final TransactionScheduleProvider scheduleProvider;
+    private final FilterFactory filterFactory;
 
-    public ScheduledTransactionResource(AccountProvider accountProvider, TransactionScheduleProvider scheduleProvider) {
+    public ScheduledTransactionResource(
+            AccountProvider accountProvider,
+            TransactionScheduleProvider scheduleProvider,
+            FilterFactory filterFactory) {
         this.accountProvider = accountProvider;
         this.scheduleProvider = scheduleProvider;
+        this.filterFactory = filterFactory;
     }
 
     @Get
@@ -73,6 +79,26 @@ public class ScheduledTransactionResource {
                         .head()));
             }
         });
+    }
+
+    @Post
+    @Operation(
+            operationId = "searchTransactionSchedule",
+            summary = "Search schedule"
+    )
+    public Flowable<ScheduledTransactionResponse> search(@Valid @Body ScheduleSearchRequest request) {
+        var filter = filterFactory.schedule()
+                .contract(Collections.List(request.getContracts()).map(c -> new EntityRef(c.getId())))
+                .activeOnly();
+
+        return Flowable.create(emitter -> {
+            scheduleProvider.lookup(filter)
+                    .map(ScheduledTransactionResponse::new)
+                    .content()
+                    .forEach(emitter::onNext);
+
+            emitter.onComplete();
+        }, BackpressureStrategy.BUFFER);
     }
 
     @Get("/{scheduleId}")
