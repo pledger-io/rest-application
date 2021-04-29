@@ -6,59 +6,69 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.SynchronousTransactionManager;
 
 import javax.persistence.EntityManager;
+import java.sql.Connection;
 import java.util.List;
 
 public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
 
     private final EntityManager entityManager;
+    private final SynchronousTransactionManager<Connection> transactionManager;
 
-    public NonReactivePipe(EntityManager entityManager) {
+    public NonReactivePipe(EntityManager entityManager, SynchronousTransactionManager<Connection> transactionManager) {
         this.entityManager = entityManager;
+        this.transactionManager = transactionManager;
     }
 
     @SuppressWarnings("unchecked")
     public Optional<T> maybe() {
-        var query = entityManager.createQuery(hql());
+        return transactionManager.executeRead(status -> {
+            var query = entityManager.createQuery(hql());
 
-        applyParameters(query);
-        applyPaging(query);
+            applyParameters(query);
+            applyPaging(query);
 
-        return Control.Try(() -> (T) query.getSingleResult())
-                .map(Control::Option)
-                .recover(e -> Control.Option())
-                .get();
+            return Control.Try(() -> (T) query.getSingleResult())
+                    .map(Control::Option)
+                    .recover(e -> Control.Option())
+                    .get();
+        });
     }
 
     @SuppressWarnings("unchecked")
     public Sequence<T> sequence() {
-        var query = entityManager.createQuery(hql() + sort());
+        return transactionManager.executeRead(status -> {
+            var query = entityManager.createQuery(hql() + sort());
 
-        applyParameters(query);
-        applyPaging(query);
+            applyParameters(query);
+            applyPaging(query);
 
-        return Collections.List(query.getResultList());
+            return Collections.List(query.getResultList());
+        });
     }
 
     @SuppressWarnings("unchecked")
     public ResultPage<T> page() {
-        var countHql = "select count(distinct a.id) " + hql();
-        var selectHql = "select distinct a " + hql() + sort();
+        return transactionManager.executeRead(status -> {
+            var countHql = "select count(distinct a.id) " + hql();
+            var selectHql = "select distinct a " + hql() + sort();
 
-        var countQuery = entityManager.createQuery(countHql, Long.class);
-        var selectQuery = entityManager.createQuery(selectHql);
+            var countQuery = entityManager.createQuery(countHql, Long.class);
+            var selectQuery = entityManager.createQuery(selectHql);
 
-        applyParameters(countQuery);
-        applyParameters(selectQuery);
-        applyPaging(selectQuery);
+            applyParameters(countQuery);
+            applyParameters(selectQuery);
+            applyPaging(selectQuery);
 
-        long hits = countQuery.getSingleResult();
+            long hits = countQuery.getSingleResult();
 
-        return new ResultPageImpl<>(
-                Collections.List((List<T>) selectQuery.getResultList()),
-                limit(),
-                hits);
+            return new ResultPageImpl<>(
+                    Collections.List((List<T>) selectQuery.getResultList()),
+                    limit(),
+                    hits);
+        });
     }
 
     @Override

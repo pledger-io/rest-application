@@ -23,7 +23,7 @@ public class RegisterAccountIconHandler implements CommandHandler<RegisterAccoun
     @Override
     @BusinessEventListener
     public void handle(RegisterAccountIconCommand command) {
-        log.trace("[{}] - Processing icon registration event", command.id());
+        log.info("[{}] - Processing icon registration event", command.id());
 
         var hql = """
                 update AccountJpa

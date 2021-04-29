@@ -23,7 +23,7 @@ public class ChangeConditionHandler implements CommandHandler<ChangeConditionCom
     @Override
     @BusinessEventListener
     public void handle(ChangeConditionCommand command) {
-        log.trace("[{}] - Updating rule condition", command.id());
+        log.info("[{}] - Updating rule condition", command.id());
 
         String hql = """
                 update %s

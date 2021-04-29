@@ -5,6 +5,7 @@ import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.security.authentication.UserDetails;
 import io.micronaut.security.event.LoginSuccessfulEvent;
 import io.micronaut.security.event.LogoutEvent;
+import io.micronaut.security.utils.SecurityService;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.inject.Singleton;
@@ -13,7 +14,12 @@ import javax.inject.Singleton;
 @Singleton
 public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
+    private final SecurityService securityService;
     private final static ThreadLocal<String> AUTHENTICATED_USER = new ThreadLocal<>();
+
+    public AuthenticationFacadeImpl(SecurityService securityService) {
+        this.securityService = securityService;
+    }
 
     @EventListener
     void authenticated(LoginSuccessfulEvent event) {
@@ -23,9 +29,14 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
         }
     }
 
+    public void authenticate(String username) {
+        log.trace("[{}] - Setting forced authentication on thread", username);
+        AUTHENTICATED_USER.set(username);
+    }
+
     @EventListener
     void internalAuthenticated(InternalAuthenticationEvent event) {
-        log.trace("Setting internal authentication for {} on thread", event.getUsername());
+        log.trace("[{}] - Setting internal authentication on thread", event.getUsername());
         AUTHENTICATED_USER.set(event.getUsername());
     }
 
@@ -37,6 +48,7 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
     @Override
     public String authenticated() {
+        log.trace("[{}] - request authenticated user.", AUTHENTICATED_USER.get());
         return AUTHENTICATED_USER.get();
     }
 

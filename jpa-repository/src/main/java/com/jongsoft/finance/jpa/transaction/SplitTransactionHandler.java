@@ -29,7 +29,7 @@ public class SplitTransactionHandler implements CommandHandler<SplitTransactionC
     @Override
     @BusinessEventListener
     public void handle(SplitTransactionCommand command) {
-        log.trace("[{}] - Processing transaction split event", command.id());
+        log.info("[{}] - Processing transaction split event", command.id());
 
         var transaction = entityManager.getDetached(
                 TransactionJournal.class,

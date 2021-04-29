@@ -26,7 +26,7 @@ public class RegisterTokenHandler implements CommandHandler<RegisterTokenCommand
     @Override
     @BusinessEventListener
     public void handle(RegisterTokenCommand command) {
-        log.trace("[{}] - Registering new security token.", command.username());
+        log.info("[{}] - Registering new security token.", command.username());
 
         var userAccountJpa = entityManager.get(UserAccountJpa.class, Collections.Map("username", command.username()));
 

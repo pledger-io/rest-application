@@ -23,7 +23,7 @@ public class ChangeTransactionDatesHandler implements CommandHandler<ChangeTrans
     @Override
     @BusinessEventListener
     public void handle(ChangeTransactionDatesCommand command) {
-        log.trace("[{}] - Processing transaction book event", command.id());
+        log.info("[{}] - Processing transaction book event", command.id());
 
         var hql = """
                 update TransactionJournal

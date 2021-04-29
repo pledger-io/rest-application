@@ -29,7 +29,7 @@ public class CreateTagHandler implements CommandHandler<CreateTagCommand> {
     @Override
     @BusinessEventListener
     public void handle(CreateTagCommand command) {
-        log.trace("[{}] - Processing tag creation event", command.tag());
+        log.info("[{}] - Processing tag creation event", command.tag());
 
         var toCreate = TagJpa.builder()
                 .name(command.tag())

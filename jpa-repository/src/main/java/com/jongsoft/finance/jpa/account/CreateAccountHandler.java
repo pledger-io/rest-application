@@ -29,7 +29,7 @@ public class CreateAccountHandler implements CommandHandler<CreateAccountCommand
     @Override
     @BusinessEventListener
     public void handle(CreateAccountCommand event) {
-        log.trace("[{}] - Processing account create event", event.name());
+        log.info("[{}] - Processing account create event", event.name());
 
         var toCreate = AccountJpa.builder()
                 .name(event.name())

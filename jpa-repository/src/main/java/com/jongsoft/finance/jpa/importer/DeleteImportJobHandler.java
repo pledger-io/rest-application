@@ -23,7 +23,7 @@ public class DeleteImportJobHandler implements CommandHandler<DeleteImportJobCom
     @Override
     @BusinessEventListener
     public void handle(DeleteImportJobCommand command) {
-        log.trace("[{}] - Processing import deleted event", command.id());
+        log.info("[{}] - Processing import deleted event", command.id());
 
         var hql = """
                 update ImportJpa

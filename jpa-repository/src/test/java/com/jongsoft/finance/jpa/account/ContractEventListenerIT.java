@@ -91,7 +91,7 @@ class ContractEventListenerIT extends JpaTestSetup {
     @Test
     void handleContractTerminated() {
         setup();
-        eventPublisher.publishEvent(new TerminateContract(1L));
+        eventPublisher.publishEvent(new TerminateContractCommand(1L));
 
         var check = entityManager.find(ContractJpa.class, 1L);
         Assertions.assertThat(check.isArchived()).isTrue();

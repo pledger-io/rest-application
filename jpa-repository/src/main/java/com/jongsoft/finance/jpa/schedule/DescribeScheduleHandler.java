@@ -23,7 +23,7 @@ public class DescribeScheduleHandler implements CommandHandler<DescribeScheduleC
     @Override
     @BusinessEventListener
     public void handle(DescribeScheduleCommand command) {
-        log.trace("[{}] - Processing schedule describe event", command.id());
+        log.info("[{}] - Processing schedule describe event", command.id());
 
         var hql = """
                 update ScheduledTransactionJpa 

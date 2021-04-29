@@ -5,13 +5,12 @@ import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.messaging.commands.account.TerminateAccountCommand;
+import com.jongsoft.finance.messaging.commands.contract.TerminateContractCommand;
 import com.jongsoft.finance.messaging.commands.schedule.LimitScheduleCommand;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,9 +21,7 @@ import org.mockito.invocation.InvocationOnMock;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class ScheduleTerminateContractHandlerTest {
+class ScheduleTerminateContractCommandHandlerTest {
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
@@ -60,7 +57,7 @@ class ScheduleTerminateContractHandlerTest {
                 .when(provider)
                 .lookup(filterMock);
 
-        subject.handle(new TerminateAccountCommand(1L));
+        subject.handle(new TerminateContractCommand(1L));
 
         Mockito.verify(filterMock).activeOnly();
         Mockito.verify(filterMock).contract(Collections.List(new EntityRef(1L)));
@@ -74,6 +71,7 @@ class ScheduleTerminateContractHandlerTest {
                 InvocationOnMock::getMock);
         var schedule = ScheduledTransaction.builder()
                 .start(LocalDate.of(2019, 1, 1))
+                .end(LocalDate.of(2040, 1, 1))
                 .id(2L)
                 .build();
 
@@ -84,7 +82,7 @@ class ScheduleTerminateContractHandlerTest {
                 .when(provider)
                 .lookup(filterMock);
 
-        subject.handle(new TerminateAccountCommand(1L));
+        subject.handle(new TerminateContractCommand(1L));
 
         var captor = ArgumentCaptor.forClass(LimitScheduleCommand.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());

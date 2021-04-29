@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.contract;
 
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.EntityRef;
+import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.account.Contract;
@@ -172,9 +173,10 @@ public class ContractResource {
         // update the schedule start / end date
         scheduleProvider.lookup(
                 filterFactory.schedule()
+                        .activeOnly()
                         .contract(Collections.List(new EntityRef(contractId))))
                 .content()
-                .forEach(schedule -> schedule.limit(contract.getStartDate(), LocalDate.MAX));
+                .forEach(ScheduledTransaction::limitForContract);
     }
 
     @Get("/{contractId}/expire-warning")

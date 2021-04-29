@@ -24,7 +24,7 @@ public class ChangeUserSettingHandler implements CommandHandler<ChangeUserSettin
     @Override
     @BusinessEventListener
     public void handle(ChangeUserSettingCommand command) {
-        log.trace("[{}] - Updating user setting {}", command.username(), command.type());
+        log.info("[{}] - Updating user setting {}", command.username(), command.type());
 
         var query = entityManager.update()
                 .set("username", command.username());

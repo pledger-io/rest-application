@@ -17,7 +17,6 @@ import javax.inject.Singleton;
 import javax.transaction.Transactional;
 
 @Singleton
-@Transactional
 @Named("budgetProvider")
 public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
 

@@ -23,7 +23,7 @@ public class RescheduleHandler implements CommandHandler<RescheduleCommand> {
     @Override
     @BusinessEventListener
     public void handle(RescheduleCommand command) {
-        log.trace("[{}] - Processing schedule reschedule event", command.id());
+        log.info("[{}] - Processing schedule reschedule event", command.id());
 
         var hql = """
                 update ScheduledTransactionJpa 

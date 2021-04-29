@@ -23,7 +23,7 @@ public class AttacheFileToContractHandler implements CommandHandler<AttachFileTo
     @Override
     @BusinessEventListener
     public void handle(AttachFileToContractCommand command) {
-        log.trace("[{}] - Processing contract upload event", command.id());
+        log.info("[{}] - Processing contract upload event", command.id());
 
         var hql = """
                 update ContractJpa

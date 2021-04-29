@@ -1,8 +1,10 @@
 package com.jongsoft.finance.schedule;
 
+import com.jongsoft.finance.core.AggregateBase;
+
 import java.time.LocalDate;
 
-public interface Schedulable {
+public interface Schedulable extends AggregateBase {
 
     /**
      * Limits the execution of the schedule to start no earlier then the start date and execute no later then the

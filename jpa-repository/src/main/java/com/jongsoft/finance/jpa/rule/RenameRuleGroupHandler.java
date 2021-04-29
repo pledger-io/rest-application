@@ -23,7 +23,7 @@ public class RenameRuleGroupHandler implements CommandHandler<RenameRuleGroupCom
     @Override
     @BusinessEventListener
     public void handle(RenameRuleGroupCommand command) {
-        log.trace("[{}] - Processing rule group rename event", command.id());
+        log.info("[{}] - Processing rule group rename event", command.id());
 
         var hql = """
                 update RuleGroupJpa 

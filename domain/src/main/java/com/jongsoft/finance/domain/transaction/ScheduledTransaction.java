@@ -2,6 +2,7 @@ package com.jongsoft.finance.domain.transaction;
 
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.messaging.EventBus;
@@ -65,6 +66,30 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
             this.end = end;
             EventBus.getBus().send(new LimitScheduleCommand(id, this, start, end));
         }
+    }
+
+    @BusinessMethod
+    public void limitForContract() {
+        if (contract == null) {
+            throw StatusException.badRequest("Cannot limit based on a contract when no contract is set.");
+        }
+
+        var expectedEnd = contract.getEndDate().plusYears(20);
+        if (end == null || !end.isEqual(expectedEnd)) {
+            this.start = Control.Option(this.start).getOrSupply(contract::getStartDate);
+            this.end = expectedEnd;
+            EventBus.getBus().send(new LimitScheduleCommand(id, this, this.start, end));
+        }
+    }
+
+    @BusinessMethod
+    public void terminate() {
+        if (this.start == null) {
+            this.start = LocalDate.now().minusDays(1);
+        }
+
+        this.end = LocalDate.now();
+        EventBus.getBus().send(new LimitScheduleCommand(id, this, start, end));
     }
 
     @BusinessMethod

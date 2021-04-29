@@ -25,7 +25,7 @@ public class CreateContractHandler implements CommandHandler<CreateContractComma
     @Override
     @BusinessEventListener
     public void handle(CreateContractCommand command) {
-        log.trace("[{}] - Processing contract create event", command.name());
+        log.info("[{}] - Processing contract create event", command.name());
 
         var company = entityManager.get(AccountJpa.class, Collections.Map("id", command.companyId()));
 

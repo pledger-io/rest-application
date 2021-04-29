@@ -23,7 +23,7 @@ public class DeleteCategoryHandler implements CommandHandler<DeleteCategoryComma
     @Override
     @BusinessEventListener
     public void handle(DeleteCategoryCommand command) {
-        log.trace("[{}] - Processing remove event for category", command.id());
+        log.info("[{}] - Processing remove event for category", command.id());
 
         entityManager.update()
                 .hql("""

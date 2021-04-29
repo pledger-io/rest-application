@@ -13,7 +13,6 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
 public class CurrencyProviderJpa implements CurrencyProvider {
 
     private final ReactiveEntityManager entityManager;

@@ -11,7 +11,6 @@ import javax.inject.Singleton;
 import javax.transaction.Transactional;
 
 @Singleton
-@Transactional()
 @Named("accountTypeProvider")
 public class AccountTypeProviderJpa implements AccountTypeProvider {
 

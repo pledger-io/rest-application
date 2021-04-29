@@ -27,7 +27,7 @@ public class ReorderRuleHandler implements CommandHandler<ReorderRuleCommand> {
     @Override
     @BusinessEventListener
     public void handle(ReorderRuleCommand command) {
-        log.trace("[{}] - Processing transaction rule sort event", command.id());
+        log.info("[{}] - Processing transaction rule sort event", command.id());
 
         var jpaEntity = entityManager.getDetached(RuleJpa.class, Collections.Map("id", command.id()));
 

@@ -28,7 +28,7 @@ public class CreateCategoryHandler implements CommandHandler<CreateCategoryComma
     @Override
     @BusinessEventListener
     public void handle(CreateCategoryCommand command) {
-        log.trace("[{}] - Processing create event for category", command.name());
+        log.info("[{}] - Processing create event for category", command.name());
 
         var entity = CategoryJpa.builder()
                 .label(command.name())

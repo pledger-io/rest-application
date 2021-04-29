@@ -18,9 +18,7 @@ import javax.inject.Singleton;
 import javax.transaction.Transactional;
 
 @Slf4j
-@ReadOnly
 @Singleton
-@Transactional
 public class ContractProviderJpa implements ContractProvider {
 
     private final AuthenticationFacade authenticationFacade;
@@ -65,6 +63,7 @@ public class ContractProviderJpa implements ContractProvider {
         var hql = """
                 select c from ContractJpa c
                 where c.name = :name
+                    and c.archived = false
                     and c.user.username = :username""";
 
         return entityManager.<ContractJpa>reactive()
@@ -82,6 +81,7 @@ public class ContractProviderJpa implements ContractProvider {
         var hql = """
                 select c from ContractJpa c
                 where lower(c.name) like lower(:name)
+                    and c.archived = false
                     and c.user.username = :username""";
 
         return entityManager.<ContractJpa>reactive()

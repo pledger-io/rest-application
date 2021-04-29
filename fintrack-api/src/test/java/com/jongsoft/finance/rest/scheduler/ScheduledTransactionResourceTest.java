@@ -127,7 +127,7 @@ class ScheduledTransactionResourceTest {
 
         Assertions.assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
 
-        Mockito.verify(scheduledTransaction).limit(LocalDate.of(2019, 1, 1), LocalDate.now());
+        Mockito.verify(scheduledTransaction).terminate();
     }
 
     @Test

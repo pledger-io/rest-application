@@ -25,7 +25,7 @@ public class ChangeTransactionAmountHandler implements CommandHandler<ChangeTran
     @Override
     @BusinessEventListener
     public void handle(ChangeTransactionAmountCommand command) {
-        log.trace("[{}] - Processing transaction amount change event", command.id());
+        log.info("[{}] - Processing transaction amount change event", command.id());
 
         var hql = """
                 update TransactionJpa 

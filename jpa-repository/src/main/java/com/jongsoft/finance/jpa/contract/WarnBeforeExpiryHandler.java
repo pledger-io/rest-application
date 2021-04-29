@@ -23,7 +23,7 @@ public class WarnBeforeExpiryHandler implements CommandHandler<WarnBeforeExpiryC
     @Override
     @BusinessEventListener
     public void handle(WarnBeforeExpiryCommand command) {
-        log.trace("[{}] - Processing contract warning event", command.id());
+        log.info("[{}] - Processing contract warning event", command.id());
 
         var hql = """
                 update ContractJpa

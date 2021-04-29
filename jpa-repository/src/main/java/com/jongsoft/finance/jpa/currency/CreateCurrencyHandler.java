@@ -23,7 +23,7 @@ public class CreateCurrencyHandler implements CommandHandler<CreateCurrencyComma
     @Override
     @BusinessEventListener
     public void handle(CreateCurrencyCommand command) {
-        log.trace("[{}] - Processing currency create event", command.isoCode());
+        log.info("[{}] - Processing currency create event", command.isoCode());
 
         var entity = CurrencyJpa.builder()
                 .name(command.name())

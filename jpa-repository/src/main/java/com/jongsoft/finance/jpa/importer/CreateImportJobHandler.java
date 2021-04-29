@@ -26,7 +26,7 @@ public class CreateImportJobHandler implements CommandHandler<CreateImportJobCom
     @Override
     @BusinessEventListener
     public void handle(CreateImportJobCommand command) {
-        log.trace("[{}] - Processing import create event", command.slug());
+        log.info("[{}] - Processing import create event", command.slug());
 
         var configJpa = entityManager.<CSVImportConfig>blocking()
                 .hql("from CSVImportConfig where id = :id")

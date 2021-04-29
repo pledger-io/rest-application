@@ -13,7 +13,7 @@ public class ScheduleFilterCommand extends FilterCommandJpa implements Transacti
     @Override
     public TransactionScheduleProvider.FilterCommand contract(Sequence<EntityRef> contracts) {
         if (!contracts.isEmpty()) {
-            hql("contracts", " and t.contract.id in (:contracts)");
+            hql("contracts", " and a.contract.id in (:contracts)");
             parameter("contracts", contracts.map(EntityRef::getId).toJava());
         }
         return this;
@@ -21,19 +21,19 @@ public class ScheduleFilterCommand extends FilterCommandJpa implements Transacti
 
     @Override
     public TransactionScheduleProvider.FilterCommand activeOnly() {
-        hql("dates", " and (end is null or end > :now)");
+        hql("dates", " and (a.end is null or a.end > :now)");
         parameter("now", LocalDate.now());
         return this;
     }
 
     @Override
     protected String fromHql() {
-        return "from ScheduledTransactionJpa t where 1 = 1";
+        return "from ScheduledTransactionJpa a where 1 = 1";
     }
 
     @Override
     public Sort sort() {
-        return Sort.of(Sort.Order.desc("t.start"));
+        return Sort.of(Sort.Order.desc("a.start"));
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ScheduleFilterCommand extends FilterCommandJpa implements Transacti
 
     @Override
     public FilterCommandJpa user(String username) {
-        hql("username", " and t.user.username = :username");
+        hql("username", " and a.user.username = :username");
         parameter("username", username);
         return this;
     }

@@ -235,8 +235,12 @@ class ContractResourceTest extends TestSetup {
         var contract = Mockito.spy(Contract.builder()
                 .id(1L)
                 .startDate(LocalDate.of(2020, 1, 1))
+                .endDate(LocalDate.of(2022, 1, 1))
                 .build());
-        var schedule = Mockito.spy(ScheduledTransaction.builder().id(2L).build());
+        var schedule = Mockito.spy(ScheduledTransaction.builder()
+                .id(2L)
+                .contract(contract)
+                .build());
         final Account account = Account.builder().id(1L).build();
         var filterCommand = filterFactory.schedule();
 
@@ -256,8 +260,7 @@ class ContractResourceTest extends TestSetup {
                 20.2));
 
         Mockito.verify(contract).createSchedule(new ScheduleValue(Periodicity.MONTHS, 3), account, 20.2);
-        Mockito.verify(schedule).limit(LocalDate.of(2020, 1, 1), LocalDate.MAX);
-
+        Mockito.verify(schedule).limitForContract();
     }
 
     @Test

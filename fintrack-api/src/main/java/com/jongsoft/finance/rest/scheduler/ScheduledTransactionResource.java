@@ -3,6 +3,7 @@ package com.jongsoft.finance.rest.scheduler;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.model.ScheduledTransactionResponse;
+import com.jongsoft.lang.Control;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
@@ -152,7 +153,8 @@ public class ScheduledTransactionResource {
         if (toRemove.isEmpty()) {
             return HttpResponse.notFound();
         } else {
-            toRemove.get().limit(toRemove.head().getStart(), LocalDate.now());
+            var schedule = toRemove.get();
+            schedule.terminate();
             return HttpResponse.ok();
         }
     }

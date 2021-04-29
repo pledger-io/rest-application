@@ -32,7 +32,7 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
     @Override
     @BusinessEventListener
     public void handle(LinkTransactionCommand command) {
-        log.trace("[{}] - Processing transaction relation change {}", command.id(), command.type());
+        log.info("[{}] - Processing transaction relation change {}", command.id(), command.type());
 
         var update = switch (command.type()) {
             case CATEGORY -> " category = :relation";

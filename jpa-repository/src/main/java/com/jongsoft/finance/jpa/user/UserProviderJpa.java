@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.Currency;
 
 @Singleton
-@Transactional
 @Named("userProvider")
 public class UserProviderJpa implements UserProvider {
 

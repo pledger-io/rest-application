@@ -28,7 +28,7 @@ public class CreateRuleGroupHandler implements CommandHandler<CreateRuleGroupCom
     @Override
     @BusinessEventListener
     public void handle(CreateRuleGroupCommand command) {
-        log.trace("[{}] - Processing rule group create event", command.name());
+        log.info("[{}] - Processing rule group create event", command.name());
 
         var hql = """
                 select max(sort) + 1 from RuleGroupJpa

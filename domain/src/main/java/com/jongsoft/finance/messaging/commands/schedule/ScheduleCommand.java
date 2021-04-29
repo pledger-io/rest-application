@@ -11,7 +11,7 @@ public interface ScheduleCommand extends ApplicationEvent {
     Schedulable schedulable();
 
     default String businessKey() {
-        return "bk_" + processDefinition();
+        return "bk_" + processDefinition() + "_" + schedulable().getId();
     }
 
     default Map<String, Object> variables() {

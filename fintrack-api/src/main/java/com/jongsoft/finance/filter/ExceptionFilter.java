@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 
 @Slf4j
-@Filter("/api/**")
+//@Filter("/api/**")
 public class ExceptionFilter extends OncePerRequestHttpServerFilter {
 
     @Override

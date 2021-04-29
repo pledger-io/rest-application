@@ -111,7 +111,7 @@ public class Contract implements AggregateBase, Serializable {
         }
 
         this.terminated = true;
-        EventBus.getBus().send(new TerminateContract(id));
+        EventBus.getBus().send(new TerminateContractCommand(id));
     }
 
     @Override

@@ -23,7 +23,7 @@ public class DescribeTransactionHandler implements CommandHandler<DescribeTransa
     @Override
     @BusinessEventListener
     public void handle(DescribeTransactionCommand command) {
-        log.trace("[{}] - Processing transaction describe event", command.id());
+        log.info("[{}] - Processing transaction describe event", command.id());
         var hqlTransaction = """
                 update TransactionJournal 
                 set description = :description

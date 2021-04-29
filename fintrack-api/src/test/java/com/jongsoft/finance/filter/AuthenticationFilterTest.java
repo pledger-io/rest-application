@@ -1,5 +1,6 @@
 package com.jongsoft.finance.filter;
 
+import com.jongsoft.finance.security.AuthenticationFacadeImpl;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.http.HttpRequest;
@@ -24,11 +25,14 @@ class AuthenticationFilterTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    private AuthenticationFacadeImpl authenticationFacade;
+
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
 
-        subject = new AuthenticationFilter(eventPublisher);
+        subject = new AuthenticationFilter(authenticationFacade);
     }
 
     @Test

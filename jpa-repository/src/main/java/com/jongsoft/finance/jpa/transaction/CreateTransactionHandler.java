@@ -47,7 +47,7 @@ public class CreateTransactionHandler implements CommandHandler<CreateTransactio
 
     @Override
     public long handleCreatedEvent(CreateTransactionCommand command) {
-        log.trace("[{}] - Processing transaction create event", command.transaction().getDescription());
+        log.info("[{}] - Processing transaction create event", command.transaction().getDescription());
 
         var jpaEntity = TransactionJournal.builder()
                 .date(command.transaction().getDate())

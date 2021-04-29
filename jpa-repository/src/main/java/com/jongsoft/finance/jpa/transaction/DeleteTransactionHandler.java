@@ -24,7 +24,7 @@ public class DeleteTransactionHandler implements CommandHandler<DeleteTransactio
     @Override
     @BusinessEventListener
     public void handle(DeleteTransactionCommand command) {
-        log.trace("[{}] - Processing transaction delete event", command.id());
+        log.info("[{}] - Processing transaction delete event", command.id());
 
         entityManager.update()
                 .hql("update TransactionJournal set deleted = :now where id = :id")

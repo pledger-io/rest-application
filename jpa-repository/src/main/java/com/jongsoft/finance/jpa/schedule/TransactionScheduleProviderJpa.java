@@ -2,8 +2,10 @@ package com.jongsoft.finance.jpa.schedule;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
+import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -16,7 +18,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 
 @Singleton
-@Transactional
 @Named("transactionScheduleProvider")
 public class TransactionScheduleProviderJpa implements TransactionScheduleProvider {
 
@@ -96,7 +97,20 @@ public class TransactionScheduleProviderJpa implements TransactionScheduleProvid
                         .name(source.getDestination().getName())
                         .type(source.getDestination().getType().getLabel())
                         .build())
+                .contract(build(source.getContract()))
                 .amount(source.getAmount())
+                .build();
+    }
+
+    private Contract build(ContractJpa source) {
+        if (source == null) {
+            return null;
+        }
+
+        return Contract.builder()
+                .id(source.getId())
+                .startDate(source.getStartDate())
+                .endDate(source.getEndDate())
                 .build();
     }
 

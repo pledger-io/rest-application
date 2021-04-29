@@ -23,7 +23,7 @@ public class ChangePasswordHandler implements CommandHandler<ChangePasswordComma
     @Override
     @BusinessEventListener
     public void handle(ChangePasswordCommand command) {
-        log.trace("[{}] - Updating password for user", command.username());
+        log.info("[{}] - Updating password for user", command.username());
 
         entityManager.update()
                 .hql("""

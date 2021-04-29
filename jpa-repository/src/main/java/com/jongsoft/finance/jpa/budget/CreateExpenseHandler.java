@@ -27,7 +27,7 @@ public class CreateExpenseHandler implements CommandHandler<CreateExpenseCommand
     @Override
     @BusinessEventListener
     public void handle(CreateExpenseCommand command) {
-        log.trace("[{}] - Processing expense create event", command.name());
+        log.info("[{}] - Processing expense create event", command.name());
 
         var hql = """
                 select b from BudgetJpa b

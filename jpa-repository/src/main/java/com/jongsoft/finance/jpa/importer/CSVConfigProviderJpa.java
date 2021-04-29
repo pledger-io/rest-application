@@ -15,7 +15,6 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
 public class CSVConfigProviderJpa implements CSVConfigProvider {
 
     private final ReactiveEntityManager entityManager;

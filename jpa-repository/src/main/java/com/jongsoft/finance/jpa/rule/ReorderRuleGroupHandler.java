@@ -27,7 +27,7 @@ public class ReorderRuleGroupHandler implements CommandHandler<ReorderRuleGroupC
     @Override
     @BusinessEventListener
     public void handle(ReorderRuleGroupCommand command) {
-        log.trace("[{}] - Processing rule group sorting event", command.id());
+        log.info("[{}] - Processing rule group sorting event", command.id());
 
         var jpaEntity = entityManager.getDetached(RuleGroupJpa.class, Collections.Map("id", command.id()));
 

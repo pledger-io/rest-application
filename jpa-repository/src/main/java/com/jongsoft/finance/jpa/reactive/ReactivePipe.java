@@ -1,15 +1,17 @@
 package com.jongsoft.finance.jpa.reactive;
 
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Control;
 import io.micronaut.transaction.SynchronousTransactionManager;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.reactivex.plugins.RxJavaPlugins;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import java.sql.Connection;
 
 public class ReactivePipe<T> extends JpaPipe<T, ReactivePipe<T>> {

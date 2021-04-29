@@ -24,7 +24,7 @@ public class RevokeTokenHandler implements CommandHandler<RevokeTokenCommand> {
     @Override
     @BusinessEventListener
     public void handle(RevokeTokenCommand command) {
-        log.trace("[{}] - Revoking security token.", command.token());
+        log.info("[{}] - Revoking security token.", command.token());
 
         var hql = """
                 update AccountTokenJpa

@@ -24,7 +24,6 @@ import java.util.Objects;
 
 @Slf4j
 @Singleton
-@Transactional
 @Named("accountProvider")
 public class AccountProviderJpa implements AccountProvider {
 
@@ -85,12 +84,12 @@ public class AccountProviderJpa implements AccountProvider {
 
     @Override
     public Maybe<Account> lookup(String name) {
-        log.trace("Account name lookup: {}", name);
+        log.trace("Account name lookup: {} for {}", name, authenticationFacade.authenticated());
 
         String hql = """
-                select a 
+                select a
                 from AccountJpa a
-                where 
+                where
                   a.name = :name
                   and a.user.username = :username
                   and a.archived = false""";

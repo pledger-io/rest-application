@@ -23,7 +23,7 @@ public class RenameCurrencyHandler implements CommandHandler<RenameCurrencyComma
     @Override
     @BusinessEventListener
     public void handle(RenameCurrencyCommand command) {
-        log.trace("[{}] - Processing currency rename event", command.id());
+        log.info("[{}] - Processing currency rename event", command.id());
 
         var hql = """
                 update CurrencyJpa c 

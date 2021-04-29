@@ -23,7 +23,7 @@ public class RenameCategoryHandler implements CommandHandler<RenameCategoryComma
     @Override
     @BusinessEventListener
     public void handle(RenameCategoryCommand command) {
-        log.trace("[{}] - Processing rename event for category", command.id());
+        log.info("[{}] - Processing rename event for category", command.id());
 
         entityManager.update()
                 .hql("""

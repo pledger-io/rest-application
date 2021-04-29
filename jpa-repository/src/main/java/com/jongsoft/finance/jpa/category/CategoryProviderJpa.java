@@ -15,7 +15,6 @@ import javax.inject.Singleton;
 import javax.transaction.Transactional;
 
 @Singleton
-@Transactional
 @Named("categoryProvider")
 public class CategoryProviderJpa implements CategoryProvider {
 

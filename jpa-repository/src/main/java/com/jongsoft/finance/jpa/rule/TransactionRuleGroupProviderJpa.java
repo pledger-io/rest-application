@@ -14,7 +14,6 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
 @Named("transactionRuleGroupProvider")
 public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProvider {
 

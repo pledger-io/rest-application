@@ -35,7 +35,7 @@ public class CreateBudgetHandler implements CommandHandler<CreateBudgetCommand> 
     @Override
     @BusinessEventListener
     public void handle(CreateBudgetCommand command) {
-        log.trace("[{}] - Processing budget create event", command.budget().getStart());
+        log.info("[{}] - Processing budget create event", command.budget().getStart());
 
         var budget = BudgetJpa.builder()
                 .from(command.budget().getStart())

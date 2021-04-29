@@ -23,7 +23,7 @@ public class ChangeContractHandler implements CommandHandler<ChangeContractComma
     @Override
     @BusinessEventListener
     public void handle(ChangeContractCommand command) {
-        log.trace("[{}] - Processing contract changed event", command.id());
+        log.info("[{}] - Processing contract changed event", command.id());
 
         var hql = """
                 update ContractJpa

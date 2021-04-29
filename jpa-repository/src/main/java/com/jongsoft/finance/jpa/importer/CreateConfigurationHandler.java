@@ -29,7 +29,7 @@ public class CreateConfigurationHandler implements CommandHandler<CreateConfigur
     @Override
     @BusinessEventListener
     public void handle(CreateConfigurationCommand command) {
-        log.trace("[{}] - Processing CSV configuration create event", command.name());
+        log.info("[{}] - Processing CSV configuration create event", command.name());
 
         var entity = CSVImportConfig.builder()
                 .fileCode(command.fileCode())

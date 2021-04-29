@@ -25,7 +25,7 @@ public class RenameAccountHandler implements CommandHandler<RenameAccountCommand
     @Override
     @BusinessEventListener
     public void handle(RenameAccountCommand command) {
-        log.trace("[{}] - Processing account rename event", command.id());
+        log.info("[{}] - Processing account rename event", command.id());
 
         var hql = """
                 update AccountJpa

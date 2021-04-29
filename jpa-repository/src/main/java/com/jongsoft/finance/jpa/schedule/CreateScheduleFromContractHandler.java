@@ -30,7 +30,7 @@ public class CreateScheduleFromContractHandler implements CommandHandler<CreateS
     @Override
     @BusinessEventListener
     public void handle(CreateScheduleForContractCommand command) {
-        log.trace("[{}] - Creating a schedule from an existing contract", command.name());
+        log.info("[{}] - Creating a schedule from an existing contract", command.name());
 
         var jpaEntity = ScheduledTransactionJpa.builder()
                 .name(command.name())

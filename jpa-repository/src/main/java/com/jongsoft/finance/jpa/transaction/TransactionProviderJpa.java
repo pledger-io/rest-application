@@ -29,7 +29,6 @@ import java.util.Objects;
 
 @Slf4j
 @Singleton
-@Transactional
 @Named("transactionProvider")
 public class TransactionProviderJpa implements TransactionProvider {
 

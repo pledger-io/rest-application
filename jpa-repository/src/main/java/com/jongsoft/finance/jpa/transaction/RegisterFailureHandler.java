@@ -23,7 +23,7 @@ public class RegisterFailureHandler implements CommandHandler<RegisterFailureCom
     @Override
     @BusinessEventListener
     public void handle(RegisterFailureCommand command) {
-        log.trace("[{}] - Processing transaction failed register event", command.id());
+        log.info("[{}] - Processing transaction failed register event", command.id());
 
         var hql = """
                 update TransactionJournal 

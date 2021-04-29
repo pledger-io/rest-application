@@ -23,7 +23,7 @@ public class LimitScheduleHandler implements CommandHandler<LimitScheduleCommand
     @Override
     @BusinessEventListener
     public void handle(LimitScheduleCommand command) {
-        log.trace("[{}] - Processing schedule limit event", command.id());
+        log.info("[{}] - Processing schedule limit event", command.id());
 
         var hql = """
                 update ScheduledTransactionJpa t

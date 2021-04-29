@@ -24,7 +24,7 @@ public class CompleteImporterJobHandler implements CommandHandler<CompleteImport
     @Override
     @BusinessEventListener
     public void handle(CompleteImportJobCommand command) {
-        log.trace("[{}] - Processing import finished event", command.id());
+        log.info("[{}] - Processing import finished event", command.id());
 
         var hql = """
                 update ImportJpa

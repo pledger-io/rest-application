@@ -23,7 +23,7 @@ public class ChangeRuleHandler implements CommandHandler<ChangeRuleCommand> {
     @Override
     @BusinessEventListener
     public void handle(ChangeRuleCommand command) {
-        log.trace("[{}] - Updating rule change", command.id());
+        log.info("[{}] - Updating rule change", command.id());
 
         var hql = """
                 update %s

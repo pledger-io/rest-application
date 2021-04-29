@@ -4,7 +4,7 @@ import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.contract.AttachFileToContractCommand;
 import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
-import com.jongsoft.finance.messaging.commands.contract.TerminateContract;
+import com.jongsoft.finance.messaging.commands.contract.TerminateContractCommand;
 import com.jongsoft.finance.messaging.commands.contract.WarnBeforeExpiryCommand;
 import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleForContractCommand;
 import com.jongsoft.finance.schedule.Periodicity;
@@ -174,7 +174,7 @@ class ContractTest {
 
     @Test
     void terminate() {
-        ArgumentCaptor<TerminateContract> changeCaptor = ArgumentCaptor.forClass(TerminateContract.class);
+        ArgumentCaptor<TerminateContractCommand> changeCaptor = ArgumentCaptor.forClass(TerminateContractCommand.class);
 
         Contract.builder()
                 .id(1L)
@@ -196,7 +196,7 @@ class ContractTest {
                         .build()
                         .terminate());
 
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any(TerminateContract.class));
+        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any(TerminateContractCommand.class));
 
         assertThat(exception.getMessage()).isEqualTo("Contract has not yet expired.");
     }
@@ -212,7 +212,7 @@ class ContractTest {
                         .build()
                         .terminate());
 
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any(TerminateContract.class));
+        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any(TerminateContractCommand.class));
 
         assertThat(exception.getMessage()).isEqualTo("Contract is already terminated.");
     }

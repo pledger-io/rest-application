@@ -16,7 +16,6 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
 public class ImportProviderJpa implements ImportProvider {
 
     private final AuthenticationFacade authenticationFacade;

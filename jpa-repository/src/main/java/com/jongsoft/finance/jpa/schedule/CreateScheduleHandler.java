@@ -28,7 +28,7 @@ public class CreateScheduleHandler implements CommandHandler<CreateScheduleComma
     @Override
     @BusinessEventListener
     public void handle(CreateScheduleCommand command) {
-        log.trace("[{}] - Processing schedule create event", command.name());
+        log.info("[{}] - Processing schedule create event", command.name());
         var from = entityManager.get(AccountJpa.class, Collections.Map("id", command.from().getId()));
         var to = entityManager.get(AccountJpa.class, Collections.Map("id", command.destination().getId()));
 

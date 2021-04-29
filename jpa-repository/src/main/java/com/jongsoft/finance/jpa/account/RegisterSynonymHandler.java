@@ -28,7 +28,7 @@ public class RegisterSynonymHandler implements CommandHandler<RegisterSynonymCom
     @Override
     @BusinessEventListener
     public void handle(RegisterSynonymCommand command) {
-        log.trace("[{}] - Processing register synonym event", command.accountId());
+        log.info("[{}] - Processing register synonym event", command.accountId());
 
         var hql = """
                 select id from AccountSynonymJpa where

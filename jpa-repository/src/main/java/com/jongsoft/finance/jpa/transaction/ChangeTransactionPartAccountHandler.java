@@ -23,7 +23,7 @@ public class ChangeTransactionPartAccountHandler implements CommandHandler<Chang
     @Override
     @BusinessEventListener
     public void handle(ChangeTransactionPartAccount command) {
-        log.trace("[{}] - Processing transaction account change", command.id());
+        log.info("[{}] - Processing transaction account change", command.id());
 
         var hql = """
                 update TransactionJpa 

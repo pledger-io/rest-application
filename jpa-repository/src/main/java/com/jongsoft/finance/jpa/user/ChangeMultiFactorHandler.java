@@ -23,7 +23,7 @@ public class ChangeMultiFactorHandler implements CommandHandler<ChangeMultiFacto
     @Override
     @BusinessEventListener
     public void handle(ChangeMultiFactorCommand command) {
-        log.trace("[{}] - Updating multi factor setting", command.username());
+        log.info("[{}] - Updating multi factor setting", command.username());
 
         entityManager.update()
                 .hql("""

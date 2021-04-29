@@ -23,7 +23,7 @@ public class ChangeAccountInterestHandler implements CommandHandler<ChangeIntere
     @Override
     @BusinessEventListener
     public void handle(ChangeInterestCommand command) {
-        log.trace("[{}] - Processing account interest event", command.id());
+        log.info("[{}] - Processing account interest event", command.id());
 
         var hql = """
                 update AccountJpa 

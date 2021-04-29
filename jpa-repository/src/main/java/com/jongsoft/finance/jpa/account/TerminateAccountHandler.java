@@ -23,7 +23,7 @@ public class TerminateAccountHandler implements CommandHandler<TerminateAccountC
     @Override
     @BusinessEventListener
     public void handle(TerminateAccountCommand command) {
-        log.trace("[{}] - Processing account terminate event", command.id());
+        log.info("[{}] - Processing account terminate event", command.id());
 
         entityManager.update()
                 .hql("update AccountJpa a set a.archived = true where a.id = :id")

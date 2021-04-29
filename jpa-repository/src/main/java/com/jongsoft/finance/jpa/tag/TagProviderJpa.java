@@ -15,7 +15,6 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
 @Named("tagProvider")
 public class TagProviderJpa implements TagProvider {
 

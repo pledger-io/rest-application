@@ -12,7 +12,6 @@ import javax.inject.Singleton;
 import javax.transaction.Transactional;
 
 @Singleton
-@Transactional
 @Named("expenseProvider")
 public class ExpenseProviderJpa implements ExpenseProvider {
 

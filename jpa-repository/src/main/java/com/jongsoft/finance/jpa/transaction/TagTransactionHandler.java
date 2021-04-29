@@ -29,7 +29,7 @@ public class TagTransactionHandler implements CommandHandler<TagTransactionComma
     @Override
     @BusinessEventListener
     public void handle(TagTransactionCommand command) {
-        log.trace("[{}] - Processing transaction tagging event", command.id());
+        log.info("[{}] - Processing transaction tagging event", command.id());
 
         var transaction = entityManager.get(TransactionJournal.class, Collections.Map("id", command.id()));
         transaction.getTags().clear();

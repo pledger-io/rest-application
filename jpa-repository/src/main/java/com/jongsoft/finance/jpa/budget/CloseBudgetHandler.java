@@ -23,7 +23,7 @@ public class CloseBudgetHandler implements CommandHandler<CloseBudgetCommand> {
     @Override
     @BusinessEventListener
     public void handle(CloseBudgetCommand command) {
-        log.trace("[{}] - Processing budget closing event", command.id());
+        log.info("[{}] - Processing budget closing event", command.id());
 
         var hql = """
                 update BudgetJpa

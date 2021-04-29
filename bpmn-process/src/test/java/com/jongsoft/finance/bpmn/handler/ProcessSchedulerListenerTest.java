@@ -35,6 +35,11 @@ class ProcessSchedulerListenerTest {
         processInstantiationBuilder = Mockito.mock(ProcessInstantiationBuilder.class);
         schedulable = new Schedulable() {
             @Override
+            public Long getId() {
+                return 1L;
+            }
+
+            @Override
             public void limit(LocalDate start, LocalDate end) {
             }
 
