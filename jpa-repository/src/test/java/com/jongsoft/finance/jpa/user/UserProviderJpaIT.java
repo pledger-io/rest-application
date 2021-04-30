@@ -2,8 +2,11 @@ package com.jongsoft.finance.jpa.user;
 
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.test.annotation.MockBean;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.inject.Inject;
 
@@ -63,4 +66,8 @@ class UserProviderJpaIT extends JpaTestSetup {
                 .assertValue(a -> "demo-user".equals(a.getUsername()));
     }
 
+    @MockBean
+    AuthenticationFacade authenticationFacade() {
+        return Mockito.mock(AuthenticationFacade.class);
+    }
 }

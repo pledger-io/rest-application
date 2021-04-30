@@ -5,9 +5,12 @@ import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.jpa.user.entity.RoleJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.commands.user.*;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -111,4 +114,8 @@ class UserEventListenerIT extends JpaTestSetup {
                 .isEqualTo(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
     }
 
+    @MockBean
+    AuthenticationFacade authenticationFacade() {
+        return Mockito.mock(AuthenticationFacade.class);
+    }
 }

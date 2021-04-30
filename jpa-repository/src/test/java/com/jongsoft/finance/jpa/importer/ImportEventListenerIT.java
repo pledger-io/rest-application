@@ -5,9 +5,12 @@ import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.messaging.commands.importer.CompleteImportJobCommand;
 import com.jongsoft.finance.messaging.commands.importer.CreateImportJobCommand;
 import com.jongsoft.finance.messaging.commands.importer.DeleteImportJobCommand;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -62,5 +65,10 @@ class ImportEventListenerIT extends JpaTestSetup {
 
         var check = entityManager.find(ImportJpa.class, 1L);
         Assertions.assertThat(check.isArchived()).isTrue();
+    }
+
+    @MockBean
+    AuthenticationFacade authenticationFacade() {
+        return Mockito.mock(AuthenticationFacade.class);
     }
 }

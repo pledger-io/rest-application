@@ -5,9 +5,12 @@ import com.jongsoft.finance.messaging.commands.currency.ChangeCurrencyPropertyCo
 import com.jongsoft.finance.messaging.commands.currency.CreateCurrencyCommand;
 import com.jongsoft.finance.messaging.commands.currency.CurrencyCommandType;
 import com.jongsoft.finance.providers.CurrencyProvider;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.inject.Inject;
 
@@ -87,6 +90,11 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
 
         var check = currencyProvider.lookup("EUR").blockingGet();
         Assertions.assertThat(check.isEnabled()).isFalse();
+    }
+
+    @MockBean
+    AuthenticationFacade authenticationFacade() {
+        return Mockito.mock(AuthenticationFacade.class);
     }
 
 }
