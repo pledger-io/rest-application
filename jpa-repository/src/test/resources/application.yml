@@ -7,13 +7,6 @@ datasources:
     dialect: mysql
     migration-locations: ["classpath:db/camunda/h2", "classpath:db/migration"]
 
-r2dbc:
-  datasources:
-    default:
-      url: r2dbc:h2:mem://./FinTrack
-      username: sa
-      password: ''
-
 jpa:
   default:
     packages-to-scan:
