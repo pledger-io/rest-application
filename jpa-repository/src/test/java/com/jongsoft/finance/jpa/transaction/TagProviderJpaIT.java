@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.transaction.TagProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.security.AuthenticationFacade;

@@ -1,9 +1,9 @@
 package com.jongsoft.finance.rest.importer;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.core.SettingProvider;
-import com.jongsoft.finance.domain.importer.CSVConfigProvider;
-import com.jongsoft.finance.domain.importer.ImportProvider;
+import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.providers.CSVConfigProvider;
+import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.rest.model.CSVImporterConfigResponse;
 import com.jongsoft.finance.rest.model.ImporterResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;

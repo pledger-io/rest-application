@@ -6,7 +6,7 @@ import javax.inject.Singleton;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
+import com.jongsoft.finance.providers.TransactionRuleProvider;
 
 import lombok.extern.slf4j.Slf4j;
 

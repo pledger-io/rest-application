@@ -1,7 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.user;
 
-import com.jongsoft.finance.domain.user.events.UserAccountCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.user.CreateUserCommand;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
@@ -37,7 +37,7 @@ class CreateUserDelegateTest {
 
         subject.execute(execution);
 
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(UserAccountCreatedEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateUserCommand.class));
     }
 
 }

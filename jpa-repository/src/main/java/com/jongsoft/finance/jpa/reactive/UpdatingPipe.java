@@ -10,7 +10,7 @@ public class UpdatingPipe extends JpaPipe<Void, UpdatingPipe> {
         this.entityManager = entityManager;
     }
 
-    public void update() {
+    public void execute() {
         var query = entityManager.createQuery(hql());
 
         applyParameters(query);

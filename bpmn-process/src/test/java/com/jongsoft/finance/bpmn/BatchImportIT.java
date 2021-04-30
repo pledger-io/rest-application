@@ -1,20 +1,20 @@
 package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.StorageService;
-import com.jongsoft.finance.domain.FilterFactory;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.core.ResultPage;
+import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.importer.BatchImport;
-import com.jongsoft.finance.domain.importer.ImportProvider;
+import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.TransactionCreationHandler;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
-import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
-import com.jongsoft.finance.domain.transaction.events.TransactionCreatedEvent;
+import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
+import com.jongsoft.finance.providers.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.domain.user.UserProvider;
+import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
 import com.jongsoft.lang.Collections;
@@ -231,13 +231,13 @@ class BatchImportIT extends ProcessTestSetup {
 
         MutableLong id = new MutableLong(1);
         Mockito.when(transactionCreationHandler.handleCreatedEvent(Mockito.any())).thenAnswer((Answer<Long>) invocation -> {
-            TransactionCreatedEvent event = invocation.getArgument(0);
+            CreateTransactionCommand event = invocation.getArgument(0);
             long transactionId = id.getAndAdd(1);
 
             var field = ReflectionUtils.getRequiredField(Transaction.class, "id");
             field.setAccessible(true);
-            field.set(event.getTransaction(), transactionId);
-            Mockito.when(transactionProvider.lookup(transactionId)).thenReturn(Control.Option(event.getTransaction()));
+            field.set(event.transaction(), transactionId);
+            Mockito.when(transactionProvider.lookup(transactionId)).thenReturn(Control.Option(event.transaction()));
             return transactionId;
         });
 

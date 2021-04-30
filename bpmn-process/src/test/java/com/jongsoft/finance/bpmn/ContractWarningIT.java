@@ -3,7 +3,7 @@ package com.jongsoft.finance.bpmn;
 import com.jongsoft.finance.core.MailDaemon;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.account.ContractProvider;
+import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.security.CurrentUserProvider;

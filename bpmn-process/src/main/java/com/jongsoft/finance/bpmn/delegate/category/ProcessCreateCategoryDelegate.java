@@ -2,7 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.category;
 
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.domain.user.CategoryProvider;
+import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.CategoryJson;
 import io.reactivex.Single;

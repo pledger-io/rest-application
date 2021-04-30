@@ -3,11 +3,11 @@ package com.jongsoft.finance.bpmn.delegate.budget;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.domain.user.BudgetProvider;
+import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
+import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
+import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
-import com.jongsoft.finance.domain.user.events.BudgetExpenseCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.BudgetJson;
@@ -71,8 +71,8 @@ class ProcessBudgetCreateDelegateTest {
 
         subject.execute(execution);
 
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(BudgetCreatedEvent.class));
-        Mockito.verify(eventPublisher, Mockito.times(2)).publishEvent(Mockito.any(BudgetExpenseCreatedEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateBudgetCommand.class));
+        Mockito.verify(eventPublisher, Mockito.times(2)).publishEvent(Mockito.any(CreateExpenseCommand.class));
     }
 
     @Test
@@ -95,9 +95,9 @@ class ProcessBudgetCreateDelegateTest {
 
         subject.execute(execution);
 
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(BudgetCreatedEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateBudgetCommand.class));
         Mockito.verify(initial).indexBudget(LocalDate.of(2019, 1, 1), 1200);
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(BudgetExpenseCreatedEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateExpenseCommand.class));
     }
 
 }

@@ -2,13 +2,13 @@ package com.jongsoft.finance.rest.budget;
 
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.core.ResultPage;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.domain.user.BudgetProvider;
-import com.jongsoft.finance.domain.user.ExpenseProvider;
-import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
+import com.jongsoft.finance.providers.BudgetProvider;
+import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -126,7 +127,7 @@ class BudgetResourceTest extends TestSetup {
         var response = subject.create(request).blockingGet();
 
         Assertions.assertThat(response.getPeriod().getFrom()).isEqualTo(LocalDate.of(2019, 2, 1));
-        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(BudgetCreatedEvent.class));
+        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateBudgetCommand.class));
     }
 
     @Test
@@ -226,7 +227,7 @@ class BudgetResourceTest extends TestSetup {
                                 .upperBound(50D)
                                 .build()))
                         .build()));
-        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option(200D));
+        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option(BigDecimal.valueOf(200)));
 
         TestSubscriber<ComputedExpenseResponse> testSubscriber = new TestSubscriber<>();
 

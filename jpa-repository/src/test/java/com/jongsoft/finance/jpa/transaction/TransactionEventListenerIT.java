@@ -3,11 +3,9 @@ package com.jongsoft.finance.jpa.transaction;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.events.*;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.jpa.transaction.entity.TransactionJournal;
-import com.jongsoft.finance.jpa.transaction.entity.TransactionJpa;
+import com.jongsoft.finance.messaging.commands.transaction.*;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -18,6 +16,7 @@ import org.mockito.Mockito;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -43,7 +42,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
     @Test
     void handleCreatedEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionCreatedEvent(
+        eventPublisher.publishEvent(new CreateTransactionCommand(
                 Transaction.builder()
                         .date(LocalDate.of(2020, 1, 1))
                         .currency("EUR")
@@ -73,10 +72,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
     @Test
     void handleFailureRegistrationEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionFailureEvent(
-                this,
-                1L,
-                FailureCode.POSSIBLE_DUPLICATE));
+        eventPublisher.publishEvent(new RegisterFailureCommand(1L, FailureCode.POSSIBLE_DUPLICATE));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
         Assertions.assertThat(check.getFailureCode()).isEqualTo(FailureCode.POSSIBLE_DUPLICATE);
@@ -85,29 +81,26 @@ class TransactionEventListenerIT extends JpaTestSetup {
     @Test
     void handleAmountChangedEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionAmountChangedEvent(
-                this,
+        eventPublisher.publishEvent(new ChangeTransactionAmountCommand(
                 1L,
-                40.55,
+                BigDecimal.valueOf(40.55),
                 "USD"));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
         Assertions.assertThat(check.getCurrency().getCode()).isEqualTo("USD");
 
         var part1 = entityManager.find(TransactionJpa.class, 1L);
-        Assertions.assertThat(part1.getAmount()).isEqualTo(40.55);
+        Assertions.assertThat(part1.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(40.55));
 
         var part2 = entityManager.find(TransactionJpa.class, 2L);
-        Assertions.assertThat(part2.getAmount()).isEqualTo(-40.55);
+        Assertions.assertThat(part2.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(-40.55));
     }
 
     @Test
     void handleDescribeEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionDescribeEvent(
-                this,
-                1L,
-                "Updated description"));
+        eventPublisher.publishEvent(
+                new DescribeTransactionCommand( 1L, "Updated description"));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
         Assertions.assertThat(check.getDescription()).isEqualTo("Updated description");
@@ -116,12 +109,11 @@ class TransactionEventListenerIT extends JpaTestSetup {
     @Test
     void handleBookedEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionBookedEvent(
-                this,
+        eventPublisher.publishEvent(new ChangeTransactionDatesCommand(
                 1L,
                 LocalDate.of(2030, 1, 1),
-                LocalDate.of(2030, 1, 2),
-                LocalDate.of(2030, 1, 3)));
+                LocalDate.of(2030, 1, 3),
+                LocalDate.of(2030, 1, 2)));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
         Assertions.assertThat(check.getDate()).isEqualTo(LocalDate.of(2030, 1, 1));
@@ -132,11 +124,10 @@ class TransactionEventListenerIT extends JpaTestSetup {
     @Test
     void handleRelationEvent_category() {
         setup();
-        eventPublisher.publishEvent(new TransactionRelationEvent(
-                this,
-                1l,
-                "Test",
-                TransactionRelationEvent.Type.CATEGORY));
+        eventPublisher.publishEvent(new LinkTransactionCommand(
+                1L,
+                LinkTransactionCommand.LinkType.CATEGORY,
+                "Test"));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
         Assertions.assertThat(check.getCategory().getLabel()).isEqualTo("Test");
@@ -145,8 +136,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
     @Test
     void handleTagEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionTaggingEvent(
-                this,
+        eventPublisher.publishEvent(new TagTransactionCommand(
                 1L,
                 Collections.List("Food")));
 
@@ -158,8 +148,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
     @Test
     void handleSplitEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionSplitEvent(
-                this,
+        eventPublisher.publishEvent(new SplitTransactionCommand(
                 1L,
                 Collections.List(
                         Transaction.Part.builder()
@@ -188,9 +177,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
     @Test
     void handleDeleteEvent() {
         setup();
-        eventPublisher.publishEvent(new TransactionDeletedEvent(
-                this,
-                1L));
+        eventPublisher.publishEvent(new DeleteTransactionCommand(1L));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
         Assertions.assertThat(check.getDeleted()).isNotNull();

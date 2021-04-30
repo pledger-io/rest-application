@@ -3,7 +3,7 @@ package com.jongsoft.finance.bpmn.delegate.account;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.AccountJson;
 import io.reactivex.Single;

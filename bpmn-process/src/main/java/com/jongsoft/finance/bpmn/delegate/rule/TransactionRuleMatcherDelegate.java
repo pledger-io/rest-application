@@ -2,8 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.rule;
 
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
-import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
 import lombok.extern.slf4j.Slf4j;

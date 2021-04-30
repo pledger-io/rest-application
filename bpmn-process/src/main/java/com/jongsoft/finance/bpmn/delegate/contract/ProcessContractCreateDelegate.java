@@ -2,8 +2,8 @@ package com.jongsoft.finance.bpmn.delegate.contract;
 
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.account.ContractProvider;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.serialized.ContractJson;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Hex;

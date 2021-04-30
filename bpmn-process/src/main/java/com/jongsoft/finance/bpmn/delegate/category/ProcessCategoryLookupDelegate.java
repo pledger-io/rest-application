@@ -1,7 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.category;
 
 import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.domain.user.CategoryProvider;
+import com.jongsoft.finance.providers.CategoryProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;

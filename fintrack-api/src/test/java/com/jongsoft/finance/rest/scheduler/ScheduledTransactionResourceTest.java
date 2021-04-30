@@ -1,11 +1,13 @@
 package com.jongsoft.finance.rest.scheduler;
 
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
-import com.jongsoft.finance.domain.transaction.TransactionScheduleProvider;
+import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
@@ -18,7 +20,7 @@ import org.mockito.Mockito;
 
 import java.time.LocalDate;
 
-class ScheduledTransactionResourceTest {
+class ScheduledTransactionResourceTest extends TestSetup {
 
     private ScheduledTransactionResource subject;
 
@@ -27,11 +29,15 @@ class ScheduledTransactionResourceTest {
 
     private ScheduledTransaction scheduledTransaction;
 
+    private FilterFactory filterFactory;
+
     @BeforeEach
     void setup() {
         accountProvider = Mockito.mock(AccountProvider.class);
         transactionScheduleProvider = Mockito.mock(TransactionScheduleProvider.class);
-        subject = new ScheduledTransactionResource(accountProvider, transactionScheduleProvider);
+        filterFactory = generateFilterMock();
+
+        subject = new ScheduledTransactionResource(accountProvider, transactionScheduleProvider, filterFactory);
 
         scheduledTransaction = Mockito.spy(ScheduledTransaction.builder()
                 .id(1L)
@@ -127,7 +133,7 @@ class ScheduledTransactionResourceTest {
 
         Assertions.assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
 
-        Mockito.verify(scheduledTransaction).limit(LocalDate.of(2019, 1, 1), LocalDate.now());
+        Mockito.verify(scheduledTransaction).terminate();
     }
 
     @Test

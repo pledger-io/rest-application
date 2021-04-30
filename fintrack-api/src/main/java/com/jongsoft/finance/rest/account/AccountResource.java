@@ -1,24 +1,31 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.account.AccountTypeProvider;
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.AccountTypeProvider;
+import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.reactive.ContextPropagation;
 import com.jongsoft.finance.rest.model.AccountResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.*;
+import io.micronaut.http.context.ServerRequestContext;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.micronaut.security.utils.SecurityService;
 import io.reactivex.Single;
+import io.reactivex.plugins.RxJavaPlugins;
+import io.reactivex.schedulers.Schedulers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Controller("/api/accounts")
 @Tag(name = "Account information")
@@ -124,30 +131,31 @@ public class AccountResource {
             description = "This operation will allow for adding new accounts to the system"
     )
     public Single<AccountResponse> create(@Valid @Body AccountEditRequest accountEditRequest) {
-        accountProvider.lookup(accountEditRequest.getName())
-                .test()
-                .assertNoValues();
-
-        currentUserProvider.currentUser()
-                .createAccount(
-                        accountEditRequest.getName(),
-                        accountEditRequest.getCurrency(),
-                        accountEditRequest.getType());
-
         return accountProvider.lookup(accountEditRequest.getName())
-                .switchIfEmpty(Single.error(StatusException.badRequest("Failed to create new account")))
-                .map(account -> {
-                    if (accountEditRequest.getInterestPeriodicity() != null) {
-                        account.interest(accountEditRequest.getInterest(), accountEditRequest.getInterestPeriodicity());
-                    }
+                .switchIfEmpty(Single.create(emitter -> {
+                    currentUserProvider.currentUser()
+                            .createAccount(
+                                    accountEditRequest.getName(),
+                                    accountEditRequest.getCurrency(),
+                                    accountEditRequest.getType());
 
-                    account.changeAccount(
-                            accountEditRequest.getIban(),
-                            accountEditRequest.getBic(),
-                            accountEditRequest.getNumber());
+                    accountProvider.lookup(accountEditRequest.getName())
+                            .map(account -> {
+                                if (accountEditRequest.getInterestPeriodicity() != null) {
+                                    account.interest(accountEditRequest.getInterest(), accountEditRequest.getInterestPeriodicity());
+                                }
 
-                    return account;
-                })
+                                account.changeAccount(
+                                        accountEditRequest.getIban(),
+                                        accountEditRequest.getBic(),
+                                        accountEditRequest.getNumber());
+
+                                return account;
+                            })
+                            .switchIfEmpty(Single.error(StatusException.internalError("Failed to create account")))
+                            .doOnError(emitter::onError)
+                            .subscribe(emitter::onSuccess);
+                }))
                 .map(AccountResponse::new);
     }
 

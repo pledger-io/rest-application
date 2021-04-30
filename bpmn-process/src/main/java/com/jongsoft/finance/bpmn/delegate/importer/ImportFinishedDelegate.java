@@ -1,7 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
 import com.jongsoft.finance.StorageService;
-import com.jongsoft.finance.domain.importer.ImportProvider;
+import com.jongsoft.finance.providers.ImportProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;

@@ -2,7 +2,7 @@ import io.franzbecker.gradle.lombok.task.DelombokTask
 
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:6.0.0'
@@ -11,7 +11,7 @@ buildscript {
 
 plugins {
     id "com.diffplug.eclipse.apt" version "3.28.0"
-    id "io.micronaut.library" version '1.4.0'
+    id "io.micronaut.library" version '1.5.0'
     id "org.sonarqube" version "3.1.1"
     id 'io.franzbecker.gradle-lombok' version '4.0.0'
     id 'jacoco'
@@ -20,13 +20,13 @@ plugins {
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 allprojects {
+    apply plugin: 'java'
     apply plugin: 'signing'
     apply plugin: 'maven-publish'
     apply plugin: 'application'
 
     repositories {
         mavenCentral()
-        jcenter()
 
         maven {
             url 'https://oss.sonatype.org/service/local/repositories/releases/content/'
@@ -53,12 +53,18 @@ allprojects {
     }
 
     mainClassName = "com.jongsoft.finance.Application"
+
+    dependencies {
+        annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+        compileOnly "org.projectlombok:lombok:$lombokVersion"
+        testCompileOnly "org.projectlombok:lombok:$lombokVersion"
+        testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    }
 }
 
 subprojects {
     apply plugin: 'io.micronaut.application'
     apply plugin: "com.diffplug.eclipse.apt"
-    apply plugin: 'java'
     apply plugin: 'jacoco'
     apply plugin: 'io.franzbecker.gradle-lombok'
 
@@ -77,8 +83,6 @@ subprojects {
     java {
         withJavadocJar()
         withSourcesJar()
-        sourceCompatibility = JavaVersion.toVersion('15')
-        targetCompatibility = JavaVersion.toVersion('15')
     }
 
     micronaut {
@@ -93,8 +97,6 @@ subprojects {
 
     test {
         useJUnitPlatform()
-
-        jvmArgs("--enable-preview")
     }
 
     configurations {
@@ -109,8 +111,7 @@ subprojects {
         source = delombok.outputDir
 
         options.addBooleanOption('html5', true)
-        options.addBooleanOption('-enable-preview', true)
-        options.addStringOption('-release', '15')
+        options.addStringOption('-release', '16')
     }
 
     publishing {
@@ -170,18 +171,18 @@ subprojects {
         options.encoding = "UTF-8"
         options.compilerArgs.addAll([
                 '-parameters',
-                '--enable-preview',
+                //'--enable-preview',
                 // enables incremental compilation
                 '-Amicronaut.processing.incremental=true',
                 '-Amicronaut.processing.annotations=com.jongsoft.finance.*',
                 "-Amicronaut.processing.group=$project.group",
-                "-Amicronaut.processing.module=$project.name",
+                "-Amicronaut.processing.module=$project.name"
         ])
     }
 
     tasks.withType(JavaExec) {
         classpath += configurations.developmentOnly
-        jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote', '--enable-preview')
+        jvmArgs('-XX:TieredStopAtLevel=1', '-Dcom.sun.management.jmxremote')
         if (gradle.startParameter.continuous) {
             systemProperties(
                     'micronaut.io.watch.restart':'true',
@@ -215,12 +216,12 @@ subprojects {
 
         implementation("ch.qos.logback:logback-classic")
         implementation("com.jongsoft.lang:language:$jongsoftLangVersion")
-        compileOnly "org.projectlombok:lombok:$lombokVersion"
 
         testImplementation("org.junit.jupiter:junit-jupiter-api")
         testImplementation("io.micronaut.test:micronaut-test-junit5")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-        testCompile("org.assertj:assertj-core:$assertjVersion")
-        testCompile("org.mockito:mockito-core:$mockitoVersion")
+
+        testImplementation("org.assertj:assertj-core:$assertjVersion")
+        testImplementation("org.mockito:mockito-core:$mockitoVersion")
     }
 }

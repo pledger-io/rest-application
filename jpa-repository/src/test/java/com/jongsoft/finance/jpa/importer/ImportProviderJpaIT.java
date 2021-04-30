@@ -1,6 +1,6 @@
 package com.jongsoft.finance.jpa.importer;
 
-import com.jongsoft.finance.domain.importer.ImportProvider;
+import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;

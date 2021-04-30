@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.importer;
 
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
-import com.jongsoft.finance.domain.importer.CSVConfigProvider;
+import com.jongsoft.finance.providers.CSVConfigProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.importer.entity.CSVImportConfig;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
@@ -15,7 +15,6 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
 public class CSVConfigProviderJpa implements CSVConfigProvider {
 
     private final ReactiveEntityManager entityManager;

@@ -1,7 +1,11 @@
 package com.jongsoft.finance.bpmn.handler;
 
-import java.time.LocalDate;
-
+import com.jongsoft.finance.domain.transaction.ScheduleValue;
+import com.jongsoft.finance.messaging.commands.schedule.ScheduleCommand;
+import com.jongsoft.finance.schedule.Periodicity;
+import com.jongsoft.finance.schedule.Schedulable;
+import com.jongsoft.finance.schedule.Schedule;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -9,18 +13,13 @@ import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.core.events.ScheduledLimitEvent;
-import com.jongsoft.finance.domain.core.events.ScheduledRescheduleEvent;
-import com.jongsoft.finance.domain.transaction.ScheduleValue;
-import com.jongsoft.finance.schedule.Periodicity;
-import com.jongsoft.finance.schedule.Schedulable;
-import com.jongsoft.finance.schedule.Schedule;
-import com.jongsoft.finance.security.AuthenticationFacade;
+
+import java.time.LocalDate;
 
 class ProcessSchedulerListenerTest {
 
     private ProcessEngine processEngine;
-    private ProcessSchedulerListener subject;
+    private ScheduleHandler subject;
 
     private Schedulable schedulable;
 
@@ -35,6 +34,11 @@ class ProcessSchedulerListenerTest {
         queryMock = Mockito.mock(ProcessInstanceQuery.class);
         processInstantiationBuilder = Mockito.mock(ProcessInstantiationBuilder.class);
         schedulable = new Schedulable() {
+            @Override
+            public Long getId() {
+                return 1L;
+            }
+
             @Override
             public void limit(LocalDate start, LocalDate end) {
             }
@@ -70,30 +74,17 @@ class ProcessSchedulerListenerTest {
         Mockito.when(processInstantiationBuilder.setVariable(Mockito.anyString(), Mockito.any())).thenReturn(processInstantiationBuilder);
         Mockito.when(authenticationFacade.authenticated()).thenReturn("test-user");
 
-        subject = new ProcessSchedulerListener(authenticationFacade, processEngine);
+        subject = new ScheduleHandler(authenticationFacade, processEngine);
     }
 
     @Test
     void handleScheduleLimit() {
-        subject.handleScheduleLimit(new ScheduledLimitEvent(this, "EmptyProcess", schedulable.getStart(), schedulable.getEnd()) {
+        subject.handle(new ScheduleCommand() {
             @Override
-            public Schedulable schedulable() {
-                return schedulable;
+            public String processDefinition() {
+                return "EmptyProcess";
             }
-        });
 
-        Mockito.verify(processInstantiationBuilder).setVariable("subProcess", "EmptyProcess");
-        Mockito.verify(processInstantiationBuilder).setVariable("start", schedulable.getStart().toString());
-        Mockito.verify(processInstantiationBuilder).setVariable("end", schedulable.getEnd().toString());
-        Mockito.verify(processInstantiationBuilder).setVariable("interval", 1);
-        Mockito.verify(processInstantiationBuilder).setVariable("username", "test-user");
-        Mockito.verify(processInstantiationBuilder).setVariable("periodicity", Periodicity.MONTHS);
-        Mockito.verify(processInstantiationBuilder).execute();
-    }
-
-    @Test
-    void handleReschedule() {
-        subject.handleReschedule(new ScheduledRescheduleEvent(this, "EmptyProcess", schedulable.getSchedule()) {
             @Override
             public Schedulable schedulable() {
                 return schedulable;

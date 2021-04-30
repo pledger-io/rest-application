@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.category;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.core.ResultPage;
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.messaging.commands.category.CreateCategoryCommand;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.domain.user.CategoryProvider;
-import com.jongsoft.finance.domain.user.events.CategoryCreatedEvent;
+import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -120,7 +120,7 @@ class CategoryResourceTest extends TestSetup {
         var response = subject.create(request).blockingGet();
 
         Assertions.assertThat(response.getId()).isEqualTo(1L);
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CategoryCreatedEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateCategoryCommand.class));
     }
 
     @Test

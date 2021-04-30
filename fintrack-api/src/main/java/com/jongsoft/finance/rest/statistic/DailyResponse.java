@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.statistic;
 
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import io.micronaut.core.annotation.Introspected;
 
 import java.time.LocalDate;

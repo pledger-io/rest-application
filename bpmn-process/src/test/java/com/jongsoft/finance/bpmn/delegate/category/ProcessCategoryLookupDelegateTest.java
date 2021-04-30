@@ -1,7 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.category;
 
 import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.domain.user.CategoryProvider;
+import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.lang.Control;
 import io.reactivex.Maybe;
 import org.camunda.bpm.engine.delegate.DelegateExecution;

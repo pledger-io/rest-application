@@ -30,6 +30,10 @@ micronaut:
       enabled: true
       location: "${micronaut.application.storage.location}/temp"
       max-file-size: 10MB
+  executors:
+    io:
+      type: fixed
+      n-threads: 75
 
 
 jackson:

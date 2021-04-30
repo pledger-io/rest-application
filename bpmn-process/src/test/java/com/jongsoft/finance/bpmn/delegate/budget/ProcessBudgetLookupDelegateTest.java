@@ -5,10 +5,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.core.ResultPage;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.domain.user.ExpenseProvider;
+import com.jongsoft.finance.providers.ExpenseProvider;
 
 class ProcessBudgetLookupDelegateTest {
 

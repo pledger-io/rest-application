@@ -2,7 +2,7 @@ package com.jongsoft.finance.rest.setting;
 
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.Currency;
-import com.jongsoft.finance.domain.core.CurrencyProvider;
+import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.CurrencyResponse;
 import io.micronaut.http.HttpStatus;

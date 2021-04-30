@@ -1,8 +1,8 @@
 package com.jongsoft.finance.bpmn.delegate;
 
-import com.jongsoft.finance.domain.FilterFactory;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Dates;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +12,7 @@ import org.camunda.bpm.engine.variable.value.BooleanValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
 import javax.inject.Singleton;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Slf4j
@@ -55,7 +56,7 @@ public class ComputeBalanceDelegate implements JavaDelegate {
         log.trace("{}: Computing the balance based upon {}", execution.getCurrentActivityName(), requestBuilder);
 
         var result = transactionProvider.balance(requestBuilder);
-        execution.setVariableLocal("result", result.getOrSupply(() -> 0D));
+        execution.setVariableLocal("result", result.getOrSupply(() -> BigDecimal.ZERO));
     }
 
 }

@@ -1,11 +1,10 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import com.jongsoft.finance.domain.FilterFactory;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.jpa.transaction.entity.DailySummaryImpl;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import io.micronaut.test.annotation.MockBean;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 class TransactionProviderJpaIT extends JpaTestSetup {
@@ -71,8 +71,8 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         var check = transactionProvider.daily(filterFactory.transaction().ownAccounts());
         Assertions.assertThat(check).hasSize(2);
         Assertions.assertThat(check).containsOnly(
-                new DailySummaryImpl(LocalDate.of(2019, 1, 1), 20.2D),
-                new DailySummaryImpl(LocalDate.of(2019, 1, 2), 20.2D));
+                new DailySummaryImpl(LocalDate.of(2019, 1, 1), BigDecimal.valueOf(20.2D)),
+                new DailySummaryImpl(LocalDate.of(2019, 1, 2), BigDecimal.valueOf(20.2D)));
     }
 
     @Test
@@ -81,7 +81,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         var check = transactionProvider.balance(filterFactory.transaction().ownAccounts());
 
         Assertions.assertThat(check.isPresent()).isTrue();
-        Assertions.assertThat(check.get()).isEqualTo(40.4);
+        Assertions.assertThat(check.get()).isEqualByComparingTo(BigDecimal.valueOf(40.4));
     }
 
     @Test

@@ -1,18 +1,13 @@
 package com.jongsoft.finance.rest;
 
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.transaction.TagProvider;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.*;
 import com.jongsoft.finance.domain.user.*;
 import com.jongsoft.lang.Collections;
-import com.jongsoft.lang.Dates;
 import org.jboss.aerogear.security.otp.api.Base32;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Currency;
 
 public class TestSetup {
@@ -39,6 +34,8 @@ public class TestSetup {
                 .thenReturn(Mockito.mock(CategoryProvider.FilterCommand.class, InvocationOnMock::getMock));
         Mockito.when(filterFactory.tag())
                 .thenReturn(Mockito.mock(TagProvider.FilterCommand.class, InvocationOnMock::getMock));
+        Mockito.when(filterFactory.schedule())
+                .thenReturn(Mockito.mock(TransactionScheduleProvider.FilterCommand.class, InvocationOnMock::getMock));
         return filterFactory;
     }
 }

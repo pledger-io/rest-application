@@ -1,13 +1,16 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.domain.user.events.*;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.jpa.user.entity.RoleJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
+import com.jongsoft.finance.messaging.commands.user.*;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -26,10 +29,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleUserAccountCreatedEvent() {
         loadDataset("sql/base-setup.sql");
-        eventPublisher.publishEvent(new UserAccountCreatedEvent(
-                this,
-                "demo@account",
-                "pasword123!"));
+        eventPublisher.publishEvent(new CreateUserCommand("demo@account", "pasword123!"));
 
         var query = entityManager.createQuery("select a from UserAccountJpa a where a.username = 'demo@account'");
         var check = (UserAccountJpa) query.getSingleResult();
@@ -46,10 +46,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleUserAccountPasswordEvent() {
         loadDataset("sql/base-setup.sql");
-        eventPublisher.publishEvent(new UserAccountPasswordChangedEvent(
-                this,
-                "demo-user",
-                "updated password"));
+        eventPublisher.publishEvent(new ChangePasswordCommand("demo-user", "updated password"));
 
         var check = entityManager.find(UserAccountJpa.class, 1L);
         Assertions.assertThat(check.getPassword()).isEqualTo("updated password");
@@ -58,10 +55,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleUserAccountMultifactorEvent() {
         loadDataset("sql/base-setup.sql");
-        eventPublisher.publishEvent(new UserAccountMultiFactorEvent(
-                this,
-                "demo-user",
-                true));
+        eventPublisher.publishEvent(new ChangeMultiFactorCommand("demo-user", true));
 
         var check = entityManager.find(UserAccountJpa.class, 1L);
         Assertions.assertThat(check.isTwoFactorEnabled()).isTrue();
@@ -70,10 +64,9 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleUserAccountSettingEvent_theme() {
         loadDataset("sql/base-setup.sql");
-        eventPublisher.publishEvent(new UserAccountSettingEvent(
-                this,
+        eventPublisher.publishEvent(new ChangeUserSettingCommand(
                 "demo-user",
-                UserAccountSettingEvent.Type.THEME,
+                ChangeUserSettingCommand.Type.THEME,
                 "sample"));
 
         var check = entityManager.find(UserAccountJpa.class, 1L);
@@ -83,10 +76,9 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleUserAccountSettingEvent_currency() {
         loadDataset("sql/base-setup.sql");
-        eventPublisher.publishEvent(new UserAccountSettingEvent(
-                this,
+        eventPublisher.publishEvent(new ChangeUserSettingCommand(
                 "demo-user",
-                UserAccountSettingEvent.Type.CURRENCY,
+                ChangeUserSettingCommand.Type.CURRENCY,
                 "USD"));
 
         var check = entityManager.find(UserAccountJpa.class, 1L);
@@ -96,7 +88,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleTokenRegistrationEvent() {
         loadDataset("sql/base-setup.sql");
-        eventPublisher.publishEvent(new TokenRegisterEvent(
+        eventPublisher.publishEvent(new RegisterTokenCommand(
                 "demo-user",
                 "my-refresh-token",
                 LocalDateTime.of(2019, 1, 1, 12, 33)));
@@ -113,7 +105,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleTokenRevokedEvent() {
         loadDataset("sql/base-setup.sql");
-        eventPublisher.publishEvent(new TokenRevokeEvent(
+        eventPublisher.publishEvent(new RevokeTokenCommand(
                 "refresh-token-1"
         ));
 
@@ -122,4 +114,8 @@ class UserEventListenerIT extends JpaTestSetup {
                 .isEqualTo(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES));
     }
 
+    @MockBean
+    AuthenticationFacade authenticationFacade() {
+        return Mockito.mock(AuthenticationFacade.class);
+    }
 }

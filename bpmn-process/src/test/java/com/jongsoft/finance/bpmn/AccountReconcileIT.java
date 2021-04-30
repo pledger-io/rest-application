@@ -1,11 +1,11 @@
 package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
-import com.jongsoft.finance.domain.FilterFactory;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.lang.Control;
 import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 class AccountReconcileIT extends ProcessTestSetup {
 
@@ -44,7 +46,7 @@ class AccountReconcileIT extends ProcessTestSetup {
     void run_differentStartBalance() throws InterruptedException {
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(Control.Option())
-                .thenReturn(Control.Option(-20.0));
+                .thenReturn(Control.Option(BigDecimal.valueOf( -20.0)));
 
         var response = processEngine.getRuntimeService().startProcessInstanceByKey(
                 "AccountReconcile",
@@ -78,7 +80,7 @@ class AccountReconcileIT extends ProcessTestSetup {
                 .processInstanceId(response.getProcessInstanceId())
                 .taskId("task_reconcile_before");
 
-        Assertions.assertThat(computedStartBalance.getValue()).isEqualTo(0.0);
+        Assertions.assertThat(computedStartBalance.getValue()).isEqualTo(BigDecimal.ZERO);
         Assertions.assertThat(computedEndBalance).isNull();
         Assertions.assertThat(hasDifference).isNull();
         Assertions.assertThat(task).isNotNull();
@@ -95,7 +97,7 @@ class AccountReconcileIT extends ProcessTestSetup {
                 .thenReturn(Maybe.just(reconcile));
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(Control.Option())
-                .thenReturn(Control.Option(-20.0));
+                .thenReturn(Control.Option(BigDecimal.valueOf(-20.0)));
 
         var response = processEngine.getRuntimeService().startProcessInstanceByKey(
                 "AccountReconcile",
@@ -124,9 +126,10 @@ class AccountReconcileIT extends ProcessTestSetup {
                 .variableName("balanceDifference")
                 .singleResult();
 
-        Assertions.assertThat(computedStartBalance.getValue()).isEqualTo(0.0);
-        Assertions.assertThat(computedEndBalance.getValue()).isEqualTo(-20.0);
-        Assertions.assertThat(balanceDifference.getValue()).isEqualTo(-120.2);
+        Assertions.assertThat(computedStartBalance.getValue()).isEqualTo(BigDecimal.ZERO);
+        Assertions.assertThat(computedEndBalance.getValue()).isEqualTo(BigDecimal.valueOf(-20.0));
+        Assertions.assertThat(((BigDecimal) balanceDifference.getValue()).setScale(2, RoundingMode.HALF_UP))
+                .isEqualByComparingTo(BigDecimal.valueOf(-120.2));
 
         Mockito.verify(reconcileAccount).createTransaction(Mockito.eq(reconcile), Mockito.eq(120.2D),
                 Mockito.eq(Transaction.Type.DEBIT), Mockito.any());

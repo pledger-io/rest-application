@@ -1,7 +1,7 @@
 package com.jongsoft.finance.security;
 
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.domain.user.UserProvider;
+import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.lang.Control;
 
 import javax.inject.Named;

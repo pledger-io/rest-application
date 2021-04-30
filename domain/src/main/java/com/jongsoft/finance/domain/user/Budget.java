@@ -3,10 +3,10 @@ package com.jongsoft.finance.domain.user;
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
-import com.jongsoft.finance.domain.user.events.BudgetClosedEvent;
-import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
-import com.jongsoft.finance.domain.user.events.BudgetExpenseCreatedEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.budget.CloseBudgetCommand;
+import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
+import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import lombok.AllArgsConstructor;
@@ -137,13 +137,13 @@ public class Budget implements AggregateBase {
         }
 
         expenses = expenses.append(new Expense(name, lowerBound, upperBound));
-        EventBus.getBus().send(new BudgetExpenseCreatedEvent(this, name, start, lowerBound, upperBound));
+        EventBus.getBus().send(new CreateExpenseCommand(name, start, BigDecimal.valueOf(upperBound)));
     }
 
     void activate() {
         if (id == null && !active) {
             active = true;
-            EventBus.getBus().send(new BudgetCreatedEvent(this, this));
+            EventBus.getBus().send(new CreateBudgetCommand(this));
         }
     }
 
@@ -153,7 +153,7 @@ public class Budget implements AggregateBase {
         }
 
         this.end = endDate;
-        EventBus.getBus().send(new BudgetClosedEvent(this, id, endDate));
+        EventBus.getBus().send(new CloseBudgetCommand(id, endDate));
     }
 
     public double computeExpenses() {

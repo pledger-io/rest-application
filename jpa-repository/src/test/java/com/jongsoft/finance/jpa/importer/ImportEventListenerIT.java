@@ -1,14 +1,16 @@
 package com.jongsoft.finance.jpa.importer;
 
-import com.jongsoft.finance.domain.importer.BatchImportConfig;
-import com.jongsoft.finance.domain.importer.events.BatchImportCreatedEvent;
-import com.jongsoft.finance.domain.importer.events.BatchImportDeletedEvent;
-import com.jongsoft.finance.domain.importer.events.BatchImportFinishedEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
+import com.jongsoft.finance.messaging.commands.importer.CompleteImportJobCommand;
+import com.jongsoft.finance.messaging.commands.importer.CreateImportJobCommand;
+import com.jongsoft.finance.messaging.commands.importer.DeleteImportJobCommand;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.test.annotation.MockBean;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -33,12 +35,8 @@ class ImportEventListenerIT extends JpaTestSetup {
     void handleCreatedEvent() {
         setup();
         eventPublisher.publishEvent(
-                new BatchImportCreatedEvent(
-                        this,
-                        BatchImportConfig.builder()
-                                .id(1L)
-                                .build(),
-                        null,
+                new CreateImportJobCommand(
+                        1L,
                         "batch-slug",
                         "file-code-5"));
 
@@ -54,9 +52,7 @@ class ImportEventListenerIT extends JpaTestSetup {
     void handleFinishedEvent() {
         setup();
         eventPublisher.publishEvent(
-                new BatchImportFinishedEvent(
-                        this,
-                        1L));
+                new CompleteImportJobCommand(1L));
 
         var check = entityManager.find(ImportJpa.class, 1L);
         Assertions.assertThat(check.getFinished()).isNotNull();
@@ -65,9 +61,14 @@ class ImportEventListenerIT extends JpaTestSetup {
     @Test
     void handleDeletedEvent() {
         setup();
-        eventPublisher.publishEvent(new BatchImportDeletedEvent(1L));
+        eventPublisher.publishEvent(new DeleteImportJobCommand(1L));
 
         var check = entityManager.find(ImportJpa.class, 1L);
         Assertions.assertThat(check.isArchived()).isTrue();
+    }
+
+    @MockBean
+    AuthenticationFacade authenticationFacade() {
+        return Mockito.mock(AuthenticationFacade.class);
     }
 }

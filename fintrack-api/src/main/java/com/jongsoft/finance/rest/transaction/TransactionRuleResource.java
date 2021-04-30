@@ -3,9 +3,9 @@ package com.jongsoft.finance.rest.transaction;
 import com.jongsoft.finance.core.Removable;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.domain.transaction.TransactionRuleGroupProvider;
-import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreatedEvent;
+import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
+import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
+import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.TransactionRuleGroupResponse;
@@ -66,9 +66,7 @@ public class TransactionRuleResource {
             throw new IllegalArgumentException("Group name not unique.");
         }
 
-        EventBus.getBus().send(new TransactionRuleGroupCreatedEvent(
-                this,
-                request.getName()));
+        EventBus.getBus().send(new CreateRuleGroupCommand(request.getName()));
     }
 
     @Get("/groups/{group}")

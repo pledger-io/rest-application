@@ -1,14 +1,20 @@
 package com.jongsoft.finance.rest.contract;
 
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.domain.transaction.ScheduleValue;
+import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.account.ContractProvider;
-import com.jongsoft.finance.domain.account.events.ContractCreatedEvent;
+import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.rest.model.ContractResponse;
+import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -34,12 +40,17 @@ class ContractResourceTest extends TestSetup {
     private ContractProvider contractProvider;
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Mock
+    private TransactionScheduleProvider scheduleProvider;
+
+    private FilterFactory filterFactory;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        subject = new ContractResource(accountProvider, contractProvider);
+        filterFactory = generateFilterMock();
+        subject = new ContractResource(accountProvider, contractProvider, scheduleProvider, filterFactory);
 
         new EventBus(applicationEventPublisher);
     }
@@ -131,7 +142,7 @@ class ContractResourceTest extends TestSetup {
         Assertions.assertThat(response.getStart()).isEqualTo(LocalDate.of(2019, 2, 1));
         Assertions.assertThat(response.getEnd()).isEqualTo(LocalDate.of(2020, 2, 1));
 
-        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(ContractCreatedEvent.class));
+        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateContractCommand.class));
     }
 
     @Test
@@ -217,6 +228,39 @@ class ContractResourceTest extends TestSetup {
         var response = subject.get(1L).blockingGet();
 
         Assertions.assertThat(response.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void schedule() {
+        var contract = Mockito.spy(Contract.builder()
+                .id(1L)
+                .startDate(LocalDate.of(2020, 1, 1))
+                .endDate(LocalDate.of(2022, 1, 1))
+                .build());
+        var schedule = Mockito.spy(ScheduledTransaction.builder()
+                .id(2L)
+                .contract(contract)
+                .build());
+        final Account account = Account.builder().id(1L).build();
+        var filterCommand = filterFactory.schedule();
+
+        Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
+
+        Mockito.doReturn(Control.Option(contract))
+                .when(contractProvider)
+                .lookup(1L);
+
+        Mockito.doReturn(ResultPage.of(schedule))
+                .when(scheduleProvider)
+                .lookup(filterCommand);
+
+        subject.schedule(1L, new CreateScheduleRequest(
+                new CreateScheduleRequest.ScheduleValueJson(Periodicity.MONTHS, 3),
+                new CreateScheduleRequest.EntityRef(1L, null),
+                20.2));
+
+        Mockito.verify(contract).createSchedule(new ScheduleValue(Periodicity.MONTHS, 3), account, 20.2);
+        Mockito.verify(schedule).limitForContract();
     }
 
     @Test

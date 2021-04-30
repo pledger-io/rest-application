@@ -7,12 +7,12 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountCreatedEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountPasswordChangedEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountSettingEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
+import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
+import com.jongsoft.finance.messaging.commands.user.ChangePasswordCommand;
+import com.jongsoft.finance.messaging.commands.user.ChangeUserSettingCommand;
+import com.jongsoft.finance.messaging.commands.user.CreateUserCommand;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.List;
 import lombok.AllArgsConstructor;
@@ -47,7 +47,7 @@ public class UserAccount implements AggregateBase, Serializable {
         this.username = username;
         this.password = password;
         this.roles = Collections.List(new Role("accountant"));
-        EventBus.getBus().send(new UserAccountCreatedEvent(this, this.username, this.password));
+        EventBus.getBus().send(new CreateUserCommand(this.username, this.password));
     }
 
     /**
@@ -58,7 +58,7 @@ public class UserAccount implements AggregateBase, Serializable {
     @BusinessMethod
     public void changePassword(String password) {
         this.password = password;
-        EventBus.getBus().send(new UserAccountPasswordChangedEvent(this, username, this.password));
+        EventBus.getBus().send(new ChangePasswordCommand(username, this.password));
     }
 
     /**
@@ -71,10 +71,9 @@ public class UserAccount implements AggregateBase, Serializable {
     public void changeCurrency(Currency currency) {
         if (!Objects.equals(this.primaryCurrency, currency)) {
             this.primaryCurrency = currency;
-            EventBus.getBus().send(new UserAccountSettingEvent(
-                    this,
+            EventBus.getBus().send(new ChangeUserSettingCommand(
                     this.username,
-                    UserAccountSettingEvent.Type.CURRENCY,
+                    ChangeUserSettingCommand.Type.CURRENCY,
                     this.primaryCurrency.getCurrencyCode()));
         }
     }
@@ -88,8 +87,10 @@ public class UserAccount implements AggregateBase, Serializable {
     public void changeTheme(String theme) {
         if (!Objects.equals(this.theme, theme)) {
             this.theme = theme;
-            EventBus.getBus().send(new UserAccountSettingEvent(this, this.username,
-                    UserAccountSettingEvent.Type.THEME, this.theme));
+            EventBus.getBus().send(new ChangeUserSettingCommand(
+                    this.username,
+                    ChangeUserSettingCommand.Type.THEME,
+                    this.theme));
         }
     }
 
@@ -100,7 +101,7 @@ public class UserAccount implements AggregateBase, Serializable {
     public void enableMultiFactorAuthentication() {
         if (!twoFactorEnabled) {
             this.twoFactorEnabled = true;
-            EventBus.getBus().send(new UserAccountMultiFactorEvent(this, username, true));
+            EventBus.getBus().send(new ChangeMultiFactorCommand(username, true));
         }
     }
 
@@ -111,7 +112,7 @@ public class UserAccount implements AggregateBase, Serializable {
     public void disableMultiFactorAuthentication() {
         if (twoFactorEnabled) {
             this.twoFactorEnabled = false;
-            EventBus.getBus().send(new UserAccountMultiFactorEvent(this, username, false));
+            EventBus.getBus().send(new ChangeMultiFactorCommand(username, false));
         }
     }
 
@@ -153,7 +154,7 @@ public class UserAccount implements AggregateBase, Serializable {
             throw new IllegalStateException("User cannot create tags, incorrect privileges.");
         }
 
-        EventBus.getBus().send(new TagCreatedEvent(this, this, label));
+        EventBus.getBus().send(new CreateTagCommand(label));
         return new Tag(label);
     }
 

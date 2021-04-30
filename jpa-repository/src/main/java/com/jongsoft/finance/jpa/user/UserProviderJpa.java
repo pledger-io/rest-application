@@ -3,11 +3,10 @@ package com.jongsoft.finance.jpa.user;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.domain.user.UserProvider;
+import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
-import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Collectors;
@@ -22,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.Currency;
 
 @Singleton
-@Transactional
 @Named("userProvider")
 public class UserProviderJpa implements UserProvider {
 

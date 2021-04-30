@@ -2,12 +2,14 @@ package com.jongsoft.finance.domain.transaction;
 
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionCreatedEvent;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionDescribeEvent;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionLimitEvent;
-import com.jongsoft.finance.domain.transaction.events.ScheduledTransactionRescheduleEvent;
+import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleCommand;
+import com.jongsoft.finance.messaging.commands.schedule.DescribeScheduleCommand;
+import com.jongsoft.finance.messaging.commands.schedule.LimitScheduleCommand;
+import com.jongsoft.finance.messaging.commands.schedule.RescheduleCommand;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedulable;
 import com.jongsoft.finance.schedule.Schedule;
@@ -33,6 +35,8 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
     private Account source;
     private Account destination;
 
+    private Contract contract;
+
     private Schedule schedule;
     private LocalDate start;
     private LocalDate end;
@@ -44,8 +48,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
         this.amount = amount;
         this.schedule = schedule;
 
-        EventBus.getBus().send(new ScheduledTransactionCreatedEvent(this, name, schedule,
-                source, destination, amount));
+        EventBus.getBus().send(new CreateScheduleCommand(name, schedule, source, destination, amount));
     }
 
     @BusinessMethod
@@ -61,8 +64,32 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
         if (hasChanged) {
             this.start = start;
             this.end = end;
-            EventBus.getBus().send(new ScheduledTransactionLimitEvent(this, id, start, end));
+            EventBus.getBus().send(new LimitScheduleCommand(id, this, start, end));
         }
+    }
+
+    @BusinessMethod
+    public void limitForContract() {
+        if (contract == null) {
+            throw StatusException.badRequest("Cannot limit based on a contract when no contract is set.");
+        }
+
+        var expectedEnd = contract.getEndDate().plusYears(20);
+        if (end == null || !end.isEqual(expectedEnd)) {
+            this.start = Control.Option(this.start).getOrSupply(contract::getStartDate);
+            this.end = expectedEnd;
+            EventBus.getBus().send(new LimitScheduleCommand(id, this, this.start, end));
+        }
+    }
+
+    @BusinessMethod
+    public void terminate() {
+        if (this.start == null) {
+            this.start = LocalDate.now().minusDays(1);
+        }
+
+        this.end = LocalDate.now();
+        EventBus.getBus().send(new LimitScheduleCommand(id, this, start, end));
     }
 
     @BusinessMethod
@@ -74,7 +101,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
 
         if (hasChanged) {
             this.schedule = new ScheduleValue(periodicity, interval);
-            EventBus.getBus().send(new ScheduledTransactionRescheduleEvent(this, id, schedule));
+            EventBus.getBus().send(new RescheduleCommand(id, this, schedule));
         }
     }
 
@@ -87,7 +114,8 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
         if (hasChanged) {
             this.name = name;
             this.description = description;
-            EventBus.getBus().send(new ScheduledTransactionDescribeEvent(this, id, description, name));
+            EventBus.getBus().send(new DescribeScheduleCommand(id, description, name));
         }
     }
+
 }

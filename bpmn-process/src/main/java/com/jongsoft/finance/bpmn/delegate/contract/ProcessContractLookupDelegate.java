@@ -1,7 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.contract;
 
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.account.ContractProvider;
+import com.jongsoft.finance.providers.ContractProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;

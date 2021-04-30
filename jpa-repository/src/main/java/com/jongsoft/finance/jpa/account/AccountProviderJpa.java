@@ -1,13 +1,12 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
-import com.jongsoft.finance.domain.core.ResultPage;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.jpa.account.entity.AccountJpa;
 import com.jongsoft.finance.jpa.projections.TripleProjection;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
@@ -19,12 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Slf4j
 @Singleton
-@Transactional
 @Named("accountProvider")
 public class AccountProviderJpa implements AccountProvider {
 
@@ -85,12 +84,12 @@ public class AccountProviderJpa implements AccountProvider {
 
     @Override
     public Maybe<Account> lookup(String name) {
-        log.trace("Account name lookup: {}", name);
+        log.trace("Account name lookup: {} for {}", name, authenticationFacade.authenticated());
 
         String hql = """
-                select a 
+                select a
                 from AccountJpa a
-                where 
+                where
                   a.name = :name
                   and a.user.username = :username
                   and a.archived = false""";
@@ -155,7 +154,7 @@ public class AccountProviderJpa implements AccountProvider {
             var hql = """
                     select new com.jongsoft.finance.jpa.projections.TripleProjection(
                                 t.account, sum(t.amount), avg(t.amount))
-                     from TransactionJpa t 
+                     from TransactionJpa t
                      where
                         t.journal.date >= :start and t.journal.date < :until
                         and t.deleted is null
@@ -164,7 +163,7 @@ public class AccountProviderJpa implements AccountProvider {
                      group by t.account
                      having sum(t.amount) %s 0""".formatted(delegate.generateHql(), asc ? "<=" : ">=");
 
-            return entityManager.<TripleProjection<AccountJpa, Double, Double>>blocking()
+            return entityManager.<TripleProjection<AccountJpa, BigDecimal, Double>>blocking()
                     .hql(hql)
                     .setAll(delegate.getParameters())
                     .set("start", range.from())

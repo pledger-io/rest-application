@@ -1,10 +1,15 @@
 package com.jongsoft.finance.rest.contract;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.domain.core.EntityRef;
+import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.account.ContractProvider;
+import com.jongsoft.finance.providers.ContractProvider;
+import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.model.ContractResponse;
+import com.jongsoft.lang.Collections;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -17,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 
 @Tag(name = "Contract")
 @Controller("/api/contracts")
@@ -27,10 +33,18 @@ public class ContractResource {
 
     private final AccountProvider accountProvider;
     private final ContractProvider contractProvider;
+    private final TransactionScheduleProvider scheduleProvider;
+    private final FilterFactory filterFactory;
 
-    public ContractResource(AccountProvider accountProvider, ContractProvider contractProvider) {
+    public ContractResource(
+            AccountProvider accountProvider,
+            ContractProvider contractProvider,
+            TransactionScheduleProvider scheduleProvider,
+            FilterFactory filterFactory) {
         this.accountProvider = accountProvider;
         this.contractProvider = contractProvider;
+        this.scheduleProvider = scheduleProvider;
+        this.filterFactory = filterFactory;
     }
 
     @Get
@@ -136,6 +150,33 @@ public class ContractResource {
                         StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
             }
         });
+    }
+
+    @Put("/{contractId}/schedule")
+    @Operation(
+            summary = "Schedule transaction",
+            description = "Create a new schedule for creating transaction under this contract.",
+            parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
+    )
+    void schedule(@PathVariable long contractId, @Body @Valid CreateScheduleRequest request) {
+        var account = accountProvider.lookup(request.getSource().getId())
+                .getOrThrow(() -> StatusException.badRequest("No source account found with provided id."));
+
+        var contract = contractProvider.lookup(contractId)
+                .getOrThrow(() -> StatusException.badRequest("No contract found with provided id."));
+
+        contract.createSchedule(
+                request.getSchedule(),
+                account,
+                request.getAmount());
+
+        // update the schedule start / end date
+        scheduleProvider.lookup(
+                filterFactory.schedule()
+                        .activeOnly()
+                        .contract(Collections.List(new EntityRef(contractId))))
+                .content()
+                .forEach(ScheduledTransaction::limitForContract);
     }
 
     @Get("/{contractId}/expire-warning")

@@ -6,4 +6,3 @@ datasources:
     password: ${DATABASE_PASSWORD:fintrack}
     dialect: mysql
     migration-locations: ["classpath:db/camunda/h2", "classpath:db/migration"]
-

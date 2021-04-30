@@ -24,6 +24,14 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
         this.sort = Control.Option();
     }
 
+    /**
+     * Set a parameter to be replaced in the {@link #hql(java.lang.String)} operation. Note that
+     * this will replace any parameter with the same name.
+     *
+     * @param parameter the name of the parameter
+     * @param value the value to be substituted
+     * @return this instance
+     */
     public <Y> R set(String parameter, Y value) {
         parameters.put(parameter, value);
         return self();
@@ -34,21 +42,46 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
         return self();
     }
 
+    /**
+     * Set the HQL query that will be used in the pipeline.
+     *
+     * @param hql the query
+     * @return this instance
+     */
     public R hql(String hql) {
         this.hql = hql;
         return self();
     }
 
+    /**
+     * Set the limit that will be applied by the pipeline in the resultset.
+     *
+     * @param limit the limit
+     * @return this instance
+     */
     public R limit(int limit) {
         this.limit = Control.Option(limit);
         return self();
     }
 
+    /**
+     * Set the offset that will be used in the pipeline's resultset. This is the number of
+     * records that should be skipped before returning the first result.
+     *
+     * @param limit the limit
+     * @return this instance
+     */
     public R offset(int offset) {
         this.offset = Control.Option(offset);
         return self();
     }
 
+    /**
+     * Set the sorting of the results.
+     *
+     * @param sort the actual sort to be applied
+     * @return this instance
+     */
     public R sort(Sort sort) {
         this.sort = Control.Option(sort);
         return self();

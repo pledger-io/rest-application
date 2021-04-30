@@ -3,7 +3,7 @@ package com.jongsoft.finance.jpa.transaction;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;

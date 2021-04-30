@@ -5,7 +5,7 @@ import java.util.List;
 import javax.inject.Singleton;
 
 import com.jongsoft.finance.core.RuleColumn;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.providers.AccountProvider;
 
 @Singleton
 public class AccountLocator implements ChangeLocator {

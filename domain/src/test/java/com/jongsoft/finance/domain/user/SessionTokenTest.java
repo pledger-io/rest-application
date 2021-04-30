@@ -1,8 +1,8 @@
 package com.jongsoft.finance.domain.user;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.user.events.TokenRevokeEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.user.RevokeTokenCommand;
 import com.jongsoft.lang.Dates;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.Assertions;
@@ -14,8 +14,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class SessionTokenTest {
 
@@ -40,10 +38,10 @@ class SessionTokenTest {
                 .build()
                 .revoke();
 
-        var captor = ArgumentCaptor.forClass(TokenRevokeEvent.class);
+        var captor = ArgumentCaptor.forClass(RevokeTokenCommand.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());
 
-        Assertions.assertEquals("my-sample-token", captor.getValue().getToken());
+        Assertions.assertEquals("my-sample-token", captor.getValue().token());
     }
 
     @Test

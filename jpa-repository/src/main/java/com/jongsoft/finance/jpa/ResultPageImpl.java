@@ -1,6 +1,6 @@
 package com.jongsoft.finance.jpa;
 
-import com.jongsoft.finance.domain.core.ResultPage;
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.lang.collection.Sequence;
 
 import java.util.function.Function;

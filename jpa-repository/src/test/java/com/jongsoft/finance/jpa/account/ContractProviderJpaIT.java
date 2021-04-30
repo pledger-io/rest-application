@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.account.ContractProvider;
+import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;

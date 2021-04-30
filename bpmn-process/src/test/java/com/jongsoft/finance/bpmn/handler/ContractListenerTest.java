@@ -1,28 +1,24 @@
 package com.jongsoft.finance.bpmn.handler;
 
+import com.jongsoft.finance.core.DateUtils;
+import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
+import com.jongsoft.finance.messaging.commands.contract.WarnBeforeExpiryCommand;
+import com.jongsoft.finance.security.AuthenticationFacade;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.runtime.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Date;
 
-import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.JobQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import com.jongsoft.finance.domain.account.events.ContractChangedEvent;
-import com.jongsoft.finance.domain.account.events.ContractWarningEvent;
-import com.jongsoft.finance.security.AuthenticationFacade;
-
 class ContractListenerTest {
 
     private ProcessEngine processEngine;
-    private ContractListener subject;
 
     private ProcessInstanceQuery queryMock;
     private JobQuery jobQuery;
@@ -36,8 +32,6 @@ class ContractListenerTest {
         queryMock = Mockito.mock(ProcessInstanceQuery.class, arg -> queryMock);
         jobQuery = Mockito.mock(JobQuery.class, arguments -> jobQuery);
         processInstantiationBuilder = Mockito.mock(ProcessInstantiationBuilder.class);
-
-        subject = new ContractListener(authenticationFacade, processEngine);
 
         RuntimeService runtimeService = Mockito.mock(RuntimeService.class);
         ManagementService managementService = Mockito.mock(ManagementService.class);
@@ -63,13 +57,13 @@ class ContractListenerTest {
         Mockito.doReturn(job).when(jobQuery).singleResult();
         Mockito.when(instance.getProcessInstanceId()).thenReturn("test_instance_1");
 
-        subject.handleContractEnd(new ContractChangedEvent(
-                this,
-                1L,
-                "",
-                "",
-                LocalDate.of(2019, 1, 31),
-                LocalDate.of(2030, 1, 1)));
+        new ChangeContractHandler(processEngine).handle(
+                new ChangeContractCommand(
+                        1L,
+                        "",
+                        "",
+                        LocalDate.of(2019, 1, 31),
+                        LocalDate.of(2030, 1, 1)));
 
         Mockito.verify(processEngine).getRuntimeService();
         Mockito.verify(queryMock).processDefinitionKey("ContractEndWarning");
@@ -80,21 +74,16 @@ class ContractListenerTest {
 
     @Test
     void handleShouldWarn() {
-        subject.handleShouldWarn(new ContractWarningEvent(this, 1L, LocalDate.now().plusMonths(2)));
+        new WarnBeforeExpiryHandler(processEngine, authenticationFacade)
+                .handle(new WarnBeforeExpiryCommand(1L, LocalDate.now().plusMonths(2)));
+
+        var endDate = DateUtils.toDate(LocalDate.now().plusMonths(1));
 
         Mockito.verify(processEngine).getRuntimeService();
         Mockito.verify(processInstantiationBuilder).businessKey("contract_term_" + 1);
-        Mockito.verify(processInstantiationBuilder).setVariable("warnAt", convert(LocalDate.now().plusMonths(1)));
+        Mockito.verify(processInstantiationBuilder).setVariable("warnAt", endDate);
         Mockito.verify(processInstantiationBuilder).setVariable("username", "test-user");
         Mockito.verify(processInstantiationBuilder).execute();
-    }
-
-    private Date convert(LocalDate localDate) {
-        if (localDate == null) {
-            return null;
-        }
-
-        return Date.from(localDate.atStartOfDay().toInstant(ZoneOffset.UTC));
     }
 
 }

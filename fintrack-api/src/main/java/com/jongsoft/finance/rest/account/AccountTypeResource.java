@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.domain.account.AccountTypeProvider;
+import com.jongsoft.finance.providers.AccountTypeProvider;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;

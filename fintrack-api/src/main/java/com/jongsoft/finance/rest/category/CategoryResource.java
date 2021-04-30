@@ -1,13 +1,14 @@
 package com.jongsoft.finance.rest.category;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.core.SettingProvider;
 import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.domain.user.CategoryProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.CategoryProvider;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.model.CategoryResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
@@ -18,7 +19,6 @@ import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import javax.annotation.Nullable;
 import javax.validation.Valid;
 
 @Tag(name = "Category")

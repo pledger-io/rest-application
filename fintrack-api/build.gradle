@@ -22,5 +22,9 @@ dependencies {
 
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
 
-    implementation project(':core'), project(':domain'), project(':jpa-repository'), project(':bpmn-process')
+    implementation project(':core'),
+            project(':domain'),
+            project(':jpa-repository'),
+            project(':rule-engine'),
+            project(':bpmn-process')
 };

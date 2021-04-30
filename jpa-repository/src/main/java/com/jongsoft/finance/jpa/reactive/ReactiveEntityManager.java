@@ -1,6 +1,8 @@
 package com.jongsoft.finance.jpa.reactive;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
+import com.jongsoft.finance.security.AuthenticationFacade;
+import com.jongsoft.lang.collection.Map;
 import io.micronaut.transaction.SynchronousTransactionManager;
 
 import javax.inject.Singleton;
@@ -13,7 +15,10 @@ public class ReactiveEntityManager {
     private final SynchronousTransactionManager<Connection> transactionManager;
     private final EntityManager entityManager;
 
-    public ReactiveEntityManager(SynchronousTransactionManager<Connection> transactionManager, EntityManager entityManager) {
+    public ReactiveEntityManager(
+            SynchronousTransactionManager<Connection> transactionManager,
+            EntityManager entityManager,
+            AuthenticationFacade authenticationFacade) {
         this.transactionManager = transactionManager;
         this.entityManager = entityManager;
     }
@@ -24,6 +29,7 @@ public class ReactiveEntityManager {
         } else{
             entityManager.merge(entity);
         }
+        entityManager.flush();
     }
 
     public <T> ReactivePipe<T> reactive() {
@@ -31,7 +37,24 @@ public class ReactiveEntityManager {
     }
 
     public <T> NonReactivePipe<T> blocking() {
-        return new NonReactivePipe<T>(entityManager);
+        return new NonReactivePipe<T>(entityManager, transactionManager);
+    }
+
+    public <T> T getDetached(Class<T> type, Map<String, Object> filter) {
+        var value = get(type, filter);
+        entityManager.detach(value);
+        return value;
+    }
+
+    public <T> T get(Class<T> type, Map<String, Object> filter) {
+        String hql = "from " + type.getName() +
+                filter.foldLeft(
+                        " where 1 = 1",
+                        (x, y) -> x + " AND " + y.getFirst() + " = :" + y.getFirst());
+
+        var query = this.<T>blocking().hql(hql);
+        filter.forEach(entry -> query.set(entry.getFirst(), entry.getSecond()));
+        return query.maybe().get();
     }
 
     public UpdatingPipe update() {

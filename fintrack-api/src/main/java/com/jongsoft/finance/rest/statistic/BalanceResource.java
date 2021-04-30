@@ -1,15 +1,12 @@
 package com.jongsoft.finance.rest.statistic;
 
 import com.jongsoft.finance.core.AggregateBase;
-import com.jongsoft.finance.domain.FilterFactory;
-import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.domain.core.Exportable;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
-import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.domain.user.CategoryProvider;
-import com.jongsoft.finance.domain.user.ExpenseProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
+import com.jongsoft.finance.providers.CategoryProvider;
+import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Sequence;
@@ -28,9 +25,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 @Tag(name = "Reports")
@@ -62,9 +56,9 @@ public class BalanceResource {
 
         return Single.create(emitter -> {
             var balance = transactionProvider.balance(filter)
-                    .getOrSupply(() -> 0D);
+                    .getOrSupply(() -> BigDecimal.ZERO);
 
-            emitter.onSuccess(new BalanceResponse(balance));
+            emitter.onSuccess(new BalanceResponse(balance.doubleValue()));
         });
     }
 
@@ -91,7 +85,6 @@ public class BalanceResource {
 
         return Flowable.create(flowableEmitter -> {
             var total = transactionProvider.balance(buildFilterCommand(request))
-                    .map(BigDecimal::valueOf)
                     .getOrSupply(() -> BigDecimal.ZERO);
 
             for (AggregateBase entity : entityProvider) {
@@ -99,10 +92,10 @@ public class BalanceResource {
                         Collections.List(
                                 new EntityRef(entity.getId())));
                 var balance = transactionProvider.balance(filter)
-                        .getOrSupply(() -> 0D);
+                        .getOrSupply(() -> BigDecimal.ZERO);
 
-                flowableEmitter.onNext(new BalancePartitionResponse(entity.toString(), balance));
-                total = total.subtract(BigDecimal.valueOf(balance));
+                flowableEmitter.onNext(new BalancePartitionResponse(entity.toString(), balance.doubleValue()));
+                total = total.subtract(BigDecimal.valueOf(balance.doubleValue()));
             }
 
             flowableEmitter.onNext(new BalancePartitionResponse("", total.doubleValue()));

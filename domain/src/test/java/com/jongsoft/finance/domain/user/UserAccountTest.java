@@ -1,15 +1,15 @@
 package com.jongsoft.finance.domain.user;
 
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.events.AccountCreatedEvent;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.domain.transaction.events.TagCreatedEvent;
-import com.jongsoft.finance.domain.user.events.BudgetCreatedEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountMultiFactorEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountPasswordChangedEvent;
-import com.jongsoft.finance.domain.user.events.UserAccountSettingEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.account.CreateAccountCommand;
+import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
+import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
+import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
+import com.jongsoft.finance.messaging.commands.user.ChangePasswordCommand;
+import com.jongsoft.finance.messaging.commands.user.ChangeUserSettingCommand;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,11 +51,9 @@ class UserAccountTest {
 
     @Test
     void createAccount() {
-        ArgumentCaptor<AccountCreatedEvent> changeCaptor = ArgumentCaptor.forClass(AccountCreatedEvent.class);
-
         Account account = fullAccount.createAccount("Demo account", "EUR", "checking");
 
-        Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
+        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateAccountCommand.class));
         assertThat(account.getUser()).isEqualTo(fullAccount);
         assertThat(account.getName()).isEqualTo("Demo account");
         assertThat(account.getCurrency()).isEqualTo("EUR");
@@ -64,12 +62,10 @@ class UserAccountTest {
 
     @Test
     void createAccount_NotAllowed() {
-        ArgumentCaptor<AccountCreatedEvent> changeCaptor = ArgumentCaptor.forClass(AccountCreatedEvent.class);
-
         IllegalStateException thrown = assertThrows(IllegalStateException.class,
                 () -> readOnlyAccount.createAccount("Demo account", "EUR", "checking"));
 
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(changeCaptor.capture());
+        Mockito.verifyNoInteractions(applicationEventPublisher);
 
         assertThat(thrown.getMessage()).isEqualTo("User cannot create accounts, incorrect privileges.");
     }
@@ -78,12 +74,11 @@ class UserAccountTest {
     void createTag() {
         var tag = fullAccount.createTag("Tag 1");
 
-        ArgumentCaptor<TagCreatedEvent> changeCaptor = ArgumentCaptor.forClass(TagCreatedEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(CreateTagCommand.class);
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
 
         assertThat(tag.name()).isEqualTo("Tag 1");
-        assertThat(changeCaptor.getValue().getTag()).isEqualTo("Tag 1");
-        assertThat(changeCaptor.getValue().getUser()).isEqualTo(fullAccount);
+        assertThat(changeCaptor.getValue().tag()).isEqualTo("Tag 1");
     }
 
     @Test
@@ -147,7 +142,7 @@ class UserAccountTest {
 
     @Test
     void createBudget() {
-        ArgumentCaptor<BudgetCreatedEvent> captor = ArgumentCaptor.forClass(BudgetCreatedEvent.class);
+        var captor = ArgumentCaptor.forClass(CreateBudgetCommand.class);
 
         Budget budget = fullAccount.createBudget(LocalDate.of(2019, 1, 1), 2500);
 
@@ -158,60 +153,60 @@ class UserAccountTest {
 
     @Test
     void changePassword() {
-        ArgumentCaptor<UserAccountPasswordChangedEvent> changeCaptor = ArgumentCaptor.forClass(UserAccountPasswordChangedEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(ChangePasswordCommand.class);
 
         fullAccount.changePassword("update1234");
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
-        assertThat(changeCaptor.getValue().getUsername()).isEqualTo(fullAccount.getUsername());
+        assertThat(changeCaptor.getValue().username()).isEqualTo(fullAccount.getUsername());
     }
 
     @Test
     void changeCurrency() {
-        ArgumentCaptor<UserAccountSettingEvent> changeCaptor = ArgumentCaptor.forClass(UserAccountSettingEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(ChangeUserSettingCommand.class);
 
         fullAccount.changeCurrency(Currency.getInstance("EUR"));
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
-        assertThat(changeCaptor.getValue().getUsername()).isEqualTo(fullAccount.getUsername());
-        assertThat(changeCaptor.getValue().getValue()).isEqualTo("EUR");
+        assertThat(changeCaptor.getValue().username()).isEqualTo(fullAccount.getUsername());
+        assertThat(changeCaptor.getValue().value()).isEqualTo("EUR");
     }
 
     @Test
     void changeTheme() {
-        ArgumentCaptor<UserAccountSettingEvent> changeCaptor = ArgumentCaptor.forClass(UserAccountSettingEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(ChangeUserSettingCommand.class);
 
         fullAccount.changeTheme("light");
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
-        assertThat(changeCaptor.getValue().getUsername()).isEqualTo(fullAccount.getUsername());
-        assertThat(changeCaptor.getValue().getValue()).isEqualTo("light");
-        assertThat(changeCaptor.getValue().getTypeOfSetting()).isEqualTo(UserAccountSettingEvent.Type.THEME);
+        assertThat(changeCaptor.getValue().username()).isEqualTo(fullAccount.getUsername());
+        assertThat(changeCaptor.getValue().value()).isEqualTo("light");
+        assertThat(changeCaptor.getValue().type()).isEqualTo(ChangeUserSettingCommand.Type.THEME);
     }
 
     @Test
     void enableMultiFactorAuthentication() {
-        ArgumentCaptor<UserAccountMultiFactorEvent> changeCaptor = ArgumentCaptor.forClass(UserAccountMultiFactorEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(ChangeMultiFactorCommand.class);
 
         fullAccount.enableMultiFactorAuthentication();
         // second attempt should not raise an event
         fullAccount.enableMultiFactorAuthentication();
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
-        assertThat(changeCaptor.getValue().isEnabled()).isTrue();
-        assertThat(changeCaptor.getValue().getUsername()).isEqualTo("demo-user");
+        assertThat(changeCaptor.getValue().enabled()).isTrue();
+        assertThat(changeCaptor.getValue().username()).isEqualTo("demo-user");
     }
 
     @Test
     void disableMultiFactorAuthentication() {
-        ArgumentCaptor<UserAccountMultiFactorEvent> changeCaptor = ArgumentCaptor.forClass(UserAccountMultiFactorEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(ChangeMultiFactorCommand.class);
 
         fullAccount.enableMultiFactorAuthentication();
         // second attempt should not raise an event
         fullAccount.disableMultiFactorAuthentication();
 
         Mockito.verify(applicationEventPublisher, Mockito.times(2)).publishEvent(changeCaptor.capture());
-        assertThat(changeCaptor.getAllValues().get(1).isEnabled()).isFalse();
-        assertThat(changeCaptor.getAllValues().get(1).getUsername()).isEqualTo("demo-user");
+        assertThat(changeCaptor.getAllValues().get(1).enabled()).isFalse();
+        assertThat(changeCaptor.getAllValues().get(1).username()).isEqualTo("demo-user");
     }
 }

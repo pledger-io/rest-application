@@ -4,9 +4,9 @@ import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
-import com.jongsoft.finance.domain.transaction.TransactionRuleGroupProvider;
-import com.jongsoft.finance.domain.transaction.TransactionRuleProvider;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupCreatedEvent;
+import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
+import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
+import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -77,7 +77,7 @@ class TransactionRuleResourceTest extends TestSetup {
 
         subject.createGroup(new GroupRenameRequest("Group setting"));
 
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(TransactionRuleGroupCreatedEvent.class));
+        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateRuleGroupCommand.class));
     }
 
     @Test

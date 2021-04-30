@@ -2,8 +2,8 @@ package com.jongsoft.finance.domain.transaction;
 
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.transaction.events.*;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.transaction.*;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -61,11 +62,11 @@ class TransactionTest {
 
     @Test
     void delete() {
-        ArgumentCaptor<TransactionDeletedEvent> captor = ArgumentCaptor.forClass(TransactionDeletedEvent.class);
+        var captor = ArgumentCaptor.forClass(DeleteTransactionCommand.class);
         transaction.delete();
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getTransactionId()).isEqualTo(1L);
+        assertThat(captor.getValue().id()).isEqualTo(1L);
     }
 
     @Test
@@ -94,7 +95,7 @@ class TransactionTest {
 
         transaction.register();
 
-        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(TransactionCreatedEvent.class));
+        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateTransactionCommand.class));
         assertThat(transaction.getFailureCode()).isEqualTo(FailureCode.FROM_TO_SAME);
     }
 
@@ -118,13 +119,13 @@ class TransactionTest {
 
         transaction.register();
 
-        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(TransactionCreatedEvent.class));
+        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateTransactionCommand.class));
         assertThat(transaction.getFailureCode()).isEqualTo(FailureCode.AMOUNT_NOT_NULL);
     }
 
     @Test
     void changeAccount() {
-        ArgumentCaptor<TransactionAccountChangedEvent> captor = ArgumentCaptor.forClass(TransactionAccountChangedEvent.class);
+        var captor = ArgumentCaptor.forClass(ChangeTransactionPartAccount.class);
 
         Account newAccount = Account.builder()
                 .id(3L)
@@ -134,8 +135,8 @@ class TransactionTest {
         transaction.changeAccount(false, newAccount);
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getTransactionPartId()).isEqualTo(2L);
-        assertThat(captor.getValue().getAccount().getId()).isEqualTo(3L);
+        assertThat(captor.getValue().id()).isEqualTo(2L);
+        assertThat(captor.getValue().accountId()).isEqualTo(3L);
         assertThat(transaction.computeTo().getId()).isEqualTo(3L);
         assertThat(transaction.computeFrom().getId()).isEqualTo(1L);
     }
@@ -149,84 +150,84 @@ class TransactionTest {
 
     @Test
     void book() {
-        ArgumentCaptor<TransactionBookedEvent> captor = ArgumentCaptor.forClass(TransactionBookedEvent.class);
+        var captor = ArgumentCaptor.forClass(ChangeTransactionDatesCommand.class);
 
         transaction.book(LocalDate.of(2017, 2, 1), LocalDate.of(2017, 2, 2), LocalDate.of(2017, 2, 12));
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getTransactionId()).isEqualTo(1L);
-        assertThat(captor.getValue().getDate()).isEqualTo(LocalDate.of(2017, 2, 1));
-        assertThat(captor.getValue().getBookDate()).isEqualTo(LocalDate.of(2017, 2, 2));
-        assertThat(captor.getValue().getInterestDate()).isEqualTo(LocalDate.of(2017, 2, 12));
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().date()).isEqualTo(LocalDate.of(2017, 2, 1));
+        assertThat(captor.getValue().bookingDate()).isEqualTo(LocalDate.of(2017, 2, 2));
+        assertThat(captor.getValue().interestDate()).isEqualTo(LocalDate.of(2017, 2, 12));
     }
 
     @Test
     void changeAmount() {
-        ArgumentCaptor<TransactionAmountChangedEvent> captor = ArgumentCaptor.forClass(TransactionAmountChangedEvent.class);
+        var captor = ArgumentCaptor.forClass(ChangeTransactionAmountCommand.class);
 
         transaction.changeAmount(20.5D, "EUR");
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getTransactionId()).isEqualTo(1L);
-        assertThat(captor.getValue().getAmount()).isEqualTo(20.5D);
-        assertThat(captor.getValue().getCurrency()).isEqualTo("EUR");
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().amount()).isEqualByComparingTo(BigDecimal.valueOf(20.5D));
+        assertThat(captor.getValue().currency()).isEqualTo("EUR");
     }
 
     @Test
     void describe() {
-        var captor = ArgumentCaptor.forClass(TransactionDescribeEvent.class);
+        var captor = ArgumentCaptor.forClass(DescribeTransactionCommand.class);
 
         transaction.describe("Updated description");
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getTransactionId()).isEqualTo(1L);
-        assertThat(captor.getValue().getDescription()).isEqualTo("Updated description");
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().description()).isEqualTo("Updated description");
     }
 
     @Test
     void tag() {
-        ArgumentCaptor<TransactionTaggingEvent> captor = ArgumentCaptor.forClass(TransactionTaggingEvent.class);
+        var captor = ArgumentCaptor.forClass(TagTransactionCommand.class);
 
         transaction.tag(Collections.List("tag 1", "tag 2"));
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getId()).isEqualTo(1L);
-        assertThat(captor.getValue().getTags()).isEqualTo(Collections.List("tag 1", "tag 2"));
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().tags()).isEqualTo(Collections.List("tag 1", "tag 2"));
     }
 
     @Test
     void linkToCategory() {
-        ArgumentCaptor<TransactionRelationEvent> captor = ArgumentCaptor.forClass(TransactionRelationEvent.class);
+        var captor = ArgumentCaptor.forClass(LinkTransactionCommand.class);
 
         transaction.linkToCategory("Test-1");
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getId()).isEqualTo(1L);
-        assertThat(captor.getValue().getRelation()).isEqualTo("Test-1");
-        assertThat(captor.getValue().getType()).isEqualTo(TransactionRelationEvent.Type.CATEGORY);
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().relation()).isEqualTo("Test-1");
+        assertThat(captor.getValue().type()).isEqualTo(LinkTransactionCommand.LinkType.CATEGORY);
     }
 
     @Test
     void linkToContract() {
-        ArgumentCaptor<TransactionRelationEvent> captor = ArgumentCaptor.forClass(TransactionRelationEvent.class);
+        var captor = ArgumentCaptor.forClass(LinkTransactionCommand.class);
 
         transaction.linkToContract("Sample contract");
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getId()).isEqualTo(1L);
-        assertThat(captor.getValue().getRelation()).isEqualTo("Sample contract");
-        assertThat(captor.getValue().getType()).isEqualTo(TransactionRelationEvent.Type.CONTRACT);
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().relation()).isEqualTo("Sample contract");
+        assertThat(captor.getValue().type()).isEqualTo(LinkTransactionCommand.LinkType.CONTRACT);
     }
 
     @Test
     void linkToBudget() {
-        ArgumentCaptor<TransactionRelationEvent> captor = ArgumentCaptor.forClass(TransactionRelationEvent.class);
+        var captor = ArgumentCaptor.forClass(LinkTransactionCommand.class);
 
         transaction.linkToBudget("Budget 1");
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getId()).isEqualTo(1L);
-        assertThat(captor.getValue().getRelation()).isEqualTo("Budget 1");
-        assertThat(captor.getValue().getType()).isEqualTo(TransactionRelationEvent.Type.EXPENSE);
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().relation()).isEqualTo("Budget 1");
+        assertThat(captor.getValue().type()).isEqualTo(LinkTransactionCommand.LinkType.EXPENSE);
     }
 
     @Test

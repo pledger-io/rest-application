@@ -4,7 +4,7 @@ import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.domain.user.UserProvider;
+import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.rest.model.SessionResponse;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;

@@ -3,8 +3,8 @@ package com.jongsoft.finance.domain.user;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.user.events.TokenRevokeEvent;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.user.RevokeTokenCommand;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.time.Range;
 import lombok.Builder;
@@ -35,8 +35,6 @@ public class SessionToken implements AggregateBase {
         }
 
         this.validity = Dates.range(this.validity.from(), LocalDateTime.now());
-        EventBus.getBus().send(new TokenRevokeEvent(
-                this.token
-        ));
+        EventBus.getBus().send(new RevokeTokenCommand(this.token));
     }
 }

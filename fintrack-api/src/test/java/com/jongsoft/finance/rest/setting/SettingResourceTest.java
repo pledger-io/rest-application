@@ -2,7 +2,7 @@ package com.jongsoft.finance.rest.setting;
 
 import com.jongsoft.finance.core.SettingType;
 import com.jongsoft.finance.domain.core.Setting;
-import com.jongsoft.finance.domain.core.SettingProvider;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;

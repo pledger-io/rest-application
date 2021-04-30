@@ -1,11 +1,12 @@
 package com.jongsoft.finance.domain.account;
 
-import com.jongsoft.finance.domain.account.events.*;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.events.TransactionCreatedEvent;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.account.*;
+import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
+import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.Assertions;
@@ -58,7 +59,7 @@ class AccountTest {
 
     @Test
     void rename_changed() {
-        ArgumentCaptor<AccountRenamedEvent> changeCaptor = ArgumentCaptor.forClass(AccountRenamedEvent.class);
+        ArgumentCaptor<RenameAccountCommand> changeCaptor = ArgumentCaptor.forClass(RenameAccountCommand.class);
 
         account.rename("New account name", "Updated account", "USD", "checking");
 
@@ -71,38 +72,37 @@ class AccountTest {
 
     @Test
     void registerIcon() {
-        ArgumentCaptor<AccountIconAttachedEvent> changeCaptor = ArgumentCaptor.forClass(AccountIconAttachedEvent.class);
+        ArgumentCaptor<RegisterAccountIconCommand> changeCaptor = ArgumentCaptor.forClass(RegisterAccountIconCommand.class);
 
         account.registerIcon("file-code");
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
-        assertThat(changeCaptor.getValue().getFileCode()).isEqualTo("file-code");
-        assertThat(changeCaptor.getValue().getAccountId()).isEqualTo(account.getId());
+        assertThat(changeCaptor.getValue().fileCode()).isEqualTo("file-code");
+        assertThat(changeCaptor.getValue().id()).isEqualTo(account.getId());
     }
 
     @Test
     void registerSynonym() {
-        ArgumentCaptor<AccountSynonymEvent> changeCaptor = ArgumentCaptor.forClass(AccountSynonymEvent.class);
+        ArgumentCaptor<RegisterSynonymCommand> changeCaptor = ArgumentCaptor.forClass(RegisterSynonymCommand.class);
 
         account.registerSynonym("Sample synonym");
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
 
         assertThat(changeCaptor.getValue()).isNotNull();
-        assertThat(changeCaptor.getValue().getAccountId()).isEqualTo(account.getId());
-        assertThat(changeCaptor.getValue().getSynonym()).isEqualTo("Sample synonym");
+        assertThat(changeCaptor.getValue().accountId()).isEqualTo(account.getId());
+        assertThat(changeCaptor.getValue().synonym()).isEqualTo("Sample synonym");
     }
 
     @Test
     void rename_unchanged() {
-        ArgumentCaptor<AccountRenamedEvent> changeCaptor = ArgumentCaptor.forClass(AccountRenamedEvent.class);
         account.rename("Test account", "Account setup for testing", "EUR", "checking");
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(changeCaptor.capture());
+        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(RenameAccountCommand.class);
     }
 
     @Test
     void changeAccount_changed() {
-        ArgumentCaptor<AccountChangedEvent> changeCaptor = ArgumentCaptor.forClass(AccountChangedEvent.class);
+        ArgumentCaptor<ChangeAccountCommand> changeCaptor = ArgumentCaptor.forClass(ChangeAccountCommand.class);
 
         account.changeAccount("NLINBS909392832", null, "909392832");
 
@@ -113,12 +113,10 @@ class AccountTest {
     }
 
     @Test
-    void changeAccount_notchanged() {
-        ArgumentCaptor<AccountChangedEvent> changeCaptor = ArgumentCaptor.forClass(AccountChangedEvent.class);
-
+    void changeAccount_notChanged() {
         account.changeAccount("NLINBS909392833", null, null);
 
-        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(changeCaptor.capture());
+        Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(ChangeAccountCommand.class);
         assertThat(account.getIban()).isEqualTo("NLINBS909392833");
         assertThat(account.getNumber()).isNull();
         assertThat(account.getBic()).isNull();
@@ -126,14 +124,14 @@ class AccountTest {
 
     @Test
     void interest() {
-        ArgumentCaptor<AccountInterestEvent> changeCaptor = ArgumentCaptor.forClass(AccountInterestEvent.class);
+        ArgumentCaptor<ChangeInterestCommand> changeCaptor = ArgumentCaptor.forClass(ChangeInterestCommand.class);
 
         account.interest(0.02, Periodicity.YEARS);
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
-        assertThat(changeCaptor.getValue().getAccountId()).isEqualTo(1L);
-        assertThat(changeCaptor.getValue().getInterest()).isEqualTo(0.02);
-        assertThat(changeCaptor.getValue().getInterestPeriodicity()).isEqualTo(Periodicity.YEARS);
+        assertThat(changeCaptor.getValue().id()).isEqualTo(1L);
+        assertThat(changeCaptor.getValue().interest()).isEqualTo(0.02);
+        assertThat(changeCaptor.getValue().periodicity()).isEqualTo(Periodicity.YEARS);
     }
 
     @Test
@@ -147,19 +145,19 @@ class AccountTest {
 
     @Test
     void terminate() {
-        ArgumentCaptor<AccountTerminatedEvent> changeCaptor = ArgumentCaptor.forClass(AccountTerminatedEvent.class);
+        ArgumentCaptor<TerminateAccountCommand> changeCaptor = ArgumentCaptor.forClass(TerminateAccountCommand.class);
 
         account.terminate();
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
 
         assertThat(account.isRemove()).isTrue();
-        assertThat(changeCaptor.getValue().getAccount()).isEqualTo(account);
+        assertThat(changeCaptor.getValue().id()).isEqualTo(account.getId());
     }
 
     @Test
     void createTransaction_debit() {
-        ArgumentCaptor<TransactionCreatedEvent> changeCaptor = ArgumentCaptor.forClass(TransactionCreatedEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(CreateTransactionCommand.class);
 
         final Transaction transaction = account.createTransaction(account2, 2500, Transaction.Type.DEBIT, t -> {});
         transaction.register();
@@ -176,7 +174,7 @@ class AccountTest {
 
     @Test
     void createTransaction_credit() {
-        ArgumentCaptor<TransactionCreatedEvent> changeCaptor = ArgumentCaptor.forClass(TransactionCreatedEvent.class);
+        var changeCaptor = ArgumentCaptor.forClass(CreateTransactionCommand.class);
 
         final Transaction transaction = account.createTransaction(account2, 2500, Transaction.Type.CREDIT, t -> {});
         transaction.register();
@@ -205,17 +203,17 @@ class AccountTest {
 
     @Test
     void createContract() {
-        ArgumentCaptor<ContractCreatedEvent> changeCaptor = ArgumentCaptor.forClass(ContractCreatedEvent.class);
+        ArgumentCaptor<CreateContractCommand> changeCaptor = ArgumentCaptor.forClass(CreateContractCommand.class);
 
         account.createContract("Sample contract", "", LocalDate.of(2009, 1, 1), LocalDate.of(2010, 1, 1));
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
 
-        final ContractCreatedEvent event = changeCaptor.getValue();
-        assertThat(event.getCompany()).isEqualTo(account);
-        assertThat(event.getName()).isEqualTo("Sample contract");
-        assertThat(event.getStart()).isEqualTo(LocalDate.of(2009, 1, 1));
-        assertThat(event.getEnd()).isEqualTo(LocalDate.of(2010, 1, 1));
+        final CreateContractCommand event = changeCaptor.getValue();
+        assertThat(event.companyId()).isEqualTo(account.getId());
+        assertThat(event.name()).isEqualTo("Sample contract");
+        assertThat(event.start()).isEqualTo(LocalDate.of(2009, 1, 1));
+        assertThat(event.end()).isEqualTo(LocalDate.of(2010, 1, 1));
     }
 
 }

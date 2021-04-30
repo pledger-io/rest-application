@@ -1,9 +1,8 @@
 package com.jongsoft.finance.jpa.account;
 
-import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.events.*;
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.jpa.account.entity.ContractJpa;
+import com.jongsoft.finance.jpa.contract.ContractJpa;
+import com.jongsoft.finance.messaging.commands.contract.*;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
@@ -38,8 +37,8 @@ class ContractEventListenerIT extends JpaTestSetup {
     void handleContractCreated() {
         setup();
         eventPublisher.publishEvent(
-                new ContractCreatedEvent(
-                        this, Account.builder().id(1L).build(),
+                new CreateContractCommand(
+                        1L,
                         "Contract create",
                         "MY description",
                         LocalDate.of(2019, 1, 22),
@@ -50,8 +49,7 @@ class ContractEventListenerIT extends JpaTestSetup {
     void handleContractChanged() {
         setup();
         eventPublisher.publishEvent(
-                new ContractChangedEvent(
-                        this,
+                new ChangeContractCommand(
                         1L,
                         "Updated name",
                         "New description",
@@ -69,8 +67,7 @@ class ContractEventListenerIT extends JpaTestSetup {
     void handleContractWarning() {
         setup();
         eventPublisher.publishEvent(
-                new ContractWarningEvent(
-                        this,
+                new WarnBeforeExpiryCommand(
                         1L,
                         LocalDate.of(2022, 4, 3)));
 
@@ -83,8 +80,7 @@ class ContractEventListenerIT extends JpaTestSetup {
     void handleContractUpload() {
         setup();
         eventPublisher.publishEvent(
-                new ContractUploadEvent(
-                        this,
+                new AttachFileToContractCommand(
                         1L,
                         "file-token"));
 
@@ -95,10 +91,7 @@ class ContractEventListenerIT extends JpaTestSetup {
     @Test
     void handleContractTerminated() {
         setup();
-        eventPublisher.publishEvent(
-                new ContractTerminatedEvent(
-                        this,
-                        1L));
+        eventPublisher.publishEvent(new TerminateContractCommand(1L));
 
         var check = entityManager.find(ContractJpa.class, 1L);
         Assertions.assertThat(check.isArchived()).isTrue();

@@ -2,18 +2,16 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.domain.core.ResultPage;
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.transaction.TransactionProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.jpa.account.entity.ContractJpa;
+import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
-import com.jongsoft.finance.jpa.transaction.entity.TagJpa;
-import com.jongsoft.finance.jpa.transaction.entity.TransactionJournal;
-import com.jongsoft.finance.jpa.transaction.entity.TransactionJpa;
-import com.jongsoft.finance.jpa.user.entity.CategoryJpa;
-import com.jongsoft.finance.jpa.user.entity.ExpenseJpa;
+import com.jongsoft.finance.jpa.tag.TagJpa;
+import com.jongsoft.finance.jpa.category.CategoryJpa;
+import com.jongsoft.finance.jpa.budget.ExpenseJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
@@ -25,12 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Slf4j
 @Singleton
-@Transactional
 @Named("transactionProvider")
 public class TransactionProviderJpa implements TransactionProvider {
 
@@ -100,12 +98,12 @@ public class TransactionProviderJpa implements TransactionProvider {
             delegate.user(authenticationFacade.authenticated());
 
             var hql = """
-                    select new com.jongsoft.finance.jpa.transaction.entity.DailySummaryImpl(
+                    select new %s(
                        a.date,
                        sum(t.amount))
                        %s
                        group by a.date
-                       order by a.date asc""".formatted(delegate.generateHql());
+                       order by a.date asc""".formatted(DailySummaryImpl.class.getName(), delegate.generateHql());
 
             return entityManager.<DailySummary>blocking()
                     .hql(hql)
@@ -117,13 +115,13 @@ public class TransactionProviderJpa implements TransactionProvider {
     }
 
     @Override
-    public Optional<Double> balance(FilterCommand filter) {
+    public Optional<BigDecimal> balance(FilterCommand filter) {
         log.trace("Transaction balance with filter: {}", filter.toString());
 
         if (filter instanceof TransactionFilterCommand delegate) {
             delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<Double>blocking()
+            return entityManager.<BigDecimal>blocking()
                     .hql("select sum(t.amount) " + delegate.generateHql())
                     .setAll(delegate.getParameters())
                     .maybe();
@@ -203,7 +201,7 @@ public class TransactionProviderJpa implements TransactionProvider {
                                 .type(transaction.getAccount().getType().getLabel())
                                 .imageFileToken(transaction.getAccount().getImageFileToken())
                                 .build())
-                .amount(transaction.getAmount())
+                .amount(transaction.getAmount().doubleValue())
                 .description(transaction.getDescription())
                 .build();
     }

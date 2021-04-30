@@ -2,12 +2,12 @@ package com.jongsoft.finance.domain.transaction;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.jongsoft.finance.messaging.commands.rule.RenameRuleGroupCommand;
+import com.jongsoft.finance.messaging.commands.rule.ReorderRuleGroupCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupRenamedEvent;
-import com.jongsoft.finance.domain.transaction.events.TransactionRuleGroupSortedEvent;
 import com.jongsoft.finance.messaging.EventBus;
 
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -24,7 +24,7 @@ class TransactionRuleGroupTest {
 
     @Test
     void changeOrder() {
-        ArgumentCaptor<TransactionRuleGroupSortedEvent> captor = ArgumentCaptor.forClass(TransactionRuleGroupSortedEvent.class);
+        var captor = ArgumentCaptor.forClass(ReorderRuleGroupCommand.class);
 
         TransactionRuleGroup.builder()
                 .sort(1)
@@ -34,13 +34,13 @@ class TransactionRuleGroupTest {
                 .changeOrder(2);
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getGroupId()).isEqualTo(1L);
-        assertThat(captor.getValue().getSortOrder()).isEqualTo(2);
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().sort()).isEqualTo(2);
     }
 
     @Test
     void rename() {
-        ArgumentCaptor<TransactionRuleGroupRenamedEvent> captor = ArgumentCaptor.forClass(TransactionRuleGroupRenamedEvent.class);
+        var captor = ArgumentCaptor.forClass(RenameRuleGroupCommand.class);
 
         TransactionRuleGroup.builder()
                 .sort(1)
@@ -50,8 +50,8 @@ class TransactionRuleGroupTest {
                 .rename("Changed group");
 
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().getRuleGroupId()).isEqualTo(1L);
-        assertThat(captor.getValue().getName()).isEqualTo("Changed group");
+        assertThat(captor.getValue().id()).isEqualTo(1L);
+        assertThat(captor.getValue().name()).isEqualTo("Changed group");
     }
 
 }

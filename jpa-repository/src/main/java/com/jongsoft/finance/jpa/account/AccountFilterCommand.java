@@ -1,6 +1,6 @@
 package com.jongsoft.finance.jpa.account;
 
-import com.jongsoft.finance.domain.account.AccountProvider;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.data.model.Sort;
