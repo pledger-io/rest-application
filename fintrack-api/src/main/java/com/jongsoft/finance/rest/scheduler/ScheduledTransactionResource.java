@@ -92,13 +92,16 @@ public class ScheduledTransactionResource {
                 .activeOnly();
 
         return Flowable.create(emitter -> {
-            scheduleProvider.lookup(filter)
-                    .map(ScheduledTransactionResponse::new)
-                    .content()
-                    .forEach(emitter::onNext);
+            try {
+                scheduleProvider.lookup(filter)
+                        .map(ScheduledTransactionResponse::new)
+                        .content()
+                        .forEach(emitter::onNext);
+            } finally {
+                emitter.onComplete();
+            }
 
-            emitter.onComplete();
-        }, BackpressureStrategy.BUFFER);
+        }, BackpressureStrategy.DROP);
     }
 
     @Get("/{scheduleId}")

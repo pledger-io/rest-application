@@ -43,4 +43,12 @@ public class ScheduledTransactionResponse {
         return new AccountResponse(wrapped.getDestination());
     }
 
+    public ContractResponse getContract() {
+        if (wrapped.getContract() == null) {
+            return null;
+        }
+
+        return new ContractResponse(wrapped.getContract());
+    }
+
 }

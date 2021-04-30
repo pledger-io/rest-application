@@ -4,12 +4,14 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.schedule.Periodicity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class AccountResponse {
 
     private final Account wrapped;
 
     public AccountResponse(final Account wrapped) {
+        Objects.requireNonNull(wrapped, "Account cannot be null for JSON response.");
         this.wrapped = wrapped;
     }
 

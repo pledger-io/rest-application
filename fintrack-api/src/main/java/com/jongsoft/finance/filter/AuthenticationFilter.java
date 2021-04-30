@@ -16,6 +16,7 @@ import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.management.endpoint.EndpointsFilter;
 import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.security.authentication.Authentication;
+import io.micronaut.security.authentication.AuthorizationException;
 import io.micronaut.security.filters.SecurityFilter;
 import io.reactivex.Flowable;
 import io.reactivex.Scheduler;
@@ -67,7 +68,31 @@ public class AuthenticationFilter extends OncePerRequestHttpServerFilter {
 
         ContextPropagation.configureContext(mdcContext, securityContext);
         return Flowable.fromPublisher(chain.proceed(request))
-                .doOnComplete(ContextPropagation::unsetContext);
+                .doOnComplete(ContextPropagation::unsetContext)
+                .onErrorReturn(exception -> this.translateException(exception, request));
+    }
+
+    private MutableHttpResponse<?> translateException(Throwable throwable, HttpRequest<?> request) {
+        var error = new JsonError(throwable.getMessage());
+        //error.link(Link.SELF, Link.of(request.getUri()));
+
+        int statusCode = 500;
+        if (throwable instanceof AuthorizationException) {
+            log.warn("{} - Attempt to access resource without proper authorization with message '{}'",
+                    request.getPath(),
+                    throwable.getMessage());
+            statusCode = HttpStatus.UNAUTHORIZED.getCode();
+        } else {
+            var message = "%s - Exception caught in HTTP chain execution, with message '%s'".formatted(
+                    request.getPath(),
+                    throwable.getMessage());
+
+            log.error(message, throwable);
+        }
+
+        return HttpResponse
+                .status(HttpStatus.valueOf(statusCode))
+                .body(error);
     }
 
     private ReactiveThreadLocal<?> createSecurityContext(final HttpRequest<?> request) {

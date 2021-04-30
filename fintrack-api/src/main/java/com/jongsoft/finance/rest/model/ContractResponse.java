@@ -51,6 +51,10 @@ public class ContractResponse {
     }
 
     public AccountResponse getCompany() {
+        if (wrapped.getCompany() == null) {
+            return null;
+        }
+
         return new AccountResponse(wrapped.getCompany());
     }
 
