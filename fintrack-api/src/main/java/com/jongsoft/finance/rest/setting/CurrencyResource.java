@@ -43,7 +43,7 @@ public class CurrencyResource {
     }
 
     @Put
-    @Secured("ADMIN")
+    @Secured("admin")
     @Status(HttpStatus.CREATED)
     @Operation(
             summary = "Create currency",

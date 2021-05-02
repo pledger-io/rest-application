@@ -64,12 +64,12 @@ public class TransactionJournal extends AuditedJpa {
     @JoinColumn
     private CurrencyJpa currency;
 
-    @ManyToMany
     @JoinTable(
             name = "transaction_tag",
             joinColumns = @JoinColumn(name = "transaction_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<TagJpa> tags;
 
     @Where(clause = "deleted is null")
