@@ -96,6 +96,7 @@ subprojects {
 
         reports {
             xml.enabled true
+            xml.destination file("${buildDir}/reports/jacoco/report.xml")
             csv.enabled false
             html.enabled false
         }
