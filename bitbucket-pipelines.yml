@@ -15,7 +15,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew -x javadoc check jacocoTestReport
+            - bash ./gradlew check
           artifacts:
             - .gradle/**
             - "**/build/**"
@@ -24,7 +24,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew -x javadoc sonarqube
+            - bash ./gradlew sonarqube
 
   branches:
     master:
@@ -33,7 +33,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew -x javadoc check jacocoTestReport
+            - bash ./gradlew check
           artifacts:
             - .gradle/**
             - "**/build/**"
@@ -48,13 +48,13 @@ pipelines:
                 - openssl11 aes-256-cbc -a -k "$SIGNING_PWD" -in private-key.gpg.enc -out private-key.gpg -d
                 - gpg --import private-key.gpg
                 - printf "signing.keyId=$GPG_KEY\nsigning.password=$GPG_PASSWORD\nsigning.secretKeyRingFile=$BITBUCKET_CLONE_DIR/private-key.gpg" > ~/.gradle/gradle.properties
-                - bash ./gradlew -x javadoc publish
+                - bash ./gradlew publish
           - step:
               name: Quality gate
               caches:
                 - gradle
               script:
-                - bash ./gradlew -x javadoc sonarqube
+                - bash ./gradlew sonarqube
 
     release/*:
       - step:

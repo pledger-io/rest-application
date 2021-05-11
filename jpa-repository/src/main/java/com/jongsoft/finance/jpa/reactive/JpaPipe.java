@@ -68,7 +68,7 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
      * Set the offset that will be used in the pipeline's resultset. This is the number of
      * records that should be skipped before returning the first result.
      *
-     * @param limit the limit
+     * @param offset the offset
      * @return this instance
      */
     public R offset(int offset) {
