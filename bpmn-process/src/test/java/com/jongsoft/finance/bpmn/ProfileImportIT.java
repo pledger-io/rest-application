@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
 public class ProfileImportIT extends ProcessTestSetup {
 
     @Inject

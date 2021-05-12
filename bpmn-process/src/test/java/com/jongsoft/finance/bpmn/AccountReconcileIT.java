@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-@Disabled
 class AccountReconcileIT extends ProcessTestSetup {
 
     @Inject

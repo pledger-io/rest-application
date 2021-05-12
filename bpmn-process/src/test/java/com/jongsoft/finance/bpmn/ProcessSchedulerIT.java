@@ -12,7 +12,6 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
-@Disabled
 class ProcessSchedulerIT extends ProcessTestSetup {
 
     @Inject

@@ -25,7 +25,6 @@ import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
 class ApplyTransactionRulesIT extends ProcessTestSetup {
 
     @Inject

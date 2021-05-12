@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Disabled
 public class ScheduledTransactionIT extends ProcessTestSetup {
 
     @Inject

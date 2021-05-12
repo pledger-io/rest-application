@@ -23,7 +23,6 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Properties;
 
-@Disabled
 public class ContractWarningIT extends ProcessTestSetup {
 
     @Inject
