@@ -9,6 +9,10 @@ public class ContextPropagation {
 
     private static final Logger log = LoggerFactory.getLogger(ContextPropagation.class);
 
+    private ContextPropagation() {
+        // hidden constructor
+    }
+
     public static void configureContext(ReactiveThreadLocal<?>... rxThreadLocals) {
         log.trace("Setting up propagation context.");
         var toPropagate = Collections.List(rxThreadLocals);

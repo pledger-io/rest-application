@@ -14,12 +14,7 @@ import javax.inject.Singleton;
 @Singleton
 public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
-    private final SecurityService securityService;
-    private final static ThreadLocal<String> AUTHENTICATED_USER = new ThreadLocal<>();
-
-    public AuthenticationFacadeImpl(SecurityService securityService) {
-        this.securityService = securityService;
-    }
+    private static final ThreadLocal<String> AUTHENTICATED_USER = new ThreadLocal<>();
 
     @EventListener
     void authenticated(LoginSuccessfulEvent event) {

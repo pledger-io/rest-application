@@ -3,8 +3,9 @@ package com.jongsoft.finance.reactive;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
-public final class ReactiveThreadLocal<T> implements Function<Runnable, Runnable> {
+public final class ReactiveThreadLocal<T> implements UnaryOperator<Runnable> {
 
     private final Supplier<T> extractor;
     private final Consumer<T> configurer;
@@ -18,9 +19,9 @@ public final class ReactiveThreadLocal<T> implements Function<Runnable, Runnable
 
     @Override
     public Runnable apply(Runnable delegate) {
-        T callerContext = extractor.get();
+        var callerContext = extractor.get();
         return () -> {
-            T originalContext = extractor.get();
+            var originalContext = extractor.get();
             try {
                 configurer.accept(callerContext);
                 delegate.run();

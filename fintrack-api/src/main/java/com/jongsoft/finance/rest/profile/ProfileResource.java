@@ -46,9 +46,7 @@ public class ProfileResource {
             operationId = "getProfile",
             summary = "Get profile of authenticated user")
     public Single<UserProfileResponse> get() {
-        return Single.create(emitter -> {
-            emitter.onSuccess(new UserProfileResponse(currentUserProvider.currentUser()));
-        });
+        return Single.create(emitter -> emitter.onSuccess(new UserProfileResponse(currentUserProvider.currentUser())));
     }
 
     @Patch
@@ -58,7 +56,7 @@ public class ProfileResource {
             description = "This change will be applied to the authenticated user")
     public Single<UserProfileResponse> patch(@Body PatchProfileRequest request) {
         return Single.create(emitter -> {
-            final UserAccount userAccount = currentUserProvider.currentUser();
+            var userAccount = currentUserProvider.currentUser();
 
             if (request.currency() != null) {
                 userAccount.changeCurrency(Currency.getInstance(request.currency()));
@@ -124,7 +122,7 @@ public class ProfileResource {
                 var reader = new ByteArrayOutputStream();
 
                 int read;
-                byte[] byteChunk = new byte[4096];
+                var byteChunk = new byte[4096];
                 while ((read = inputStream.read(byteChunk)) > 0) {
                     reader.write(byteChunk, 0, read);
                 }

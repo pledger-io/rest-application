@@ -34,7 +34,7 @@ public class StorageServiceImpl implements StorageService {
             StorageSettings storageLocation) throws GeneralSecurityException {
         this.securitySettings = securitySettings;
         this.currentUserProvider = currentUserProvider;
-        this.encryption = new Encryption(securitySettings);
+        this.encryption = new Encryption();
 
         uploadRootDirectory = Path.of(storageLocation.getLocation(), "upload");
         if (Files.notExists(uploadRootDirectory)) {

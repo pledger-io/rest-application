@@ -13,18 +13,18 @@ import java.util.Base64;
 
 public class Encryption {
 
-    private final static String ALGORITHM_NAME = "AES/GCM/NoPadding";
-    private final static int ALGORITHM_NONCE_SIZE = 12;
-    private final static int ALGORITHM_TAG_SIZE = 128;
-    private final static int ALGORITHM_KEY_SIZE = 128;
-    private final static String PBKDF2_NAME = "PBKDF2WithHmacSHA256";
-    private final static int PBKDF2_SALT_SIZE = 16;
-    private final static int PBKDF2_ITERATIONS = 32767;
+    private static final String ALGORITHM_NAME = "AES/GCM/NoPadding";
+    private static final int ALGORITHM_NONCE_SIZE = 12;
+    private static final int ALGORITHM_TAG_SIZE = 128;
+    private static final int ALGORITHM_KEY_SIZE = 128;
+    private static final String PBKDF2_NAME = "PBKDF2WithHmacSHA256";
+    private static final int PBKDF2_SALT_SIZE = 16;
+    private static final int PBKDF2_ITERATIONS = 32767;
 
     private final byte[] securitySalt = new byte[PBKDF2_SALT_SIZE];
     private final byte[] nonce = new byte[ALGORITHM_NONCE_SIZE];
 
-    public Encryption(SecuritySettings securitySettings) throws GeneralSecurityException {
+    public Encryption() {
         SecureRandom rand = new SecureRandom();
         rand.nextBytes(securitySalt);
         rand.nextBytes(nonce);
@@ -82,12 +82,12 @@ public class Encryption {
                     cipherTextAndNonce.length);
 
             // Create an instance of PBKDF2 and derive the key.
-            PBEKeySpec pwSpec = new PBEKeySpec(
+            var pwSpec = new PBEKeySpec(
                     password.toCharArray(),
                     salt,
                     PBKDF2_ITERATIONS,
                     ALGORITHM_KEY_SIZE);
-            SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(PBKDF2_NAME);
+            var keyFactory = SecretKeyFactory.getInstance(PBKDF2_NAME);
             byte[] key = keyFactory.generateSecret(pwSpec).getEncoded();
 
             // Decrypt and return result.

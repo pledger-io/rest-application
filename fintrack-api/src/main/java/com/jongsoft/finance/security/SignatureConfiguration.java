@@ -68,12 +68,12 @@ public class SignatureConfiguration implements RSASignatureGeneratorConfiguratio
         Security.addProvider(new BouncyCastleProvider());
 
         // Parse the EC key pair
-        try (PEMParser pemParser = new PEMParser(new InputStreamReader(Files.newInputStream(Paths.get(pemPath))))) {
-            PEMKeyPair pemKeyPair = (PEMKeyPair) pemParser.readObject();
+        try (var pemParser = new PEMParser(new InputStreamReader(Files.newInputStream(Paths.get(pemPath))))) {
+            var pemKeyPair = (PEMKeyPair) pemParser.readObject();
 
             // Convert to Java (JCA) format
-            JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
-            KeyPair keyPair = converter.getKeyPair(pemKeyPair);
+            var converter = new JcaPEMKeyConverter();
+            var keyPair = converter.getKeyPair(pemKeyPair);
 
             return Optional.of(keyPair);
         } catch (FileNotFoundException e) {
