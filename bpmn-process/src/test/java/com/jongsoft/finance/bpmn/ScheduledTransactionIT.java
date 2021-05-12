@@ -18,6 +18,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
@@ -26,6 +27,7 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Disabled
 public class ScheduledTransactionIT extends ProcessTestSetup {
 
     @Inject

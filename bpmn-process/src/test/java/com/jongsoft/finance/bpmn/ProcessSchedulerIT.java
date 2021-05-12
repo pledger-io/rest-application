@@ -3,6 +3,7 @@ package com.jongsoft.finance.bpmn;
 import com.jongsoft.finance.schedule.Periodicity;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
@@ -11,6 +12,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
+@Disabled
 class ProcessSchedulerIT extends ProcessTestSetup {
 
     @Inject

@@ -12,6 +12,7 @@ import com.jongsoft.lang.Control;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -22,6 +23,7 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Properties;
 
+@Disabled
 public class ContractWarningIT extends ProcessTestSetup {
 
     @Inject
