@@ -1,21 +1,28 @@
 package com.jongsoft.finance.jpa.reactive;
 
+import io.micronaut.transaction.SynchronousTransactionManager;
+
 import javax.persistence.EntityManager;
+import java.sql.Connection;
 
 public class UpdatingPipe extends JpaPipe<Void, UpdatingPipe> {
 
+    private final SynchronousTransactionManager<Connection> transactionManager;
     private final EntityManager entityManager;
 
-    public UpdatingPipe(EntityManager entityManager) {
+    public UpdatingPipe(SynchronousTransactionManager<Connection> transactionManager, EntityManager entityManager) {
+        this.transactionManager = transactionManager;
         this.entityManager = entityManager;
     }
 
     public void execute() {
-        var query = entityManager.createQuery(hql());
+        transactionManager.executeWrite(status -> {
+            var query = entityManager.createQuery(hql());
 
-        applyParameters(query);
+            applyParameters(query);
 
-        query.executeUpdate();
+            return query.executeUpdate();
+        });
     }
 
     @Override

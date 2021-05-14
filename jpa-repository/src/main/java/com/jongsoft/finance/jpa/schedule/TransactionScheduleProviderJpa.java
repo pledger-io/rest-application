@@ -14,7 +14,6 @@ import com.jongsoft.lang.control.Optional;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 
 @Singleton

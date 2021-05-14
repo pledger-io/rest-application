@@ -1,21 +1,11 @@
 package com.jongsoft.finance.reactive;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-public final class ReactiveThreadLocal<T> implements UnaryOperator<Runnable> {
-
-    private final Supplier<T> extractor;
-    private final Consumer<T> configurer;
-    private final Consumer<T> restorer;
-
-    public ReactiveThreadLocal(Supplier<T> extractor, Consumer<T> configurer, Consumer<T> restorer) {
-        this.extractor = extractor;
-        this.configurer = configurer;
-        this.restorer = restorer;
-    }
+public record ReactiveThreadLocal<T>(Supplier<T> extractor, Consumer<T> configurer, Consumer<T> restorer)
+        implements UnaryOperator<Runnable> {
 
     @Override
     public Runnable apply(Runnable delegate) {

@@ -13,7 +13,6 @@ import org.mockito.Mockito;
 
 import javax.inject.Inject;
 
-@Disabled
 class TransactionScheduleProviderJpaIT extends JpaTestSetup {
 
     @Inject

@@ -1,7 +1,6 @@
 package com.jongsoft.finance.jpa.reactive;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Map;
 import io.micronaut.transaction.SynchronousTransactionManager;
 
@@ -17,19 +16,21 @@ public class ReactiveEntityManager {
 
     public ReactiveEntityManager(
             SynchronousTransactionManager<Connection> transactionManager,
-            EntityManager entityManager,
-            AuthenticationFacade authenticationFacade) {
+            EntityManager entityManager) {
         this.transactionManager = transactionManager;
         this.entityManager = entityManager;
     }
 
     public <T extends EntityJpa> void persist(T entity) {
-        if (entity.getId() == null) {
-            entityManager.persist(entity);
-        } else{
-            entityManager.merge(entity);
-        }
-        entityManager.flush();
+        transactionManager.executeWrite(status -> {
+            if (entity.getId() == null) {
+                entityManager.persist(entity);
+            } else{
+                entityManager.merge(entity);
+            }
+            entityManager.flush();
+            return entity;
+        });
     }
 
     public <T> ReactivePipe<T> reactive() {
@@ -58,7 +59,7 @@ public class ReactiveEntityManager {
     }
 
     public UpdatingPipe update() {
-        return new UpdatingPipe(entityManager);
+        return new UpdatingPipe(transactionManager, entityManager);
     }
 
 }
