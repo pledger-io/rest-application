@@ -138,7 +138,7 @@ public class AccountTransactionResource {
                     builderConsumer);
 
             transaction.register();
-            emitter.onSuccess(HttpResponse.created(new URI("/accounts/"+ fromAccount.getId() +"/transactions")));
+            emitter.onSuccess(HttpResponse.created(new URI("/accounts/" + fromAccount.getId() + "/transactions")));
         });
     }
 
@@ -270,21 +270,19 @@ public class AccountTransactionResource {
             description = "Split the transaction into smaller pieces, all belonging to the same actual transaction.",
             parameters = @Parameter(name = "transactionId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
     )
-    Single<HttpResponse<TransactionResponse>> split(
+    Single<TransactionResponse> split(
             @PathVariable long transactionId,
             @Valid @Body AccountTransactionSplitRequest request) {
-        return Single.create(emitter -> {
-            var presence = transactionProvider.lookup(transactionId);
-            if (!presence.isPresent()) {
-                emitter.onSuccess(HttpResponse.notFound());
-            } else {
-                presence.get().split(
-                        Collections.List(request.getSplits())
-                                .map(split -> new SplitRecord(split.getDescription(), split.getAmount())));
+        return transactionProvider.lookup(transactionId)
+                .map(Single::just)
+                .getOrSupply(() -> Single.error(StatusException.notFound("No transaction found for id " + transactionId)))
+                .map(transaction -> {
+                    var splits = Collections.List(request.getSplits())
+                            .map(split -> new SplitRecord(split.getDescription(), split.getAmount()));
+                    transaction.split(splits);
 
-                emitter.onSuccess(HttpResponse.ok(new TransactionResponse(presence.get())));
-            }
-        });
+                    return new TransactionResponse(transaction);
+                });
     }
 
     @Delete("/{transactionId}")

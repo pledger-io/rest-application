@@ -42,17 +42,22 @@ public class ReactiveEntityManager {
     }
 
     public <T> T getDetached(Class<T> type, Map<String, Object> filter) {
-        var value = get(type, filter);
-        entityManager.detach(value);
-        return value;
+        return transactionManager.executeRead(status -> {
+            var entity = getShared(type, filter);
+            entityManager.detach(entity);
+            return entity;
+        });
     }
 
     public <T> T get(Class<T> type, Map<String, Object> filter) {
+        return transactionManager.executeRead(status -> getShared(type, filter));
+    }
+
+    private <T> T getShared(Class<T> type, Map<String, Object> filter) {
         String hql = "from " + type.getName() +
                 filter.foldLeft(
                         " where 1 = 1",
                         (x, y) -> x + " AND " + y.getFirst() + " = :" + y.getFirst());
-
         var query = this.<T>blocking().hql(hql);
         filter.forEach(entry -> query.set(entry.getFirst(), entry.getSecond()));
         return query.maybe().get();

@@ -287,6 +287,27 @@ class AccountTransactionResourceTest extends TestSetup {
     }
 
     @Test
+    void split_noTransaction() {
+        var request = AccountTransactionSplitRequest.builder()
+                .splits(List.of(
+                        AccountTransactionSplitRequest.SplitRecord.builder()
+                                .description("Part 1")
+                                .amount(-5D)
+                                .build(),
+                        AccountTransactionSplitRequest.SplitRecord.builder()
+                                .description("Part 2")
+                                .amount(-15D)
+                                .build()
+                ))
+                .build();
+
+        Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option());
+        subject.split(123L, request)
+                .test()
+                .assertErrorMessage("No transaction found for id 123");
+    }
+
+    @Test
     void split() {
         Account account = Account.builder()
                 .id(1L)
@@ -340,15 +361,13 @@ class AccountTransactionResourceTest extends TestSetup {
                 ))
                 .build();
 
-        var response = subject.split(123L, request).blockingGet();
-
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
-
-        var check = response.body();
-        Assertions.assertThat(check.getSplit().get(0).getAmount()).isEqualTo(5D);
-        Assertions.assertThat(check.getSplit().get(0).getDescription()).isEqualTo("Part 1");
-        Assertions.assertThat(check.getSplit().get(1).getAmount()).isEqualTo(15D);
-        Assertions.assertThat(check.getSplit().get(1).getDescription()).isEqualTo("Part 2");
+        subject.split(123L, request)
+                .test()
+                .assertComplete()
+                .assertValueCount(1)
+                .assertValue(check -> check.getSplit().get(0).getAmount() == 5D)
+                .assertValue(check -> "Part 1".equals(check.getSplit().get(0).getDescription()))
+                .assertValue(check -> "Part 2".equals(check.getSplit().get(1).getDescription()));
     }
 
     @Test
