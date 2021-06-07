@@ -13,28 +13,113 @@ import java.time.LocalDate;
 
 public interface TransactionProvider extends DataProvider<Transaction> {
 
+    /**
+     * This command class helps to search in the database for relevant transactions. Use
+     * the methods provided to add filters to the query. Calling a method twice will
+     * override the previous value.
+     */
     interface FilterCommand {
+        /**
+         * A list of {@link EntityRef} with unique identifiers of accounts that
+         * should be filtered for.
+         *
+         * @param value the list of identifiers
+         * @return this instance
+         */
         FilterCommand accounts(Sequence<EntityRef> value);
+
+        /**
+         * A list of {@link EntityRef} with unique identifiers of categories that
+         * should be filtered for.
+         *
+         * @param value the list of identifiers
+         * @return this instance
+         */
         FilterCommand categories(Sequence<EntityRef> value);
+
+        /**
+         * A list of {@link EntityRef} with unique identifiers of contracts that
+         * should be filtered for.
+         *
+         * @param value the list of identifiers
+         * @return this instance
+         */
         FilterCommand contracts(Sequence<EntityRef> value);
+
+        /**
+         * A list of {@link EntityRef} with unique identifiers of expenses that
+         * should be filtered for.
+         *
+         * @param value the list of identifiers
+         * @return this instance
+         */
         FilterCommand expenses(Sequence<EntityRef> value);
 
+        /**
+         * Add a filter on the name of one of the accounts involved in the transaction. Depending on
+         * the value of the {@code exact} flag this will be an exact match or a partial match.
+         *
+         * @param value the name
+         * @param exact should the name match exactly or partially
+         * @return this instance
+         */
         FilterCommand name(String value, boolean exact);
         FilterCommand description(String value, boolean exact);
+
+        /**
+         * Add a date range to the filter for the transactions.
+         *
+         * @param range the active date range
+         * @return this instance
+         */
         FilterCommand range(Range<LocalDate> range);
         FilterCommand importSlug(String value);
         FilterCommand currency(String currency);
 
+        /**
+         * Indicates if the result should include only income or expenses.
+         *
+         * @param onlyIncome true for income, false for expenses
+         * @return this instance
+         */
         FilterCommand onlyIncome(boolean onlyIncome);
+
+        /**
+         * Filter to only include transactions to all of your own accounts. This will exclude some transactions
+         * from the search. This operation is mutually exclusive with {@link #transfers()} ()}
+         * and {@link #accounts(Sequence)}.
+         *
+         * @return this instance
+         */
         FilterCommand ownAccounts();
+
+        /**
+         * Only include transactions between accounts owned by the user. This operation is mutually exclusive with
+         * {@link #ownAccounts()} and {@link #accounts(Sequence)}.
+         *
+         * @return this instance
+         */
         FilterCommand transfers();
 
         FilterCommand page(int value);
         FilterCommand pageSize(int value);
     }
 
+    /**
+     * The daily summary is a statistical data container. It will allow the system to provide the aggregation of
+     * all transactions that occurred on one single day.
+     */
     interface DailySummary {
+        /**
+         * The date for which this summary is valid.
+         * @return the day
+         */
         LocalDate day();
+
+        /**
+         * The actual aggregated value for the given date.
+         * @return the summary
+         */
         double summary();
     }
 
