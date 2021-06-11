@@ -2,7 +2,9 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.tag.TagJpa;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
+import com.jongsoft.finance.messaging.commands.transaction.DeleteTagCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
@@ -41,6 +43,18 @@ class TagEventListenerIT extends JpaTestSetup {
         var check = (TagJpa) query.getSingleResult();
         Assertions.assertThat(check.getName()).isEqualTo("created-tag");
         Assertions.assertThat(check.getUser().getUsername()).isEqualTo("demo-user");
+    }
+
+    @Test
+    void handleTagDeleted() {
+        setup();
+
+        eventPublisher.publishEvent(new DeleteTagCommand("Sample"));
+
+        var check = entityManager.createQuery("select t from TagJpa t where t.id = 1", TagJpa.class)
+                .getSingleResult();
+
+        Assertions.assertThat(check.isArchived()).isTrue();
     }
 
     @MockBean

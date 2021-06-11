@@ -18,6 +18,9 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +44,7 @@ public class BalanceResource {
 
     @Post
     @Operation(
-            summary = "Calculate a balance based upon request",
+            summary = "Calculate balance",
             description = "This operation will calculate the balance for the current user based upon the given filters",
             operationId = "getBalance"
     )
@@ -58,6 +61,17 @@ public class BalanceResource {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Post("/partitioned/{partitionKey}")
+    @Operation(
+            summary = "Partitioned balance",
+            description = "Partition all transaction matching the balance request using the partitionKey provided.",
+            operationId = "partitionedBalance",
+            parameters = {
+                    @Parameter(
+                            name = "partitionKey",
+                            in = ParameterIn.PATH,
+                            schema = @Schema(implementation = String.class),
+                            description = "The partition key can be one of: account, budget or category")
+            })
     public Publisher<BalancePartitionResponse> calculatePartitioned(
             @PathVariable String partitionKey,
             @Valid @Body BalanceRequest request) {
@@ -98,6 +112,10 @@ public class BalanceResource {
     }
 
     @Post("/daily")
+    @Operation(
+            summary = "Daily balance",
+            description = "Compute the daily balance based upon the provided request",
+            operationId = "dailyBalance")
     public Publisher<?> daily(@Valid @Body BalanceRequest request) {
         return Flux.create(emitter -> {
             transactionProvider.daily(buildFilterCommand(request))

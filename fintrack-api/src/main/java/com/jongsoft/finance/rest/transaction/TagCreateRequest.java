@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.transaction;
 
 import io.micronaut.core.annotation.Introspected;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * The tag create request is used to add new tags to FinTrack
@@ -8,6 +9,10 @@ import io.micronaut.core.annotation.Introspected;
 @Introspected
 public class TagCreateRequest {
 
+    @Schema(
+            description = "The name of the tag to be created",
+            implementation = String.class,
+            required = true)
     private String tag;
 
     private TagCreateRequest() {

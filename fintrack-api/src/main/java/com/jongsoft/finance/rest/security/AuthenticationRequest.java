@@ -1,6 +1,10 @@
 package com.jongsoft.finance.rest.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micronaut.core.annotation.Introspected;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -10,9 +14,19 @@ class AuthenticationRequest implements io.micronaut.security.authentication.Auth
 
     @Email
     @NotNull
+    @Schema(
+            description = "The username, must be a valid e-mail address.",
+            required = true,
+            implementation = String.class,
+            example = "me@example.com")
     private String username;
 
     @NotNull
+    @Schema(
+            description = "The password",
+            required = true,
+            implementation = String.class,
+            example = "password123")
     private String password;
 
     public AuthenticationRequest(@Email @NotNull final String username, @NotNull final String password) {
@@ -21,11 +35,21 @@ class AuthenticationRequest implements io.micronaut.security.authentication.Auth
     }
 
     @Override
+    @JsonIgnore
     public String getIdentity() {
         return username;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
     @Override
+    @JsonIgnore
     public String getSecret() {
         return password;
     }

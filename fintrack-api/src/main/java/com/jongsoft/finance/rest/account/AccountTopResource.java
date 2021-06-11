@@ -39,7 +39,8 @@ public class AccountTopResource {
     @Get("/debit/{start}/{end}")
     @Operation(
             summary = "Top debit accounts",
-            description = "Calculates and returns the accounts where you spent the most for the given date range"
+            description = "Calculates and returns the accounts where you spent the most for the given date range",
+            operationId = "listTopDebtors"
     )
     Flux<AccountSpendingResponse> topDebtors(
             @PathVariable @DateFormat LocalDate start,
@@ -60,7 +61,8 @@ public class AccountTopResource {
     @Get("/creditor/{start}/{end}")
     @Operation(
             summary = "Top creditor accounts",
-            description = "Calculates and returns the accounts that credited the most money for the given date range"
+            description = "Calculates and returns the accounts that credited the most money for the given date range",
+            operationId = "listTopCreditors"
     )
     Flux<AccountSpendingResponse> topCreditor(
             @PathVariable @DateFormat LocalDate start,

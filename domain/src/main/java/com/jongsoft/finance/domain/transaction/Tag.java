@@ -1,5 +1,9 @@
 package com.jongsoft.finance.domain.transaction;
 
+import com.jongsoft.finance.annotation.BusinessMethod;
+import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.transaction.DeleteTagCommand;
+
 import java.util.Objects;
 
 public class Tag {
@@ -12,6 +16,11 @@ public class Tag {
 
     public String name() {
         return this.name;
+    }
+
+    @BusinessMethod
+    public void archive() {
+        EventBus.getBus().send(new DeleteTagCommand(name));
     }
 
     @Override

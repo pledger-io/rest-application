@@ -106,8 +106,13 @@ public class AuthenticationResource {
                         "passwordHash", application.getHashingAlgorithm().encrypt(authenticationRequest.getSecret())));
     }
 
+    @ApiDefaults
     @Post("/api/security/2-factor")
     @Secured("PRE_VERIFICATION_USER")
+    @Operation(
+            summary = "Verify MFA token",
+            description = "Used to verify the user token against that what is expected. If valid the user will get a new JWT with updated authorizations."
+    )
     public Publisher<MutableHttpResponse<AccessRefreshToken>> mfaValidate(@Valid @Body MultiFactorRequest request) {
         return Mono.just(userProvider.lookup(authenticationFacade.authenticated())
                 .filter(user -> TwoFactorHelper.verifySecurityCode(user.getSecret(), request.getVerificationCode()))
@@ -131,7 +136,10 @@ public class AuthenticationResource {
 
     @Secured(SecurityRule.IS_ANONYMOUS)
     @Get(value = "/.well-known/public-key")
-    @Operation(hidden = true)
+    @Operation(
+            summary = "Get the signing key",
+            description = "Use this operation to obtain the public signing key used to sign the JWT."
+    )
     public String publicKey() {
         return Base64.encodeBase64String(rsaSignatureConfiguration.getPublicKey().getEncoded());
     }

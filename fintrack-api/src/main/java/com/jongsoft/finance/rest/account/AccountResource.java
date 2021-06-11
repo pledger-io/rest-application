@@ -14,6 +14,10 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Mono;
 
@@ -47,7 +51,8 @@ public class AccountResource {
     @Get("/my-own")
     @Operation(
             summary = "List own accounts",
-            description = "List all accounts that are creatable in the front-end using one of the selectable account types"
+            description = "List all accounts that are creatable in the front-end using one of the selectable account types",
+            operationId = "ownAccounts"
     )
     Mono<List<AccountResponse>> ownAccounts() {
         return Mono.create(emitter -> {
@@ -64,7 +69,8 @@ public class AccountResource {
     @Get("/all")
     @Operation(
             summary = "List all accounts",
-            description = "Fetch all accounts registered to the authenticated user"
+            description = "Fetch all accounts registered to the authenticated user",
+            operationId = "listAllAccounts"
     )
     Mono<List<AccountResponse>> allAccounts() {
         return Mono.create(emitter -> {
@@ -79,7 +85,23 @@ public class AccountResource {
     @Get("/auto-complete{?token,type}")
     @Operation(
             summary = "Autocomplete accounts",
-            description = "Performs a search operation based on the partial name (token) of the given account type"
+            description = "Performs a search operation based on the partial name (token) of the given account type",
+            operationId = "autocomplete",
+            parameters = {
+                    @Parameter(
+                            name = "token",
+                            description = "A partial search text.",
+                            in = ParameterIn.QUERY,
+                            required = true,
+                            schema = @Schema(implementation = String.class)),
+                    @Parameter(
+                            name = "type",
+                            description = "An account type to limit the search to, see <a href='#get-/api/account-type'>types</a> for available types.",
+                            example = "credit",
+                            in = ParameterIn.QUERY,
+                            required = true,
+                            schema = @Schema(implementation = String.class)),
+            }
     )
     Mono<List<AccountResponse>> autocomplete(@Nullable String token, @Nullable String type) {
         return Mono.create(emitter -> {
@@ -99,7 +121,8 @@ public class AccountResource {
     @Post
     @Operation(
             summary = "Search accounts",
-            description = "Search through all accounts using the provided filter set"
+            description = "Search through all accounts using the provided filter set",
+            operationId = "listAccounts"
     )
     Mono<ResultPageResponse<AccountResponse>> accounts(@Valid @Body AccountSearchRequest searchRequest) {
         return Mono.create(emitter -> {
@@ -121,7 +144,8 @@ public class AccountResource {
     @Put
     @Operation(
             summary = "Create account",
-            description = "This operation will allow for adding new accounts to the system"
+            description = "This operation will allow for adding new accounts to the system",
+            operationId = "createAccount"
     )
     public Mono<AccountResponse> create(@Valid @Body AccountEditRequest accountEditRequest) {
         return accountProvider.lookup(accountEditRequest.getName())

@@ -1,15 +1,14 @@
 package com.jongsoft.finance.rest.transaction;
 
+import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.rest.model.TagResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import io.micronaut.core.annotation.Nullable;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,6 +57,18 @@ public class TransactionTagResource {
 
             emitter.complete();
         });
+    }
+
+    @Delete("/{tag}")
+    @Operation(
+            operationId = "deleteTag",
+            summary = "Delete tag",
+            description = "Removes a tag from the system, this prevents it being used in updates. But will not remove old relations between tags and transactions."
+    )
+    void delete(@PathVariable String tag) {
+        tagProvider.lookup(tag)
+                .switchIfEmpty(Single.error(StatusException.notFound("No active tag found with contents " + tag)))
+                .subscribe(Tag::archive);
     }
 
     @Get("/auto-complete{?token}")

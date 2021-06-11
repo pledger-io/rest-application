@@ -23,5 +23,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
         responseCode = "500",
         content = @Content(schema = @Schema(implementation = JsonError.class)),
         description = "Internal server error")
+@ApiResponse(
+        responseCode = "401",
+        content = @Content(schema = @Schema(implementation = JsonError.class)),
+        description = "The user is not authenticated, login first.")
 public @interface ApiDefaults {
 }

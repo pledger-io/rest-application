@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.transaction;
 
 import io.micronaut.core.annotation.Introspected;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -17,8 +18,10 @@ public class TransactionBulkEditRequest {
 
     @NoArgsConstructor
     @AllArgsConstructor
+    @Schema(name = "EntityRef")
     static class EntityRef {
         @NotNull
+        @Schema(description = "The unique identifier of the entity.")
         private Long id;
         private String name;
 
@@ -33,11 +36,16 @@ public class TransactionBulkEditRequest {
 
     @NotNull
     @Size(min = 1)
+    @Schema(
+            description = "A list of all transaction identifiers that should be updated.",
+            required = true,
+            minLength = 1)
     private List<Long> transactions;
 
     private EntityRef contract;
     private EntityRef budget;
     private EntityRef category;
+    @Schema(description = "The list of tags to set to the transactions")
     private List<String> tags;
 
     public List<Long> getTransactions() {

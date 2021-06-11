@@ -64,6 +64,15 @@ public interface TransactionProvider extends DataProvider<Transaction> {
          * @return this instance
          */
         FilterCommand name(String value, boolean exact);
+
+        /**
+         * Add a filter for the description in the transaction. You can choose if the match should be exact or partial
+         * using the {@code exact} parameter.
+         *
+         * @param value the description
+         * @param exact should the name match exactly or partially
+         * @return this instance
+         */
         FilterCommand description(String value, boolean exact);
 
         /**
@@ -101,6 +110,13 @@ public interface TransactionProvider extends DataProvider<Transaction> {
          */
         FilterCommand transfers();
 
+        /**
+         * Set the page to retrieve, if a page is set greater then available the result will be a blank
+         * {@link ResultPage}.
+         *
+         * @param value the page
+         * @return this instance
+         */
         FilterCommand page(int value);
         FilterCommand pageSize(int value);
     }
@@ -123,6 +139,12 @@ public interface TransactionProvider extends DataProvider<Transaction> {
         double summary();
     }
 
+    /**
+     * Locate the first ever transaction made that meets the preset given using the {@link FilterCommand}.
+     *
+     * @param filter the filter to be applied
+     * @return the first found transaction, or an {@link Mono#empty()} otherwise
+     */
     Mono<Transaction> first(FilterCommand filter);
 
     ResultPage<Transaction> lookup(FilterCommand filter);
