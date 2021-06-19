@@ -44,8 +44,8 @@ public class AuthenticationResource {
     private final ApplicationEventPublisher eventPublisher;
     private final UserProvider userProvider;
     private final AuthenticationFacade authenticationFacade;
+    private final FinTrack application;
 
-    private final PasswordEncoder passwordEncoder;
     private final ProcessEngine processEngine;
 
     public AuthenticationResource(
@@ -55,7 +55,7 @@ public class AuthenticationResource {
             final ApplicationEventPublisher eventPublisher,
             final UserProvider userProvider,
             final AuthenticationFacade authenticationFacade,
-            final PasswordEncoder passwordEncoder,
+            final FinTrack application,
             final ProcessEngine processEngine) {
         this.accessRefreshTokenGenerator = accessRefreshTokenGenerator;
         this.authenticationProvider = authenticationProvider;
@@ -63,7 +63,7 @@ public class AuthenticationResource {
         this.eventPublisher = eventPublisher;
         this.userProvider = userProvider;
         this.authenticationFacade = authenticationFacade;
-        this.passwordEncoder = passwordEncoder;
+        this.application = application;
         this.processEngine = processEngine;
     }
 
@@ -94,7 +94,7 @@ public class AuthenticationResource {
                 var refreshToken = accessRefreshTokenGenerator.generate(refresh, userDetails);
                 if (refreshToken.isPresent()) {
                     var actualToken = refreshToken.get();
-                    FinTrack.registerToken(
+                    application.registerToken(
                             userDetails.getUsername(),
                             actualToken.getRefreshToken(),
                             actualToken.getExpiresIn());
@@ -121,7 +121,7 @@ public class AuthenticationResource {
         processEngine.getRuntimeService()
                 .startProcessInstanceByKey("RegisterUserAccount", Map.of(
                         "username", authenticationRequest.getIdentity(),
-                        "passwordHash", passwordEncoder.encrypt(authenticationRequest.getSecret())));
+                        "passwordHash", application.getHashingAlgorithm().encrypt(authenticationRequest.getSecret())));
     }
 
     @Post("/api/security/2-factor")
@@ -162,7 +162,7 @@ public class AuthenticationResource {
 
         return accessRefreshTokenGenerator.generate(refresh, userDetails)
                 .stream()
-                .peek(token -> FinTrack.registerToken(
+                .peek(token -> application.registerToken(
                         user.getUsername(),
                         token.getRefreshToken(),
                         token.getExpiresIn()))

@@ -1,13 +1,14 @@
 package com.jongsoft.finance.rest.profile;
 
+import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
 import com.jongsoft.finance.messaging.commands.user.RegisterTokenCommand;
-import com.jongsoft.finance.messaging.commands.user.RevokeTokenCommand;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.finance.security.PasswordEncoder;
 import com.jongsoft.lang.Dates;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.reactivex.Flowable;
@@ -34,7 +35,7 @@ class ProfileResourceTest extends TestSetup {
         eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         currentUserProvider = Mockito.mock(CurrentUserProvider.class);
         userProvider = Mockito.mock(UserProvider.class);
-        subject = new ProfileResource(currentUserProvider, userProvider);
+        subject = new ProfileResource(new FinTrack(new PasswordEncoder()), currentUserProvider, userProvider);
 
         Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
 

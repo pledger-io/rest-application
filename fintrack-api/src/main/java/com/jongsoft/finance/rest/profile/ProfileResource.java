@@ -3,7 +3,6 @@ package com.jongsoft.finance.rest.profile;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.SessionToken;
-import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.rest.model.SessionResponse;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
@@ -33,10 +32,12 @@ import java.util.UUID;
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public class ProfileResource {
 
+    private final FinTrack application;
     private final CurrentUserProvider currentUserProvider;
     private final UserProvider userProvider;
 
-    public ProfileResource(final CurrentUserProvider currentUserProvider, UserProvider userProvider) {
+    public ProfileResource(FinTrack application, final CurrentUserProvider currentUserProvider, UserProvider userProvider) {
+        this.application = application;
         this.currentUserProvider = currentUserProvider;
         this.userProvider = userProvider;
     }
@@ -67,7 +68,7 @@ public class ProfileResource {
             }
 
             if (request.password() != null) {
-                userAccount.changePassword(PasswordEncoder.getInstance().encrypt(request.password()));
+                userAccount.changePassword(application.getHashingAlgorithm().encrypt(request.password()));
             }
 
             emitter.onSuccess(new UserProfileResponse(userAccount));
@@ -92,7 +93,7 @@ public class ProfileResource {
             description = "Create a new session token that has a longer validity then default authentication tokens."
     )
     Flowable<SessionResponse> createSession(@Body @Valid TokenCreateRequest request) {
-        FinTrack.registerToken(
+        application.registerToken(
                 currentUserProvider.currentUser().getUsername(),
                 UUID.randomUUID().toString(),
                 (int) ChronoUnit.SECONDS.between(

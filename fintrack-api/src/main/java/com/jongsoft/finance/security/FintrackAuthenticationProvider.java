@@ -1,5 +1,6 @@
 package com.jongsoft.finance.security;
 
+import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.providers.UserProvider;
 import io.micronaut.http.HttpRequest;
@@ -17,14 +18,14 @@ import java.util.List;
 @Singleton
 public class FintrackAuthenticationProvider implements AuthenticationProvider {
 
-    private final PasswordEncoder passwordEncoder;
+    private final FinTrack application;
     private final UserProvider userProvider;
     private final Logger log;
 
-    public FintrackAuthenticationProvider(final UserProvider userProvider) {
+    public FintrackAuthenticationProvider(FinTrack application, final UserProvider userProvider) {
+        this.application = application;
         this.userProvider = userProvider;
         this.log = LoggerFactory.getLogger(getClass());
-        this.passwordEncoder = PasswordEncoder.getInstance();
     }
 
     @Override
@@ -34,11 +35,15 @@ public class FintrackAuthenticationProvider implements AuthenticationProvider {
         log.info("Authentication request for user {}", authenticationRequest.getIdentity());
         return Flowable.create(emitter -> {
 
-            var authenticated = userProvider.lookup(authenticationRequest.getIdentity().toString());            
+            var authenticated = userProvider.lookup(
+                    authenticationRequest.getIdentity().toString());
             if (authenticated.isPresent()) {
                 var userAccount = authenticated.get();
 
-                if (passwordEncoder.matches(userAccount.getPassword(), authenticationRequest.getSecret().toString())) {
+                boolean matches = application.getHashingAlgorithm().matches(
+                        userAccount.getPassword(),
+                        authenticationRequest.getSecret().toString());
+                if (matches) {
                     List<String> roles = new ArrayList<>();
                     if (userAccount.isTwoFactorEnabled()) {
                         roles.add("PRE_VERIFICATION_USER");
