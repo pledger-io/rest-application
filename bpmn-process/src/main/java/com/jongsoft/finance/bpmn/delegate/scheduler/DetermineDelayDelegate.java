@@ -25,11 +25,7 @@ public class DetermineDelayDelegate implements JavaDelegate {
         var interval = (Integer) execution.getVariable("interval");
         var periodicity = (Periodicity) execution.getVariable("periodicity");
         var startCalculation = LocalDate.parse(execution.getVariable("start").toString());
-        var datePart = switch (periodicity) {
-            case MONTHS -> ChronoUnit.MONTHS;
-            case WEEKS -> ChronoUnit.WEEKS;
-            case YEARS -> ChronoUnit.YEARS;
-        };
+        var datePart = periodicity.toChronoUnit();
 
         var nextRun = nextRun(startCalculation, interval, datePart);
         execution.setVariable("nextRun", convert(nextRun));

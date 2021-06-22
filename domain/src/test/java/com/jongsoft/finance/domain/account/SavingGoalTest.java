@@ -1,6 +1,7 @@
 package com.jongsoft.finance.domain.account;
 
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.savings.AdjustSavingGoalCommand;
 import com.jongsoft.finance.messaging.commands.savings.AdjustScheduleCommand;
@@ -27,6 +28,31 @@ class SavingGoalTest {
         publisher = Mockito.mock(ApplicationEventPublisher.class);
 
         new EventBus(publisher);
+    }
+
+    @Test
+    void computeAllocation_alreadyCompleted() {
+        var savingGoal = SavingGoal.builder()
+                .id(1L)
+                .goal(new BigDecimal("312.22"))
+                .allocated(new BigDecimal("321.22"))
+                .targetDate(LocalDate.now().plusYears(10))
+                .build();
+
+        Assertions.assertThat(savingGoal.computeAllocation()).isEqualByComparingTo(BigDecimal.ZERO);
+    }
+
+    @Test
+    void computeAllocation() {
+        var savingGoal = SavingGoal.builder()
+                .id(1L)
+                .goal(new BigDecimal("200"))
+                .allocated(new BigDecimal("25"))
+                .targetDate(LocalDate.now().plusYears(1))
+                .schedule(new ScheduleValue(Periodicity.MONTHS, 1))
+                .build();
+
+        Assertions.assertThat(savingGoal.computeAllocation()).isEqualByComparingTo(BigDecimal.valueOf(16));
     }
 
     @Test

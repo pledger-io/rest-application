@@ -11,12 +11,14 @@ import com.jongsoft.finance.messaging.commands.savings.CompleteSavingGoalCommand
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedulable;
 import com.jongsoft.finance.schedule.Schedule;
+import com.jongsoft.lang.Control;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -28,6 +30,7 @@ public class SavingGoal implements AggregateBase {
     private Long id;
     private String name;
     private String description;
+    private BigDecimal allocated;
     private BigDecimal goal;
     private LocalDate targetDate;
     private Account account;
@@ -42,6 +45,37 @@ public class SavingGoal implements AggregateBase {
         if (!account.isManaged()) {
             throw StatusException.badRequest("Cannot create a savings goal if the account is not owned by the user.");
         }
+    }
+
+    /**
+     * Call this operation to calculate the amount of money that should be allocated to this saving goal every
+     * schedule step to reach the goal.
+     *
+     * Note: since this is a calculation the value can vary, based upon the already allocated amount of money in the
+     * account.
+     *
+     * @return the amount the user should set apart when the next saving date comes along
+     */
+    public BigDecimal computeAllocation() {
+        var remainingToGoal = goal.subtract(
+                Control.Option(allocated)
+                        .getOrSupply(() -> BigDecimal.ZERO));
+
+        if (remainingToGoal.compareTo(BigDecimal.ONE) < 0) {
+            return BigDecimal.ZERO;
+        }
+
+        var times = 0;
+        var now = LocalDate.now();
+        var allocationTime = schedule.previous(targetDate);
+        while (now.isBefore(allocationTime)) {
+            times++;
+            allocationTime = schedule.previous(allocationTime);
+        }
+
+        return remainingToGoal.divide(
+                BigDecimal.valueOf(times),
+                RoundingMode.HALF_UP);
     }
 
     /**
