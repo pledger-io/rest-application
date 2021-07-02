@@ -3,32 +3,30 @@ package com.jongsoft.finance.jpa.user;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
+import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Collectors;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Currency;
 
 @Singleton
 @Named("userProvider")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class UserProviderJpa implements UserProvider {
 
     private final ReactiveEntityManager entityManager;
-
-    public UserProviderJpa(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     @Override
     public Optional<UserAccount> lookup(long id) {

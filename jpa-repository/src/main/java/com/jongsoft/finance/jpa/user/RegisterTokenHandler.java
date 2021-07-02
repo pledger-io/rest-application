@@ -7,21 +7,18 @@ import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.user.RegisterTokenCommand;
 import com.jongsoft.lang.Collections;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RegisterTokenHandler implements CommandHandler<RegisterTokenCommand> {
 
     private final ReactiveEntityManager entityManager;
-
-    public RegisterTokenHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     @Override
     @BusinessEventListener

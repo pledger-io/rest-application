@@ -7,20 +7,17 @@ import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.SynchronousTransactionManager;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.EntityManager;
 import java.sql.Connection;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
 
     private final EntityManager entityManager;
     private final SynchronousTransactionManager<Connection> transactionManager;
-
-    public NonReactivePipe(EntityManager entityManager, SynchronousTransactionManager<Connection> transactionManager) {
-        this.entityManager = entityManager;
-        this.transactionManager = transactionManager;
-    }
 
     @SuppressWarnings("unchecked")
     public Optional<T> maybe() {

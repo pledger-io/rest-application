@@ -3,23 +3,19 @@ package com.jongsoft.finance.jpa.reactive;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.lang.collection.Map;
 import io.micronaut.transaction.SynchronousTransactionManager;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import java.sql.Connection;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ReactiveEntityManager {
 
     private final SynchronousTransactionManager<Connection> transactionManager;
     private final EntityManager entityManager;
-
-    public ReactiveEntityManager(
-            SynchronousTransactionManager<Connection> transactionManager,
-            EntityManager entityManager) {
-        this.transactionManager = transactionManager;
-        this.entityManager = entityManager;
-    }
 
     public <T extends EntityJpa> void persist(T entity) {
         transactionManager.executeWrite(status -> {

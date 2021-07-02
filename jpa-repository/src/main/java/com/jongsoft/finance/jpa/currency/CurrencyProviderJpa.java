@@ -6,21 +6,18 @@ import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Maybe;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CurrencyProviderJpa implements CurrencyProvider {
 
     private final ReactiveEntityManager entityManager;
-
-    public CurrencyProviderJpa(
-            ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     public Optional<Currency> lookup(long id) {
         return entityManager.<CurrencyJpa>blocking()

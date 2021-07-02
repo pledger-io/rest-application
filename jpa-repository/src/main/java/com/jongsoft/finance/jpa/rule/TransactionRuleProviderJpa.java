@@ -1,18 +1,20 @@
 package com.jongsoft.finance.jpa.rule;
 
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
-import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
+import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.transaction.Transactional;
@@ -20,17 +22,11 @@ import java.util.Optional;
 
 @Singleton
 @Named("transactionRuleProvider")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
-
-    public TransactionRuleProviderJpa(
-            AuthenticationFacade authenticationFacade,
-            ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
-    }
 
     @Override
     public Sequence<TransactionRule> lookup() {

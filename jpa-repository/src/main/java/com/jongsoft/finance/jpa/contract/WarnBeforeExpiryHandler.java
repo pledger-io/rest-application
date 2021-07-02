@@ -4,21 +4,18 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.WarnBeforeExpiryCommand;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class WarnBeforeExpiryHandler implements CommandHandler<WarnBeforeExpiryCommand> {
 
     private final ReactiveEntityManager entityManager;
-
-    public WarnBeforeExpiryHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     @Override
     @BusinessEventListener

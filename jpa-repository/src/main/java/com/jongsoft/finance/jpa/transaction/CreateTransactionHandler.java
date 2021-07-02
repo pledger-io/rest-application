@@ -4,13 +4,13 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.core.TransactionType;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.jpa.account.AccountJpa;
+import com.jongsoft.finance.jpa.budget.ExpenseJpa;
+import com.jongsoft.finance.jpa.category.CategoryJpa;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.currency.CurrencyJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.tag.TagJpa;
-import com.jongsoft.finance.jpa.category.CategoryJpa;
-import com.jongsoft.finance.jpa.budget.ExpenseJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
@@ -19,25 +19,21 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.HashSet;
 
 @Slf4j
 @Singleton
-@Transactional
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateTransactionHandler implements CommandHandler<CreateTransactionCommand>, TransactionCreationHandler {
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
-
-    public CreateTransactionHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
-        this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
-    }
 
     @Override
     @BusinessEventListener

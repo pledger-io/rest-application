@@ -7,23 +7,19 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.category.CreateCategoryCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateCategoryHandler implements CommandHandler<CreateCategoryCommand> {
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
-
-    public CreateCategoryHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
-        this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
-    }
 
     @Override
     @BusinessEventListener

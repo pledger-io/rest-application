@@ -15,7 +15,7 @@ import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-public class SettingProviderJpa extends RepositoryJpa implements SettingProvider {
+public class SettingProviderJpa implements SettingProvider {
 
     private final ReactiveEntityManager entityManager;
 

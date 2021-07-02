@@ -1,28 +1,29 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.jpa.budget.ExpenseJpa;
+import com.jongsoft.finance.jpa.category.CategoryJpa;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.tag.TagJpa;
-import com.jongsoft.finance.jpa.category.CategoryJpa;
-import com.jongsoft.finance.jpa.budget.ExpenseJpa;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Maybe;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -30,17 +31,11 @@ import java.util.Objects;
 @Slf4j
 @Singleton
 @Named("transactionProvider")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionProviderJpa implements TransactionProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
-
-    public TransactionProviderJpa(
-            AuthenticationFacade authenticationFacade,
-            ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
-    }
 
     @Override
     public Maybe<Transaction> first(FilterCommand filter) {

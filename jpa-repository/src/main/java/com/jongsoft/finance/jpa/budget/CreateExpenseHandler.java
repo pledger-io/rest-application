@@ -5,24 +5,20 @@ import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 
 @Slf4j
 @Singleton
-@Transactional
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateExpenseHandler implements CommandHandler<CreateExpenseCommand> {
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
-
-    public CreateExpenseHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
-        this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
-    }
 
     @Override
     @BusinessEventListener

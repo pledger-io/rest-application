@@ -4,22 +4,19 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.DeleteTransactionCommand;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 import java.util.Date;
 
 @Slf4j
 @Singleton
-@Transactional
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class DeleteTransactionHandler implements CommandHandler<DeleteTransactionCommand> {
 
     private final ReactiveEntityManager entityManager;
-
-    public DeleteTransactionHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     @Override
     @BusinessEventListener

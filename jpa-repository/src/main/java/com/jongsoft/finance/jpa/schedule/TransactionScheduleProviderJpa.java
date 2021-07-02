@@ -11,24 +11,20 @@ import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.time.LocalDate;
 
 @Singleton
 @Named("transactionScheduleProvider")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionScheduleProviderJpa implements TransactionScheduleProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
-
-    public TransactionScheduleProviderJpa(
-            AuthenticationFacade authenticationFacade,
-            ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
-    }
 
     @Override
     public Optional<ScheduledTransaction> lookup(long id) {

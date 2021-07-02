@@ -2,28 +2,23 @@ package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.control.Optional;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 
 @Singleton
 @Named("expenseProvider")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ExpenseProviderJpa implements ExpenseProvider {
 
-    private AuthenticationFacade authenticationFacadea;
-    private ReactiveEntityManager entityManager;
-
-    public ExpenseProviderJpa(
-            AuthenticationFacade authenticationFacade,
-            ReactiveEntityManager entityManager) {
-        this.authenticationFacadea = authenticationFacade;
-        this.entityManager = entityManager;
-    }
+    private final AuthenticationFacade authenticationFacadea;
+    private final ReactiveEntityManager entityManager;
 
     @Override
     public Optional<Budget.Expense> lookup(long id) {

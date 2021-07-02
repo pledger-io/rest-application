@@ -5,25 +5,19 @@ import com.jongsoft.finance.jpa.account.AccountJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleCommand;
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateScheduleHandler implements CommandHandler<CreateScheduleCommand> {
 
     private final ReactiveEntityManager entityManager;
-    private final AuthenticationFacade authenticationFacade;
-
-    public CreateScheduleHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
-        this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
-    }
 
     @Override
     @BusinessEventListener

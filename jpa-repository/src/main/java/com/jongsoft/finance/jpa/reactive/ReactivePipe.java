@@ -1,28 +1,22 @@
 package com.jongsoft.finance.jpa.reactive;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Control;
 import io.micronaut.transaction.SynchronousTransactionManager;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
-import io.reactivex.plugins.RxJavaPlugins;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.EntityManager;
 import java.sql.Connection;
 
+@RequiredArgsConstructor
 public class ReactivePipe<T> extends JpaPipe<T, ReactivePipe<T>> {
 
     private final EntityManager entityManager;
     private final SynchronousTransactionManager<Connection> transactionManager;
-
-    public ReactivePipe(EntityManager entityManager, SynchronousTransactionManager<Connection> transactionManager) {
-        this.entityManager = entityManager;
-        this.transactionManager = transactionManager;
-    }
 
     @SuppressWarnings("unchecked")
     public Maybe<T> maybe() {

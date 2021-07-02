@@ -9,23 +9,19 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleForContractCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.transaction.Transactional;
 
 @Slf4j
 @Singleton
-@Transactional
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateScheduleFromContractHandler implements CommandHandler<CreateScheduleForContractCommand> {
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
-
-    public CreateScheduleFromContractHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
-        this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
-    }
 
     @Override
     @BusinessEventListener
