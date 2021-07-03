@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.importer;
 
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.lang.collection.tuple.Triplet;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
@@ -10,14 +11,10 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class PrepareTransactionForExtractionDelegate implements JavaDelegate {
 
     private final StorageService storageService;
-
-    @Inject
-    public PrepareTransactionForExtractionDelegate(StorageService storageService) {
-        this.storageService = storageService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

@@ -40,7 +40,7 @@ class RuntimeResourceTest {
         Mockito.when(processEngine.getHistoryService()).thenReturn(historyService);
         Mockito.when(authenticationFacade.authenticated()).thenReturn("test-user");
 
-        subject = new RuntimeResource(processEngine, authenticationFacade);
+        subject = new RuntimeResource(historyService, runtimeService, authenticationFacade);
     }
 
     @Test

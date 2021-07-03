@@ -27,13 +27,16 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.function.Consumer;
 
 @Tag(name = "Transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/accounts/{accountId}/transactions")
 public class AccountTransactionResource {
 
@@ -41,17 +44,6 @@ public class AccountTransactionResource {
     private final TransactionProvider transactionProvider;
     private final AccountProvider accountProvider;
     private final SettingProvider settingProvider;
-
-    public AccountTransactionResource(
-            FilterFactory filterFactory,
-            TransactionProvider transactionProvider,
-            AccountProvider accountService,
-            SettingProvider settingProvider) {
-        this.filterFactory = filterFactory;
-        this.transactionProvider = transactionProvider;
-        this.accountProvider = accountService;
-        this.settingProvider = settingProvider;
-    }
 
     @Post
     @Operation(

@@ -32,7 +32,7 @@ class ProcessVariableResourceTest {
         Mockito.when(variableInstanceQuery.processInstanceId(Mockito.anyString())).thenReturn(variableInstanceQuery);
         Mockito.when(variableInstanceQuery.variableName(Mockito.anyString())).thenReturn(variableInstanceQuery);
 
-        subject = new ProcessVariableResource(processEngine);
+        subject = new ProcessVariableResource(historyService);
     }
 
     @Test

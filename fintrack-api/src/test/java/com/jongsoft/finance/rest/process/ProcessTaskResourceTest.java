@@ -27,7 +27,7 @@ class ProcessTaskResourceTest {
         MockitoAnnotations.openMocks(this);
 
         Mockito.when(processEngine.getTaskService()).thenReturn(taskService);
-        subject = new ProcessTaskResource(processEngine);
+        subject = new ProcessTaskResource(taskService);
     }
 
     @Test

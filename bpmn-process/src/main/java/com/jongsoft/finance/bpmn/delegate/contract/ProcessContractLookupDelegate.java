@@ -2,21 +2,20 @@ package com.jongsoft.finance.bpmn.delegate.contract;
 
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.providers.ContractProvider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessContractLookupDelegate implements JavaDelegate {
 
     private final ContractProvider contractProvider;
-
-    public ProcessContractLookupDelegate(ContractProvider contractProvider) {
-        this.contractProvider = contractProvider;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

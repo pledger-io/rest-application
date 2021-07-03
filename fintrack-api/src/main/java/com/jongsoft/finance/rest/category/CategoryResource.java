@@ -18,12 +18,15 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 
 @Tag(name = "Category")
 @Controller("/api/categories")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CategoryResource {
 
     private final FilterFactory filterFactory;
@@ -31,17 +34,6 @@ public class CategoryResource {
     private final CurrentUserProvider currentUserProvider;
 
     private final SettingProvider settingProvider;
-
-    public CategoryResource(
-            FilterFactory filterFactory,
-            CategoryProvider categoryService,
-            CurrentUserProvider currentUserProvider,
-            SettingProvider settingProvider) {
-        this.filterFactory = filterFactory;
-        this.categoryService = categoryService;
-        this.currentUserProvider = currentUserProvider;
-        this.settingProvider = settingProvider;
-    }
 
     @Get
     @Operation(

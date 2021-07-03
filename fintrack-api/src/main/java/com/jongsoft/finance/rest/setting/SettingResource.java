@@ -9,17 +9,17 @@ import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+
+import javax.inject.Inject;
 
 @Secured("admin")
 @Controller("/api/settings")
 @Tag(name = "Application Settings")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SettingResource {
 
     private final SettingProvider settingProvider;
-
-    public SettingResource(SettingProvider settingProvider) {
-        this.settingProvider = settingProvider;
-    }
 
     @Get
     @Operation(

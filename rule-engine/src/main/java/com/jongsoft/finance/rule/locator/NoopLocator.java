@@ -1,10 +1,13 @@
 package com.jongsoft.finance.rule.locator;
 
+import com.jongsoft.finance.core.RuleColumn;
+import lombok.RequiredArgsConstructor;
+
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.jongsoft.finance.core.RuleColumn;
-
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class NoopLocator implements ChangeLocator {
 
     @Override

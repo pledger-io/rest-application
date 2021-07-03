@@ -1,15 +1,15 @@
 package com.jongsoft.finance.rest.profile;
 
+import com.jongsoft.finance.Exportable;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.providers.DataProvider;
-import com.jongsoft.finance.Exportable;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Category;
+import com.jongsoft.finance.providers.DataProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.serialized.*;
 import com.jongsoft.lang.Collections;
@@ -23,11 +23,14 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import java.util.List;
 
 @Controller("/api/profile/export")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 @io.swagger.v3.oas.annotations.tags.Tag(name = "User profile")
 public class ProfileExportResource {
 
@@ -35,17 +38,6 @@ public class ProfileExportResource {
     private final List<Exportable<?>> exportable;
     private final List<DataProvider<?>> dataProviders;
     private final StorageService storageService;
-
-    public ProfileExportResource(
-            AuthenticationFacade authenticationFacade,
-            List<Exportable<?>> exportable,
-            List<DataProvider<?>> dataProviders,
-            StorageService storageService) {
-        this.authenticationFacade = authenticationFacade;
-        this.exportable = exportable;
-        this.dataProviders = dataProviders;
-        this.storageService = storageService;
-    }
 
     @Get
     @Operation(

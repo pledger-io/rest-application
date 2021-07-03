@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.rule;
 
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.serialized.RuleConfigJson;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -11,14 +12,10 @@ import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ParseTransactionRuleDelegate implements JavaDelegate {
 
     private final StorageService storageService;
-
-    @Inject
-    public ParseTransactionRuleDelegate(StorageService storageService) {
-        this.storageService = storageService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

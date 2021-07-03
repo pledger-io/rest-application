@@ -16,12 +16,15 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/transactions/tags")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Transactions")
 public class TransactionTagResource {
 
     private final SettingProvider settingProvider;
@@ -29,17 +32,6 @@ public class TransactionTagResource {
     private final FilterFactory filterFactory;
 
     private final CurrentUserProvider currentUserProvider;
-
-    public TransactionTagResource(
-            SettingProvider settingProvider,
-            TagProvider tagProvider,
-            FilterFactory filterFactory,
-            CurrentUserProvider currentUserProvider) {
-        this.settingProvider = settingProvider;
-        this.tagProvider = tagProvider;
-        this.filterFactory = filterFactory;
-        this.currentUserProvider = currentUserProvider;
-    }
 
     @Post
     @Operation(

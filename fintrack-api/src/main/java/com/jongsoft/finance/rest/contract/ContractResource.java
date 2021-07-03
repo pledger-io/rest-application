@@ -1,11 +1,11 @@
 package com.jongsoft.finance.rest.contract;
 
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.model.ContractResponse;
@@ -20,13 +20,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
-import java.time.LocalDate;
 
 @Tag(name = "Contract")
 @Controller("/api/contracts")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ContractResource {
 
     private static final String NO_CONTRACT_FOUND_MESSAGE = "No contract can be found for ";
@@ -35,17 +37,6 @@ public class ContractResource {
     private final ContractProvider contractProvider;
     private final TransactionScheduleProvider scheduleProvider;
     private final FilterFactory filterFactory;
-
-    public ContractResource(
-            AccountProvider accountProvider,
-            ContractProvider contractProvider,
-            TransactionScheduleProvider scheduleProvider,
-            FilterFactory filterFactory) {
-        this.accountProvider = accountProvider;
-        this.contractProvider = contractProvider;
-        this.scheduleProvider = scheduleProvider;
-        this.filterFactory = filterFactory;
-    }
 
     @Get
     @Operation(

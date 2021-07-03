@@ -1,27 +1,25 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.LongValue;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.lang.collection.List;
-
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.variable.value.LongValue;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class DuplicateTransactionFinderDelegate implements JavaDelegate {
 
     private final TransactionProvider transactionProvider;
-
-    public DuplicateTransactionFinderDelegate(TransactionProvider transactionProvider) {
-        this.transactionProvider = transactionProvider;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

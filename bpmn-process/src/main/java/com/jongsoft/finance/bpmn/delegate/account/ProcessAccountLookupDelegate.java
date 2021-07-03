@@ -1,11 +1,12 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
-import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Single;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -29,18 +30,11 @@ import javax.inject.Singleton;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessAccountLookupDelegate implements JavaDelegate {
 
     private final AccountProvider accountProvider;
     private final FilterFactory accountFilterFactory;
-
-    @Inject
-    public ProcessAccountLookupDelegate(
-            AccountProvider accountProvider,
-            FilterFactory accountFilterFactory) {
-        this.accountProvider = accountProvider;
-        this.accountFilterFactory = accountFilterFactory;
-    }
 
     @Override
     public void execute(DelegateExecution execution) {

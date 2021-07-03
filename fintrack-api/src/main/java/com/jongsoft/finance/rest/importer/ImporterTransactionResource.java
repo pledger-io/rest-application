@@ -1,8 +1,8 @@
 package com.jongsoft.finance.rest.importer;
 
+import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.SettingProvider;
-import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
@@ -14,27 +14,21 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.security.Principal;
 
 @Tag(name = "Transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/import/{batchSlug}/transactions")
 public class ImporterTransactionResource {
 
     private final SettingProvider settingProvider;
     private final FilterFactory filterFactory;
     private final TransactionProvider transactionProvider;
-
-    public ImporterTransactionResource(
-            SettingProvider settingProvider,
-            FilterFactory filterFactory,
-            TransactionProvider transactionProvider) {
-        this.settingProvider = settingProvider;
-        this.filterFactory = filterFactory;
-        this.transactionProvider = transactionProvider;
-    }
 
     @Post
     @Operation(

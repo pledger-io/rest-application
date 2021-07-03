@@ -3,10 +3,10 @@ package com.jongsoft.finance.rest.transaction;
 import com.jongsoft.finance.core.Removable;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
 import com.jongsoft.finance.providers.TransactionRuleProvider;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.TransactionRuleGroupResponse;
 import com.jongsoft.finance.rest.model.TransactionRuleResponse;
@@ -22,26 +22,20 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 
 @Tag(name = "Transaction Rules")
 @Controller("/api/transaction-rules")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionRuleResource {
 
     private final TransactionRuleGroupProvider ruleGroupProvider;
     private final TransactionRuleProvider ruleProvider;
     private final CurrentUserProvider currentUserProvider;
-
-    public TransactionRuleResource(
-            TransactionRuleGroupProvider ruleGroupProvider,
-            TransactionRuleProvider ruleProvider,
-            CurrentUserProvider currentUserProvider) {
-        this.ruleGroupProvider = ruleGroupProvider;
-        this.ruleProvider = ruleProvider;
-        this.currentUserProvider = currentUserProvider;
-    }
 
     @Get("/groups")
     @Operation(

@@ -5,6 +5,7 @@ import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.serialized.ContractJson;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Hex;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -16,21 +17,12 @@ import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessContractCreateDelegate implements JavaDelegate {
 
     private final AccountProvider accountProvider;
     private final ContractProvider contractProvider;
     private final StorageService storageService;
-
-    @Inject
-    public ProcessContractCreateDelegate(
-            AccountProvider accountProvider,
-            ContractProvider contractProvider,
-            StorageService storageService) {
-        this.accountProvider = accountProvider;
-        this.contractProvider = contractProvider;
-        this.storageService = storageService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

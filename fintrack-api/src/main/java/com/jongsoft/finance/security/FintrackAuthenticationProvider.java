@@ -7,26 +7,22 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.security.authentication.*;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class FintrackAuthenticationProvider implements AuthenticationProvider {
 
     private final FinTrack application;
     private final UserProvider userProvider;
-    private final Logger log;
-
-    public FintrackAuthenticationProvider(FinTrack application, final UserProvider userProvider) {
-        this.application = application;
-        this.userProvider = userProvider;
-        this.log = LoggerFactory.getLogger(getClass());
-    }
 
     @Override
     public Publisher<AuthenticationResponse> authenticate(

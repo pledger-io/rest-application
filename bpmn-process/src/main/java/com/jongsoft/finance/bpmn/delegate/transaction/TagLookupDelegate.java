@@ -5,24 +5,22 @@ import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import io.reactivex.Single;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TagLookupDelegate implements JavaDelegate {
 
     private final CurrentUserProvider currentUserProvider;
     private final TagProvider tagProvider;
-
-    public TagLookupDelegate(CurrentUserProvider currentUserProvider, TagProvider tagProvider) {
-        this.currentUserProvider = currentUserProvider;
-        this.tagProvider = tagProvider;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.category;
 
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.providers.CategoryProvider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -29,14 +30,10 @@ import javax.inject.Singleton;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessCategoryLookupDelegate implements JavaDelegate {
 
     private final CategoryProvider categoryProvider;
-
-    @Inject
-    public ProcessCategoryLookupDelegate(CategoryProvider categoryProvider) {
-        this.categoryProvider = categoryProvider;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

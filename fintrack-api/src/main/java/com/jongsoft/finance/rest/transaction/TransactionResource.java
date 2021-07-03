@@ -2,12 +2,12 @@ package com.jongsoft.finance.rest.transaction;
 
 import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.core.EntityRef;
+import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.AccountTypeProvider;
-import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.providers.SettingProvider;
-import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
@@ -31,7 +31,9 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Map;
@@ -40,6 +42,7 @@ import java.util.concurrent.Executors;
 @Tag(name = "Transactions")
 @Controller("/api/transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionResource {
 
     private final SettingProvider settingProvider;
@@ -49,27 +52,7 @@ public class TransactionResource {
     private final AccountTypeProvider accountTypeProvider;
     private final RuntimeResource runtimeResource;
     private final AuthenticationFacade authenticationFacade;
-
     private final ApplicationEventPublisher eventPublisher;
-
-    public TransactionResource(
-            SettingProvider settingProvider,
-            TransactionProvider transactionProvider,
-            AccountProvider accountProvider,
-            FilterFactory filterFactory,
-            AccountTypeProvider accountTypeProvider,
-            RuntimeResource runtimeResource,
-            AuthenticationFacade authenticationFacade,
-            ApplicationEventPublisher eventPublisher) {
-        this.settingProvider = settingProvider;
-        this.transactionProvider = transactionProvider;
-        this.accountProvider = accountProvider;
-        this.filterFactory = filterFactory;
-        this.accountTypeProvider = accountTypeProvider;
-        this.runtimeResource = runtimeResource;
-        this.authenticationFacade = authenticationFacade;
-        this.eventPublisher = eventPublisher;
-    }
 
     @Post
     @Operation(

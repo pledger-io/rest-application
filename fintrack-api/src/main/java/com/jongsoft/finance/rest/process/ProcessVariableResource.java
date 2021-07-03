@@ -10,19 +10,18 @@ import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.ProcessEngine;
+
+import javax.inject.Inject;
 
 @Tag(name = "Process Engine")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/runtime-process/{processDefinitionKey}/{businessKey}/{instanceId}/variables")
 public class ProcessVariableResource {
 
     private final HistoryService historyService;
-
-    public ProcessVariableResource(ProcessEngine processEngine) {
-        this.historyService = processEngine.getHistoryService();
-    }
 
     @Get
     @Operation(

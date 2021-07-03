@@ -5,7 +5,6 @@ import com.jongsoft.finance.reactive.ReactiveThreadLocal;
 import com.jongsoft.finance.security.AuthenticationFacadeImpl;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
-import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.http.*;
 import io.micronaut.http.annotation.Filter;
@@ -14,34 +13,27 @@ import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.management.endpoint.EndpointsFilter;
-import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.authentication.AuthorizationException;
 import io.micronaut.security.filters.SecurityFilter;
 import io.reactivex.Flowable;
-import io.reactivex.Scheduler;
-import io.reactivex.schedulers.Schedulers;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.slf4j.MDC;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.Principal;
 import java.util.UUID;
 
 @Slf4j
 @Filter("/**")
 @Replaces(EndpointsFilter.class)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class AuthenticationFilter extends OncePerRequestHttpServerFilter {
     public static final CharSequence AUTHENTICATION = HttpAttributes.PRINCIPAL.toString();
 
     private final AuthenticationFacadeImpl authenticationFacade;
-
-    @Inject
-    public AuthenticationFilter(AuthenticationFacadeImpl authenticationFacade) {
-        this.authenticationFacade = authenticationFacade;
-    }
 
     @Override
     public int getOrder() {

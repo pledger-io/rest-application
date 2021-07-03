@@ -8,19 +8,18 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 @Tag(name = "Attachments")
-@Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/attachment")
+@Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class FileResource {
 
     private final StorageService storageService;
-
-    public FileResource(StorageService storageService) {
-        this.storageService = storageService;
-    }
 
     @Post
     @Consumes(MediaType.MULTIPART_FORM_DATA)

@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.statistic;
 
 import com.jongsoft.finance.core.AggregateBase;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.providers.ExpenseProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Sequence;
@@ -22,7 +22,9 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.function.Function;
@@ -30,20 +32,12 @@ import java.util.function.Function;
 @Tag(name = "Reports")
 @Controller("/api/statistics/balance")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class BalanceResource {
 
     private final FilterFactory filterFactory;
     private final TransactionProvider transactionProvider;
     private final ApplicationContext applicationContext;
-
-    public BalanceResource(
-            FilterFactory filterFactory,
-            TransactionProvider transactionProvider,
-            ApplicationContext applicationContext) {
-        this.filterFactory = filterFactory;
-        this.transactionProvider = transactionProvider;
-        this.applicationContext = applicationContext;
-    }
 
     @Post
     @Operation(

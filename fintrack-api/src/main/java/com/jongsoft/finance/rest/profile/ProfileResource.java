@@ -7,7 +7,6 @@ import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.rest.model.SessionResponse;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.finance.security.PasswordEncoder;
 import com.jongsoft.finance.security.TwoFactorHelper;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
@@ -17,7 +16,9 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
@@ -30,17 +31,12 @@ import java.util.UUID;
 @Tag(name = "User profile")
 @Controller("/api/profile")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProfileResource {
 
     private final FinTrack application;
     private final CurrentUserProvider currentUserProvider;
     private final UserProvider userProvider;
-
-    public ProfileResource(FinTrack application, final CurrentUserProvider currentUserProvider, UserProvider userProvider) {
-        this.application = application;
-        this.currentUserProvider = currentUserProvider;
-        this.userProvider = userProvider;
-    }
 
     @Get
     @Operation(

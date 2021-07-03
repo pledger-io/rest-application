@@ -18,27 +18,21 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Objects;
 
 @Tag(name = "Transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/schedule/transaction")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ScheduledTransactionResource {
 
     private final AccountProvider accountProvider;
     private final TransactionScheduleProvider scheduleProvider;
     private final FilterFactory filterFactory;
-
-    public ScheduledTransactionResource(
-            AccountProvider accountProvider,
-            TransactionScheduleProvider scheduleProvider,
-            FilterFactory filterFactory) {
-        this.accountProvider = accountProvider;
-        this.scheduleProvider = scheduleProvider;
-        this.filterFactory = filterFactory;
-    }
 
     @Get
     @Operation(

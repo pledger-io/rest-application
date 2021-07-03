@@ -23,8 +23,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,6 +35,7 @@ import java.util.List;
 @Tag(name = "Budget")
 @Controller("/api/budgets")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class BudgetResource {
 
     private final CurrentUserProvider currentUserProvider;
@@ -41,19 +44,6 @@ public class BudgetResource {
     private final FilterFactory filterFactory;
 
     private final TransactionProvider transactionProvider;
-
-    public BudgetResource(
-            CurrentUserProvider currentUserProvider,
-            BudgetProvider budgetProvider,
-            ExpenseProvider expenseProvider,
-            FilterFactory filterFactory,
-            TransactionProvider transactionProvider) {
-        this.currentUserProvider = currentUserProvider;
-        this.budgetProvider = budgetProvider;
-        this.expenseProvider = expenseProvider;
-        this.filterFactory = filterFactory;
-        this.transactionProvider = transactionProvider;
-    }
 
     @Get
     @Operation(

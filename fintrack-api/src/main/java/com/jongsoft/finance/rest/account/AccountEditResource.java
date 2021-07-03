@@ -20,21 +20,19 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 
 @Controller("/api/accounts/{accountId}")
 @Tag(name = "Account information")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class AccountEditResource {
 
     private final CurrentUserProvider currentUserProvider;
     private final AccountProvider accountProvider;
-
-    public AccountEditResource(CurrentUserProvider currentUserProvider, AccountProvider accountProvider) {
-        this.currentUserProvider = currentUserProvider;
-        this.accountProvider = accountProvider;
-    }
 
     @Get
     @Operation(

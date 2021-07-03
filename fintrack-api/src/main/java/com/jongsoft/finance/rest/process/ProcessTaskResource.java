@@ -11,19 +11,18 @@ import io.micronaut.security.rules.SecurityRule;
 import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.camunda.bpm.engine.ProcessEngine;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.TaskService;
+
+import javax.inject.Inject;
 
 @Tag(name = "Process Engine")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/runtime-process/{processDefinitionKey}/{businessKey}/{instanceId}/tasks")
 public class ProcessTaskResource {
 
     private final TaskService taskService;
-
-    public ProcessTaskResource(ProcessEngine processEngine) {
-        this.taskService = processEngine.getTaskService();
-    }
 
     @Get
     @Operation(

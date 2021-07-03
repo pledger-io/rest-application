@@ -3,34 +3,28 @@ package com.jongsoft.finance.bpmn.delegate.transaction;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
+import com.jongsoft.finance.providers.AccountProvider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateTransactionDelegate implements JavaDelegate {
 
     private final StorageService storageService;
     private final AccountProvider accountProvider;
     private final TransactionCreationHandler creationHandler;
-
-    public CreateTransactionDelegate(
-            StorageService storageService,
-            AccountProvider accountProvider,
-            TransactionCreationHandler creationHandler) {
-        this.storageService = storageService;
-        this.accountProvider = accountProvider;
-        this.creationHandler = creationHandler;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

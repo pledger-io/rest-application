@@ -6,7 +6,6 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.finance.security.PasswordEncoder;
 import com.jongsoft.finance.security.TwoFactorHelper;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -27,14 +26,17 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
 
 @Tag(name = "Authentication")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller(consumes = MediaType.APPLICATION_JSON)
 public class AuthenticationResource {
 
@@ -45,27 +47,7 @@ public class AuthenticationResource {
     private final UserProvider userProvider;
     private final AuthenticationFacade authenticationFacade;
     private final FinTrack application;
-
     private final ProcessEngine processEngine;
-
-    public AuthenticationResource(
-            final AccessRefreshTokenGenerator accessRefreshTokenGenerator,
-            final AuthenticationProvider authenticationProvider,
-            final RSASignatureConfiguration rsaSignatureConfiguration,
-            final ApplicationEventPublisher eventPublisher,
-            final UserProvider userProvider,
-            final AuthenticationFacade authenticationFacade,
-            final FinTrack application,
-            final ProcessEngine processEngine) {
-        this.accessRefreshTokenGenerator = accessRefreshTokenGenerator;
-        this.authenticationProvider = authenticationProvider;
-        this.rsaSignatureConfiguration = rsaSignatureConfiguration;
-        this.eventPublisher = eventPublisher;
-        this.userProvider = userProvider;
-        this.authenticationFacade = authenticationFacade;
-        this.application = application;
-        this.processEngine = processEngine;
-    }
 
     @ApiDefaults
     @Secured(SecurityRule.IS_ANONYMOUS)

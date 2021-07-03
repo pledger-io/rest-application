@@ -2,12 +2,12 @@ package com.jongsoft.finance.bpmn.delegate.account;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.providers.AccountProvider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
 import javax.inject.Inject;
@@ -30,14 +30,10 @@ import java.time.LocalDate;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ReconcileAccountDelegate implements JavaDelegate {
 
     private final AccountProvider accountProvider;
-
-    @Inject
-    public ReconcileAccountDelegate(AccountProvider accountProvider) {
-        this.accountProvider = accountProvider;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

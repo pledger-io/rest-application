@@ -1,9 +1,9 @@
 package com.jongsoft.finance.rest.importer;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.CSVConfigProvider;
 import com.jongsoft.finance.providers.ImportProvider;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.model.CSVImporterConfigResponse;
 import com.jongsoft.finance.rest.model.ImporterResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
@@ -18,29 +18,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 
 @Tag(name = "Importer")
 @Controller("/api/import")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class BatchImportResource {
 
     private final CurrentUserProvider currentUserProvider;
     private final CSVConfigProvider csvConfigProvider;
     private final ImportProvider importProvider;
     private final SettingProvider settingProvider;
-
-    public BatchImportResource(
-            CurrentUserProvider currentUserProvider,
-            CSVConfigProvider csvConfigProvider,
-            ImportProvider importProvider,
-            SettingProvider settingProvider) {
-        this.currentUserProvider = currentUserProvider;
-        this.csvConfigProvider = csvConfigProvider;
-        this.importProvider = importProvider;
-        this.settingProvider = settingProvider;
-    }
 
     @Post
     @Operation(
