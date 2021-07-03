@@ -10,7 +10,10 @@ import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -53,6 +56,21 @@ public class ProcessEngineConfiguration {
 
         deployResources(processEngine);
         return processEngine;
+    }
+
+    @Context
+    public HistoryService historyService(ProcessEngine processEngine) {
+        return processEngine.getHistoryService();
+    }
+
+    @Context
+    public TaskService taskService(ProcessEngine processEngine) {
+        return processEngine.getTaskService();
+    }
+
+    @Context
+    public RuntimeService runtimeService(ProcessEngine processEngine) {
+        return processEngine.getRuntimeService();
     }
 
     private void deployResources(ProcessEngine processEngine) throws IOException {

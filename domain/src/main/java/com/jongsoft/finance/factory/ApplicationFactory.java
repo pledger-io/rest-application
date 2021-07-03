@@ -3,10 +3,9 @@ package com.jongsoft.finance.factory;
 import com.jongsoft.finance.core.Encoder;
 import com.jongsoft.finance.domain.FinTrack;
 import io.micronaut.context.annotation.Context;
+import io.micronaut.context.annotation.Factory;
 
-import javax.inject.Singleton;
-
-@Singleton
+@Factory
 public class ApplicationFactory {
 
     @Context
