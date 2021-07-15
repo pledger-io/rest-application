@@ -1,8 +1,12 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.savings.SavingGoalJpa;
+import com.jongsoft.finance.messaging.commands.savings.AdjustScheduleCommand;
 import com.jongsoft.finance.messaging.commands.savings.CreateSavingGoalCommand;
+import com.jongsoft.finance.schedule.Periodicity;
+import com.jongsoft.finance.schedule.Schedulable;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,7 +16,7 @@ import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class SavingGoalEventTest extends JpaTestSetup {
+public class SavingGoalEventIT extends JpaTestSetup {
 
     @Inject
     private ApplicationEventPublisher eventPublisher;
@@ -23,7 +27,8 @@ public class SavingGoalEventTest extends JpaTestSetup {
     void setup() {
         loadDataset(
                 "sql/base-setup.sql",
-                "sql/account/account-provider.sql"
+                "sql/account/account-provider.sql",
+                "sql/account/saving-goal-listener.sql"
         );
     }
 
@@ -44,6 +49,26 @@ public class SavingGoalEventTest extends JpaTestSetup {
         Assertions.assertThat(check.getAccount().getIban()).isEqualTo("NLJND200001928233");
         Assertions.assertThat(check.getGoal()).isEqualByComparingTo("10");
         Assertions.assertThat(check.getTargetDate()).isEqualTo(LocalDate.now().plusDays(10));
+    }
+
+    @Test
+    void adjustSchedule() {
+        setup();
+
+        eventPublisher.publishEvent(new AdjustScheduleCommand(
+                1L,
+                Schedulable.basicSchedule(
+                        1L,
+                        LocalDate.now().plusMonths(4),
+                        new ScheduleValue(Periodicity.MONTHS, 1))));
+
+        var check = entityManager.find(SavingGoalJpa.class, 1L);
+
+        Assertions.assertThat(check.getAllocated()).isEqualByComparingTo("0");
+        Assertions.assertThat(check.getGoal()).isEqualByComparingTo("2500.50");
+        Assertions.assertThat(check.getTargetDate()).isEqualTo(LocalDate.now().plusMonths(4));
+        Assertions.assertThat(check.getInterval()).isEqualTo(1);
+        Assertions.assertThat(check.getPeriodicity()).isEqualTo(Periodicity.MONTHS);
     }
 
 }
