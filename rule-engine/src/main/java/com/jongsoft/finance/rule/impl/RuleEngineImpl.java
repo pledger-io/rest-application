@@ -9,10 +9,10 @@ import com.jongsoft.finance.rule.locator.ChangeLocator;
 import com.jongsoft.finance.rule.matcher.ConditionMatcher;
 import com.jongsoft.finance.rule.matcher.NumberMatcher;
 import com.jongsoft.finance.rule.matcher.StringMatcher;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.List;
 
 @Singleton

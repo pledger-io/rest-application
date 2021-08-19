@@ -1,15 +1,15 @@
 package com.jongsoft.finance.bpmn;
 
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.delegate.importer.ExtractionMapping;
-import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.importer.BatchImport;
-import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
@@ -17,8 +17,7 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.collection.Set;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -27,12 +26,11 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceWithVariables;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -126,16 +124,16 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
         Mockito.when(userProvider.lookup("test-user")).thenReturn(Control.Option(userAccount));
 
         Mockito.when(accountProvider.lookup("MW GA Pieterse"))
-                .thenReturn(Maybe.empty())
-                .thenReturn(Maybe.just(Account.builder()
+                .thenReturn(Mono.empty())
+                .thenReturn(Mono.just(Account.builder()
                         .id(2L)
                         .name("MW GA Pieterse")
                         .type("creditor")
                         .build()));
 
         Mockito.when(filterFactory.account()).thenAnswer(args -> new AccountFilterTest());
-        Mockito.when(accountProvider.synonymOf(Mockito.anyString())).thenReturn(Maybe.empty());
-        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(Maybe.empty());
+        Mockito.when(accountProvider.synonymOf(Mockito.anyString())).thenReturn(Mono.empty());
+        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(Mono.empty());
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))
                 .thenReturn(ResultPage.empty());
 
@@ -147,7 +145,7 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
                         .build()));
 
         Mockito.when(accountProvider.synonymOf("Janssen PA"))
-                .thenReturn(Maybe.just(Account.builder()
+                .thenReturn(Mono.just(Account.builder()
                         .id(5L)
                         .name("Jansen PA")
                         .type("creditor")
@@ -167,12 +165,12 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
                 .fileCode("sample-file-run")
                 .build();
 
-        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Maybe.just(batchImport));
-        Mockito.when(storageService.read("sample-file-run")).thenReturn(Single.just(readFile("import-test/import-test.csv")));
+        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Mono.just(batchImport));
+        Mockito.when(storageService.read("sample-file-run")).thenReturn(Mono.just(readFile("import-test/import-test.csv")));
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);
             String token = UUID.randomUUID().toString();
-            Mockito.when(storageService.read(token)).thenReturn(Single.just(original));
+            Mockito.when(storageService.read(token)).thenReturn(Mono.just(original));
             return token;
         });
 

@@ -7,11 +7,11 @@ import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.SplitTransactionCommand;
 import com.jongsoft.lang.Collections;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;

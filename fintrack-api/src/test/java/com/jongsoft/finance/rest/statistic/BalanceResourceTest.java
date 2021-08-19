@@ -11,6 +11,7 @@ import io.micronaut.context.ApplicationContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 
@@ -41,7 +42,9 @@ class BalanceResourceTest extends TestSetup {
                 LocalDate.of(2019, 1, 1),
                 LocalDate.of(2019, 2, 1)));
 
-        subject.calculate(request).blockingGet();
+        StepVerifier.create(subject.calculate(request))
+                .expectNextCount(1)
+                .verifyComplete();
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(transactionProvider).balance(Mockito.any());
@@ -57,9 +60,8 @@ class BalanceResourceTest extends TestSetup {
                 LocalDate.of(2019, 1, 1),
                 LocalDate.of(2019, 2, 1)));
 
-        subject.daily(request)
-                .test()
-                .assertComplete();
+        StepVerifier.create(subject.daily(request))
+                .verifyComplete();
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(transactionProvider).daily(Mockito.any());
@@ -81,9 +83,8 @@ class BalanceResourceTest extends TestSetup {
                 .thenReturn(accountMock);
         Mockito.when(accountMock.lookup()).thenReturn(Collections.List());
 
-        subject.calculatePartitioned("account", request)
-                .test()
-                .assertComplete()
-                .assertValueCount(1);
+        StepVerifier.create(subject.calculatePartitioned("account", request))
+                .expectNextCount(1)
+                .verifyComplete();
     }
 }

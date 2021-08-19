@@ -3,11 +3,10 @@ package com.jongsoft.finance.security;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.lang.Control;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 @Singleton
 @Named("currentUserProvider")

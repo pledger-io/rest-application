@@ -5,12 +5,11 @@ import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-import io.reactivex.Maybe;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Singleton
@@ -28,7 +27,7 @@ public class CurrencyProviderJpa implements CurrencyProvider {
     }
 
     @Override
-    public Maybe<Currency> lookup(String code) {
+    public Mono<Currency> lookup(String code) {
         log.trace("Currency lookup by code: {}", code);
 
         var hql = """

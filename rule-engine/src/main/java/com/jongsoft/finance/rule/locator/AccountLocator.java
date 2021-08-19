@@ -2,10 +2,10 @@ package com.jongsoft.finance.rule.locator;
 
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.providers.AccountProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.List;
 
 @Singleton

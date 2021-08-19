@@ -6,7 +6,7 @@ import com.jongsoft.finance.Exportable;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.time.Range;
-import io.reactivex.Maybe;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 
@@ -28,11 +28,11 @@ public interface AccountProvider extends DataProvider<Account>, Exportable<Accou
         double average();
     }
 
-    Maybe<Account> synonymOf(String synonym);
+    Mono<Account> synonymOf(String synonym);
 
-    Maybe<Account> lookup(String name);
+    Mono<Account> lookup(String name);
 
-    Maybe<Account> lookup(SystemAccountTypes accountType);
+    Mono<Account> lookup(SystemAccountTypes accountType);
 
     ResultPage<Account> lookup(FilterCommand filter);
 

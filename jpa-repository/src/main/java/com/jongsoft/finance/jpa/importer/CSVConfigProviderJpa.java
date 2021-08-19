@@ -1,17 +1,16 @@
 package com.jongsoft.finance.jpa.importer;
 
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
-import com.jongsoft.finance.providers.CSVConfigProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.importer.entity.CSVImportConfig;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.providers.CSVConfigProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Flowable;
+import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
+import reactor.core.publisher.Flux;
 
 @Slf4j
 @Singleton
@@ -44,7 +43,7 @@ public class CSVConfigProviderJpa implements CSVConfigProvider {
     }
 
     @Override
-    public Flowable<BatchImportConfig> lookup() {
+    public Flux<BatchImportConfig> lookup() {
         log.trace("CSVConfiguration listing");
 
         var hql = """

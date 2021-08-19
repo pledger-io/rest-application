@@ -17,14 +17,14 @@ import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.function.Function;
@@ -45,20 +45,20 @@ public class BalanceResource {
             description = "This operation will calculate the balance for the current user based upon the given filters",
             operationId = "getBalance"
     )
-    public Single<BalanceResponse> calculate(@Valid @Body BalanceRequest request) {
+    public Publisher<BalanceResponse> calculate(@Valid @Body BalanceRequest request) {
         TransactionProvider.FilterCommand filter = buildFilterCommand(request);
 
-        return Single.create(emitter -> {
+        return Mono.create(emitter -> {
             var balance = transactionProvider.balance(filter)
                     .getOrSupply(() -> BigDecimal.ZERO);
 
-            emitter.onSuccess(new BalanceResponse(balance.doubleValue()));
+            emitter.success(new BalanceResponse(balance.doubleValue()));
         });
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Post("/partitioned/{partitionKey}")
-    public Flowable<BalancePartitionResponse> calculatePartitioned(
+    public Publisher<BalancePartitionResponse> calculatePartitioned(
             @PathVariable String partitionKey,
             @Valid @Body BalanceRequest request) {
         Sequence<? extends AggregateBase> entityProvider = switch (partitionKey) {
@@ -77,7 +77,7 @@ public class BalanceResource {
             default -> throw new IllegalArgumentException("Unsupported partition used " + partitionKey);
         };
 
-        return Flowable.create(flowableEmitter -> {
+        return Flux.create(flowableEmitter -> {
             var total = transactionProvider.balance(buildFilterCommand(request))
                     .getOrSupply(() -> BigDecimal.ZERO);
 
@@ -88,24 +88,24 @@ public class BalanceResource {
                 var balance = transactionProvider.balance(filter)
                         .getOrSupply(() -> BigDecimal.ZERO);
 
-                flowableEmitter.onNext(new BalancePartitionResponse(entity.toString(), balance.doubleValue()));
+                flowableEmitter.next(new BalancePartitionResponse(entity.toString(), balance.doubleValue()));
                 total = total.subtract(BigDecimal.valueOf(balance.doubleValue()));
             }
 
-            flowableEmitter.onNext(new BalancePartitionResponse("", total.doubleValue()));
-            flowableEmitter.onComplete();
-        }, BackpressureStrategy.LATEST);
+            flowableEmitter.next(new BalancePartitionResponse("", total.doubleValue()));
+            flowableEmitter.complete();
+        });
     }
 
     @Post("/daily")
-    public Flowable<?> daily(@Valid @Body BalanceRequest request) {
-        return Flowable.create(emitter -> {
+    public Publisher<?> daily(@Valid @Body BalanceRequest request) {
+        return Flux.create(emitter -> {
             transactionProvider.daily(buildFilterCommand(request))
                     .map(DailyResponse::new)
-                    .forEach(emitter::onNext);
+                    .forEach(emitter::next);
 
-            emitter.onComplete();
-        }, BackpressureStrategy.DROP);
+            emitter.complete();
+        });
 
     }
 

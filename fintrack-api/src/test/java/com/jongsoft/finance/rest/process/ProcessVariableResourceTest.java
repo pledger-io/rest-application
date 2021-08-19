@@ -8,6 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.test.StepVerifier;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class ProcessVariableResourceTest {
 
@@ -26,36 +30,32 @@ class ProcessVariableResourceTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
 
-        Mockito.when(processEngine.getHistoryService()).thenReturn(historyService);
-        Mockito.when(historyService.createHistoricVariableInstanceQuery()).thenReturn(variableInstanceQuery);
-        Mockito.when(variableInstanceQuery.processDefinitionKey(Mockito.anyString())).thenReturn(variableInstanceQuery);
-        Mockito.when(variableInstanceQuery.processInstanceId(Mockito.anyString())).thenReturn(variableInstanceQuery);
-        Mockito.when(variableInstanceQuery.variableName(Mockito.anyString())).thenReturn(variableInstanceQuery);
+        when(processEngine.getHistoryService()).thenReturn(historyService);
+        when(historyService.createHistoricVariableInstanceQuery()).thenReturn(variableInstanceQuery);
+        when(variableInstanceQuery.processDefinitionKey(Mockito.anyString())).thenReturn(variableInstanceQuery);
+        when(variableInstanceQuery.processInstanceId(Mockito.anyString())).thenReturn(variableInstanceQuery);
+        when(variableInstanceQuery.variableName(Mockito.anyString())).thenReturn(variableInstanceQuery);
 
         subject = new ProcessVariableResource(historyService);
     }
 
     @Test
     void variables() {
-        var checker = subject.variables("procDefKey", "InstanceId")
-                .test();
+        StepVerifier.create(subject.variables("procDefKey", "InstanceId"))
+                .verifyComplete();
 
-        checker.assertComplete();
-
-        Mockito.verify(variableInstanceQuery).processDefinitionKey("procDefKey");
-        Mockito.verify(variableInstanceQuery).processInstanceId("InstanceId");
+        verify(variableInstanceQuery).processDefinitionKey("procDefKey");
+        verify(variableInstanceQuery).processInstanceId("InstanceId");
     }
 
     @Test
     void variable() {
-        var checker = subject.variable("procDefKey", "InstanceId", "variable")
-                .test();
+        StepVerifier.create(subject.variable("procDefKey", "InstanceId", "variable"))
+                .verifyComplete();
 
-        checker.assertComplete();
-
-        Mockito.verify(variableInstanceQuery).processDefinitionKey("procDefKey");
-        Mockito.verify(variableInstanceQuery).processInstanceId("InstanceId");
-        Mockito.verify(variableInstanceQuery).variableName("variable");
+        verify(variableInstanceQuery).processDefinitionKey("procDefKey");
+        verify(variableInstanceQuery).processInstanceId("InstanceId");
+        verify(variableInstanceQuery).variableName("variable");
     }
 
 }

@@ -6,13 +6,18 @@ import com.jongsoft.finance.messaging.commands.currency.CreateCurrencyCommand;
 import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class CurrencyResourceTest {
 
@@ -34,7 +39,7 @@ class CurrencyResourceTest {
 
     @Test
     void available() {
-        Mockito.when(currencyProvider.lookup()).thenReturn(
+        when(currencyProvider.lookup()).thenReturn(
                 Collections.List(
                         Currency.builder()
                                 .id(1L)
@@ -56,11 +61,9 @@ class CurrencyResourceTest {
                                 .build()
                 ));
 
-        var response = subject.available()
-                .test();
-
-        response.assertComplete();
-        response.assertValueCount(3);
+        StepVerifier.create(subject.available())
+                .expectNextCount(3)
+                .verifyComplete();
     }
 
     @Test
@@ -71,15 +74,18 @@ class CurrencyResourceTest {
                 .name("Test currency")
                 .build();
 
-        Mockito.when(currencyProvider.lookup("TCC")).thenReturn(Maybe.empty());
+        when(currencyProvider.lookup("TCC")).thenReturn(Mono.empty());
 
-        var response = subject.create(request).blockingGet();
+        StepVerifier.create(subject.create(request))
+                .assertNext(response -> {
+                    assertThat(response.getCode()).isEqualTo("TCC");
+                    assertThat(response.getName()).isEqualTo("Test currency");
+                    assertThat(response.getSymbol()).isEqualTo('S');
+                })
+                .verifyComplete();
 
-        Assertions.assertThat(response.getCode()).isEqualTo("TCC");
-        Assertions.assertThat(response.getName()).isEqualTo("Test currency");
-        Assertions.assertThat(response.getSymbol()).isEqualTo('S');
 
-        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateCurrencyCommand.class));
+        verify(applicationEventPublisher).publishEvent(Mockito.any(CreateCurrencyCommand.class));
     }
 
     @Test
@@ -90,11 +96,14 @@ class CurrencyResourceTest {
                 .code("EUR")
                 .build());
 
-        Mockito.when(currencyProvider.lookup("EUR")).thenReturn(Maybe.just(currency));
+        when(currencyProvider.lookup("EUR")).thenReturn(Mono.just(currency));
 
-        var response = subject.get("EUR").blockingGet();
-        Assertions.assertThat(response.getCode()).isEqualTo("EUR");
-        Assertions.assertThat(response.getName()).isEqualTo("Euro");
+        StepVerifier.create(subject.get("EUR"))
+                .assertNext(response -> {
+                    assertThat(response.getCode()).isEqualTo("EUR");
+                    assertThat(response.getName()).isEqualTo("Euro");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -105,7 +114,7 @@ class CurrencyResourceTest {
                 .code("EUR")
                 .build());
 
-        Mockito.when(currencyProvider.lookup("EUR")).thenReturn(Maybe.just(currency));
+        when(currencyProvider.lookup("EUR")).thenReturn(Mono.just(currency));
 
         var request = CurrencyRequest.builder()
                 .code("TCC")
@@ -113,12 +122,15 @@ class CurrencyResourceTest {
                 .name("Test currency")
                 .build();
 
-        var response = subject.update("EUR", request).blockingGet();
-        Assertions.assertThat(response.getCode()).isEqualTo("TCC");
-        Assertions.assertThat(response.getName()).isEqualTo("Test currency");
-        Assertions.assertThat(response.getSymbol()).isEqualTo('S');
+        StepVerifier.create(subject.update("EUR", request))
+                .assertNext(response -> {
+                    assertThat(response.getCode()).isEqualTo("TCC");
+                    assertThat(response.getName()).isEqualTo("Test currency");
+                    assertThat(response.getSymbol()).isEqualTo('S');
+                })
+                .verifyComplete();
 
-        Mockito.verify(currency).rename("Test currency", "TCC", 'S');
+        verify(currency).rename("Test currency", "TCC", 'S');
     }
 
     @Test
@@ -131,18 +143,21 @@ class CurrencyResourceTest {
                 .code("EUR")
                 .build());
 
-        Mockito.when(currencyProvider.lookup("EUR")).thenReturn(Maybe.just(currency));
+        when(currencyProvider.lookup("EUR")).thenReturn(Mono.just(currency));
 
         var request = CurrencyPatchRequest.builder()
                 .enabled(false)
                 .decimalPlaces(2)
                 .build();
 
-        var response = subject.patch("EUR", request).blockingGet();
-        Assertions.assertThat(response.isEnabled()).isFalse();
-        Assertions.assertThat(response.getNumberDecimals()).isEqualTo(2);
+        StepVerifier.create(subject.patch("EUR", request))
+                .assertNext(response -> {
+                    assertThat(response.isEnabled()).isFalse();
+                    assertThat(response.getNumberDecimals()).isEqualTo(2);
+                })
+                .verifyComplete();
 
-        Mockito.verify(currency).disable();
-        Mockito.verify(currency).accuracy(2);
+        verify(currency).disable();
+        verify(currency).accuracy(2);
     }
 }

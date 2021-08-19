@@ -1,16 +1,16 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
+import reactor.test.StepVerifier;
 
 class SettingProviderJpaIT extends JpaTestSetup {
 
@@ -23,9 +23,10 @@ class SettingProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup() {
         loadDataset("sql/base-setup.sql");
-        var check = settingProvider.lookup().test();
 
-        check.assertValueCount(6);
+        StepVerifier.create(settingProvider.lookup())
+                .expectNextCount(6)
+                .verifyComplete();
     }
 
     @Test

@@ -2,16 +2,24 @@ package com.jongsoft.finance.jpa.reactive;
 
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.lang.Control;
+import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.transaction.SynchronousTransactionManager;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
 
 import javax.persistence.EntityManager;
 import java.sql.Connection;
+import java.util.stream.Stream;
 
+@Slf4j
 @RequiredArgsConstructor
 public class ReactivePipe<T> extends JpaPipe<T, ReactivePipe<T>> {
 
@@ -19,43 +27,50 @@ public class ReactivePipe<T> extends JpaPipe<T, ReactivePipe<T>> {
     private final SynchronousTransactionManager<Connection> transactionManager;
 
     @SuppressWarnings("unchecked")
-    public Maybe<T> maybe() {
-        return Maybe.create(emitter -> {
+    public Mono<T> maybe() {
+        return Mono.create(emitter -> {
             transactionManager.executeRead(status -> {
                 var query = entityManager.createQuery(hql());
 
                 applyParameters(query);
                 applyPaging(query);
 
-                Control.Try(() -> (T) query.getSingleResult())
-                        .consume(emitter::onSuccess);
+                var result = Control.Try(() -> (T) query.getSingleResult())
+                        .consume(emitter::success);
 
-                emitter.onComplete();
+                if (result.isFailure()) {
+                    emitter.success();
+                }
                 return null;
             });
         });
     }
 
     @SuppressWarnings("unchecked")
-    public Flowable<T> flow() {
-        return Flowable.create(emitter -> {
+    public Flux<T> flow() {
+        if (log.isTraceEnabled()) {
+            log.trace("Executing reactive query `{}`", hql().replaceAll("\n", " "));
+        }
+
+        return Flux.create(emitter -> {
             transactionManager.executeRead(status -> {
                 var query = entityManager.createQuery(hql());
 
                 applyParameters(query);
                 applyPaging(query);
-                query.getResultStream()
-                        .forEach(entity -> emitter.onNext((T) entity));
 
-                emitter.onComplete();
+                query.getResultStream()
+                        .forEach(entity -> emitter.next((T) entity));
+
+                emitter.complete();
                 return null;
             });
-        }, BackpressureStrategy.BUFFER);
+        });
     }
 
     @SuppressWarnings("unchecked")
-    public Single<T> single() {
-        return Single.create(emitter -> {
+    public Mono<T> single() {
+        return Mono.create(emitter -> {
             transactionManager.executeRead(status -> {
                 var query = entityManager.createQuery(hql());
 
@@ -64,9 +79,9 @@ public class ReactivePipe<T> extends JpaPipe<T, ReactivePipe<T>> {
 
                 var result = Control.Try(() -> (T) query.getSingleResult());
                 if (result.isSuccess()) {
-                    emitter.onSuccess(result.get());
+                    emitter.success(result.get());
                 } else {
-                    emitter.onError(StatusException.notFound("Entity not found"));
+                    emitter.error(StatusException.notFound("Entity not found"));
                 }
                 return null;
             });

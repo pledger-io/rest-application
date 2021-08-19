@@ -1,14 +1,14 @@
 package com.jongsoft.finance.jpa.rule;
 
-import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
+import reactor.test.StepVerifier;
 
 class TransactionRuleGroupProviderJpaIT extends JpaTestSetup {
 
@@ -29,9 +29,11 @@ class TransactionRuleGroupProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup() {
         setup();
-        ruleGroupProvider.lookup()
-                .test()
-                .assertValueCount(2);
+
+        StepVerifier.create(ruleGroupProvider.lookup())
+                .consumeNextWith(rule -> Assertions.assertThat(rule.getName()).isEqualTo("Grocery stores"))
+                .consumeNextWith(rule -> Assertions.assertThat(rule.getName()).isEqualTo("Hardware stores"))
+                .verifyComplete();
     }
 
     @Test

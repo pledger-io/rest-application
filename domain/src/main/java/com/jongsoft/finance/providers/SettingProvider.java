@@ -3,13 +3,13 @@ package com.jongsoft.finance.providers;
 import com.jongsoft.finance.core.SettingType;
 import com.jongsoft.finance.domain.core.Setting;
 import com.jongsoft.lang.control.Optional;
-import io.reactivex.Flowable;
+import reactor.core.publisher.Flux;
 
 import java.util.function.Function;
 
 public interface SettingProvider {
 
-    Flowable<Setting> lookup();
+    Flux<Setting> lookup();
 
     Optional<Setting> lookup(String name);
 

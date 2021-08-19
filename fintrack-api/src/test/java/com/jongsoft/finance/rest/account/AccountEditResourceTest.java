@@ -13,6 +13,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import reactor.test.StepVerifier;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AccountEditResourceTest extends TestSetup {
 
@@ -37,8 +40,8 @@ class AccountEditResourceTest extends TestSetup {
 
     @Test
     void get_missing() {
-        org.junit.jupiter.api.Assertions.assertThrows(StatusException.class,
-                () -> subject.get(1L).blockingGet());
+        StepVerifier.create(subject.get(1L))
+                .verifyErrorMessage("Account not found");
     }
 
     @Test
@@ -52,17 +55,22 @@ class AccountEditResourceTest extends TestSetup {
                         .currency("EUR")
                         .build()));
 
-        var response = subject.get(123L).blockingGet();
+        StepVerifier.create(subject.get(123L))
+                .assertNext(response -> {
+                    assertThat(response.getName()).isEqualTo("Sample account");
+                })
+                .verifyComplete();
 
         Mockito.verify(accountProvider).lookup(123L);
     }
 
     @Test
     void update_missing() {
-        var response = subject.update(1L, new AccountEditRequest()).blockingGet();
+        StepVerifier.create(subject.update(1L, new AccountEditRequest()))
+                .assertNext(response -> assertThat(response.code()).isEqualTo(HttpStatus.NOT_FOUND.getCode()))
+                .verifyComplete();
 
         Mockito.verify(accountProvider).lookup(1L);
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
     }
 
     @Test
@@ -82,10 +90,10 @@ class AccountEditResourceTest extends TestSetup {
                 .type("checking")
                 .build();
 
-        var response = subject.update(123L, request).blockingGet();
+        var response = subject.update(123L, request).block();
 
         Mockito.verify(accountProvider).lookup(123L);
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
+        assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
     }
 
     @Test
@@ -101,9 +109,9 @@ class AccountEditResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
 
         var response = subject.persistImage(1L, new AccountImageRequest("file-code"))
-                .blockingGet();
+                .block();
 
-        Assertions.assertThat(response.getIconFileCode()).isEqualTo("file-code");
+        assertThat(response.getIconFileCode()).isEqualTo("file-code");
         Mockito.verify(account).registerIcon("file-code");
     }
 
@@ -119,9 +127,9 @@ class AccountEditResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(123L))
                 .thenReturn(Control.Option(account));
 
-        var response = subject.delete(123L).blockingGet();
+        var response = subject.delete(123L).block();
 
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.NO_CONTENT.getCode());
+        assertThat(response.code()).isEqualTo(HttpStatus.NO_CONTENT.getCode());
 
         Mockito.verify(account).terminate();
     }

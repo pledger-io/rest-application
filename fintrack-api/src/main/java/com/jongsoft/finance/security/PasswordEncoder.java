@@ -3,8 +3,8 @@ package com.jongsoft.finance.security;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import at.favre.lib.crypto.bcrypt.LongPasswordStrategies;
 import com.jongsoft.finance.core.Encoder;
+import jakarta.inject.Singleton;
 
-import javax.inject.Singleton;
 import java.security.SecureRandom;
 
 @Singleton

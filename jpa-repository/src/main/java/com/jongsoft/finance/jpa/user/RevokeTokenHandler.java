@@ -4,11 +4,11 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.user.RevokeTokenCommand;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.time.LocalDateTime;
 
 @Slf4j

@@ -5,27 +5,20 @@ import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.finance.providers.SettingProvider;
-import com.jongsoft.finance.reactive.ContextPropagation;
 import com.jongsoft.finance.rest.model.AccountResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.*;
-import io.micronaut.http.context.ServerRequestContext;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.micronaut.security.utils.SecurityService;
-import io.reactivex.Single;
-import io.reactivex.plugins.RxJavaPlugins;
-import io.reactivex.schedulers.Schedulers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Controller("/api/accounts")
 @Tag(name = "Account information")
@@ -56,15 +49,15 @@ public class AccountResource {
             summary = "List own accounts",
             description = "List all accounts that are creatable in the front-end using one of the selectable account types"
     )
-    Single<List<AccountResponse>> ownAccounts() {
-        return Single.create(emitter -> {
+    Mono<List<AccountResponse>> ownAccounts() {
+        return Mono.create(emitter -> {
             var accounts = accountProvider.lookup(
                     accountFilterFactory.account().types(accountTypeProvider.lookup(false)));
 
             var response = accounts.content()
                     .map(AccountResponse::new);
 
-            emitter.onSuccess(response.toJava());
+            emitter.success(response.toJava());
         });
     }
 
@@ -73,13 +66,13 @@ public class AccountResource {
             summary = "List all accounts",
             description = "Fetch all accounts registered to the authenticated user"
     )
-    Single<List<AccountResponse>> allAccounts() {
-        return Single.create(emitter -> {
+    Mono<List<AccountResponse>> allAccounts() {
+        return Mono.create(emitter -> {
             var accounts = accountProvider.lookup()
                     .map(AccountResponse::new)
                     .toJava();
 
-            emitter.onSuccess(accounts);
+            emitter.success(accounts);
         });
     }
 
@@ -88,8 +81,8 @@ public class AccountResource {
             summary = "Autocomplete accounts",
             description = "Performs a search operation based on the partial name (token) of the given account type"
     )
-    Single<List<AccountResponse>> autocomplete(@Nullable String token, @Nullable String type) {
-        return Single.create(emitter -> {
+    Mono<List<AccountResponse>> autocomplete(@Nullable String token, @Nullable String type) {
+        return Mono.create(emitter -> {
             var accounts = accountProvider.lookup(
                     accountFilterFactory.account()
                             .name(token, false)
@@ -99,7 +92,7 @@ public class AccountResource {
             var response = accounts.content()
                     .map(AccountResponse::new);
 
-            emitter.onSuccess(response.toJava());
+            emitter.success(response.toJava());
         });
     }
 
@@ -108,8 +101,8 @@ public class AccountResource {
             summary = "Search accounts",
             description = "Search through all accounts using the provided filter set"
     )
-    Single<ResultPageResponse<AccountResponse>> accounts(@Valid @Body AccountSearchRequest searchRequest) {
-        return Single.create(emitter -> {
+    Mono<ResultPageResponse<AccountResponse>> accounts(@Valid @Body AccountSearchRequest searchRequest) {
+        return Mono.create(emitter -> {
             var filter = accountFilterFactory.account()
                     .page(Math.max(0, searchRequest.page() - 1))
                     .pageSize(settingProvider.getPageSize())
@@ -121,7 +114,7 @@ public class AccountResource {
             var response = accountProvider.lookup(filter)
                     .map(AccountResponse::new);
 
-            emitter.onSuccess(new ResultPageResponse<>(response));
+            emitter.success(new ResultPageResponse<>(response));
         });
     }
 
@@ -130,9 +123,9 @@ public class AccountResource {
             summary = "Create account",
             description = "This operation will allow for adding new accounts to the system"
     )
-    public Single<AccountResponse> create(@Valid @Body AccountEditRequest accountEditRequest) {
+    public Mono<AccountResponse> create(@Valid @Body AccountEditRequest accountEditRequest) {
         return accountProvider.lookup(accountEditRequest.getName())
-                .switchIfEmpty(Single.create(emitter -> {
+                .switchIfEmpty(Mono.create(emitter -> {
                     currentUserProvider.currentUser()
                             .createAccount(
                                     accountEditRequest.getName(),
@@ -152,9 +145,9 @@ public class AccountResource {
 
                                 return account;
                             })
-                            .switchIfEmpty(Single.error(StatusException.internalError("Failed to create account")))
-                            .doOnError(emitter::onError)
-                            .subscribe(emitter::onSuccess);
+                            .switchIfEmpty(Mono.error(StatusException.internalError("Failed to create account")))
+                            .doOnError(emitter::error)
+                            .subscribe(emitter::success);
                 }))
                 .map(AccountResponse::new);
     }

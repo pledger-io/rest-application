@@ -5,14 +5,13 @@ import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.lang.collection.List;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.LongValue;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Slf4j
 @Singleton

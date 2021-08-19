@@ -10,13 +10,13 @@ import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
@@ -53,7 +53,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
     }
 
     @Override
-    public Flowable<TransactionRule> lookup(String group) {
+    public Flux<TransactionRule> lookup(String group) {
         var hql = """
                 select r from RuleJpa r
                 where r.user.username = :username
@@ -163,10 +163,10 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
                 .set("username", authenticationFacade.authenticated())
                 .set("group", group)
                 .maybe()
-                .switchIfEmpty(Single.create(emitter -> {
+                .switchIfEmpty(Mono.create(emitter -> {
                     EventBus.getBus().send(new CreateRuleGroupCommand(group));
-                    emitter.onSuccess(group(group));
+                    emitter.success(group(group));
                 }))
-                .blockingGet();
+                .block();
     }
 }

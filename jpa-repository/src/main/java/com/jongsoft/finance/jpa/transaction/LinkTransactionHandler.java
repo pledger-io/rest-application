@@ -11,11 +11,10 @@ import com.jongsoft.finance.jpa.tag.TagJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Slf4j
 @Singleton

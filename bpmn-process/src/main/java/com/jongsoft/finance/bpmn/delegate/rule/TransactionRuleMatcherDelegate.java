@@ -5,14 +5,14 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.LongValue;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.Map;
 
 @Slf4j

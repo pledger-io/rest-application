@@ -7,9 +7,9 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
 import java.util.Locale;
 
 @Secured(SecurityRule.IS_ANONYMOUS)

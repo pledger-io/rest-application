@@ -6,12 +6,10 @@ import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
 
 class TransactionScheduleProviderJpaIT extends JpaTestSetup {
 

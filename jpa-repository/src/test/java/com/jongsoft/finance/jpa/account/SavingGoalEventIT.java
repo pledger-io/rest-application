@@ -8,10 +8,10 @@ import com.jongsoft.finance.messaging.commands.savings.CreateSavingGoalCommand;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedulable;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;

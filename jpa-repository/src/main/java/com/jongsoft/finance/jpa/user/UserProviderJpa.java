@@ -13,11 +13,13 @@ import com.jongsoft.lang.collection.Collectors;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.time.LocalDateTime;
 import java.util.Currency;
 
@@ -56,7 +58,7 @@ public class UserProviderJpa implements UserProvider {
     }
 
     @Override
-    public Maybe<UserAccount> refreshToken(String refreshToken) {
+    public Mono<UserAccount> refreshToken(String refreshToken) {
         var hql = """
                 select u.user from AccountTokenJpa u
                 where u.refreshToken = :refreshToken
@@ -71,7 +73,7 @@ public class UserProviderJpa implements UserProvider {
     }
 
     @Override
-    public Flowable<SessionToken> tokens(String username) {
+    public Flux<SessionToken> tokens(String username) {
         var hql = """
                 from AccountTokenJpa
                 where user.username = :username

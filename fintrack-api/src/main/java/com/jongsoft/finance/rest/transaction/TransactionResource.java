@@ -23,17 +23,17 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Map;
@@ -149,7 +149,7 @@ public class TransactionResource {
             description = "Get the oldest transaction in the system based upon the provided request."
     )
     @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = JsonError.class)))
-    Single<LocalDate> firstTransaction(@Body TransactionSearchRequest request) {
+    Publisher<LocalDate> firstTransaction(@Body TransactionSearchRequest request) {
         var command = filterFactory.transaction();
 
         if (request.getAccount() != null) {
@@ -170,7 +170,7 @@ public class TransactionResource {
 
         return transactionProvider.first(command)
                 .map(Transaction::getDate)
-                .switchIfEmpty(Single.error(StatusException.notFound("No transaction found")));
+                .switchIfEmpty(Mono.error(StatusException.notFound("No transaction found")));
     }
 
     @Get(value = "/export", produces = MediaType.TEXT_PLAIN)
@@ -179,9 +179,9 @@ public class TransactionResource {
             summary = "Export transactions",
             description = "Creates a CSV export of all transactions in the system."
     )
-    Flowable<String> export() {
-        return Flowable.create(emitter -> {
-            emitter.onNext("Date,Booking Date,Interest Date,From name,From IBAN," +
+    Publisher<String> export() {
+        return Flux.create(emitter -> {
+            emitter.next("Date,Booking Date,Interest Date,From name,From IBAN," +
                     "To name,To IBAN,Description,Category,Budget,Contract,Amount\n");
 
             var filterCommand = filterFactory.transaction()
@@ -196,15 +196,15 @@ public class TransactionResource {
             var page = transactionProvider.lookup(filterCommand);
             do {
                 for (Transaction transaction : page.content()) {
-                    emitter.onNext(convertTransaction(transaction));
+                    emitter.next(convertTransaction(transaction));
                 }
 
                 filterCommand.page(++currentPage);
                 page = transactionProvider.lookup(filterCommand);
             } while (page.hasNext());
 
-            emitter.onComplete();
-        }, BackpressureStrategy.LATEST);
+            emitter.complete();
+        });
     }
 
     @Get("/apply-all-rules")

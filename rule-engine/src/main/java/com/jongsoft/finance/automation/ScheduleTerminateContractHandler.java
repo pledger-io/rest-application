@@ -8,11 +8,10 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.TerminateContractCommand;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.lang.Collections;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * This class will automatically terminate all active transaction schedules attached to the contract that was

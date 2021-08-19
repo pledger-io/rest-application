@@ -13,11 +13,11 @@ import com.jongsoft.lang.control.Optional;
 import com.jongsoft.lang.time.Range;
 import io.micronaut.data.model.Sort;
 import io.reactivex.Maybe;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -38,7 +38,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Maybe<Account> synonymOf(String synonym) {
+    public Mono<Account> synonymOf(String synonym) {
         log.trace("Account synonym lookup with: {}", synonym);
 
         String hql = """
@@ -83,7 +83,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Maybe<Account> lookup(String name) {
+    public Mono<Account> lookup(String name) {
         log.trace("Account name lookup: {} for {}", name, authenticationFacade.authenticated());
 
         String hql = """
@@ -103,7 +103,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Maybe<Account> lookup(SystemAccountTypes accountType) {
+    public Mono<Account> lookup(SystemAccountTypes accountType) {
         log.trace("Account type lookup: {}", accountType);
 
         var hql = """

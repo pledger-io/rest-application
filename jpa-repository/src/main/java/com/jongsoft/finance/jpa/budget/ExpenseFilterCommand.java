@@ -1,10 +1,9 @@
 package com.jongsoft.finance.jpa.budget;
 
-import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
+import com.jongsoft.finance.providers.ExpenseProvider;
 import io.micronaut.data.model.Sort;
-
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class ExpenseFilterCommand extends FilterCommandJpa implements ExpenseProvider.FilterCommand {

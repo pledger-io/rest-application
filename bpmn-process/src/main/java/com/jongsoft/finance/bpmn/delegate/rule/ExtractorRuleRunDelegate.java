@@ -5,12 +5,11 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
 import com.jongsoft.lang.collection.tuple.Triplet;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)

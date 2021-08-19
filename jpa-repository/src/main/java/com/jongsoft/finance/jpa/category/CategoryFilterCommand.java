@@ -1,10 +1,9 @@
 package com.jongsoft.finance.jpa.category;
 
-import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
+import com.jongsoft.finance.providers.CategoryProvider;
 import io.micronaut.data.model.Sort;
-
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class CategoryFilterCommand extends FilterCommandJpa implements CategoryProvider.FilterCommand {

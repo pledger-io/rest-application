@@ -1,14 +1,14 @@
 package com.jongsoft.finance.jpa.importer;
 
-import com.jongsoft.finance.providers.CSVConfigProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.CSVConfigProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
+import reactor.test.StepVerifier;
 
 class CSVConfigProviderJpaIT extends JpaTestSetup {
 
@@ -29,10 +29,10 @@ class CSVConfigProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup() {
         setup();
-        var check = csvConfigProvider.lookup().test();
 
-        check.assertValueCount(1);
-        check.assertValueAt(0, batch -> batch.getFileCode().equals("file-code-1"));
+        StepVerifier.create(csvConfigProvider.lookup())
+                .assertNext(batch -> Assertions.assertThat(batch.getFileCode()).isEqualTo("file-code-1"))
+                .verifyComplete();
     }
 
     @Test

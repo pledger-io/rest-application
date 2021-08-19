@@ -1,28 +1,23 @@
 package com.jongsoft.finance.bpmn;
 
-import com.jongsoft.finance.StorageService;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.importer.BatchImport;
-import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
-import com.jongsoft.finance.providers.TransactionProvider;
-import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.providers.UserProvider;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
+import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
+import com.jongsoft.finance.providers.*;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.core.reflect.ReflectionUtils;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -30,12 +25,11 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -151,7 +145,7 @@ class BatchImportIT extends ProcessTestSetup {
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);
             String token = UUID.randomUUID().toString();
-            Mockito.when(storageService.read(token)).thenReturn(Single.just(original));
+            Mockito.when(storageService.read(token)).thenReturn(Mono.just(original));
             tokenCleanup.add(token);
             return token;
         });
@@ -164,7 +158,7 @@ class BatchImportIT extends ProcessTestSetup {
                     .currency(args.getArgument(1, String.class))
                     .type(args.getArgument(2, String.class))
                     .build();
-            Mockito.when(accountProvider.lookup(args.getArgument(0, String.class))).thenReturn(Maybe.just(account));
+            Mockito.when(accountProvider.lookup(args.getArgument(0, String.class))).thenReturn(Mono.just(account));
             Mockito.when(accountProvider.lookup(account.getId())).thenReturn(Control.Option(account));
             return null;
         }).when(userAccount).createAccount(Mockito.anyString(), Mockito.any(), Mockito.anyString());
@@ -190,8 +184,8 @@ class BatchImportIT extends ProcessTestSetup {
 
         importConfigJson.setAccountId(1L);
 
-        Mockito.when(storageService.read("sample-file-run")).thenReturn(Single.just(readFile("import-test/import-test.csv")));
-        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Maybe.just(batchImport));
+        Mockito.when(storageService.read("sample-file-run")).thenReturn(Mono.just(readFile("import-test/import-test.csv")));
+        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Mono.just(batchImport));
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(Account.builder()
                 .id(1L)
@@ -204,14 +198,14 @@ class BatchImportIT extends ProcessTestSetup {
         final Account accountKabel = Account.builder().id(4L).name("KABEL TV").iban("NL31INGB0001122334").type("creditor").build();
 
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class))).thenReturn(ResultPage.empty());
-        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(Maybe.empty());
+        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(Mono.empty());
         Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(pieterseAccount));
         Mockito.when(accountProvider.lookup(3L)).thenReturn(Control.Option(accountPost));
 
         Mockito.when(accountProvider.lookup("MW GA Pieterse"))
-                .thenReturn(Maybe.empty())
-                .thenReturn(Maybe.empty())
-                .thenReturn(Maybe.just(pieterseAccount));
+                .thenReturn(Mono.empty())
+                .thenReturn(Mono.empty())
+                .thenReturn(Mono.just(pieterseAccount));
 
         Mockito.when(accountProvider.lookup(123L))
                 .thenReturn(Control.Option(Account.builder()
@@ -223,12 +217,12 @@ class BatchImportIT extends ProcessTestSetup {
         Mockito.when(accountProvider.lookup(new AccountFilterTest().iban("NL69INGB0123456789", true)))
                 .thenReturn(ResultPage.of(accountPost));
         Mockito.when(accountProvider.lookup("KABEL TV"))
-                .thenReturn(Maybe.just(accountKabel));
+                .thenReturn(Mono.just(accountKabel));
         Mockito.when(accountProvider.lookup(new AccountFilterTest().iban("NL31INGB0001122334", true)))
                 .thenReturn(ResultPage.empty())
                 .thenReturn(ResultPage.of(accountKabel));
 
-        Mockito.when(storageService.read("account-mapping-token")).thenReturn(Single.just("{\"Janssen PA\": 123}".getBytes()));
+        Mockito.when(storageService.read("account-mapping-token")).thenReturn(Mono.just("{\"Janssen PA\": 123}".getBytes()));
 
         MutableLong id = new MutableLong(1);
         Mockito.when(transactionCreationHandler.handleCreatedEvent(Mockito.any())).thenAnswer((Answer<Long>) invocation -> {

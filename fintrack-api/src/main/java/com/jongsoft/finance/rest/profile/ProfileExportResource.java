@@ -21,11 +21,12 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import java.util.List;
 
 @Controller("/api/profile/export")
@@ -45,14 +46,14 @@ public class ProfileExportResource {
             description = "Exports the profile of the authenticated user to JSON",
             operationId = "exportProfile"
     )
-    public Single<HttpResponse<ExportJson>> export() {
-        return Single.create(emitter -> {
+    public Publisher<HttpResponse<ExportJson>> export() {
+        return Mono.create(emitter -> {
             var exportFileName = authenticationFacade.authenticated() + "-profile.json";
             var exportJson = ExportJson.builder()
                     .accounts(lookupAllOf(Account.class)
                             .map(account -> AccountJson.fromDomain(
                                     account,
-                                    () -> storageService.read(account.getImageFileToken()).blockingGet()))
+                                    () -> storageService.read(account.getImageFileToken()).block()))
                             .toJava())
                     .budgetPeriods(lookupAllOf(Budget.class).map(BudgetJson::fromDomain).toJava())
                     .categories(lookupAllOf(Category.class).map(CategoryJson::fromDomain).toJava())
@@ -60,7 +61,7 @@ public class ProfileExportResource {
                     .contracts(lookupAllOf(Contract.class)
                             .map(c -> ContractJson.fromDomain(
                                     c,
-                                    () -> storageService.read(c.getFileToken()).blockingGet()))
+                                    () -> storageService.read(c.getFileToken()).block()))
                             .toJava())
                     .rules(lookupAllOf(TransactionRule.class)
                             .map(rule -> RuleConfigJson.RuleJson.fromDomain(
@@ -73,7 +74,7 @@ public class ProfileExportResource {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + exportFileName + "\"")
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 
-            emitter.onSuccess(response);
+            emitter.success(response);
         });
     }
 

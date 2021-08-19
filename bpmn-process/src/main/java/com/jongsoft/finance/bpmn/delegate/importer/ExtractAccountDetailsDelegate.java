@@ -5,10 +5,10 @@ import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
 import com.jongsoft.lang.API;
 import com.jongsoft.lang.collection.tuple.Triplet;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.HashSet;
 

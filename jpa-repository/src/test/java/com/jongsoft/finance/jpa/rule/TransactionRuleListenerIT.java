@@ -3,20 +3,17 @@ package com.jongsoft.finance.jpa.rule;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.jpa.rule.RuleChangeJpa;
-import com.jongsoft.finance.jpa.rule.RuleConditionJpa;
-import com.jongsoft.finance.jpa.rule.RuleJpa;
 import com.jongsoft.finance.messaging.commands.rule.ChangeConditionCommand;
 import com.jongsoft.finance.messaging.commands.rule.ChangeRuleCommand;
 import com.jongsoft.finance.messaging.commands.rule.ReorderRuleCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 
 class TransactionRuleListenerIT extends JpaTestSetup {

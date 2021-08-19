@@ -1,11 +1,9 @@
 package com.jongsoft.finance.bpmn.listeners;
 
-import javax.inject.Singleton;
-
+import jakarta.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton

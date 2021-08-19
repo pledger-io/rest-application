@@ -15,18 +15,17 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -50,7 +49,7 @@ public class BudgetResource {
             summary = "First budget start",
             description = "Computes the date of the start of the first budget registered in FinTrack"
     )
-    Maybe<LocalDate> firstBudget() {
+    Mono<LocalDate> firstBudget() {
         return budgetProvider.first()
                 .map(Budget::getStart);
     }
@@ -64,7 +63,7 @@ public class BudgetResource {
                     @Parameter(name = "month", in = ParameterIn.PATH, schema = @Schema(implementation = Integer.class, description = "The month"))
             }
     )
-    Single<BudgetResponse> budget(@PathVariable int year, @PathVariable int month) {
+    Mono<BudgetResponse> budget(@PathVariable int year, @PathVariable int month) {
         return budgetProvider.lookup(year, month)
                 .map(BudgetResponse::new);
     }
@@ -87,14 +86,14 @@ public class BudgetResource {
             summary = "Create budget",
             description = "Create a new budget in the system with the provided start date"
     )
-    Single<BudgetResponse> create(@Valid @Body BudgetCreateRequest budgetCreateRequest) {
+    Mono<BudgetResponse> create(@Valid @Body BudgetCreateRequest budgetCreateRequest) {
         LocalDate startDate = LocalDate.of(budgetCreateRequest.getYear(), budgetCreateRequest.getMonth(), 1);
 
-        return Single.create(
+        return Mono.create(
                 emitter -> {
                     var budget = currentUserProvider.currentUser()
                             .createBudget(startDate, budgetCreateRequest.getIncome());
-                    emitter.onSuccess(new BudgetResponse(budget));
+                    emitter.success(new BudgetResponse(budget));
                 });
     }
 
@@ -103,7 +102,7 @@ public class BudgetResource {
             summary = "Index budget",
             description = "Indexing a budget will change it expenses and expected income by a percentage"
     )
-    Single<BudgetResponse> index(@Valid @Body BudgetCreateRequest budgetUpdateRequest) {
+    Mono<BudgetResponse> index(@Valid @Body BudgetCreateRequest budgetUpdateRequest) {
         var startDate = LocalDate.of(budgetUpdateRequest.getYear(), budgetUpdateRequest.getMonth(), 1);
 
         return budgetProvider.lookup(budgetUpdateRequest.getYear(), budgetUpdateRequest.getMonth())
@@ -116,7 +115,7 @@ public class BudgetResource {
             summary = "Create expense",
             description = "Add a new expense to all existing budgets"
     )
-    Single<BudgetResponse> createExpense(@Valid @Body ExpenseCreateRequest createRequest) {
+    Mono<BudgetResponse> createExpense(@Valid @Body ExpenseCreateRequest createRequest) {
         var now = LocalDate.now();
 
         return budgetProvider.lookup(now.getYear(), now.getMonthValue())
@@ -136,7 +135,7 @@ public class BudgetResource {
         var dateRange = DateUtils.forMonth(year, month);
 
         return budgetProvider.lookup(year, month)
-                .flatMapPublisher(budget -> Flowable.fromIterable(budget.getExpenses()))
+                .flatMapMany(budget -> Flux.fromIterable(budget.getExpenses()))
                 .filter(expense -> expense.getId() == id)
                 .map(expense -> {
                     var filter = filterFactory.transaction()

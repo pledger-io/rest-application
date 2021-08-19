@@ -17,8 +17,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.test.StepVerifier;
 
 import java.util.Objects;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TransactionTagResourceTest extends TestSetup {
 
@@ -54,9 +57,11 @@ class TransactionTagResourceTest extends TestSetup {
 
     @Test
     void create() {
-        var response = subject.create(new TagCreateRequest("Sample tag")).blockingGet();
-
-        Assertions.assertThat(response.getName()).isEqualTo("Sample tag");
+        StepVerifier.create(subject.create(new TagCreateRequest("Sample tag")))
+                .assertNext(response -> {
+                    assertThat(response.getName()).isEqualTo("Sample tag");
+                })
+                .verifyComplete();
 
         Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateTagCommand.class));
     }
@@ -68,12 +73,10 @@ class TransactionTagResourceTest extends TestSetup {
                         new Tag("Sample"),
                         new Tag("Description")));
 
-        subject.list()
-                .test()
-                .assertComplete()
-                .assertValueCount(2)
-                .assertValueAt(0, value -> Objects.equals("Sample", value.getName()))
-                .assertValueAt(1, value -> Objects.equals("Description", value.getName()));
+        StepVerifier.create(subject.list())
+                .assertNext(value -> assertThat(value.getName()).isEqualTo("Sample"))
+                .assertNext(value -> assertThat(value.getName()).isEqualTo("Description"))
+                .verifyComplete();
     }
 
     @Test
@@ -81,10 +84,9 @@ class TransactionTagResourceTest extends TestSetup {
         Mockito.when(tagProvider.lookup(Mockito.any(TagProvider.FilterCommand.class))).thenReturn(
                 ResultPage.of(new Tag("Sample")));
 
-        var response = subject.autoCompleteTag("samp").test();
-
-        response.assertComplete();
-        response.assertValueCount(1);
+        StepVerifier.create(subject.autoCompleteTag("samp"))
+                .expectNextCount(1)
+                .verifyComplete();
 
         var mockFilter = filterFactory.tag();
         Mockito.verify(tagProvider).lookup(Mockito.any(TagProvider.FilterCommand.class));

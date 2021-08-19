@@ -2,28 +2,28 @@ package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
+import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
 import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.domain.transaction.*;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.core.reflect.ReflectionUtils;
-import io.reactivex.Single;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -80,7 +80,7 @@ public class ScheduledTransactionIT extends ProcessTestSetup {
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);
             String token = UUID.randomUUID().toString();
-            Mockito.when(storageService.read(token)).thenReturn(Single.just(original));
+            Mockito.when(storageService.read(token)).thenReturn(Mono.just(original));
             return token;
         });
     }

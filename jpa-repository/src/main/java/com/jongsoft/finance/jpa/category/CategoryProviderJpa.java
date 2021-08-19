@@ -8,12 +8,11 @@ import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-import io.reactivex.Maybe;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import reactor.core.publisher.Mono;
 
 @Singleton
 @Named("categoryProvider")
@@ -34,7 +33,7 @@ public class CategoryProviderJpa implements CategoryProvider {
     }
 
     @Override
-    public Maybe<Category> lookup(String label) {
+    public Mono<Category> lookup(String label) {
         var hql = """
                 select c from CategoryJpa c
                 where c.label = :label

@@ -1,15 +1,14 @@
 package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
 
 class ExpenseProviderJpaIT extends JpaTestSetup {
 

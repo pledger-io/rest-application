@@ -5,16 +5,17 @@ import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.providers.UserProvider;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.security.authentication.*;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Singleton
@@ -29,7 +30,7 @@ public class FintrackAuthenticationProvider implements AuthenticationProvider {
             final HttpRequest<?> httpRequest,
             final AuthenticationRequest<?, ?> authenticationRequest) {
         log.info("Authentication request for user {}", authenticationRequest.getIdentity());
-        return Flowable.create(emitter -> {
+        return Flux.create(emitter -> {
 
             var authenticated = userProvider.lookup(
                     authenticationRequest.getIdentity().toString());
@@ -46,15 +47,15 @@ public class FintrackAuthenticationProvider implements AuthenticationProvider {
                     } else {
                         userAccount.getRoles().map(Role::getName).forEach(roles::add);
                     }
-
-                    emitter.onNext(new UserDetails(userAccount.getUsername(), roles));
-                    emitter.onComplete();
+                    emitter.next((AuthenticationResponse) () ->
+                            Optional.of(new ServerAuthentication(userAccount.getUsername(), roles, Map.of())));
+                    emitter.complete();
                 } else {
-                    emitter.onNext(new AuthenticationFailed(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH));
+                    emitter.next(new AuthenticationFailed(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH));
                 }
             } else {
-                emitter.onNext(new AuthenticationFailed(AuthenticationFailureReason.USER_NOT_FOUND));
+                emitter.next(new AuthenticationFailed(AuthenticationFailureReason.USER_NOT_FOUND));
             }
-        }, BackpressureStrategy.ERROR);
+        });
     }
 }

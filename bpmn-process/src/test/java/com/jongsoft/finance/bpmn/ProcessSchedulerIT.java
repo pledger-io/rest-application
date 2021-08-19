@@ -1,12 +1,11 @@
 package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.schedule.Periodicity;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;

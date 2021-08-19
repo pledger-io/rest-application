@@ -8,8 +8,10 @@ import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.lang.collection.Sequence;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString(of = {"accountId", "headers", "dateFormat", "delimiter"})
 public class ImportConfigJson implements Serializable {
 
     public enum MappingRole {

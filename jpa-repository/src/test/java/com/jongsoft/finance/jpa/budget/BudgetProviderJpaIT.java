@@ -1,14 +1,14 @@
 package com.jongsoft.finance.jpa.budget;
 
-import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.inject.Inject;
 import java.io.IOException;
 
 class BudgetProviderJpaIT extends JpaTestSetup {
@@ -37,7 +37,7 @@ class BudgetProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_201901() throws IOException {
         setup();
-        var check = budgetProvider.lookup(2019, 1).blockingGet();
+        var check = budgetProvider.lookup(2019, 1).block();
 
         Assertions.assertThat(check.getExpenses()).hasSize(2);
         Assertions.assertThat(check.getExpectedIncome()).isEqualTo(2500);
@@ -46,7 +46,7 @@ class BudgetProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_202001() throws IOException {
         setup();
-        var check = budgetProvider.lookup(2020, 1).blockingGet();
+        var check = budgetProvider.lookup(2020, 1).block();
 
         Assertions.assertThat(check.getExpenses()).hasSize(2);
         Assertions.assertThat(check.getExpectedIncome()).isEqualTo(2800);
@@ -55,7 +55,7 @@ class BudgetProviderJpaIT extends JpaTestSetup {
     @Test
     void first() throws IOException {
         setup();
-        var check = budgetProvider.first().blockingGet();
+        var check = budgetProvider.first().block();
 
         Assertions.assertThat(check.getExpenses()).hasSize(2);
         Assertions.assertThat(check.getExpectedIncome()).isEqualTo(2500);

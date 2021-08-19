@@ -5,12 +5,11 @@ import com.jongsoft.finance.messaging.EventBus;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
 
 @MicronautTest(startApplication = false)
 class ProcessTestSetup {

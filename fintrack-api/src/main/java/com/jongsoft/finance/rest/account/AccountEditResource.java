@@ -11,8 +11,6 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -20,10 +18,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.MonoSink;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
+import java.util.function.Consumer;
 
 @Controller("/api/accounts/{accountId}")
 @Tag(name = "Account information")
@@ -51,12 +52,12 @@ public class AccountEditResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Single<AccountResponse> get(@PathVariable long accountId) {
-        return Single.create(emitter -> {
+    Mono<AccountResponse> get(@PathVariable long accountId) {
+        return Mono.create(emitter -> {
             accountProvider.lookup(accountId)
                     .map(AccountResponse::new)
-                    .ifPresent(emitter::onSuccess)
-                    .elseRun(() -> emitter.onError(StatusException.notFound("Account not found")));
+                    .ifPresent((Consumer<AccountResponse>) emitter::success)
+                    .elseRun(() -> emitter.error(StatusException.notFound("Account not found")));
         });
     }
 
@@ -77,10 +78,10 @@ public class AccountEditResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Single<HttpResponse<AccountResponse>> update(
+    Mono<HttpResponse<AccountResponse>> update(
             @PathVariable long accountId,
             @Valid @Body AccountEditRequest accountEditRequest) {
-        return Single.create(emitter -> {
+        return Mono.create(emitter -> {
             var accountOption = getOrFail(emitter, accountId);
 
             if (accountOption.isPresent()) {
@@ -101,7 +102,7 @@ public class AccountEditResource {
                     account.interest(accountEditRequest.getInterest(), accountEditRequest.getInterestPeriodicity());
                 }
 
-                emitter.onSuccess(HttpResponse.ok(new AccountResponse(account)));
+                emitter.success(HttpResponse.ok(new AccountResponse(account)));
             }
         });
     }
@@ -117,19 +118,19 @@ public class AccountEditResource {
                     in = ParameterIn.PATH,
                     schema = @Schema(implementation = Long.class))
     )
-    Single<AccountResponse> persistImage(
+    Mono<AccountResponse> persistImage(
             @PathVariable long accountId,
             @Body @Valid AccountImageRequest imageRequest) {
-        return Single.create(emitter -> {
+        return Mono.create(emitter -> {
             var accountPromise = accountProvider.lookup(accountId);
 
             if (accountPromise.isPresent()) {
                 accountPromise.get()
                         .registerIcon(imageRequest.getFileCode());
 
-                emitter.onSuccess(new AccountResponse(accountPromise.get()));
+                emitter.success(new AccountResponse(accountPromise.get()));
             } else {
-                emitter.onError(StatusException.notFound("Could not find account"));
+                emitter.error(StatusException.notFound("Could not find account"));
             }
         });
     }
@@ -147,27 +148,27 @@ public class AccountEditResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Single<HttpResponse<Void>> delete(@PathVariable long accountId) {
-        return Single.create(emitter -> {
+    Mono<HttpResponse<Void>> delete(@PathVariable long accountId) {
+        return Mono.create(emitter -> {
             var account = accountProvider.lookup(accountId)
                     .filter(a -> a.getUser().getId().equals(currentUserProvider.currentUser().getId()));
             if (account.isPresent()) {
                 account.get().terminate();
-                emitter.onSuccess(HttpResponse.noContent());
+                emitter.success(HttpResponse.noContent());
             } else {
-                emitter.onSuccess(HttpResponse.notFound());
+                emitter.success(HttpResponse.notFound());
             }
         });
     }
 
-    private Optional<Account> getOrFail(SingleEmitter<HttpResponse<AccountResponse>> emitter, long accountId) {
+    private Optional<Account> getOrFail(MonoSink<HttpResponse<AccountResponse>> emitter, long accountId) {
         var accountOption = accountProvider.lookup(accountId);
 
         if (!accountOption.isPresent()) {
-            emitter.onSuccess(HttpResponse.notFound());
+            emitter.success(HttpResponse.notFound());
             return Control.Option();
         } else if (!accountOption.get().getUser().getId().equals(currentUserProvider.currentUser().getId())) {
-            emitter.onSuccess(HttpResponse.unauthorized());
+            emitter.success(HttpResponse.unauthorized());
             return Control.Option();
         }
 

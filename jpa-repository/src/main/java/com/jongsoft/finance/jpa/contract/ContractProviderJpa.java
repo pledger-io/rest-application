@@ -10,11 +10,12 @@ import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Singleton
@@ -50,7 +51,7 @@ public class ContractProviderJpa implements ContractProvider {
     }
 
     @Override
-    public Maybe<Contract> lookup(String name) {
+    public Mono<Contract> lookup(String name) {
         log.trace("Contract lookup by name: {}", name);
 
         var hql = """
@@ -68,7 +69,7 @@ public class ContractProviderJpa implements ContractProvider {
     }
 
     @Override
-    public Flowable<Contract> search(String partialName) {
+    public Flux<Contract> search(String partialName) {
         log.trace("Contract lookup by partial name: {}", partialName);
 
         var hql = """

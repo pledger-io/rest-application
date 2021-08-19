@@ -8,10 +8,10 @@ import com.jongsoft.finance.messaging.commands.storage.ReplaceFileCommand;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.Encryption;
 import com.jongsoft.lang.Control;
-import io.reactivex.Single;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -68,8 +68,8 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public Single<byte[]> read(String token) {
-        return Single.create(emitter -> {
+    public Mono<byte[]> read(String token) {
+        return Mono.create(emitter -> {
             try {
                 var readResult = Files.readAllBytes(uploadRootDirectory.resolve(token));
 
@@ -79,11 +79,11 @@ public class StorageServiceImpl implements StorageService {
                             currentUserProvider.currentUser().getSecret());
                 }
 
-                emitter.onSuccess(readResult);
+                emitter.success(readResult);
             } catch (IOException e) {
-                emitter.onError(StatusException.notFound("Cannot locate content for token " + token));
+                emitter.error(StatusException.notFound("Cannot locate content for token " + token));
             } catch (IllegalStateException e) {
-                emitter.onError(StatusException.notAuthorized("Cannot access file with token " + token));
+                emitter.error(StatusException.notAuthorized("Cannot access file with token " + token));
             }
         });
     }

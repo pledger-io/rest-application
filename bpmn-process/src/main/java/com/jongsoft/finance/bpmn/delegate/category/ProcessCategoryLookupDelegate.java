@@ -2,13 +2,15 @@ package com.jongsoft.finance.bpmn.delegate.category;
 
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.providers.CategoryProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate will lookup a {@link Category} in the system.
@@ -45,7 +47,7 @@ public class ProcessCategoryLookupDelegate implements JavaDelegate {
         if (execution.hasVariableLocal("name")) {
             var label = (String) execution.getVariableLocal("name");
 
-            category = categoryProvider.lookup(label).blockingGet();
+            category = categoryProvider.lookup(label).block(Duration.of(500, ChronoUnit.MILLIS));
         } else {
             category = categoryProvider.lookup((Long) execution.getVariableLocal("id"))
                     .get();

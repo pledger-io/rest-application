@@ -5,13 +5,12 @@ import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.control.Optional;
-import io.reactivex.Flowable;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import reactor.core.publisher.Flux;
 
 @Slf4j
 @Singleton
@@ -23,7 +22,7 @@ public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProv
     private final ReactiveEntityManager entityManager;
 
     @Override
-    public Flowable<TransactionRuleGroup> lookup() {
+    public Flux<TransactionRuleGroup> lookup() {
         log.trace("TransactionRuleGroup listing");
 
         var hql = """

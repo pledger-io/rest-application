@@ -17,8 +17,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ScheduledTransactionResourceTest extends TestSetup {
 
@@ -65,10 +68,9 @@ class ScheduledTransactionResourceTest extends TestSetup {
 
     @Test
     void list() {
-        subject.list().test()
-                .assertValueCount(1)
-                .assertComplete()
-                .assertValue(el -> "Monthly gym membership".equalsIgnoreCase(el.getName()));
+        StepVerifier.create(subject.list())
+                .assertNext(response -> assertThat(response.getName()).isEqualTo("Monthly gym membership"))
+                .verifyComplete();
     }
 
     @Test
@@ -88,25 +90,24 @@ class ScheduledTransactionResourceTest extends TestSetup {
                         .name("Sample schedule")
                         .build()));
 
-        var response = subject.create(request)
-                .blockingGet();
-
-        Assertions.assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.CREATED.getCode());
-
+        StepVerifier.create(subject.create(request))
+                .assertNext(response -> assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.CREATED.getCode()))
+                .verifyComplete();
     }
 
     @Test
     void get() {
-        var response = subject.get(1L)
-                .blockingGet();
+        StepVerifier.create(subject.get(1L))
+                .assertNext(response -> {
+                    assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
 
-        Assertions.assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
-
-        var actual = response.getBody().get();
-        Assertions.assertThat(actual.getName()).isEqualTo("Monthly gym membership");
-        Assertions.assertThat(actual.getDescription()).isEqualTo("Gym membership");
-        Assertions.assertThat(actual.getRange().getStart()).isEqualTo(LocalDate.parse("2019-01-01"));
-        Assertions.assertThat(actual.getRange().getEnd()).isEqualTo(LocalDate.parse("2021-01-01"));
+                    var actual = response.getBody().get();
+                    assertThat(actual.getName()).isEqualTo("Monthly gym membership");
+                    assertThat(actual.getDescription()).isEqualTo("Gym membership");
+                    assertThat(actual.getRange().getStart()).isEqualTo(LocalDate.parse("2019-01-01"));
+                    assertThat(actual.getRange().getEnd()).isEqualTo(LocalDate.parse("2021-01-01"));
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -119,9 +120,12 @@ class ScheduledTransactionResourceTest extends TestSetup {
                         LocalDate.of(2022, 1, 1)))
                 .build();
 
-        var response = subject.patch(1L, request).blockingGet();
+        StepVerifier.create(subject.patch(1L, request))
+                .assertNext(response -> {
+                    assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
 
-        Assertions.assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
+                })
+                .verifyComplete();
 
         Mockito.verify(scheduledTransaction).describe("New name", "Updated description");
         Mockito.verify(scheduledTransaction).limit(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1));
@@ -131,7 +135,7 @@ class ScheduledTransactionResourceTest extends TestSetup {
     void remove() {
         var response = subject.remove(1L);
 
-        Assertions.assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
+        assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
 
         Mockito.verify(scheduledTransaction).terminate();
     }
@@ -140,6 +144,6 @@ class ScheduledTransactionResourceTest extends TestSetup {
     void remove_notFound() {
         var response = subject.remove(2L);
 
-        Assertions.assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
+        assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
     }
 }

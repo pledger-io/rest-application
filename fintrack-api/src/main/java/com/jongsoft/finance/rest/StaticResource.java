@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -11,11 +12,12 @@ import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,7 +38,7 @@ public class StaticResource {
 
     @Get("/favicon.ico")
     @Operation(hidden = true)
-    public Single<HttpResponse<?>> favicon() {
+    public Publisher<HttpResponse<?>> favicon() {
         return resource("assets/favicon.ico");
     }
 
@@ -56,27 +58,31 @@ public class StaticResource {
 
     @Operation(hidden = true)
     @Get("/ui/{path:(.+)\\.[\\w]+$}")
-    public Single<HttpResponse<?>> resource(@PathVariable String path) {
+    public Publisher<HttpResponse<?>> resource(@PathVariable String path) {
         log.info("Loading static resource: {}", path);
 
-        return Single.create(emitter -> {
+        return Mono.create(emitter -> {
             var actualResource = res.getResource("classpath:public/" + path);
             if (actualResource.isEmpty()) {
-                emitter.onSuccess(HttpResponse.notFound(
+                emitter.success(HttpResponse.notFound(
                         "Resource at path " + path  + " is not found on the server"));
             } else {
-                emitter.onSuccess(loadFromUri(actualResource.get()));
+                emitter.success(loadFromUri(actualResource.get()));
             }
         });
     }
 
-    private HttpResponse<?> loadFromUri(URL uri) throws IOException {
+    private HttpResponse<?> loadFromUri(URL uri) {
         var streamedFile = new StreamedFile(uri);
 
-        return HttpResponse.ok(
-                streamedFile.getInputStream().readAllBytes())
-                .contentType(streamedFile.getMediaType())
-                .characterEncoding("utf-8");
+        try {
+            return HttpResponse.ok(
+                    streamedFile.getInputStream().readAllBytes())
+                    .contentType(streamedFile.getMediaType())
+                    .characterEncoding("utf-8");
+        } catch (IOException e) {
+            throw StatusException.internalError(e.getMessage());
+        }
     }
 
 }

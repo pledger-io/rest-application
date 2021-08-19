@@ -8,6 +8,7 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.HistoryService;
@@ -18,7 +19,6 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 

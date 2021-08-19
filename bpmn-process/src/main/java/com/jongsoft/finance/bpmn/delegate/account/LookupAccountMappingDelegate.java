@@ -4,14 +4,16 @@ import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.providers.AccountProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 /**
@@ -72,7 +74,7 @@ public class LookupAccountMappingDelegate implements JavaDelegate {
         var fileCode = execution.getVariable("accountMapping").toString();
 
         var rawValue = storageService.read(fileCode)
-                .blockingGet();
+                .block(Duration.of(500, ChronoUnit.MILLIS));
         return ProcessMapper.INSTANCE.readValue(rawValue, Map.class);
     }
 

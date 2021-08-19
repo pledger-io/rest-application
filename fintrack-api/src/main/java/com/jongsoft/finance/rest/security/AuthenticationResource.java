@@ -9,28 +9,29 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.TwoFactorHelper;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.http.*;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.AuthenticationProvider;
-import io.micronaut.security.authentication.UserDetails;
+import io.micronaut.security.authentication.ClientAuthentication;
 import io.micronaut.security.event.LoginSuccessfulEvent;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.jwt.generator.AccessRefreshTokenGenerator;
 import io.micronaut.security.token.jwt.render.AccessRefreshToken;
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureConfiguration;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
@@ -61,32 +62,31 @@ public class AuthenticationResource {
             responseCode = "200",
             description = "Successfully authenticated",
             content = @Content(schema = @Schema(implementation = AccessRefreshToken.class)))
-    public Single<MutableHttpResponse<?>> authenticate(
+    public Publisher<MutableHttpResponse<?>> authenticate(
             HttpRequest<?> request,
             @Valid @Body AuthenticationRequest authenticationRequest) {
-        var response = Flowable.fromPublisher(
-                authenticationProvider.authenticate(request, authenticationRequest));
+        return Publishers.map(
+                authenticationProvider.authenticate(request, authenticationRequest),
+                authenticated -> {
+                    if (authenticated.isAuthenticated() && authenticated.getAuthentication().isPresent()) {
+                        var userDetails = authenticated.getAuthentication().get();
+                        var refresh = UUID.randomUUID().toString();
 
-        return response.map(authenticated -> {
-            if (authenticated.isAuthenticated() && authenticated.getUserDetails().isPresent()) {
-                var userDetails = authenticated.getUserDetails().get();
-                var refresh = UUID.randomUUID().toString();
+                        eventPublisher.publishEvent(new LoginSuccessfulEvent(userDetails));
+                        var refreshToken = accessRefreshTokenGenerator.generate(refresh, userDetails);
+                        if (refreshToken.isPresent()) {
+                            var actualToken = refreshToken.get();
+                            application.registerToken(
+                                    userDetails.getName(),
+                                    actualToken.getRefreshToken(),
+                                    actualToken.getExpiresIn());
 
-                eventPublisher.publishEvent(new LoginSuccessfulEvent(userDetails));
-                var refreshToken = accessRefreshTokenGenerator.generate(refresh, userDetails);
-                if (refreshToken.isPresent()) {
-                    var actualToken = refreshToken.get();
-                    application.registerToken(
-                            userDetails.getUsername(),
-                            actualToken.getRefreshToken(),
-                            actualToken.getExpiresIn());
+                            return HttpResponse.ok(actualToken);
+                        }
+                    }
 
-                    return HttpResponse.ok(actualToken);
-                }
-            }
-
-            return HttpResponse.unauthorized();
-        }).first(HttpResponse.unauthorized());
+                    return HttpResponse.unauthorized();
+                });
     }
 
     @ApiDefaults
@@ -108,8 +108,8 @@ public class AuthenticationResource {
 
     @Post("/api/security/2-factor")
     @Secured("PRE_VERIFICATION_USER")
-    public Single<MutableHttpResponse<AccessRefreshToken>> mfaValidate(@Valid @Body MultiFactorRequest request) {
-        return Single.just(userProvider.lookup(authenticationFacade.authenticated())
+    public Publisher<MutableHttpResponse<AccessRefreshToken>> mfaValidate(@Valid @Body MultiFactorRequest request) {
+        return Mono.just(userProvider.lookup(authenticationFacade.authenticated())
                 .filter(user -> TwoFactorHelper.verifySecurityCode(user.getSecret(), request.getVerificationCode()))
                 .map(this::createAccessToken)
                 .getOrSupply(HttpResponse::unauthorized));
@@ -123,10 +123,10 @@ public class AuthenticationResource {
             description = "Renew the JWT token if it is about to expire",
             operationId = "refreshToken"
     )
-    public Single<MutableHttpResponse<AccessRefreshToken>> refresh(@Body @Valid TokenRefreshRequest request) {
+    public Publisher<MutableHttpResponse<AccessRefreshToken>> refresh(@Body @Valid TokenRefreshRequest request) {
         return userProvider.refreshToken(request.getToken())
                 .map(this::createAccessToken)
-                .switchIfEmpty(Single.just(HttpResponse.unauthorized()));
+                .switchIfEmpty(Mono.just(HttpResponse.unauthorized()));
     }
 
     @Secured(SecurityRule.IS_ANONYMOUS)
@@ -137,9 +137,9 @@ public class AuthenticationResource {
     }
 
     private MutableHttpResponse<AccessRefreshToken> createAccessToken(UserAccount user) {
-        var userDetails = new UserDetails(
+        var userDetails = new ClientAuthentication(
                 user.getUsername(),
-                Collections.List(user.getRoles()).map(Role::getName).toJava());
+                Map.of("rolesKey", Collections.List(user.getRoles()).map(Role::getName).toJava()));
         var refresh = UUID.randomUUID().toString();
 
         return accessRefreshTokenGenerator.generate(refresh, userDetails)

@@ -17,13 +17,13 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-import io.reactivex.Maybe;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -38,7 +38,7 @@ public class TransactionProviderJpa implements TransactionProvider {
     private final ReactiveEntityManager entityManager;
 
     @Override
-    public Maybe<Transaction> first(FilterCommand filter) {
+    public Mono<Transaction> first(FilterCommand filter) {
         log.trace("Transaction locate first with filter: {}", filter);
 
         if (filter instanceof TransactionFilterCommand delegate) {

@@ -1,12 +1,12 @@
 package com.jongsoft.finance.providers;
 
-import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import com.jongsoft.lang.time.Range;
-import io.reactivex.Maybe;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -123,7 +123,7 @@ public interface TransactionProvider extends DataProvider<Transaction> {
         double summary();
     }
 
-    Maybe<Transaction> first(FilterCommand filter);
+    Mono<Transaction> first(FilterCommand filter);
 
     ResultPage<Transaction> lookup(FilterCommand filter);
 

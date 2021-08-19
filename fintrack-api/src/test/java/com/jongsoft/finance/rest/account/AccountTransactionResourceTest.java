@@ -1,24 +1,25 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.providers.TransactionProvider;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
-import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -94,7 +95,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .dateRange(new AccountTransactionSearchRequest.Range())
                 .build();
 
-        var response = subject.search(1L, request).blockingGet();
+        var response = subject.search(1L, request).block();
 
         Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
 
@@ -106,7 +107,7 @@ class AccountTransactionResourceTest extends TestSetup {
     void search_notfound() {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option());
 
-        var response = subject.search(1L, new AccountTransactionSearchRequest()).blockingGet();
+        var response = subject.search(1L, new AccountTransactionSearchRequest()).block();
 
         Assertions.assertThat(response.code()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
     }
@@ -130,8 +131,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .budget(new AccountTransactionCreateRequest.EntityRef(3L, null))
                 .build();
 
-        var response = subject.create(request).blockingGet();
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.CREATED.getCode());
+        subject.create(request);
 
         Mockito.verify(accountProvider).lookup(1L);
         Mockito.verify(accountProvider).lookup(2L);
@@ -175,12 +175,14 @@ class AccountTransactionResourceTest extends TestSetup {
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(transactionProvider.first(Mockito.any(TransactionProvider.FilterCommand.class)))
-                .thenReturn(Maybe.just(transaction));
+                .thenReturn(Mono.just(transaction));
 
-        var response = subject.first(1L, null).blockingGet();
-
-        Assertions.assertThat(response.getId()).isEqualTo(1L);
-        Assertions.assertThat(response.getAmount()).isEqualTo(20D);
+        StepVerifier.create(subject.first(1L, null))
+                .assertNext(response -> {
+                    Assertions.assertThat(response.getId()).isEqualTo(1L);
+                    Assertions.assertThat(response.getAmount()).isEqualTo(20D);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -217,15 +219,17 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
-        var response = subject.get(123L).blockingGet();
+        StepVerifier.create(subject.get(123L))
+                .assertNext(response -> {
+                    Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
 
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
-
-        var content = response.body();
-        Assertions.assertThat(content.getId()).isEqualTo(1L);
-        Assertions.assertThat(content.getAmount()).isEqualTo(20D);
-        Assertions.assertThat(content.getDescription()).isEqualTo("Sample transaction");
-        Assertions.assertThat(content.getCurrency()).isEqualTo("EUR");
+                    var content = response.body();
+                    Assertions.assertThat(content.getId()).isEqualTo(1L);
+                    Assertions.assertThat(content.getAmount()).isEqualTo(20D);
+                    Assertions.assertThat(content.getDescription()).isEqualTo("Sample transaction");
+                    Assertions.assertThat(content.getCurrency()).isEqualTo("EUR");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -279,7 +283,9 @@ class AccountTransactionResourceTest extends TestSetup {
                 .budget(new AccountTransactionCreateRequest.EntityRef(3L, null))
                 .build();
 
-        subject.update(123L, request).blockingGet();
+        StepVerifier.create(subject.update(123L, request))
+                .expectNextCount(1)
+                .verifyComplete();
 
         Mockito.verify(transaction).changeAmount(20.2D, "EUR");
         Mockito.verify(transaction).changeAccount(true, account);
@@ -302,9 +308,9 @@ class AccountTransactionResourceTest extends TestSetup {
                 .build();
 
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option());
-        subject.split(123L, request)
-                .test()
-                .assertErrorMessage("No transaction found for id 123");
+        StepVerifier.create(subject.split(123L, request))
+                .expectErrorMessage("No transaction found for id 123")
+                .verify();
     }
 
     @Test
@@ -361,13 +367,15 @@ class AccountTransactionResourceTest extends TestSetup {
                 ))
                 .build();
 
-        subject.split(123L, request)
-                .test()
-                .assertComplete()
-                .assertValueCount(1)
-                .assertValue(check -> check.getSplit().get(0).getAmount() == 5D)
-                .assertValue(check -> "Part 1".equals(check.getSplit().get(0).getDescription()))
-                .assertValue(check -> "Part 2".equals(check.getSplit().get(1).getDescription()));
+        StepVerifier.create(subject.split(123L, request))
+                .assertNext(response -> {
+                    Assertions.assertThat(response.getSplit().get(0))
+                            .hasFieldOrPropertyWithValue("amount", 5D)
+                            .hasFieldOrPropertyWithValue("description", "Part 1");
+                    Assertions.assertThat(response.getSplit().get(1))
+                            .hasFieldOrPropertyWithValue("description", "Part 2");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -386,7 +394,7 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
-        subject.delete(123L).blockingGet();
+        subject.delete(123L).block();
 
         Mockito.verify(transaction).delete();
     }

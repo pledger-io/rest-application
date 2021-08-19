@@ -4,13 +4,12 @@ import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Slf4j
 @Singleton

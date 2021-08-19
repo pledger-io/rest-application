@@ -8,9 +8,9 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
 import java.io.IOException;
 
 @Tag(name = "Attachments")
@@ -40,7 +40,7 @@ public class FileResource {
     )
     byte[] download(@PathVariable String fileCode) {
         return storageService.read(fileCode)
-                .blockingGet();
+                .block();
     }
 
 }

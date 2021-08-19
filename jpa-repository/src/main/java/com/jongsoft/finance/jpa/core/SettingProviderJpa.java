@@ -7,10 +7,10 @@ import com.jongsoft.finance.jpa.core.entity.SettingJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.lang.control.Optional;
-import io.reactivex.Flowable;
+import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 
-import javax.inject.Singleton;
 import javax.transaction.Transactional;
 
 @Slf4j
@@ -24,7 +24,7 @@ public class SettingProviderJpa implements SettingProvider {
     }
 
     @Override
-    public Flowable<Setting> lookup() {
+    public Flux<Setting> lookup() {
         log.trace("Setting listing");
 
         return entityManager.<SettingJpa>reactive()

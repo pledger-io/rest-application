@@ -12,13 +12,13 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -39,8 +39,8 @@ public class TransactionTagResource {
             description = "Creates a new tag into the system",
             operationId = "createTag"
     )
-    Single<TagResponse> create(@Valid @Body TagCreateRequest tag) {
-        return Single.just(currentUserProvider.currentUser().createTag(tag.getTag()))
+    Publisher<TagResponse> create(@Valid @Body TagCreateRequest tag) {
+        return Mono.just(currentUserProvider.currentUser().createTag(tag.getTag()))
                 .map(TagResponse::new);
     }
 
@@ -50,14 +50,14 @@ public class TransactionTagResource {
             summary = "List tags",
             description = "Get all tags available in the system."
     )
-    Flowable<TagResponse> list() {
-        return Flowable.create(emitter -> {
+    Publisher<TagResponse> list() {
+        return Flux.create(emitter -> {
             tagProvider.lookup()
                     .map(TagResponse::new)
-                    .forEach(emitter::onNext);
+                    .forEach(emitter::next);
 
-            emitter.onComplete();
-        }, BackpressureStrategy.DROP);
+            emitter.complete();
+        });
     }
 
     @Get("/auto-complete{?token}")
@@ -66,14 +66,14 @@ public class TransactionTagResource {
             description = "Look for tags with the partial token in the name",
             operationId = "lookupTags"
     )
-    Flowable<TagResponse> autoCompleteTag(@Nullable String token) {
+    Publisher<TagResponse> autoCompleteTag(@Nullable String token) {
         var filter = filterFactory.tag()
                 .name(token, false)
                 .pageSize(settingProvider.getAutocompleteLimit());
 
         var response = tagProvider.lookup(filter).content();
 
-        return Flowable.fromIterable(response.map(TagResponse::new));
+        return Flux.fromIterable(response.map(TagResponse::new));
     }
 
 }

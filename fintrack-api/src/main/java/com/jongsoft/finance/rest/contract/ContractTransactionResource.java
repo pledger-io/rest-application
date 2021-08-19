@@ -15,9 +15,8 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
-
-import javax.inject.Inject;
 
 @Tag(name = "Transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)

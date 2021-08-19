@@ -15,30 +15,36 @@ import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
-import io.reactivex.subscribers.TestSubscriber;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 
 class BudgetResourceTest extends TestSetup {
 
     private BudgetResource subject;
 
-    @Mock private CurrentUserProvider currentUserProvider;
-    @Mock private BudgetProvider budgetProvider;
-    @Mock private ExpenseProvider expenseProvider;
-    @Mock private TransactionProvider transactionProvider;
-    @Mock private ApplicationEventPublisher applicationEventPublisher;
+    @Mock
+    private CurrentUserProvider currentUserProvider;
+    @Mock
+    private BudgetProvider budgetProvider;
+    @Mock
+    private ExpenseProvider expenseProvider;
+    @Mock
+    private TransactionProvider transactionProvider;
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     private FilterFactory filterFactory;
 
@@ -62,7 +68,7 @@ class BudgetResourceTest extends TestSetup {
     @Test
     void firstBudget() {
         Mockito.when(budgetProvider.first()).thenReturn(
-                Maybe.just(Budget.builder()
+                Mono.just(Budget.builder()
                         .expectedIncome(200.20D)
                         .start(LocalDate.of(2018, 2, 3))
                         .expenses(Collections.List(Budget.Expense.builder()
@@ -73,13 +79,15 @@ class BudgetResourceTest extends TestSetup {
                                 .build()))
                         .build()));
 
-        var response = subject.firstBudget();
+        StepVerifier.create(subject.firstBudget())
+                .assertNext(response -> assertThat(response).isEqualTo("2018-02-03"))
+                .verifyComplete();
     }
 
     @Test
     void budget() {
         Mockito.when(budgetProvider.lookup(2019, 1)).thenReturn(
-                Single.just(Budget.builder()
+                Mono.just(Budget.builder()
                         .expectedIncome(200.20D)
                         .start(LocalDate.of(2018, 2, 3))
                         .expenses(Collections.List(Budget.Expense.builder()
@@ -90,11 +98,13 @@ class BudgetResourceTest extends TestSetup {
                                 .build()))
                         .build()));
 
-        var response = subject.budget(2019, 1).blockingGet();
-
-        Assertions.assertThat(response.getIncome()).isEqualTo(200.20D);
-        Assertions.assertThat(response.getPeriod().getFrom()).isEqualTo(LocalDate.of(2018, 2, 3));
-        Assertions.assertThat(response.getExpenses()).hasSize(1);
+        StepVerifier.create(subject.budget(2019, 1))
+                .assertNext(response -> {
+                    assertThat(response.getIncome()).isEqualTo(200.20D);
+                    assertThat(response.getPeriod().getFrom()).isEqualTo(LocalDate.of(2018, 2, 3));
+                    assertThat(response.getExpenses()).hasSize(1);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -110,13 +120,13 @@ class BudgetResourceTest extends TestSetup {
         var response = subject.autocomplete("gro");
 
         var mockFilter = filterFactory.expense();
-        Mockito.verify(expenseProvider).lookup(Mockito.any(ExpenseProvider.FilterCommand.class));
-        Mockito.verify(mockFilter).name("gro", false);
+        verify(expenseProvider).lookup(Mockito.any(ExpenseProvider.FilterCommand.class));
+        verify(mockFilter).name("gro", false);
     }
 
     @Test
     void create() {
-        Mockito.when(budgetProvider.first()).thenReturn(Maybe.empty());
+        Mockito.when(budgetProvider.first()).thenReturn(Mono.empty());
 
         var request = BudgetCreateRequest.builder()
                 .month(2)
@@ -124,16 +134,19 @@ class BudgetResourceTest extends TestSetup {
                 .income(2300.33D)
                 .build();
 
-        var response = subject.create(request).blockingGet();
+        StepVerifier.create(subject.create(request))
+                .assertNext(response -> {
+                    assertThat(response.getPeriod().getFrom()).isEqualTo(LocalDate.of(2019, 2, 1));
+                })
+                .verifyComplete();
 
-        Assertions.assertThat(response.getPeriod().getFrom()).isEqualTo(LocalDate.of(2019, 2, 1));
-        Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateBudgetCommand.class));
+        verify(applicationEventPublisher).publishEvent(Mockito.any(CreateBudgetCommand.class));
     }
 
     @Test
     void index_noBudget() {
         Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt()))
-                .thenReturn(Single.error(StatusException.notFound("No such element")));
+                .thenReturn(Mono.error(StatusException.notFound("No such element")));
 
         var request = BudgetCreateRequest.builder()
                 .month(2)
@@ -141,7 +154,9 @@ class BudgetResourceTest extends TestSetup {
                 .income(2300.33D)
                 .build();
 
-        assertThrows(StatusException.class, () -> subject.index(request).blockingGet());
+        StepVerifier.create(subject.index(request))
+                .expectError(StatusException.class)
+                .verify();
     }
 
 
@@ -157,7 +172,7 @@ class BudgetResourceTest extends TestSetup {
                         .build())).build());
 
         Mockito.when(budgetProvider.lookup(2019, 2))
-                .thenReturn(Single.just(existingBudget));
+                .thenReturn(Mono.just(existingBudget));
 
         var request = BudgetCreateRequest.builder()
                 .month(2)
@@ -165,9 +180,11 @@ class BudgetResourceTest extends TestSetup {
                 .income(2300.33D)
                 .build();
 
-        subject.index(request).blockingGet();
+        StepVerifier.create(subject.index(request))
+                .expectNextCount(1)
+                .verifyComplete();
 
-        Mockito.verify(existingBudget).indexBudget(LocalDate.of(2019, 2, 1), 2300.33D);
+        verify(existingBudget).indexBudget(LocalDate.of(2019, 2, 1), 2300.33D);
     }
 
     @Test
@@ -183,9 +200,9 @@ class BudgetResourceTest extends TestSetup {
                         .build()))
                 .build());
 
-        Mockito.when(budgetProvider.first()).thenReturn(Maybe.just(Budget.builder().start(LocalDate.MIN).build()));
+        Mockito.when(budgetProvider.first()).thenReturn(Mono.just(Budget.builder().start(LocalDate.MIN).build()));
         Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt())).thenReturn(
-                Single.just(budget));
+                Mono.just(budget));
 
         var request = ExpenseCreateRequest.builder()
                 .name("My new expense")
@@ -193,16 +210,19 @@ class BudgetResourceTest extends TestSetup {
                 .upperBound(40)
                 .build();
 
-        var response = subject.createExpense(request).blockingGet();
+        StepVerifier.create(subject.createExpense(request))
+                .assertNext(response -> {
+                    assertThat(response.getExpenses()).hasSize(2);
+                })
+                .verifyComplete();
 
-        Mockito.verify(budget).createExpense("My new expense", 20, 40);
-        Assertions.assertThat(response.getExpenses()).hasSize(2);
+        verify(budget).createExpense("My new expense", 20, 40);
     }
 
     @Test
     void createExpense_noBudget() {
         Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt()))
-                .thenReturn(Single.error(StatusException.notFound("No such element")));
+                .thenReturn(Mono.error(StatusException.notFound("No such element")));
 
         var request = ExpenseCreateRequest.builder()
                 .name("My new expense")
@@ -210,14 +230,16 @@ class BudgetResourceTest extends TestSetup {
                 .upperBound(40)
                 .build();
 
-        assertThrows(StatusException.class, () -> subject.createExpense(request).blockingGet());
+        StepVerifier.create(subject.createExpense(request))
+                .expectError(StatusException.class)
+                .verify();
     }
 
     @Test
     void computeExpense() {
-        Mockito.when(budgetProvider.first()).thenReturn(Maybe.just(Budget.builder().start(LocalDate.MIN).build()));
+        Mockito.when(budgetProvider.first()).thenReturn(Mono.just(Budget.builder().start(LocalDate.MIN).build()));
         Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt())).thenReturn(
-                Single.just(Budget.builder()
+                Mono.just(Budget.builder()
                         .expectedIncome(200.20D)
                         .start(LocalDate.of(2018, 2, 3))
                         .expenses(Collections.List(Budget.Expense.builder()
@@ -229,13 +251,8 @@ class BudgetResourceTest extends TestSetup {
                         .build()));
         Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option(BigDecimal.valueOf(200)));
 
-        TestSubscriber<ComputedExpenseResponse> testSubscriber = new TestSubscriber<>();
-
-        subject.computeExpense(1, 2019, 1)
-                .subscribe(testSubscriber);
-
-        testSubscriber.assertComplete();
-        testSubscriber.assertValueCount(1);
-        testSubscriber.assertResult(new ComputedExpenseResponse(35, 200, DateUtils.forMonth(2019, 1)));
+        StepVerifier.create(subject.computeExpense(1, 2019, 1))
+                .expectNext(new ComputedExpenseResponse(35, 200, DateUtils.forMonth(2019, 1)))
+                .verifyComplete();
     }
 }

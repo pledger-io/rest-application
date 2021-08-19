@@ -3,10 +3,10 @@ package com.jongsoft.finance.jpa.reactive;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.lang.collection.Map;
 import io.micronaut.transaction.SynchronousTransactionManager;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.persistence.EntityManager;
 import java.sql.Connection;
 
