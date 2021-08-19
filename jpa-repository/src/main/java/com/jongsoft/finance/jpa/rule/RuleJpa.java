@@ -2,12 +2,7 @@ package com.jongsoft.finance.jpa.rule;
 
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;

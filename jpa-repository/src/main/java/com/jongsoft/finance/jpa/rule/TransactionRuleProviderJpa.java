@@ -49,8 +49,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
                 .hql("from RuleJpa where id = :id and user.username = :username")
                 .set("id", id)
                 .set("username", authenticationFacade.authenticated())
-                .maybe()
-                .map(this::convert);
+                .maybe(this::convert);
     }
 
     @Override
