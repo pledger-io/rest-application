@@ -4,6 +4,7 @@ import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.SystemAccountTypes;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.user.UserAccount;
@@ -16,7 +17,9 @@ import com.jongsoft.lang.Control;
 import lombok.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 @Getter
@@ -226,6 +229,21 @@ public class Account implements AggregateBase, Serializable {
                 description,
                 start,
                 end);
+    }
+
+    /**
+     * Create a new saving goal for the account. This can only be done for accounts of type SAVING or COMBINED_SAVING.
+     *
+     * @return the newly created saving goal
+     */
+    @BusinessMethod
+    public SavingGoal createSavingGoal(String name, BigDecimal goal, LocalDate targetDate) {
+        if (!Collections.List("savings", "joined_savings").contains(type.toLowerCase())) {
+            throw StatusException.badRequest(
+                    "Cannot add a savings goal to account " + id + " it is of unsupported type " + type);
+        }
+
+        return new SavingGoal(this, name, goal, targetDate);
     }
 
     /**

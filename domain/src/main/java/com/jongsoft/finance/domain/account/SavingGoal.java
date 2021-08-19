@@ -5,9 +5,7 @@ import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.messaging.commands.savings.AdjustSavingGoalCommand;
-import com.jongsoft.finance.messaging.commands.savings.AdjustScheduleCommand;
-import com.jongsoft.finance.messaging.commands.savings.CompleteSavingGoalCommand;
+import com.jongsoft.finance.messaging.commands.savings.*;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedulable;
 import com.jongsoft.finance.schedule.Schedule;
@@ -37,14 +35,21 @@ public class SavingGoal implements AggregateBase {
     private Schedule schedule;
 
     SavingGoal(Account account, String name, BigDecimal goal, LocalDate targetDate) {
+        if (!account.isManaged()) {
+            throw StatusException.badRequest("Cannot create a savings goal if the account is not owned by the user.");
+        }
+
         this.account = Objects.requireNonNull(account, "Account cannot be empty.");
         this.goal = goal;
         this.targetDate = targetDate;
         this.name = name;
 
-        if (!account.isManaged()) {
-            throw StatusException.badRequest("Cannot create a savings goal if the account is not owned by the user.");
-        }
+        EventBus.getBus()
+                .send(new CreateSavingGoalCommand(
+                        account.getId(),
+                        name,
+                        goal,
+                        targetDate));
     }
 
     /**
@@ -121,6 +126,26 @@ public class SavingGoal implements AggregateBase {
                                 this.id,
                                 this.targetDate,
                                 this.schedule)));
+    }
+
+    /**
+     * Calling this method will create the next installment towards the end goal. The installment is calculated using
+     * the {@link #computeAllocation()} method.
+     */
+    @BusinessMethod
+    public void reserveNextPayment() {
+        if (schedule == null) {
+            throw StatusException.badRequest(
+                    "Cannot automatically reserve an installment for saving goal " + id + ". No schedule was setup.");
+        }
+
+        var installment = computeAllocation();
+        if (installment.compareTo(BigDecimal.ZERO) > 0) {
+            this.allocated = this.allocated.add(installment);
+
+            EventBus.getBus()
+                    .send(new RegisterSavingInstallment(this.id, installment));
+        }
     }
 
     /**

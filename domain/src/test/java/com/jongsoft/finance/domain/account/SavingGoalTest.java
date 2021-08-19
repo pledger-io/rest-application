@@ -6,6 +6,7 @@ import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.savings.AdjustSavingGoalCommand;
 import com.jongsoft.finance.messaging.commands.savings.AdjustScheduleCommand;
 import com.jongsoft.finance.messaging.commands.savings.CompleteSavingGoalCommand;
+import com.jongsoft.finance.messaging.commands.savings.RegisterSavingInstallment;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
@@ -100,6 +101,44 @@ class SavingGoalTest {
                 () -> goal.adjustGoal(BigDecimal.valueOf(-1), LocalDate.now().plusYears(10)));
 
         Assertions.assertThat(exception.getMessage()).isEqualTo("The goal cannot be 0 or less.");
+    }
+
+    @Test
+    void reserveNextPayment() {
+        var savingGoal = SavingGoal.builder()
+                .id(1L)
+                .goal(new BigDecimal("312.22"))
+                .schedule(new ScheduleValue(Periodicity.MONTHS, 3))
+                .allocated(BigDecimal.valueOf(150.20))
+                .targetDate(LocalDate.now().plusYears(2))
+                .build();
+
+        savingGoal.reserveNextPayment();
+
+        var captor = ArgumentCaptor.forClass(RegisterSavingInstallment.class);
+        Mockito.verify(publisher).publishEvent(captor.capture());
+
+        Assertions.assertThat(captor.getValue().id()).isEqualTo(1L);
+        Assertions.assertThat(captor.getValue().amount()).isEqualByComparingTo("23.15");
+    }
+
+    @Test
+    void reserveNextPayment_missingSchedule() {
+        var savingGoal = SavingGoal.builder()
+                .id(1L)
+                .goal(new BigDecimal("312.22"))
+                .allocated(BigDecimal.valueOf(150.20))
+                .targetDate(LocalDate.now().plusYears(2))
+                .build();
+
+        var exception = assertThrows(
+                StatusException.class,
+                savingGoal::reserveNextPayment);
+
+        Assertions.assertThat(exception)
+                .isInstanceOf(StatusException.class)
+                .hasFieldOrPropertyWithValue("statusCode", 400)
+                .hasMessage("Cannot automatically reserve an installment for saving goal 1. No schedule was setup.");
     }
 
     @Test
