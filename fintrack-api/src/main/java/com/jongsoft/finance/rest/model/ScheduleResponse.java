@@ -2,7 +2,9 @@ package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedule;
+import io.micronaut.core.annotation.Introspected;
 
+@Introspected
 public class ScheduleResponse {
 
     private final Schedule wrapped;

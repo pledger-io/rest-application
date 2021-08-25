@@ -1,9 +1,11 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.user.SessionToken;
+import io.micronaut.core.annotation.Introspected;
 
 import java.time.LocalDateTime;
 
+@Introspected
 public class SessionResponse {
 
     private final SessionToken wrapped;

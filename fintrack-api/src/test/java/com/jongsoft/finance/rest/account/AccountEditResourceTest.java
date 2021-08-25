@@ -67,8 +67,7 @@ class AccountEditResourceTest extends TestSetup {
     @Test
     void update_missing() {
         StepVerifier.create(subject.update(1L, new AccountEditRequest()))
-                .assertNext(response -> assertThat(response.code()).isEqualTo(HttpStatus.NOT_FOUND.getCode()))
-                .verifyComplete();
+                .verifyErrorMessage("No account found with id 1");
 
         Mockito.verify(accountProvider).lookup(1L);
     }
@@ -90,10 +89,13 @@ class AccountEditResourceTest extends TestSetup {
                 .type("checking")
                 .build();
 
-        var response = subject.update(123L, request).block();
+        StepVerifier.create(subject.update(123L, request))
+                .assertNext(response -> {
+                    assertThat(response.getName()).isEqualTo("Sample account");
+                })
+                .verifyComplete();
 
         Mockito.verify(accountProvider).lookup(123L);
-        assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
     }
 
     @Test
@@ -127,9 +129,7 @@ class AccountEditResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(123L))
                 .thenReturn(Control.Option(account));
 
-        var response = subject.delete(123L).block();
-
-        assertThat(response.code()).isEqualTo(HttpStatus.NO_CONTENT.getCode());
+        subject.delete(123L);
 
         Mockito.verify(account).terminate();
     }

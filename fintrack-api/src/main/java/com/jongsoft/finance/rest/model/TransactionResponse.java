@@ -3,10 +3,12 @@ package com.jongsoft.finance.rest.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import io.micronaut.core.annotation.Introspected;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Introspected
 public class TransactionResponse {
 
     private transient final Transaction wrapped;
@@ -68,6 +70,7 @@ public class TransactionResponse {
                 .toJava();
     }
 
+    @Introspected
     public class Metadata {
 
         public String getCategory() {
@@ -95,6 +98,7 @@ public class TransactionResponse {
         }
     }
 
+    @Introspected
     public class Type {
         public String getCode() {
             return wrapped.computeType().name();
@@ -106,6 +110,7 @@ public class TransactionResponse {
         }
     }
 
+    @Introspected
     public class Dates {
         public LocalDate getTransaction() {
             return wrapped.getDate();
@@ -120,6 +125,7 @@ public class TransactionResponse {
         }
     }
 
+    @Introspected
     public static class SplitAmount {
         private final transient Transaction.Part wrapped;
 

@@ -1,7 +1,9 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
+import io.micronaut.core.annotation.Introspected;
 
+@Introspected
 public class TransactionRuleGroupResponse {
 
     private final TransactionRuleGroup wrapped;

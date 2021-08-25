@@ -2,9 +2,11 @@ package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.lang.Control;
+import io.micronaut.core.annotation.Introspected;
 
 import java.util.Currency;
 
+@Introspected
 public class UserProfileResponse {
 
     private final transient UserAccount wrappedModel;

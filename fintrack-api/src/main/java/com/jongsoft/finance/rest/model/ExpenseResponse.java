@@ -1,7 +1,9 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.user.Budget;
+import io.micronaut.core.annotation.Introspected;
 
+@Introspected
 public class ExpenseResponse {
 
     private final Budget.Expense wrapped;

@@ -14,6 +14,7 @@ import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedule;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
+import com.jongsoft.lang.collection.Set;
 import lombok.*;
 
 import java.io.Serializable;
@@ -49,6 +50,7 @@ public class Account implements AggregateBase, Serializable {
 
     private double interest;
     private Periodicity interestPeriodicity;
+    private Set<SavingGoal> savingGoals;
 
     private boolean remove;
 

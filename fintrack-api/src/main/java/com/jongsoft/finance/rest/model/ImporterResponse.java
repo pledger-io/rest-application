@@ -1,9 +1,11 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.importer.BatchImport;
+import io.micronaut.core.annotation.Introspected;
 
 import java.util.Date;
 
+@Introspected
 public class ImporterResponse {
 
     private final BatchImport wrapped;
