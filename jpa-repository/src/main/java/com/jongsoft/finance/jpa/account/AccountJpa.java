@@ -87,6 +87,6 @@ public class AccountJpa extends EntityJpa {
         this.user = user;
         this.currency = currency;
         this.archived = archived;
-        this.savingGoals = new HashSet<>(savingGoals);
+        this.savingGoals = savingGoals != null ? new HashSet<>(savingGoals) : new HashSet<>();
     }
 }
