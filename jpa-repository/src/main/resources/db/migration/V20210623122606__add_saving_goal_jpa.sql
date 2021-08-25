@@ -13,6 +13,7 @@ create table saving_goal
     reoccurrence decimal(10, 0),
 
     account_id   bigint         not null,
+    archived     bit            not null default false,
 
     constraint pk_saving_goal primary key (id),
     constraint fk_saving_goal_account foreign key (account_id) references account (id)

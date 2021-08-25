@@ -131,6 +131,8 @@ public class SavingGoal implements AggregateBase {
     /**
      * Calling this method will create the next installment towards the end goal. The installment is calculated using
      * the {@link #computeAllocation()} method.
+     *
+     * @throws StatusException in case no schedule was yet activated on this saving goal
      */
     @BusinessMethod
     public void reserveNextPayment() {
@@ -144,8 +146,25 @@ public class SavingGoal implements AggregateBase {
             this.allocated = this.allocated.add(installment);
 
             EventBus.getBus()
-                    .send(new RegisterSavingInstallment(this.id, installment));
+                    .send(new RegisterSavingInstallmentCommand(this.id, installment));
         }
+    }
+
+    /**
+     * Add additional money towards the savings goal. This does not require any scheduling (for automated savings).
+     *
+     * @param amount the amount to add
+     * @throws StatusException in case the saved amount exceeds the targeted goal amount
+     */
+    @BusinessMethod
+    public void registerPayment(BigDecimal amount) {
+        if (allocated.add(amount).compareTo(goal) > 0) {
+            throw StatusException.badRequest("Cannot increase allocation, the increment would add more then the desired goal of " + goal);
+        }
+
+        this.allocated = this.allocated.add(amount);
+        EventBus.getBus()
+                .send(new RegisterSavingInstallmentCommand(this.id, amount));
     }
 
     /**

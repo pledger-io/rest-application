@@ -37,6 +37,8 @@ public class SavingGoalJpa extends EntityJpa {
     @ManyToOne
     private AccountJpa account;
 
+    private boolean archived;
+
     @Builder
     public SavingGoalJpa(
             Long id,
