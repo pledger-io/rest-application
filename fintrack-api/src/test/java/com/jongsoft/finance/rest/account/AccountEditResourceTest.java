@@ -1,19 +1,19 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.micronaut.http.HttpStatus;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import reactor.test.StepVerifier;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -132,5 +132,33 @@ class AccountEditResourceTest extends TestSetup {
         subject.delete(123L);
 
         Mockito.verify(account).terminate();
+    }
+
+    @Test
+    void createSavingGoal() {
+        Account account = Mockito.spy(Account.builder()
+                .id(1L)
+                .user(ACTIVE_USER)
+                .balance(0D)
+                .name("Sample account")
+                .currency("EUR")
+                .type("savings")
+                .build());
+
+        Mockito.when(accountProvider.lookup(123L))
+                .thenReturn(Control.Option(account));
+
+        subject.createSavingGoal(
+                123L,
+                AccountSavingGoalCreateRequest.builder()
+                        .goal(BigDecimal.valueOf(1500))
+                        .targetDate(LocalDate.now().plusDays(300))
+                        .name("Saving for washer")
+                        .build());
+
+        Mockito.verify(account).createSavingGoal(
+                "Saving for washer",
+                BigDecimal.valueOf(1500),
+                LocalDate.now().plusDays(300));
     }
 }

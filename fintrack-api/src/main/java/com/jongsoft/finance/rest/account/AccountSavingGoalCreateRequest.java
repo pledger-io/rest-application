@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
 import io.micronaut.core.annotation.Introspected;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
+@Builder
 @Introspected
 public class AccountSavingGoalCreateRequest {
 
