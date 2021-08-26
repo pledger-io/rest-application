@@ -67,7 +67,7 @@ public class TransactionTagResource {
     )
     void delete(@PathVariable String tag) {
         tagProvider.lookup(tag)
-                .switchIfEmpty(Single.error(StatusException.notFound("No active tag found with contents " + tag)))
+                .switchIfEmpty(Mono.error(StatusException.notFound("No active tag found with contents " + tag)))
                 .subscribe(Tag::archive);
     }
 
