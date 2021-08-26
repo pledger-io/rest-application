@@ -19,6 +19,8 @@ dependencies {
     implementation("io.micronaut.servlet:micronaut-http-server-jetty")
     implementation("io.micronaut:micronaut-tracing")
 
+    implementation("io.micronaut.beanvalidation:micronaut-hibernate-validator")
+
     implementation("at.favre.lib:bcrypt:0.9.0")
     implementation("org.bouncycastle:bcprov-jdk15on:$bouncyCastleVersion")
     implementation("org.bouncycastle:bcpkix-jdk15on:$bouncyCastleVersion")
