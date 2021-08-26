@@ -6,15 +6,18 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.AccountJson;
-import io.reactivex.Single;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Hex;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate reads a JSON serialized as a variable and processes it into an
@@ -29,21 +32,12 @@ import javax.inject.Singleton;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessAccountCreationDelegate implements JavaDelegate {
 
     private final CurrentUserProvider userProvider;
     private final AccountProvider accountProvider;
     private final StorageService storageService;
-
-    @Inject
-    public ProcessAccountCreationDelegate(
-            CurrentUserProvider userProvider,
-            AccountProvider accountProvider,
-            StorageService storageService) {
-        this.userProvider = userProvider;
-        this.accountProvider = accountProvider;
-        this.storageService = storageService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) {
@@ -56,7 +50,7 @@ public class ProcessAccountCreationDelegate implements JavaDelegate {
                 accountJson.getName());
 
         accountProvider.lookup(accountJson.getName())
-                .switchIfEmpty(Single.create(emitter -> {
+                .switchIfEmpty(Mono.create(emitter -> {
                     userProvider.currentUser().createAccount(
                             accountJson.getName(),
                             accountJson.getCurrency(),
@@ -82,9 +76,9 @@ public class ProcessAccountCreationDelegate implements JavaDelegate {
                                     account.registerIcon(storageService.store(Hex.decode(accountJson.getIcon())));;
                                 }
 
-                                emitter.onSuccess(account);
+                                emitter.success(account);
                             });
-                })).blockingGet();
+                })).block(Duration.of(500, ChronoUnit.MILLIS));
     }
 
     private String handleEmptyAsNull(String value) {

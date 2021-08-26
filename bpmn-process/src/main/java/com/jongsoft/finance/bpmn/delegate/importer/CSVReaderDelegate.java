@@ -2,16 +2,16 @@ package com.jongsoft.finance.bpmn.delegate.importer;
 
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.importer.BatchImport;
-import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
-import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import reactor.core.publisher.Flux;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -36,29 +36,26 @@ abstract class CSVReaderDelegate implements JavaDelegate {
         String batchImportSlug = (String) execution.getVariableLocal("batchImportSlug");
         ImportConfigJson importConfigJson = getFromContext(execution);
 
-        BatchImport batchImport = importProvider.lookup(batchImportSlug).blockingGet();
+        BatchImport batchImport = importProvider.lookup(batchImportSlug).block();
         log.debug("{}: Processing transaction import CSV {}", execution.getCurrentActivityName(), batchImport.getSlug());
         if (importConfigJson == null) {
             throw new IllegalStateException("Cannot run account extraction without actual configuration.");
         }
 
         var mappingIndices = computeIndices(importConfigJson.getColumnRoles());
-        var parserConfig = new CSVParserBuilder()
-                .withSeparator(importConfigJson.getDelimiter())
-                .build();
 
         beforeProcess(execution, importConfigJson);
 
         storageService.read(batchImport.getFileCode())
                 .map(bytes -> new InputStreamReader(new ByteArrayInputStream(bytes)))
-                .flatMapPublisher(stream -> Flowable.fromIterable(
-                        new CSVReaderBuilder(stream)
-                                .withSkipLines(importConfigJson.isHeaders() ? 1 : 0)
-                                .withCSVParser(parserConfig)
-                                .build()))
-                .filter(line -> line.length > 1 || line.length <= mappingIndices.size())
+                .flatMapMany(stream -> Flux.fromIterable(new CSVReaderBuilder(stream)
+                        .withCSVParser(new CSVParserBuilder()
+                                .withSeparator(importConfigJson.getDelimiter())
+                                .build())
+                        .build()))
+                .filter(line -> this.lineMatcherRequirements(line, mappingIndices.size()))
                 .map(csvLine -> this.transform(csvLine, mappingIndices, importConfigJson))
-                .forEach(transaction -> this.lineRead(execution, transaction));
+                .subscribe(transaction -> this.lineRead(execution, transaction));
 
         afterProcess(execution);
     }
@@ -68,6 +65,21 @@ abstract class CSVReaderDelegate implements JavaDelegate {
     protected abstract void lineRead(DelegateExecution execution, ParsedTransaction parsedTransaction);
 
     protected abstract void afterProcess(DelegateExecution execution);
+
+    private boolean lineMatcherRequirements(String[] line, int mappingIndicesCount) {
+        if (line.length == 1) {
+            log.debug("Invalid short line in CSV {}", String.join(", ", line));
+        } else if (line.length < mappingIndicesCount) {
+            log.debug("Line contains to few columns got {} expected {}, `{}`",
+                    line.length,
+                    mappingIndicesCount,
+                    String.join(", ", line));
+        } else {
+            return true;
+        }
+
+        return false;
+    }
 
     private ImportConfigJson getFromContext(DelegateExecution execution) {
         Object rawEntity = execution.getVariable("importConfig");

@@ -6,6 +6,7 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.account.*;
 import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
+import com.jongsoft.finance.messaging.commands.savings.CreateSavingGoalCommand;
 import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,6 +25,7 @@ class AccountTest {
 
     private Account account;
     private Account account2;
+    private Account accountSavings;
 
     private ApplicationEventPublisher applicationEventPublisher;
 
@@ -48,6 +51,15 @@ class AccountTest {
                 .user(UserAccount.builder().username("demo-user").build())
                 .currency("EUR")
                 .type("debtor")
+                .build();
+        accountSavings = Account.builder()
+                .id(3L)
+                .name("Saving account")
+                .description("Second account")
+                .iban("NLINBS909232324323")
+                .user(UserAccount.builder().username("demo-user").build())
+                .currency("EUR")
+                .type("savings")
                 .build();
     }
 
@@ -214,6 +226,20 @@ class AccountTest {
         assertThat(event.name()).isEqualTo("Sample contract");
         assertThat(event.start()).isEqualTo(LocalDate.of(2009, 1, 1));
         assertThat(event.end()).isEqualTo(LocalDate.of(2010, 1, 1));
+    }
+
+    @Test
+    void createSavingGoal() {
+        accountSavings.createSavingGoal("Test saving goal", BigDecimal.valueOf(200), LocalDate.now().plusYears(1));
+
+        var changeCaptor = ArgumentCaptor.forClass(CreateSavingGoalCommand.class);
+
+        Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
+
+        assertThat(changeCaptor.getValue())
+            .hasFieldOrPropertyWithValue("accountId", accountSavings.getId())
+            .hasFieldOrPropertyWithValue("targetDate", LocalDate.now().plusYears(1))
+            .hasFieldOrPropertyWithValue("name", "Test saving goal");
     }
 
 }

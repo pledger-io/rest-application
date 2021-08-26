@@ -1,15 +1,14 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
 import com.jongsoft.finance.domain.transaction.Tag;
-import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
-import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
+import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.reactivex.Maybe;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +17,7 @@ import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
 
 class TagLookupDelegateTest {
 
@@ -47,7 +47,7 @@ class TagLookupDelegateTest {
 
         BDDMockito.given(execution.getVariableLocalTyped("name"))
                 .willReturn(new PrimitiveTypeValueImpl.StringValueImpl("Auto"));
-        BDDMockito.given(tagProvider.lookup("Auto")).willReturn(Maybe.just(tag));
+        BDDMockito.given(tagProvider.lookup("Auto")).willReturn(Mono.just(tag));
 
         subject.execute(execution);
 
@@ -68,8 +68,8 @@ class TagLookupDelegateTest {
                 .willReturn(new PrimitiveTypeValueImpl.StringValueImpl("Auto"));
         BDDMockito.given(currentUserProvider.currentUser()).willReturn(userAccount);
         BDDMockito.given(tagProvider.lookup("Auto"))
-                .willReturn(Maybe.empty())
-                .willReturn(Maybe.just(tag));
+                .willReturn(Mono.empty())
+                .willReturn(Mono.just(tag));
 
         subject.execute(execution);
 

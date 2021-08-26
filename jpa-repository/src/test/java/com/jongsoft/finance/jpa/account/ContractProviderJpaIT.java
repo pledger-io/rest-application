@@ -1,16 +1,16 @@
 package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
 import io.reactivex.subscribers.TestSubscriber;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
 
 public class ContractProviderJpaIT extends JpaTestSetup {
@@ -43,7 +43,7 @@ public class ContractProviderJpaIT extends JpaTestSetup {
         setup();
 
         var check = contractProvider.lookup("Test contract")
-                .blockingGet();
+                .block();
 
         Assertions.assertThat(check.getId()).isEqualTo(1L);
         Assertions.assertThat(check.getName()).isEqualTo("Test contract");
@@ -55,7 +55,8 @@ public class ContractProviderJpaIT extends JpaTestSetup {
     void lookup_nameIncorrectUser() {
         setup();
 
-        Assertions.assertThat(contractProvider.lookup("In between").isEmpty().blockingGet()).isTrue();
+        Assertions.assertThat(contractProvider.lookup("In between").blockOptional())
+                .isEmpty();
     }
 
     @Test

@@ -3,13 +3,13 @@ package com.jongsoft.finance.bpmn.delegate.category;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.lang.Control;
-import io.reactivex.Maybe;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
 
 class ProcessCategoryLookupDelegateTest {
 
@@ -33,7 +33,7 @@ class ProcessCategoryLookupDelegateTest {
 
         BDDMockito.given(execution.hasVariableLocal("name")).willReturn(true);
         BDDMockito.given(execution.getVariableLocal("name")).willReturn("Grocery");
-        BDDMockito.given(categoryProvider.lookup("Grocery")).willReturn(Maybe.just(category));
+        BDDMockito.given(categoryProvider.lookup("Grocery")).willReturn(Mono.just(category));
 
         subject.execute(execution);
 

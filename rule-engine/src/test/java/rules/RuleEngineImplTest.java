@@ -1,5 +1,6 @@
 package rules;
 
+import com.jongsoft.finance.core.Encoder;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.account.Account;

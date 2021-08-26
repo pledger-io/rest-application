@@ -3,24 +3,30 @@ package com.jongsoft.finance.jpa.account;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.account.SavingGoal;
+import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.projections.TripleProjection;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.savings.SavingGoalJpa;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import com.jongsoft.lang.time.Range;
 import io.micronaut.data.model.Sort;
 import io.reactivex.Maybe;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
@@ -38,7 +44,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Maybe<Account> synonymOf(String synonym) {
+    public Mono<Account> synonymOf(String synonym) {
         log.trace("Account synonym lookup with: {}", synonym);
 
         String hql = """
@@ -83,7 +89,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Maybe<Account> lookup(String name) {
+    public Mono<Account> lookup(String name) {
         log.trace("Account name lookup: {} for {}", name, authenticationFacade.authenticated());
 
         String hql = """
@@ -103,7 +109,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Maybe<Account> lookup(SystemAccountTypes accountType) {
+    public Mono<Account> lookup(SystemAccountTypes accountType) {
         log.trace("Account type lookup: {}", accountType);
 
         var hql = """
@@ -200,10 +206,33 @@ public class AccountProviderJpa implements AccountProvider {
                 .number(source.getNumber())
                 .interest(source.getInterest())
                 .interestPeriodicity(source.getInterestPeriodicity())
+                .savingGoals(Collections.Set(this.convertSavingGoals(source.getSavingGoals())))
                 .user(UserAccount.builder()
                         .id(source.getUser().getId())
                         .username(source.getUser().getUsername())
                         .build())
                 .build();
+    }
+
+    private Set<SavingGoal> convertSavingGoals(Set<SavingGoalJpa> savingGoals) {
+        if (savingGoals == null) {
+            return Set.of();
+        }
+
+        return savingGoals.stream()
+                .map(source -> SavingGoal.builder()
+                        .id(source.getId())
+                        .allocated(source.getAllocated())
+                        .goal(source.getGoal())
+                        .targetDate(source.getTargetDate())
+                        .name(source.getName())
+                        .description(source.getDescription())
+                        .schedule(source.getPeriodicity() != null ? new ScheduleValue(source.getPeriodicity(), source.getInterval()) : null)
+                        .account(Account.builder()
+                                .id(source.getAccount().getId())
+                                .name(source.getAccount().getName())
+                                .build())
+                        .build())
+                .collect(Collectors.toSet());
     }
 }

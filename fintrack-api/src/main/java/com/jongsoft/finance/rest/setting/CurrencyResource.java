@@ -10,27 +10,27 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 
 @Tag(name = "Application Settings")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/settings/currencies")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CurrencyResource {
 
     private static final String NO_CURRENCY_WITH_CODE_MESSAGE = "No currency exists with code ";
     private final CurrencyProvider currencyProvider;
-
-    public CurrencyResource(CurrencyProvider currencyProvider) {
-        this.currencyProvider = currencyProvider;
-    }
 
     @Get
     @Operation(
@@ -38,8 +38,8 @@ public class CurrencyResource {
             description = "List all available currencies in the system",
             operationId = "getAllCurrencies"
     )
-    public Flowable<CurrencyResponse> available() {
-        return Flowable.fromIterable(currencyProvider.lookup().map(CurrencyResponse::new));
+    public Publisher<CurrencyResponse> available() {
+        return Flux.fromIterable(currencyProvider.lookup().map(CurrencyResponse::new));
     }
 
     @Put
@@ -51,9 +51,9 @@ public class CurrencyResource {
             operationId = "createCurrency"
     )
     @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)))
-    public Single<CurrencyResponse> create(@Valid @Body CurrencyRequest request) {
+    public Publisher<CurrencyResponse> create(@Valid @Body CurrencyRequest request) {
         return currencyProvider.lookup(request.getCode())
-                .switchIfEmpty(Single.just(
+                .switchIfEmpty(Mono.just(
                         new Currency(
                                 request.getName(),
                                 request.getCode(),
@@ -79,9 +79,9 @@ public class CurrencyResource {
     )
     @ApiDefaults
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)), description = "The currency entity")
-    public Single<CurrencyResponse> get(@PathVariable String currencyCode) {
+    public Publisher<CurrencyResponse> get(@PathVariable String currencyCode) {
         return currencyProvider.lookup(currencyCode)
-                .switchIfEmpty(Single.error(
+                .switchIfEmpty(Mono.error(
                         StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode)))
                 .map(CurrencyResponse::new);
     }
@@ -105,9 +105,9 @@ public class CurrencyResource {
     )
     @ApiDefaults
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)), description = "The currency entity")
-    public Single<CurrencyResponse> update(@PathVariable String currencyCode, @Valid @Body CurrencyRequest request) {
+    public Publisher<CurrencyResponse> update(@PathVariable String currencyCode, @Valid @Body CurrencyRequest request) {
         return currencyProvider.lookup(currencyCode)
-                .switchIfEmpty(Single.error(
+                .switchIfEmpty(Mono.error(
                         StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode)))
                 .map(currency -> {
                     currency.rename(request.getName(), request.getCode(), request.getSymbol());
@@ -125,9 +125,9 @@ public class CurrencyResource {
     )
     @ApiDefaults
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)), description = "The currency entity")
-    public Single<CurrencyResponse> patch(@PathVariable String currencyCode, @Valid @Body CurrencyPatchRequest request) {
+    public Publisher<CurrencyResponse> patch(@PathVariable String currencyCode, @Valid @Body CurrencyPatchRequest request) {
         return currencyProvider.lookup(currencyCode)
-                .switchIfEmpty(Single.error(
+                .switchIfEmpty(Mono.error(
                         StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode)))
                 .map(currency -> {
                     if (request.getEnabled() != null) {

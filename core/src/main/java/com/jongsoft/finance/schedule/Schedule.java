@@ -1,6 +1,7 @@
 package com.jongsoft.finance.schedule;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 public interface Schedule extends Serializable {
 
@@ -20,4 +21,11 @@ public interface Schedule extends Serializable {
      */
     int interval();
 
+    default LocalDate previous(LocalDate current) {
+        return current.minus(interval(), periodicity().toChronoUnit());
+    }
+
+    default LocalDate next(LocalDate current) {
+        return current.plus(interval(), periodicity().toChronoUnit());
+    }
 }

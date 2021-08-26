@@ -4,9 +4,11 @@ import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.lang.Collections;
+import io.micronaut.core.annotation.Introspected;
 
 import java.util.List;
 
+@Introspected
 public class TransactionRuleResponse {
 
     private final TransactionRule wrapped;

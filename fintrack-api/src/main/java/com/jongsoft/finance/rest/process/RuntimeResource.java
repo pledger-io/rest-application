@@ -7,21 +7,24 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.HistoryService;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
 @Tag(name = "Process Engine")
-@Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/runtime-process")
+@Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RuntimeResource {
 
     private static final String KEY_USERNAME = "username";
@@ -29,23 +32,17 @@ public class RuntimeResource {
     private final RuntimeService runtimeService;
     private final AuthenticationFacade authenticationFacade;
 
-    public RuntimeResource(ProcessEngine processEngine, AuthenticationFacade authenticationFacade) {
-        this.historyService = processEngine.getHistoryService();
-        this.runtimeService = processEngine.getRuntimeService();
-        this.authenticationFacade = authenticationFacade;
-    }
-
     @Put("/{processDefinitionKey}/start")
     @Operation(
             summary = "Create Process",
             description = "Creates and executes a new process for the selected definition, with the provided map as parameters",
             operationId = "startProcess"
     )
-    public Single<ProcessResponse> startProcess(
+    public Publisher<ProcessResponse> startProcess(
             @PathVariable String processDefinitionKey,
             @Body Map<String, Object> parameters) {
 
-        var response = Single.<ProcessInstance>create(emitter -> {
+        var response = Mono.<ProcessInstance>create(emitter -> {
             var instanceBuilder = runtimeService.createProcessInstanceByKey(processDefinitionKey);
             parameters.forEach(instanceBuilder::setVariable);
 
@@ -55,7 +52,7 @@ public class RuntimeResource {
 
             instanceBuilder.setVariable(KEY_USERNAME, authenticationFacade.authenticated());
 
-            emitter.onSuccess(instanceBuilder.execute());
+            emitter.success(instanceBuilder.execute());
         });
 
         return response.map(process -> historyService.createHistoricProcessInstanceQuery().processInstanceId(process.getProcessInstanceId()).singleResult())
@@ -68,14 +65,14 @@ public class RuntimeResource {
             description = "Lists the historic executions for the provided process definition key",
             operationId = "getProcessHistory"
     )
-    public Flowable<ProcessResponse> history(@PathVariable String processDefinitionKey) {
+    public Publisher<ProcessResponse> history(@PathVariable String processDefinitionKey) {
         var result = Collections.List(historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
                 .orderByProcessInstanceStartTime().desc()
                 .list());
 
-        return Flowable.fromIterable(result.map(ProcessResponse::new));
+        return Flux.fromIterable(result.map(ProcessResponse::new));
     }
 
     @Get("/{processDefinitionKey}/{businessKey}")
@@ -84,7 +81,7 @@ public class RuntimeResource {
             description = "List the history executions for the provided definition key, but only once with matching business key",
             operationId = "getProcessHistoryByBusinessKey"
     )
-    public Flowable<ProcessResponse> history(
+    public Publisher<ProcessResponse> history(
             @PathVariable String processDefinitionKey,
             @PathVariable String businessKey) {
         var result = Collections.List(historyService.createHistoricProcessInstanceQuery()
@@ -94,7 +91,7 @@ public class RuntimeResource {
                 .orderByProcessInstanceStartTime().desc()
                 .list());
 
-        return Flowable.fromIterable(result.map(ProcessResponse::new));
+        return Flux.fromIterable(result.map(ProcessResponse::new));
     }
 
     @Status(HttpStatus.NO_CONTENT)

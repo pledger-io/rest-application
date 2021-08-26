@@ -13,15 +13,18 @@ import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.reactivex.Flowable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TransactionRuleResourceTest extends TestSetup {
 
@@ -52,7 +55,7 @@ class TransactionRuleResourceTest extends TestSetup {
 
     @Test
     void groups() {
-        Mockito.when(ruleGroupProvider.lookup()).thenReturn(Flowable.just(
+        Mockito.when(ruleGroupProvider.lookup()).thenReturn(Flux.just(
                 TransactionRuleGroup.builder()
                         .id(1L)
                         .name("Grocery stores")
@@ -64,11 +67,10 @@ class TransactionRuleResourceTest extends TestSetup {
                         .sort(2)
                         .build()));
 
-        subject.groups().test()
-                .assertValueCount(2)
-                .assertComplete()
-                .assertValueAt(0, rule -> "Grocery stores".equals(rule.getName()))
-                .assertValueAt(1, rule -> "Savings transactions".equals(rule.getName()));
+        StepVerifier.create(subject.groups())
+                .assertNext(rule -> assertThat(rule.getName()).isEqualTo("Grocery stores"))
+                .assertNext(rule -> assertThat(rule.getName()).isEqualTo("Savings transactions"))
+                .verifyComplete();
     }
 
     @Test
@@ -97,12 +99,14 @@ class TransactionRuleResourceTest extends TestSetup {
         transactionRule.new Change(1L, RuleColumn.TO_ACCOUNT, "2");
         transactionRule.new Change(2L, RuleColumn.CATEGORY, "3");
 
-        Mockito.when(ruleProvider.lookup("Grocery")).thenReturn(Flowable.just(transactionRule));
+        Mockito.when(ruleProvider.lookup("Grocery")).thenReturn(Flux.just(transactionRule));
 
-        subject.rules("Grocery").test()
-                .assertValueCount(1)
-                .assertComplete()
-                .assertValue(rule -> "Grocery Store 1".equals(rule.getName()));
+        StepVerifier.create(subject.rules("Grocery"))
+                .assertNext(rule -> {
+                    assertThat(rule.getName()).isEqualTo("Grocery Store 1");
+                    assertThat(rule.getId()).isEqualTo(1L);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -194,9 +198,9 @@ class TransactionRuleResourceTest extends TestSetup {
 
         Mockito.when(ruleProvider.lookup(1L)).thenReturn(Control.Option(transactionRule));
 
-        var response = subject.getRule("Grocery", 1L).blockingGet();
-
-        Assertions.assertThat(response.getId()).isEqualTo(1L);
+        StepVerifier.create(subject.getRule("Grocery", 1L))
+                .assertNext(response -> assertThat(response.getId()).isEqualTo(1L))
+                .verifyComplete();
     }
 
     @Test
@@ -264,7 +268,9 @@ class TransactionRuleResourceTest extends TestSetup {
 
         Mockito.when(ruleProvider.lookup(1L)).thenReturn(Control.Option(transactionRule));
 
-        subject.updateRule("Group 1", 1L, request).blockingGet();
+        StepVerifier.create(subject.updateRule("Group 1", 1L, request))
+                .expectNextCount(1)
+                .verifyComplete();
 
         Mockito.verify(transactionRule).change("Grocery Matcher", "My sample rule", true, true);
         Mockito.verify(ruleProvider).save(transactionRule);
@@ -288,7 +294,7 @@ class TransactionRuleResourceTest extends TestSetup {
         subject.deleteRule("Group", 1L);
 
         Mockito.verify(ruleProvider).save(transactionRule);
-        Assertions.assertThat(transactionRule.isDeleted()).isTrue();
+        assertThat(transactionRule.isDeleted()).isTrue();
     }
 
 }

@@ -1,18 +1,19 @@
 package com.jongsoft.finance.rule.locator;
 
-import java.util.List;
-
-import javax.inject.Singleton;
-
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.providers.DataProvider;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Category;
-
+import com.jongsoft.finance.providers.DataProvider;
 import io.micronaut.context.ApplicationContext;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RelationLocator implements ChangeLocator {
 
     private final static List<RuleColumn> SUPPORTED_COLUMNS = List.of(
@@ -21,10 +22,6 @@ public class RelationLocator implements ChangeLocator {
             RuleColumn.CONTRACT);
 
     private final ApplicationContext applicationContext;
-
-    public RelationLocator(final ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 
     @Override
     public Object locate(RuleColumn column, String change) {

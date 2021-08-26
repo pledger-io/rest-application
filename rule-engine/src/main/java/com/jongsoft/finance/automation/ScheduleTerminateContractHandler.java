@@ -8,9 +8,10 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.TerminateContractCommand;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.lang.Collections;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Singleton;
 
 /**
  * This class will automatically terminate all active transaction schedules attached to the contract that was
@@ -18,15 +19,11 @@ import javax.inject.Singleton;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ScheduleTerminateContractHandler implements CommandHandler<TerminateContractCommand> {
 
     private final TransactionScheduleProvider transactionScheduleProvider;
     private final FilterFactory filterFactory;
-
-    public ScheduleTerminateContractHandler(TransactionScheduleProvider transactionScheduleProvider, FilterFactory filterFactory) {
-        this.transactionScheduleProvider = transactionScheduleProvider;
-        this.filterFactory = filterFactory;
-    }
 
     @Override
     @BusinessEventListener

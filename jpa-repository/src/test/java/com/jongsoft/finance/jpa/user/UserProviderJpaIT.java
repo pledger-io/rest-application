@@ -1,14 +1,14 @@
 package com.jongsoft.finance.jpa.user;
 
-import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
+import reactor.test.StepVerifier;
 
 class UserProviderJpaIT extends JpaTestSetup {
 
@@ -50,20 +50,18 @@ class UserProviderJpaIT extends JpaTestSetup {
     void tokens() {
         init();
 
-        userProvider.tokens("demo-user")
-                .test()
-                .assertComplete()
-                .assertValue(token -> "refresh-token-1".equals(token.getToken()));
+        StepVerifier.create(userProvider.tokens("demo-user"))
+                .assertNext(token -> "refresh-token-1".equals(token.getToken()))
+                .verifyComplete();
     }
 
     @Test
     void lookup_refreshToken() {
         init();
 
-        userProvider.refreshToken("refresh-token-1")
-                .test()
-                .assertComplete()
-                .assertValue(a -> "demo-user".equals(a.getUsername()));
+        StepVerifier.create(userProvider.refreshToken("refresh-token-1"))
+                .assertNext(a -> "demo-user".equals(a.getUsername()))
+                .verifyComplete();
     }
 
     @MockBean

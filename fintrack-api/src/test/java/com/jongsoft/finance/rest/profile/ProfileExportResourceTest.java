@@ -16,8 +16,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.test.StepVerifier;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 class ProfileExportResourceTest {
 
@@ -44,16 +48,16 @@ class ProfileExportResourceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        Mockito.when(accountProvider.supports(Mockito.any())).thenCallRealMethod();
-        Mockito.when(accountProvider.lookup()).thenReturn(Collections.List());
-        Mockito.when(categoryProvider.supports(Mockito.any())).thenCallRealMethod();
-        Mockito.when(categoryProvider.lookup()).thenReturn(Collections.List());
-        Mockito.when(budgetProvider.supports(Mockito.any())).thenCallRealMethod();
-        Mockito.when(budgetProvider.lookup()).thenReturn(Collections.List());
-        Mockito.when(tagProvider.supports(Mockito.any())).thenCallRealMethod();
-        Mockito.when(tagProvider.lookup()).thenReturn(Collections.List());
-        Mockito.when(transactionRuleProvider.supports(Mockito.any())).thenCallRealMethod();
-        Mockito.when(transactionRuleProvider.lookup()).thenReturn(Collections.List());
+        when(accountProvider.supports(Mockito.any())).thenCallRealMethod();
+        when(accountProvider.lookup()).thenReturn(Collections.List());
+        when(categoryProvider.supports(Mockito.any())).thenCallRealMethod();
+        when(categoryProvider.lookup()).thenReturn(Collections.List());
+        when(budgetProvider.supports(Mockito.any())).thenCallRealMethod();
+        when(budgetProvider.lookup()).thenReturn(Collections.List());
+        when(tagProvider.supports(Mockito.any())).thenCallRealMethod();
+        when(tagProvider.lookup()).thenReturn(Collections.List());
+        when(transactionRuleProvider.supports(Mockito.any())).thenCallRealMethod();
+        when(transactionRuleProvider.lookup()).thenReturn(Collections.List());
 
         subject = new ProfileExportResource(
                 authenticationFacade,
@@ -72,12 +76,14 @@ class ProfileExportResourceTest {
 
     @Test
     void export() {
-        Mockito.when(authenticationFacade.authenticated()).thenReturn("sample@gmail.com");
+        when(authenticationFacade.authenticated()).thenReturn("sample@gmail.com");
 
-        var response = subject.export().blockingGet();
-
-        Assertions.assertThat(response.status().getCode()).isEqualTo(200);
-        Assertions.assertThat(response.header(HttpHeaders.CONTENT_TYPE)).isEqualTo("application/json");
-        Assertions.assertThat(response.header(HttpHeaders.CONTENT_DISPOSITION)).isEqualTo("attachment; filename=\"sample@gmail.com-profile.json\"");
+        StepVerifier.create(subject.export())
+                .assertNext(response -> {
+                    assertThat(response.status().getCode()).isEqualTo(200);
+                    assertThat(response.header(HttpHeaders.CONTENT_TYPE)).isEqualTo("application/json");
+                    assertThat(response.header(HttpHeaders.CONTENT_DISPOSITION)).isEqualTo("attachment; filename=\"sample@gmail.com-profile.json\"");
+                })
+                .verifyComplete();
     }
 }

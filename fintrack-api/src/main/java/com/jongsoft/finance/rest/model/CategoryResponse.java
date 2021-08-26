@@ -1,9 +1,11 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.user.Category;
+import io.micronaut.core.annotation.Introspected;
 
 import java.time.LocalDate;
 
+@Introspected
 public class CategoryResponse {
 
     private final Category wrapped;

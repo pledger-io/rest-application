@@ -11,10 +11,9 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import reactor.core.publisher.Flux;
 
 import java.time.LocalDate;
 
@@ -42,20 +41,20 @@ public class AccountTopResource {
             summary = "Top debit accounts",
             description = "Calculates and returns the accounts where you spent the most for the given date range"
     )
-    Flowable<AccountSpendingResponse> topDebtors(
+    Flux<AccountSpendingResponse> topDebtors(
             @PathVariable @DateFormat LocalDate start,
             @PathVariable @DateFormat LocalDate end) {
-        return Flowable.create(emitter -> {
+        return Flux.create(emitter -> {
             var filterCommand = filterFactory.account()
                     .types(Collections.List("debtor"))
                     .pageSize(settingProvider.getAutocompleteLimit());
 
             accountProvider.top(filterCommand, Dates.range(start, end), true)
                     .map(AccountSpendingResponse::new)
-                    .forEach(emitter::onNext);
+                    .forEach(emitter::next);
 
-            emitter.onComplete();
-        }, BackpressureStrategy.LATEST);
+            emitter.complete();
+        });
     }
 
     @Get("/creditor/{start}/{end}")
@@ -63,20 +62,20 @@ public class AccountTopResource {
             summary = "Top creditor accounts",
             description = "Calculates and returns the accounts that credited the most money for the given date range"
     )
-    Flowable<AccountSpendingResponse> topCreditor(
+    Flux<AccountSpendingResponse> topCreditor(
             @PathVariable @DateFormat LocalDate start,
             @PathVariable @DateFormat LocalDate end) {
-        return Flowable.create(emitter -> {
+        return Flux.create(emitter -> {
             var filterCommand = filterFactory.account()
                     .types(Collections.List("creditor"))
                     .pageSize(settingProvider.getAutocompleteLimit());
 
             accountProvider.top(filterCommand, Dates.range(start, end), false)
                     .map(AccountSpendingResponse::new)
-                    .forEach(emitter::onNext);
+                    .forEach(emitter::next);
 
-            emitter.onComplete();
-        }, BackpressureStrategy.ERROR);
+            emitter.complete();
+        });
     }
 
 }

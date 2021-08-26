@@ -2,13 +2,11 @@ package com.jongsoft.finance.security;
 
 import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
-import io.micronaut.security.authentication.UserDetails;
+import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.event.LoginSuccessfulEvent;
 import io.micronaut.security.event.LogoutEvent;
-import io.micronaut.security.utils.SecurityService;
+import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
@@ -18,9 +16,9 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
     @EventListener
     void authenticated(LoginSuccessfulEvent event) {
-        if (event.getSource() instanceof UserDetails u) {
-            log.info("Login processed for {}", u.getUsername());
-            AUTHENTICATED_USER.set(u.getUsername());
+        if (event.getSource() instanceof Authentication u) {
+            log.info("Login processed for {}", u.getName());
+            AUTHENTICATED_USER.set(u.getName());
         }
     }
 

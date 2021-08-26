@@ -1,9 +1,11 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.lang.time.Range;
+import io.micronaut.core.annotation.Introspected;
 
 import java.time.LocalDate;
 
+@Introspected
 public class DateRangeResponse {
 
     private final Range<LocalDate> wrapped;

@@ -1,9 +1,11 @@
 package com.jongsoft.finance.rest.model;
 
+import io.micronaut.core.annotation.Introspected;
 import org.camunda.bpm.engine.task.Task;
 
 import java.util.Date;
 
+@Introspected
 public class ProcessTaskResponse {
 
     private final Task wrapped;

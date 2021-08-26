@@ -1,23 +1,21 @@
 package com.jongsoft.finance.bpmn.delegate.rule;
 
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
 import com.jongsoft.lang.collection.tuple.Triplet;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ExtractorRuleRunDelegate implements JavaDelegate {
 
     private final RuleEngine ruleEngine;
-
-    public ExtractorRuleRunDelegate(RuleEngine ruleEngine) {
-        this.ruleEngine = ruleEngine;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

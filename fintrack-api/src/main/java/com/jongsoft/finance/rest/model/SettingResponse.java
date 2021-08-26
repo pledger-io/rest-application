@@ -1,7 +1,9 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.core.SettingType;
+import io.micronaut.core.annotation.Introspected;
 
+@Introspected
 public class SettingResponse {
 
     private String name;

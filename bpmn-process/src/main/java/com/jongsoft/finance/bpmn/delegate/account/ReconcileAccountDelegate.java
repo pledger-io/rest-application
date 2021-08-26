@@ -2,18 +2,20 @@ package com.jongsoft.finance.bpmn.delegate.account;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.providers.AccountProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.DoubleValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate will create a reconciliation transaction into a selected account. This can be used to correct missing
@@ -30,14 +32,10 @@ import java.time.LocalDate;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ReconcileAccountDelegate implements JavaDelegate {
 
     private final AccountProvider accountProvider;
-
-    @Inject
-    public ReconcileAccountDelegate(AccountProvider accountProvider) {
-        this.accountProvider = accountProvider;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
@@ -51,7 +49,7 @@ public class ReconcileAccountDelegate implements JavaDelegate {
                 toReconcile.getName(), isoBookDate, amount);
 
         Account reconcileAccount = accountProvider.lookup(SystemAccountTypes.RECONCILE)
-                .blockingGet();
+                .block(Duration.of(500, ChronoUnit.MILLIS));
 
         var transactionDate = LocalDate.parse(isoBookDate);
         Transaction.Type type = amount.compareTo(BigDecimal.ZERO) >= 0 ? Transaction.Type.CREDIT : Transaction.Type.DEBIT;

@@ -1,7 +1,9 @@
 package com.jongsoft.finance.rest.model;
 
+import io.micronaut.core.annotation.Introspected;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 
+@Introspected
 public class ProcessVariableResponse {
 
     private final HistoricVariableInstance wrapped;

@@ -16,16 +16,19 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.reactivex.Maybe;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TransactionResourceTest extends TestSetup {
 
@@ -174,7 +177,7 @@ class TransactionResourceTest extends TestSetup {
 
     @Test
     void firstTransaction() {
-        Mockito.when(transactionProvider.first(Mockito.any())).thenReturn(Maybe.just(
+        Mockito.when(transactionProvider.first(Mockito.any())).thenReturn(Mono.just(
                 Transaction.builder()
                         .date(LocalDate.of(2019, 1, 1))
                         .build()));
@@ -183,9 +186,9 @@ class TransactionResourceTest extends TestSetup {
                 .description("test")
                 .build();
 
-        var response = subject.firstTransaction(request).blockingGet();
-
-        Assertions.assertThat(response).isEqualTo(LocalDate.of(2019, 1, 1));
+        StepVerifier.create(subject.firstTransaction(request))
+                .assertNext(response -> assertThat(response).isEqualTo(LocalDate.of(2019, 1, 1)))
+                .verifyComplete();
     }
 
     @Test
@@ -225,10 +228,9 @@ class TransactionResourceTest extends TestSetup {
                 ))
                 .thenReturn(ResultPage.empty());
 
-        var response = subject.export().test().awaitCount(2);
-
-        response.assertComplete();
-        response.assertValueCount(2);
+        StepVerifier.create(subject.export())
+                .expectNextCount(2)
+                .verifyComplete();
     }
 
 }

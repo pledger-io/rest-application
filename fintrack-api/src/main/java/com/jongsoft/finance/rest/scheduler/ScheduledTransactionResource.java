@@ -10,14 +10,16 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.util.Objects;
@@ -25,33 +27,25 @@ import java.util.Objects;
 @Tag(name = "Transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/schedule/transaction")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ScheduledTransactionResource {
 
     private final AccountProvider accountProvider;
     private final TransactionScheduleProvider scheduleProvider;
     private final FilterFactory filterFactory;
 
-    public ScheduledTransactionResource(
-            AccountProvider accountProvider,
-            TransactionScheduleProvider scheduleProvider,
-            FilterFactory filterFactory) {
-        this.accountProvider = accountProvider;
-        this.scheduleProvider = scheduleProvider;
-        this.filterFactory = filterFactory;
-    }
-
     @Get
     @Operation(
             operationId = "listTransactionSchedule",
             summary = "List all available transaction schedules"
     )
-    public Flowable<ScheduledTransactionResponse> list() {
-        return Flowable.create(emitter -> {
+    public Publisher<ScheduledTransactionResponse> list() {
+        return Flux.create(emitter -> {
             scheduleProvider.lookup()
                     .map(ScheduledTransactionResponse::new)
-                    .forEach(emitter::onNext);
-            emitter.onComplete();
-        }, BackpressureStrategy.LATEST);
+                    .forEach(emitter::next);
+            emitter.complete();
+        });
     }
 
     @Put
@@ -59,13 +53,13 @@ public class ScheduledTransactionResource {
             operationId = "createTransactionSchedule",
             summary = "Create a new transaction schedule"
     )
-    public Single<HttpResponse<ScheduledTransactionResponse>> create(@Valid @Body ScheduledTransactionCreateRequest request) {
-        return Single.create(emitter -> {
+    public Publisher<HttpResponse<ScheduledTransactionResponse>> create(@Valid @Body ScheduledTransactionCreateRequest request) {
+        return Mono.create(emitter -> {
             var account = accountProvider.lookup(request.getSource().getId());
             var destination = accountProvider.lookup(request.getDestination().getId());
 
             if (!account.isPresent() || !destination.isPresent()) {
-                emitter.onError(new IllegalArgumentException("Either source or destination account cannot be located."));
+                emitter.error(new IllegalArgumentException("Either source or destination account cannot be located."));
             } else {
                 account.get().createSchedule(
                         request.getName(),
@@ -73,7 +67,7 @@ public class ScheduledTransactionResource {
                         destination.get(),
                         request.getAmount());
 
-                emitter.onSuccess(HttpResponse.created(scheduleProvider.lookup()
+                emitter.success(HttpResponse.created(scheduleProvider.lookup()
                         .filter(schedule -> request.getName().equals(schedule.getName()))
                         .map(ScheduledTransactionResponse::new)
                         .head()));
@@ -86,22 +80,22 @@ public class ScheduledTransactionResource {
             operationId = "searchTransactionSchedule",
             summary = "Search schedule"
     )
-    public Flowable<ScheduledTransactionResponse> search(@Valid @Body ScheduleSearchRequest request) {
+    public Publisher<ScheduledTransactionResponse> search(@Valid @Body ScheduleSearchRequest request) {
         var filter = filterFactory.schedule()
                 .contract(Collections.List(request.getContracts()).map(c -> new EntityRef(c.getId())))
                 .activeOnly();
 
-        return Flowable.create(emitter -> {
+        return Flux.create(emitter -> {
             try {
                 scheduleProvider.lookup(filter)
                         .map(ScheduledTransactionResponse::new)
                         .content()
-                        .forEach(emitter::onNext);
+                        .forEach(emitter::next);
             } finally {
-                emitter.onComplete();
+                emitter.complete();
             }
 
-        }, BackpressureStrategy.DROP);
+        });
     }
 
     @Get("/{scheduleId}")
@@ -115,15 +109,15 @@ public class ScheduledTransactionResource {
                     schema = @Schema(implementation = Long.class),
                     in = ParameterIn.PATH)
     )
-    public Single<HttpResponse<ScheduledTransactionResponse>> get(@PathVariable long scheduleId) {
-        return Single.create(emitter -> {
+    public Publisher<HttpResponse<ScheduledTransactionResponse>> get(@PathVariable long scheduleId) {
+        return Mono.create(emitter -> {
             var scheduleOption = scheduleProvider.lookup()
                     .filter(s -> s.getId() == scheduleId)
                     .map(ScheduledTransactionResponse::new);
             if (scheduleOption.isEmpty()) {
-                emitter.onSuccess(HttpResponse.notFound());
+                emitter.success(HttpResponse.notFound());
             } else {
-                emitter.onSuccess(HttpResponse.ok(scheduleOption.head()));
+                emitter.success(HttpResponse.ok(scheduleOption.head()));
             }
         });
     }
@@ -138,14 +132,14 @@ public class ScheduledTransactionResource {
                     schema = @Schema(implementation = Long.class),
                     in = ParameterIn.PATH)
     )
-    public Single<HttpResponse<ScheduledTransactionResponse>> patch(
+    public Publisher<HttpResponse<ScheduledTransactionResponse>> patch(
             @PathVariable long scheduleId,
             @Valid @Body ScheduledTransactionPatchRequest request) {
-        return Single.create(emitter -> {
+        return Mono.create(emitter -> {
             var scheduleOption = scheduleProvider.lookup()
                     .filter(s -> s.getId() == scheduleId);
             if (scheduleOption.isEmpty()) {
-                emitter.onSuccess(HttpResponse.notFound());
+                emitter.success(HttpResponse.notFound());
             } else {
                 var schedule = scheduleOption.head();
                 if (Objects.nonNull(request.getName())) {
@@ -160,7 +154,7 @@ public class ScheduledTransactionResource {
                     schedule.limit(request.getRange().getStart(), request.getRange().getEnd());
                 }
 
-                emitter.onSuccess(HttpResponse.ok(new ScheduledTransactionResponse(schedule)));
+                emitter.success(HttpResponse.ok(new ScheduledTransactionResponse(schedule)));
             }
         });
     }

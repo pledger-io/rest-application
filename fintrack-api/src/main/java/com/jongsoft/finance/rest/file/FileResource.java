@@ -8,19 +8,18 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
 @Tag(name = "Attachments")
-@Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/attachment")
+@Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class FileResource {
 
     private final StorageService storageService;
-
-    public FileResource(StorageService storageService) {
-        this.storageService = storageService;
-    }
 
     @Post
     @Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -41,7 +40,7 @@ public class FileResource {
     )
     byte[] download(@PathVariable String fileCode) {
         return storageService.read(fileCode)
-                .blockingGet();
+                .block();
     }
 
 }

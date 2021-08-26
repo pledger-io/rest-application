@@ -4,12 +4,13 @@ import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.serialized.ExportJson;
 import com.jongsoft.finance.serialized.RuleConfigJson;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
@@ -17,14 +18,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ParseUserConfigurationDelegate implements JavaDelegate {
 
     private final StorageService storageService;
-
-    @Inject
-    public ParseUserConfigurationDelegate(StorageService storageService) {
-        this.storageService = storageService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
@@ -34,7 +31,7 @@ public class ParseUserConfigurationDelegate implements JavaDelegate {
 
         String storageToken = (String) execution.getVariable("storageToken");
 
-        byte[] rawJsonContent = storageService.read(storageToken).blockingGet();
+        byte[] rawJsonContent = storageService.read(storageToken).block();
         ExportJson profileJson = ExportJson.read(new String(rawJsonContent, StandardCharsets.UTF_8));
 
         String ruleStorageToken = storageService.store(RuleConfigJson.builder()

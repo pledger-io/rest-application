@@ -5,43 +5,37 @@ import com.jongsoft.finance.reactive.ReactiveThreadLocal;
 import com.jongsoft.finance.security.AuthenticationFacadeImpl;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
-import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.http.*;
 import io.micronaut.http.annotation.Filter;
-import io.micronaut.http.filter.OncePerRequestHttpServerFilter;
+import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.management.endpoint.EndpointsFilter;
-import io.micronaut.scheduling.TaskExecutors;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.authentication.AuthorizationException;
 import io.micronaut.security.filters.SecurityFilter;
-import io.reactivex.Flowable;
-import io.reactivex.Scheduler;
-import io.reactivex.schedulers.Schedulers;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.slf4j.MDC;
+import reactor.core.publisher.Flux;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.security.Principal;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Slf4j
 @Filter("/**")
 @Replaces(EndpointsFilter.class)
-public class AuthenticationFilter extends OncePerRequestHttpServerFilter {
+@RequiredArgsConstructor(onConstructor_ = @Inject)
+public class AuthenticationFilter implements HttpServerFilter {
     public static final CharSequence AUTHENTICATION = HttpAttributes.PRINCIPAL.toString();
 
     private final AuthenticationFacadeImpl authenticationFacade;
-
-    @Inject
-    public AuthenticationFilter(AuthenticationFacadeImpl authenticationFacade) {
-        this.authenticationFacade = authenticationFacade;
-    }
 
     @Override
     public int getOrder() {
@@ -49,7 +43,7 @@ public class AuthenticationFilter extends OncePerRequestHttpServerFilter {
     }
 
     @Override
-    protected Publisher<MutableHttpResponse<?>> doFilterOnce(final HttpRequest<?> request, final ServerFilterChain chain) {
+    public Publisher<MutableHttpResponse<?>> doFilter(final HttpRequest<?> request, final ServerFilterChain chain) {
         var securityFailure = request.getAttribute(SecurityFilter.REJECTION, HttpStatus.class);
         if (securityFailure.isPresent()) {
             return Publishers.just(
@@ -67,9 +61,12 @@ public class AuthenticationFilter extends OncePerRequestHttpServerFilter {
         }
 
         ContextPropagation.configureContext(mdcContext, securityContext);
-        return Flowable.fromPublisher(chain.proceed(request))
+
+        return Flux.just(chain.proceed(request))
                 .doOnComplete(ContextPropagation::unsetContext)
-                .onErrorReturn(exception -> this.translateException(exception, request));
+                .onErrorContinue((exception, a) -> this.translateException(exception, request))
+                .next()
+                .block(Duration.of(2, ChronoUnit.SECONDS));
     }
 
     private MutableHttpResponse<?> translateException(Throwable throwable, HttpRequest<?> request) {

@@ -11,10 +11,12 @@ import com.jongsoft.finance.serialized.AccountJson;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(of = {"transactionDate", "opposingName"})
 public class ParsedTransaction implements Serializable {
 
     private double amount;

@@ -1,13 +1,15 @@
 package com.jongsoft.finance.bpmn;
 
+import com.jongsoft.finance.core.Encoder;
 import com.jongsoft.finance.messaging.EventBus;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.junit.jupiter.api.BeforeEach;
-
-import javax.inject.Inject;
+import org.mockito.Mockito;
 
 @MicronautTest(startApplication = false)
 class ProcessTestSetup {
@@ -61,6 +63,11 @@ class ProcessTestSetup {
         } catch (InterruptedException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @MockBean
+    public Encoder encoder() {
+        return Mockito.mock(Encoder.class);
     }
 
 }

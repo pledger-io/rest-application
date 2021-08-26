@@ -1,10 +1,12 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.ResultPage;
+import io.micronaut.core.annotation.Introspected;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+@Introspected
 public class ResultPageResponse<T> {
 
     private final ResultPage<T> wrapped;
@@ -22,6 +24,7 @@ public class ResultPageResponse<T> {
         return new Info();
     }
 
+    @Introspected
     public class Info {
 
         public long getRecords() {

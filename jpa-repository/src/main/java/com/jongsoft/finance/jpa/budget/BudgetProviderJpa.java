@@ -2,23 +2,18 @@ package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.providers.BudgetProvider;
-import com.jongsoft.finance.jpa.core.RepositoryJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
-import com.jongsoft.finance.jpa.budget.BudgetJpa;
+import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import reactor.core.publisher.Mono;
 
 @Singleton
 @Named("budgetProvider")
-public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
+public class BudgetProviderJpa implements BudgetProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager reactiveEntityManager;
@@ -43,7 +38,7 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
     }
 
     @Override
-    public Single<Budget> lookup(int year, int month) {
+    public Mono<Budget> lookup(int year, int month) {
         var range = DateUtils.forMonth(year, month);
 
         var hql = """
@@ -62,7 +57,7 @@ public class BudgetProviderJpa extends RepositoryJpa implements BudgetProvider {
     }
 
     @Override
-    public Maybe<Budget> first() {
+    public Mono<Budget> first() {
         var hql = """
                 select b from BudgetJpa b
                 where b.user.username = :username

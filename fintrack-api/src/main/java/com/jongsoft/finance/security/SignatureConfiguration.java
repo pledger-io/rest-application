@@ -7,6 +7,7 @@ import io.micronaut.context.annotation.Value;
 import io.micronaut.security.token.jwt.signature.SignatureGeneratorConfiguration;
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGenerator;
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGeneratorConfiguration;
+import jakarta.inject.Named;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMException;
@@ -14,7 +15,6 @@ import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 
-import javax.inject.Named;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;

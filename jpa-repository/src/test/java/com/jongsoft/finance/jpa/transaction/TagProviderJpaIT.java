@@ -1,16 +1,16 @@
 package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
+import reactor.test.StepVerifier;
 
 class TagProviderJpaIT extends JpaTestSetup {
 
@@ -42,10 +42,10 @@ class TagProviderJpaIT extends JpaTestSetup {
     void lookup_name() {
         setup();
 
-        tagProvider.lookup("Nono").test().assertNoValues();
-        tagProvider.lookup("Bike").test().assertNoValues();
+        StepVerifier.create(tagProvider.lookup("Nono")).expectNextCount(0).verifyComplete();
+        StepVerifier.create(tagProvider.lookup("Bike")).expectNextCount(0).verifyComplete();
 
-        Assertions.assertThat(tagProvider.lookup("Sample").blockingGet().name()).isEqualTo("Sample");
+        Assertions.assertThat(tagProvider.lookup("Sample").block().name()).isEqualTo("Sample");
     }
 
     @Test

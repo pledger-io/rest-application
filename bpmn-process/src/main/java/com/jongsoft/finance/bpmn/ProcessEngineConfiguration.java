@@ -8,30 +8,28 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Factory
 @Requires(beans = DataSourceMigration.class)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessEngineConfiguration {
 
-    private final Logger log;
     private final ApplicationContext applicationContext;
     private final CamundaDatasourceConfiguration camundaDatasourceConfiguration;
-
-    public ProcessEngineConfiguration(final ApplicationContext applicationContext,
-            final CamundaDatasourceConfiguration camundaDatasourceConfiguration) {
-        this.applicationContext = applicationContext;
-        this.camundaDatasourceConfiguration = camundaDatasourceConfiguration;
-        this.log = LoggerFactory.getLogger(getClass());
-    }
 
     @Context
     public ProcessEngine processEngine() throws IOException {
@@ -58,6 +56,21 @@ public class ProcessEngineConfiguration {
 
         deployResources(processEngine);
         return processEngine;
+    }
+
+    @Context
+    public HistoryService historyService(ProcessEngine processEngine) {
+        return processEngine.getHistoryService();
+    }
+
+    @Context
+    public TaskService taskService(ProcessEngine processEngine) {
+        return processEngine.getTaskService();
+    }
+
+    @Context
+    public RuntimeService runtimeService(ProcessEngine processEngine) {
+        return processEngine.getRuntimeService();
     }
 
     private void deployResources(ProcessEngine processEngine) throws IOException {

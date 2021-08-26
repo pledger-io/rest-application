@@ -3,10 +3,10 @@ package com.jongsoft.finance.rest.transaction;
 import com.jongsoft.finance.core.Removable;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
 import com.jongsoft.finance.providers.TransactionRuleProvider;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.TransactionRuleGroupResponse;
 import com.jongsoft.finance.rest.model.TransactionRuleResponse;
@@ -15,33 +15,28 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
+import java.util.function.Consumer;
 
 @Tag(name = "Transaction Rules")
 @Controller("/api/transaction-rules")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionRuleResource {
 
     private final TransactionRuleGroupProvider ruleGroupProvider;
     private final TransactionRuleProvider ruleProvider;
     private final CurrentUserProvider currentUserProvider;
-
-    public TransactionRuleResource(
-            TransactionRuleGroupProvider ruleGroupProvider,
-            TransactionRuleProvider ruleProvider,
-            CurrentUserProvider currentUserProvider) {
-        this.ruleGroupProvider = ruleGroupProvider;
-        this.ruleProvider = ruleProvider;
-        this.currentUserProvider = currentUserProvider;
-    }
 
     @Get("/groups")
     @Operation(
@@ -49,7 +44,7 @@ public class TransactionRuleResource {
             description = "List all the transaction rule groups available",
             operationId = "getRuleGroups"
     )
-    Flowable<TransactionRuleGroupResponse> groups() {
+    Publisher<TransactionRuleGroupResponse> groups() {
         return ruleGroupProvider.lookup()
                 .map(TransactionRuleGroupResponse::new);
     }
@@ -75,7 +70,7 @@ public class TransactionRuleResource {
             description = "Lists all transaction rules present in the requested group",
             operationId = "getRules"
     )
-    Flowable<TransactionRuleResponse> rules(@PathVariable String group) {
+    Publisher<TransactionRuleResponse> rules(@PathVariable String group) {
         return ruleProvider.lookup(group)
                 .map(TransactionRuleResponse::new);
     }
@@ -160,12 +155,12 @@ public class TransactionRuleResource {
     )
     @ApiDefaults
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = TransactionRuleResponse.class)))
-    Single<TransactionRuleResponse> getRule(@PathVariable String group, @PathVariable long id) {
-        return Single.create(emitter -> {
+    Publisher<TransactionRuleResponse> getRule(@PathVariable String group, @PathVariable long id) {
+        return Mono.create(emitter -> {
             ruleProvider.lookup(id)
                     .map(TransactionRuleResponse::new)
-                    .ifPresent(emitter::onSuccess)
-                    .elseRun(() -> emitter.onError(StatusException.notFound("Rule not found with id " + id)));
+                    .ifPresent((Consumer<TransactionRuleResponse>) emitter::success)
+                    .elseRun(() -> emitter.error(StatusException.notFound("Rule not found with id " + id)));
         });
     }
 
@@ -203,11 +198,11 @@ public class TransactionRuleResource {
     )
     @ApiDefaults
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = TransactionRuleResponse.class)))
-    Single<TransactionRuleResponse> updateRule(
+    Publisher<TransactionRuleResponse> updateRule(
             @PathVariable String group,
             @PathVariable long id,
             @Valid @Body CreateRuleRequest request) {
-        return Single.<TransactionRule>create(emitter -> {
+        return Mono.<TransactionRule>create(emitter -> {
             ruleProvider.lookup(id)
                     .ifPresent(rule -> {
                         rule.change(
@@ -232,9 +227,9 @@ public class TransactionRuleResource {
                                         condition.getValue()));
 
                         ruleProvider.save(rule);
-                        emitter.onSuccess(ruleProvider.lookup(id).get());
+                        emitter.success(ruleProvider.lookup(id).get());
                     })
-                    .elseRun(() -> emitter.onError(StatusException.notFound("Rule not found with id " + id)));
+                    .elseRun(() -> emitter.error(StatusException.notFound("Rule not found with id " + id)));
         }).map(TransactionRuleResponse::new);
     }
 

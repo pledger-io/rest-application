@@ -4,13 +4,17 @@ import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.BudgetJson;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate will create process a serialize {@link BudgetJson} into a new budget period in the system. It will
@@ -24,18 +28,11 @@ import javax.inject.Singleton;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessBudgetCreateDelegate implements JavaDelegate {
 
     private final CurrentUserProvider currentUserProvider;
     private final BudgetProvider budgetProvider;
-
-    @Inject
-    public ProcessBudgetCreateDelegate(
-            CurrentUserProvider currentUserProvider,
-            BudgetProvider budgetProvider) {
-        this.currentUserProvider = currentUserProvider;
-        this.budgetProvider = budgetProvider;
-    }
 
     @Override
     public void execute(DelegateExecution execution) {
@@ -53,8 +50,8 @@ public class ProcessBudgetCreateDelegate implements JavaDelegate {
 
         var budget = budgetProvider.lookup(year, month)
                 .map(b -> b.indexBudget(budgetJson.getStart(), budgetJson.getExpectedIncome()))
-                .onErrorReturn(e -> userAccount.createBudget(budgetJson.getStart(), budgetJson.getExpectedIncome()))
-                .blockingGet();
+                .onErrorResume(e -> Mono.just(userAccount.createBudget(budgetJson.getStart(), budgetJson.getExpectedIncome())))
+                .block(Duration.of(500, ChronoUnit.MILLIS));
 
         budgetJson.getExpenses().stream()
                 .filter(e -> budget.determineExpense(e.getName()) == null)

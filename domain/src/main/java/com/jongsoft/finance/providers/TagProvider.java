@@ -3,7 +3,7 @@ package com.jongsoft.finance.providers;
 import com.jongsoft.finance.Exportable;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Tag;
-import io.reactivex.Maybe;
+import reactor.core.publisher.Mono;
 
 public interface TagProvider extends Exportable<Tag> {
 
@@ -13,7 +13,7 @@ public interface TagProvider extends Exportable<Tag> {
         FilterCommand pageSize(int pageSize);
     }
 
-    Maybe<Tag> lookup(String name);
+    Mono<Tag> lookup(String name);
     ResultPage<Tag> lookup(FilterCommand filter);
 
     @Override

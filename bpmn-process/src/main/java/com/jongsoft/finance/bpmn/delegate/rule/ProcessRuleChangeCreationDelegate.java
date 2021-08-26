@@ -1,13 +1,11 @@
 package com.jongsoft.finance.bpmn.delegate.rule;
 
-import javax.inject.Singleton;
-
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-
+import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Slf4j
 @Singleton

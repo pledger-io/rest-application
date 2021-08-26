@@ -6,22 +6,19 @@ import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.WarnBeforeExpiryCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
 
-import javax.inject.Singleton;
-
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 class WarnBeforeExpiryHandler implements CommandHandler<WarnBeforeExpiryCommand> {
 
     private final ProcessEngine processEngine;
     private final AuthenticationFacade authenticationFacade;
-
-    WarnBeforeExpiryHandler(ProcessEngine processEngine, AuthenticationFacade authenticationFacade) {
-        this.processEngine = processEngine;
-        this.authenticationFacade = authenticationFacade;
-    }
 
     @Override
     @BusinessEventListener

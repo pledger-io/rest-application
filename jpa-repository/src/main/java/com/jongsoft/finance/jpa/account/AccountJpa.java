@@ -2,16 +2,17 @@ package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.finance.jpa.currency.CurrencyJpa;
+import com.jongsoft.finance.jpa.savings.SavingGoalJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.schedule.Periodicity;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.Formula;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -50,6 +51,9 @@ public class AccountJpa extends EntityJpa {
 
     private boolean archived;
 
+    @OneToMany(mappedBy = "account", fetch = FetchType.EAGER)
+    private Set<SavingGoalJpa> savingGoals = Set.of();
+
     public AccountJpa() {
     }
 
@@ -67,7 +71,8 @@ public class AccountJpa extends EntityJpa {
             AccountTypeJpa type,
             UserAccountJpa user,
             CurrencyJpa currency,
-            boolean archived) {
+            boolean archived,
+            Set<SavingGoalJpa> savingGoals) {
         super(id);
 
         this.name = name;
@@ -82,5 +87,6 @@ public class AccountJpa extends EntityJpa {
         this.user = user;
         this.currency = currency;
         this.archived = archived;
+        this.savingGoals = savingGoals != null ? new HashSet<>(savingGoals) : new HashSet<>();
     }
 }

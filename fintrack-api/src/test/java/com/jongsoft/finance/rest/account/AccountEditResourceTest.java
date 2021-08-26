@@ -1,18 +1,21 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.micronaut.http.HttpStatus;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import reactor.test.StepVerifier;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AccountEditResourceTest extends TestSetup {
 
@@ -37,8 +40,8 @@ class AccountEditResourceTest extends TestSetup {
 
     @Test
     void get_missing() {
-        org.junit.jupiter.api.Assertions.assertThrows(StatusException.class,
-                () -> subject.get(1L).blockingGet());
+        StepVerifier.create(subject.get(1L))
+                .verifyErrorMessage("Account not found");
     }
 
     @Test
@@ -52,17 +55,21 @@ class AccountEditResourceTest extends TestSetup {
                         .currency("EUR")
                         .build()));
 
-        var response = subject.get(123L).blockingGet();
+        StepVerifier.create(subject.get(123L))
+                .assertNext(response -> {
+                    assertThat(response.getName()).isEqualTo("Sample account");
+                })
+                .verifyComplete();
 
         Mockito.verify(accountProvider).lookup(123L);
     }
 
     @Test
     void update_missing() {
-        var response = subject.update(1L, new AccountEditRequest()).blockingGet();
+        StepVerifier.create(subject.update(1L, new AccountEditRequest()))
+                .verifyErrorMessage("No account found with id 1");
 
         Mockito.verify(accountProvider).lookup(1L);
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
     }
 
     @Test
@@ -82,10 +89,13 @@ class AccountEditResourceTest extends TestSetup {
                 .type("checking")
                 .build();
 
-        var response = subject.update(123L, request).blockingGet();
+        StepVerifier.create(subject.update(123L, request))
+                .assertNext(response -> {
+                    assertThat(response.getName()).isEqualTo("Sample account");
+                })
+                .verifyComplete();
 
         Mockito.verify(accountProvider).lookup(123L);
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
     }
 
     @Test
@@ -101,9 +111,9 @@ class AccountEditResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
 
         var response = subject.persistImage(1L, new AccountImageRequest("file-code"))
-                .blockingGet();
+                .block();
 
-        Assertions.assertThat(response.getIconFileCode()).isEqualTo("file-code");
+        assertThat(response.getIconFileCode()).isEqualTo("file-code");
         Mockito.verify(account).registerIcon("file-code");
     }
 
@@ -119,10 +129,36 @@ class AccountEditResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(123L))
                 .thenReturn(Control.Option(account));
 
-        var response = subject.delete(123L).blockingGet();
-
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.NO_CONTENT.getCode());
+        subject.delete(123L);
 
         Mockito.verify(account).terminate();
+    }
+
+    @Test
+    void createSavingGoal() {
+        Account account = Mockito.spy(Account.builder()
+                .id(1L)
+                .user(ACTIVE_USER)
+                .balance(0D)
+                .name("Sample account")
+                .currency("EUR")
+                .type("savings")
+                .build());
+
+        Mockito.when(accountProvider.lookup(123L))
+                .thenReturn(Control.Option(account));
+
+        subject.createSavingGoal(
+                123L,
+                AccountSavingGoalCreateRequest.builder()
+                        .goal(BigDecimal.valueOf(1500))
+                        .targetDate(LocalDate.now().plusDays(300))
+                        .name("Saving for washer")
+                        .build());
+
+        Mockito.verify(account).createSavingGoal(
+                "Saving for washer",
+                BigDecimal.valueOf(1500),
+                LocalDate.now().plusDays(300));
     }
 }

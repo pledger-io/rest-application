@@ -2,34 +2,28 @@ package com.jongsoft.finance.jpa.contract;
 
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-import io.micronaut.transaction.annotation.ReadOnly;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ContractProviderJpa implements ContractProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
-
-    public ContractProviderJpa(
-            AuthenticationFacade authenticationFacade,
-            ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
-    }
 
     @Override
     public Sequence<Contract> lookup() {
@@ -57,7 +51,7 @@ public class ContractProviderJpa implements ContractProvider {
     }
 
     @Override
-    public Maybe<Contract> lookup(String name) {
+    public Mono<Contract> lookup(String name) {
         log.trace("Contract lookup by name: {}", name);
 
         var hql = """
@@ -75,7 +69,7 @@ public class ContractProviderJpa implements ContractProvider {
     }
 
     @Override
-    public Flowable<Contract> search(String partialName) {
+    public Flux<Contract> search(String partialName) {
         log.trace("Contract lookup by partial name: {}", partialName);
 
         var hql = """

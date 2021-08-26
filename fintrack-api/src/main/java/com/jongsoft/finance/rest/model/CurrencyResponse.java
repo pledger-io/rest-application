@@ -1,7 +1,9 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.core.Currency;
+import io.micronaut.core.annotation.Introspected;
 
+@Introspected
 public class CurrencyResponse {
 
     private final Currency wrapped;

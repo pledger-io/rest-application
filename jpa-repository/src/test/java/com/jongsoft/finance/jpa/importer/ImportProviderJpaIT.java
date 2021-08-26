@@ -1,14 +1,13 @@
 package com.jongsoft.finance.jpa.importer;
 
-import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
 
 public class ImportProviderJpaIT extends JpaTestSetup {
 
@@ -30,7 +29,7 @@ public class ImportProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_slug() {
         setup();
-        var check = importProvider.lookup("test-import-1").blockingGet();
+        var check = importProvider.lookup("test-import-1").block();
 
         Assertions.assertThat(check.getFileCode()).isEqualTo("Large,CSV,file");
     }

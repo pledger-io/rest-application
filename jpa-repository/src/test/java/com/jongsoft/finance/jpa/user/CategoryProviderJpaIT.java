@@ -5,11 +5,10 @@ import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.category.CategoryProviderJpa;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import javax.inject.Inject;
 
 class CategoryProviderJpaIT extends JpaTestSetup {
 
@@ -51,7 +50,7 @@ class CategoryProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_byLabel() {
         setUp();
-        var response = categoryProviderJpa.lookup("Grocery").blockingGet();
+        var response = categoryProviderJpa.lookup("Grocery").block();
 
         Assertions.assertThat(response.getId()).isEqualTo(1L);
     }

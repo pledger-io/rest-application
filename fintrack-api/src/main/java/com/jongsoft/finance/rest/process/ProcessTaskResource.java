@@ -8,22 +8,21 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.camunda.bpm.engine.ProcessEngine;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.TaskService;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 @Tag(name = "Process Engine")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/runtime-process/{processDefinitionKey}/{businessKey}/{instanceId}/tasks")
 public class ProcessTaskResource {
 
     private final TaskService taskService;
-
-    public ProcessTaskResource(ProcessEngine processEngine) {
-        this.taskService = processEngine.getTaskService();
-    }
 
     @Get
     @Operation(
@@ -31,7 +30,7 @@ public class ProcessTaskResource {
             description = "List all available tasks for the provided process",
             operationId = "getTasks"
     )
-    public Flowable<ProcessTaskResponse> tasks(@PathVariable String processDefinitionKey, @PathVariable String instanceId) {
+    public Publisher<ProcessTaskResponse> tasks(@PathVariable String processDefinitionKey, @PathVariable String instanceId) {
         var tasks = Collections.List(taskService.createTaskQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .processInstanceId(instanceId)
@@ -39,7 +38,7 @@ public class ProcessTaskResource {
                 .list())
                 .map(ProcessTaskResponse::new);
 
-        return Flowable.fromIterable(tasks);
+        return Flux.fromIterable(tasks);
     }
 
     @Delete("/{taskId}")

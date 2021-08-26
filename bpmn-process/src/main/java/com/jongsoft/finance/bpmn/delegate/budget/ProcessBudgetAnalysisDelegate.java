@@ -1,18 +1,19 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
 import com.jongsoft.finance.core.DateUtils;
-import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
+import com.jongsoft.finance.domain.user.Budget;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
-import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.lang.Collections;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -27,21 +28,12 @@ import java.time.LocalDate;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessBudgetAnalysisDelegate implements JavaDelegate {
 
     private final TransactionProvider transactionProvider;
     private final FilterFactory filterFactory;
     private final SettingProvider settingProvider;
-
-    @Inject
-    public ProcessBudgetAnalysisDelegate(
-            TransactionProvider transactionProvider,
-            FilterFactory filterFactory,
-            SettingProvider settingProvider) {
-        this.transactionProvider = transactionProvider;
-        this.filterFactory = filterFactory;
-        this.settingProvider = settingProvider;
-    }
 
     @Override
     public void execute(DelegateExecution execution) {

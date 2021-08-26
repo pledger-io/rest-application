@@ -11,14 +11,13 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.security.filters.SecurityFilter;
-import io.reactivex.Single;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.test.StepVerifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -48,10 +47,11 @@ class AuthenticationFilterTest {
         Mockito.when(mockRequest.getAttribute(SecurityFilter.REJECTION, HttpStatus.class))
                 .thenReturn(Optional.of(HttpStatus.UNAUTHORIZED));
 
-        var response = Single.fromPublisher(subject.doFilterOnce(mockRequest, Mockito.mock(ServerFilterChain.class)))
-                .blockingGet();
-
-        Assertions.assertThat(response.status().getCode()).isEqualTo(HttpStatus.UNAUTHORIZED.getCode());
+        StepVerifier.create(subject.doFilter(mockRequest, Mockito.mock(ServerFilterChain.class)))
+                .assertNext(step -> {
+                    Assertions.assertThat(step.status().getCode()).isEqualTo(HttpStatus.UNAUTHORIZED.getCode());
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -62,11 +62,12 @@ class AuthenticationFilterTest {
         Mockito.when(chain.proceed(mockRequest))
                 .thenReturn(Publishers.just(HttpResponse.ok("OK")));
 
-        var response = Single.fromPublisher(subject.doFilterOnce(mockRequest, chain))
-                .blockingGet();
-
-        Assertions.assertThat(response.status().getCode()).isEqualTo(HttpStatus.OK.getCode());
-        Assertions.assertThat(response.getBody().get()).isEqualTo("OK");
+        StepVerifier.create(subject.doFilter(mockRequest, chain))
+                .assertNext(step -> {
+                    Assertions.assertThat(step.status().getCode()).isEqualTo(HttpStatus.OK.getCode());
+                    Assertions.assertThat(step.getBody().get()).isEqualTo("OK");
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -80,11 +81,12 @@ class AuthenticationFilterTest {
 
         Mockito.when(mockRequest.getUri()).thenReturn(new URI("http://localhost"));
 
-        var response = Single.fromPublisher(subject.doFilterOnce(mockRequest, chain))
-                .blockingGet();
-
-        Assertions.assertThat(response.getStatus().getCode()).isEqualTo(500);
-        Assertions.assertThat(response.getBody(JsonError.class).get().getMessage()).isEqualTo("Cannot find exception");
+        StepVerifier.create(subject.doFilter(mockRequest, chain))
+                .verifyErrorSatisfies(error -> {
+                    Assertions.assertThat(error)
+                            .isInstanceOf(StatusException.class)
+                            .hasMessage("Cannot find exception");
+                });
     }
 
     HttpRequest prepareMock() {

@@ -4,16 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.messaging.commands.account.CreateAccountCommand;
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.account.CreateAccountCommand;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.AccountJson;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.reactivex.Maybe;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
 import org.camunda.bpm.engine.variable.value.StringValue;
@@ -22,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Mono;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,7 +61,7 @@ class ProcessAccountCreationDelegateTest {
 
     @Test
     void execute_alreadyExists() {
-        Mockito.when(accountProvider.lookup("Test account")).thenReturn(Maybe.just(Account.builder().build()));
+        Mockito.when(accountProvider.lookup("Test account")).thenReturn(Mono.just(Account.builder().build()));
 
         subject.execute(execution);
 
@@ -72,8 +72,8 @@ class ProcessAccountCreationDelegateTest {
     void execute() {
         Account account = Account.builder().id(1L).build();
         Mockito.when(accountProvider.lookup("Test account"))
-                .thenReturn(Maybe.empty())
-                .thenReturn(Maybe.just(account));
+                .thenReturn(Mono.empty())
+                .thenReturn(Mono.just(account));
 
         subject.execute(execution);
 

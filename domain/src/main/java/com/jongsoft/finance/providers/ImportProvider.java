@@ -2,7 +2,7 @@ package com.jongsoft.finance.providers;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.importer.BatchImport;
-import io.reactivex.Maybe;
+import reactor.core.publisher.Mono;
 
 public interface ImportProvider {
 
@@ -19,7 +19,7 @@ public interface ImportProvider {
         }
     }
 
-    Maybe<BatchImport> lookup(String slug);
+    Mono<BatchImport> lookup(String slug);
     ResultPage<BatchImport> lookup(FilterCommand filter);
 
 }

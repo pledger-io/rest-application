@@ -6,12 +6,13 @@ import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.reactivex.Flowable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 class SettingResourceTest {
 
@@ -34,7 +35,7 @@ class SettingResourceTest {
 
     @Test
     void list() {
-        Mockito.when(settingProvider.lookup()).thenReturn(Flowable.just(
+        Mockito.when(settingProvider.lookup()).thenReturn(Flux.just(
                 Setting.builder()
                         .name("RecordSetPageSize")
                         .type(SettingType.NUMBER)
@@ -47,10 +48,9 @@ class SettingResourceTest {
                         .build()
         ));
 
-        var response = subject.list().test();
-
-        response.assertComplete();
-        response.assertValueCount(2);
+        StepVerifier.create(subject.list())
+                .expectNextCount(2)
+                .verifyComplete();
     }
 
     @Test

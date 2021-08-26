@@ -5,21 +5,20 @@ import com.jongsoft.finance.rest.model.SettingResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Flowable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
 
 @Secured("admin")
 @Controller("/api/settings")
 @Tag(name = "Application Settings")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SettingResource {
 
     private final SettingProvider settingProvider;
-
-    public SettingResource(SettingProvider settingProvider) {
-        this.settingProvider = settingProvider;
-    }
 
     @Get
     @Operation(
@@ -28,7 +27,7 @@ public class SettingResource {
             operationId = "getSettings"
     )
     @Secured({SecurityRule.IS_ANONYMOUS, SecurityRule.IS_AUTHENTICATED})
-    Flowable<SettingResponse> list() {
+    Publisher<SettingResponse> list() {
         return settingProvider.lookup()
                 .map(setting -> new SettingResponse(
                         setting.getName(),

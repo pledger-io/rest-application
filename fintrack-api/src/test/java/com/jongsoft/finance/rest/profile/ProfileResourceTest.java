@@ -1,26 +1,31 @@
 package com.jongsoft.finance.rest.profile;
 
+import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
 import com.jongsoft.finance.messaging.commands.user.RegisterTokenCommand;
-import com.jongsoft.finance.messaging.commands.user.RevokeTokenCommand;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.finance.security.PasswordEncoder;
 import com.jongsoft.lang.Dates;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.reactivex.Flowable;
 import org.assertj.core.api.Assertions;
 import org.jboss.aerogear.security.otp.Totp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 class ProfileResourceTest extends TestSetup {
 
@@ -34,7 +39,7 @@ class ProfileResourceTest extends TestSetup {
         eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         currentUserProvider = Mockito.mock(CurrentUserProvider.class);
         userProvider = Mockito.mock(UserProvider.class);
-        subject = new ProfileResource(currentUserProvider, userProvider);
+        subject = new ProfileResource(new FinTrack(new PasswordEncoder()), currentUserProvider, userProvider);
 
         Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
 
@@ -43,12 +48,14 @@ class ProfileResourceTest extends TestSetup {
 
     @Test
     public void get() {
-        var result = subject.get().blockingGet();
-
-        Assertions.assertThat(result.getCurrency()).isEqualTo("EUR");
-        Assertions.assertThat(result.getProfilePicture()).isNull();
-        Assertions.assertThat(result.getTheme()).isEqualTo("dark");
-        Assertions.assertThat(result.isMfa()).isEqualTo(false);
+        StepVerifier.create(subject.get())
+                .assertNext(result -> {
+                    assertThat(result.getCurrency()).isEqualTo("EUR");
+                    assertThat(result.getProfilePicture()).isNull();
+                    assertThat(result.getTheme()).isEqualTo("dark");
+                    assertThat(result.isMfa()).isEqualTo(false);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -58,36 +65,38 @@ class ProfileResourceTest extends TestSetup {
         request.setTheme("light");
         request.setPassword("updated-password");
 
-        var result = subject.patch(request).blockingGet();
-
-        Assertions.assertThat(result.getTheme()).isEqualTo("light");
-        Assertions.assertThat(result.getCurrency()).isEqualTo("USD");
+        StepVerifier.create(subject.patch(request))
+                .assertNext(result -> {
+                    assertThat(result.getTheme()).isEqualTo("light");
+                    assertThat(result.getCurrency()).isEqualTo("USD");
+                })
+                .verifyComplete();
     }
 
     @Test
     public void sessions() {
         Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername()))
-                .thenReturn(Flowable.just(
+                .thenReturn(Flux.just(
                         SessionToken.builder()
                                 .id(1L)
                                 .description("Sample session token")
                                 .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
                                 .build()));
 
-        subject.sessions()
-                .test()
-                .assertComplete()
-                .assertValue(token -> "Sample session token".equals(token.getDescription()))
-                .assertValue(token -> LocalDateTime.now()
-                        .plusDays(1)
-                        .truncatedTo(ChronoUnit.MINUTES)
-                        .equals(token.getValidUntil().truncatedTo(ChronoUnit.MINUTES)));
+        StepVerifier.create(subject.sessions())
+                .assertNext(token -> {
+                    assertThat(token.getDescription()).isEqualTo("Sample session token");
+                    assertThat(token.getValidUntil().truncatedTo(ChronoUnit.MINUTES)).isEqualTo(LocalDateTime.now()
+                            .plusDays(1)
+                            .truncatedTo(ChronoUnit.MINUTES));
+                })
+                .verifyComplete();
     }
 
     @Test
     public void createSession() {
         Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername()))
-                .thenReturn(Flowable.just(
+                .thenReturn(Flux.just(
                         SessionToken.builder()
                                 .id(1L)
                                 .description("Sample session token")
@@ -96,7 +105,7 @@ class ProfileResourceTest extends TestSetup {
 
         subject.createSession(new TokenCreateRequest("sample description", LocalDate.now().plusDays(1)));
 
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(RegisterTokenCommand.class));
+        verify(eventPublisher).publishEvent(Mockito.any(RegisterTokenCommand.class));
     }
 
     @Test
@@ -107,11 +116,11 @@ class ProfileResourceTest extends TestSetup {
                 .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
                 .build());
 
-        Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername())).thenReturn(Flowable.just(token));
+        Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername())).thenReturn(Flux.just(token));
 
         subject.deleteSession(1L);
 
-        Mockito.verify(token).revoke();
+        verify(token).revoke();
     }
 
     @Test
@@ -123,10 +132,10 @@ class ProfileResourceTest extends TestSetup {
         subject.enableMfa(request);
 
         var captor = ArgumentCaptor.forClass(ChangeMultiFactorCommand.class);
-        Mockito.verify(eventPublisher).publishEvent(captor.capture());
+        verify(eventPublisher).publishEvent(captor.capture());
 
-        Assertions.assertThat(captor.getValue().username()).isEqualTo(ACTIVE_USER.getUsername());
-        Assertions.assertThat(captor.getValue().enabled()).isEqualTo(true);
+        assertThat(captor.getValue().username()).isEqualTo(ACTIVE_USER.getUsername());
+        assertThat(captor.getValue().enabled()).isEqualTo(true);
     }
 
 //    @Test

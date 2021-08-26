@@ -1,6 +1,6 @@
 package com.jongsoft.finance;
 
-import io.reactivex.Single;
+import reactor.core.publisher.Mono;
 
 public interface StorageService {
 
@@ -12,7 +12,7 @@ public interface StorageService {
      */
     String store(byte[] content);
 
-    Single<byte[]> read(String token);
+    Mono<byte[]> read(String token);
 
     /**
      * Remove a file from storage that is no longer needed.

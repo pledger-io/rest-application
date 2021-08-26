@@ -1,7 +1,6 @@
 package com.jongsoft.finance.rest.process;
 
 import com.jongsoft.finance.rest.model.ProcessTaskResponse;
-import io.reactivex.subscribers.TestSubscriber;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.test.StepVerifier;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ class ProcessTaskResourceTest {
         MockitoAnnotations.openMocks(this);
 
         Mockito.when(processEngine.getTaskService()).thenReturn(taskService);
-        subject = new ProcessTaskResource(processEngine);
+        subject = new ProcessTaskResource(taskService);
     }
 
     @Test
@@ -40,12 +40,8 @@ class ProcessTaskResourceTest {
         Mockito.when(taskMock.initializeFormKeys()).thenReturn(taskMock);
         Mockito.when(taskMock.list()).thenReturn(List.of());
 
-        TestSubscriber<ProcessTaskResponse> subscriber = new TestSubscriber<>();
-        subject.tasks("reconcileAccount", "1")
-                .subscribe(subscriber);
-
-        subscriber.assertComplete();
-        subscriber.assertValueCount(0);
+        StepVerifier.create(subject.tasks("reconcileAccount", "1"))
+                .verifyComplete();
     }
 
     @Test

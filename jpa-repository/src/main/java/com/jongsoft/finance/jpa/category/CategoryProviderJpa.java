@@ -2,31 +2,25 @@ package com.jongsoft.finance.jpa.category;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-import io.reactivex.Maybe;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @Singleton
 @Named("categoryProvider")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CategoryProviderJpa implements CategoryProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
-
-    public CategoryProviderJpa(
-            AuthenticationFacade authenticationFacade,
-            ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
-    }
 
     @Override
     public Optional<Category> lookup(long id) {
@@ -39,7 +33,7 @@ public class CategoryProviderJpa implements CategoryProvider {
     }
 
     @Override
-    public Maybe<Category> lookup(String label) {
+    public Mono<Category> lookup(String label) {
         var hql = """
                 select c from CategoryJpa c
                 where c.label = :label

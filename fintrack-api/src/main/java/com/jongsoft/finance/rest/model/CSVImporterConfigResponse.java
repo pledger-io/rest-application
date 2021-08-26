@@ -1,7 +1,9 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
+import io.micronaut.core.annotation.Introspected;
 
+@Introspected
 public class CSVImporterConfigResponse {
 
     private final BatchImportConfig wrapped;

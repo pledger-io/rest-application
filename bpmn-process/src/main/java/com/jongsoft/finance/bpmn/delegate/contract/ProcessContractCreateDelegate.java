@@ -5,32 +5,23 @@ import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.serialized.ContractJson;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Hex;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessContractCreateDelegate implements JavaDelegate {
 
     private final AccountProvider accountProvider;
     private final ContractProvider contractProvider;
     private final StorageService storageService;
-
-    @Inject
-    public ProcessContractCreateDelegate(
-            AccountProvider accountProvider,
-            ContractProvider contractProvider,
-            StorageService storageService) {
-        this.accountProvider = accountProvider;
-        this.contractProvider = contractProvider;
-        this.storageService = storageService;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
@@ -43,9 +34,8 @@ public class ProcessContractCreateDelegate implements JavaDelegate {
                 contractJson.getName());
 
         var noDuplicate = contractProvider.lookup(contractJson.getName())
-                .isEmpty()
-                .blockingGet();
-        if (noDuplicate) {
+                .blockOptional();
+        if (noDuplicate.isEmpty()) {
             accountProvider.lookup(contractJson.getCompany())
                     .map(account -> account.createContract(
                             contractJson.getName(),

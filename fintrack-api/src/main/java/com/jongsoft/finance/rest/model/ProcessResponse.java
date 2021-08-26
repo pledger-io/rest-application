@@ -1,10 +1,12 @@
 package com.jongsoft.finance.rest.model;
 
+import io.micronaut.core.annotation.Introspected;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 
 import java.time.Duration;
 import java.util.Date;
 
+@Introspected
 public class ProcessResponse {
 
     private final HistoricProcessInstance wrapped;

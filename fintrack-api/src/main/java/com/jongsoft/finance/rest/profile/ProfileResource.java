@@ -3,24 +3,25 @@ package com.jongsoft.finance.rest.profile;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.SessionToken;
-import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.rest.model.SessionResponse;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.finance.security.PasswordEncoder;
 import com.jongsoft.finance.security.TwoFactorHelper;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,22 +32,19 @@ import java.util.UUID;
 @Tag(name = "User profile")
 @Controller("/api/profile")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProfileResource {
 
+    private final FinTrack application;
     private final CurrentUserProvider currentUserProvider;
     private final UserProvider userProvider;
-
-    public ProfileResource(final CurrentUserProvider currentUserProvider, UserProvider userProvider) {
-        this.currentUserProvider = currentUserProvider;
-        this.userProvider = userProvider;
-    }
 
     @Get
     @Operation(
             operationId = "getProfile",
             summary = "Get profile of authenticated user")
-    public Single<UserProfileResponse> get() {
-        return Single.create(emitter -> emitter.onSuccess(new UserProfileResponse(currentUserProvider.currentUser())));
+    public Publisher<UserProfileResponse> get() {
+        return Mono.just(new UserProfileResponse(currentUserProvider.currentUser()));
     }
 
     @Patch
@@ -54,8 +52,8 @@ public class ProfileResource {
             operationId = "patchProfile",
             summary = "Update part of the user profile",
             description = "This change will be applied to the authenticated user")
-    public Single<UserProfileResponse> patch(@Body PatchProfileRequest request) {
-        return Single.create(emitter -> {
+    public Publisher<UserProfileResponse> patch(@Body PatchProfileRequest request) {
+        return Mono.create(emitter -> {
             var userAccount = currentUserProvider.currentUser();
 
             if (request.currency() != null) {
@@ -67,10 +65,10 @@ public class ProfileResource {
             }
 
             if (request.password() != null) {
-                userAccount.changePassword(PasswordEncoder.getInstance().encrypt(request.password()));
+                userAccount.changePassword(application.getHashingAlgorithm().encrypt(request.password()));
             }
 
-            emitter.onSuccess(new UserProfileResponse(userAccount));
+            emitter.success(new UserProfileResponse(userAccount));
         });
     }
 
@@ -80,7 +78,7 @@ public class ProfileResource {
             summary = "Active Sessions",
             description = "Get a list of active session for the current user."
     )
-    Flowable<SessionResponse> sessions() {
+    Publisher<SessionResponse> sessions() {
         return userProvider.tokens(currentUserProvider.currentUser().getUsername())
                 .map(SessionResponse::new);
     }
@@ -91,8 +89,8 @@ public class ProfileResource {
             summary = "Create session token",
             description = "Create a new session token that has a longer validity then default authentication tokens."
     )
-    Flowable<SessionResponse> createSession(@Body @Valid TokenCreateRequest request) {
-        FinTrack.registerToken(
+    Publisher<SessionResponse> createSession(@Body @Valid TokenCreateRequest request) {
+        application.registerToken(
                 currentUserProvider.currentUser().getUsername(),
                 UUID.randomUUID().toString(),
                 (int) ChronoUnit.SECONDS.between(
@@ -106,7 +104,7 @@ public class ProfileResource {
     void deleteSession(@PathVariable long id) {
         userProvider.tokens(currentUserProvider.currentUser().getUsername())
                 .filter(token -> token.getId() == id)
-                .forEach(SessionToken::revoke);
+                .subscribe(SessionToken::revoke);
     }
 
     @Get(value = "/multi-factor/qr-code", produces = MediaType.IMAGE_PNG)
@@ -114,8 +112,8 @@ public class ProfileResource {
             operationId = "getQrCode",
             summary = "QR Code",
             description = "Use this API to obtain a QR code that can be used to scan in a 2-factor application")
-    Single<byte[]> qrCode() {
-        return Single.create(emitter -> {
+    Publisher<byte[]> qrCode() {
+        return Mono.create(emitter -> {
             var graphUri = TwoFactorHelper.build2FactorQr(currentUserProvider.currentUser());
 
             try (var inputStream = new URL(graphUri).openStream()) {
@@ -127,7 +125,9 @@ public class ProfileResource {
                     reader.write(byteChunk, 0, read);
                 }
 
-                emitter.onSuccess(reader.toByteArray());
+                emitter.success(reader.toByteArray());
+            } catch (IOException e) {
+                emitter.error(StatusException.internalError("Could not successfully generate QR code"));
             }
         });
     }

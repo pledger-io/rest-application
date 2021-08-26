@@ -1,18 +1,18 @@
 package com.jongsoft.finance.jpa.transaction;
 
-import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.providers.TransactionProvider;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -38,7 +38,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
     void first() {
         setup();
         var check = transactionProvider.first(filterFactory.transaction().ownAccounts())
-                .blockingGet();
+                .block();
 
         Assertions.assertThat(check.getId()).isEqualTo(1L);
     }

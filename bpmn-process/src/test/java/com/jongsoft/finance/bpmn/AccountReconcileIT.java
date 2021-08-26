@@ -1,22 +1,21 @@
 package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
-import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.lang.Control;
-import io.reactivex.Maybe;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -95,7 +94,7 @@ class AccountReconcileIT extends ProcessTestSetup {
         Mockito.when(accountProvider.lookup(1L))
                 .thenReturn(Control.Option(reconcileAccount));
         Mockito.when(accountProvider.lookup(SystemAccountTypes.RECONCILE))
-                .thenReturn(Maybe.just(reconcile));
+                .thenReturn(Mono.just(reconcile));
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(Control.Option())
                 .thenReturn(Control.Option(BigDecimal.valueOf(-20.0)));

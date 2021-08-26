@@ -2,31 +2,26 @@ package com.jongsoft.finance.jpa.tag;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Tag;
-import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import io.reactivex.Maybe;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Singleton
 @Named("tagProvider")
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TagProviderJpa implements TagProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
-
-    public TagProviderJpa(
-            AuthenticationFacade authenticationFacade,
-            ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
-    }
 
     @Override
     public Sequence<Tag> lookup() {
@@ -44,7 +39,7 @@ public class TagProviderJpa implements TagProvider {
     }
 
     @Override
-    public Maybe<Tag> lookup(String name) {
+    public Mono<Tag> lookup(String name) {
         log.trace("Tag lookup by name: {}", name);
 
         var hql = """

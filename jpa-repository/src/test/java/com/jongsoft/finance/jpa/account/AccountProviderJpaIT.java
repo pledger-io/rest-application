@@ -2,20 +2,21 @@ package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.test.annotation.MockBean;
+import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import reactor.test.StepVerifier;
 
-import javax.inject.Inject;
 import java.time.LocalDate;
 
 class AccountProviderJpaIT extends JpaTestSetup {
@@ -46,7 +47,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
     @Test
     void ofSynonym_accountOne() {
         setup();
-        var account = accountProvider.synonymOf("Account trial").blockingGet();
+        var account = accountProvider.synonymOf("Account trial").block();
 
         Assertions.assertThat(account.getName()).isEqualTo("Account One");
     }
@@ -54,10 +55,10 @@ class AccountProviderJpaIT extends JpaTestSetup {
     @Test
     void ofSynonym_notMyAccount() {
         setup();
-        var account = accountProvider.synonymOf("Account Junk")
-                .test();
 
-        account.assertNoValues();
+        StepVerifier.create(accountProvider.synonymOf("Account Junk"))
+                .expectNextCount(0)
+                .verifyComplete();
     }
 
     @Test
@@ -82,7 +83,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_name() {
         setup();
-        var account = accountProvider.lookup("Account One").blockingGet();
+        var account = accountProvider.lookup("Account One").block();
 
         Assertions.assertThat(account.getIban()).isEqualTo("NLJND200001928233");
         Assertions.assertThat(account.getDescription()).isEqualTo("Demo Account");
@@ -134,10 +135,10 @@ class AccountProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_systemType() {
         setup();
-        var account = accountProvider.lookup(SystemAccountTypes.RECONCILE).test();
 
-        account.assertNoValues();
-        account.assertComplete();
+        StepVerifier.create(accountProvider.lookup(SystemAccountTypes.RECONCILE))
+                .expectNextCount(0)
+                .verifyComplete();
     }
 
     @Test

@@ -2,24 +2,24 @@ package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.user.Category;
+import com.jongsoft.finance.domain.user.Role;
+import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.providers.TransactionRuleProvider;
-import com.jongsoft.finance.domain.user.*;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
+import jakarta.inject.Inject;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -85,38 +85,38 @@ public class ProfileImportIT extends ProcessTestSetup {
         StringBuilder ruleJsonString = new StringBuilder();
 
         Mockito.when(storageService.read("my-sample-token")).thenReturn(
-                Single.just(configContent.getBytes()));
+                Mono.just(configContent.getBytes()));
         Mockito.when(storageService.store(Mockito.any())).then((Answer<String>) invocation -> {
             byte[] param = invocation.getArgument(0);
             ruleJsonString.append(new String(param));
             return "my-json-token";
         });
-        Mockito.when(storageService.read("my-json-token")).thenAnswer(invocation -> Single.just(ruleJsonString.toString().getBytes()));
+        Mockito.when(storageService.read("my-json-token")).thenAnswer(invocation -> Mono.just(ruleJsonString.toString().getBytes()));
 
         Mockito.when(categoryProvider.lookup("Salary")).thenReturn(
-                Maybe.empty(),
-                Maybe.just(Category.builder()
+                Mono.empty(),
+                Mono.just(Category.builder()
                         .id(1L)
                         .build()));
         Mockito.when(categoryProvider.lookup("Groceries")).thenReturn(
-                Maybe.empty(),
-                Maybe.just(Category.builder()
+                Mono.empty(),
+                Mono.just(Category.builder()
                         .id(2L)
                         .build()));
         Mockito.when(categoryProvider.lookup("Car")).thenReturn(
-                Maybe.empty(),
-                Maybe.just(Category.builder()
+                Mono.empty(),
+                Mono.just(Category.builder()
                         .id(3L)
                         .build()));
         Mockito.when(accountProvider.lookup("Boss & Co."))
-                .thenReturn(Maybe.empty())
-                .thenReturn(Maybe.just(accountBoss));
+                .thenReturn(Mono.empty())
+                .thenReturn(Mono.just(accountBoss));
         Mockito.when(accountProvider.lookup("Demo checking account"))
-                .thenReturn(Maybe.empty())
-                .thenReturn(Maybe.just(accountDemo));
+                .thenReturn(Mono.empty())
+                .thenReturn(Mono.just(accountDemo));
         Mockito.when(accountProvider.lookup("Groceries are us"))
-                .thenReturn(Maybe.empty())
-                .thenReturn(Maybe.just(accountShop));
+                .thenReturn(Mono.empty())
+                .thenReturn(Mono.just(accountShop));
 
         var process = processEngine.getRuntimeService().createProcessInstanceByKey("ImportUserProfile")
                 .setVariable("storageToken", "my-sample-token")

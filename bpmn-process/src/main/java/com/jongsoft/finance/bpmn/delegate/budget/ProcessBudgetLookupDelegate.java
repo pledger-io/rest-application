@@ -1,15 +1,14 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import com.jongsoft.finance.domain.user.Budget;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.ExpenseProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.providers.ExpenseProvider;
-
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * This delegate allows for locating a specific budget in the system using one of the following methods:
@@ -24,16 +23,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessBudgetLookupDelegate implements JavaDelegate {
 
     private final FilterFactory filterFactory;
     private final ExpenseProvider expenseProvider;
-
-    @Inject
-    public ProcessBudgetLookupDelegate(FilterFactory filterFactory, ExpenseProvider expenseProvider) {
-        this.filterFactory = filterFactory;
-        this.expenseProvider = expenseProvider;
-    }
 
     @Override
     public void execute(DelegateExecution execution) {

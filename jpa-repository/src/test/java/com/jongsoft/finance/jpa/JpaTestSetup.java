@@ -1,12 +1,15 @@
 package com.jongsoft.finance.jpa;
 
+import com.jongsoft.finance.core.Encoder;
 import io.micronaut.core.io.IOUtils;
+import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,6 +46,11 @@ public abstract class JpaTestSetup {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @MockBean
+    public Encoder encoder() {
+        return Mockito.mock(Encoder.class);
     }
 
 }

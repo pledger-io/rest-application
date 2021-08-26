@@ -7,23 +7,46 @@ import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.SynchronousTransactionManager;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.EntityManager;
 import java.sql.Connection;
 import java.util.List;
+import java.util.function.Function;
 
+/**
+ * The non reactive JPA pipeline can be used to obtain entities from the database in a blocking manner. This means that
+ * once a query gets executed the caller will wait until the query completes. The result will be returned instantly and can
+ * be used directly.
+ *
+ * @param <T> the type of JPA entity this pipeline supports
+ */
+@RequiredArgsConstructor
 public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
 
     private final EntityManager entityManager;
     private final SynchronousTransactionManager<Connection> transactionManager;
 
-    public NonReactivePipe(EntityManager entityManager, SynchronousTransactionManager<Connection> transactionManager) {
-        this.entityManager = entityManager;
-        this.transactionManager = transactionManager;
+    /**
+     * Run the query in the pipeline and convert the result into an optional.
+     *
+     * @return either an empty optional or an optional containing the resolved entity.
+     */
+    public Optional<T> maybe() {
+        return maybe(Function.identity());
     }
 
+    /**
+     * Run the query in the pipeline and convert the result into an optional. Additionally apply the mapping logic
+     * to the entity as provided with the {@code converter}. The conversion will occur from the JPA entity {@code T}
+     * to the provided type of {@code R}.
+     *
+     * @param <R> the type to be returned
+     * @param converter the conversion logic
+     * @return either an empty optional or an optional containing the resolved entity.
+     */
     @SuppressWarnings("unchecked")
-    public Optional<T> maybe() {
+    public <R> Optional<R> maybe(Function<T, R> converter) {
         return transactionManager.executeRead(status -> {
             var query = entityManager.createQuery(hql());
 
@@ -31,12 +54,19 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
             applyPaging(query);
 
             return Control.Try(() -> (T) query.getSingleResult())
+                    .map(converter)
                     .map(Control::Option)
                     .recover(e -> Control.Option())
                     .get();
         });
     }
 
+    /**
+     * Run the provided query in the pipeline, returning a sequence of entities that are found in the
+     * database.
+     *
+     * @return a sequence with all found entities, or empty in case none are found
+     */
     @SuppressWarnings("unchecked")
     public Sequence<T> sequence() {
         return transactionManager.executeRead(status -> {
@@ -49,6 +79,12 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
         });
     }
 
+    /**
+     * Run a query on the database, supporting paging. Here the pagination is provided by the pipeline using the
+     * {@link #offset(int)} and the {@link #limit()}.
+     *
+     * @return a paged result with entities, or empty page when no entities match the query
+     */
     @SuppressWarnings("unchecked")
     public ResultPage<T> page() {
         return transactionManager.executeRead(status -> {

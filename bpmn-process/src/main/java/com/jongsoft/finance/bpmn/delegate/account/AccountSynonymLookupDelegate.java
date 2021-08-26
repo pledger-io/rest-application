@@ -2,13 +2,16 @@ package com.jongsoft.finance.bpmn.delegate.account;
 
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.providers.AccountProvider;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate accesses the {@link Account} synonym list in the system. The synonym list
@@ -28,14 +31,10 @@ import javax.inject.Singleton;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class AccountSynonymLookupDelegate implements JavaDelegate {
 
     private final AccountProvider accountProvider;
-
-    @Inject
-    public AccountSynonymLookupDelegate(AccountProvider accountProvider) {
-        this.accountProvider = accountProvider;
-    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
@@ -45,9 +44,10 @@ public class AccountSynonymLookupDelegate implements JavaDelegate {
         var synonym = execution.<StringValue>getVariableLocalTyped("name").getValue();
         var accountId = accountProvider.synonymOf(synonym)
                 .map(Account::getId)
-                .blockingGet(Long.MIN_VALUE);
+                .blockOptional(Duration.of(500, ChronoUnit.MILLIS))
+                .orElse(null);
 
-        execution.setVariableLocal("id", accountId.equals(Long.MIN_VALUE) ? null : accountId);
+        execution.setVariableLocal("id", accountId);
     }
 
 }

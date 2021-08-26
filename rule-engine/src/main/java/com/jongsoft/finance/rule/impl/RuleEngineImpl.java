@@ -1,9 +1,5 @@
 package com.jongsoft.finance.rule.impl;
 
-import java.util.List;
-
-import javax.inject.Singleton;
-
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.providers.TransactionRuleProvider;
@@ -13,17 +9,18 @@ import com.jongsoft.finance.rule.locator.ChangeLocator;
 import com.jongsoft.finance.rule.matcher.ConditionMatcher;
 import com.jongsoft.finance.rule.matcher.NumberMatcher;
 import com.jongsoft.finance.rule.matcher.StringMatcher;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RuleEngineImpl implements RuleEngine {
 
     private final TransactionRuleProvider transactionRuleProvider;
     private final List<ChangeLocator> locators;
-
-    public RuleEngineImpl(TransactionRuleProvider transactionRuleProvider, List<ChangeLocator> locators) {
-        this.transactionRuleProvider = transactionRuleProvider;
-        this.locators = locators;
-    }
 
     @Override
     public RuleDataSet run(RuleDataSet input) {

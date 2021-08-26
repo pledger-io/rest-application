@@ -3,33 +3,28 @@ package com.jongsoft.finance.jpa.importer;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
-import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.data.model.Sort;
 import io.reactivex.Maybe;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ImportProviderJpa implements ImportProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
 
-    public ImportProviderJpa(
-            AuthenticationFacade authenticationFacade,
-            ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
-    }
-
     @Override
-    public Maybe<BatchImport> lookup(String slug) {
+    public Mono<BatchImport> lookup(String slug) {
         log.trace("Importer lookup by slug: {}", slug);
 
         var hql = """

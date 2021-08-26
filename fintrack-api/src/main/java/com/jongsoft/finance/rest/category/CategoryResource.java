@@ -13,17 +13,20 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
-import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-import io.reactivex.Single;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 
 @Tag(name = "Category")
 @Controller("/api/categories")
 @Secured(SecurityRule.IS_AUTHENTICATED)
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CategoryResource {
 
     private final FilterFactory filterFactory;
@@ -32,25 +35,14 @@ public class CategoryResource {
 
     private final SettingProvider settingProvider;
 
-    public CategoryResource(
-            FilterFactory filterFactory,
-            CategoryProvider categoryService,
-            CurrentUserProvider currentUserProvider,
-            SettingProvider settingProvider) {
-        this.filterFactory = filterFactory;
-        this.categoryService = categoryService;
-        this.currentUserProvider = currentUserProvider;
-        this.settingProvider = settingProvider;
-    }
-
     @Get
     @Operation(
             summary = "List categories",
             description = "List all available categories",
             operationId = "getAll"
     )
-    Flowable<CategoryResponse> list() {
-        return Flowable.fromIterable(
+    Publisher<CategoryResponse> list() {
+        return Flux.fromIterable(
                 categoryService.lookup()
                         .map(CategoryResponse::new));
     }
@@ -76,7 +68,7 @@ public class CategoryResource {
             description = "List all categories matching the provided token",
             operationId = "getCategoriesByToken"
     )
-    Flowable<CategoryResponse> autocomplete(@Nullable String token) {
+    Publisher<CategoryResponse> autocomplete(@Nullable String token) {
         var response = categoryService.lookup(
                 filterFactory.category()
                         .label(token, false)
@@ -84,7 +76,7 @@ public class CategoryResource {
                 .content()
                 .map(CategoryResponse::new);
 
-        return Flowable.fromIterable(response);
+        return Flux.fromIterable(response);
     }
 
     @Put
@@ -94,7 +86,7 @@ public class CategoryResource {
             description = "Adds a new category to the system",
             operationId = "createCategory"
     )
-    Single<CategoryResponse> create(@Valid @Body CategoryCreateRequest createRequest) {
+    Mono<CategoryResponse> create(@Valid @Body CategoryCreateRequest createRequest) {
         currentUserProvider.currentUser()
                 .createCategory(createRequest.getName());
 
@@ -104,7 +96,7 @@ public class CategoryResource {
                     return category;
                 })
                 .map(CategoryResponse::new)
-                .switchIfEmpty(Single.error(StatusException.internalError("Could not create category")));
+                .switchIfEmpty(Mono.error(StatusException.internalError("Could not create category")));
     }
 
     @Get("/{id}")
@@ -113,15 +105,10 @@ public class CategoryResource {
             description = "Get a single category by its Id",
             operationId = "getCategory"
     )
-    Single<CategoryResponse> get(@PathVariable long id) {
-        return Maybe.<Category>create(emitter -> {
-            categoryService.lookup(id)
-                    .ifPresent(emitter::onSuccess);
-
-            emitter.onComplete();
-        })
-                .map(CategoryResponse::new)
-                .switchIfEmpty(Single.error(StatusException.notFound("No category found with id " + id)));
+    Mono<CategoryResponse> get(@PathVariable long id) {
+        return Mono.just(categoryService.lookup(id))
+                .map(optional -> optional.getOrThrow(() -> StatusException.notFound("No category found with id " + id)))
+                .map(CategoryResponse::new);
     }
 
     @Post("/{id}")
@@ -130,22 +117,15 @@ public class CategoryResource {
             description = "Update a single category by its Id",
             operationId = "updateCategory"
     )
-    Single<CategoryResponse> update(
+    Mono<CategoryResponse> update(
             @PathVariable long id,
             @Valid @Body CategoryCreateRequest updateRequest) {
-        return Maybe.
-                <Category>create(emitter -> {
-                    categoryService.lookup(id)
-                            .ifPresent(emitter::onSuccess);
-
-                    emitter.onComplete();
-                })
+        return Mono.just(categoryService.lookup(id))
+                .map(optional -> optional.getOrThrow(() -> StatusException.notFound("No category found with id " + id)))
                 .map(category -> {
                     category.rename(updateRequest.getName(), updateRequest.getDescription());
-                    return category;
-                })
-                .map(CategoryResponse::new)
-                .switchIfEmpty(Single.error(StatusException.notFound("No category found with id " + id)));
+                    return new CategoryResponse(category);
+                });
     }
 
     @Delete("/{id}")

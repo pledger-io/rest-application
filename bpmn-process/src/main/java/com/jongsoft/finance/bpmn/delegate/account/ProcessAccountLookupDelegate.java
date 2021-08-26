@@ -1,17 +1,20 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
-import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.control.Optional;
-import io.reactivex.Single;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import reactor.core.publisher.Mono;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate allows for locating {@link Account} instances within the system using the following methods:
@@ -29,18 +32,11 @@ import javax.inject.Singleton;
  */
 @Slf4j
 @Singleton
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessAccountLookupDelegate implements JavaDelegate {
 
     private final AccountProvider accountProvider;
     private final FilterFactory accountFilterFactory;
-
-    @Inject
-    public ProcessAccountLookupDelegate(
-            AccountProvider accountProvider,
-            FilterFactory accountFilterFactory) {
-        this.accountProvider = accountProvider;
-        this.accountFilterFactory = accountFilterFactory;
-    }
 
     @Override
     public void execute(DelegateExecution execution) {
@@ -68,8 +64,8 @@ public class ProcessAccountLookupDelegate implements JavaDelegate {
             final String accountName = (String) execution.getVariableLocal("name");
             matchedAccount = accountProvider.lookup(accountName)
                     .map(Control::Option)
-                    .switchIfEmpty(Single.just(Control.Option()))
-                    .blockingGet();
+                    .switchIfEmpty(Mono.just(Control.Option()))
+                    .block(Duration.of(500, ChronoUnit.MILLIS));
         }
 
         log.trace("{}: Processing account located {}", execution.getCurrentActivityName(), matchedAccount);

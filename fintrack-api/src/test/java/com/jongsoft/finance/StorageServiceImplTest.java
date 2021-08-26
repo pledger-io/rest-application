@@ -45,7 +45,7 @@ class StorageServiceImplTest {
     void unencryptedStore() {
         var storageKey = subject.store("My private text".getBytes());
         var read = subject.read(storageKey)
-                .blockingGet();
+                .block();
 
         Assertions.assertThat(new String(read)).isEqualTo("My private text");
         Assertions.assertThat(new File(System.getProperty("java.io.tmpdir") + "/upload/" + storageKey)).exists();
@@ -56,7 +56,7 @@ class StorageServiceImplTest {
         Mockito.when(securitySettings.isEncrypt()).thenReturn(true);
 
         var storageKey = subject.store("My private text".getBytes());
-        var read = subject.read(storageKey).blockingGet();
+        var read = subject.read(storageKey).block();
 
         Assertions.assertThat(new String(read)).isEqualTo("My private text");
         Assertions.assertThat(new File(System.getProperty("java.io.tmpdir") + "/upload/" + storageKey)).exists();

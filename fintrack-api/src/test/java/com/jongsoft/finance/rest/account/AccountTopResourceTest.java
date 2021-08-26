@@ -10,6 +10,7 @@ import com.jongsoft.lang.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 
@@ -65,10 +66,9 @@ class AccountTopResourceTest extends TestSetup {
                 Mockito.eq(true));
 
 
-        subject.topDebtors(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2))
-                .test()
-                .assertComplete()
-                .assertValueCount(1);
+        StepVerifier.create(subject.topDebtors(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2)))
+                .expectNextCount(1)
+                .verifyComplete();
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).top(
@@ -112,10 +112,9 @@ class AccountTopResourceTest extends TestSetup {
                 Mockito.eq(DateUtils.forMonth(2019, 1)),
                 Mockito.eq(false));
 
-        subject.topCreditor(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2))
-                .test()
-                .assertComplete()
-                .assertValueCount(1);
+        StepVerifier.create(subject.topCreditor(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2)))
+                .expectNextCount(1)
+                .verifyComplete();
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).top(

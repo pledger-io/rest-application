@@ -8,8 +8,7 @@ import com.jongsoft.finance.jpa.schedule.ScheduleFilterCommand;
 import com.jongsoft.finance.jpa.tag.TagFilterCommand;
 import com.jongsoft.finance.jpa.transaction.TransactionFilterCommand;
 import com.jongsoft.finance.providers.*;
-
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class FilterFactoryJpa implements FilterFactory {

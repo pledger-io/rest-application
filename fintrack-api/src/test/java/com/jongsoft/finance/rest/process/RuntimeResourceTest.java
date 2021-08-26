@@ -2,7 +2,6 @@ package com.jongsoft.finance.rest.process;
 
 import com.jongsoft.finance.rest.model.ProcessResponse;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import io.reactivex.subscribers.TestSubscriber;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
@@ -15,9 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import reactor.test.StepVerifier;
 
 import java.util.List;
 import java.util.Map;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class RuntimeResourceTest {
 
@@ -36,11 +39,11 @@ class RuntimeResourceTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
 
-        Mockito.when(processEngine.getRuntimeService()).thenReturn(runtimeService);
-        Mockito.when(processEngine.getHistoryService()).thenReturn(historyService);
-        Mockito.when(authenticationFacade.authenticated()).thenReturn("test-user");
+        when(processEngine.getRuntimeService()).thenReturn(runtimeService);
+        when(processEngine.getHistoryService()).thenReturn(historyService);
+        when(authenticationFacade.authenticated()).thenReturn("test-user");
 
-        subject = new RuntimeResource(processEngine, authenticationFacade);
+        subject = new RuntimeResource(historyService, runtimeService, authenticationFacade);
     }
 
     @Test
@@ -50,51 +53,50 @@ class RuntimeResourceTest {
         var instanceBuilder = Mockito.mock(ProcessInstantiationBuilder.class);
         var historyBuilder = Mockito.mock(HistoricProcessInstanceQuery.class);
 
-        Mockito.when(runtimeService.createProcessInstanceByKey("testProcess")).thenReturn(instanceBuilder);
-        Mockito.when(instanceBuilder.execute()).thenReturn(mockInstance);
-        Mockito.when(mockInstance.getProcessInstanceId()).thenReturn("MockProcessInstance");
-        Mockito.when(historyService.createHistoricProcessInstanceQuery()).thenReturn(historyBuilder);
-        Mockito.when(historyBuilder.processInstanceId("MockProcessInstance")).thenReturn(historyBuilder);
-        Mockito.when(historyBuilder.singleResult()).thenReturn(historyMock);
+        when(runtimeService.createProcessInstanceByKey("testProcess")).thenReturn(instanceBuilder);
+        when(instanceBuilder.execute()).thenReturn(mockInstance);
+        when(mockInstance.getProcessInstanceId()).thenReturn("MockProcessInstance");
+        when(historyService.createHistoricProcessInstanceQuery()).thenReturn(historyBuilder);
+        when(historyBuilder.processInstanceId("MockProcessInstance")).thenReturn(historyBuilder);
+        when(historyBuilder.singleResult()).thenReturn(historyMock);
 
-        subject.startProcess("testProcess", Map.of("businessKey", "sample-key")).blockingGet();
+        StepVerifier.create(subject.startProcess("testProcess", Map.of("businessKey", "sample-key")))
+                .expectNextCount(1)
+                .verifyComplete();
 
-        Mockito.verify(runtimeService).createProcessInstanceByKey("testProcess");
-        Mockito.verify(instanceBuilder).businessKey("sample-key");
+        verify(runtimeService).createProcessInstanceByKey("testProcess");
+        verify(instanceBuilder).businessKey("sample-key");
     }
 
     @Test
     void history() {
         final HistoricProcessInstanceQuery instanceBuilder = Mockito.mock(HistoricProcessInstanceQuery.class);
 
-        Mockito.when(historyService.createHistoricProcessInstanceQuery()).thenReturn(instanceBuilder);
-        Mockito.when(instanceBuilder.processDefinitionKey("testProcess")).thenReturn(instanceBuilder);
-        Mockito.when(instanceBuilder.variableValueEquals("username", "test-user")).thenReturn(instanceBuilder);
-        Mockito.when(instanceBuilder.orderByProcessInstanceStartTime()).thenReturn(instanceBuilder);
-        Mockito.when(instanceBuilder.desc()).thenReturn(instanceBuilder);
-        Mockito.when(instanceBuilder.list()).thenReturn(List.of());
+        when(historyService.createHistoricProcessInstanceQuery()).thenReturn(instanceBuilder);
+        when(instanceBuilder.processDefinitionKey("testProcess")).thenReturn(instanceBuilder);
+        when(instanceBuilder.variableValueEquals("username", "test-user")).thenReturn(instanceBuilder);
+        when(instanceBuilder.orderByProcessInstanceStartTime()).thenReturn(instanceBuilder);
+        when(instanceBuilder.desc()).thenReturn(instanceBuilder);
+        when(instanceBuilder.list()).thenReturn(List.of());
 
-        TestSubscriber<ProcessResponse> subscriber = new TestSubscriber<>();
-        subject.history("testProcess")
-                .subscribe(subscriber);
+        StepVerifier.create(subject.history("testProcess"))
+                .verifyComplete();
 
-        subscriber.assertComplete();
-
-        Mockito.verify(historyService).createHistoricProcessInstanceQuery();
-        Mockito.verify(instanceBuilder).processDefinitionKey("testProcess");
+        verify(historyService).createHistoricProcessInstanceQuery();
+        verify(instanceBuilder).processDefinitionKey("testProcess");
     }
 
     @Test
     void deleteProcess() {
         subject.deleteProcess("procId", "BusKey", "InstanceId");
 
-        Mockito.verify(runtimeService).deleteProcessInstance("InstanceId", "User termination");
+        verify(runtimeService).deleteProcessInstance("InstanceId", "User termination");
     }
 
     @Test
     void cleanHistory() {
         subject.cleanHistory();
 
-        Mockito.verify(historyService).cleanUpHistoryAsync(true);
+        verify(historyService).cleanUpHistoryAsync(true);
     }
 }

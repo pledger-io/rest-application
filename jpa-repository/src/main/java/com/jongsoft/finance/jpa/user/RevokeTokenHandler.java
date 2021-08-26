@@ -4,22 +4,19 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.user.RevokeTokenCommand;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.inject.Singleton;
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
 @Slf4j
 @Singleton
-@Transactional
+@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RevokeTokenHandler implements CommandHandler<RevokeTokenCommand> {
 
     private final ReactiveEntityManager entityManager;
-
-    public RevokeTokenHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
 
     @Override
     @BusinessEventListener
