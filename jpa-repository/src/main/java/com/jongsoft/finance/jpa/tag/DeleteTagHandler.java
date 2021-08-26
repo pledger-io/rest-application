@@ -6,9 +6,8 @@ import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.DeleteTagCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Singleton;
 
 @Slf4j
 @Singleton
