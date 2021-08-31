@@ -19,7 +19,7 @@
       <bpmn:incoming>SequenceFlow_1q5pqa4</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_102zsei</bpmn:outgoing>
     </bpmn:sendTask>
-    <bpmn:serviceTask id="st_create_account" name="Create account" camunda:asyncBefore="true" camunda:class="createUserDelegate">
+    <bpmn:serviceTask id="st_create_account" name="Create account" camunda:asyncBefore="true" camunda:delegateExpression="${createUserDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="username">${username}</camunda:inputParameter>

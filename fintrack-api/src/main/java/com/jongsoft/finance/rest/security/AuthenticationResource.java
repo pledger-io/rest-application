@@ -105,7 +105,7 @@ public class AuthenticationResource {
                         "username", authenticationRequest.getIdentity(),
                         "passwordHash", application.getHashingAlgorithm().encrypt(authenticationRequest.getSecret())));
 
-        return HttpResponse.created(null);
+        return HttpResponse.created((Void) null);
     }
 
     @ApiDefaults
