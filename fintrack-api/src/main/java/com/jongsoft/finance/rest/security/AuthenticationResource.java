@@ -90,7 +90,6 @@ public class AuthenticationResource {
     }
 
     @ApiDefaults
-    @Status(HttpStatus.CREATED)
     @Secured(SecurityRule.IS_ANONYMOUS)
     @Put("/api/security/create-account")
     @Operation(
@@ -99,11 +98,13 @@ public class AuthenticationResource {
             operationId = "createAccount"
     )
     @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(nullable = true)))
-    public void createAccount(@Valid @Body AuthenticationRequest authenticationRequest) {
+    public HttpResponse<Void> createAccount(@Valid @Body AuthenticationRequest authenticationRequest) {
         processEngine.getRuntimeService()
                 .startProcessInstanceByKey("RegisterUserAccount", Map.of(
                         "username", authenticationRequest.getIdentity(),
                         "passwordHash", application.getHashingAlgorithm().encrypt(authenticationRequest.getSecret())));
+
+        return HttpResponse.created(null);
     }
 
     @ApiDefaults
