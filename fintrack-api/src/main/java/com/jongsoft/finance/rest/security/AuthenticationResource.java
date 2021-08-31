@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest.security;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
@@ -62,10 +63,10 @@ public class AuthenticationResource {
             responseCode = "200",
             description = "Successfully authenticated",
             content = @Content(schema = @Schema(implementation = AccessRefreshToken.class)))
-    public Publisher<MutableHttpResponse<?>> authenticate(
+    public Mono<AccessRefreshToken> authenticate(
             HttpRequest<?> request,
             @Valid @Body AuthenticationRequest authenticationRequest) {
-        return Publishers.map(
+        return Mono.fromDirect(Publishers.map(
                 authenticationProvider.authenticate(request, authenticationRequest),
                 authenticated -> {
                     if (authenticated.isAuthenticated() && authenticated.getAuthentication().isPresent()) {
@@ -81,12 +82,12 @@ public class AuthenticationResource {
                                     actualToken.getRefreshToken(),
                                     actualToken.getExpiresIn());
 
-                            return HttpResponse.ok(actualToken);
+                            return actualToken;
                         }
                     }
 
-                    return HttpResponse.unauthorized();
-                });
+                    throw StatusException.notAuthorized("User cannot be found.");
+                }));
     }
 
     @ApiDefaults

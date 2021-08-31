@@ -95,9 +95,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .dateRange(new AccountTransactionSearchRequest.Range())
                 .build();
 
-        var response = subject.search(1L, request).block();
-
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
+        subject.search(1L, request).block();
 
         Mockito.verify(accountProvider).lookup(1L);
         Mockito.verify(transactionProvider).lookup(Mockito.any());
@@ -107,9 +105,8 @@ class AccountTransactionResourceTest extends TestSetup {
     void search_notfound() {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option());
 
-        var response = subject.search(1L, new AccountTransactionSearchRequest()).block();
-
-        Assertions.assertThat(response.code()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
+        StepVerifier.create(subject.search(1L, new AccountTransactionSearchRequest()))
+            .verifyErrorMessage("Account not found with id 1");
     }
 
     @Test

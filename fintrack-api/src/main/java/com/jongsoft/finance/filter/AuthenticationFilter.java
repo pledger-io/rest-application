@@ -54,18 +54,20 @@ public class AuthenticationFilter implements HttpServerFilter {
         var mdcContext = createMDCContext(request);
         var securityContext = createSecurityContext(request);
 
-        if (request.getPath().contains("/api/localization/")) {
-            log.trace("{}: {}", request.getMethod(), request.getPath());
-        } else {
-            log.info("{}: {}", request.getMethod(), request.getPath());
-        }
-
         ContextPropagation.configureContext(mdcContext, securityContext);
 
+        var startTime = System.nanoTime();
         return Flux.just(chain.proceed(request))
-                .doOnComplete(ContextPropagation::unsetContext)
                 .onErrorContinue((exception, a) -> this.translateException(exception, request))
                 .next()
+                .doOnTerminate(() -> {
+                    ContextPropagation.unsetContext();
+                    if (request.getPath().contains("/api/localization/")) {
+                        log.trace("{}: {}", request.getMethod(), request.getPath());
+                    } else {
+                        log.info("{}: {} in {} ms", request.getMethod(), request.getPath(), (double)(System.nanoTime() - startTime) / 1000000);
+                    }
+                })
                 .block(Duration.of(2, ChronoUnit.SECONDS));
     }
 

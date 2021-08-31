@@ -58,14 +58,14 @@ public class AccountTransactionResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Mono<HttpResponse<ResultPageResponse<TransactionResponse>>> search(
+    Mono<ResultPageResponse<TransactionResponse>> search(
             @PathVariable long accountId,
             @Valid @Body AccountTransactionSearchRequest request) {
         return Mono.create(emitter -> {
             var accountOption = accountProvider.lookup(accountId);
 
             if (!accountOption.isPresent()) {
-                emitter.success(HttpResponse.notFound());
+                emitter.error(StatusException.notAuthorized("Account not found with id " + accountId));
             } else {
                 var command = filterFactory.transaction()
                         .accounts(Collections.List(new EntityRef(accountId)))
@@ -82,7 +82,7 @@ public class AccountTransactionResource {
                 var results = transactionProvider.lookup(command)
                         .map(TransactionResponse::new);
 
-                emitter.success(HttpResponse.ok(new ResultPageResponse<>(results)));
+                emitter.success(new ResultPageResponse<>(results));
             }
         });
     }
