@@ -9,32 +9,25 @@ import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 
 @Slf4j
-class DatasourceMigrationJpa implements DataSourceMigration {
+public class DemoModeMigrationJpa implements DataSourceMigration {
 
-    private final MigrationDatasourceConfiguration datasourceConfiguration;
+    public DemoModeMigrationJpa() {
+        log.info("Setting up with demo database configuration.");
 
-    DatasourceMigrationJpa(MigrationDatasourceConfiguration datasourceConfiguration) {
-        this.datasourceConfiguration = datasourceConfiguration;
-
-        log.info("Setting up with production database configuration.");
-        migrate();
-    }
-
-    private void migrate() {
         var config = new FluentConfiguration();
         config.baselineOnMigrate(true)
-                .locations(datasourceConfiguration.getMigrationLocations())
+                .locations("classpath:db/camunda/h2", "classpath:db/migration", "classpath:db/sample")
+                .dataSource(
+                        "jdbc:h2:mem:finance;MODE=MYSQL",
+                        "demo-user",
+                        "secret")
                 .javaMigrations(
                         new V20200429151821__MigrateEncryptedStorage(),
                         new V20200430171321__MigrateToEncryptedDatabase(),
                         new V20200503171321__MigrateToDecryptDatabase()
-                )
-                .dataSource(
-                        datasourceConfiguration.getUrl(),
-                        datasourceConfiguration.getUsername(),
-                        datasourceConfiguration.getPassword()
                 );
 
         new Flyway(config).migrate();
     }
+
 }
