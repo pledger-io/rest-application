@@ -218,13 +218,10 @@ class AccountTransactionResourceTest extends TestSetup {
 
         StepVerifier.create(subject.get(123L))
                 .assertNext(response -> {
-                    Assertions.assertThat(response.code()).isEqualTo(HttpStatus.OK.getCode());
-
-                    var content = response.body();
-                    Assertions.assertThat(content.getId()).isEqualTo(1L);
-                    Assertions.assertThat(content.getAmount()).isEqualTo(20D);
-                    Assertions.assertThat(content.getDescription()).isEqualTo("Sample transaction");
-                    Assertions.assertThat(content.getCurrency()).isEqualTo("EUR");
+                    Assertions.assertThat(response.getId()).isEqualTo(1L);
+                    Assertions.assertThat(response.getAmount()).isEqualTo(20D);
+                    Assertions.assertThat(response.getDescription()).isEqualTo("Sample transaction");
+                    Assertions.assertThat(response.getCurrency()).isEqualTo("EUR");
                 })
                 .verifyComplete();
     }

@@ -6,9 +6,11 @@ import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedulable;
 import io.micronaut.core.annotation.Introspected;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -55,19 +57,23 @@ public class AccountResponse {
         return new History();
     }
 
-    public Set<SavingGoalResponse> savingGoals() {
-        return wrapped.getSavingGoals()
-                .map(SavingGoalResponse::new)
-                .toJava();
+    public Set<SavingGoalResponse> getSavingGoals() {
+        if (wrapped.getSavingGoals() != null) {
+            return wrapped.getSavingGoals()
+                    .map(SavingGoalResponse::new)
+                    .toJava();
+        }
+
+        return null;
     }
 
     @Introspected
-    @AllArgsConstructor
+    @RequiredArgsConstructor
     public class SavingGoalResponse {
 
         private final SavingGoal wrapped;
 
-        public long id () {
+        public long getId() {
             return wrapped.getId();
         }
 
@@ -80,7 +86,11 @@ public class AccountResponse {
         }
 
         public ScheduleResponse getSchedule() {
-            return new ScheduleResponse(wrapped.getSchedule());
+            if (wrapped.getSchedule() != null) {
+                return new ScheduleResponse(wrapped.getSchedule());
+            }
+
+            return null;
         }
 
         public BigDecimal getGoal() {
@@ -101,6 +111,11 @@ public class AccountResponse {
 
         public LocalDate getTargetDate() {
             return wrapped.getTargetDate();
+        }
+
+        public long getMonthsLeft() {
+            var monthsLeft = ChronoUnit.MONTHS.between(LocalDate.now(), wrapped.getTargetDate());
+            return Math.max(0, monthsLeft);
         }
 
     }

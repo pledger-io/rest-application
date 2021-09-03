@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.savings;
 
+import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.savings.RegisterSavingInstallmentCommand;
@@ -16,6 +17,7 @@ public class RegisterSavingInstallmentHandler implements CommandHandler<Register
     private final ReactiveEntityManager entityManager;
 
     @Override
+    @BusinessEventListener
     public void handle(RegisterSavingInstallmentCommand command) {
         log.info("[{}] - Incrementing allocation for saving goal.", command.id());
 

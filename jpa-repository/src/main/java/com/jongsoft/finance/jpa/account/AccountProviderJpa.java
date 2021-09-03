@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -220,6 +221,7 @@ public class AccountProviderJpa implements AccountProvider {
         }
 
         return savingGoals.stream()
+                .filter(Predicate.not(SavingGoalJpa::isArchived))
                 .map(source -> SavingGoal.builder()
                         .id(source.getId())
                         .allocated(source.getAllocated())

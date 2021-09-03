@@ -178,15 +178,11 @@ public class AccountTransactionResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Mono<HttpResponse<TransactionResponse>> get(@PathVariable long transactionId) {
+    Mono<TransactionResponse> get(@PathVariable long transactionId) {
         return Mono.create(emitter -> {
-            var transaction = transactionProvider.lookup(transactionId);
-
-            if (!transaction.isPresent()) {
-                emitter.success(HttpResponse.notFound());
-            } else {
-                emitter.success(HttpResponse.ok(new TransactionResponse(transaction.get())));
-            }
+            transactionProvider.lookup(transactionId)
+                    .ifPresent(transactions -> emitter.success(new TransactionResponse(transactions)))
+                    .elseRun(() -> emitter.error(StatusException.notFound("Cannot find transaction with id " + transactionId)));
         });
     }
 
