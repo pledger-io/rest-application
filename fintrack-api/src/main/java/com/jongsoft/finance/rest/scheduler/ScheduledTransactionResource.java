@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 import javax.validation.Valid;
 import java.util.Objects;
 
-@Tag(name = "Transactions")
+@Tag(name = "Scheduling agent")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/schedule/transaction")
 @RequiredArgsConstructor(onConstructor_ = @Inject)

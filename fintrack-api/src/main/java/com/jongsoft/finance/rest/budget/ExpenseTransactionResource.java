@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "Transactions")
+@Tag(name = "Budget")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/budgets/expenses/{expenseId}/{year}/{month}/transactions")
@@ -35,7 +35,7 @@ public class ExpenseTransactionResource {
 
     @Get("{?page}")
     @Operation(
-            summary = "Budget transactions",
+            summary = "Transaction overview",
             description = "Paged listing of all transactions for the provided expense and month.",
             parameters = {
                     @Parameter(name = "expenseId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class), required = true),

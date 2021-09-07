@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "Transactions")
+@Tag(name = "Contract")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/contracts/{contractId}/transactions")
@@ -30,7 +30,7 @@ public class ContractTransactionResource {
 
     @Get("{?page}")
     @Operation(
-            summary = "Contract transactions",
+            summary = "Transaction overview",
             description = "Paged listing of all transactions that belong to a contract"
     )
     ResultPageResponse<TransactionResponse> transactions(

@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 import javax.validation.Valid;
 import java.security.Principal;
 
-@Tag(name = "Transactions")
+@Tag(name = "Importer")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/import/{batchSlug}/transactions")
@@ -32,7 +32,8 @@ public class ImporterTransactionResource {
 
     @Post
     @Operation(
-            summary = "Importer transactions",
+            summary = "Transaction overview",
+            operationId = "getTransactions",
             description = "Search for transactions created by the importer job",
             parameters = @Parameter(name = "batchSlug", in = ParameterIn.PATH, schema = @Schema(implementation = String.class))
     )
@@ -53,7 +54,8 @@ public class ImporterTransactionResource {
     @Delete("/{transactionId}")
     @Post
     @Operation(
-            summary = "Delete import transactions",
+            summary = "Delete transaction",
+            operationId = "deleteTransaction",
             description = "Search for transactions created by the importer job",
             parameters = {
                     @Parameter(name = "batchSlug", in = ParameterIn.PATH, schema = @Schema(implementation = String.class)),

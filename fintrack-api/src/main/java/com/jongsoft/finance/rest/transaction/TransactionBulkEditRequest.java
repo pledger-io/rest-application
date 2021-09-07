@@ -42,8 +42,11 @@ public class TransactionBulkEditRequest {
             minLength = 1)
     private List<Long> transactions;
 
+    @Schema(description = "The contract to set to all transactions")
     private EntityRef contract;
+    @Schema(description = "The budget expense to set to all transactions")
     private EntityRef budget;
+    @Schema(description = "The category to set to all transactions")
     private EntityRef category;
     @Schema(description = "The list of tags to set to the transactions")
     private List<String> tags;
