@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import io.micronaut.core.annotation.Introspected;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Introspected
 public class CSVImporterConfigResponse {
@@ -12,14 +13,17 @@ public class CSVImporterConfigResponse {
         this.wrapped = wrapped;
     }
 
+    @Schema(description = "The CSV configuration identifier")
     public Long getId() {
         return wrapped.getId();
     }
 
+    @Schema(description = "The name of the CSV configuration")
     public String getName() {
         return wrapped.getName();
     }
 
+    @Schema(description = "The file code to get the contents of the configuration")
     public String getFile() {
         return wrapped.getFileCode();
     }
