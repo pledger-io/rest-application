@@ -26,8 +26,7 @@ public record ReactiveThreadLocal<T>(Supplier<T> extractor, Consumer<T> configur
      *
      * @param <T>        the type of the to-be propagated objects
      * @param extractor  the operation using which the context to be propagated and the context to be
-     *                   replaced are extracted before a {@link Runnable} is scheduled by an RxJava {@link
-     *                   io.reactivex.Scheduler}
+     *                   replaced are extracted before a {@link Runnable} is scheduled by an RxJava.
      * @param configurer the operation that updates the relevant thread local context just before a
      *                   scheduled {@link Runnable} is invoked, based on the previously extracted context
      * @param restorer   the operation that restores the original thread local context following
@@ -45,8 +44,7 @@ public record ReactiveThreadLocal<T>(Supplier<T> extractor, Consumer<T> configur
      *
      * @param <T> the type of the to-be propagated objects
      * @param extractor the operation using which the context to be propagated and the context to be
-     *     replaced are extracted before a {@link Runnable} is scheduled by an RxJava {@link
-     *     io.reactivex.Scheduler}
+     *     replaced are extracted before a {@link Runnable} is scheduled by an RxJava
      * @param setAndRestore the operation that updates and restores the relevant thread local context
      *     before and after the execution of a scheduled {@link Runnable}
      * @return
