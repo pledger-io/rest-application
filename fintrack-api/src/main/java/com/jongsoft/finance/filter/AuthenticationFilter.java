@@ -4,7 +4,6 @@ import com.jongsoft.finance.reactive.ContextPropagation;
 import com.jongsoft.finance.reactive.ReactiveThreadLocal;
 import com.jongsoft.finance.security.AuthenticationFacadeImpl;
 import com.jongsoft.lang.Control;
-import io.micronaut.context.annotation.Replaces;
 import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.http.*;
 import io.micronaut.http.annotation.Filter;
@@ -12,7 +11,6 @@ import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
 import io.micronaut.http.hateoas.JsonError;
-import io.micronaut.management.endpoint.EndpointsFilter;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.authentication.AuthorizationException;
 import io.micronaut.security.filters.SecurityFilter;
@@ -30,7 +28,6 @@ import java.util.UUID;
 
 @Slf4j
 @Filter("/**")
-@Replaces(EndpointsFilter.class)
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class AuthenticationFilter implements HttpServerFilter {
     public static final CharSequence AUTHENTICATION = HttpAttributes.PRINCIPAL.toString();
@@ -73,7 +70,6 @@ public class AuthenticationFilter implements HttpServerFilter {
 
     private MutableHttpResponse<?> translateException(Throwable throwable, HttpRequest<?> request) {
         var error = new JsonError(throwable.getMessage());
-        //error.link(Link.SELF, Link.of(request.getUri()));
 
         int statusCode = 500;
         if (throwable instanceof AuthorizationException) {
