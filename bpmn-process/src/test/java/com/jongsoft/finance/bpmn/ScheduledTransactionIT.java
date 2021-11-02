@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public class ScheduledTransactionIT extends ProcessTestSetup {
+class ScheduledTransactionIT extends ProcessTestSetup {
 
     @Inject
     private StorageService storageService;
@@ -54,9 +54,10 @@ public class ScheduledTransactionIT extends ProcessTestSetup {
     void setup() {
         Mockito.reset(transactionProvider, storageService, accountProvider, transactionCreationHandler, transactionScheduleProvider, transactionRuleProvider);
 
-        Mockito.when(transactionScheduleProvider.lookup()).thenReturn(Collections.List(
+        Mockito.when(transactionScheduleProvider.lookup(1L)).thenReturn(Control.Option(
                 ScheduledTransaction.builder()
                         .id(1L)
+                        .name("CableCom")
                         .amount(29.99)
                         .description("Monthly TV")
                         .source(Account.builder().id(1L).build())
@@ -113,7 +114,7 @@ public class ScheduledTransactionIT extends ProcessTestSetup {
         Assertions.assertThat(transaction.getValue().computeTo().getId()).isEqualTo(2L);
         Assertions.assertThat(transaction.getValue().computeFrom().getId()).isEqualTo(1L);
         Assertions.assertThat(transaction.getValue().computeAmount(transaction.getValue().computeTo())).isEqualTo(29.99);
-        Assertions.assertThat(transaction.getValue().getDescription()).isEqualTo("Monthly TV");
+        Assertions.assertThat(transaction.getValue().getDescription()).isEqualTo("CableCom: Monthly TV");
         Assertions.assertThat(transaction.getValue().getDate()).isEqualTo(LocalDate.of(2019, 1, 1));
     }
 }

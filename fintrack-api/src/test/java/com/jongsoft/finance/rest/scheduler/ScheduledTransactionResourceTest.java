@@ -1,19 +1,18 @@
 package com.jongsoft.finance.rest.scheduler;
 
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
-import com.jongsoft.finance.providers.TransactionScheduleProvider;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -99,13 +98,10 @@ class ScheduledTransactionResourceTest extends TestSetup {
     void get() {
         StepVerifier.create(subject.get(1L))
                 .assertNext(response -> {
-                    assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
-
-                    var actual = response.getBody().get();
-                    assertThat(actual.getName()).isEqualTo("Monthly gym membership");
-                    assertThat(actual.getDescription()).isEqualTo("Gym membership");
-                    assertThat(actual.getRange().getStart()).isEqualTo(LocalDate.parse("2019-01-01"));
-                    assertThat(actual.getRange().getEnd()).isEqualTo(LocalDate.parse("2021-01-01"));
+                    assertThat(response.getName()).isEqualTo("Monthly gym membership");
+                    assertThat(response.getDescription()).isEqualTo("Gym membership");
+                    assertThat(response.getRange().getStart()).isEqualTo(LocalDate.parse("2019-01-01"));
+                    assertThat(response.getRange().getEnd()).isEqualTo(LocalDate.parse("2021-01-01"));
                 })
                 .verifyComplete();
     }

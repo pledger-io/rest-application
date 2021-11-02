@@ -37,7 +37,7 @@ public class ProcessEngineConfiguration {
 
         configuration.setHistory(org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_FULL)
                 .setJobExecutorActivate(true)
-                .setMetricsEnabled(false)
+                .setMetricsEnabled(true)
                 .setJdbcDriver(camundaDatasourceConfiguration.getDriverClassName())
                 .setJdbcUrl(camundaDatasourceConfiguration.getUrl())
                 .setJdbcUsername(camundaDatasourceConfiguration.getUsername())

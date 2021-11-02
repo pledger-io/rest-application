@@ -32,6 +32,7 @@ class WarnBeforeExpiryHandler implements CommandHandler<WarnBeforeExpiryCommand>
                 .businessKey("contract_term_" + command.id())
                 .setVariable("warnAt", DateUtils.toDate(newDueDate))
                 .setVariable("username", authenticationFacade.authenticated())
+                .setVariable("contractId", command.id())
                 .execute();
     }
 

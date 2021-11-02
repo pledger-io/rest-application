@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.scheduler;
 
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
+import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import jakarta.inject.Inject;
@@ -14,7 +15,6 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Objects;
 
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -28,25 +28,34 @@ public class GenerateTransactionJsonDelegate implements JavaDelegate {
         var scheduledTransactionId = execution.<LongValue>getVariableLocalTyped("id").getValue();
         var isoDate = execution.<StringValue>getVariableLocalTyped("scheduled").getValue();
 
-        var schedule = transactionScheduleProvider.lookup()
-                .filter(e -> Objects.equals(e.getId(), scheduledTransactionId))
-                .head();
+        transactionScheduleProvider.lookup(scheduledTransactionId)
+                .ifPresent(schedule -> {
+                    var transaction = new ParsedTransaction(
+                            schedule.getAmount(),
+                            Transaction.Type.CREDIT,
+                            generateTransactionDescription(schedule),
+                            LocalDate.parse(isoDate),
+                            null,
+                            null,
+                            "",
+                            "");
 
-        var transaction = new ParsedTransaction(
-                schedule.getAmount(),
-                Transaction.Type.CREDIT,
-                schedule.getDescription(),
-                LocalDate.parse(isoDate),
-                null,
-                null,
-                "",
-                "");
+                    var transactionToken = storageService.store(transaction.stringify().getBytes(StandardCharsets.UTF_8));
 
-        var transactionToken = storageService.store(transaction.stringify().getBytes(StandardCharsets.UTF_8));
+                    execution.setVariable("destinationId", schedule.getDestination().getId());
+                    execution.setVariable("sourceId", schedule.getSource().getId());
+                    execution.setVariable("transactionToken", transactionToken);
+                }).elseThrow(() -> new IllegalStateException("Cannot find schedule with id " + scheduledTransactionId));
+    }
 
-        execution.setVariable("destinationId", schedule.getDestination().getId());
-        execution.setVariable("sourceId", schedule.getSource().getId());
-        execution.setVariable("transactionToken", transactionToken);
+    private String generateTransactionDescription(ScheduledTransaction scheduledTransaction) {
+        var descriptionBuilder = new StringBuilder(scheduledTransaction.getName());
+        if (scheduledTransaction.getDescription() != null) {
+            descriptionBuilder
+                    .append(": ")
+                    .append(scheduledTransaction.getDescription());
+        }
+        return descriptionBuilder.toString();
     }
 
 }

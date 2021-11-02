@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest.scheduler;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
@@ -109,15 +110,16 @@ public class ScheduledTransactionResource {
                     schema = @Schema(implementation = Long.class),
                     in = ParameterIn.PATH)
     )
-    public Publisher<HttpResponse<ScheduledTransactionResponse>> get(@PathVariable long scheduleId) {
+    public Publisher<ScheduledTransactionResponse> get(@PathVariable long scheduleId) {
         return Mono.create(emitter -> {
             var scheduleOption = scheduleProvider.lookup()
                     .filter(s -> s.getId() == scheduleId)
                     .map(ScheduledTransactionResponse::new);
+
             if (scheduleOption.isEmpty()) {
-                emitter.success(HttpResponse.notFound());
+                emitter.error(StatusException.notFound("No scheduled transaction found with id " + scheduleId));
             } else {
-                emitter.success(HttpResponse.ok(scheduleOption.head()));
+                emitter.success(scheduleOption.head());
             }
         });
     }
