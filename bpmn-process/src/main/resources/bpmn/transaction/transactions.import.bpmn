@@ -48,8 +48,7 @@
       <bpmn:endEvent id="end_transaction_analysis">
         <bpmn:incoming>SequenceFlow_1vo4x03</bpmn:incoming>
       </bpmn:endEvent>
-      <bpmn:sequenceFlow id="SequenceFlow_1ksh7iz" sourceRef="sp_call_apply_rules" targetRef="Task_0jxcsc4" />
-      <bpmn:serviceTask id="locate_account_task" name="Locate account" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountLookup" camunda:delegateExpression="${processAccountLookupDelegate}">
+      <bpmn:serviceTask id="locate_account_task" name="Locate account" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountLookup" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${processAccountLookupDelegate}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
             <camunda:inputParameter name="iban">${iban}</camunda:inputParameter>
@@ -63,7 +62,7 @@
         <bpmn:incoming>SequenceFlow_0p4u2h2</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_154v2ot</bpmn:outgoing>
       </bpmn:serviceTask>
-      <bpmn:serviceTask id="task_create_account" name="Create account" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountCreate" camunda:delegateExpression="${processAccountCreationDelegate}">
+      <bpmn:serviceTask id="task_create_account" name="Create account" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountCreate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${processAccountCreationDelegate}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
             <camunda:inputParameter name="account">${accountJson}</camunda:inputParameter>
@@ -72,41 +71,17 @@
         <bpmn:incoming>SequenceFlow_0u8y9kf</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_1uohf2q</bpmn:outgoing>
       </bpmn:serviceTask>
-      <bpmn:serviceTask id="Task_12rm9hn" name="Create transaction" camunda:delegateExpression="${createTransactionDelegate}">
-        <bpmn:extensionElements>
-          <camunda:inputOutput>
-            <camunda:inputParameter name="transactionToken">${transactionToken}</camunda:inputParameter>
-            <camunda:inputParameter name="accountId">${toAccount}</camunda:inputParameter>
-            <camunda:inputParameter name="targetAccount">${targetAccountId}</camunda:inputParameter>
-            <camunda:inputParameter name="batchImportSlug">${slug}</camunda:inputParameter>
-            <camunda:outputParameter name="transactionId">${transactionId}</camunda:outputParameter>
-          </camunda:inputOutput>
-        </bpmn:extensionElements>
-        <bpmn:incoming>SequenceFlow_1955s8c</bpmn:incoming>
-        <bpmn:outgoing>SequenceFlow_0xjad35</bpmn:outgoing>
-      </bpmn:serviceTask>
       <bpmn:sequenceFlow id="SequenceFlow_1955s8c" name="yes" sourceRef="gw_account_found" targetRef="Task_12rm9hn" />
       <bpmn:sequenceFlow id="SequenceFlow_06bttbu" name="no" sourceRef="gw_account_found" targetRef="gw_allow_create">
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${toAccount== null}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
-      <bpmn:sequenceFlow id="SequenceFlow_1vo4x03" sourceRef="Task_0jxcsc4" targetRef="end_transaction_analysis" />
-      <bpmn:serviceTask id="Task_0jxcsc4" name="Detect duplicates" camunda:delegateExpression="${duplicateTransactionFinderDelegate}">
-        <bpmn:extensionElements>
-          <camunda:inputOutput>
-            <camunda:inputParameter name="transactionId">${transactionId}</camunda:inputParameter>
-          </camunda:inputOutput>
-        </bpmn:extensionElements>
-        <bpmn:incoming>SequenceFlow_1ksh7iz</bpmn:incoming>
-        <bpmn:incoming>gw_rules_active_no</bpmn:incoming>
-        <bpmn:outgoing>SequenceFlow_1vo4x03</bpmn:outgoing>
-      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="SequenceFlow_1vo4x03" sourceRef="Activity_1nt1q0a" targetRef="end_transaction_analysis" />
       <bpmn:exclusiveGateway id="gw_rules_active" name="rules active&#10;&#10;" default="gw_rules_active_no">
-        <bpmn:incoming>SequenceFlow_0xjad35</bpmn:incoming>
+        <bpmn:incoming>Flow_0308ccu</bpmn:incoming>
         <bpmn:outgoing>gw_rules_active_yes</bpmn:outgoing>
         <bpmn:outgoing>gw_rules_active_no</bpmn:outgoing>
       </bpmn:exclusiveGateway>
-      <bpmn:sequenceFlow id="SequenceFlow_0xjad35" sourceRef="Task_12rm9hn" targetRef="gw_rules_active" />
-      <bpmn:sequenceFlow id="gw_rules_active_no" name="no" sourceRef="gw_rules_active" targetRef="Task_0jxcsc4" />
+      <bpmn:sequenceFlow id="gw_rules_active_no" name="no" sourceRef="gw_rules_active" targetRef="Activity_1nt1q0a" />
       <bpmn:sequenceFlow id="SequenceFlow_0p4u2h2" sourceRef="st_lookup_mapping" targetRef="locate_account_task" />
       <bpmn:serviceTask id="st_lookup_mapping" name="Lookup mapping" camunda:delegateExpression="${lookupAccountMappingDelegate}">
         <bpmn:extensionElements>
@@ -141,14 +116,39 @@
         <bpmn:incoming>SequenceFlow_0an83zh</bpmn:incoming>
         <bpmn:outgoing>SequenceFlow_0u8y9kf</bpmn:outgoing>
       </bpmn:serviceTask>
-      <bpmn:serviceTask id="sp_call_apply_rules" name="Apply rules" camunda:delegateExpression="${transactionRuleMatcherDelegate}">
+      <bpmn:serviceTask id="sp_call_apply_rules" name="Apply rules" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.rule.TransactionRuleMatcherDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${transactionRuleMatcherDelegate}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
             <camunda:inputParameter name="transactionId">${transactionId}</camunda:inputParameter>
           </camunda:inputOutput>
         </bpmn:extensionElements>
         <bpmn:incoming>gw_rules_active_yes</bpmn:incoming>
-        <bpmn:outgoing>SequenceFlow_1ksh7iz</bpmn:outgoing>
+        <bpmn:outgoing>Flow_0a9yda8</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="Flow_0a9yda8" sourceRef="sp_call_apply_rules" targetRef="Activity_1nt1q0a" />
+      <bpmn:serviceTask id="Task_12rm9hn" name="Create transaction" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.scheduler.CreateTransactionDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${createTransactionDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="transactionToken">${transactionToken}</camunda:inputParameter>
+            <camunda:inputParameter name="accountId">${toAccount}</camunda:inputParameter>
+            <camunda:inputParameter name="targetAccount">${targetAccountId}</camunda:inputParameter>
+            <camunda:inputParameter name="batchImportSlug">${slug}</camunda:inputParameter>
+            <camunda:outputParameter name="transactionId">${transactionId}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_1955s8c</bpmn:incoming>
+        <bpmn:outgoing>Flow_0308ccu</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="Flow_0308ccu" sourceRef="Task_12rm9hn" targetRef="gw_rules_active" />
+      <bpmn:serviceTask id="Activity_1nt1q0a" name="Detect duplicates" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.scheduler.DuplicateTransactionFinderDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${duplicateTransactionFinderDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="transactionId">${transactionId}</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0a9yda8</bpmn:incoming>
+        <bpmn:incoming>gw_rules_active_no</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_1vo4x03</bpmn:outgoing>
       </bpmn:serviceTask>
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="SequenceFlow_1vvgsbz" sourceRef="readTransactionCSV" targetRef="task_locate_target_account" />
@@ -172,7 +172,7 @@
       <bpmn:outgoing>SequenceFlow_1vvgsbz</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_14u9otf" sourceRef="task_locate_target_account" targetRef="processTransactionSubProcess" />
-    <bpmn:serviceTask id="task_locate_target_account" name="Locate target account" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountLookup" camunda:asyncBefore="true" camunda:delegateExpression="${processAccountLookupDelegate}">
+    <bpmn:serviceTask id="task_locate_target_account" name="Locate target account" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountLookup" camunda:modelerTemplateVersion="1" camunda:asyncBefore="true" camunda:delegateExpression="${processAccountLookupDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="name" />
@@ -237,14 +237,10 @@
       <bpmndi:BPMNEdge id="SequenceFlow_1qzwv69_di" bpmnElement="gw_rules_active_no">
         <di:waypoint x="1561" y="201" />
         <di:waypoint x="1561" y="299" />
-        <di:waypoint x="1635" y="299" />
+        <di:waypoint x="1630" y="299" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1570" y="247" width="13" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0xjad35_di" bpmnElement="SequenceFlow_0xjad35">
-        <di:waypoint x="1497" y="176" />
-        <di:waypoint x="1536" y="176" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1vo4x03_di" bpmnElement="SequenceFlow_1vo4x03">
         <di:waypoint x="1735" y="299" />
@@ -259,20 +255,16 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1955s8c_di" bpmnElement="SequenceFlow_1955s8c">
         <di:waypoint x="1308" y="176" />
-        <di:waypoint x="1397" y="176" />
+        <di:waypoint x="1370" y="176" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1336" y="182" width="17" height="14" />
+          <dc:Bounds x="1327" y="182" width="18" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_1ksh7iz_di" bpmnElement="SequenceFlow_1ksh7iz">
-        <di:waypoint x="1685" y="216" />
-        <di:waypoint x="1685" y="259" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_00gqw1y_di" bpmnElement="gw_rules_active_yes">
         <di:waypoint x="1586" y="176" />
         <di:waypoint x="1635" y="176" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1602" y="158" width="17" height="14" />
+          <dc:Bounds x="1589" y="158" width="18" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0phihpx_di" bpmnElement="SequenceFlow_0phihpx">
@@ -309,6 +301,14 @@
         <di:waypoint x="697" y="176" />
         <di:waypoint x="760" y="176" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0a9yda8_di" bpmnElement="Flow_0a9yda8">
+        <di:waypoint x="1685" y="216" />
+        <di:waypoint x="1685" y="259" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0308ccu_di" bpmnElement="Flow_0308ccu">
+        <di:waypoint x="1470" y="176" />
+        <di:waypoint x="1536" y="176" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="StartEvent_0nr132h_di" bpmnElement="start_transaction_analysis">
         <dc:Bounds x="661" y="158" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -336,12 +336,6 @@
       <bpmndi:BPMNShape id="ServiceTask_16v650j_di" bpmnElement="task_create_account">
         <dc:Bounds x="1319" y="477" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_1i837zv_di" bpmnElement="Task_12rm9hn">
-        <dc:Bounds x="1397" y="136" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_0175bl4_di" bpmnElement="Task_0jxcsc4">
-        <dc:Bounds x="1635" y="259" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ExclusiveGateway_0q0j0u2_di" bpmnElement="gw_rules_active" isMarkerVisible="true">
         <dc:Bounds x="1536" y="151" width="50" height="50" />
         <bpmndi:BPMNLabel>
@@ -357,8 +351,14 @@
       <bpmndi:BPMNShape id="ServiceTask_1ylw73d_di" bpmnElement="st_prepare_account">
         <dc:Bounds x="1319" y="356" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_1do81md_di" bpmnElement="sp_call_apply_rules">
+      <bpmndi:BPMNShape id="Activity_0apcr7k_di" bpmnElement="sp_call_apply_rules">
         <dc:Bounds x="1635" y="136" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0312avy_di" bpmnElement="Task_12rm9hn">
+        <dc:Bounds x="1370" y="136" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nt1q0a_di" bpmnElement="Activity_1nt1q0a">
+        <dc:Bounds x="1635" y="259" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_08ghvrk_di" bpmnElement="end_batch_import">
         <dc:Bounds x="2177" y="282" width="36" height="36" />

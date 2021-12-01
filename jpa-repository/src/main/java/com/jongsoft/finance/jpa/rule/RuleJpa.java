@@ -1,14 +1,12 @@
 package com.jongsoft.finance.jpa.rule;
 
-import java.util.List;
-
-import javax.persistence.*;
-
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
-
 import lombok.Builder;
 import lombok.Getter;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Entity
@@ -30,10 +28,10 @@ public class RuleJpa extends EntityJpa {
     @JoinColumn
     private RuleGroupJpa group;
 
-    @OneToMany(mappedBy = "rule", orphanRemoval = true, cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "rule", orphanRemoval = true, cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private List<RuleConditionJpa> conditions;
 
-    @OneToMany(mappedBy = "rule", orphanRemoval = true, cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "rule", orphanRemoval = true, cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     private List<RuleChangeJpa> changes;
 
     @Builder

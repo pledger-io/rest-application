@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_11axzpv" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_11axzpv" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
   <bpmn:process id="ImportExtractAccounts" name="Extract account names" isExecutable="true" camunda:versionTag="1.0.0" camunda:historyTimeToLive="P1D">
     <bpmn:extensionElements>
       <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
@@ -30,19 +30,7 @@
       <bpmn:startEvent id="se_locate_account">
         <bpmn:outgoing>SequenceFlow_0ig9uso</bpmn:outgoing>
       </bpmn:startEvent>
-      <bpmn:serviceTask id="ServiceTask_153hryt" name="Find match" camunda:delegateExpression="${processAccountLookupDelegate}">
-        <bpmn:extensionElements>
-          <camunda:inputOutput>
-            <camunda:inputParameter name="iban">${iban}</camunda:inputParameter>
-            <camunda:inputParameter name="name">${name}</camunda:inputParameter>
-            <camunda:outputParameter name="account">${id}</camunda:outputParameter>
-          </camunda:inputOutput>
-        </bpmn:extensionElements>
-        <bpmn:incoming>SequenceFlow_0blgm1l</bpmn:incoming>
-        <bpmn:outgoing>SequenceFlow_13upyse</bpmn:outgoing>
-      </bpmn:serviceTask>
       <bpmn:sequenceFlow id="SequenceFlow_0ig9uso" sourceRef="se_locate_account" targetRef="st_convert_transaction" />
-      <bpmn:sequenceFlow id="SequenceFlow_13upyse" sourceRef="ServiceTask_153hryt" targetRef="eg_account_found" />
       <bpmn:endEvent id="EndEvent_1ayeh48">
         <bpmn:incoming>SequenceFlow_0gvltk4</bpmn:incoming>
       </bpmn:endEvent>
@@ -72,7 +60,7 @@
         <bpmn:outgoing>SequenceFlow_0blgm1l</bpmn:outgoing>
       </bpmn:serviceTask>
       <bpmn:exclusiveGateway id="eg_account_found" name="Account found" default="sf_account_found">
-        <bpmn:incoming>SequenceFlow_13upyse</bpmn:incoming>
+        <bpmn:incoming>Flow_1hf32xo</bpmn:incoming>
         <bpmn:outgoing>sf_account_found</bpmn:outgoing>
         <bpmn:outgoing>sf_account_not_found</bpmn:outgoing>
       </bpmn:exclusiveGateway>
@@ -81,7 +69,7 @@
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${account == null}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="SequenceFlow_1foqzxr" sourceRef="st_locate_synonym" targetRef="ExclusiveGateway_0w5d9dn" />
-      <bpmn:serviceTask id="st_locate_synonym" name="Find by synonym" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.SynonymLookup" camunda:delegateExpression="${accountSynonymLookupDelegate}">
+      <bpmn:serviceTask id="st_locate_synonym" name="Find by synonym" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.SynonymLookup" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${accountSynonymLookupDelegate}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
             <camunda:inputParameter name="name">${name}</camunda:inputParameter>
@@ -111,6 +99,19 @@
         <bpmn:outgoing>SequenceFlow_0ifb8gk</bpmn:outgoing>
       </bpmn:serviceTask>
       <bpmn:sequenceFlow id="SequenceFlow_0ifb8gk" sourceRef="Task_16w3kks" targetRef="st_generate_pair" />
+      <bpmn:serviceTask id="ServiceTask_153hryt" name="Find match" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountLookup" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${processAccountLookupDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="id" />
+            <camunda:inputParameter name="iban">${iban}</camunda:inputParameter>
+            <camunda:inputParameter name="name">${name}</camunda:inputParameter>
+            <camunda:outputParameter name="account">${id}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>SequenceFlow_0blgm1l</bpmn:incoming>
+        <bpmn:outgoing>Flow_1hf32xo</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="Flow_1hf32xo" sourceRef="ServiceTask_153hryt" targetRef="eg_account_found" />
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="SequenceFlow_0wegpol" sourceRef="st_read_csv" targetRef="sp_extract_accounts" />
     <bpmn:sequenceFlow id="SequenceFlow_0wp67ry" sourceRef="sp_extract_accounts" targetRef="EndEvent_0dzor1o" />
@@ -183,25 +184,22 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0blgm1l_di" bpmnElement="SequenceFlow_0blgm1l">
         <di:waypoint x="660" y="226" />
-        <di:waypoint x="696" y="226" />
+        <di:waypoint x="700" y="226" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0gvltk4_di" bpmnElement="SequenceFlow_0gvltk4">
         <di:waypoint x="1160" y="226" />
         <di:waypoint x="1248" y="226" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_13upyse_di" bpmnElement="SequenceFlow_13upyse">
-        <di:waypoint x="796" y="226" />
-        <di:waypoint x="834" y="226" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0ig9uso_di" bpmnElement="SequenceFlow_0ig9uso">
         <di:waypoint x="534" y="226" />
         <di:waypoint x="560" y="226" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hf32xo_di" bpmnElement="Flow_1hf32xo">
+        <di:waypoint x="800" y="226" />
+        <di:waypoint x="834" y="226" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="StartEvent_038oj4w_di" bpmnElement="se_locate_account">
         <dc:Bounds x="498" y="208" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_153hryt_di" bpmnElement="ServiceTask_153hryt">
-        <dc:Bounds x="696" y="186" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_1ayeh48_di" bpmnElement="EndEvent_1ayeh48">
         <dc:Bounds x="1248" y="208" width="36" height="36" />
@@ -229,6 +227,9 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_11nngh1_di" bpmnElement="Task_16w3kks">
         <dc:Bounds x="1060" y="329" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0qcc88n_di" bpmnElement="ServiceTask_153hryt">
+        <dc:Bounds x="700" y="186" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_0dzor1o_di" bpmnElement="EndEvent_0dzor1o">
         <dc:Bounds x="1452" y="259" width="36" height="36" />

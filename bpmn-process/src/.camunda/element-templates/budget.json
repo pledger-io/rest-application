@@ -1,7 +1,9 @@
 [
   {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
     "name": "Budget Lookup",
     "id": "com.jongsoft.finance.bpmn.budget.BudgetLookup",
+    "description": "Locate an budget item based upon its name.",
     "appliesTo": [
       "bpmn:ServiceTask"
     ],
@@ -19,6 +21,7 @@
       {
         "label": "Name",
         "type": "String",
+        "description": "The name of the budget item to locate.",
         "binding": {
           "type": "camunda:inputParameter",
           "name": "name"
@@ -30,6 +33,7 @@
       {
         "label": "Resolved budget",
         "type": "String",
+        "description": "The budget item that was found.",
         "binding": {
           "type": "camunda:outputParameter",
           "source": "${budget}"
@@ -38,6 +42,7 @@
     ]
   },
   {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
     "name": "Budget Create",
     "id": "com.jongsoft.finance.bpmn.budget.BudgetCreate",
     "appliesTo": [
