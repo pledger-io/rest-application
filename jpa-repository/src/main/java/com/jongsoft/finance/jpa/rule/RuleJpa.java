@@ -28,10 +28,10 @@ public class RuleJpa extends EntityJpa {
     @JoinColumn
     private RuleGroupJpa group;
 
-    @OneToMany(mappedBy = "rule", orphanRemoval = true, cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "rule", orphanRemoval = true, cascade = {CascadeType.ALL})
     private List<RuleConditionJpa> conditions;
 
-    @OneToMany(mappedBy = "rule", orphanRemoval = true, cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "rule", orphanRemoval = true, cascade = {CascadeType.ALL})
     private List<RuleChangeJpa> changes;
 
     @Builder

@@ -1,7 +1,10 @@
 [
   {
-    "name": "Category Lookup",
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Category: Lookup existing category",
     "id": "com.jongsoft.finance.bpmn.category.CategoryLookup",
+    "description": "Look for a category in the application using the search parameters.",
+    "version": 1,
     "appliesTo": [
       "bpmn:ServiceTask"
     ],
@@ -19,6 +22,7 @@
       {
         "label": "Name",
         "type": "String",
+        "description": "Search by name, exact match.",
         "binding": {
           "type": "camunda:inputParameter",
           "name": "name"
@@ -30,6 +34,7 @@
       {
         "label": "Identifier",
         "type": "String",
+        "description": "Search by identifier.",
         "binding": {
           "type": "camunda:inputParameter",
           "name": "id"
@@ -41,6 +46,7 @@
       {
         "label": "Resolved category",
         "type": "String",
+        "description": "The matching category.",
         "binding": {
           "type": "camunda:outputParameter",
           "source": "${category}"
@@ -49,8 +55,10 @@
     ]
   },
   {
-    "name": "Category Create",
+    "name": "Category: Create new one",
     "id": "com.jongsoft.finance.bpmn.category.CategoryCreate",
+    "description": "Create a category based upon a JSON representation.",
+    "version": 1,
     "appliesTo": [
       "bpmn:ServiceTask"
     ],
@@ -68,6 +76,7 @@
       {
         "label": "Category JSON",
         "type": "String",
+        "description": "The JSON representation of the category.",
         "binding": {
           "type": "camunda:inputParameter",
           "name": "category"

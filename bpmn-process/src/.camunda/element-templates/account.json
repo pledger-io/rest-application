@@ -1,7 +1,7 @@
 [
   {
     "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
-    "name": "Account Synonym Lookup",
+    "name": "Account: Lookup by a synonym",
     "description": "Lookup an account by its recorded synonyms.",
     "id": "com.jongsoft.finance.bpmn.account.SynonymLookup",
     "version": 1,
@@ -44,7 +44,7 @@
   },
   {
     "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
-    "name": "Account Lookup",
+    "name": "Account: Lookup by search criteria",
     "id": "com.jongsoft.finance.bpmn.account.AccountLookup",
     "description": "Lookup an account by the provided fields. First by id; then by iban and lastly by name.",
     "version": 1,
@@ -102,7 +102,7 @@
   },
   {
     "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
-    "name": "Account Reconcile",
+    "name": "Account: Register reconcile transaction",
     "id": "com.jongsoft.finance.bpmn.account.AccountReconcile",
     "description": "Add an reconcile transaction to the provided amount for the given date.",
     "version": 1,
@@ -170,7 +170,7 @@
   },
   {
     "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
-    "name": "Account Create",
+    "name": "Account: Create a new account",
     "id": "com.jongsoft.finance.bpmn.account.AccountCreate",
     "description": "Create a new account in the application using the provided JSON",
     "version": 1,

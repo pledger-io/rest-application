@@ -27,7 +27,7 @@ import java.time.temporal.ChronoUnit;
  *     This delegate will result in the following variables
  * </p>
  * <ul>
- *     <li>category, the {@link Category} that was found</li>
+ *     <li>category, the {@link Category#getId()} that was found</li>
  * </ul>
  */
 @Slf4j

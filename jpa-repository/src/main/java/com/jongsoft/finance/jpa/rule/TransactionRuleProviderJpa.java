@@ -21,6 +21,7 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Singleton
+@Transactional
 @Named("transactionRuleProvider")
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionRuleProviderJpa implements TransactionRuleProvider {

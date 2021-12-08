@@ -10,6 +10,7 @@ import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 
 @Slf4j
@@ -21,6 +22,7 @@ public class CreateExpenseHandler implements CommandHandler<CreateExpenseCommand
     private final AuthenticationFacade authenticationFacade;
 
     @Override
+    @Transactional
     @BusinessEventListener
     public void handle(CreateExpenseCommand command) {
         log.info("[{}] - Processing expense create event", command.name());

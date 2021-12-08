@@ -1,7 +1,10 @@
 [
   {
-    "name": "Contract Lookup",
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Contract: Lookup an existing contract",
     "id": "com.jongsoft.finance.bpmn.contract.ContractLookup",
+    "description": "Search for a contract using the provided filters, first by name then by id.",
+    "version": 1,
     "appliesTo": [
       "bpmn:ServiceTask"
     ],
@@ -19,6 +22,7 @@
       {
         "label": "Name",
         "type": "String",
+        "description": "The name to look for, exact matches only.",
         "binding": {
           "type": "camunda:inputParameter",
           "name": "name"
@@ -30,6 +34,7 @@
       {
         "label": "Identifier",
         "type": "String",
+        "description": "The identifier of the contract",
         "binding": {
           "type": "camunda:inputParameter",
           "name": "id"
@@ -41,6 +46,7 @@
       {
         "label": "Resolved contract",
         "type": "String",
+        "description": "The contract that was found.",
         "binding": {
           "type": "camunda:outputParameter",
           "source": "${contract}"
@@ -49,8 +55,11 @@
     ]
   },
   {
-    "name": "Contract Create",
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Contract: Create contract with JSON",
     "id": "com.jongsoft.finance.bpmn.contract.ContractCreate",
+    "description": "Create a contract based upon a JSON representation.",
+    "version": 1,
     "appliesTo": [
       "bpmn:ServiceTask"
     ],
@@ -68,6 +77,7 @@
       {
         "label": "Contract JSON",
         "type": "String",
+        "description": "The JSON representation of the contract.",
         "binding": {
           "type": "camunda:inputParameter",
           "name": "category"
