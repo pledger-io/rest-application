@@ -44,7 +44,11 @@ allprojects {
             property "sonar.organization", "jongsoft"
             property "sonar.host.url", "https://sonarcloud.io"
             property "sonar.jacoco.reportPaths", "${buildDir}/reports/jacoco/report.xml"
-            property "sonar.exclusions", "**/*Test.java"
+
+            // Hack to preven sonar reporting issues in test code
+            property "sonar.issue.ignore.multicriteria", "e1"
+            property "sonar.issue.ignore.multicriteria.e1.resourceKey", "src/test/java/**/*"
+            property "sonar.issue.ignore.multicriteria.e1.ruleKey", "*"
         }
     }
 
