@@ -8,6 +8,8 @@ import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+@Tags(@Tag(name = "Localization"))
 @Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/api/localization/lang")
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -44,6 +47,10 @@ public class LanguageResource {
     }
 
     @Get("/{language}/{textKey}")
+    @Operation(
+            summary = "Get single translation",
+            operationId = "getTranslation"
+    )
     public LanguageResponse getText(@PathVariable String language, @PathVariable String textKey) {
         var message = messageSource.getMessage(
                 textKey,

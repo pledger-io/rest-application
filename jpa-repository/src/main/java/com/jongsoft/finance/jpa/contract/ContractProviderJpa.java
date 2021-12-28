@@ -102,6 +102,7 @@ public class ContractProviderJpa implements ContractProvider {
                                 .build())
                         .name(source.getCompany().getName())
                         .type(source.getCompany().getType().getLabel())
+                        .imageFileToken(source.getCompany().getImageFileToken())
                         .build())
                 .notifyBeforeEnd(source.isWarningActive())
                 .fileToken(source.getFileToken())

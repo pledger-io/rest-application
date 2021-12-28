@@ -23,8 +23,10 @@ import reactor.core.publisher.Flux;
 
 import java.security.Principal;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Filter("/**")
@@ -53,19 +55,16 @@ public class AuthenticationFilter implements HttpServerFilter {
 
         ContextPropagation.configureContext(mdcContext, securityContext);
 
-        var startTime = System.nanoTime();
-        return Flux.just(chain.proceed(request))
-                .onErrorContinue((exception, a) -> this.translateException(exception, request))
-                .next()
-                .doOnTerminate(() -> {
-                    ContextPropagation.unsetContext();
-                    if (request.getPath().contains("/api/localization/")) {
-                        log.trace("{}: {}", request.getMethod(), request.getPath());
-                    } else {
-                        log.info("{}: {} in {} ms", request.getMethod(), request.getPath(), (double)(System.nanoTime() - startTime) / 1000000);
-                    }
-                })
-                .block(Duration.of(2, ChronoUnit.SECONDS));
+        var startTime = Instant.now();
+        return Publishers.map(chain.proceed(request), response -> {
+            ContextPropagation.unsetContext();
+            if (request.getPath().contains("/api/localization/")) {
+                log.trace("{}: {}", request.getMethod(), request.getPath());
+            } else {
+                log.debug("{}: {} in {} ms", request.getMethod(), request.getPath(), Duration.between(startTime, Instant.now()).toMillis());
+            }
+            return response;
+        });
     }
 
     private MutableHttpResponse<?> translateException(Throwable throwable, HttpRequest<?> request) {
