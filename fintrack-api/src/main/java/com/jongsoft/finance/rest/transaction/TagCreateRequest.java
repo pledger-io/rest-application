@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.transaction;
 
 import io.micronaut.core.annotation.Introspected;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
  * The tag create request is used to add new tags to FinTrack
  */
 @Introspected
+@NoArgsConstructor
 public class TagCreateRequest {
 
     @Schema(
@@ -20,10 +22,6 @@ public class TagCreateRequest {
     @NotNull
     @NotBlank
     private String tag;
-
-    private TagCreateRequest() {
-
-    }
 
     public TagCreateRequest(String tag) {
         this.tag = tag;

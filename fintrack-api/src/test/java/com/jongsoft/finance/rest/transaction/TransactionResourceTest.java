@@ -64,9 +64,7 @@ class TransactionResourceTest extends TestSetup {
                 filterFactory,
                 accountTypeProvider,
                 runtimeResource,
-                authenticationFacade, eventPublisher);
-
-        new EventBus(eventPublisher);
+                authenticationFacade, new EventBus(eventPublisher));
     }
 
     @Test

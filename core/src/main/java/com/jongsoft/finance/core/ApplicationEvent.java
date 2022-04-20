@@ -1,4 +1,6 @@
 package com.jongsoft.finance.core;
 
-public interface ApplicationEvent {
+import java.io.Serializable;
+
+public interface ApplicationEvent extends Serializable {
 }

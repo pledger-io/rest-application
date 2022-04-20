@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
@@ -170,6 +171,7 @@ class BatchImportIT extends ProcessTestSetup {
     }
 
     @Test
+    @DisplayName("Convert a CSV file into transactions.")
     @Deployment(resources = {"/bpmn/transaction/transactions.import.bpmn", "/bpmn/transaction/transaction.rules.apply.bpmn"})
     @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_NONE)
     void run() throws InterruptedException {

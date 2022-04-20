@@ -16,9 +16,9 @@ import org.mockito.MockitoAnnotations;
 import java.io.File;
 import java.security.GeneralSecurityException;
 
-class StorageServiceImplTest {
+class DiskStorageServiceTest {
 
-    private StorageServiceImpl subject;
+    private DiskStorageService subject;
 
     @Mock
     private SecuritySettings securitySettings;
@@ -33,7 +33,7 @@ class StorageServiceImplTest {
         Mockito.when(securitySettings.getSecret()).thenReturn("mySalt");
         Mockito.when(storageSettings.getLocation()).thenReturn(System.getProperty("java.io.tmpdir"));
 
-        subject = new StorageServiceImpl(securitySettings, currentUserProvider, storageSettings);
+        subject = new DiskStorageService(securitySettings, currentUserProvider, storageSettings);
 
         Mockito.when(currentUserProvider.currentUser()).thenReturn(
                 UserAccount.builder()

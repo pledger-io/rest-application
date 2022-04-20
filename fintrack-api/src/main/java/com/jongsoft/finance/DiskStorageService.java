@@ -16,22 +16,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.security.GeneralSecurityException;
 import java.util.UUID;
 
 @Singleton
 @Named("storageService")
-public class StorageServiceImpl implements StorageService {
+public class DiskStorageService implements StorageService {
 
     private final SecuritySettings securitySettings;
     private final CurrentUserProvider currentUserProvider;
     private final Path uploadRootDirectory;
     private final Encryption encryption;
 
-    public StorageServiceImpl(
+    public DiskStorageService(
             SecuritySettings securitySettings,
             CurrentUserProvider currentUserProvider,
-            StorageSettings storageLocation) throws GeneralSecurityException {
+            StorageSettings storageLocation) {
         this.securitySettings = securitySettings;
         this.currentUserProvider = currentUserProvider;
         this.encryption = new Encryption();

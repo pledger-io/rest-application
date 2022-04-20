@@ -12,6 +12,7 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import reactor.core.publisher.Mono;
@@ -19,6 +20,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@DisplayName("Account reconciliation feature")
 class AccountReconcileIT extends ProcessTestSetup {
 
     @Inject
@@ -43,6 +45,7 @@ class AccountReconcileIT extends ProcessTestSetup {
     }
 
     @Test
+    @DisplayName("Account reconcile with mismatching starting balance.")
     void run_differentStartBalance() throws InterruptedException {
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(Control.Option())
@@ -87,6 +90,7 @@ class AccountReconcileIT extends ProcessTestSetup {
     }
 
     @Test
+    @DisplayName("Account reconcile with different end balance creates a balancing transaction.")
     void run_endBalanceOff() {
         Account reconcileAccount = Mockito.spy(Account.builder().id(1L).type("checking").name("Example Account").build());
         Account reconcile = Account.builder().id(3L).type("reconcile").build();

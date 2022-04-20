@@ -10,6 +10,9 @@ import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 @Filter("/**")
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CurrencyHeaderFilter implements HttpServerFilter {
@@ -21,8 +24,9 @@ public class CurrencyHeaderFilter implements HttpServerFilter {
         var requestedCurrency = request.getHeaders().get("X-Accept-Currency", String.class);
 
         if (requestedCurrency.isPresent()) {
-            currencyProvider.lookup(requestedCurrency.get())
-                    .subscribe(currency -> request.setAttribute(RequestAttributes.CURRENCY, currency));
+            var currency = currencyProvider.lookup(requestedCurrency.get())
+                    .blockOptional(Duration.of(50, ChronoUnit.MILLIS));
+            currency.ifPresent(curr -> request.setAttribute(RequestAttributes.CURRENCY, curr));
         } else {
             request.setAttribute(RequestAttributes.CURRENCY, "");
         }

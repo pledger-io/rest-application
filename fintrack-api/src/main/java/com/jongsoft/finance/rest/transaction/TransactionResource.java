@@ -5,6 +5,7 @@ import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.finance.providers.SettingProvider;
@@ -52,7 +53,7 @@ public class TransactionResource {
     private final AccountTypeProvider accountTypeProvider;
     private final RuntimeResource runtimeResource;
     private final AuthenticationFacade authenticationFacade;
-    private final ApplicationEventPublisher eventPublisher;
+    private final EventBus eventBus;
 
     @Post
     @Operation(
@@ -213,7 +214,7 @@ public class TransactionResource {
         var executors = Executors.newFixedThreadPool(25);
 
         executors.execute(() -> {
-            eventPublisher.publishEvent(new InternalAuthenticationEvent(
+            eventBus.sendSystemEvent(new InternalAuthenticationEvent(
                     this,
                     authenticationFacade.authenticated()));
 
@@ -230,7 +231,7 @@ public class TransactionResource {
                 page.content()
                         .map(Transaction::getId)
                         .forEach(transaction -> executors.execute(() -> {
-                            eventPublisher.publishEvent(
+                            eventBus.sendSystemEvent(
                                     new InternalAuthenticationEvent(
                                             this,
                                             authenticationFacade.authenticated()));
@@ -247,23 +248,19 @@ public class TransactionResource {
     }
 
     private String convertTransaction(Transaction transaction) {
-        var builder = new StringBuilder();
-
-        builder.append(transaction.getDate()).append(",");
-        builder.append(valueOrEmpty(transaction.getBookDate())).append(",");
-        builder.append(valueOrEmpty(transaction.getInterestDate())).append(",");
-        builder.append(transaction.computeFrom().getName()).append(",");
-        builder.append(valueOrEmpty(transaction.computeFrom().getIban())).append(",");
-        builder.append(transaction.computeTo().getName()).append(",");
-        builder.append(valueOrEmpty(transaction.computeTo().getIban())).append(",");
-        builder.append(transaction.getDescription()).append(",");
-        builder.append(valueOrEmpty(transaction.getCategory())).append(",");
-        builder.append(valueOrEmpty(transaction.getBudget())).append(",");
-        builder.append(valueOrEmpty(transaction.getContract())).append(",");
-        builder.append(transaction.computeAmount(transaction.computeFrom()));
-        builder.append("\n");
-
-        return builder.toString();
+        return transaction.getDate() + "," +
+                valueOrEmpty(transaction.getBookDate()) + "," +
+                valueOrEmpty(transaction.getInterestDate()) + "," +
+                transaction.computeFrom().getName() + "," +
+                valueOrEmpty(transaction.computeFrom().getIban()) + "," +
+                transaction.computeTo().getName() + "," +
+                valueOrEmpty(transaction.computeTo().getIban()) + "," +
+                transaction.getDescription() + "," +
+                valueOrEmpty(transaction.getCategory()) + "," +
+                valueOrEmpty(transaction.getBudget()) + "," +
+                valueOrEmpty(transaction.getContract()) + "," +
+                transaction.computeAmount(transaction.computeFrom()) +
+                "\n";
     }
 
     private <T> String valueOrEmpty(T value) {

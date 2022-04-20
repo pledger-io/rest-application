@@ -4,6 +4,9 @@ import com.jongsoft.finance.core.ApplicationEvent;
 
 import io.micronaut.context.event.ApplicationEventPublisher;
 
+import java.io.Serializable;
+import java.util.EventObject;
+
 /**
  * This component wraps the underlying message bus, introducing an abstraction for the eventing system of the
  * application.
@@ -11,9 +14,9 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 public class EventBus {
     private static EventBus INSTANCE;
 
-    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher<Serializable> eventPublisher;
 
-    public EventBus(ApplicationEventPublisher eventPublisher) {
+    public EventBus(ApplicationEventPublisher<Serializable> eventPublisher) {
         INSTANCE = this;
         this.eventPublisher = eventPublisher;
     }
@@ -24,6 +27,10 @@ public class EventBus {
      * @param event     the event to be published
      */
     public void send(ApplicationEvent event) {
+        eventPublisher.publishEvent(event);
+    }
+
+    public void sendSystemEvent(EventObject event) {
         eventPublisher.publishEvent(event);
     }
 

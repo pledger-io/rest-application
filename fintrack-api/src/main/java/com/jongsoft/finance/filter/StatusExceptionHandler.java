@@ -21,7 +21,8 @@ public class StatusExceptionHandler implements ExceptionHandler<StatusException,
     @Override
     public HttpResponse<JsonError> handle(HttpRequest request, StatusException exception) {
         if (exception.getStatusCode() != 404) {
-            log.warn("[{}] - Resource requested resolved in issues {} with message '{}'",
+            log.warn("{}: {} - Resource requested resolved in issues {} with message '{}'",
+                    request.getMethod(),
                     request.getPath(),
                     exception.getStatusCode(),
                     exception.getMessage());

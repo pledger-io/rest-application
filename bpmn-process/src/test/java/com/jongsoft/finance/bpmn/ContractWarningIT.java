@@ -13,6 +13,7 @@ import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -50,6 +51,7 @@ public class ContractWarningIT extends ProcessTestSetup {
     }
 
     @Test
+    @DisplayName("Contract is about to expire.")
     void runContract() throws InterruptedException {
         final Contract contract = Contract.builder()
                 .id(1L)
@@ -92,6 +94,7 @@ public class ContractWarningIT extends ProcessTestSetup {
     }
 
     @Test
+    @DisplayName("Contract has already expired.")
     void run_InPast() {
         final Contract contract = Contract.builder()
                 .id(1L)
