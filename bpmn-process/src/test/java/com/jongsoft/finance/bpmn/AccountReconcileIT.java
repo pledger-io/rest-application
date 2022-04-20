@@ -47,10 +47,21 @@ class AccountReconcileIT extends ProcessTestSetup {
     @Test
     @DisplayName("Account reconcile with mismatching starting balance.")
     void run_differentStartBalance() throws InterruptedException {
+        Account reconcileAccount = Mockito.spy(Account.builder().id(1L).type("checking").name("Example Account").build());
+        Account reconcile = Account.builder().id(3L).type("reconcile").build();
+
+        // Given:
+        Mockito.when(accountProvider.lookup(1L))
+                .thenReturn(Control.Option(reconcileAccount));
+        Mockito.when(accountProvider.lookup(SystemAccountTypes.RECONCILE))
+                .thenReturn(Mono.just(reconcile));
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(Control.Option())
+                // for phase 2
+                .thenReturn(Control.Option(BigDecimal.valueOf(10)))
                 .thenReturn(Control.Option(BigDecimal.valueOf( -20.0)));
 
+        // When: Reconcile started with different starting budget
         var response = processEngine.getRuntimeService().startProcessInstanceByKey(
                 "AccountReconcile",
                 Variables.createVariables()
@@ -81,12 +92,31 @@ class AccountReconcileIT extends ProcessTestSetup {
         var task = processEngine.getTaskService()
                 .createTaskQuery()
                 .processInstanceId(response.getProcessInstanceId())
-                .taskId("task_reconcile_before");
+                .taskDefinitionKey("task_reconcile_before")
+                .singleResult();
 
         Assertions.assertThat(computedStartBalance.getValue()).isEqualTo(BigDecimal.ZERO);
         Assertions.assertThat(computedEndBalance).isNull();
         Assertions.assertThat(hasDifference).isNull();
         Assertions.assertThat(task).isNotNull();
+
+        // And: the user corrects the starting balance
+        processEngine.getTaskService()
+                .complete(task.getId());
+
+        waitForSuspended(processEngine, response.getProcessInstanceId());
+
+        // Then: no tasks should be open and a balance transaction registered
+        var tasksAfterCorrection = processEngine.getTaskService()
+                .createTaskQuery()
+                .processInstanceId(response.getProcessInstanceId())
+                .taskDefinitionKey("task_reconcile_before")
+                .active()
+                .list();
+
+        Assertions.assertThat(tasksAfterCorrection).isEmpty();
+        Mockito.verify(reconcileAccount).createTransaction(Mockito.eq(reconcile), Mockito.eq(120.2D),
+                Mockito.eq(Transaction.Type.DEBIT), Mockito.any());
     }
 
     @Test

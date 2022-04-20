@@ -53,7 +53,13 @@ public class ComputeBalanceDelegate implements JavaDelegate {
             requestBuilder.onlyIncome(onlyIncome);
         }
 
-        log.trace("{}: Computing the balance based upon {}", execution.getCurrentActivityName(), requestBuilder);
+        if (log.isTraceEnabled()) {
+            log.trace("{}: Computing the balance based upon {}", execution.getCurrentActivityName(), requestBuilder);
+        } else {
+            log.debug("{}: Computing the balance for accountId {}",
+                    execution.getCurrentActivityName(),
+                    execution.getVariableLocal("accountId"));
+        }
 
         var result = transactionProvider.balance(requestBuilder);
         execution.setVariableLocal("result", result.getOrSupply(() -> BigDecimal.ZERO));
