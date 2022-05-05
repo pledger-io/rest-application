@@ -36,7 +36,7 @@ In this repository you will find the backend REST application needed to run FinT
 
 To build the application the following needs to be present on your local PC:
 
-* JDK 15 or higher
+* JDK 17 or higher
 * GIT for completing the checkout
 
 You can build the application using the Gradle command:
@@ -48,10 +48,10 @@ You can build the application using the Gradle command:
 The generated phat JAR in the ```fintrack-api``` module can be started, which will run the backend of FinTrack. To access the
 API documentation use the url:
 
-    http://localhost:8080/openapi/index.html
+    http://localhost:8080/spec/index.html
 
 ## License
-Copyright 2021 Jong Soft Development
+Copyright 2022 Jong Soft Development
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
 associated documentation files (the "Software"), to deal in the Software without restriction, including 
