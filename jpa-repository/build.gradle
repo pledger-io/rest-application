@@ -14,6 +14,7 @@ dependencies {
     runtimeOnly("com.h2database:h2")
 
     runtimeOnly("mysql:mysql-connector-java")
+    runtimeOnly("org.flywaydb:flyway-mysql")
 //    runtimeOnly("dev.miku:r2dbc-mysql")
 }
 
