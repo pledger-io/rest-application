@@ -57,7 +57,8 @@ public class AccountResource {
     Mono<List<AccountResponse>> ownAccounts() {
         return Mono.create(emitter -> {
             var accounts = accountProvider.lookup(
-                    accountFilterFactory.account().types(accountTypeProvider.lookup(false)));
+                    accountFilterFactory.account()
+                            .types(accountTypeProvider.lookup(false)));
 
             var response = accounts.content()
                     .map(AccountResponse::new);

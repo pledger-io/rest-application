@@ -30,14 +30,11 @@ class AuthenticationFilterTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
-    @Mock
-    private AuthenticationFacadeImpl authenticationFacade;
-
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
 
-        subject = new AuthenticationFilter(authenticationFacade);
+        subject = new AuthenticationFilter(eventPublisher);
     }
 
     @Test

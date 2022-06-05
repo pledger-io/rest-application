@@ -13,8 +13,6 @@ micronaut:
         enabled: true
         bearer:
           enabled: true
-        cookie:
-          enabled: false
   router:
     static-resources:
       docs:
