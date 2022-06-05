@@ -21,6 +21,7 @@ import reactor.test.StepVerifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.Optional;
 
 class AuthenticationFilterTest {
@@ -92,6 +93,11 @@ class AuthenticationFilterTest {
         Mockito.doReturn(Mockito.mock(HttpHeaders.class))
                 .when(mockRequest)
                 .getHeaders();
+
+        Mockito.doReturn(Optional.of(Mockito.mock(Principal.class)))
+                .when(mockRequest)
+                .getUserPrincipal();
+
 
         Mockito.doReturn("/api/transactions")
                 .when(mockRequest)
