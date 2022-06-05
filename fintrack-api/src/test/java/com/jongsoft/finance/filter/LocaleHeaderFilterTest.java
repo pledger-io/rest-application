@@ -22,7 +22,7 @@ class LocaleHeaderFilterTest {
         Mockito.doReturn(headers).when(mockRequest).getHeaders();
         Mockito.doReturn(Optional.of("en")).when(headers).get(HttpHeaders.ACCEPT_LANGUAGE, String.class);
 
-        subject.doFilterOnce(mockRequest, Mockito.mock(ServerFilterChain.class));
+        subject.doFilter(mockRequest, Mockito.mock(ServerFilterChain.class));
 
         Mockito.verify(mockRequest).setAttribute(RequestAttributes.LOCALIZATION, Locale.forLanguageTag("en"));
     }
@@ -35,7 +35,7 @@ class LocaleHeaderFilterTest {
         Mockito.doReturn(headers).when(mockRequest).getHeaders();
         Mockito.doReturn(Optional.empty()).when(headers).get(HttpHeaders.ACCEPT_LANGUAGE, String.class);
 
-        subject.doFilterOnce(mockRequest, Mockito.mock(ServerFilterChain.class));
+        subject.doFilter(mockRequest, Mockito.mock(ServerFilterChain.class));
 
         Mockito.verify(mockRequest, Mockito.never()).setAttribute(Mockito.eq(RequestAttributes.LOCALIZATION), Mockito.any());
     }
