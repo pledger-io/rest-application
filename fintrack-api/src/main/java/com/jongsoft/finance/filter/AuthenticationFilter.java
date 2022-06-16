@@ -33,23 +33,18 @@ public class AuthenticationFilter implements HttpServerFilter {
 
     @Override
     public Publisher<MutableHttpResponse<?>> doFilter(final HttpRequest<?> request, final ServerFilterChain chain) {
-        var principalOpt = request.getUserPrincipal();
-        if (principalOpt.isPresent()) {
-            handleAuthentication(principalOpt.get());
-            var startTime = Instant.now();
-            return Publishers.map(chain.proceed(request), response -> {
-                if (request.getPath().contains("/api/localization/")) {
-                    log.trace("{}: {}", request.getMethod(), request.getPath());
-                } else {
-                    log.debug("{}: {} in {} ms", request.getMethod(), request.getPath(), Duration.between(startTime, Instant.now()).toMillis());
-                }
-                return response;
-            });
-        }
+        request.getUserPrincipal()
+                .ifPresent(this::handleAuthentication);
 
-        return Publishers.just(
-                HttpResponse.status(HttpStatus.UNAUTHORIZED)
-                        .body(new JsonError("Not authorized")));
+        var startTime = Instant.now();
+        return Publishers.map(chain.proceed(request), response -> {
+            if (request.getPath().contains("/api/localization/")) {
+                log.trace("{}: {}", request.getMethod(), request.getPath());
+            } else {
+                log.debug("{}: {} in {} ms", request.getMethod(), request.getPath(), Duration.between(startTime, Instant.now()).toMillis());
+            }
+            return response;
+        });
     }
 
     private void handleAuthentication(Principal principal) {
