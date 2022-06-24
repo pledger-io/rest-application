@@ -1,5 +1,6 @@
 package com.jongsoft.finance.filter;
 
+import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.security.AuthenticationFacadeImpl;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -29,27 +30,28 @@ class AuthenticationFilterTest {
     private AuthenticationFilter subject;
 
     @Mock
-    private ApplicationEventPublisher eventPublisher;
+    private ApplicationEventPublisher<InternalAuthenticationEvent> eventPublisher;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-
         subject = new AuthenticationFilter(eventPublisher);
     }
 
     @Test
     void doFilterOnce_unauthorized() {
-        var mockRequest = Mockito.mock(HttpRequest.class);
+        var mockRequest = prepareMock();
+        var chain = Mockito.mock(ServerFilterChain.class);
 
-        Mockito.when(mockRequest.getAttribute(SecurityFilter.REJECTION, HttpStatus.class))
-                .thenReturn(Optional.of(HttpStatus.UNAUTHORIZED));
+        Mockito.when(chain.proceed(mockRequest))
+                .thenReturn(Publishers.just(HttpResponse.ok("OK")));
 
-        StepVerifier.create(subject.doFilter(mockRequest, Mockito.mock(ServerFilterChain.class)))
-                .assertNext(step -> {
-                    Assertions.assertThat(step.status().getCode()).isEqualTo(HttpStatus.UNAUTHORIZED.getCode());
-                })
+        StepVerifier.create(subject.doFilter(mockRequest, chain))
+                .expectNextCount(1)
                 .verifyComplete();
+
+        Mockito.verify(eventPublisher, Mockito.never())
+                .publishEvent(Mockito.any(InternalAuthenticationEvent.class));
     }
 
     @Test
@@ -57,6 +59,8 @@ class AuthenticationFilterTest {
         var mockRequest = prepareMock();
         var chain = Mockito.mock(ServerFilterChain.class);
 
+        Mockito.when(mockRequest.getUserPrincipal())
+                .thenReturn(Optional.of(Mockito.mock(Principal.class)));
         Mockito.when(chain.proceed(mockRequest))
                 .thenReturn(Publishers.just(HttpResponse.ok("OK")));
 
@@ -66,6 +70,9 @@ class AuthenticationFilterTest {
                     Assertions.assertThat(step.getBody().get()).isEqualTo("OK");
                 })
                 .verifyComplete();
+
+        Mockito.verify(eventPublisher)
+                .publishEvent(Mockito.any(InternalAuthenticationEvent.class));
     }
 
     @Test
@@ -94,7 +101,7 @@ class AuthenticationFilterTest {
                 .when(mockRequest)
                 .getHeaders();
 
-        Mockito.doReturn(Optional.of(Mockito.mock(Principal.class)))
+        Mockito.doReturn(Optional.empty())
                 .when(mockRequest)
                 .getUserPrincipal();
 
