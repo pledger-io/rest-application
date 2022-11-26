@@ -36,7 +36,7 @@ In this repository you will find the backend REST application needed to run FinT
 
 To build the application the following needs to be present on your local PC:
 
-* JDK 17 or higher
+* JDK 19 or higher
 * GIT for completing the checkout
 
 You can build the application using the Gradle command:
