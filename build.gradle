@@ -74,8 +74,8 @@ subprojects {
 
     java {
         compileJava.options.encoding = 'UTF-8'
-        sourceCompatibility = JavaVersion.toVersion("17")
-        targetCompatibility = JavaVersion.toVersion("17")
+        sourceCompatibility = JavaVersion.toVersion("19")
+        targetCompatibility = JavaVersion.toVersion("19")
 
         withJavadocJar()
         withSourcesJar()
@@ -144,7 +144,7 @@ subprojects {
         source = delombok.outputDir
 
         options.addBooleanOption('html5', true)
-        options.addStringOption('-release', '17')
+        options.addStringOption('-release', '19')
     }
 
     publishing {
