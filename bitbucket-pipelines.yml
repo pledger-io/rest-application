@@ -1,4 +1,4 @@
-image: maven:3-amazoncorretto-19
+image: maven:3-amazoncorretto-17
 
 pipelines:
   default:
