@@ -3,12 +3,7 @@ package com.jongsoft.finance.jpa.budget;
 import java.time.LocalDate;
 import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 
@@ -33,7 +28,7 @@ public class BudgetJpa extends EntityJpa {
     @JoinColumn
     private UserAccountJpa user;
 
-    @OneToMany(mappedBy = "budget")
+    @OneToMany(mappedBy = "budget", fetch = FetchType.EAGER)
     private Set<ExpensePeriodJpa> expenses;
 
     @Builder
