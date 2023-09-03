@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @Tag(name = "Contract")
 @Controller("/api/contracts")

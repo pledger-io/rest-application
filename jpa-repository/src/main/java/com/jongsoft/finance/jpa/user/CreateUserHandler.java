@@ -8,7 +8,6 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.user.CreateUserCommand;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.aerogear.security.otp.api.Base32;
 
@@ -17,10 +16,14 @@ import java.util.HashSet;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateUserHandler implements CommandHandler<CreateUserCommand> {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public CreateUserHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @BusinessEventListener

@@ -10,17 +10,21 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.data.model.Sort;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ImportProviderJpa implements ImportProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public ImportProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+        this.authenticationFacade = authenticationFacade;
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Mono<BatchImport> lookup(String slug) {

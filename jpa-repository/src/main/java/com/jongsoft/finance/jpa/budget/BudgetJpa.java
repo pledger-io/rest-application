@@ -3,7 +3,7 @@ package com.jongsoft.finance.jpa.budget;
 import java.time.LocalDate;
 import java.util.Set;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 

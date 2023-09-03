@@ -3,7 +3,7 @@ package com.jongsoft.finance.jpa.reactive;
 import io.micronaut.transaction.SynchronousTransactionManager;
 import lombok.RequiredArgsConstructor;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.sql.Connection;
 
 @RequiredArgsConstructor

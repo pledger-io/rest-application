@@ -4,19 +4,20 @@ import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RuleGroupLookupDelegate implements JavaDelegate {
 
     private final TransactionRuleGroupProvider ruleGroupProvider;
+
+    RuleGroupLookupDelegate(TransactionRuleGroupProvider ruleGroupProvider) {
+        this.ruleGroupProvider = ruleGroupProvider;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

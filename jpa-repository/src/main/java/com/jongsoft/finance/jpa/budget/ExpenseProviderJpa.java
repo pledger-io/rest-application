@@ -9,15 +9,19 @@ import com.jongsoft.lang.control.Optional;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 
 @Singleton
 @Named("expenseProvider")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ExpenseProviderJpa implements ExpenseProvider {
 
     private final AuthenticationFacade authenticationFacadea;
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public ExpenseProviderJpa(AuthenticationFacade authenticationFacadea, ReactiveEntityManager entityManager) {
+        this.authenticationFacadea = authenticationFacadea;
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Optional<Budget.Expense> lookup(long id) {

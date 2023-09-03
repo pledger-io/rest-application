@@ -4,9 +4,7 @@ import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.BudgetJson;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -28,11 +26,17 @@ import java.time.temporal.ChronoUnit;
  */
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessBudgetCreateDelegate implements JavaDelegate {
 
     private final CurrentUserProvider currentUserProvider;
     private final BudgetProvider budgetProvider;
+
+    ProcessBudgetCreateDelegate(
+            CurrentUserProvider currentUserProvider,
+            BudgetProvider budgetProvider) {
+        this.currentUserProvider = currentUserProvider;
+        this.budgetProvider = budgetProvider;
+    }
 
     @Override
     public void execute(DelegateExecution execution) {

@@ -4,9 +4,7 @@ import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.providers.AccountProvider;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -34,11 +32,15 @@ import java.util.Map;
  */
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class LookupAccountMappingDelegate implements JavaDelegate {
 
     private final AccountProvider accountProvider;
     private final StorageService storageService;
+
+    LookupAccountMappingDelegate(AccountProvider accountProvider, StorageService storageService) {
+        this.accountProvider = accountProvider;
+        this.storageService = storageService;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

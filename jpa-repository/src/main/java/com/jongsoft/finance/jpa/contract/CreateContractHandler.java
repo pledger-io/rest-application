@@ -8,15 +8,18 @@ import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
 import com.jongsoft.lang.Collections;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateContractHandler implements CommandHandler<CreateContractCommand> {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public CreateContractHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @BusinessEventListener

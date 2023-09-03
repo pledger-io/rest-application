@@ -12,9 +12,10 @@ import com.jongsoft.finance.schedule.Schedulable;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -26,8 +27,10 @@ public class SavingGoalEventIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
     void setup() {
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/account/account-provider.sql",
                 "sql/account/saving-goal-listener.sql"
@@ -36,8 +39,6 @@ public class SavingGoalEventIT extends JpaTestSetup {
 
     @Test
     void createSavingGoal() {
-        setup();
-
         eventPublisher.publishEvent(new CreateSavingGoalCommand(
                 1L,
                 "New savings",
@@ -55,8 +56,6 @@ public class SavingGoalEventIT extends JpaTestSetup {
 
     @Test
     void adjustSchedule() {
-        setup();
-
         eventPublisher.publishEvent(new AdjustScheduleCommand(
                 1L,
                 Schedulable.basicSchedule(
@@ -75,8 +74,6 @@ public class SavingGoalEventIT extends JpaTestSetup {
 
     @Test
     void adjustGoal() {
-        setup();
-
         eventPublisher.publishEvent(new AdjustSavingGoalCommand(
                 1L,
                 BigDecimal.valueOf(50121.22),
@@ -89,8 +86,6 @@ public class SavingGoalEventIT extends JpaTestSetup {
 
     @Test
     void completeGoal() {
-        setup();
-
         eventPublisher.publishEvent(new CompleteSavingGoalCommand(1L));
 
         var check = entityManager.find(SavingGoalJpa.class, 1L);

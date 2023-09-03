@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.Formula;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;

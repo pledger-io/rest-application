@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa;
 
 import io.micronaut.data.model.Sort;
 
-import javax.persistence.Query;
+import jakarta.persistence.Query;
 import java.util.Map;
 
 public interface FilterDelegate<T extends FilterDelegate<T>> {

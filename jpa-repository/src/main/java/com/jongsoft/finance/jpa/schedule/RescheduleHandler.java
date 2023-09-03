@@ -6,15 +6,18 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.schedule.RescheduleCommand;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RescheduleHandler implements CommandHandler<RescheduleCommand> {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public RescheduleHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @BusinessEventListener

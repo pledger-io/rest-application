@@ -4,7 +4,7 @@ import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.core.annotation.Introspected;
 import lombok.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 
 @Builder

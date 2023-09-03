@@ -9,18 +9,22 @@ import com.jongsoft.lang.collection.Sequence;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 @Singleton
 @Named("tagProvider")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TagProviderJpa implements TagProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public TagProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+        this.authenticationFacade = authenticationFacade;
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Sequence<Tag> lookup() {

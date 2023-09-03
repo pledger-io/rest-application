@@ -7,16 +7,19 @@ import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CurrencyProviderJpa implements CurrencyProvider {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public CurrencyProviderJpa(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     public Optional<Currency> lookup(long id) {
         return entityManager.<CurrencyJpa>blocking()

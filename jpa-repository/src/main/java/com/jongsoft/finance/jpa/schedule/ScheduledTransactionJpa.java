@@ -8,7 +8,7 @@ import com.jongsoft.finance.schedule.Periodicity;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Getter

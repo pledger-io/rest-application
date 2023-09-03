@@ -6,15 +6,18 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.savings.CompleteSavingGoalCommand;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@AllArgsConstructor(onConstructor_ = @Inject)
 public class CompleteSavingGoalHandler implements CommandHandler<CompleteSavingGoalCommand> {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public CompleteSavingGoalHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @BusinessEventListener

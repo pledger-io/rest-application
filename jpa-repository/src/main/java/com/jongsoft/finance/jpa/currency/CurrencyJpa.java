@@ -4,8 +4,8 @@ import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Getter
 @Entity

@@ -30,7 +30,7 @@ import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.function.Consumer;
 
 @Tag(name = "Transactions")

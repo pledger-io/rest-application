@@ -5,18 +5,19 @@ import com.jongsoft.finance.bpmn.KnownProcesses;
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 class ChangeContractHandler implements CommandHandler<ChangeContractCommand> {
 
     private final ProcessEngine processEngine;
+
+    ChangeContractHandler(ProcessEngine processEngine) {
+        this.processEngine = processEngine;
+    }
 
     @Override
     @BusinessEventListener

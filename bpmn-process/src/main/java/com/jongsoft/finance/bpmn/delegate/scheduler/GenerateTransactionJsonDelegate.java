@@ -5,9 +5,7 @@ import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.LongValue;
@@ -17,11 +15,17 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class GenerateTransactionJsonDelegate implements JavaDelegate {
 
     private final TransactionScheduleProvider transactionScheduleProvider;
     private final StorageService storageService;
+
+    GenerateTransactionJsonDelegate(
+            TransactionScheduleProvider transactionScheduleProvider,
+            StorageService storageService) {
+        this.transactionScheduleProvider = transactionScheduleProvider;
+        this.storageService = storageService;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

@@ -3,9 +3,7 @@ package com.jongsoft.finance.bpmn.delegate.budget;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.ExpenseProvider;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -23,11 +21,15 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  */
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessBudgetLookupDelegate implements JavaDelegate {
 
     private final FilterFactory filterFactory;
     private final ExpenseProvider expenseProvider;
+
+    ProcessBudgetLookupDelegate(FilterFactory filterFactory, ExpenseProvider expenseProvider) {
+        this.filterFactory = filterFactory;
+        this.expenseProvider = expenseProvider;
+    }
 
     @Override
     public void execute(DelegateExecution execution) {

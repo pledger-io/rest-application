@@ -46,16 +46,28 @@ abstract class CSVReaderDelegate implements JavaDelegate {
 
         beforeProcess(execution, importConfigJson);
 
-        storageService.read(batchImport.getFileCode())
+        try (var inputStream = storageService.read(batchImport.getFileCode())
                 .map(bytes -> new InputStreamReader(new ByteArrayInputStream(bytes)))
-                .flatMapMany(stream -> Flux.fromIterable(new CSVReaderBuilder(stream)
-                        .withCSVParser(new CSVParserBuilder()
-                                .withSeparator(importConfigJson.getDelimiter())
-                                .build())
-                        .build()))
-                .filter(line -> this.lineMatcherRequirements(line, mappingIndices.size()))
-                .map(csvLine -> this.transform(csvLine, mappingIndices, importConfigJson))
-                .subscribe(transaction -> this.lineRead(execution, transaction));
+                .block()) {
+            var reader = new CSVReaderBuilder(inputStream)
+                    .withCSVParser(new CSVParserBuilder()
+                            .withSeparator(importConfigJson.getDelimiter())
+                            .build())
+                    .build();
+
+            if (importConfigJson.isHeaders()) {
+                reader.skip(1);
+            }
+
+            var line = reader.readNext();
+            while (line != null) {
+                if (lineMatcherRequirements(line, mappingIndices.size())) {
+                    var transaction = transform(line, mappingIndices, importConfigJson);
+                    lineRead(execution, transaction);
+                }
+                line = reader.readNext();
+            }
+        }
 
         afterProcess(execution);
     }

@@ -11,16 +11,20 @@ import com.jongsoft.lang.control.Optional;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @Singleton
 @Named("categoryProvider")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CategoryProviderJpa implements CategoryProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public CategoryProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+        this.authenticationFacade = authenticationFacade;
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Optional<Category> lookup(long id) {

@@ -9,16 +9,20 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateCategoryHandler implements CommandHandler<CreateCategoryCommand> {
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
+
+    @Inject
+    public CreateCategoryHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+        this.entityManager = entityManager;
+        this.authenticationFacade = authenticationFacade;
+    }
 
     @Override
     @BusinessEventListener

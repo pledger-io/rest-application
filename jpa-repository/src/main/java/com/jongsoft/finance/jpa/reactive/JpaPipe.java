@@ -4,7 +4,7 @@ import com.jongsoft.lang.Control;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.data.model.Sort;
 
-import javax.persistence.Query;
+import jakarta.persistence.Query;
 import java.util.HashMap;
 import java.util.Map;
 

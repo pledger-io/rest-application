@@ -8,13 +8,12 @@ import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
-import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -25,11 +24,17 @@ import java.util.List;
 @Slf4j
 @Factory
 @Requires(beans = DataSourceMigration.class)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessEngineConfiguration {
 
     private final ApplicationContext applicationContext;
     private final CamundaDatasourceConfiguration camundaDatasourceConfiguration;
+
+    public ProcessEngineConfiguration(
+            ApplicationContext applicationContext,
+            CamundaDatasourceConfiguration camundaDatasourceConfiguration) {
+        this.applicationContext = applicationContext;
+        this.camundaDatasourceConfiguration = camundaDatasourceConfiguration;
+    }
 
     @Context
     public ProcessEngine processEngine() throws IOException {

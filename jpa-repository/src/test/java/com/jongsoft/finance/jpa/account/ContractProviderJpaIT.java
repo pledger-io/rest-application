@@ -7,6 +7,7 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import reactor.test.StepVerifier;
@@ -21,9 +22,11 @@ class ContractProviderJpaIT extends JpaTestSetup {
     @Inject
     private ContractProvider contractProvider;
 
+    @BeforeEach
     void setup() {
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/account/contract-provider.sql"
         );
@@ -31,7 +34,6 @@ class ContractProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup() {
-        setup();
         var check = contractProvider.lookup();
 
         Assertions.assertThat(check).hasSize(1);
@@ -40,8 +42,6 @@ class ContractProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_name() {
-        setup();
-
         var check = contractProvider.lookup("Test contract")
                 .block();
 
@@ -53,16 +53,12 @@ class ContractProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_nameIncorrectUser() {
-        setup();
-
         Assertions.assertThat(contractProvider.lookup("In between").blockOptional())
                 .isEmpty();
     }
 
     @Test
     void search() {
-        setup();
-
         StepVerifier.create(contractProvider.search("conT"))
                 .expectNext(Contract.builder().id(1L).build())
                 .verifyComplete();
@@ -70,8 +66,6 @@ class ContractProviderJpaIT extends JpaTestSetup {
 
     @Test
     void search_incorrectUser() {
-        setup();
-
         StepVerifier.create(contractProvider.search("betwe"))
                 .verifyComplete();
     }

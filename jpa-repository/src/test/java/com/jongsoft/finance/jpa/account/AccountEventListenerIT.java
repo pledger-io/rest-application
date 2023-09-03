@@ -8,10 +8,11 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 class AccountEventListenerIT extends JpaTestSetup {
 
@@ -24,9 +25,11 @@ class AccountEventListenerIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
     void setup() {
         Mockito.doReturn("demo-user").when(authenticationFacade).authenticated();
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/account/account-listener.sql"
         );
@@ -34,7 +37,6 @@ class AccountEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleAccountCreate() {
-        setup();
         eventPublisher.publishEvent(
                 new CreateAccountCommand(
                         "New account",
@@ -51,7 +53,6 @@ class AccountEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleAccountRename() {
-        setup();
         eventPublisher.publishEvent(
                 new RenameAccountCommand(
                         1L,
@@ -69,7 +70,6 @@ class AccountEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleAccountChange() {
-        setup();
         eventPublisher.publishEvent(
                 new ChangeAccountCommand(
                         1L,
@@ -85,7 +85,6 @@ class AccountEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleAccountInterestChange() {
-        setup();
         eventPublisher.publishEvent(
                 new ChangeInterestCommand(
                         3L,
@@ -99,7 +98,6 @@ class AccountEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleAccountIconEvent() {
-        setup();
         eventPublisher.publishEvent(new RegisterAccountIconCommand(
                 3L,
                 "file-code",
@@ -111,7 +109,6 @@ class AccountEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleAccountTerminate() {
-        setup();
         eventPublisher.publishEvent(new TerminateAccountCommand(1L));
 
         var check = entityManager.find(AccountJpa.class, 1L);
@@ -120,7 +117,6 @@ class AccountEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleRegisterSynonym_update() {
-        setup();
         eventPublisher.publishEvent(new RegisterSynonymCommand(1L, "Test account"));
 
         var query = entityManager.createQuery("select a from AccountSynonymJpa a where a.synonym = 'Test account'");

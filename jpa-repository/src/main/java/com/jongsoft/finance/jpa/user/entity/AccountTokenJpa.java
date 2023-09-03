@@ -4,7 +4,7 @@ import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter

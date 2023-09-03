@@ -6,15 +6,18 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.account.ChangeInterestCommand;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ChangeAccountInterestHandler implements CommandHandler<ChangeInterestCommand> {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    ChangeAccountInterestHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @BusinessEventListener

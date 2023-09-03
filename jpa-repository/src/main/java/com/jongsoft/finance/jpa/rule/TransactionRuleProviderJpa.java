@@ -13,21 +13,25 @@ import com.jongsoft.lang.collection.Sequence;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Singleton
 @Transactional
 @Named("transactionRuleProvider")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public TransactionRuleProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+        this.authenticationFacade = authenticationFacade;
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Sequence<TransactionRule> lookup() {
@@ -73,11 +77,11 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
     @Override
     @Transactional
     public void save(TransactionRule rule) {
-        int sortOrder= rule.getSort();
+        int sortOrder = rule.getSort();
         if (rule.getId() == null || rule.getSort() == 0) {
             var hql = """
-                select max(sort) + 1 from RuleJpa 
-                where user.username = :username and archived = false and group.name = :group""";
+                    select max(sort) + 1 from RuleJpa 
+                    where user.username = :username and archived = false and group.name = :group""";
 
             sortOrder = entityManager.<Integer>blocking()
                     .hql(hql)

@@ -14,7 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.Set;

@@ -6,15 +6,18 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.schedule.DescribeScheduleCommand;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class DescribeScheduleHandler implements CommandHandler<DescribeScheduleCommand> {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public DescribeScheduleHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @BusinessEventListener

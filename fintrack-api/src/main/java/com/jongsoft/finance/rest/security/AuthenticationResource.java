@@ -11,29 +11,33 @@ import com.jongsoft.finance.security.TwoFactorHelper;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.core.async.publisher.Publishers;
-import io.micronaut.http.*;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.AuthenticationProvider;
+import io.micronaut.security.authentication.AuthenticationResponse;
 import io.micronaut.security.authentication.ClientAuthentication;
 import io.micronaut.security.event.LoginSuccessfulEvent;
 import io.micronaut.security.rules.SecurityRule;
-import io.micronaut.security.token.jwt.generator.AccessRefreshTokenGenerator;
-import io.micronaut.security.token.jwt.render.AccessRefreshToken;
+import io.micronaut.security.token.generator.AccessRefreshTokenGenerator;
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureConfiguration;
+import io.micronaut.security.token.render.AccessRefreshToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Mono;
 
-import javax.validation.Valid;
 import java.util.Map;
 import java.util.UUID;
 
@@ -68,7 +72,7 @@ public class AuthenticationResource {
             @Valid @Body AuthenticationRequest authenticationRequest) {
         return Mono.fromDirect(Publishers.map(
                 authenticationProvider.authenticate(request, authenticationRequest),
-                authenticated -> {
+                (AuthenticationResponse authenticated) -> {
                     if (authenticated.isAuthenticated() && authenticated.getAuthentication().isPresent()) {
                         var userDetails = authenticated.getAuthentication().get();
                         var refresh = UUID.randomUUID().toString();

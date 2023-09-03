@@ -5,9 +5,7 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -17,11 +15,15 @@ import java.util.Map;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionRuleMatcherDelegate implements JavaDelegate {
 
     private final RuleEngine ruleEngine;
     private final TransactionProvider transactionProvider;
+
+    TransactionRuleMatcherDelegate(RuleEngine ruleEngine, TransactionProvider transactionProvider) {
+        this.ruleEngine = ruleEngine;
+        this.transactionProvider = transactionProvider;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

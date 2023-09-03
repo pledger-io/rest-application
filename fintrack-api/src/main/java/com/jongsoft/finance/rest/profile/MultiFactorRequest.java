@@ -3,8 +3,8 @@ package com.jongsoft.finance.rest.profile;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Setter
 @Introspected

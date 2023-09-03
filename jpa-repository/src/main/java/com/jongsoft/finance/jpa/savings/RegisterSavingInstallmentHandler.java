@@ -6,15 +6,18 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.savings.RegisterSavingInstallmentCommand;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@AllArgsConstructor(onConstructor_ = @Inject)
 public class RegisterSavingInstallmentHandler implements CommandHandler<RegisterSavingInstallmentCommand> {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public RegisterSavingInstallmentHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @BusinessEventListener

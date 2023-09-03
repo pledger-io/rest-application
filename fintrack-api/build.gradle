@@ -17,7 +17,6 @@ dependencies {
     implementation("io.micronaut.security:micronaut-security")
     implementation("io.micronaut.security:micronaut-security-jwt")
     implementation("io.micronaut.servlet:micronaut-http-server-jetty")
-    implementation("io.micronaut:micronaut-tracing")
 
     implementation("io.micronaut.beanvalidation:micronaut-hibernate-validator")
 
@@ -26,6 +25,12 @@ dependencies {
     implementation("org.bouncycastle:bcpkix-jdk15on:$bouncyCastleVersion")
 
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
+
+    // needed for application.yml
+    runtimeOnly("org.yaml:snakeyaml")
+
+    // Investigate if this can be swapped for micronaut serde
+    implementation("io.micronaut:micronaut-jackson-databind")
 
     implementation project(':core'),
             project(':domain'),

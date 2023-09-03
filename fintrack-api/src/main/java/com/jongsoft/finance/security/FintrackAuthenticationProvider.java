@@ -16,18 +16,15 @@ import reactor.core.publisher.FluxSink;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
-public class FintrackAuthenticationProvider implements AuthenticationProvider {
+public class FintrackAuthenticationProvider implements AuthenticationProvider<HttpRequest<?>> {
 
     private final FinTrack application;
     private final UserProvider userProvider;
 
-    @Override
     public Publisher<AuthenticationResponse> authenticate(
             final HttpRequest<?> httpRequest,
             final AuthenticationRequest<?, ?> authenticationRequest) {

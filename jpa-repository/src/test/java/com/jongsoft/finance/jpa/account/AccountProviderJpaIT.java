@@ -13,6 +13,7 @@ import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import reactor.test.StepVerifier;
@@ -33,12 +34,14 @@ class AccountProviderJpaIT extends JpaTestSetup {
     private Sequence<String> ownTypes;
     private FilterFactory filterFactory = new FilterFactoryJpa();
 
+    @BeforeEach
     void setup() {
         ownTypes = Collections.List(accountTypeProvider.lookup(false));
 
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
 
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/account/account-provider.sql"
         );
@@ -46,7 +49,6 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void ofSynonym_accountOne() {
-        setup();
         var account = accountProvider.synonymOf("Account trial").block();
 
         Assertions.assertThat(account.getName()).isEqualTo("Account One");
@@ -54,8 +56,6 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void ofSynonym_notMyAccount() {
-        setup();
-
         StepVerifier.create(accountProvider.synonymOf("Account Junk"))
                 .expectNextCount(0)
                 .verifyComplete();
@@ -63,14 +63,12 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup() {
-        setup();
         var all = accountProvider.lookup();
         Assertions.assertThat(all).hasSize(1);
     }
 
     @Test
     void lookup_ownAccounts() {
-        setup();
         var filter = filterFactory.account()
                 .types(ownTypes);
 
@@ -82,7 +80,6 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_name() {
-        setup();
         var account = accountProvider.lookup("Account One").block();
 
         Assertions.assertThat(account.getIban()).isEqualTo("NLJND200001928233");
@@ -97,7 +94,6 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_partialName() {
-        setup();
         var filter = filterFactory.account()
                 .name("one", false);
 
@@ -109,7 +105,6 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_iban() {
-        setup();
         var filter = filterFactory.account()
                 .iban("NLJND200001928233", true);
 
@@ -121,7 +116,6 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_ibanPartial() {
-        setup();
         var filter = filterFactory.account()
                 .iban("NLJND20000", false)
                 .page(0);
@@ -134,8 +128,6 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_systemType() {
-        setup();
-
         StepVerifier.create(accountProvider.lookup(SystemAccountTypes.RECONCILE))
                 .expectNextCount(0)
                 .verifyComplete();
@@ -143,7 +135,6 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void top() {
-        setup();
         var filter = filterFactory.account()
                 .types(ownTypes)
                 .pageSize(2);

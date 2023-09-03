@@ -9,7 +9,6 @@ import com.jongsoft.finance.messaging.commands.transaction.SplitTransactionComma
 import com.jongsoft.lang.Collections;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -18,10 +17,14 @@ import java.util.Objects;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SplitTransactionHandler implements CommandHandler<SplitTransactionCommand> {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public SplitTransactionHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @BusinessEventListener

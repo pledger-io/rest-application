@@ -3,8 +3,8 @@ package com.jongsoft.finance.rest.importer;
 import io.micronaut.core.annotation.Introspected;
 import lombok.Builder;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Introspected
 class ImporterCreateRequest {

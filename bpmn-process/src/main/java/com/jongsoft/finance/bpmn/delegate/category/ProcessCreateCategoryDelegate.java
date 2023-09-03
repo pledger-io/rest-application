@@ -5,9 +5,7 @@ import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.CategoryJson;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -27,11 +25,15 @@ import reactor.core.publisher.Mono;
  */
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessCreateCategoryDelegate implements JavaDelegate {
 
     private final CurrentUserProvider currentUserProvider;
     private final CategoryProvider categoryProvider;
+
+    ProcessCreateCategoryDelegate(CurrentUserProvider currentUserProvider, CategoryProvider categoryProvider) {
+        this.currentUserProvider = currentUserProvider;
+        this.categoryProvider = categoryProvider;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

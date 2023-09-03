@@ -8,10 +8,11 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 class CSVConfigEventListenerIT extends JpaTestSetup {
 
@@ -24,9 +25,11 @@ class CSVConfigEventListenerIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
     void setup() {
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/importer/csv-config-provider.sql"
         );
@@ -34,7 +37,6 @@ class CSVConfigEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleCreatedEvent() {
-        setup();
         eventPublisher.publishEvent(
                 new CreateConfigurationCommand("test-config", "file-code-3"));
 

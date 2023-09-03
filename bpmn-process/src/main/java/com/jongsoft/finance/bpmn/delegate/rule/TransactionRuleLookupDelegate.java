@@ -1,9 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.rule;
 
 import com.jongsoft.finance.providers.TransactionRuleProvider;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -12,10 +10,13 @@ import java.util.Objects;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionRuleLookupDelegate implements JavaDelegate {
 
     private final TransactionRuleProvider transactionRuleProvider;
+
+    TransactionRuleLookupDelegate(TransactionRuleProvider transactionRuleProvider) {
+        this.transactionRuleProvider = transactionRuleProvider;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

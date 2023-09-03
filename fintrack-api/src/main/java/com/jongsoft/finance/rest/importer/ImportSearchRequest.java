@@ -3,7 +3,7 @@ package com.jongsoft.finance.rest.importer;
 import io.micronaut.core.annotation.Introspected;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Min;
+import jakarta.validation.constraints.Min;
 
 @Introspected
 @NoArgsConstructor

@@ -7,19 +7,23 @@ import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateExpenseHandler implements CommandHandler<CreateExpenseCommand> {
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
+
+    @Inject
+    public CreateExpenseHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+        this.entityManager = entityManager;
+        this.authenticationFacade = authenticationFacade;
+    }
 
     @Override
     @Transactional

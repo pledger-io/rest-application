@@ -6,16 +6,19 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.importer.DeleteImportJobCommand;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class DeleteImportJobHandler implements CommandHandler<DeleteImportJobCommand> {
 
     private final ReactiveEntityManager entityManager;
-    
+
+    @Inject
+    public DeleteImportJobHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
+
     @Override
     @BusinessEventListener
     public void handle(DeleteImportJobCommand command) {

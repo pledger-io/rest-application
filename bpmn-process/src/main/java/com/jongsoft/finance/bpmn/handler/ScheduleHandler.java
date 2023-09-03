@@ -5,9 +5,7 @@ import com.jongsoft.finance.bpmn.KnownProcesses;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.schedule.ScheduleCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.ProcessEngine;
 
@@ -15,11 +13,15 @@ import java.util.Objects;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ScheduleHandler implements CommandHandler<ScheduleCommand> {
 
     private final AuthenticationFacade authenticationFacade;
     private final ProcessEngine processEngine;
+
+    ScheduleHandler(AuthenticationFacade authenticationFacade, ProcessEngine processEngine) {
+        this.authenticationFacade = authenticationFacade;
+        this.processEngine = processEngine;
+    }
 
     @BusinessEventListener
     public void handle(ScheduleCommand command) {

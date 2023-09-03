@@ -9,7 +9,7 @@ import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.SynchronousTransactionManager;
 import lombok.RequiredArgsConstructor;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.sql.Connection;
 import java.util.List;
 import java.util.function.Function;

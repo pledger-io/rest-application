@@ -9,16 +9,20 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateTagHandler implements CommandHandler<CreateTagCommand> {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public CreateTagHandler(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+        this.authenticationFacade = authenticationFacade;
+        this.entityManager = entityManager;
+    }
 
     @Override
     @BusinessEventListener

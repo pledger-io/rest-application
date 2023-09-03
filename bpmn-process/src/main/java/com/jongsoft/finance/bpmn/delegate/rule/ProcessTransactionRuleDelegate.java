@@ -2,19 +2,20 @@ package com.jongsoft.finance.bpmn.delegate.rule;
 
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.RuleConfigJson;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessTransactionRuleDelegate implements JavaDelegate {
 
     private final CurrentUserProvider currentUserProvider;
+
+    ProcessTransactionRuleDelegate(CurrentUserProvider currentUserProvider) {
+        this.currentUserProvider = currentUserProvider;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

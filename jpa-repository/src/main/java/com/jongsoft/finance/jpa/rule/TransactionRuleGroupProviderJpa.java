@@ -8,18 +8,22 @@ import com.jongsoft.lang.control.Optional;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 @Slf4j
 @Singleton
 @Named("transactionRuleGroupProvider")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public TransactionRuleGroupProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+        this.authenticationFacade = authenticationFacade;
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Flux<TransactionRuleGroup> lookup() {

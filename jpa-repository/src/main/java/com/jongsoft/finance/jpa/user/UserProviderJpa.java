@@ -14,7 +14,6 @@ import com.jongsoft.lang.control.Optional;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -23,10 +22,14 @@ import java.util.Currency;
 
 @Singleton
 @Named("userProvider")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class UserProviderJpa implements UserProvider {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public UserProviderJpa(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Optional<UserAccount> lookup(long id) {

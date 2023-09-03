@@ -6,6 +6,7 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -19,9 +20,11 @@ class BudgetProviderJpaIT extends JpaTestSetup {
     @Inject
     private BudgetProvider budgetProvider;
 
+    @BeforeEach
     void setup() throws IOException {
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/user/budget-provider.sql"
         );
@@ -29,14 +32,12 @@ class BudgetProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup() throws IOException {
-        setup();
         var check = budgetProvider.lookup();
         Assertions.assertThat(check).hasSize(2);
     }
 
     @Test
     void lookup_201901() throws IOException {
-        setup();
         var check = budgetProvider.lookup(2019, 1).block();
 
         Assertions.assertThat(check.getExpenses()).hasSize(2);
@@ -45,7 +46,6 @@ class BudgetProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_202001() throws IOException {
-        setup();
         var check = budgetProvider.lookup(2020, 1).block();
 
         Assertions.assertThat(check.getExpenses()).hasSize(2);
@@ -54,7 +54,6 @@ class BudgetProviderJpaIT extends JpaTestSetup {
 
     @Test
     void first() throws IOException {
-        setup();
         var check = budgetProvider.first().block();
 
         Assertions.assertThat(check.getExpenses()).hasSize(2);

@@ -7,6 +7,7 @@ import db.migration.V20200503171321__MigrateToDecryptDatabase;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.flywaydb.core.internal.command.DbMigrate;
 
 @Slf4j
 class DatasourceMigrationJpa implements DataSourceMigration {
@@ -35,6 +36,14 @@ class DatasourceMigrationJpa implements DataSourceMigration {
                         datasourceConfiguration.getPassword()
                 );
 
-        new Flyway(config).migrate();
+        try {
+            new Flyway(config).migrate();
+        } catch (DbMigrate.FlywayMigrateException e) {
+            log.error("Failed to migrate database from {} to {}: {}",
+                    e.getErrorResult().initialSchemaVersion,
+                    e.getErrorResult().targetSchemaVersion,
+                    e.getErrorResult().error.message);
+            throw new IllegalStateException("Failed to migrate database.");
+        }
     }
 }

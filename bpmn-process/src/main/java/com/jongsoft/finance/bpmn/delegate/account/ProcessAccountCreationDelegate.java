@@ -6,9 +6,7 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.AccountJson;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Hex;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -32,12 +30,20 @@ import java.time.temporal.ChronoUnit;
  */
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProcessAccountCreationDelegate implements JavaDelegate {
 
     private final CurrentUserProvider userProvider;
     private final AccountProvider accountProvider;
     private final StorageService storageService;
+
+    ProcessAccountCreationDelegate(
+            CurrentUserProvider userProvider,
+            AccountProvider accountProvider,
+            StorageService storageService) {
+        this.userProvider = userProvider;
+        this.accountProvider = accountProvider;
+        this.storageService = storageService;
+    }
 
     @Override
     public void execute(DelegateExecution execution) {

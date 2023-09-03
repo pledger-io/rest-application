@@ -21,7 +21,6 @@ import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -29,11 +28,16 @@ import java.util.HashSet;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateTransactionHandler implements CommandHandler<CreateTransactionCommand>, TransactionCreationHandler {
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
+
+    @Inject
+    public CreateTransactionHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+        this.entityManager = entityManager;
+        this.authenticationFacade = authenticationFacade;
+    }
 
     @Override
     @BusinessEventListener

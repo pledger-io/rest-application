@@ -7,6 +7,7 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -21,9 +22,11 @@ class ExpenseProviderJpaIT extends JpaTestSetup {
     @Inject
     private FilterFactory filterFactory;
 
+    @BeforeEach
     void setUp() {
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/user/budget-provider.sql"
         );
@@ -31,8 +34,6 @@ class ExpenseProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_byId() {
-        setUp();
-
         var response = expenseProvider.lookup(1L);
 
         Assertions.assertThat(response.isPresent()).isTrue();
@@ -42,8 +43,6 @@ class ExpenseProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_byIdWrongUser() {
-        setUp();
-
         var response = expenseProvider.lookup(2L);
 
         Assertions.assertThat(response.isPresent()).isFalse();
@@ -51,8 +50,6 @@ class ExpenseProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_byFilter() {
-        setUp();
-
         var command = filterFactory.expense()
                 .name("gro", false);
 

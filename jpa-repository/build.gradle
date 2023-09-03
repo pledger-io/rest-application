@@ -15,6 +15,7 @@ dependencies {
 
     runtimeOnly("mysql:mysql-connector-java")
     runtimeOnly("org.flywaydb:flyway-mysql")
+    runtimeOnly("org.yaml:snakeyaml")
 //    runtimeOnly("dev.miku:r2dbc-mysql")
 }
 

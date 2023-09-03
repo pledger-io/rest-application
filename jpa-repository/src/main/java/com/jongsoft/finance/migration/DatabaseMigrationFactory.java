@@ -5,13 +5,16 @@ import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.env.Environment;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 
 @Factory
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class DatabaseMigrationFactory {
 
     private final Environment environment;
+
+    @Inject
+    public DatabaseMigrationFactory(Environment environment) {
+        this.environment = environment;
+    }
 
     @Context
     public DataSourceMigration datasourceMigration(MigrationDatasourceConfiguration configuration) {

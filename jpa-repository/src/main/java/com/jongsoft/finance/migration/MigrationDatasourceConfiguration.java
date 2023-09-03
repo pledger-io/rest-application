@@ -3,8 +3,8 @@ package com.jongsoft.finance.migration;
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.core.bind.annotation.Bindable;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @ConfigurationProperties("datasources.default")
 public interface MigrationDatasourceConfiguration {

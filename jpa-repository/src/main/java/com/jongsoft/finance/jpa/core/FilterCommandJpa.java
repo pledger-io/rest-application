@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.core;
 
 import com.jongsoft.finance.jpa.FilterDelegate;
 
-import javax.persistence.Query;
+import jakarta.persistence.Query;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;

@@ -7,10 +7,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.lang.collection.Sequence;
 
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.ToString;
 
 @Data
+@Serdeable
 @ToString(of = {"accountId", "headers", "dateFormat", "delimiter"})
 public class ImportConfigJson implements Serializable {
 

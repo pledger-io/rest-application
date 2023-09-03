@@ -5,17 +5,18 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
 import com.jongsoft.lang.collection.tuple.Triplet;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ExtractorRuleRunDelegate implements JavaDelegate {
 
     private final RuleEngine ruleEngine;
+
+    ExtractorRuleRunDelegate(RuleEngine ruleEngine) {
+        this.ruleEngine = ruleEngine;
+    }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

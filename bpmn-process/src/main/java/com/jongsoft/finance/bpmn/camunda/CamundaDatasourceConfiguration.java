@@ -1,10 +1,9 @@
 package com.jongsoft.finance.bpmn.camunda;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.core.bind.annotation.Bindable;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @ConfigurationProperties("datasources.default")
 public interface CamundaDatasourceConfiguration {

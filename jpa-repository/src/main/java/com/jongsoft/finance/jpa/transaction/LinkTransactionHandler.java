@@ -13,16 +13,20 @@ import com.jongsoft.finance.messaging.commands.transaction.LinkTransactionComman
 import com.jongsoft.finance.security.AuthenticationFacade;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class LinkTransactionHandler implements CommandHandler<LinkTransactionCommand> {
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
+
+    @Inject
+    public LinkTransactionHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+        this.entityManager = entityManager;
+        this.authenticationFacade = authenticationFacade;
+    }
 
     @Override
     @BusinessEventListener
@@ -33,7 +37,7 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
             case CATEGORY -> " category = :relation";
             case CONTRACT -> " contract = :relation";
             case EXPENSE -> " budget = :relation";
-            case IMPORT ->  " batchImport = :relation";
+            case IMPORT -> " batchImport = :relation";
         };
 
         var hql = "update TransactionJournal set"

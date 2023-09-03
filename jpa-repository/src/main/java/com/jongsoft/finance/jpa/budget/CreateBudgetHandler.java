@@ -13,7 +13,6 @@ import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
@@ -22,11 +21,16 @@ import java.util.HashSet;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CreateBudgetHandler implements CommandHandler<CreateBudgetCommand> {
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
+
+    @Inject
+    public CreateBudgetHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+        this.entityManager = entityManager;
+        this.authenticationFacade = authenticationFacade;
+    }
 
     @Override
     @BusinessEventListener
@@ -48,12 +52,12 @@ public class CreateBudgetHandler implements CommandHandler<CreateBudgetCommand> 
 
     private Collection<ExpensePeriodJpa> createExpenses(BudgetJpa budget, Sequence<Budget.Expense> expenses) {
         return expenses.map(expense ->
-                ExpensePeriodJpa.builder()
-                        .budget(budget)
-                        .expense(entityManager.get(ExpenseJpa.class, Collections.Map("id", expense.getId())))
-                        .lowerBound(BigDecimal.valueOf(expense.getLowerBound()).subtract(new BigDecimal("0.001")))
-                        .upperBound(BigDecimal.valueOf(expense.getUpperBound()))
-                        .build())
+                        ExpensePeriodJpa.builder()
+                                .budget(budget)
+                                .expense(entityManager.get(ExpenseJpa.class, Collections.Map("id", expense.getId())))
+                                .lowerBound(BigDecimal.valueOf(expense.getLowerBound()).subtract(new BigDecimal("0.001")))
+                                .upperBound(BigDecimal.valueOf(expense.getUpperBound()))
+                                .build())
                 .map(this::persist)
                 .toJava();
     }

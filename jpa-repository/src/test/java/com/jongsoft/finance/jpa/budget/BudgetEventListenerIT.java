@@ -11,10 +11,11 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -29,8 +30,10 @@ class BudgetEventListenerIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
     void init() {
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/user/budget-provider.sql"
         );
@@ -38,7 +41,6 @@ class BudgetEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleBudgetCreatedEvent() {
-        init();
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user-not");
 
         eventPublisher.publishEvent(new CreateBudgetCommand(
@@ -63,7 +65,6 @@ class BudgetEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleBudgetClosedEvent() {
-        init();
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
 
         eventPublisher.publishEvent(new CloseBudgetCommand(2L, LocalDate.of(2020, 1, 1)));
@@ -74,7 +75,6 @@ class BudgetEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleExpenseCreatedEvent() {
-        init();
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
 
         eventPublisher.publishEvent(new CreateExpenseCommand(

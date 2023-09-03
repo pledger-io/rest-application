@@ -20,7 +20,6 @@ import com.jongsoft.lang.control.Optional;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
@@ -31,11 +30,16 @@ import java.util.Objects;
 @Slf4j
 @Singleton
 @Named("transactionProvider")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionProviderJpa implements TransactionProvider {
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    public TransactionProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+        this.authenticationFacade = authenticationFacade;
+        this.entityManager = entityManager;
+    }
 
     @Override
     public Mono<Transaction> first(FilterCommand filter) {

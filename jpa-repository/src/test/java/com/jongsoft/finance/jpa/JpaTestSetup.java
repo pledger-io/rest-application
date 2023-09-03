@@ -3,20 +3,22 @@ package com.jongsoft.finance.jpa;
 import com.jongsoft.finance.core.Encoder;
 import io.micronaut.core.io.IOUtils;
 import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.annotation.TransactionMode;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 @MicronautTest(
-        environments = "application"
+        environments = "application",
+        transactionMode = TransactionMode.SEPARATE_TRANSACTIONS
 )
 public abstract class JpaTestSetup {
 

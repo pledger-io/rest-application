@@ -1,16 +1,13 @@
 package com.jongsoft.finance.jpa.user.entity;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.persistence.*;
-
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
-
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.Where;
+
+import java.util.Currency;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Entity

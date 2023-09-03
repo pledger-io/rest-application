@@ -8,15 +8,18 @@ import com.jongsoft.finance.messaging.commands.account.RenameAccountCommand;
 import com.jongsoft.lang.Collections;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RenameAccountHandler implements CommandHandler<RenameAccountCommand> {
 
     private final ReactiveEntityManager entityManager;
+
+    @Inject
+    RenameAccountHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     @BusinessEventListener

@@ -11,7 +11,7 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 @Slf4j
 @Singleton
