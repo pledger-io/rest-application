@@ -10,8 +10,10 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import reactor.test.StepVerifier;
 
 public class CurrencyProviderJpaIT extends JpaTestSetup {
 
@@ -21,15 +23,16 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
     @Inject
     private ApplicationEventPublisher eventPublisher;
 
+    @BeforeEach
     void init() {
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql"
         );
     }
 
     @Test
     void lookup_all() {
-        init();
         var check = currencyProvider.lookup();
 
         Assertions.assertThat(check).hasSize(3);
@@ -37,7 +40,6 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_eur() {
-        init();
         var check = currencyProvider.lookup("EUR").block();
 
         Assertions.assertThat(check.getCode()).isEqualTo("EUR");
@@ -46,7 +48,6 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
 
     @Test
     void handleCreate() {
-        init();
         var check = currencyProvider.lookup("MST").blockOptional();
         Assertions.assertThat(check).isEmpty();
 
@@ -65,7 +66,6 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
 
     @Test
     void handleProperty_decimalPlaces() {
-        init();
         eventPublisher.publishEvent(new ChangeCurrencyPropertyCommand<>(
                 "EUR",
                 12,
@@ -79,15 +79,17 @@ public class CurrencyProviderJpaIT extends JpaTestSetup {
 
     @Test
     void handleProperty_enable() {
-        init();
         eventPublisher.publishEvent(new ChangeCurrencyPropertyCommand<>(
                 "EUR",
                 false,
                 CurrencyCommandType.ENABLED
         ));
 
-        var check = currencyProvider.lookup("EUR").block();
-        Assertions.assertThat(check.isEnabled()).isFalse();
+        StepVerifier.create(currencyProvider.lookup("EUR"))
+                .assertNext(check -> {
+                    Assertions.assertThat(check.isEnabled()).isFalse();
+                })
+                .verifyComplete();
     }
 
     @MockBean

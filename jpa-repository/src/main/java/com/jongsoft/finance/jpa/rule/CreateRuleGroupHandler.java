@@ -36,7 +36,7 @@ public class CreateRuleGroupHandler implements CommandHandler<CreateRuleGroupCom
         var currentMax = entityManager
                 .<Integer>blocking()
                 .hql(hql)
-                .set("username", authenticationFacade)
+                .set("username", authenticationFacade.authenticated())
                 .maybe();
 
         var jpaEntity = RuleGroupJpa.builder()

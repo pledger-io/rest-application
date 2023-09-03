@@ -27,7 +27,7 @@ public class ChangeRuleHandler implements CommandHandler<ChangeRuleCommand> {
         var hql = """
                 update %s
                 set field = :field,
-                    value = :value
+                    `value` = :value
                 where id = :id""".formatted(RuleChangeJpa.class.getName());
 
         entityManager.update()

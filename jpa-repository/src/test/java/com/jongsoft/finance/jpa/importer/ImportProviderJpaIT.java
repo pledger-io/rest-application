@@ -6,6 +6,7 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -17,9 +18,11 @@ public class ImportProviderJpaIT extends JpaTestSetup {
     @Inject
     private ImportProvider importProvider;
 
+    @BeforeEach
     void setup() {
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/importer/csv-config-provider.sql",
                 "sql/importer/import-provider.sql"
@@ -28,7 +31,6 @@ public class ImportProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_slug() {
-        setup();
         var check = importProvider.lookup("test-import-1").block();
 
         Assertions.assertThat(check.getFileCode()).isEqualTo("Large,CSV,file");
@@ -36,7 +38,6 @@ public class ImportProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup() {
-        setup();
         var check = importProvider.lookup(ImportProvider.FilterCommand.unpaged());
 
         Assertions.assertThat(check.content()).hasSize(1);

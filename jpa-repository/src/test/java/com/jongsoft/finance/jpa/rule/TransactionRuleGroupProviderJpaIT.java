@@ -6,6 +6,7 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import reactor.test.StepVerifier;
@@ -18,9 +19,11 @@ class TransactionRuleGroupProviderJpaIT extends JpaTestSetup {
     @Inject
     private TransactionRuleGroupProvider ruleGroupProvider;
 
+    @BeforeEach
     void setup() {
         Mockito.doReturn("demo-user").when(authenticationFacade).authenticated();
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/transaction/rule-group-provider.sql"
         );
@@ -28,8 +31,6 @@ class TransactionRuleGroupProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup() {
-        setup();
-
         StepVerifier.create(ruleGroupProvider.lookup())
                 .consumeNextWith(rule -> Assertions.assertThat(rule.getName()).isEqualTo("Grocery stores"))
                 .consumeNextWith(rule -> Assertions.assertThat(rule.getName()).isEqualTo("Hardware stores"))
@@ -38,7 +39,6 @@ class TransactionRuleGroupProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_name() {
-        setup();
         var check = ruleGroupProvider.lookup("Grocery stores");
         Assertions.assertThat(check.isPresent()).isTrue();
     }

@@ -35,7 +35,7 @@ public class DeleteTransactionHandler implements CommandHandler<DeleteTransactio
         var updateHql = """
                 update TransactionJpa
                 set deleted = :now
-                where journal_id = :id""";
+                where journal.id = :id""";
 
         entityManager.update()
                 .hql(updateHql)

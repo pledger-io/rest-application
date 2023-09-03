@@ -2,18 +2,17 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.tag.TagJpa;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.finance.messaging.commands.transaction.DeleteTagCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import jakarta.persistence.EntityManager;
 
 class TagEventListenerIT extends JpaTestSetup {
 
@@ -26,9 +25,11 @@ class TagEventListenerIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
     void setup() {
         Mockito.doReturn("demo-user").when(authenticationFacade).authenticated();
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/transaction/tag-provider.sql"
         );

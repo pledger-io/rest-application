@@ -12,6 +12,7 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -29,9 +30,11 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
     @Inject
     private AuthenticationFacade authenticationFacade;
 
+    @BeforeEach
     void setup() {
         Mockito.doReturn("demo-user").when(authenticationFacade).authenticated();
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/account/account-provider.sql",
                 "sql/transaction/schedule-provider.sql"
@@ -40,7 +43,6 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleCreated() {
-        setup();
         var schedule = new ScheduleValue(Periodicity.MONTHS, 3);
 
         eventPublisher.publishEvent(new CreateScheduleCommand(
@@ -54,7 +56,6 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleCreateByContract() {
-        setup();
         eventPublisher.publishEvent(new CreateScheduleForContractCommand(
                 "ut_create_by_contract",
                 new ScheduleValue(Periodicity.MONTHS, 3),
@@ -76,7 +77,6 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleDescribe() {
-        setup();
         eventPublisher.publishEvent(new DescribeScheduleCommand(
                 2L,
                 "My description",
@@ -89,7 +89,6 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleLimit() {
-        setup();
         eventPublisher.publishEvent(new LimitScheduleCommand(
                 2L,
                 null,
@@ -103,7 +102,6 @@ class TransactionScheduleEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleReschedule() {
-        setup();
         eventPublisher.publishEvent(new RescheduleCommand(
                 2L,
                 null,

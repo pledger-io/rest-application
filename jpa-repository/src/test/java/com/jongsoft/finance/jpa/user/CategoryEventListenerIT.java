@@ -10,6 +10,7 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -26,9 +27,11 @@ class CategoryEventListenerIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
     void setUp() {
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/user/category-provider.sql"
         );
@@ -36,7 +39,6 @@ class CategoryEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleCreatedEvent() {
-        setUp();
         eventPublisher.publishEvent(new CreateCategoryCommand("Created tag", "Description of"));
 
         var check = entityManager.createQuery("from CategoryJpa where label = :label", CategoryJpa.class)
@@ -49,7 +51,6 @@ class CategoryEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleRenamedEvent() {
-        setUp();
         eventPublisher.publishEvent(new RenameCategoryCommand(
                 1L,
                 "Updated grocery",
@@ -62,7 +63,6 @@ class CategoryEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleRemovedEvent() {
-        setUp();
         eventPublisher.publishEvent(new DeleteCategoryCommand(1L));
 
         var check = entityManager.find(CategoryJpa.class, 1L);

@@ -11,5 +11,16 @@ TRUNCATE TABLE saving_goal;
 TRUNCATE TABLE budget_expense;
 TRUNCATE TABLE budget;
 TRUNCATE TABLE budget_period;
+TRUNCATE TABLE import_config;
+TRUNCATE TABLE import;
+TRUNCATE TABLE rule_group;
+TRUNCATE TABLE rule;
+TRUNCATE TABLE rule_change;
+TRUNCATE TABLE rule_condition;
+TRUNCATE TABLE transaction_schedule;
+TRUNCATE TABLE tags;
+TRUNCATE TABLE category;
+TRUNCATE TABLE transaction_tag;
+TRUNCATE TABLE currency;
 
 SET FOREIGN_KEY_CHECKS=1;  -- turn on foreign key checks

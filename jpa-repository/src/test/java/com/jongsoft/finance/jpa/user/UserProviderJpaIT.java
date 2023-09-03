@@ -6,6 +6,7 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import reactor.test.StepVerifier;
@@ -15,8 +16,10 @@ class UserProviderJpaIT extends JpaTestSetup {
     @Inject
     private UserProvider userProvider;
 
+    @BeforeEach
     void init() {
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/account/account-provider.sql"
         );
@@ -24,14 +27,12 @@ class UserProviderJpaIT extends JpaTestSetup {
 
     @Test
     void available() {
-        init();
         Assertions.assertTrue(userProvider.available("user@account"));
         Assertions.assertFalse(userProvider.available("demo-user"));
     }
 
     @Test
     void lookup() {
-        init();
         var check = userProvider.lookup("demo-user");
 
         Assertions.assertTrue(check.isPresent());
@@ -42,14 +43,11 @@ class UserProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_notFound() {
-        init();
         Assertions.assertFalse(userProvider.lookup("user@account").isPresent());
     }
 
     @Test
     void tokens() {
-        init();
-
         StepVerifier.create(userProvider.tokens("demo-user"))
                 .assertNext(token -> "refresh-token-1".equals(token.getToken()))
                 .verifyComplete();
@@ -57,8 +55,6 @@ class UserProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_refreshToken() {
-        init();
-
         StepVerifier.create(userProvider.refreshToken("refresh-token-1"))
                 .assertNext(a -> "demo-user".equals(a.getUsername()))
                 .verifyComplete();

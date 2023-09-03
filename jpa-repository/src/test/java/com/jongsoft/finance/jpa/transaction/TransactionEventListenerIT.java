@@ -12,6 +12,7 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -31,9 +32,11 @@ class TransactionEventListenerIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
     void setup() {
         Mockito.doReturn("demo-user").when(authenticationFacade).authenticated();
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/transaction/transaction-provider.sql"
         );
@@ -41,7 +44,6 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleCreatedEvent() {
-        setup();
         eventPublisher.publishEvent(new CreateTransactionCommand(
                 Transaction.builder()
                         .date(LocalDate.of(2020, 1, 1))
@@ -71,7 +73,6 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleFailureRegistrationEvent() {
-        setup();
         eventPublisher.publishEvent(new RegisterFailureCommand(1L, FailureCode.POSSIBLE_DUPLICATE));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
@@ -80,7 +81,6 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleAmountChangedEvent() {
-        setup();
         eventPublisher.publishEvent(new ChangeTransactionAmountCommand(
                 1L,
                 BigDecimal.valueOf(40.55),
@@ -98,7 +98,6 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleDescribeEvent() {
-        setup();
         eventPublisher.publishEvent(
                 new DescribeTransactionCommand( 1L, "Updated description"));
 
@@ -108,7 +107,6 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleBookedEvent() {
-        setup();
         eventPublisher.publishEvent(new ChangeTransactionDatesCommand(
                 1L,
                 LocalDate.of(2030, 1, 1),
@@ -123,7 +121,6 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleRelationEvent_category() {
-        setup();
         eventPublisher.publishEvent(new LinkTransactionCommand(
                 1L,
                 LinkTransactionCommand.LinkType.CATEGORY,
@@ -135,7 +132,6 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleTagEvent() {
-        setup();
         eventPublisher.publishEvent(new TagTransactionCommand(
                 1L,
                 Collections.List("Food")));
@@ -147,7 +143,6 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleSplitEvent() {
-        setup();
         eventPublisher.publishEvent(new SplitTransactionCommand(
                 1L,
                 Collections.List(
@@ -176,7 +171,6 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleDeleteEvent() {
-        setup();
         eventPublisher.publishEvent(new DeleteTransactionCommand(1L));
 
         var check = entityManager.find(TransactionJournal.class, 1L);

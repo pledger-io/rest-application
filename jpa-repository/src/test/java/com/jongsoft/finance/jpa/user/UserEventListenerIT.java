@@ -10,6 +10,7 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -26,9 +27,15 @@ class UserEventListenerIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
+    void setup() {
+        loadDataset(
+                "sql/clean-up.sql",
+                "sql/base-setup.sql");
+    }
+
     @Test
     void handleUserAccountCreatedEvent() {
-        loadDataset("sql/base-setup.sql");
         eventPublisher.publishEvent(new CreateUserCommand("demo@account", "pasword123!"));
 
         var query = entityManager.createQuery("select a from UserAccountJpa a where a.username = 'demo@account'");
@@ -45,7 +52,6 @@ class UserEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleUserAccountPasswordEvent() {
-        loadDataset("sql/base-setup.sql");
         eventPublisher.publishEvent(new ChangePasswordCommand("demo-user", "updated password"));
 
         var check = entityManager.find(UserAccountJpa.class, 1L);
@@ -54,7 +60,6 @@ class UserEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleUserAccountMultifactorEvent() {
-        loadDataset("sql/base-setup.sql");
         eventPublisher.publishEvent(new ChangeMultiFactorCommand("demo-user", true));
 
         var check = entityManager.find(UserAccountJpa.class, 1L);
@@ -63,7 +68,6 @@ class UserEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleUserAccountSettingEvent_theme() {
-        loadDataset("sql/base-setup.sql");
         eventPublisher.publishEvent(new ChangeUserSettingCommand(
                 "demo-user",
                 ChangeUserSettingCommand.Type.THEME,
@@ -75,7 +79,6 @@ class UserEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleUserAccountSettingEvent_currency() {
-        loadDataset("sql/base-setup.sql");
         eventPublisher.publishEvent(new ChangeUserSettingCommand(
                 "demo-user",
                 ChangeUserSettingCommand.Type.CURRENCY,
@@ -87,7 +90,6 @@ class UserEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleTokenRegistrationEvent() {
-        loadDataset("sql/base-setup.sql");
         eventPublisher.publishEvent(new RegisterTokenCommand(
                 "demo-user",
                 "my-refresh-token",
@@ -104,7 +106,6 @@ class UserEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleTokenRevokedEvent() {
-        loadDataset("sql/base-setup.sql");
         eventPublisher.publishEvent(new RevokeTokenCommand(
                 "refresh-token-1"
         ));

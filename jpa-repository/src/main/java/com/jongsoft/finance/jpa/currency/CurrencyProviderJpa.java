@@ -34,7 +34,7 @@ public class CurrencyProviderJpa implements CurrencyProvider {
         log.trace("Currency lookup by code: {}", code);
 
         var hql = """
-                select c from CurrencyJpa c 
+                select c from CurrencyJpa c
                 where c.archived = false
                     and c.code = :code""";
 

@@ -6,6 +6,7 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import reactor.test.StepVerifier;
@@ -18,9 +19,11 @@ class CSVConfigProviderJpaIT extends JpaTestSetup {
     @Inject
     private CSVConfigProvider csvConfigProvider;
 
+    @BeforeEach
     void setup() {
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user");
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/importer/csv-config-provider.sql"
         );
@@ -28,8 +31,6 @@ class CSVConfigProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup() {
-        setup();
-
         StepVerifier.create(csvConfigProvider.lookup())
                 .assertNext(batch -> Assertions.assertThat(batch.getFileCode()).isEqualTo("file-code-1"))
                 .verifyComplete();
@@ -37,7 +38,6 @@ class CSVConfigProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_name() {
-        setup();
         var check = csvConfigProvider.lookup("sample-config");
 
         Assertions.assertThat(check.isPresent()).isTrue();
@@ -46,7 +46,6 @@ class CSVConfigProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_nameIncorrectUser() {
-        setup();
         var check = csvConfigProvider.lookup("other-config");
 
         Assertions.assertThat(check.isPresent()).isFalse();

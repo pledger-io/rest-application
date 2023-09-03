@@ -10,6 +10,7 @@ import com.jongsoft.lang.Collections;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -26,9 +27,11 @@ class TransactionProviderJpaIT extends JpaTestSetup {
 
     private FilterFactory filterFactory = new FilterFactoryJpa();
 
+    @BeforeEach
     void setup() {
         Mockito.doReturn("demo-user").when(authenticationFacade).authenticated();
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/transaction/transaction-provider.sql"
         );
@@ -36,7 +39,6 @@ class TransactionProviderJpaIT extends JpaTestSetup {
 
     @Test
     void first() {
-        setup();
         var check = transactionProvider.first(filterFactory.transaction().ownAccounts())
                 .block();
 
@@ -45,7 +47,6 @@ class TransactionProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup() {
-        setup();
         var filter = filterFactory.transaction()
                 .accounts(Collections.List(new EntityRef(2L)))
                 .description("tran", false)
@@ -57,7 +58,6 @@ class TransactionProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_currency() {
-        setup();
         var filter = filterFactory.transaction()
                 .currency("EUR");
 
@@ -67,7 +67,6 @@ class TransactionProviderJpaIT extends JpaTestSetup {
 
     @Test
     void daily() {
-        setup();
         var check = transactionProvider.daily(filterFactory.transaction().ownAccounts());
         Assertions.assertThat(check).hasSize(2);
         Assertions.assertThat(check).containsOnly(
@@ -77,7 +76,6 @@ class TransactionProviderJpaIT extends JpaTestSetup {
 
     @Test
     void balance() {
-        setup();
         var check = transactionProvider.balance(filterFactory.transaction().ownAccounts());
 
         Assertions.assertThat(check.isPresent()).isTrue();
@@ -86,7 +84,6 @@ class TransactionProviderJpaIT extends JpaTestSetup {
 
     @Test
     void similar() {
-        setup();
         var check = transactionProvider.similar(new EntityRef(1L), new EntityRef(2L), 20.2, LocalDate.of(2019, 1, 1));
         Assertions.assertThat(check).hasSize(1);
     }

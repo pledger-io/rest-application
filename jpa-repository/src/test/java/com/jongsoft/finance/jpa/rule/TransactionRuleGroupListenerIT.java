@@ -9,6 +9,7 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -25,9 +26,11 @@ class TransactionRuleGroupListenerIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
     void setup() {
         Mockito.doReturn("demo-user").when(authenticationFacade).authenticated();
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/transaction/rule-group-provider.sql"
         );
@@ -35,7 +38,6 @@ class TransactionRuleGroupListenerIT extends JpaTestSetup {
 
     @Test
     void handleCreateEvent() {
-        setup();
         eventPublisher.publishEvent(new CreateRuleGroupCommand("group-name"));
 
         var query = entityManager.createQuery("select t from RuleGroupJpa t where t.name = 'group-name'");
@@ -46,7 +48,6 @@ class TransactionRuleGroupListenerIT extends JpaTestSetup {
 
     @Test
     void handleRenamedEvent() {
-        setup();
         eventPublisher.publishEvent(new RenameRuleGroupCommand(2L, "updated-name"));
 
         var check = entityManager.find(RuleGroupJpa.class, 2L);
@@ -55,7 +56,6 @@ class TransactionRuleGroupListenerIT extends JpaTestSetup {
 
     @Test
     void handleSortedEvent() {
-        setup();
         eventPublisher.publishEvent(new ReorderRuleGroupCommand(2L, 0));
 
         var check = entityManager.find(RuleGroupJpa.class, 2L);

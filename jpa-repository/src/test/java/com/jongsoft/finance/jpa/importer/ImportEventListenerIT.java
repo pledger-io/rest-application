@@ -10,6 +10,7 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -23,8 +24,10 @@ class ImportEventListenerIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
     void setup() {
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/importer/csv-config-provider.sql",
                 "sql/importer/import-provider.sql"
@@ -33,7 +36,6 @@ class ImportEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleCreatedEvent() {
-        setup();
         eventPublisher.publishEvent(
                 new CreateImportJobCommand(
                         1L,
@@ -50,7 +52,6 @@ class ImportEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleFinishedEvent() {
-        setup();
         eventPublisher.publishEvent(
                 new CompleteImportJobCommand(1L));
 
@@ -60,7 +61,6 @@ class ImportEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleDeletedEvent() {
-        setup();
         eventPublisher.publishEvent(new DeleteImportJobCommand(1L));
 
         var check = entityManager.find(ImportJpa.class, 1L);

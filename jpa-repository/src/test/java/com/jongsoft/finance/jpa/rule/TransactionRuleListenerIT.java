@@ -11,6 +11,7 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -27,9 +28,11 @@ class TransactionRuleListenerIT extends JpaTestSetup {
     @Inject
     private EntityManager entityManager;
 
+    @BeforeEach
     void setup() {
         Mockito.doReturn("demo-user").when(authenticationFacade).authenticated();
         loadDataset(
+                "sql/clean-up.sql",
                 "sql/base-setup.sql",
                 "sql/transaction/rule-group-provider.sql",
                 "sql/transaction/rule-provider.sql"
@@ -38,7 +41,6 @@ class TransactionRuleListenerIT extends JpaTestSetup {
 
     @Test
     void handleConditionChange() {
-        setup();
         eventPublisher.publishEvent(
                 new ChangeConditionCommand(1L, RuleColumn.BUDGET, RuleOperation.EQUALS, "rude"));
 
@@ -49,7 +51,6 @@ class TransactionRuleListenerIT extends JpaTestSetup {
 
     @Test
     void handleChange() {
-        setup();
         eventPublisher.publishEvent(
                 new ChangeRuleCommand(1L, RuleColumn.CATEGORY, "1"));
 
@@ -60,7 +61,6 @@ class TransactionRuleListenerIT extends JpaTestSetup {
 
     @Test
     void handleSortedEvent() {
-        setup();
         eventPublisher.publishEvent(
                 new ReorderRuleCommand(2L, 2));
 

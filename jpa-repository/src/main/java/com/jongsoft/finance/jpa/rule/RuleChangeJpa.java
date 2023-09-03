@@ -1,11 +1,6 @@
 package com.jongsoft.finance.jpa.rule;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
@@ -21,6 +16,7 @@ public class RuleChangeJpa extends EntityJpa {
     @Enumerated(value = EnumType.STRING)
     private RuleColumn field;
 
+    @Column(name = "`value`")
     private String value;
 
     @ManyToOne
