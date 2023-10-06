@@ -9,18 +9,25 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+/**
+ * Date utilities.
+ */
 public interface DateUtils {
 
     static LocalDate startOfMonth(int year, int month) {
         return LocalDate.of(year, month, 1);
     }
-    
+
+    /**
+     * Returns the last day of the month.
+     */
     static LocalDate endOfMonth(int year, int month) {
         return LocalDate.of(year, month, 1)
                 .plusMonths(1)
                 .minusDays(1);
     }
-    
+
+
     static Long timestamp(LocalDate localDate) {
         if (localDate == null) {
             return null;
