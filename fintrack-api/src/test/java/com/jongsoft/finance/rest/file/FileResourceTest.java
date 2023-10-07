@@ -47,4 +47,11 @@ class FileResourceTest {
         Assertions.assertThat(response).isEqualTo("sample-token".getBytes());
         Mockito.verify(storageService).read("fasjkdh8nfasd8");
     }
+
+    @Test
+    void delete() {
+        subject.delete("fasjkdh8nfasd8");
+
+        Mockito.verify(storageService).remove("fasjkdh8nfasd8");
+    }
 }

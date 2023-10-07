@@ -43,4 +43,14 @@ public class FileResource {
                 .block();
     }
 
+    @Delete("/{fileCode}")
+    @Operation(
+            summary = "Delete attachment",
+            description = "Delete an existing attachment, if file encryption is enabled this will" +
+                    " throw an exception if the current user did not upload the file."
+    )
+    void delete(@PathVariable String fileCode) {
+        storageService.remove(fileCode);
+    }
+
 }
