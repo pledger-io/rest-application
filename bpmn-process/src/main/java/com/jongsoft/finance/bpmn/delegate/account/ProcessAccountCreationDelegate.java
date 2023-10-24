@@ -12,10 +12,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
-import reactor.core.publisher.Mono;
-
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate reads a JSON serialized as a variable and processes it into an
@@ -56,14 +52,14 @@ public class ProcessAccountCreationDelegate implements JavaDelegate {
                 accountJson.getName());
 
         accountProvider.lookup(accountJson.getName())
-                .switchIfEmpty(Mono.create(emitter -> {
+                .ifNotPresent(() -> {
                     userProvider.currentUser().createAccount(
                             accountJson.getName(),
                             accountJson.getCurrency(),
                             accountJson.getType());
 
                     accountProvider.lookup(accountJson.getName())
-                            .subscribe(account -> {
+                            .ifPresent(account -> {
                                 account.changeAccount(
                                         handleEmptyAsNull(accountJson.getIban()),
                                         handleEmptyAsNull(accountJson.getBic()),
@@ -79,12 +75,11 @@ public class ProcessAccountCreationDelegate implements JavaDelegate {
                                 }
 
                                 if (accountJson.getIcon() != null) {
-                                    account.registerIcon(storageService.store(Hex.decode(accountJson.getIcon())));;
+                                    account.registerIcon(storageService.store(Hex.decode(accountJson.getIcon())));
+                                    ;
                                 }
-
-                                emitter.success(account);
                             });
-                })).block(Duration.of(500, ChronoUnit.MILLIS));
+                });
     }
 
     private String handleEmptyAsNull(String value) {

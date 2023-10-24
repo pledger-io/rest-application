@@ -1,5 +1,8 @@
 package com.jongsoft.finance.rest.statistic;
 
+import io.micronaut.serde.annotation.Serdeable;
+
+@Serdeable.Serializable
 public class BalancePartitionResponse {
 
     private final String partition;

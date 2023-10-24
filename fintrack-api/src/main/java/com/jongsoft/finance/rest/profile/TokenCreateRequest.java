@@ -1,10 +1,10 @@
 package com.jongsoft.finance.rest.profile;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
 import java.time.LocalDate;
 
-@Introspected
+@Serdeable.Deserializable
 public class TokenCreateRequest {
 
     private String description;

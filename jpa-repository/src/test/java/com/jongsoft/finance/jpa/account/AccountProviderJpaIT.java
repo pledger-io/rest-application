@@ -16,7 +16,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 
@@ -49,16 +48,15 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void ofSynonym_accountOne() {
-        var account = accountProvider.synonymOf("Account trial").block();
+        var account = accountProvider.synonymOf("Account trial")
+                .get();
 
         Assertions.assertThat(account.getName()).isEqualTo("Account One");
     }
 
     @Test
     void ofSynonym_notMyAccount() {
-        StepVerifier.create(accountProvider.synonymOf("Account Junk"))
-                .expectNextCount(0)
-                .verifyComplete();
+        Assertions.assertThat(accountProvider.synonymOf("Account Junk").isPresent()).isFalse();
     }
 
     @Test
@@ -80,7 +78,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_name() {
-        var account = accountProvider.lookup("Account One").block();
+        var account = accountProvider.lookup("Account One").get();
 
         Assertions.assertThat(account.getIban()).isEqualTo("NLJND200001928233");
         Assertions.assertThat(account.getDescription()).isEqualTo("Demo Account");
@@ -128,9 +126,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_systemType() {
-        StepVerifier.create(accountProvider.lookup(SystemAccountTypes.RECONCILE))
-                .expectNextCount(0)
-                .verifyComplete();
+        Assertions.assertThat(accountProvider.lookup(SystemAccountTypes.RECONCILE).isPresent()).isFalse();
     }
 
     @Test

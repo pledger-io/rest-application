@@ -6,12 +6,14 @@ import com.jongsoft.finance.jpa.importer.entity.CSVImportConfig;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.CSVConfigProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
 
 @Slf4j
+@ReadOnly
 @Singleton
 public class CSVConfigProviderJpa implements CSVConfigProvider {
 
@@ -42,17 +44,17 @@ public class CSVConfigProviderJpa implements CSVConfigProvider {
     }
 
     @Override
-    public Flux<BatchImportConfig> lookup() {
+    public Sequence<BatchImportConfig> lookup() {
         log.trace("CSVConfiguration listing");
 
         var hql = """
                 select b from CSVImportConfig b
                 where b.user.username = :username""";
 
-        return entityManager.<CSVImportConfig>reactive()
+        return entityManager.<CSVImportConfig>blocking()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
-                .flow()
+                .sequence()
                 .map(this::convert);
     }
 

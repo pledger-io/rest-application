@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.AccountProvider;
@@ -11,9 +12,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate will create a reconciliation transaction into a selected account. This can be used to correct missing
@@ -50,7 +49,7 @@ public class ReconcileAccountDelegate implements JavaDelegate {
                 toReconcile.getName(), isoBookDate, amount);
 
         Account reconcileAccount = accountProvider.lookup(SystemAccountTypes.RECONCILE)
-                .block(Duration.of(500, ChronoUnit.MILLIS));
+                .getOrThrow(() -> StatusException.badRequest("Reconcile account not found"));
 
         var transactionDate = LocalDate.parse(isoBookDate);
         Transaction.Type type = amount.compareTo(BigDecimal.ZERO) >= 0 ? Transaction.Type.CREDIT : Transaction.Type.DEBIT;

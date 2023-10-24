@@ -4,11 +4,11 @@ import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.lang.Collections;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
 import java.util.List;
 
-@Introspected
+@Serdeable.Serializable
 public class TransactionRuleResponse {
 
     private final TransactionRule wrapped;

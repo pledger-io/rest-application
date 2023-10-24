@@ -5,12 +5,13 @@ import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 @Slf4j
+@ReadOnly
 @Singleton
 public class CurrencyProviderJpa implements CurrencyProvider {
 
@@ -30,7 +31,7 @@ public class CurrencyProviderJpa implements CurrencyProvider {
     }
 
     @Override
-    public Mono<Currency> lookup(String code) {
+    public Optional<Currency> lookup(String code) {
         log.trace("Currency lookup by code: {}", code);
 
         var hql = """
@@ -38,7 +39,7 @@ public class CurrencyProviderJpa implements CurrencyProvider {
                 where c.archived = false
                     and c.code = :code""";
 
-        return entityManager.<CurrencyJpa>reactive()
+        return entityManager.<CurrencyJpa>blocking()
                 .hql(hql)
                 .set("code", code)
                 .maybe()

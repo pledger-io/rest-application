@@ -11,7 +11,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
 
 class SettingProviderJpaIT extends JpaTestSetup {
 
@@ -30,9 +29,8 @@ class SettingProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup() {
-        StepVerifier.create(settingProvider.lookup())
-                .expectNextCount(6)
-                .verifyComplete();
+        Assertions.assertThat(settingProvider.lookup())
+                .hasSize(6);
     }
 
     @Test

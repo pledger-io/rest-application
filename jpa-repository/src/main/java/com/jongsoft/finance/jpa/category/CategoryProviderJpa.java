@@ -8,11 +8,12 @@ import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import reactor.core.publisher.Mono;
 
+@ReadOnly
 @Singleton
 @Named("categoryProvider")
 public class CategoryProviderJpa implements CategoryProvider {
@@ -37,13 +38,13 @@ public class CategoryProviderJpa implements CategoryProvider {
     }
 
     @Override
-    public Mono<Category> lookup(String label) {
+    public Optional<Category> lookup(String label) {
         var hql = """
                 select c from CategoryJpa c
                 where c.label = :label
                     and c.user.username = :username""";
 
-        return entityManager.<CategoryJpa>reactive()
+        return entityManager.<CategoryJpa>blocking()
                 .hql(hql)
                 .set("label", label)
                 .set("username", authenticationFacade.authenticated())

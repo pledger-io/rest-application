@@ -1,17 +1,14 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.schedule.Periodicity;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.*;
-
-@Introspected
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Serdeable
 class AccountEditRequest {
 
     @NotNull

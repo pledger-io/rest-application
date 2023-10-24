@@ -23,13 +23,12 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 @Tag(name = "Reports")
@@ -48,15 +47,13 @@ public class BalanceResource {
             description = "This operation will calculate the balance for the current user based upon the given filters",
             operationId = "getBalance"
     )
-    public Publisher<BalanceResponse> calculate(@Valid @Body BalanceRequest request) {
+    public BalanceResponse calculate(@Valid @Body BalanceRequest request) {
         TransactionProvider.FilterCommand filter = buildFilterCommand(request);
 
-        return Mono.create(emitter -> {
-            var balance = transactionProvider.balance(filter)
-                    .getOrSupply(() -> BigDecimal.ZERO);
+        var balance = transactionProvider.balance(filter)
+                .getOrSupply(() -> BigDecimal.ZERO);
 
-            emitter.success(new BalanceResponse(balance.doubleValue()));
-        });
+        return new BalanceResponse(balance.doubleValue());
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -72,7 +69,7 @@ public class BalanceResource {
                             schema = @Schema(implementation = String.class),
                             description = "The partition key can be one of: account, budget or category")
             })
-    public Publisher<BalancePartitionResponse> calculatePartitioned(
+    public List<BalancePartitionResponse> calculatePartitioned(
             @PathVariable String partitionKey,
             @Valid @Body BalanceRequest request) {
         Sequence<? extends AggregateBase> entityProvider = switch (partitionKey) {
@@ -91,24 +88,23 @@ public class BalanceResource {
             default -> throw new IllegalArgumentException("Unsupported partition used " + partitionKey);
         };
 
-        return Flux.create(flowableEmitter -> {
-            var total = transactionProvider.balance(buildFilterCommand(request))
+        var result = new ArrayList<BalancePartitionResponse>();
+        var total = transactionProvider.balance(buildFilterCommand(request))
+                .getOrSupply(() -> BigDecimal.ZERO);
+
+        for (AggregateBase entity : entityProvider) {
+            var filter = filterBuilder.apply(
+                    Collections.List(
+                            new EntityRef(entity.getId())));
+            var balance = transactionProvider.balance(filter)
                     .getOrSupply(() -> BigDecimal.ZERO);
 
-            for (AggregateBase entity : entityProvider) {
-                var filter = filterBuilder.apply(
-                        Collections.List(
-                                new EntityRef(entity.getId())));
-                var balance = transactionProvider.balance(filter)
-                        .getOrSupply(() -> BigDecimal.ZERO);
+            result.add(new BalancePartitionResponse(entity.toString(), balance.doubleValue()));
+            total = total.subtract(BigDecimal.valueOf(balance.doubleValue()));
+        }
 
-                flowableEmitter.next(new BalancePartitionResponse(entity.toString(), balance.doubleValue()));
-                total = total.subtract(BigDecimal.valueOf(balance.doubleValue()));
-            }
-
-            flowableEmitter.next(new BalancePartitionResponse("", total.doubleValue()));
-            flowableEmitter.complete();
-        });
+        result.add(new BalancePartitionResponse("", total.doubleValue()));
+        return result;
     }
 
     @Post("/daily")
@@ -116,15 +112,10 @@ public class BalanceResource {
             summary = "Daily balance",
             description = "Compute the daily balance based upon the provided request",
             operationId = "dailyBalance")
-    public Publisher<?> daily(@Valid @Body BalanceRequest request) {
-        return Flux.create(emitter -> {
-            transactionProvider.daily(buildFilterCommand(request))
-                    .map(DailyResponse::new)
-                    .forEach(emitter::next);
-
-            emitter.complete();
-        });
-
+    public List<DailyResponse> daily(@Valid @Body BalanceRequest request) {
+        return transactionProvider.daily(buildFilterCommand(request))
+                .map(DailyResponse::new)
+                .toJava();
     }
 
     private TransactionProvider.FilterCommand buildFilterCommand(BalanceRequest request) {

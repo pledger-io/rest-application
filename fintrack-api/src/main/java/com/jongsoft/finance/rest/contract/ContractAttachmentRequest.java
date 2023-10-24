@@ -1,10 +1,10 @@
 package com.jongsoft.finance.rest.contract;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Setter;
 
 @Setter
-@Introspected
+@Serdeable.Deserializable
 public class ContractAttachmentRequest {
 
     private String fileCode;

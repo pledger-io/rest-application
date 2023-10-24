@@ -1,19 +1,19 @@
 package com.jongsoft.finance.rest.scheduler;
 
 import com.jongsoft.finance.schedule.Periodicity;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.Valid;
 import lombok.*;
 
-import jakarta.validation.Valid;
 import java.time.LocalDate;
 
 @Builder
-@Introspected
+@Serdeable.Deserializable
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ScheduledTransactionPatchRequest {
 
-    @Introspected
+    @Serdeable.Deserializable
     public static class DateRange {
         private LocalDate start;
         private LocalDate end;
@@ -37,6 +37,7 @@ public class ScheduledTransactionPatchRequest {
     }
 
     @Data
+    @Serdeable.Deserializable
     static class ScheduleValue {
         private Periodicity periodicity;
         private int interval;

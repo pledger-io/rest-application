@@ -1,18 +1,18 @@
 package com.jongsoft.finance.rest.scheduler;
 
 import com.jongsoft.finance.schedule.Periodicity;
-import io.micronaut.core.annotation.Introspected;
-import lombok.*;
-
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 @Setter
-@Introspected
+@Serdeable.Deserializable
 public class ScheduledTransactionCreateRequest {
 
     @Builder
     @NoArgsConstructor
+    @Serdeable.Deserializable
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     static class EntityRef {
         @NotNull
@@ -29,6 +29,7 @@ public class ScheduledTransactionCreateRequest {
     }
 
     @Data
+    @Serdeable.Deserializable
     static class ScheduleValue {
         private Periodicity periodicity;
         private int interval;

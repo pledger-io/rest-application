@@ -7,9 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
 /**
  * This delegate will lookup a {@link Category} in the system.
  *
@@ -48,7 +45,7 @@ public class ProcessCategoryLookupDelegate implements JavaDelegate {
         if (execution.hasVariableLocal("name")) {
             var label = (String) execution.getVariableLocal("name");
 
-            category = categoryProvider.lookup(label).block(Duration.of(500, ChronoUnit.MILLIS));
+            category = categoryProvider.lookup(label).get();
         } else {
             category = categoryProvider.lookup((Long) execution.getVariableLocal("id"))
                     .get();

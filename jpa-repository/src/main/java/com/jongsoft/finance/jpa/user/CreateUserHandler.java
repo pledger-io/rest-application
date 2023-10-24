@@ -6,6 +6,7 @@ import com.jongsoft.finance.jpa.user.entity.RoleJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.user.CreateUserCommand;
+import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.HashSet;
 
 @Slf4j
 @Singleton
+@Transactional
 public class CreateUserHandler implements CommandHandler<CreateUserCommand> {
 
     private final ReactiveEntityManager entityManager;

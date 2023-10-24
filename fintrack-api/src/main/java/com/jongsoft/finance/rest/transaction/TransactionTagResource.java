@@ -13,12 +13,10 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/transactions/tags")
@@ -38,9 +36,8 @@ public class TransactionTagResource {
             description = "Creates a new tag into the system",
             operationId = "createTag"
     )
-    Publisher<TagResponse> create(@Valid @Body TagCreateRequest tag) {
-        return Mono.just(currentUserProvider.currentUser().createTag(tag.getTag()))
-                .map(TagResponse::new);
+    TagResponse create(@Valid @Body TagCreateRequest tag) {
+        return new TagResponse(currentUserProvider.currentUser().createTag(tag.getTag()));
     }
 
     @Get
@@ -49,14 +46,10 @@ public class TransactionTagResource {
             summary = "List tags",
             description = "Get all tags available in the system."
     )
-    Publisher<TagResponse> list() {
-        return Flux.create(emitter -> {
-            tagProvider.lookup()
-                    .map(TagResponse::new)
-                    .forEach(emitter::next);
-
-            emitter.complete();
-        });
+    List<TagResponse> list() {
+        return tagProvider.lookup()
+                .map(TagResponse::new)
+                .toJava();
     }
 
     @Delete("/{tag}")
@@ -67,8 +60,8 @@ public class TransactionTagResource {
     )
     void delete(@PathVariable String tag) {
         tagProvider.lookup(tag)
-                .switchIfEmpty(Mono.error(StatusException.notFound("No active tag found with contents " + tag)))
-                .subscribe(Tag::archive);
+                .ifPresent(Tag::archive)
+                .elseThrow(() -> StatusException.notFound("No active tag found with contents " + tag));
     }
 
     @Get("/auto-complete{?token}")
@@ -77,14 +70,15 @@ public class TransactionTagResource {
             description = "Look for tags with the partial token in the name",
             operationId = "lookupTags"
     )
-    Publisher<TagResponse> autoCompleteTag(@Nullable String token) {
+    List<TagResponse> autoCompleteTag(@Nullable String token) {
         var filter = filterFactory.tag()
                 .name(token, false)
                 .pageSize(settingProvider.getAutocompleteLimit());
 
-        var response = tagProvider.lookup(filter).content();
-
-        return Flux.fromIterable(response.map(TagResponse::new));
+        return tagProvider.lookup(filter)
+                .content()
+                .map(TagResponse::new)
+                .toJava();
     }
 
 }

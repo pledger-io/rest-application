@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class UserProviderJpaIT extends JpaTestSetup {
 
@@ -48,16 +49,18 @@ class UserProviderJpaIT extends JpaTestSetup {
 
     @Test
     void tokens() {
-        StepVerifier.create(userProvider.tokens("demo-user"))
-                .assertNext(token -> "refresh-token-1".equals(token.getToken()))
-                .verifyComplete();
+        assertThat(userProvider.tokens("demo-user"))
+                .hasSize(1)
+                .first()
+                .satisfies(token -> assertThat(token.getToken()).isEqualTo("refresh-token-1"));
     }
 
     @Test
     void lookup_refreshToken() {
-        StepVerifier.create(userProvider.refreshToken("refresh-token-1"))
-                .assertNext(a -> "demo-user".equals(a.getUsername()))
-                .verifyComplete();
+        assertThat(userProvider.refreshToken("refresh-token-1"))
+                .hasSize(1)
+                .first()
+                .satisfies(token -> assertThat(token.getUsername()).isEqualTo("demo-user"));
     }
 
     @MockBean

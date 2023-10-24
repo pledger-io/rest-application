@@ -1,20 +1,20 @@
 package com.jongsoft.finance.rest.account;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Generated;
 import lombok.Setter;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Setter
-@Introspected
+@Serdeable.Deserializable
 class AccountTransactionSearchRequest {
 
     @Setter
-    @Introspected
+    @Serdeable.Deserializable
     public static class Range {
         private LocalDate start;
         private LocalDate end;

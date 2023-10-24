@@ -1,6 +1,6 @@
 package com.jongsoft.finance;
 
-import reactor.core.publisher.Mono;
+import com.jongsoft.lang.control.Optional;
 
 public interface StorageService {
 
@@ -12,7 +12,7 @@ public interface StorageService {
      */
     String store(byte[] content);
 
-    Mono<byte[]> read(String token);
+    Optional<byte[]> read(String token);
 
     /**
      * Remove a file from storage that is no longer needed.

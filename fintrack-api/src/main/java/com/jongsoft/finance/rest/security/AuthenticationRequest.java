@@ -1,13 +1,12 @@
 package com.jongsoft.finance.rest.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
-@Introspected
+@Serdeable.Deserializable
 class AuthenticationRequest implements io.micronaut.security.authentication.AuthenticationRequest<String, String> {
 
     @Email

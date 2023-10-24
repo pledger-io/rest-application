@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
-import reactor.core.publisher.Mono;
 
 /**
  * This delegate can be used to create a {@link Category} in the system using
@@ -46,19 +45,17 @@ public class ProcessCreateCategoryDelegate implements JavaDelegate {
                 categoryJson.getLabel());
 
         categoryProvider.lookup(categoryJson.getLabel())
-                .switchIfEmpty(Mono.create(emitter -> {
+                .ifNotPresent(() -> {
                     currentUserProvider.currentUser()
                             .createCategory(categoryJson.getLabel());
 
                     categoryProvider.lookup(categoryJson.getLabel())
-                            .subscribe(category -> {
+                            .ifPresent(category -> {
                                 category.rename(
                                         categoryJson.getLabel(),
                                         categoryJson.getDescription());
-
-                                emitter.success(category);
                             });
-                })).block();
+                });
     }
 
 }

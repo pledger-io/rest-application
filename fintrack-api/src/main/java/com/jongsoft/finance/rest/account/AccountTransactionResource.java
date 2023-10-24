@@ -15,7 +15,6 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.Dates;
 import io.micronaut.core.annotation.Nullable;
-import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -27,10 +26,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import java.util.function.Consumer;
 
 @Tag(name = "Transactions")
@@ -58,33 +56,30 @@ public class AccountTransactionResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Mono<ResultPageResponse<TransactionResponse>> search(
+    ResultPageResponse<TransactionResponse> search(
             @PathVariable long accountId,
             @Valid @Body AccountTransactionSearchRequest request) {
-        return Mono.create(emitter -> {
-            var accountOption = accountProvider.lookup(accountId);
+        var accountOption = accountProvider.lookup(accountId);
 
-            if (!accountOption.isPresent()) {
-                emitter.error(StatusException.notAuthorized("Account not found with id " + accountId));
-            } else {
-                var command = filterFactory.transaction()
-                        .accounts(Collections.List(new EntityRef(accountId)))
-                        .range(Dates.range(
-                                request.getDateRange().getStart(),
-                                request.getDateRange().getEnd()))
-                        .pageSize(settingProvider.getPageSize())
-                        .page(request.getPage());
+        if (!accountOption.isPresent()) {
+            throw StatusException.notAuthorized("Account not found with id " + accountId);
+        }
+        var command = filterFactory.transaction()
+                .accounts(Collections.List(new EntityRef(accountId)))
+                .range(Dates.range(
+                        request.getDateRange().getStart(),
+                        request.getDateRange().getEnd()))
+                .pageSize(settingProvider.getPageSize())
+                .page(request.getPage());
 
-                if (request.getText() != null) {
-                    command.description(request.getText(), false);
-                }
+        if (request.getText() != null) {
+            command.description(request.getText(), false);
+        }
 
-                var results = transactionProvider.lookup(command)
-                        .map(TransactionResponse::new);
+        var results = transactionProvider.lookup(command)
+                .map(TransactionResponse::new);
 
-                emitter.success(new ResultPageResponse<>(results));
-            }
-        });
+        return new ResultPageResponse<>(results);
     }
 
     @Put
@@ -144,7 +139,7 @@ public class AccountTransactionResource {
                     @ApiResponse(responseCode = "404", description = "No transaction found")
             }
     )
-    Mono<TransactionResponse> first(@PathVariable Long accountId, @Nullable String description) {
+    TransactionResponse first(@PathVariable Long accountId, @Nullable String description) {
         var command = filterFactory.transaction()
                 .accounts(Collections.List(new EntityRef(accountId)));
 
@@ -154,7 +149,7 @@ public class AccountTransactionResource {
 
         return transactionProvider.first(command)
                 .map(TransactionResponse::new)
-                .switchIfEmpty(Mono.error(StatusException.notFound("No transactions found")));
+                .getOrThrow(() -> StatusException.notFound("No transactions found"));
     }
 
     @Get("/{transactionId}")
@@ -178,12 +173,10 @@ public class AccountTransactionResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Mono<TransactionResponse> get(@PathVariable long transactionId) {
-        return Mono.create(emitter -> {
-            transactionProvider.lookup(transactionId)
-                    .ifPresent(transactions -> emitter.success(new TransactionResponse(transactions)))
-                    .elseRun(() -> emitter.error(StatusException.notFound("Cannot find transaction with id " + transactionId)));
-        });
+    TransactionResponse get(@PathVariable long transactionId) {
+        return transactionProvider.lookup(transactionId)
+                .map(TransactionResponse::new)
+                .getOrThrow(() -> StatusException.notFound("No transaction found for id " + transactionId));
     }
 
     @Post("/{transactionId}")
@@ -207,45 +200,42 @@ public class AccountTransactionResource {
                     @ApiResponse(responseCode = "404", description = "Transaction not found")
             }
     )
-    Mono<HttpResponse<TransactionResponse>> update(
+    TransactionResponse update(
             @PathVariable long transactionId,
             @Valid @Body AccountTransactionCreateRequest request) {
-        return Mono.create(emitter -> {
-            var presence = transactionProvider.lookup(transactionId);
-            if (!presence.isPresent()) {
-                emitter.success(HttpResponse.notFound());
-            } else {
-                var fromAccount = accountProvider.lookup(request.getSource().getId()).get();
-                var toAccount = accountProvider.lookup(request.getDestination().getId()).get();
-                var transaction = presence.get();
+        var presence = transactionProvider.lookup(transactionId);
+        if (!presence.isPresent()) {
+            throw StatusException.notFound("No transaction found for id " + transactionId);
+        }
+        var fromAccount = accountProvider.lookup(request.getSource().getId()).get();
+        var toAccount = accountProvider.lookup(request.getDestination().getId()).get();
+        var transaction = presence.get();
 
-                transaction.changeAccount(true, fromAccount);
-                transaction.changeAccount(false, toAccount);
-                transaction.book(request.getDate(), request.getBookDate(), request.getInterestDate());
-                transaction.describe(request.getDescription());
+        transaction.changeAccount(true, fromAccount);
+        transaction.changeAccount(false, toAccount);
+        transaction.book(request.getDate(), request.getBookDate(), request.getInterestDate());
+        transaction.describe(request.getDescription());
 
-                if (!transaction.isSplit()) {
-                    transaction.changeAmount(request.getAmount(), request.getCurrency());
-                }
+        if (!transaction.isSplit()) {
+            transaction.changeAmount(request.getAmount(), request.getCurrency());
+        }
 
-                // update meta-data
-                transaction.linkToBudget(Control.Option(request.getBudget())
-                        .map(AccountTransactionCreateRequest.EntityRef::getName)
-                        .getOrSupply(() -> null));
-                transaction.linkToCategory(Control.Option(request.getCategory())
-                        .map(AccountTransactionCreateRequest.EntityRef::getName)
-                        .getOrSupply(() -> null));
-                transaction.linkToContract(Control.Option(request.getContract())
-                        .map(AccountTransactionCreateRequest.EntityRef::getName)
-                        .getOrSupply(() -> null));
+        // update meta-data
+        transaction.linkToBudget(Control.Option(request.getBudget())
+                .map(AccountTransactionCreateRequest.EntityRef::getName)
+                .getOrSupply(() -> null));
+        transaction.linkToCategory(Control.Option(request.getCategory())
+                .map(AccountTransactionCreateRequest.EntityRef::getName)
+                .getOrSupply(() -> null));
+        transaction.linkToContract(Control.Option(request.getContract())
+                .map(AccountTransactionCreateRequest.EntityRef::getName)
+                .getOrSupply(() -> null));
 
-                Control.Option(request.getTags())
-                        .map(Collections::List)
-                        .ifPresent(transaction::tag);
+        Control.Option(request.getTags())
+                .map(Collections::List)
+                .ifPresent(transaction::tag);
 
-                emitter.success(HttpResponse.ok(new TransactionResponse(transaction)));
-            }
-        });
+        return new TransactionResponse(transaction);
     }
 
     @Patch("/{transactionId}")
@@ -254,19 +244,18 @@ public class AccountTransactionResource {
             description = "Split the transaction into smaller pieces, all belonging to the same actual transaction.",
             parameters = @Parameter(name = "transactionId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
     )
-    Mono<TransactionResponse> split(
+    TransactionResponse split(
             @PathVariable long transactionId,
             @Valid @Body AccountTransactionSplitRequest request) {
         return transactionProvider.lookup(transactionId)
-                .map(Mono::just)
-                .getOrSupply(() -> Mono.error(StatusException.notFound("No transaction found for id " + transactionId)))
                 .map(transaction -> {
                     var splits = Collections.List(request.getSplits())
                             .map(split -> new SplitRecord(split.getDescription(), split.getAmount()));
                     transaction.split(splits);
 
                     return new TransactionResponse(transaction);
-                });
+                })
+                .getOrThrow(() -> StatusException.notFound("No transaction found for id " + transactionId));
     }
 
     @Delete("/{transactionId}")
@@ -275,15 +264,12 @@ public class AccountTransactionResource {
             description = "Delete a transaction from the account",
             parameters = @Parameter(name = "transactionId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
     )
-    Mono<HttpResponse<Void>> delete(@PathVariable long transactionId) {
-        return Mono.create(emitter -> {
-            transactionProvider.lookup(transactionId)
-                    .ifPresent(transaction -> {
-                        transaction.delete();
-                        emitter.success();
-                    })
-                    .elseRun(() -> emitter.error(StatusException.notFound("No transaction found with id " + transactionId)));
-        });
+    void delete(@PathVariable long transactionId) {
+        transactionProvider.lookup(transactionId)
+                .ifPresent(transaction -> {
+                    transaction.delete();
+                })
+                .elseThrow(() -> StatusException.notFound("No transaction found with id " + transactionId));
     }
 
     private Transaction.Type determineType(Account fromAccount, Account toAccount) {

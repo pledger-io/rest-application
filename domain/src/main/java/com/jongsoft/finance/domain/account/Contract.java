@@ -50,14 +50,24 @@ public class Contract implements AggregateBase, Serializable {
         EventBus.getBus().send(new CreateContractCommand(company.getId(), name, description, start, end));
     }
 
+    /**
+     * Creates a schedule for this contract.
+     * For each period in the schedule, a transaction will be created automatically.
+     *
+     * @param schedule The schedule to create.
+     * @param source   The account to use as source for the schedule.
+     * @param amount   The amount to use for the schedule.
+     */
     @BusinessMethod
     public void createSchedule(Schedule schedule, Account source, double amount) {
-        EventBus.getBus().send(new CreateScheduleForContractCommand(
-                this.name,
-                schedule,
-                this,
-                source,
-                amount));
+        EventBus.getBus()
+                .send(
+                        new CreateScheduleForContractCommand(
+                                this.name,
+                                schedule,
+                                this,
+                                source,
+                                amount));
     }
 
     @BusinessMethod
@@ -74,6 +84,10 @@ public class Contract implements AggregateBase, Serializable {
         EventBus.getBus().send(new ChangeContractCommand(id, name, description, start, end));
     }
 
+    /**
+     * Activates the warning before the ending for this contract.
+     * If the contract is not yet persisted, or has already expired, an exception will be thrown.
+     */
     @BusinessMethod
     public void warnBeforeExpires() {
         if (id == null) {

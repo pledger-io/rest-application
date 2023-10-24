@@ -2,9 +2,9 @@ package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.lang.Dates;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
-@Introspected
+@Serdeable.Serializable
 public class ScheduledTransactionResponse {
 
     private final ScheduledTransaction wrapped;

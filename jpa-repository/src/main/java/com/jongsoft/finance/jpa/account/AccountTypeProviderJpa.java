@@ -3,11 +3,13 @@ package com.jongsoft.finance.jpa.account;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.lang.collection.Sequence;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@ReadOnly
 @Singleton
 @Named("accountTypeProvider")
 public class AccountTypeProviderJpa implements AccountTypeProvider {

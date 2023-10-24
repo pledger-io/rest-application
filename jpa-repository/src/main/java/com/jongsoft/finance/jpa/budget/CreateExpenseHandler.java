@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 
 @Slf4j
 @Singleton
+@Transactional
 public class CreateExpenseHandler implements CommandHandler<CreateExpenseCommand> {
 
     private final ReactiveEntityManager entityManager;
@@ -26,7 +27,6 @@ public class CreateExpenseHandler implements CommandHandler<CreateExpenseCommand
     }
 
     @Override
-    @Transactional
     @BusinessEventListener
     public void handle(CreateExpenseCommand command) {
         log.info("[{}] - Processing expense create event", command.name());

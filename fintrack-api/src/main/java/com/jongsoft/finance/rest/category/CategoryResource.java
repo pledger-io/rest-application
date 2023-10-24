@@ -16,12 +16,10 @@ import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Tag(name = "Category")
 @Controller("/api/categories")
@@ -41,10 +39,10 @@ public class CategoryResource {
             description = "List all available categories",
             operationId = "getAll"
     )
-    Publisher<CategoryResponse> list() {
-        return Flux.fromIterable(
-                categoryService.lookup()
-                        .map(CategoryResponse::new));
+    List<CategoryResponse> list() {
+        return categoryService.lookup()
+                .map(CategoryResponse::new)
+                .toJava();
     }
 
     @Post
@@ -68,15 +66,14 @@ public class CategoryResource {
             description = "List all categories matching the provided token",
             operationId = "getCategoriesByToken"
     )
-    Publisher<CategoryResponse> autocomplete(@Nullable String token) {
-        var response = categoryService.lookup(
-                filterFactory.category()
-                        .label(token, false)
-                        .pageSize(settingProvider.getAutocompleteLimit()))
+    List<CategoryResponse> autocomplete(@Nullable String token) {
+        return categoryService.lookup(
+                        filterFactory.category()
+                                .label(token, false)
+                                .pageSize(settingProvider.getAutocompleteLimit()))
                 .content()
-                .map(CategoryResponse::new);
-
-        return Flux.fromIterable(response);
+                .map(CategoryResponse::new)
+                .toJava();
     }
 
     @Put
@@ -86,7 +83,7 @@ public class CategoryResource {
             description = "Adds a new category to the system",
             operationId = "createCategory"
     )
-    Mono<CategoryResponse> create(@Valid @Body CategoryCreateRequest createRequest) {
+    CategoryResponse create(@Valid @Body CategoryCreateRequest createRequest) {
         currentUserProvider.currentUser()
                 .createCategory(createRequest.getName());
 
@@ -96,7 +93,7 @@ public class CategoryResource {
                     return category;
                 })
                 .map(CategoryResponse::new)
-                .switchIfEmpty(Mono.error(StatusException.internalError("Could not create category")));
+                .getOrThrow(() -> StatusException.internalError("Could not create category"));
     }
 
     @Get("/{id}")
@@ -105,10 +102,10 @@ public class CategoryResource {
             description = "Get a single category by its Id",
             operationId = "getCategory"
     )
-    Mono<CategoryResponse> get(@PathVariable long id) {
-        return Mono.just(categoryService.lookup(id))
-                .map(optional -> optional.getOrThrow(() -> StatusException.notFound("No category found with id " + id)))
-                .map(CategoryResponse::new);
+    CategoryResponse get(@PathVariable long id) {
+        return categoryService.lookup(id)
+                .map(CategoryResponse::new)
+                .getOrThrow(() -> StatusException.notFound("No category found with id " + id));
     }
 
     @Post("/{id}")
@@ -117,15 +114,15 @@ public class CategoryResource {
             description = "Update a single category by its Id",
             operationId = "updateCategory"
     )
-    Mono<CategoryResponse> update(
+    CategoryResponse update(
             @PathVariable long id,
             @Valid @Body CategoryCreateRequest updateRequest) {
-        return Mono.just(categoryService.lookup(id))
-                .map(optional -> optional.getOrThrow(() -> StatusException.notFound("No category found with id " + id)))
+        return categoryService.lookup(id)
                 .map(category -> {
                     category.rename(updateRequest.getName(), updateRequest.getDescription());
                     return new CategoryResponse(category);
-                });
+                })
+                .getOrThrow(() -> StatusException.notFound("No category found with id " + id));
     }
 
     @Delete("/{id}")

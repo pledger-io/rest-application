@@ -1,7 +1,8 @@
 package com.jongsoft.finance.bpmn;
 
-import com.jongsoft.finance.bpmn.camunda.ApplicationContextElResolver;
 import com.jongsoft.finance.bpmn.camunda.CamundaDatasourceConfiguration;
+import com.jongsoft.finance.bpmn.camunda.MicronautBeanResolver;
+import com.jongsoft.finance.bpmn.camunda.MicronautElResolver;
 import com.jongsoft.finance.bpmn.camunda.MicronautExpressionManager;
 import com.jongsoft.finance.core.DataSourceMigration;
 import io.micronaut.context.ApplicationContext;
@@ -13,7 +14,6 @@ import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -50,11 +50,13 @@ public class ProcessEngineConfiguration {
                 .setDatabaseSchemaUpdate(camundaDatasourceConfiguration.getAutoUpdate())
                 .setProcessEngineName("fintrack")
                 .setHistoryCleanupEnabled(true)
-                .setExpressionManager(new MicronautExpressionManager(new ApplicationContextElResolver(applicationContext)));
+                .setExpressionManager(new MicronautExpressionManager(new MicronautElResolver(applicationContext)));
 
         configuration.setHistoryCleanupBatchSize(250);
         configuration.setHistoryCleanupBatchWindowStartTime("01:00");
         configuration.setHistoryCleanupBatchWindowEndTime("03:00");
+        configuration.setHistoryTimeToLive("P1D");
+        configuration.setResolverFactories(List.of(new MicronautBeanResolver(applicationContext)));
 
         var processEngine = configuration.buildProcessEngine();
         log.info("Created camunda process engine");

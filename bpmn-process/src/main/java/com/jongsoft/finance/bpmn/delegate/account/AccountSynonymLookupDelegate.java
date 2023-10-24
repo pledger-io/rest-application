@@ -8,9 +8,6 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
 /**
  * This delegate accesses the {@link Account} synonym list in the system. The synonym list
  * contains a relation between potential account names encountered during import and previously selected actual
@@ -43,10 +40,10 @@ public class AccountSynonymLookupDelegate implements JavaDelegate {
                 execution.getVariable("name"));
 
         var synonym = execution.<StringValue>getVariableLocalTyped("name").getValue();
+
         var accountId = accountProvider.synonymOf(synonym)
                 .map(Account::getId)
-                .blockOptional(Duration.of(500, ChronoUnit.MILLIS))
-                .orElse(null);
+                .getOrSupply(() -> null);
 
         execution.setVariableLocal("id", accountId);
     }

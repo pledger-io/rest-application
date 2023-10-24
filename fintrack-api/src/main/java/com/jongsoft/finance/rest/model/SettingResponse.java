@@ -1,9 +1,9 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.core.SettingType;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
-@Introspected
+@Serdeable.Serializable
 public class SettingResponse {
 
     private String name;

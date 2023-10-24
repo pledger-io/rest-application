@@ -13,12 +13,12 @@ import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Singleton;
 import org.mockito.Mockito;
-import reactor.core.publisher.Mono;
 
 import java.util.function.Consumer;
 
@@ -32,7 +32,7 @@ public class ApplicationContext {
             @EventListener
             public void accept(CreateAccountCommand accountCreatedEvent) {
                 Mockito.when(accountProvider.lookup(accountCreatedEvent.name()))
-                        .thenReturn(Mono.just(Account.builder()
+                        .thenReturn(Control.Option(Account.builder()
                                 .name(accountCreatedEvent.name())
                                 .currency(accountCreatedEvent.currency())
                                 .type(accountCreatedEvent.type())

@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.user.Budget;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
-@Introspected
+@Serdeable.Serializable
 public class BudgetResponse {
 
     private final Budget wrapped;

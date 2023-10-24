@@ -9,7 +9,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
 
 class CSVConfigProviderJpaIT extends JpaTestSetup {
 
@@ -31,9 +30,10 @@ class CSVConfigProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup() {
-        StepVerifier.create(csvConfigProvider.lookup())
-                .assertNext(batch -> Assertions.assertThat(batch.getFileCode()).isEqualTo("file-code-1"))
-                .verifyComplete();
+        Assertions.assertThat(csvConfigProvider.lookup())
+                .hasSize(1)
+                .first()
+                .satisfies(batch -> Assertions.assertThat(batch.getFileCode()).isEqualTo("file-code-1"));
     }
 
     @Test

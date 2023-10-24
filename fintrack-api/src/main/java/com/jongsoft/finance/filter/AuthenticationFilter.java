@@ -3,12 +3,13 @@ package com.jongsoft.finance.filter;
 import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.core.async.publisher.Publishers;
-import io.micronaut.http.*;
+import io.micronaut.http.HttpAttributes;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
-import io.micronaut.http.hateoas.JsonError;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +38,12 @@ public class AuthenticationFilter implements HttpServerFilter {
                 .ifPresent(this::handleAuthentication);
 
         var startTime = Instant.now();
-        return Publishers.map(chain.proceed(request), response -> {
+        return Publishers.then(chain.proceed(request), response -> {
             if (request.getPath().contains("/api/localization/")) {
                 log.trace("{}: {}", request.getMethod(), request.getPath());
             } else {
                 log.debug("{}: {} in {} ms", request.getMethod(), request.getPath(), Duration.between(startTime, Instant.now()).toMillis());
             }
-            return response;
         });
     }
 

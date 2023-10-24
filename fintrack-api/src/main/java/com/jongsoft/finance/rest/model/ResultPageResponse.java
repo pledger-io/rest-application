@@ -1,13 +1,13 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.ResultPage;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import jakarta.validation.constraints.NotNull;
+
 import java.util.List;
 
-@Introspected
+@Serdeable.Serializable
 public class ResultPageResponse<T> {
 
     private final ResultPage<T> wrapped;
@@ -27,7 +27,7 @@ public class ResultPageResponse<T> {
         return new Info();
     }
 
-    @Introspected
+    @Serdeable.Serializable
     public class Info {
 
         @Schema(description = "The total amount of matches", required = true, example = "20")

@@ -1,11 +1,11 @@
 package com.jongsoft.finance.rest.model;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import org.camunda.bpm.engine.task.Task;
 
 import java.util.Date;
 
-@Introspected
+@Serdeable.Serializable
 public class ProcessTaskResponse {
 
     private final Task wrapped;

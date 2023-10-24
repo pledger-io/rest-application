@@ -1,5 +1,8 @@
 package com.jongsoft.finance.rest.file;
 
+import io.micronaut.serde.annotation.Serdeable;
+
+@Serdeable.Serializable
 class UploadResponse {
 
     private String fileCode;

@@ -32,7 +32,7 @@ public class ParseUserConfigurationDelegate implements JavaDelegate {
 
         String storageToken = (String) execution.getVariable("storageToken");
 
-        byte[] rawJsonContent = storageService.read(storageToken).block();
+        byte[] rawJsonContent = storageService.read(storageToken).get();
         ExportJson profileJson = ExportJson.read(new String(rawJsonContent, StandardCharsets.UTF_8));
 
         String ruleStorageToken = storageService.store(RuleConfigJson.builder()

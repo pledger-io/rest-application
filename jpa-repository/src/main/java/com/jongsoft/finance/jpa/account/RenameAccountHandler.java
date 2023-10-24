@@ -6,12 +6,14 @@ import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.account.RenameAccountCommand;
 import com.jongsoft.lang.Collections;
+import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@Transactional
 public class RenameAccountHandler implements CommandHandler<RenameAccountCommand> {
 
     private final ReactiveEntityManager entityManager;

@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.contract;
 
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
@@ -8,8 +9,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Introspected
 @NoArgsConstructor
+@Serdeable.Deserializable
 class ContractCreateRequest {
 
     @Introspected

@@ -17,7 +17,6 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.Dates;
-import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
@@ -30,12 +29,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -150,7 +150,7 @@ public class TransactionResource {
             description = "Get the oldest transaction in the system based upon the provided request."
     )
     @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = JsonError.class)))
-    Publisher<LocalDate> firstTransaction(@Body TransactionSearchRequest request) {
+    LocalDate firstTransaction(@Body TransactionSearchRequest request) {
         var command = filterFactory.transaction();
 
         if (request.getAccount() != null) {
@@ -171,7 +171,7 @@ public class TransactionResource {
 
         return transactionProvider.first(command)
                 .map(Transaction::getDate)
-                .switchIfEmpty(Mono.error(StatusException.notFound("No transaction found")));
+                .getOrThrow(() -> StatusException.notFound("No transaction found"));
     }
 
     @Get(value = "/export", produces = MediaType.TEXT_PLAIN)
@@ -180,32 +180,31 @@ public class TransactionResource {
             summary = "Export transactions",
             description = "Creates a CSV export of all transactions in the system."
     )
-    Publisher<String> export() {
-        return Flux.create(emitter -> {
-            emitter.next("Date,Booking Date,Interest Date,From name,From IBAN," +
-                    "To name,To IBAN,Description,Category,Budget,Contract,Amount\n");
+    OutputStream export() throws IOException {
+        var outputStream = new ByteArrayOutputStream();
+        outputStream.write(("Date,Booking Date,Interest Date,From name,From IBAN," +
+                "To name,To IBAN,Description,Category,Budget,Contract,Amount\n").getBytes(StandardCharsets.UTF_8));
 
-            var filterCommand = filterFactory.transaction()
-                    .accounts(accountProvider.lookup(filterFactory.account()
-                            .types(accountTypeProvider.lookup(false)))
-                            .content()
-                            .map(account -> new EntityRef(account.getId())))
-                    .pageSize(100);
+        var filterCommand = filterFactory.transaction()
+                .accounts(accountProvider.lookup(filterFactory.account()
+                                .types(accountTypeProvider.lookup(false)))
+                        .content()
+                        .map(account -> new EntityRef(account.getId())))
+                .pageSize(100);
 
-            int currentPage = 0;
-            filterCommand.page(currentPage);
-            var page = transactionProvider.lookup(filterCommand);
-            do {
-                for (Transaction transaction : page.content()) {
-                    emitter.next(convertTransaction(transaction));
-                }
+        int currentPage = 0;
+        filterCommand.page(currentPage);
+        var page = transactionProvider.lookup(filterCommand);
+        do {
+            for (Transaction transaction : page.content()) {
+                outputStream.write(convertTransaction(transaction));
+            }
 
-                filterCommand.page(++currentPage);
-                page = transactionProvider.lookup(filterCommand);
-            } while (page.hasNext());
+            filterCommand.page(++currentPage);
+            page = transactionProvider.lookup(filterCommand);
+        } while (page.hasNext());
 
-            emitter.complete();
-        });
+        return outputStream;
     }
 
     @Get("/apply-all-rules")
@@ -220,7 +219,7 @@ public class TransactionResource {
 
             var filterCommand = filterFactory.transaction()
                     .accounts(accountProvider.lookup(filterFactory.account()
-                            .types(accountTypeProvider.lookup(false)))
+                                    .types(accountTypeProvider.lookup(false)))
                             .content()
                             .map(account -> new EntityRef(account.getId())))
                     .pageSize(100);
@@ -247,8 +246,8 @@ public class TransactionResource {
         });
     }
 
-    private String convertTransaction(Transaction transaction) {
-        return transaction.getDate() + "," +
+    private byte[] convertTransaction(Transaction transaction) {
+        return (transaction.getDate() + "," +
                 valueOrEmpty(transaction.getBookDate()) + "," +
                 valueOrEmpty(transaction.getInterestDate()) + "," +
                 transaction.computeFrom().getName() + "," +
@@ -260,7 +259,7 @@ public class TransactionResource {
                 valueOrEmpty(transaction.getBudget()) + "," +
                 valueOrEmpty(transaction.getContract()) + "," +
                 transaction.computeAmount(transaction.computeFrom()) +
-                "\n";
+                "\n").getBytes(StandardCharsets.UTF_8);
     }
 
     private <T> String valueOrEmpty(T value) {

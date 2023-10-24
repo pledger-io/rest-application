@@ -33,7 +33,7 @@ public class ImportFinishedDelegate implements JavaDelegate {
                 slug);
 
         importProvider.lookup(slug)
-                .subscribe(entity -> entity.finish(new Date()));
+                .ifPresent(entity -> entity.finish(new Date()));
 
         importTokens.forEach(storageService::remove);
     }

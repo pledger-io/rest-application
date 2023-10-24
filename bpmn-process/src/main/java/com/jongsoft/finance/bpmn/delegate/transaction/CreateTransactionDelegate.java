@@ -38,7 +38,7 @@ public class CreateTransactionDelegate implements JavaDelegate {
         Account toAccount = accountProvider.lookup(execution.<LongValue>getVariableLocalTyped("accountId").getValue()).get();
         Account targetAccount = accountProvider.lookup(execution.<LongValue>getVariableLocalTyped("targetAccount").getValue()).get();
 
-        ParsedTransaction parsedTransaction = ParsedTransaction.parse(storageService.read(transactionToken).block());
+        ParsedTransaction parsedTransaction = ParsedTransaction.parse(storageService.read(transactionToken).get());
         log.debug("{}: Creating transaction into {} from {} with amount {}",
                 execution.getCurrentActivityName(),
                 targetAccount.getName(),

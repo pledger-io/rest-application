@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.providers.ContractProvider;
@@ -10,7 +11,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 
@@ -43,7 +43,7 @@ class ContractProviderJpaIT extends JpaTestSetup {
     @Test
     void lookup_name() {
         var check = contractProvider.lookup("Test contract")
-                .block();
+                .get();
 
         Assertions.assertThat(check.getId()).isEqualTo(1L);
         Assertions.assertThat(check.getName()).isEqualTo("Test contract");
@@ -53,21 +53,23 @@ class ContractProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_nameIncorrectUser() {
-        Assertions.assertThat(contractProvider.lookup("In between").blockOptional())
+        Assertions.assertThat(contractProvider.lookup("In between"))
                 .isEmpty();
     }
 
     @Test
     void search() {
-        StepVerifier.create(contractProvider.search("conT"))
-                .expectNext(Contract.builder().id(1L).build())
-                .verifyComplete();
+        Assertions.assertThat(contractProvider.search("con"))
+                .hasSize(1)
+                .first()
+                .extracting(Contract::getId)
+                .isEqualTo(1L);
     }
 
     @Test
     void search_incorrectUser() {
-        StepVerifier.create(contractProvider.search("betwe"))
-                .verifyComplete();
+        Assertions.assertThat(contractProvider.search("betwe"))
+                .isEmpty();
     }
 
     @MockBean

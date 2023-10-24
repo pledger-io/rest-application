@@ -12,13 +12,13 @@ import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.serialized.ContractJson;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 
@@ -62,7 +62,7 @@ class ProcessContractCreateDelegateTest {
     @Test
     void execute() throws Exception {
         Mockito.when(accountProvider.lookup("Telfo"))
-                .thenReturn(Mono.just(Account.builder()
+                .thenReturn(Control.Option(Account.builder()
                         .id(1L)
                         .user(USER_ACCOUNT)
                         .build()));
@@ -73,8 +73,8 @@ class ProcessContractCreateDelegateTest {
                 .endDate(LocalDate.of(2019, 1, 1))
                 .build();
         Mockito.when(contractProvider.lookup("Test contract"))
-                .thenReturn(Mono.empty())
-                .thenReturn(Mono.just(contract));
+                .thenReturn(Control.Option())
+                .thenReturn(Control.Option(contract));
 
         subject.execute(execution);
 

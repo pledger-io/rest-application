@@ -1,18 +1,18 @@
 package com.jongsoft.finance.rest.account;
 
-import io.micronaut.core.annotation.Introspected;
-import lombok.Builder;
-import lombok.Data;
-
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
 @Builder
-@Introspected
+@Serdeable.Deserializable
 public class AccountSavingGoalCreateRequest {
 
     @NotBlank

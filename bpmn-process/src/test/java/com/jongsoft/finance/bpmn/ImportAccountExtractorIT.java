@@ -29,7 +29,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
-import reactor.core.publisher.Mono;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -124,16 +123,16 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
         Mockito.when(userProvider.lookup("test-user")).thenReturn(Control.Option(userAccount));
 
         Mockito.when(accountProvider.lookup("MW GA Pieterse"))
-                .thenReturn(Mono.empty())
-                .thenReturn(Mono.just(Account.builder()
+                .thenReturn(Control.Option())
+                .thenReturn(Control.Option(Account.builder()
                         .id(2L)
                         .name("MW GA Pieterse")
                         .type("creditor")
                         .build()));
 
         Mockito.when(filterFactory.account()).thenAnswer(args -> new AccountFilterTest());
-        Mockito.when(accountProvider.synonymOf(Mockito.anyString())).thenReturn(Mono.empty());
-        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(Mono.empty());
+        Mockito.when(accountProvider.synonymOf(Mockito.anyString())).thenReturn(Control.Option());
+        Mockito.when(accountProvider.lookup(Mockito.anyString())).thenReturn(Control.Option());
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))
                 .thenReturn(ResultPage.empty());
 
@@ -145,7 +144,7 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
                         .build()));
 
         Mockito.when(accountProvider.synonymOf("Janssen PA"))
-                .thenReturn(Mono.just(Account.builder()
+                .thenReturn(Control.Option(Account.builder()
                         .id(5L)
                         .name("Jansen PA")
                         .type("creditor")
@@ -165,12 +164,12 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
                 .fileCode("sample-file-run")
                 .build();
 
-        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Mono.just(batchImport));
-        Mockito.when(storageService.read("sample-file-run")).thenReturn(Mono.just(readFile("import-test/import-test.csv")));
+        Mockito.when(importProvider.lookup("account-test-import")).thenReturn(Control.Option(batchImport));
+        Mockito.when(storageService.read("sample-file-run")).thenReturn(Control.Option(readFile("import-test/import-test.csv")));
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);
             String token = UUID.randomUUID().toString();
-            Mockito.when(storageService.read(token)).thenReturn(Mono.just(original));
+            Mockito.when(storageService.read(token)).thenReturn(Control.Option(original));
             return token;
         });
 

@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Mono;
 
 class ProcessCategoryLookupDelegateTest {
 
@@ -33,7 +32,7 @@ class ProcessCategoryLookupDelegateTest {
 
         BDDMockito.given(execution.hasVariableLocal("name")).willReturn(true);
         BDDMockito.given(execution.getVariableLocal("name")).willReturn("Grocery");
-        BDDMockito.given(categoryProvider.lookup("Grocery")).willReturn(Mono.just(category));
+        BDDMockito.given(categoryProvider.lookup("Grocery")).willReturn(Control.Option(category));
 
         subject.execute(execution);
 

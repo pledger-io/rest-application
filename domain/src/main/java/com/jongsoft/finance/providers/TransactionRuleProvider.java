@@ -2,11 +2,11 @@ package com.jongsoft.finance.providers;
 
 import com.jongsoft.finance.Exportable;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import reactor.core.publisher.Flux;
+import com.jongsoft.lang.collection.Sequence;
 
 public interface TransactionRuleProvider extends DataProvider<TransactionRule>, Exportable<TransactionRule> {
 
-    Flux<TransactionRule> lookup(String group);
+    Sequence<TransactionRule> lookup(String group);
 
     @Deprecated
     void save(TransactionRule rule);

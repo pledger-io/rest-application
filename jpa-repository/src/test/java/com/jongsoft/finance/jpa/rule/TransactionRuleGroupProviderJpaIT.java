@@ -9,7 +9,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
 
 class TransactionRuleGroupProviderJpaIT extends JpaTestSetup {
 
@@ -31,10 +30,10 @@ class TransactionRuleGroupProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup() {
-        StepVerifier.create(ruleGroupProvider.lookup())
-                .consumeNextWith(rule -> Assertions.assertThat(rule.getName()).isEqualTo("Grocery stores"))
-                .consumeNextWith(rule -> Assertions.assertThat(rule.getName()).isEqualTo("Hardware stores"))
-                .verifyComplete();
+        Assertions.assertThat(ruleGroupProvider.lookup())
+                .hasSize(2)
+                .first()
+                .satisfies(rule -> Assertions.assertThat(rule.getName()).isEqualTo("Grocery stores"));
     }
 
     @Test

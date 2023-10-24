@@ -3,6 +3,7 @@ package com.jongsoft.finance.rest.transaction;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,8 +16,8 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 @Builder
-@Introspected
 @NoArgsConstructor
+@Serdeable.Deserializable
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 class CreateRuleRequest {
 

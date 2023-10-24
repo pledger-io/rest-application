@@ -24,7 +24,7 @@ public class ParseTransactionRuleDelegate implements JavaDelegate {
                 execution.getActivityInstanceId());
 
         String storageToken = (String) execution.getVariableLocal("storageToken");
-        final byte[] rawRuleConfig = storageService.read(storageToken).block();
+        final byte[] rawRuleConfig = storageService.read(storageToken).get();
 
         var configJson = RuleConfigJson.read(new String(rawRuleConfig));
 

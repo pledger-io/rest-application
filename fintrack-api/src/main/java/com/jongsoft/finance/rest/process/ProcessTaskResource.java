@@ -13,8 +13,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.TaskService;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 @Tag(name = "Process Engine")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -30,15 +30,14 @@ public class ProcessTaskResource {
             description = "List all available tasks for the provided process",
             operationId = "getTasks"
     )
-    public Publisher<ProcessTaskResponse> tasks(@PathVariable String processDefinitionKey, @PathVariable String instanceId) {
-        var tasks = Collections.List(taskService.createTaskQuery()
+    public List<ProcessTaskResponse> tasks(@PathVariable String processDefinitionKey, @PathVariable String instanceId) {
+        return Collections.List(taskService.createTaskQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .processInstanceId(instanceId)
                 .initializeFormKeys()
                 .list())
-                .map(ProcessTaskResponse::new);
-
-        return Flux.fromIterable(tasks);
+                .map(ProcessTaskResponse::new)
+                .toJava();
     }
 
     @Delete("/{taskId}")

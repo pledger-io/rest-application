@@ -50,7 +50,7 @@ class CategoryProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_byLabel() {
-        var response = categoryProviderJpa.lookup("Grocery").block();
+        var response = categoryProviderJpa.lookup("Grocery").get();
 
         Assertions.assertThat(response.getId()).isEqualTo(1L);
     }

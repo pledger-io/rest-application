@@ -10,7 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
+
+import java.util.List;
 
 @Secured("admin")
 @Controller("/api/settings")
@@ -27,12 +28,13 @@ public class SettingResource {
             operationId = "getSettings"
     )
     @Secured({SecurityRule.IS_ANONYMOUS, SecurityRule.IS_AUTHENTICATED})
-    Publisher<SettingResponse> list() {
+    List<SettingResponse> list() {
         return settingProvider.lookup()
                 .map(setting -> new SettingResponse(
                         setting.getName(),
                         setting.getValue(),
-                        setting.getType()));
+                        setting.getType()))
+                .toJava();
     }
 
     @Post("/{setting}")

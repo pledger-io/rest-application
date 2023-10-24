@@ -8,9 +8,9 @@ import com.jongsoft.finance.messaging.commands.storage.ReplaceFileCommand;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.Encryption;
 import com.jongsoft.lang.Control;
+import com.jongsoft.lang.control.Optional;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -67,24 +67,22 @@ public class DiskStorageService implements StorageService {
     }
 
     @Override
-    public Mono<byte[]> read(String token) {
-        return Mono.create(emitter -> {
-            try {
-                var readResult = Files.readAllBytes(uploadRootDirectory.resolve(token));
+    public Optional<byte[]> read(String token) {
+        try {
+            var readResult = Files.readAllBytes(uploadRootDirectory.resolve(token));
 
-                if (securitySettings.isEncrypt()) {
-                    readResult = encryption.decrypt(
-                            readResult,
-                            currentUserProvider.currentUser().getSecret());
-                }
-
-                emitter.success(readResult);
-            } catch (IOException e) {
-                emitter.error(StatusException.notFound("Cannot locate content for token " + token));
-            } catch (IllegalStateException e) {
-                emitter.error(StatusException.notAuthorized("Cannot access file with token " + token));
+            if (securitySettings.isEncrypt()) {
+                readResult = encryption.decrypt(
+                        readResult,
+                        currentUserProvider.currentUser().getSecret());
             }
-        });
+
+            return Control.Option(readResult);
+        } catch (IOException e) {
+            throw StatusException.notFound("Cannot locate content for token " + token);
+        } catch (IllegalStateException e) {
+            throw StatusException.notAuthorized("Cannot access file with token " + token);
+        }
     }
 
     @Override

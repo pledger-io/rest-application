@@ -8,6 +8,7 @@ import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
@@ -17,7 +18,6 @@ import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Mono;
 
 class TagLookupDelegateTest {
 
@@ -47,7 +47,7 @@ class TagLookupDelegateTest {
 
         BDDMockito.given(execution.getVariableLocalTyped("name"))
                 .willReturn(new PrimitiveTypeValueImpl.StringValueImpl("Auto"));
-        BDDMockito.given(tagProvider.lookup("Auto")).willReturn(Mono.just(tag));
+        BDDMockito.given(tagProvider.lookup("Auto")).willReturn(Control.Option(tag));
 
         subject.execute(execution);
 
@@ -68,8 +68,8 @@ class TagLookupDelegateTest {
                 .willReturn(new PrimitiveTypeValueImpl.StringValueImpl("Auto"));
         BDDMockito.given(currentUserProvider.currentUser()).willReturn(userAccount);
         BDDMockito.given(tagProvider.lookup("Auto"))
-                .willReturn(Mono.empty())
-                .willReturn(Mono.just(tag));
+                .willReturn(Control.Option())
+                .willReturn(Control.Option(tag));
 
         subject.execute(execution);
 

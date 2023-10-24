@@ -7,9 +7,6 @@ import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.AccountResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.Control;
-import com.jongsoft.lang.control.Optional;
-import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -21,14 +18,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoSink;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
+
 import java.math.BigDecimal;
-import java.util.function.Consumer;
 
 @Controller("/api/accounts/{accountId}")
 @Tag(name = "Account information")
@@ -56,13 +50,10 @@ public class AccountEditResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Mono<AccountResponse> get(@PathVariable long accountId) {
-        return Mono.create(emitter -> {
-            accountProvider.lookup(accountId)
-                    .map(AccountResponse::new)
-                    .ifPresent((Consumer<AccountResponse>) emitter::success)
-                    .elseRun(() -> emitter.error(StatusException.notFound("Account not found")));
-        });
+    AccountResponse get(@PathVariable long accountId) {
+        return accountProvider.lookup(accountId)
+                .map(AccountResponse::new)
+                .getOrThrow(() -> StatusException.notFound("Account not found"));
     }
 
     @Post
@@ -82,30 +73,28 @@ public class AccountEditResource {
                     @ApiResponse(responseCode = "404", description = "No account can be located")
             }
     )
-    Mono<AccountResponse> update(
+    AccountResponse update(
             @PathVariable long accountId,
             @Valid @Body AccountEditRequest accountEditRequest) {
-        return Mono.create(emitter -> {
-            var account = accountProvider.lookup(accountId)
-                    .getOrThrow(() -> StatusException.notFound("No account found with id " + accountId));
+        var account = accountProvider.lookup(accountId)
+                .getOrThrow(() -> StatusException.notFound("No account found with id " + accountId));
 
-            account.rename(
-                    accountEditRequest.getName(),
-                    accountEditRequest.getDescription(),
-                    accountEditRequest.getCurrency(),
-                    accountEditRequest.getType());
+        account.rename(
+                accountEditRequest.getName(),
+                accountEditRequest.getDescription(),
+                accountEditRequest.getCurrency(),
+                accountEditRequest.getType());
 
-            account.changeAccount(
-                    accountEditRequest.getIban(),
-                    accountEditRequest.getBic(),
-                    accountEditRequest.getNumber());
+        account.changeAccount(
+                accountEditRequest.getIban(),
+                accountEditRequest.getBic(),
+                accountEditRequest.getNumber());
 
-            if (accountEditRequest.getInterestPeriodicity() != null) {
-                account.interest(accountEditRequest.getInterest(), accountEditRequest.getInterestPeriodicity());
-            }
+        if (accountEditRequest.getInterestPeriodicity() != null) {
+            account.interest(accountEditRequest.getInterest(), accountEditRequest.getInterestPeriodicity());
+        }
 
-            emitter.success(new AccountResponse(account));
-        });
+        return new AccountResponse(account);
     }
 
     @Post(value = "/image")
@@ -119,21 +108,19 @@ public class AccountEditResource {
                     in = ParameterIn.PATH,
                     schema = @Schema(implementation = Long.class))
     )
-    Mono<AccountResponse> persistImage(
+    AccountResponse persistImage(
             @PathVariable long accountId,
             @Body @Valid AccountImageRequest imageRequest) {
-        return Mono.create(emitter -> {
-            var accountPromise = accountProvider.lookup(accountId);
+        var accountPromise = accountProvider.lookup(accountId);
 
-            if (accountPromise.isPresent()) {
-                accountPromise.get()
-                        .registerIcon(imageRequest.getFileCode());
+        if (accountPromise.isPresent()) {
+            accountPromise.get()
+                    .registerIcon(imageRequest.getFileCode());
 
-                emitter.success(new AccountResponse(accountPromise.get()));
-            } else {
-                emitter.error(StatusException.notFound("Could not find account"));
-            }
-        });
+            return new AccountResponse(accountPromise.get());
+        } else {
+            throw StatusException.notFound("Could not find account");
+        }
     }
 
     @Delete
@@ -241,19 +228,4 @@ public class AccountEditResource {
                                 .forEach(SavingGoal::completed))
                 .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
     }
-
-    private Optional<Account> getOrFail(MonoSink<HttpResponse<AccountResponse>> emitter, long accountId) {
-        var accountOption = accountProvider.lookup(accountId);
-
-        if (!accountOption.isPresent()) {
-            emitter.success(HttpResponse.notFound());
-            return Control.Option();
-        } else if (!accountOption.get().getUser().getId().equals(currentUserProvider.currentUser().getId())) {
-            emitter.success(HttpResponse.unauthorized());
-            return Control.Option();
-        }
-
-        return accountOption;
-    }
-
 }

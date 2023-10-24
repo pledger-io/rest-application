@@ -40,7 +40,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
     @Test
     void first() {
         var check = transactionProvider.first(filterFactory.transaction().ownAccounts())
-                .block();
+                .get();
 
         Assertions.assertThat(check.getId()).isEqualTo(1L);
     }

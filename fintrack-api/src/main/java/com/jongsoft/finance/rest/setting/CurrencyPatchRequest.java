@@ -1,14 +1,14 @@
 package com.jongsoft.finance.rest.setting;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Builder
-@Introspected
 @NoArgsConstructor
 @AllArgsConstructor
+@Serdeable.Deserializable
 public class CurrencyPatchRequest {
 
     private Integer decimalPlaces;

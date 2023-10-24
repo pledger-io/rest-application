@@ -1,16 +1,16 @@
 package com.jongsoft.finance.rest.scheduler;
 
 import com.jongsoft.lang.Control;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 
 import java.util.List;
 
-@Introspected
+@Serdeable.Deserializable
 public class ScheduleSearchRequest {
 
     @Data
-    @Introspected
+    @Serdeable.Deserializable
     public static class EntityRef {
         private long id;
     }

@@ -1,19 +1,19 @@
 package com.jongsoft.finance.rest.transaction;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.util.List;
 
 @Builder
-@Introspected
 @NoArgsConstructor
 @AllArgsConstructor
+@Serdeable.Deserializable
 public class TransactionBulkEditRequest {
 
     @NoArgsConstructor

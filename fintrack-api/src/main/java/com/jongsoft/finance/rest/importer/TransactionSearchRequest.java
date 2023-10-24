@@ -1,12 +1,9 @@
 package com.jongsoft.finance.rest.importer;
 
-import io.micronaut.core.annotation.Introspected;
-import lombok.NoArgsConstructor;
-
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.Min;
 
-@Introspected
-@NoArgsConstructor
+@Serdeable.Deserializable
 class TransactionSearchRequest {
 
     @Min(0)

@@ -21,7 +21,7 @@ public class PrepareAccountGenerationDelegate implements JavaDelegate {
     public void execute(DelegateExecution execution) throws Exception {
         String transactionToken = execution.<StringValue>getVariableLocalTyped("transactionToken").getValue();
 
-        ParsedTransaction transaction = ParsedTransaction.parse(storageService.read(transactionToken).block());
+        ParsedTransaction transaction = ParsedTransaction.parse(storageService.read(transactionToken).get());
 
         execution.setVariableLocal(
                 "accountJson",

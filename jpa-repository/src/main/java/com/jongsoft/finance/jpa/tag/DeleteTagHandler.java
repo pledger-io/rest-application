@@ -6,11 +6,13 @@ import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.DeleteTagCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@Transactional
 public class DeleteTagHandler implements CommandHandler<DeleteTagCommand> {
 
     private final ReactiveEntityManager entityManager;

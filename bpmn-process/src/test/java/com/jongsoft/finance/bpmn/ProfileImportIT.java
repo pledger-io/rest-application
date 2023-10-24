@@ -18,7 +18,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
-import reactor.core.publisher.Mono;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -85,38 +84,38 @@ public class ProfileImportIT extends ProcessTestSetup {
         StringBuilder ruleJsonString = new StringBuilder();
 
         Mockito.when(storageService.read("my-sample-token")).thenReturn(
-                Mono.just(configContent.getBytes()));
+                Control.Option(configContent.getBytes()));
         Mockito.when(storageService.store(Mockito.any())).then((Answer<String>) invocation -> {
             byte[] param = invocation.getArgument(0);
             ruleJsonString.append(new String(param));
             return "my-json-token";
         });
-        Mockito.when(storageService.read("my-json-token")).thenAnswer(invocation -> Mono.just(ruleJsonString.toString().getBytes()));
+        Mockito.when(storageService.read("my-json-token")).thenAnswer(invocation -> Control.Option(ruleJsonString.toString().getBytes()));
 
         Mockito.when(categoryProvider.lookup("Salary")).thenReturn(
-                Mono.empty(),
-                Mono.just(Category.builder()
+                Control.Option(),
+                Control.Option(Category.builder()
                         .id(1L)
                         .build()));
         Mockito.when(categoryProvider.lookup("Groceries")).thenReturn(
-                Mono.empty(),
-                Mono.just(Category.builder()
+                Control.Option(),
+                Control.Option(Category.builder()
                         .id(2L)
                         .build()));
         Mockito.when(categoryProvider.lookup("Car")).thenReturn(
-                Mono.empty(),
-                Mono.just(Category.builder()
+                Control.Option(),
+                Control.Option(Category.builder()
                         .id(3L)
                         .build()));
         Mockito.when(accountProvider.lookup("Boss & Co."))
-                .thenReturn(Mono.empty())
-                .thenReturn(Mono.just(accountBoss));
+                .thenReturn(Control.Option())
+                .thenReturn(Control.Option(accountBoss));
         Mockito.when(accountProvider.lookup("Demo checking account"))
-                .thenReturn(Mono.empty())
-                .thenReturn(Mono.just(accountDemo));
+                .thenReturn(Control.Option())
+                .thenReturn(Control.Option(accountDemo));
         Mockito.when(accountProvider.lookup("Groceries are us"))
-                .thenReturn(Mono.empty())
-                .thenReturn(Mono.just(accountShop));
+                .thenReturn(Control.Option())
+                .thenReturn(Control.Option(accountShop));
 
         var process = processEngine.getRuntimeService().createProcessInstanceByKey("ImportUserProfile")
                 .setVariable("storageToken", "my-sample-token")

@@ -1,11 +1,10 @@
 package com.jongsoft.finance.rest.security;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import jakarta.validation.constraints.NotBlank;
 
-@Introspected
+@Serdeable.Deserializable
 public class TokenRefreshRequest {
 
     @NotBlank

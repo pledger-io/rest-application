@@ -7,10 +7,12 @@ import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import reactor.core.publisher.Mono;
 
+@ReadOnly
 @Singleton
 @Named("budgetProvider")
 public class BudgetProviderJpa implements BudgetProvider {
@@ -38,7 +40,7 @@ public class BudgetProviderJpa implements BudgetProvider {
     }
 
     @Override
-    public Mono<Budget> lookup(int year, int month) {
+    public Optional<Budget> lookup(int year, int month) {
         var range = DateUtils.forMonth(year, month);
 
         var hql = """
@@ -47,23 +49,23 @@ public class BudgetProviderJpa implements BudgetProvider {
                     and b.from <= :start
                     and (b.until is null or b.until >= :end)""";
 
-        return reactiveEntityManager.<BudgetJpa>reactive()
+        return reactiveEntityManager.<BudgetJpa>blocking()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
                 .set("start", range.from())
                 .set("end", range.until())
-                .single()
+                .maybe()
                 .map(this::convert);
     }
 
     @Override
-    public Mono<Budget> first() {
+    public Optional<Budget> first() {
         var hql = """
                 select b from BudgetJpa b
                 where b.user.username = :username
                 order by b.from asc""";
 
-        return reactiveEntityManager.<BudgetJpa>reactive()
+        return reactiveEntityManager.<BudgetJpa>blocking()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
                 .limit(1)

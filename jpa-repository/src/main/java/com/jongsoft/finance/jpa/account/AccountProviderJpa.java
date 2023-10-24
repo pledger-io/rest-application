@@ -16,10 +16,10 @@ import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import com.jongsoft.lang.time.Range;
 import io.micronaut.data.model.Sort;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,6 +29,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
+@ReadOnly
 @Singleton
 @Named("accountProvider")
 public class AccountProviderJpa implements AccountProvider {
@@ -44,7 +45,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Mono<Account> synonymOf(String synonym) {
+    public Optional<Account> synonymOf(String synonym) {
         log.trace("Account synonym lookup with: {}", synonym);
 
         String hql = """
@@ -53,7 +54,7 @@ public class AccountProviderJpa implements AccountProvider {
                 and a.account.user.username = :username
                 and a.account.archived = false""";
 
-        return entityManager.<AccountJpa>reactive()
+        return entityManager.<AccountJpa>blocking()
                 .hql(hql)
                 .set("synonym", synonym)
                 .set("username", authenticationFacade.authenticated())
@@ -89,7 +90,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Mono<Account> lookup(String name) {
+    public Optional<Account> lookup(String name) {
         log.trace("Account name lookup: {} for {}", name, authenticationFacade.authenticated());
 
         String hql = """
@@ -100,7 +101,7 @@ public class AccountProviderJpa implements AccountProvider {
                   and a.user.username = :username
                   and a.archived = false""";
 
-        return entityManager.<AccountJpa>reactive()
+        return entityManager.<AccountJpa>blocking()
                 .hql(hql)
                 .set("name", name)
                 .set("username", authenticationFacade.authenticated())
@@ -109,7 +110,7 @@ public class AccountProviderJpa implements AccountProvider {
     }
 
     @Override
-    public Mono<Account> lookup(SystemAccountTypes accountType) {
+    public Optional<Account> lookup(SystemAccountTypes accountType) {
         log.trace("Account type lookup: {}", accountType);
 
         var hql = """
@@ -120,7 +121,7 @@ public class AccountProviderJpa implements AccountProvider {
                     and a.user.username = :username
                     and a.archived = false""";
 
-        return entityManager.<AccountJpa>reactive()
+        return entityManager.<AccountJpa>blocking()
                 .hql(hql)
                 .set("label", accountType.label())
                 .set("username", authenticationFacade.authenticated())

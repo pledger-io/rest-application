@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import reactor.core.publisher.Flux;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -36,7 +35,7 @@ abstract class CSVReaderDelegate implements JavaDelegate {
         String batchImportSlug = (String) execution.getVariableLocal("batchImportSlug");
         ImportConfigJson importConfigJson = getFromContext(execution);
 
-        BatchImport batchImport = importProvider.lookup(batchImportSlug).block();
+        BatchImport batchImport = importProvider.lookup(batchImportSlug).get();
         log.debug("{}: Processing transaction import CSV {}", execution.getCurrentActivityName(), batchImport.getSlug());
         if (importConfigJson == null) {
             throw new IllegalStateException("Cannot run account extraction without actual configuration.");
@@ -48,7 +47,7 @@ abstract class CSVReaderDelegate implements JavaDelegate {
 
         try (var inputStream = storageService.read(batchImport.getFileCode())
                 .map(bytes -> new InputStreamReader(new ByteArrayInputStream(bytes)))
-                .block()) {
+                .get()) {
             var reader = new CSVReaderBuilder(inputStream)
                     .withCSVParser(new CSVParserBuilder()
                             .withSeparator(importConfigJson.getDelimiter())

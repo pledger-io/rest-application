@@ -1,5 +1,8 @@
 package com.jongsoft.finance.rest.localization;
 
+import io.micronaut.serde.annotation.Serdeable;
+
+@Serdeable.Serializable
 class LanguageResponse {
 
     private String text;

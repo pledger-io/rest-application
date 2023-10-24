@@ -1,13 +1,12 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.account.Contract;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.bouncycastle.cert.dane.DANEEntry;
 
 import java.time.LocalDate;
 
-@Introspected
+@Serdeable.Serializable
 public class ContractResponse {
 
     private final Contract wrapped;

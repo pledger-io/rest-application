@@ -2,7 +2,7 @@ package com.jongsoft.finance.rest.statistic;
 
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.lang.Control;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Setter;
 
@@ -10,10 +10,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Setter
-@Introspected
+@Serdeable.Deserializable
 public class BalanceRequest {
 
-    @Introspected
+    @Serdeable.Deserializable
     public static class DateRange {
         @Schema(description = "Earliest date a transaction may be.", implementation = String.class, format = "yyyy-mm-dd")
         private LocalDate start;
@@ -52,6 +52,7 @@ public class BalanceRequest {
     private String importSlug;
 
     @Setter
+    @Serdeable.Deserializable
     public static class EntityRef implements AggregateBase {
 
         @Schema(description = "The unique identifier of the entity", required = true)

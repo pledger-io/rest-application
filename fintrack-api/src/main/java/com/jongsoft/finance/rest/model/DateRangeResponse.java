@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.lang.time.Range;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
-@Introspected
+@Serdeable.Serializable
 public class DateRangeResponse {
 
     private final Range<LocalDate> wrapped;

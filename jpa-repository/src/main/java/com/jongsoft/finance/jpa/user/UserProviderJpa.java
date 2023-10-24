@@ -10,17 +10,18 @@ import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Collectors;
+import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.Currency;
 
 @Singleton
+@ReadOnly
 @Named("userProvider")
 public class UserProviderJpa implements UserProvider {
 
@@ -59,13 +60,13 @@ public class UserProviderJpa implements UserProvider {
     }
 
     @Override
-    public Mono<UserAccount> refreshToken(String refreshToken) {
+    public Optional<UserAccount> refreshToken(String refreshToken) {
         var hql = """
                 select u.user from AccountTokenJpa u
                 where u.refreshToken = :refreshToken
                     and u.expires >= :now""";
 
-        return entityManager.<UserAccountJpa>reactive()
+        return entityManager.<UserAccountJpa>blocking()
                 .hql(hql)
                 .set("refreshToken", refreshToken)
                 .set("now", LocalDateTime.now())
@@ -74,17 +75,17 @@ public class UserProviderJpa implements UserProvider {
     }
 
     @Override
-    public Flux<SessionToken> tokens(String username) {
+    public Sequence<SessionToken> tokens(String username) {
         var hql = """
                 from AccountTokenJpa
                 where user.username = :username
                       and expires > :now""";
 
-        return entityManager.<AccountTokenJpa>reactive()
+        return entityManager.<AccountTokenJpa>blocking()
                 .hql(hql)
                 .set("username", username)
                 .set("now", LocalDateTime.now())
-                .flow()
+                .sequence()
                 .map(this::convert);
     }
 

@@ -12,8 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.HistoryService;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 @Tag(name = "Process Engine")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -29,15 +29,15 @@ public class ProcessVariableResource {
             description = "This operation lists all process variables available for the provided process",
             operationId = "getVariables"
     )
-    public Publisher<ProcessVariableResponse> variables(
+    public List<ProcessVariableResponse> variables(
             @PathVariable String processDefinitionKey,
             @PathVariable String instanceId) {
-        var result = Collections.List(historyService.createHistoricVariableInstanceQuery()
-                .processDefinitionKey(processDefinitionKey)
-                .processInstanceId(instanceId)
-                .list());
-
-        return Flux.fromIterable(result.map(ProcessVariableResponse::new));
+        return Collections.List(historyService.createHistoricVariableInstanceQuery()
+                        .processDefinitionKey(processDefinitionKey)
+                        .processInstanceId(instanceId)
+                        .list())
+                .map(ProcessVariableResponse::new)
+                .toJava();
     }
 
     @Get("/{variable}")
@@ -46,17 +46,17 @@ public class ProcessVariableResource {
             description = "This operation lists variables of a given name for a process",
             operationId = "getVariable"
     )
-    public Publisher<ProcessVariableResponse> variable(
+    public List<ProcessVariableResponse> variable(
             @PathVariable String processDefinitionKey,
             @PathVariable String instanceId,
             @PathVariable String variable) {
-        var result = Collections.List(historyService.createHistoricVariableInstanceQuery()
-                .processDefinitionKey(processDefinitionKey)
-                .processInstanceId(instanceId)
-                .variableName(variable)
-                .list());
-
-        return Flux.fromIterable(result.map(ProcessVariableResponse::new));
+        return Collections.List(historyService.createHistoricVariableInstanceQuery()
+                        .processDefinitionKey(processDefinitionKey)
+                        .processInstanceId(instanceId)
+                        .variableName(variable)
+                        .list())
+                .map(ProcessVariableResponse::new)
+                .toJava();
     }
 
 }

@@ -11,7 +11,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
 
 class TagProviderJpaIT extends JpaTestSetup {
 
@@ -42,10 +41,10 @@ class TagProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_name() {
-        StepVerifier.create(tagProvider.lookup("Nono")).expectNextCount(0).verifyComplete();
-        StepVerifier.create(tagProvider.lookup("Bike")).expectNextCount(0).verifyComplete();
+        Assertions.assertThat(tagProvider.lookup("Nono")).hasSize(0);
+        Assertions.assertThat(tagProvider.lookup("Bike")).hasSize(0);
 
-        Assertions.assertThat(tagProvider.lookup("Sample").block().name()).isEqualTo("Sample");
+        Assertions.assertThat(tagProvider.lookup("Sample").get().name()).isEqualTo("Sample");
     }
 
     @Test

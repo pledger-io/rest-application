@@ -1,7 +1,6 @@
 package com.jongsoft.finance.filter;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
@@ -15,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Produces
 @Singleton
-@Requires(classes = {StatusException.class, ExceptionHandler.class})
 public class StatusExceptionHandler implements ExceptionHandler<StatusException, HttpResponse<JsonError>> {
 
     @Override

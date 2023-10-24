@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.category;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-@Introspected
 @NoArgsConstructor
 @AllArgsConstructor
+@Serdeable.Deserializable
 public class CategorySearchRequest {
 
     private int page;

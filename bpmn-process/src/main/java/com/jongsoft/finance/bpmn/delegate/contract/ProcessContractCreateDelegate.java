@@ -39,27 +39,26 @@ public class ProcessContractCreateDelegate implements JavaDelegate {
                 execution.getCurrentActivityName(),
                 contractJson.getName());
 
-        var noDuplicate = contractProvider.lookup(contractJson.getName())
-                .blockOptional();
-        if (noDuplicate.isEmpty()) {
-            accountProvider.lookup(contractJson.getCompany())
-                    .map(account -> account.createContract(
-                            contractJson.getName(),
-                            contractJson.getDescription(),
-                            contractJson.getStart(),
-                            contractJson.getEnd()))
-                    .subscribe(unsaved -> {
-                        contractProvider.lookup(contractJson.getName())
-                                .subscribe(contract -> {
-                                    if (contractJson.getContract() != null) {
-                                        contract.registerUpload(storageService.store(Hex.decode(contractJson.getContract())));
-                                    }
+        contractProvider.lookup(contractJson.getName())
+                .ifNotPresent(() -> {
+                    accountProvider.lookup(contractJson.getCompany())
+                            .map(account -> account.createContract(
+                                    contractJson.getName(),
+                                    contractJson.getDescription(),
+                                    contractJson.getStart(),
+                                    contractJson.getEnd()))
+                            .ifPresent(unsaved -> {
+                                contractProvider.lookup(contractJson.getName())
+                                        .ifPresent(contract -> {
+                                            if (contractJson.getContract() != null) {
+                                                contract.registerUpload(storageService.store(Hex.decode(contractJson.getContract())));
+                                            }
 
-                                    if (contractJson.isTerminated()) {
-                                        contract.terminate();
-                                    }
-                                });
-                    });
-        }
+                                            if (contractJson.isTerminated()) {
+                                                contract.terminate();
+                                            }
+                                        });
+                            });
+                });
     }
 }

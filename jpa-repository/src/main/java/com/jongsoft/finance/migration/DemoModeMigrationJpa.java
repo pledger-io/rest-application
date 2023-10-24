@@ -16,7 +16,7 @@ public class DemoModeMigrationJpa implements DataSourceMigration {
 
         var config = new FluentConfiguration();
         config.baselineOnMigrate(true)
-                .locations("classpath:db/camunda/h2", "classpath:db/migration", "classpath:db/sample")
+                .locations("classpath:/db/camunda/h2", "classpath:/db/migration", "classpath:/db/sample")
                 .dataSource(
                         "jdbc:h2:mem:finance;MODE=MYSQL",
                         "demo-user",

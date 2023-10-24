@@ -3,7 +3,7 @@ package com.jongsoft.finance.providers;
 import com.jongsoft.finance.Exportable;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.Category;
-import reactor.core.publisher.Mono;
+import com.jongsoft.lang.control.Optional;
 
 public interface CategoryProvider extends DataProvider<Category>, Exportable<Category> {
 
@@ -13,7 +13,7 @@ public interface CategoryProvider extends DataProvider<Category>, Exportable<Cat
         FilterCommand pageSize(int pageSize);
     }
 
-    Mono<Category> lookup(String label);
+    Optional<Category> lookup(String label);
 
     ResultPage<Category> lookup(FilterCommand filterCommand);
 

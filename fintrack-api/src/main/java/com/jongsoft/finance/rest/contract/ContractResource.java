@@ -19,11 +19,10 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Tag(name = "Contract")
 @Controller("/api/contracts")
@@ -58,9 +57,10 @@ public class ContractResource {
             description = "Performs a search operation based on the partial name (token)",
             operationId = "getByToken"
     )
-    Publisher<ContractResponse> autocomplete(@QueryValue String token) {
+    List<ContractResponse> autocomplete(@QueryValue String token) {
         return contractProvider.search(token)
-                .map(ContractResponse::new);
+                .map(ContractResponse::new)
+                .toJava();
     }
 
     @Put
@@ -69,28 +69,17 @@ public class ContractResource {
             description = "Adds a new contract to FinTrack for the authenticated user",
             operationId = "createContract"
     )
-    Mono<ContractResponse> create(@Body @Valid ContractCreateRequest createRequest) {
-        return Mono.create(emitter -> {
-            var result = accountProvider.lookup(createRequest.getCompany().getId())
-                    .map(account -> account.createContract(
-                            createRequest.getName(),
-                            createRequest.getDescription(),
-                            createRequest.getStart(),
-                            createRequest.getEnd()));
-
-            if (result.isPresent()) {
-                contractProvider.lookup(createRequest.getName())
-                        .switchIfEmpty(Mono.error(
-                                StatusException.internalError("Error creating contract")))
-                        .subscribe(
-                                contract -> emitter.success(new ContractResponse(contract)),
-                                emitter::error);
-            } else {
-                emitter.error(
-                        StatusException.notFound(
-                                "No account can be found for " + createRequest.getCompany().getId()));
-            }
-        });
+    ContractResponse create(@Body @Valid ContractCreateRequest createRequest) {
+        return accountProvider.lookup(createRequest.getCompany().getId())
+                .map(account -> account.createContract(
+                        createRequest.getName(),
+                        createRequest.getDescription(),
+                        createRequest.getStart(),
+                        createRequest.getEnd()))
+                .map(account -> contractProvider.lookup(createRequest.getName())
+                        .getOrThrow(() -> StatusException.internalError("Error creating contract")))
+                .map(ContractResponse::new)
+                .getOrThrow(() -> StatusException.notFound("No account can be found for " + createRequest.getCompany().getId()));
     }
 
     @Post("/{contractId}")
@@ -99,28 +88,20 @@ public class ContractResource {
             description = "Updates an existing contract for the authenticated user",
             parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
     )
-    Mono<ContractResponse> update(
+    ContractResponse update(
             @PathVariable long contractId,
             @Body @Valid ContractCreateRequest updateRequest) {
-        return Mono.create(emitter -> {
-            var response = contractProvider.lookup(contractId)
-                    .map(contract -> {
-                        contract.change(
-                                updateRequest.getName(),
-                                updateRequest.getDescription(),
-                                updateRequest.getStart(),
-                                updateRequest.getEnd());
-                        return contract;
-                    })
-                    .map(ContractResponse::new);
-
-            if (response.isPresent()) {
-                emitter.success(response.get());
-            } else {
-                emitter.error(
-                        StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
-            }
-        });
+        return contractProvider.lookup(contractId)
+                .map(contract -> {
+                    contract.change(
+                            updateRequest.getName(),
+                            updateRequest.getDescription(),
+                            updateRequest.getStart(),
+                            updateRequest.getEnd());
+                    return contract;
+                })
+                .map(ContractResponse::new)
+                .getOrThrow(() -> StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
     }
 
     @Get("/{contractId}")
@@ -129,18 +110,10 @@ public class ContractResource {
             description = "Get a single contract from FinTrack",
             parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
     )
-    Mono<ContractResponse> get(@PathVariable long contractId) {
-        return Mono.create(emitter -> {
-            var response = contractProvider.lookup(contractId)
-                    .map(ContractResponse::new);
-
-            if (response.isPresent()) {
-                emitter.success(response.get());
-            } else {
-                emitter.error(
-                        StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
-            }
-        });
+    ContractResponse get(@PathVariable long contractId) {
+        return contractProvider.lookup(contractId)
+                .map(ContractResponse::new)
+                .getOrThrow(() -> StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
     }
 
     @Put("/{contractId}/schedule")
@@ -163,9 +136,9 @@ public class ContractResource {
 
         // update the schedule start / end date
         scheduleProvider.lookup(
-                filterFactory.schedule()
-                        .activeOnly()
-                        .contract(Collections.List(new EntityRef(contractId))))
+                        filterFactory.schedule()
+                                .activeOnly()
+                                .contract(Collections.List(new EntityRef(contractId))))
                 .content()
                 .forEach(ScheduledTransaction::limitForContract);
     }
@@ -177,22 +150,14 @@ public class ContractResource {
             parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
             operationId = "warnBeforeExpireDate"
     )
-    Mono<ContractResponse> warnExpiry(@PathVariable long contractId) {
-        return Mono.create(emitter -> {
-            var response = contractProvider.lookup(contractId)
-                    .map(contract -> {
-                        contract.warnBeforeExpires();
-                        return contract;
-                    })
-                    .map(ContractResponse::new);
-
-            if (response.isPresent()) {
-                emitter.success(response.get());
-            } else {
-                emitter.error(
-                        StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
-            }
-        });
+    ContractResponse warnExpiry(@PathVariable long contractId) {
+        return contractProvider.lookup(contractId)
+                .map(contract -> {
+                    contract.warnBeforeExpires();
+                    return contract;
+                })
+                .map(ContractResponse::new)
+                .getOrThrow(() -> StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
     }
 
     @Post("/{contractId}/attachment")
@@ -202,24 +167,16 @@ public class ContractResource {
             parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class)),
             operationId = "registerAttachment"
     )
-    Mono<ContractResponse> attachment(
+    ContractResponse attachment(
             @PathVariable long contractId,
             @Body @Valid ContractAttachmentRequest attachmentRequest) {
-        return Mono.create(emitter -> {
-            var response = contractProvider.lookup(contractId)
-                    .map(contract -> {
-                        contract.registerUpload(attachmentRequest.getFileCode());
-                        return contract;
-                    })
-                    .map(ContractResponse::new);
-
-            if (response.isPresent()) {
-                emitter.success(response.get());
-            } else {
-                emitter.error(
-                        StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
-            }
-        });
+        return contractProvider.lookup(contractId)
+                .map(contract -> {
+                    contract.registerUpload(attachmentRequest.getFileCode());
+                    return contract;
+                })
+                .map(ContractResponse::new)
+                .getOrThrow(() -> StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
     }
 
     @Delete("/{contractId}")

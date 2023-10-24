@@ -1,13 +1,12 @@
 package com.jongsoft.finance.rest.importer;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotBlank;
-
-@Introspected
 @NoArgsConstructor
+@Serdeable.Deserializable
 class CSVImporterConfigCreateRequest {
 
     @NotBlank

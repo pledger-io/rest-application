@@ -7,6 +7,7 @@ import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.SplitTransactionCommand;
 import com.jongsoft.lang.Collections;
+import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import java.util.Objects;
 
 @Slf4j
 @Singleton
+@Transactional
 public class SplitTransactionHandler implements CommandHandler<SplitTransactionCommand> {
 
     private final ReactiveEntityManager entityManager;

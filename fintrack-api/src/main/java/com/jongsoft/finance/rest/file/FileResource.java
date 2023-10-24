@@ -39,8 +39,7 @@ public class FileResource {
                     " throw an exception if the current user did not upload the file."
     )
     byte[] download(@PathVariable String fileCode) {
-        return storageService.read(fileCode)
-                .block();
+        return storageService.read(fileCode).get();
     }
 
     @Delete("/{fileCode}")

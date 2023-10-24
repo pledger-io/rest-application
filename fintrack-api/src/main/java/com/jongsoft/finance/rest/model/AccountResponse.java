@@ -3,20 +3,17 @@ package com.jongsoft.finance.rest.model;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.SavingGoal;
 import com.jongsoft.finance.schedule.Periodicity;
-import com.jongsoft.finance.schedule.Schedulable;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-@Introspected
+@Serdeable.Serializable
 public class AccountResponse {
 
     private final Account wrapped;
@@ -77,7 +74,7 @@ public class AccountResponse {
         return null;
     }
 
-    @Introspected
+    @Serdeable.Serializable
     @RequiredArgsConstructor
     public class SavingGoalResponse {
 
@@ -139,7 +136,7 @@ public class AccountResponse {
 
     }
 
-    @Introspected
+    @Serdeable.Serializable
     public class InterestInformation {
 
         @Schema(description = "The interval the interest is calculated on", example = "MONTHS")
@@ -154,7 +151,7 @@ public class AccountResponse {
 
     }
 
-    @Introspected
+    @Serdeable.Serializable
     public class NumberInformation {
 
         public String getIban() {
@@ -174,7 +171,7 @@ public class AccountResponse {
         }
     }
 
-    @Introspected
+    @Serdeable.Serializable
     public class History {
 
         @Schema(description = "The date of the first recorded transaction for the account")

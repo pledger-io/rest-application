@@ -9,10 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
-import reactor.core.publisher.Mono;
-
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate will create process a serialize {@link BudgetJson} into a new budget period in the system. It will
@@ -54,8 +50,7 @@ public class ProcessBudgetCreateDelegate implements JavaDelegate {
 
         var budget = budgetProvider.lookup(year, month)
                 .map(b -> b.indexBudget(budgetJson.getStart(), budgetJson.getExpectedIncome()))
-                .onErrorResume(e -> Mono.just(userAccount.createBudget(budgetJson.getStart(), budgetJson.getExpectedIncome())))
-                .block(Duration.of(500, ChronoUnit.MILLIS));
+                .getOrSupply(() -> userAccount.createBudget(budgetJson.getStart(), budgetJson.getExpectedIncome()));
 
         budgetJson.getExpenses().stream()
                 .filter(e -> budget.determineExpense(e.getName()) == null)

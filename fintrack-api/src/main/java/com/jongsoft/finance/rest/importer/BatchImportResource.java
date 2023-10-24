@@ -17,11 +17,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Tag(name = "Importer")
 @Controller("/api/import")
@@ -60,14 +59,11 @@ public class BatchImportResource {
             summary = "Create importer",
             description = "Creates a new importer job in FinTrack, which can be used to import a CSV of transactions"
     )
-    Publisher<ImporterResponse> create(@Valid @Body ImporterCreateRequest request) {
-        return Mono.create(emitter -> {
-            csvConfigProvider.lookup(request.getConfiguration())
-                    .map(config -> config.createImport(request.getUploadToken()))
-                    .map(ImporterResponse::new)
-                    .ifPresent(e -> emitter.success(e))
-                    .elseRun(() -> emitter.error(StatusException.notFound("CSV configuration not found")));
-        });
+    ImporterResponse create(@Valid @Body ImporterCreateRequest request) {
+        return csvConfigProvider.lookup(request.getConfiguration())
+                .map(config -> config.createImport(request.getUploadToken()))
+                .map(ImporterResponse::new)
+                .getOrThrow(() -> StatusException.notFound("CSV configuration not found"));
     }
 
     @Get("/{batchSlug}")
@@ -76,10 +72,10 @@ public class BatchImportResource {
             description = "Fetch a single importer job from FinTrack",
             parameters = @Parameter(name = "batchSlug", in = ParameterIn.PATH, description = "The unique identifier")
     )
-    Publisher<ImporterResponse> get(@PathVariable String batchSlug) {
+    ImporterResponse get(@PathVariable String batchSlug) {
         return importProvider.lookup(batchSlug)
                 .map(ImporterResponse::new)
-                .switchIfEmpty(Mono.error(StatusException.notFound("CSV configuration not found")));
+                .getOrThrow(() -> StatusException.notFound("CSV configuration not found"));
     }
 
     @Delete("/{batchSlug}")
@@ -89,13 +85,13 @@ public class BatchImportResource {
             parameters = @Parameter(name = "batchSlug", in = ParameterIn.PATH, description = "The unique identifier")
     )
     @Status(value = HttpStatus.NO_CONTENT)
-    Publisher<String> delete(@PathVariable String batchSlug) {
+    String delete(@PathVariable String batchSlug) {
         return importProvider.lookup(batchSlug)
-                .switchIfEmpty(Mono.error(StatusException.notFound("Cannot delete import with slug " + batchSlug)))
                 .map(job -> {
                     job.archive();
                     return "";
-                });
+                })
+                .getOrThrow(() -> StatusException.notFound("Cannot delete import with slug " + batchSlug));
     }
 
     @Get("/config")
@@ -103,9 +99,10 @@ public class BatchImportResource {
             summary = "List configurations",
             description = "List all available importer configurations in FinTrack"
     )
-    Publisher<CSVImporterConfigResponse> config() {
+    List<CSVImporterConfigResponse> config() {
         return csvConfigProvider.lookup()
-                .map(CSVImporterConfigResponse::new);
+                .map(CSVImporterConfigResponse::new)
+                .toJava();
     }
 
     @Put("/config")
@@ -113,17 +110,14 @@ public class BatchImportResource {
             summary = "Create configuration",
             description = "Creates a new importer configuration in FinTrack, using the provided file token"
     )
-    Publisher<CSVImporterConfigResponse> createConfig(@Valid @Body CSVImporterConfigCreateRequest request) {
-        return Mono.create(emitter -> {
-            csvConfigProvider.lookup(request.getName())
-                    .ifPresent(x -> emitter.error(StatusException.badRequest(
-                            "Configuration with name " + request.getName() + " already exists.")))
-                    .elseRun(() -> {
-                        var config = currentUserProvider.currentUser().createImportConfiguration(
-                                request.getName(),
-                                request.getFileCode());
-                        emitter.success(new CSVImporterConfigResponse(config));
-                    });
-        });
+    CSVImporterConfigResponse createConfig(@Valid @Body CSVImporterConfigCreateRequest request) {
+        var existing = csvConfigProvider.lookup(request.getName());
+        if (existing.isPresent()) {
+            throw StatusException.badRequest("Configuration with name " + request.getName() + " already exists.");
+        }
+
+        return new CSVImporterConfigResponse(currentUserProvider.currentUser().createImportConfiguration(
+                request.getName(),
+                request.getFileCode()));
     }
 }

@@ -1,14 +1,13 @@
 package com.jongsoft.finance.rest.transaction;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.NoArgsConstructor;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.NoArgsConstructor;
 
-@Introspected
 @NoArgsConstructor
+@Serdeable.Deserializable
 class GroupRenameRequest {
 
     @NotNull

@@ -2,16 +2,14 @@ package com.jongsoft.finance.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jongsoft.finance.core.FailureCode;
-import com.jongsoft.finance.core.TransactionType;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import io.micronaut.core.annotation.Introspected;
-import io.micronaut.http.annotation.Delete;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Introspected
+@Serdeable.Serializable
 public class TransactionResponse {
 
     private transient final Transaction wrapped;
@@ -83,7 +81,7 @@ public class TransactionResponse {
                 .toJava();
     }
 
-    @Introspected
+    @Serdeable.Serializable
     public class Metadata {
 
         @Schema(description = "The category this transaction was linked to", example = "Food related expenses")
@@ -116,7 +114,7 @@ public class TransactionResponse {
         }
     }
 
-    @Introspected
+    @Serdeable.Serializable
     public class Type {
 
         @Schema(description = "The type of transaction", allowableValues = {"CREDIT", "DEBIT", "TRANSFER"})
@@ -131,7 +129,7 @@ public class TransactionResponse {
         }
     }
 
-    @Introspected
+    @Serdeable.Serializable
     public class Dates {
         @Schema(description = "The date this transaction was created")
         public LocalDate getTransaction() {
@@ -149,7 +147,7 @@ public class TransactionResponse {
         }
     }
 
-    @Introspected
+    @Serdeable.Serializable
     public static class SplitAmount {
         private final transient Transaction.Part wrapped;
 

@@ -1,21 +1,22 @@
 package com.jongsoft.finance.rest.account;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.util.List;
 
 @Builder
-@Introspected
+@Serdeable.Deserializable
 @NoArgsConstructor
 @AllArgsConstructor
 class AccountTransactionSplitRequest {
 
     @NoArgsConstructor
+    @Serdeable.Deserializable
     public static final class SplitRecord {
         private String description;
         private double amount;

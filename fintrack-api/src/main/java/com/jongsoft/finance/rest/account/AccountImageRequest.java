@@ -1,8 +1,8 @@
 package com.jongsoft.finance.rest.account;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
-@Introspected
+@Serdeable.Deserializable
 public class AccountImageRequest {
 
     private String fileCode;

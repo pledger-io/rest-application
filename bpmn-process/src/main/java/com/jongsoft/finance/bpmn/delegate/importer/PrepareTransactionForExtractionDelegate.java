@@ -27,7 +27,7 @@ public class PrepareTransactionForExtractionDelegate implements JavaDelegate {
         } else {
             String transactionToken = execution.<StringValue>getVariableLocalTyped("transactionToken").getValue();
 
-            ParsedTransaction transaction = ParsedTransaction.parse(storageService.read(transactionToken).block());
+            ParsedTransaction transaction = ParsedTransaction.parse(storageService.read(transactionToken).get());
 
             execution.setVariableLocal("iban", transaction.getOpposingIBAN());
             execution.setVariableLocal("name", transaction.getOpposingName());

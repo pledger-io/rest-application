@@ -7,7 +7,7 @@ import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.model.ScheduledTransactionResponse;
 import com.jongsoft.lang.Collections;
-import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -17,12 +17,10 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 import java.util.Objects;
 
 @Tag(name = "Scheduling agent")
@@ -40,13 +38,10 @@ public class ScheduledTransactionResource {
             operationId = "listTransactionSchedule",
             summary = "List all available transaction schedules"
     )
-    public Publisher<ScheduledTransactionResponse> list() {
-        return Flux.create(emitter -> {
-            scheduleProvider.lookup()
-                    .map(ScheduledTransactionResponse::new)
-                    .forEach(emitter::next);
-            emitter.complete();
-        });
+    public List<ScheduledTransactionResponse> list() {
+        return scheduleProvider.lookup()
+                .map(ScheduledTransactionResponse::new)
+                .toJava();
     }
 
     @Put
@@ -54,26 +49,25 @@ public class ScheduledTransactionResource {
             operationId = "createTransactionSchedule",
             summary = "Create a new transaction schedule"
     )
-    public Publisher<HttpResponse<ScheduledTransactionResponse>> create(@Valid @Body ScheduledTransactionCreateRequest request) {
-        return Mono.create(emitter -> {
-            var account = accountProvider.lookup(request.getSource().getId());
-            var destination = accountProvider.lookup(request.getDestination().getId());
+    @Status(HttpStatus.CREATED)
+    public ScheduledTransactionResponse create(@Valid @Body ScheduledTransactionCreateRequest request) {
+        var account = accountProvider.lookup(request.getSource().getId());
+        var destination = accountProvider.lookup(request.getDestination().getId());
 
-            if (!account.isPresent() || !destination.isPresent()) {
-                emitter.error(new IllegalArgumentException("Either source or destination account cannot be located."));
-            } else {
-                account.get().createSchedule(
-                        request.getName(),
-                        request.getSchedule(),
-                        destination.get(),
-                        request.getAmount());
+        if (!account.isPresent() || !destination.isPresent()) {
+            throw StatusException.badRequest("Either source or destination account cannot be located.");
+        }
 
-                emitter.success(HttpResponse.created(scheduleProvider.lookup()
-                        .filter(schedule -> request.getName().equals(schedule.getName()))
-                        .map(ScheduledTransactionResponse::new)
-                        .head()));
-            }
-        });
+        account.get().createSchedule(
+                request.getName(),
+                request.getSchedule(),
+                destination.get(),
+                request.getAmount());
+
+        return scheduleProvider.lookup()
+                .filter(schedule -> request.getName().equals(schedule.getName()))
+                .map(ScheduledTransactionResponse::new)
+                .head();
     }
 
     @Post
@@ -81,22 +75,15 @@ public class ScheduledTransactionResource {
             operationId = "searchTransactionSchedule",
             summary = "Search schedule"
     )
-    public Publisher<ScheduledTransactionResponse> search(@Valid @Body ScheduleSearchRequest request) {
+    public List<ScheduledTransactionResponse> search(@Valid @Body ScheduleSearchRequest request) {
         var filter = filterFactory.schedule()
                 .contract(Collections.List(request.getContracts()).map(c -> new EntityRef(c.getId())))
                 .activeOnly();
 
-        return Flux.create(emitter -> {
-            try {
-                scheduleProvider.lookup(filter)
-                        .map(ScheduledTransactionResponse::new)
-                        .content()
-                        .forEach(emitter::next);
-            } finally {
-                emitter.complete();
-            }
-
-        });
+        return scheduleProvider.lookup(filter)
+                .map(ScheduledTransactionResponse::new)
+                .content()
+                .toJava();
     }
 
     @Get("/{scheduleId}")
@@ -110,18 +97,16 @@ public class ScheduledTransactionResource {
                     schema = @Schema(implementation = Long.class),
                     in = ParameterIn.PATH)
     )
-    public Publisher<ScheduledTransactionResponse> get(@PathVariable long scheduleId) {
-        return Mono.create(emitter -> {
-            var scheduleOption = scheduleProvider.lookup()
-                    .filter(s -> s.getId() == scheduleId)
-                    .map(ScheduledTransactionResponse::new);
+    public ScheduledTransactionResponse get(@PathVariable long scheduleId) {
+        var scheduleOption = scheduleProvider.lookup()
+                .filter(s -> s.getId() == scheduleId)
+                .map(ScheduledTransactionResponse::new);
 
-            if (scheduleOption.isEmpty()) {
-                emitter.error(StatusException.notFound("No scheduled transaction found with id " + scheduleId));
-            } else {
-                emitter.success(scheduleOption.head());
-            }
-        });
+        if (scheduleOption.isEmpty()) {
+            throw StatusException.notFound("No scheduled transaction found with id " + scheduleId);
+        }
+
+        return scheduleOption.head();
     }
 
     @Patch("/{scheduleId}")
@@ -134,31 +119,30 @@ public class ScheduledTransactionResource {
                     schema = @Schema(implementation = Long.class),
                     in = ParameterIn.PATH)
     )
-    public Publisher<HttpResponse<ScheduledTransactionResponse>> patch(
+    public ScheduledTransactionResponse patch(
             @PathVariable long scheduleId,
             @Valid @Body ScheduledTransactionPatchRequest request) {
-        return Mono.create(emitter -> {
-            var scheduleOption = scheduleProvider.lookup()
-                    .filter(s -> s.getId() == scheduleId);
-            if (scheduleOption.isEmpty()) {
-                emitter.success(HttpResponse.notFound());
-            } else {
-                var schedule = scheduleOption.head();
-                if (Objects.nonNull(request.getName())) {
-                    schedule.describe(request.getName(), request.getDescription());
-                }
+        var scheduleOption = scheduleProvider.lookup()
+                .filter(s -> s.getId() == scheduleId);
 
-                if (Objects.nonNull(request.getSchedule())) {
-                    schedule.adjustSchedule(request.getSchedule().periodicity(), request.getSchedule().interval());
-                }
+        if (scheduleOption.isEmpty()) {
+            throw StatusException.notFound("No scheduled transaction found with id " + scheduleId);
+        }
 
-                if (Objects.nonNull(request.getRange())) {
-                    schedule.limit(request.getRange().getStart(), request.getRange().getEnd());
-                }
+        var schedule = scheduleOption.head();
+        if (Objects.nonNull(request.getName())) {
+            schedule.describe(request.getName(), request.getDescription());
+        }
 
-                emitter.success(HttpResponse.ok(new ScheduledTransactionResponse(schedule)));
-            }
-        });
+        if (Objects.nonNull(request.getSchedule())) {
+            schedule.adjustSchedule(request.getSchedule().periodicity(), request.getSchedule().interval());
+        }
+
+        if (Objects.nonNull(request.getRange())) {
+            schedule.limit(request.getRange().getStart(), request.getRange().getEnd());
+        }
+
+        return new ScheduledTransactionResponse(schedule);
     }
 
     @Delete("/{scheduleId}")
@@ -171,17 +155,15 @@ public class ScheduledTransactionResource {
                     schema = @Schema(implementation = Long.class),
                     in = ParameterIn.PATH)
     )
-    public HttpResponse<Void> remove(@PathVariable long scheduleId) {
+    public void remove(@PathVariable long scheduleId) {
         var toRemove = scheduleProvider.lookup()
                 .filter(schedule -> schedule.getId() == scheduleId);
 
         if (toRemove.isEmpty()) {
-            return HttpResponse.notFound();
-        } else {
-            var schedule = toRemove.get();
-            schedule.terminate();
-            return HttpResponse.ok();
+            throw StatusException.notFound("No scheduled transaction found with id " + scheduleId);
         }
+
+        toRemove.get().terminate();
     }
 
 }

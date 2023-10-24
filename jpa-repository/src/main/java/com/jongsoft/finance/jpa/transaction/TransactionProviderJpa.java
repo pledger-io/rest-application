@@ -17,17 +17,18 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
 @Slf4j
+@ReadOnly
 @Singleton
 @Named("transactionProvider")
 public class TransactionProviderJpa implements TransactionProvider {
@@ -42,13 +43,13 @@ public class TransactionProviderJpa implements TransactionProvider {
     }
 
     @Override
-    public Mono<Transaction> first(FilterCommand filter) {
+    public Optional<Transaction> first(FilterCommand filter) {
         log.trace("Transaction locate first with filter: {}", filter);
 
         if (filter instanceof TransactionFilterCommand delegate) {
             delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<TransactionJournal>reactive()
+            return entityManager.<TransactionJournal>blocking()
                     .hql("select distinct a " + delegate.generateHql() + " order by a.date asc")
                     .setAll(delegate.getParameters())
                     .limit(1)

@@ -2,15 +2,15 @@ package com.jongsoft.finance.rest.contract;
 
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.schedule.Periodicity;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import jakarta.validation.constraints.NotNull;
-
-@Introspected
+@Serdeable.Deserializable
 class CreateScheduleRequest {
 
     @Data
+    @Serdeable.Deserializable
     static class ScheduleValueJson {
         private Periodicity periodicity;
         private int interval;
@@ -25,6 +25,7 @@ class CreateScheduleRequest {
     }
 
     @Data
+    @Serdeable.Deserializable
     static class EntityRef {
         @NotNull
         private Long id;

@@ -6,13 +6,15 @@ import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 @Slf4j
+@ReadOnly
 @Singleton
 @Named("tagProvider")
 public class TagProviderJpa implements TagProvider {
@@ -42,7 +44,7 @@ public class TagProviderJpa implements TagProvider {
     }
 
     @Override
-    public Mono<Tag> lookup(String name) {
+    public Optional<Tag> lookup(String name) {
         log.trace("Tag lookup by name: {}", name);
 
         var hql = """
@@ -51,7 +53,7 @@ public class TagProviderJpa implements TagProvider {
                     and t.user.username = :username
                     and t.archived = false""";
 
-        return entityManager.<TagJpa>reactive()
+        return entityManager.<TagJpa>blocking()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
                 .set("name", name)

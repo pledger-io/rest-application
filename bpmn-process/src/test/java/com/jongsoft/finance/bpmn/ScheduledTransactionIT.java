@@ -22,7 +22,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -81,7 +80,7 @@ class ScheduledTransactionIT extends ProcessTestSetup {
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);
             String token = UUID.randomUUID().toString();
-            Mockito.when(storageService.read(token)).thenReturn(Mono.just(original));
+            Mockito.when(storageService.read(token)).thenReturn(Control.Option(original));
             return token;
         });
     }

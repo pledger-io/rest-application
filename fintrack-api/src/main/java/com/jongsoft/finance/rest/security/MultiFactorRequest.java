@@ -1,14 +1,13 @@
 package com.jongsoft.finance.rest.security;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Setter;
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Setter;
 
 @Setter
-@Introspected
+@Serdeable.Deserializable
 class MultiFactorRequest {
 
     @NotNull

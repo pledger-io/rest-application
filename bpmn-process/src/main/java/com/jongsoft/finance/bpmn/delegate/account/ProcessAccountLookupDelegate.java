@@ -9,10 +9,6 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import reactor.core.publisher.Mono;
-
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 /**
  * This delegate allows for locating {@link Account} instances within the system using the following methods:
@@ -66,10 +62,7 @@ public class ProcessAccountLookupDelegate implements JavaDelegate {
 
         if (!matchedAccount.isPresent() && execution.hasVariableLocal("name")) {
             final String accountName = (String) execution.getVariableLocal("name");
-            matchedAccount = accountProvider.lookup(accountName)
-                    .map(Control::Option)
-                    .switchIfEmpty(Mono.just(Control.Option()))
-                    .block(Duration.of(500, ChronoUnit.MILLIS));
+            matchedAccount = accountProvider.lookup(accountName);
         }
 
         log.trace("{}: Processing account located {}", execution.getCurrentActivityName(), matchedAccount);

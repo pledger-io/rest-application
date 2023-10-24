@@ -10,8 +10,6 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 /**
@@ -75,8 +73,7 @@ public class LookupAccountMappingDelegate implements JavaDelegate {
     private Map retrieveMappings(DelegateExecution execution) throws IOException {
         var fileCode = execution.getVariable("accountMapping").toString();
 
-        var rawValue = storageService.read(fileCode)
-                .block(Duration.of(500, ChronoUnit.MILLIS));
+        var rawValue = storageService.read(fileCode).get();
         return ProcessMapper.INSTANCE.readValue(rawValue, Map.class);
     }
 

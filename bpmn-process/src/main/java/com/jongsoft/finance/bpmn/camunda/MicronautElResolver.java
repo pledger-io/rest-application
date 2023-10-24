@@ -1,21 +1,22 @@
 package com.jongsoft.finance.bpmn.camunda;
 
+import io.micronaut.context.ApplicationContext;
+import io.micronaut.inject.qualifiers.Qualifiers;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.impl.juel.jakarta.el.ELContext;
+import org.camunda.bpm.impl.juel.jakarta.el.ELResolver;
+
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+/**
+ * This ELResolver implementation allows to resolve beans from the Micronaut application-context.
+ */
+public class MicronautElResolver extends ELResolver {
 
-import io.micronaut.context.ApplicationContext;
-import io.micronaut.context.Qualifier;
-import io.micronaut.inject.qualifiers.Qualifiers;
+    protected final ApplicationContext applicationContext;
 
-public class ApplicationContextElResolver extends ELResolver {
-
-    private final ApplicationContext applicationContext;
-
-    public ApplicationContextElResolver(final ApplicationContext applicationContext) {
+    public MicronautElResolver(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
@@ -23,9 +24,9 @@ public class ApplicationContextElResolver extends ELResolver {
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
             // according to javadoc, can only be a String
-            String key = (String) property;
+            var key = (String) property;
 
-            Qualifier<Object> qualifier = Qualifiers.byName(key);
+            var qualifier = Qualifiers.byName(key);
             if (applicationContext.containsBean(Object.class, qualifier)) {
                 context.setPropertyResolved(true);
                 return applicationContext.getBean(Object.class, qualifier);
@@ -43,7 +44,7 @@ public class ApplicationContextElResolver extends ELResolver {
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
         if (base == null) {
-            String key = (String) property;
+            var key = (String) property;
             if (applicationContext.containsBean(Object.class, Qualifiers.byName(key))) {
                 throw new ProcessEngineException("Cannot set value of '" + property +
                         "', it resolves to a bean defined in the Micronaut application-context.");

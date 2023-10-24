@@ -6,14 +6,15 @@ import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
 import com.jongsoft.finance.jpa.core.entity.SettingJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
-
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@ReadOnly
 @Singleton
 public class SettingProviderJpa implements SettingProvider {
 
@@ -24,12 +25,12 @@ public class SettingProviderJpa implements SettingProvider {
     }
 
     @Override
-    public Flux<Setting> lookup() {
+    public Sequence<Setting> lookup() {
         log.trace("Setting listing");
 
-        return entityManager.<SettingJpa>reactive()
+        return entityManager.<SettingJpa>blocking()
                 .hql("select s from SettingJpa s")
-                .flow()
+                .sequence()
                 .map(this::convert);
     }
 

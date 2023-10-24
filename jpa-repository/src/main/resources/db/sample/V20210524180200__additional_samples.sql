@@ -12,7 +12,7 @@ VALUES (100, 2, 'Personal checking', 'This is a sample account used for day to d
      , (104, 2, 'House mortgage', 'The mortgage on my home.', null, null, '938222-X102', false, 12, 1, 0.03500, 'YEARS', null)
      , (110, 2, 'Grocery store 1', 'Lorum ipsum dipsum.', 'NL03ING010928374615', null, null, false, 7, 1, 0.00000, null, null)
      , (111, 2, 'Car body shop', 'Lorum ipsum dipsum.', 'NL03ING0109234124615', null, null, false, 7, 1, 0.00000, null, null)
-     , (111, 2, 'Taxation office', 'Lorum ipsum dipsum.', null, null, null, false, 7, 1, 0.00000, null, null)
+     , (112, 2, 'Taxation office', 'Lorum ipsum dipsum.', null, null, null, false, 7, 1, 0.00000, null, null)
      , (106, 2, 'System Reconcile account', null, null, null, null, false, 9, 1, 0.00000, null, null)
      , (107, 2, 'Employer', null, null, null, null, false, 8, 1, 0.00000, null, null);
 

@@ -1,22 +1,17 @@
 package com.jongsoft.finance.bpmn.camunda;
 
-import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
 import org.camunda.bpm.engine.impl.el.ReadOnlyMapELResolver;
 import org.camunda.bpm.engine.impl.el.VariableContextElResolver;
 import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
-import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
-import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
-import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
-import org.camunda.bpm.engine.impl.javax.el.ELResolver;
-import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
-import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.*;
 
-public class MicronautExpressionManager extends ExpressionManager {
+public class MicronautExpressionManager extends JuelExpressionManager {
 
-    private final ApplicationContextElResolver applicationContextElResolver;
+    private final MicronautElResolver micronautElResolver;
 
-    public MicronautExpressionManager(final ApplicationContextElResolver applicationContextElResolver) {
-        this.applicationContextElResolver = applicationContextElResolver;
+    public MicronautExpressionManager(MicronautElResolver micronautElResolver) {
+        this.micronautElResolver = micronautElResolver;
     }
 
     @Override
@@ -30,7 +25,7 @@ public class MicronautExpressionManager extends ExpressionManager {
             compositeElResolver.add(new ReadOnlyMapELResolver(beans));
         } else {
             // Expose full application-context in expressions
-            compositeElResolver.add(applicationContextElResolver);
+            compositeElResolver.add(micronautElResolver);
         }
 
         compositeElResolver.add(new ArrayELResolver());
@@ -40,5 +35,4 @@ public class MicronautExpressionManager extends ExpressionManager {
 
         return compositeElResolver;
     }
-
 }

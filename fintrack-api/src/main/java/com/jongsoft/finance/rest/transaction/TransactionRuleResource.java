@@ -2,7 +2,6 @@ package com.jongsoft.finance.rest.transaction;
 
 import com.jongsoft.finance.core.Removable;
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
@@ -21,12 +20,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
-import java.util.function.Consumer;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Tag(name = "Transaction Rules")
 @Controller("/api/transaction-rules")
@@ -44,9 +41,10 @@ public class TransactionRuleResource {
             description = "List all the transaction rule groups available",
             operationId = "getRuleGroups"
     )
-    Publisher<TransactionRuleGroupResponse> groups() {
+    List<TransactionRuleGroupResponse> groups() {
         return ruleGroupProvider.lookup()
-                .map(TransactionRuleGroupResponse::new);
+                .map(TransactionRuleGroupResponse::new)
+                .toJava();
     }
 
     @Put("/groups")
@@ -70,9 +68,10 @@ public class TransactionRuleResource {
             description = "Lists all transaction rules present in the requested group",
             operationId = "getRules"
     )
-    Publisher<TransactionRuleResponse> rules(@PathVariable String group) {
+    List<TransactionRuleResponse> rules(@PathVariable String group) {
         return ruleProvider.lookup(group)
-                .map(TransactionRuleResponse::new);
+                .map(TransactionRuleResponse::new)
+                .toJava();
     }
 
     @Status(HttpStatus.NO_CONTENT)
@@ -155,13 +154,10 @@ public class TransactionRuleResource {
     )
     @ApiDefaults
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = TransactionRuleResponse.class)))
-    Publisher<TransactionRuleResponse> getRule(@PathVariable String group, @PathVariable long id) {
-        return Mono.create(emitter -> {
-            ruleProvider.lookup(id)
-                    .map(TransactionRuleResponse::new)
-                    .ifPresent((Consumer<TransactionRuleResponse>) emitter::success)
-                    .elseRun(() -> emitter.error(StatusException.notFound("Rule not found with id " + id)));
-        });
+    TransactionRuleResponse getRule(@PathVariable String group, @PathVariable long id) {
+        return ruleProvider.lookup(id)
+                .map(TransactionRuleResponse::new)
+                .getOrThrow(() -> StatusException.notFound("Rule not found with id " + id));
     }
 
     @Status(HttpStatus.NO_CONTENT)
@@ -198,39 +194,38 @@ public class TransactionRuleResource {
     )
     @ApiDefaults
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = TransactionRuleResponse.class)))
-    Publisher<TransactionRuleResponse> updateRule(
+    TransactionRuleResponse updateRule(
             @PathVariable String group,
             @PathVariable long id,
             @Valid @Body CreateRuleRequest request) {
-        return Mono.<TransactionRule>create(emitter -> {
-            ruleProvider.lookup(id)
-                    .ifPresent(rule -> {
-                        rule.change(
-                                request.getName(),
-                                request.getDescription(),
-                                request.isRestrictive(),
-                                request.isActive());
+        return ruleProvider.lookup(id)
+                .map(rule -> {
+                    rule.change(
+                            request.getName(),
+                            request.getDescription(),
+                            request.isRestrictive(),
+                            request.isActive());
 
-                        rule.getChanges()
-                                .forEach(Removable::delete);
+                    rule.getChanges()
+                            .forEach(Removable::delete);
 
-                        request.getChanges()
-                                .forEach(change -> rule.registerChange(change.getColumn(), change.getValue()));
+                    request.getChanges()
+                            .forEach(change -> rule.registerChange(change.getColumn(), change.getValue()));
 
-                        rule.getConditions()
-                                .forEach(Removable::delete);
+                    rule.getConditions()
+                            .forEach(Removable::delete);
 
-                        request.getConditions()
-                                .forEach(condition -> rule.registerCondition(
-                                        condition.getColumn(),
-                                        condition.getOperation(),
-                                        condition.getValue()));
+                    request.getConditions()
+                            .forEach(condition -> rule.registerCondition(
+                                    condition.getColumn(),
+                                    condition.getOperation(),
+                                    condition.getValue()));
 
-                        ruleProvider.save(rule);
-                        emitter.success(ruleProvider.lookup(id).get());
-                    })
-                    .elseRun(() -> emitter.error(StatusException.notFound("Rule not found with id " + id)));
-        }).map(TransactionRuleResponse::new);
+                    ruleProvider.save(rule);
+                    return ruleProvider.lookup(id).get();
+                })
+                .map(TransactionRuleResponse::new)
+                .getOrThrow(() -> StatusException.notFound("Rule not found with id " + id));
     }
 
     @Status(HttpStatus.NO_CONTENT)

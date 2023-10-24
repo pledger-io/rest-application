@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.user.SessionToken;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
-@Introspected
+@Serdeable.Serializable
 public class SessionResponse {
 
     private final SessionToken wrapped;

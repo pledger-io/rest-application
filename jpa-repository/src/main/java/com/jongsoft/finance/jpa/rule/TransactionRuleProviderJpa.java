@@ -10,17 +10,16 @@ import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
+@ReadOnly
 @Singleton
-@Transactional
 @Named("transactionRuleProvider")
 public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 
@@ -58,7 +57,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
     }
 
     @Override
-    public Flux<TransactionRule> lookup(String group) {
+    public Sequence<TransactionRule> lookup(String group) {
         var hql = """
                 select r from RuleJpa r
                 where r.user.username = :username
@@ -66,11 +65,11 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
                  and r.archived = false
                 order by r.sort asc""";
 
-        return entityManager.<RuleJpa>reactive()
+        return entityManager.<RuleJpa>blocking()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
                 .set("name", group)
-                .flow()
+                .sequence()
                 .map(this::convert);
     }
 
@@ -163,15 +162,14 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
     }
 
     private RuleGroupJpa group(String group) {
-        return entityManager.<RuleGroupJpa>reactive()
+        return entityManager.<RuleGroupJpa>blocking()
                 .hql("from RuleGroupJpa where user.username = :username and name = :group")
                 .set("username", authenticationFacade.authenticated())
                 .set("group", group)
                 .maybe()
-                .switchIfEmpty(Mono.create(emitter -> {
+                .getOrSupply(() -> {
                     EventBus.getBus().send(new CreateRuleGroupCommand(group));
-                    emitter.success(group(group));
-                }))
-                .block();
+                    return group(group);
+                });
     }
 }

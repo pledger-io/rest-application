@@ -1,14 +1,13 @@
 package com.jongsoft.finance.rest.budget;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-
-@Introspected
 @NoArgsConstructor
+@Serdeable.Deserializable
 class BudgetCreateRequest {
 
     @Min(1900)

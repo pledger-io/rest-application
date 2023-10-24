@@ -14,11 +14,8 @@ import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "Process Engine")
@@ -38,25 +35,24 @@ public class RuntimeResource {
             description = "Creates and executes a new process for the selected definition, with the provided map as parameters",
             operationId = "startProcess"
     )
-    public Publisher<ProcessResponse> startProcess(
+    public ProcessResponse startProcess(
             @PathVariable String processDefinitionKey,
             @Body Map<String, Object> parameters) {
 
-        var response = Mono.<ProcessInstance>create(emitter -> {
-            var instanceBuilder = runtimeService.createProcessInstanceByKey(processDefinitionKey);
-            parameters.forEach(instanceBuilder::setVariable);
+        var instanceBuilder = runtimeService.createProcessInstanceByKey(processDefinitionKey);
+        parameters.forEach(instanceBuilder::setVariable);
 
-            if (parameters.containsKey("businessKey")) {
-                instanceBuilder.businessKey(parameters.get("businessKey").toString());
-            }
+        if (parameters.containsKey("businessKey")) {
+            instanceBuilder.businessKey(parameters.get("businessKey").toString());
+        }
 
-            instanceBuilder.setVariable(KEY_USERNAME, authenticationFacade.authenticated());
+        instanceBuilder.setVariable(KEY_USERNAME, authenticationFacade.authenticated());
 
-            emitter.success(instanceBuilder.execute());
-        });
-
-        return response.map(process -> historyService.createHistoricProcessInstanceQuery().processInstanceId(process.getProcessInstanceId()).singleResult())
-                .map(ProcessResponse::new);
+        var process = instanceBuilder.execute();
+        return new ProcessResponse(
+                historyService.createHistoricProcessInstanceQuery()
+                        .processInstanceId(process.getProcessInstanceId())
+                        .singleResult());
     }
 
     @Get("/{processDefinitionKey}")
@@ -65,14 +61,14 @@ public class RuntimeResource {
             description = "Lists the historic executions for the provided process definition key",
             operationId = "getProcessHistory"
     )
-    public Publisher<ProcessResponse> history(@PathVariable String processDefinitionKey) {
-        var result = Collections.List(historyService.createHistoricProcessInstanceQuery()
+    public List<ProcessResponse> history(@PathVariable String processDefinitionKey) {
+        return Collections.List(historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
                 .orderByProcessInstanceStartTime().desc()
-                .list());
-
-        return Flux.fromIterable(result.map(ProcessResponse::new));
+                .list())
+                .map(ProcessResponse::new)
+                .toJava();
     }
 
     @Get("/{processDefinitionKey}/{businessKey}")
@@ -81,17 +77,17 @@ public class RuntimeResource {
             description = "List the history executions for the provided definition key, but only once with matching business key",
             operationId = "getProcessHistoryByBusinessKey"
     )
-    public Publisher<ProcessResponse> history(
+    public List<ProcessResponse> history(
             @PathVariable String processDefinitionKey,
             @PathVariable String businessKey) {
-        var result = Collections.List(historyService.createHistoricProcessInstanceQuery()
+        return Collections.List(historyService.createHistoricProcessInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .processInstanceBusinessKey(businessKey)
                 .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
                 .orderByProcessInstanceStartTime().desc()
-                .list());
-
-        return Flux.fromIterable(result.map(ProcessResponse::new));
+                .list())
+                .map(ProcessResponse::new)
+                .toJava();
     }
 
     @Status(HttpStatus.NO_CONTENT)

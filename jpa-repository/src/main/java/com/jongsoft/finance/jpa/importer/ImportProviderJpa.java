@@ -7,13 +7,15 @@ import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import com.jongsoft.lang.control.Optional;
 import io.micronaut.data.model.Sort;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 @Slf4j
+@ReadOnly
 @Singleton
 public class ImportProviderJpa implements ImportProvider {
 
@@ -27,7 +29,7 @@ public class ImportProviderJpa implements ImportProvider {
     }
 
     @Override
-    public Mono<BatchImport> lookup(String slug) {
+    public Optional<BatchImport> lookup(String slug) {
         log.trace("Importer lookup by slug: {}", slug);
 
         var hql = """
@@ -36,7 +38,7 @@ public class ImportProviderJpa implements ImportProvider {
                     and b.archived = false
                     and b.user.username = :username""";
 
-        return entityManager.<ImportJpa>reactive()
+        return entityManager.<ImportJpa>blocking()
                 .hql(hql)
                 .set("slug", slug)
                 .set("username", authenticationFacade.authenticated())

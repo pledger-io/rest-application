@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.model;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 
 import java.time.Duration;
 import java.util.Date;
 
-@Introspected
+@Serdeable.Serializable
 public class ProcessResponse {
 
     private final HistoricProcessInstance wrapped;

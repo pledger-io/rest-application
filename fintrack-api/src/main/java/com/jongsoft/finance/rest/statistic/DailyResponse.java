@@ -1,11 +1,11 @@
 package com.jongsoft.finance.rest.statistic;
 
 import com.jongsoft.finance.providers.TransactionProvider;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
 import java.time.LocalDate;
 
-@Introspected
+@Serdeable.Serializable
 class DailyResponse {
 
     private final TransactionProvider.DailySummary wrapped;

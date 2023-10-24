@@ -11,12 +11,12 @@ import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -67,7 +67,7 @@ class AccountResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))
                 .thenReturn(resultPage);
 
-        var response = subject.ownAccounts().block();
+        var response = subject.ownAccounts();
 
         Assertions.assertThat(response).hasSize(1);
         var firstHit = response.get(0);
@@ -97,7 +97,7 @@ class AccountResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup())
                 .thenReturn(resultPage);
 
-        subject.allAccounts().block();
+        subject.allAccounts();
 
         Mockito.verify(accountProvider).lookup();
     }
@@ -121,7 +121,7 @@ class AccountResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(Mockito.any(AccountProvider.FilterCommand.class)))
                 .thenReturn(resultPage);
 
-        var response = subject.autocomplete("sampl", "creditor").block();
+        var response = subject.autocomplete("sampl", "creditor");
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).lookup(Mockito.any(AccountProvider.FilterCommand.class));
@@ -149,7 +149,7 @@ class AccountResourceTest extends TestSetup {
         subject.accounts(AccountSearchRequest.builder()
                 .accountTypes(List.of("creditor"))
                 .page(0)
-                .build()).block();
+                .build());
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).lookup(Mockito.any(AccountProvider.FilterCommand.class));
@@ -167,8 +167,8 @@ class AccountResourceTest extends TestSetup {
                 .build());
 
         Mockito.when(accountProvider.lookup("Sample account"))
-                .thenReturn(Mono.empty())
-                .thenReturn(Mono.just(account));
+                .thenReturn(Control.Option())
+                .thenReturn(Control.Option(account));
 
         var request = AccountEditRequest.builder()
                 .name("Sample account")
@@ -178,7 +178,7 @@ class AccountResourceTest extends TestSetup {
                 .interestPeriodicity(Periodicity.MONTHS)
                 .build();
 
-        subject.create(request).block();
+        subject.create(request);
 
         Mockito.verify(accountProvider, Mockito.times(2)).lookup("Sample account");
         Mockito.verify(account).interest(0.22, Periodicity.MONTHS);

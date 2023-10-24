@@ -4,14 +4,16 @@ import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
 
 @Slf4j
+@ReadOnly
 @Singleton
 @Named("transactionRuleGroupProvider")
 public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProvider {
@@ -26,7 +28,7 @@ public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProv
     }
 
     @Override
-    public Flux<TransactionRuleGroup> lookup() {
+    public Sequence<TransactionRuleGroup> lookup() {
         log.trace("TransactionRuleGroup listing");
 
         var hql = """
@@ -35,10 +37,10 @@ public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProv
                     and g.archived = false
                 order by g.sort asc""";
 
-        return entityManager.<RuleGroupJpa>reactive()
+        return entityManager.<RuleGroupJpa>blocking()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
-                .flow()
+                .sequence()
                 .map(this::convert);
     }
 

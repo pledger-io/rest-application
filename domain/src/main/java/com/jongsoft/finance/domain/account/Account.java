@@ -20,7 +20,6 @@ import lombok.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Locale;
 import java.util.function.Consumer;
 
 @Getter
@@ -103,6 +102,12 @@ public class Account implements AggregateBase, Serializable {
         this.imageFileToken = fileCode;
     }
 
+    /**
+     * Change the interest rate for this account.
+     *
+     * @param interest      the new interest rate
+     * @param periodicity   the periodicity of the interest rate
+     */
     @BusinessMethod
     public void interest(double interest, Periodicity periodicity) {
         if (interest < -2 || interest > 2) {

@@ -2,14 +2,14 @@ package com.jongsoft.finance.providers;
 
 import com.jongsoft.finance.core.SettingType;
 import com.jongsoft.finance.domain.core.Setting;
+import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-import reactor.core.publisher.Flux;
 
 import java.util.function.Function;
 
 public interface SettingProvider {
 
-    Flux<Setting> lookup();
+    Sequence<Setting> lookup();
 
     Optional<Setting> lookup(String name);
 

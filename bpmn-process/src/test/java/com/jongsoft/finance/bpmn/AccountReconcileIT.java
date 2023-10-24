@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -54,7 +53,7 @@ class AccountReconcileIT extends ProcessTestSetup {
         Mockito.when(accountProvider.lookup(1L))
                 .thenReturn(Control.Option(reconcileAccount));
         Mockito.when(accountProvider.lookup(SystemAccountTypes.RECONCILE))
-                .thenReturn(Mono.just(reconcile));
+                .thenReturn(Control.Option(reconcile));
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(Control.Option())
                 // for phase 2
@@ -128,7 +127,7 @@ class AccountReconcileIT extends ProcessTestSetup {
         Mockito.when(accountProvider.lookup(1L))
                 .thenReturn(Control.Option(reconcileAccount));
         Mockito.when(accountProvider.lookup(SystemAccountTypes.RECONCILE))
-                .thenReturn(Mono.just(reconcile));
+                .thenReturn(Control.Option(reconcile));
         Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(Control.Option())
                 .thenReturn(Control.Option(BigDecimal.valueOf(-20.0)));

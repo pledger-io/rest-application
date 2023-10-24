@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.budget;
 
 import com.jongsoft.lang.time.Range;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 
@@ -11,8 +11,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-@Introspected
 @EqualsAndHashCode
+@Serdeable.Serializable
 class ComputedExpenseResponse {
 
     @EqualsAndHashCode

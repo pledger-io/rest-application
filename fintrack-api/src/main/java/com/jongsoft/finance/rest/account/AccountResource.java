@@ -15,13 +15,11 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 @Controller("/api/accounts")
@@ -54,17 +52,13 @@ public class AccountResource {
             description = "List all accounts that are creatable in the front-end using one of the selectable account types",
             operationId = "ownAccounts"
     )
-    Mono<List<AccountResponse>> ownAccounts() {
-        return Mono.create(emitter -> {
-            var accounts = accountProvider.lookup(
-                    accountFilterFactory.account()
-                            .types(accountTypeProvider.lookup(false)));
+    List<AccountResponse> ownAccounts() {
+        var accounts = accountProvider.lookup(
+                accountFilterFactory.account().types(accountTypeProvider.lookup(false)));
 
-            var response = accounts.content()
-                    .map(AccountResponse::new);
-
-            emitter.success(response.toJava());
-        });
+        return accounts.content()
+                .map(AccountResponse::new)
+                .toJava();
     }
 
     @Get("/all")
@@ -73,14 +67,10 @@ public class AccountResource {
             description = "Fetch all accounts registered to the authenticated user",
             operationId = "listAllAccounts"
     )
-    Mono<List<AccountResponse>> allAccounts() {
-        return Mono.create(emitter -> {
-            var accounts = accountProvider.lookup()
-                    .map(AccountResponse::new)
-                    .toJava();
-
-            emitter.success(accounts);
-        });
+    List<AccountResponse> allAccounts() {
+        return accountProvider.lookup()
+                .map(AccountResponse::new)
+                .toJava();
     }
 
     @Get("/auto-complete{?token,type}")
@@ -104,19 +94,16 @@ public class AccountResource {
                             schema = @Schema(implementation = String.class)),
             }
     )
-    Mono<List<AccountResponse>> autocomplete(@Nullable String token, @Nullable String type) {
-        return Mono.create(emitter -> {
-            var accounts = accountProvider.lookup(
-                    accountFilterFactory.account()
-                            .name(token, false)
-                            .pageSize(settingProvider.getAutocompleteLimit())
-                            .types(Collections.List(type)));
+    List<AccountResponse> autocomplete(@Nullable String token, @Nullable String type) {
+        var accounts = accountProvider.lookup(
+                accountFilterFactory.account()
+                        .name(token, false)
+                        .pageSize(settingProvider.getAutocompleteLimit())
+                        .types(Collections.List(type)));
 
-            var response = accounts.content()
-                    .map(AccountResponse::new);
-
-            emitter.success(response.toJava());
-        });
+        return accounts.content()
+                .map(AccountResponse::new)
+                .toJava();
     }
 
     @Post
@@ -125,21 +112,19 @@ public class AccountResource {
             description = "Search through all accounts using the provided filter set",
             operationId = "listAccounts"
     )
-    Mono<ResultPageResponse<AccountResponse>> accounts(@Valid @Body AccountSearchRequest searchRequest) {
-        return Mono.create(emitter -> {
-            var filter = accountFilterFactory.account()
-                    .page(Math.max(0, searchRequest.page() - 1))
-                    .pageSize(settingProvider.getPageSize())
-                    .types(searchRequest.accountTypes());
-            if (searchRequest.name() != null) {
-                filter.name(searchRequest.name(), false);
-            }
+    ResultPageResponse<AccountResponse> accounts(@Valid @Body AccountSearchRequest searchRequest) {
+        var filter = accountFilterFactory.account()
+                .page(Math.max(0, searchRequest.page() - 1))
+                .pageSize(settingProvider.getPageSize())
+                .types(searchRequest.accountTypes());
+        if (searchRequest.name() != null) {
+            filter.name(searchRequest.name(), false);
+        }
 
-            var response = accountProvider.lookup(filter)
-                    .map(AccountResponse::new);
+        var response = accountProvider.lookup(filter)
+                .map(AccountResponse::new);
 
-            emitter.success(new ResultPageResponse<>(response));
-        });
+        return new ResultPageResponse<>(response);
     }
 
     @Put
@@ -148,33 +133,22 @@ public class AccountResource {
             description = "This operation will allow for adding new accounts to the system",
             operationId = "createAccount"
     )
-    public Mono<AccountResponse> create(@Valid @Body AccountEditRequest accountEditRequest) {
-        return accountProvider.lookup(accountEditRequest.getName())
-                .switchIfEmpty(Mono.create(emitter -> {
-                    currentUserProvider.currentUser()
-                            .createAccount(
-                                    accountEditRequest.getName(),
-                                    accountEditRequest.getCurrency(),
-                                    accountEditRequest.getType());
+    public AccountResponse create(@Valid @Body AccountEditRequest accountEditRequest) {
+        var existing = accountProvider.lookup(accountEditRequest.getName());
 
-                    accountProvider.lookup(accountEditRequest.getName())
-                            .map(account -> {
-                                if (accountEditRequest.getInterestPeriodicity() != null) {
-                                    account.interest(accountEditRequest.getInterest(), accountEditRequest.getInterestPeriodicity());
-                                }
+        if (!existing.isPresent()) {
+            currentUserProvider.currentUser()
+                    .createAccount(
+                            accountEditRequest.getName(),
+                            accountEditRequest.getCurrency(),
+                            accountEditRequest.getType());
 
-                                account.changeAccount(
-                                        accountEditRequest.getIban(),
-                                        accountEditRequest.getBic(),
-                                        accountEditRequest.getNumber());
+            return accountProvider.lookup(accountEditRequest.getName())
+                    .map(AccountResponse::new)
+                    .getOrThrow(() -> StatusException.internalError("Failed to create account"));
+        }
 
-                                return account;
-                            })
-                            .switchIfEmpty(Mono.error(StatusException.internalError("Failed to create account")))
-                            .doOnError(emitter::error)
-                            .subscribe(emitter::success);
-                }))
-                .map(AccountResponse::new);
+        throw StatusException.badRequest("Account already exists");
     }
 
 }

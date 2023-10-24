@@ -7,9 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
 @Slf4j
 @Singleton
 public class ProcessContractLookupDelegate implements JavaDelegate {
@@ -30,8 +27,7 @@ public class ProcessContractLookupDelegate implements JavaDelegate {
         if (execution.hasVariableLocal("name")) {
             var name = (String) execution.getVariableLocal("name");
             contract = contractProvider.lookup(name)
-                    .defaultIfEmpty(Contract.builder().name(name).build())
-                    .block(Duration.of(500, ChronoUnit.MILLIS));
+                    .getOrSupply(() -> Contract.builder().name(name).build());
         } else {
             contract = contractProvider.lookup((Long) execution.getVariableLocal("id"))
                     .getOrSupply(() -> null);

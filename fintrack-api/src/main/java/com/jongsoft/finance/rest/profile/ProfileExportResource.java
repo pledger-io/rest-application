@@ -24,8 +24,6 @@ import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -46,36 +44,32 @@ public class ProfileExportResource {
             description = "Exports the profile of the authenticated user to JSON",
             operationId = "exportProfile"
     )
-    public Publisher<HttpResponse<ExportJson>> export() {
-        return Mono.create(emitter -> {
-            var exportFileName = authenticationFacade.authenticated() + "-profile.json";
-            var exportJson = ExportJson.builder()
-                    .accounts(lookupAllOf(Account.class)
-                            .map(account -> AccountJson.fromDomain(
-                                    account,
-                                    () -> storageService.read(account.getImageFileToken()).block()))
-                            .toJava())
-                    .budgetPeriods(lookupAllOf(Budget.class).map(BudgetJson::fromDomain).toJava())
-                    .categories(lookupAllOf(Category.class).map(CategoryJson::fromDomain).toJava())
-                    .tags(lookupAllOf(Tag.class).map(Tag::name).toJava())
-                    .contracts(lookupAllOf(Contract.class)
-                            .map(c -> ContractJson.fromDomain(
-                                    c,
-                                    () -> storageService.read(c.getFileToken()).block()))
-                            .toJava())
-                    .rules(lookupAllOf(TransactionRule.class)
-                            .map(rule -> RuleConfigJson.RuleJson.fromDomain(
-                                    rule,
-                                    this::loadRelation))
-                            .toJava())
-                    .build();
+    public HttpResponse<ExportJson> export() {
+        var exportFileName = authenticationFacade.authenticated() + "-profile.json";
+        var exportJson = ExportJson.builder()
+                .accounts(lookupAllOf(Account.class)
+                        .map(account -> AccountJson.fromDomain(
+                                account,
+                                () -> storageService.read(account.getImageFileToken()).get()))
+                        .toJava())
+                .budgetPeriods(lookupAllOf(Budget.class).map(BudgetJson::fromDomain).toJava())
+                .categories(lookupAllOf(Category.class).map(CategoryJson::fromDomain).toJava())
+                .tags(lookupAllOf(Tag.class).map(Tag::name).toJava())
+                .contracts(lookupAllOf(Contract.class)
+                        .map(c -> ContractJson.fromDomain(
+                                c,
+                                () -> storageService.read(c.getFileToken()).get()))
+                        .toJava())
+                .rules(lookupAllOf(TransactionRule.class)
+                        .map(rule -> RuleConfigJson.RuleJson.fromDomain(
+                                rule,
+                                this::loadRelation))
+                        .toJava())
+                .build();
 
-            var response = HttpResponse.ok(exportJson)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + exportFileName + "\"")
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-
-            emitter.success(response);
-        });
+        return HttpResponse.ok(exportJson)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + exportFileName + "\"")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
     }
 
     @SuppressWarnings("unchecked")

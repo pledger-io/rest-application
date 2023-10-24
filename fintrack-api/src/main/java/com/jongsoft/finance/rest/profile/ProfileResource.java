@@ -2,7 +2,6 @@ package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FinTrack;
-import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.rest.model.SessionResponse;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
@@ -15,11 +14,9 @@ import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -27,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Currency;
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "User profile")
@@ -43,8 +41,8 @@ public class ProfileResource {
     @Operation(
             operationId = "getProfile",
             summary = "Get profile of authenticated user")
-    public Publisher<UserProfileResponse> get() {
-        return Mono.just(new UserProfileResponse(currentUserProvider.currentUser()));
+    public UserProfileResponse get() {
+        return new UserProfileResponse(currentUserProvider.currentUser());
     }
 
     @Patch
@@ -52,24 +50,22 @@ public class ProfileResource {
             operationId = "patchProfile",
             summary = "Update part of the user profile",
             description = "This change will be applied to the authenticated user")
-    public Publisher<UserProfileResponse> patch(@Body PatchProfileRequest request) {
-        return Mono.create(emitter -> {
-            var userAccount = currentUserProvider.currentUser();
+    public UserProfileResponse patch(@Body PatchProfileRequest request) {
+        var userAccount = currentUserProvider.currentUser();
 
-            if (request.currency() != null) {
-                userAccount.changeCurrency(Currency.getInstance(request.currency()));
-            }
+        if (request.currency() != null) {
+            userAccount.changeCurrency(Currency.getInstance(request.currency()));
+        }
 
-            if (request.theme() != null) {
-                userAccount.changeTheme(request.theme());
-            }
+        if (request.theme() != null) {
+            userAccount.changeTheme(request.theme());
+        }
 
-            if (request.password() != null) {
-                userAccount.changePassword(application.getHashingAlgorithm().encrypt(request.password()));
-            }
+        if (request.password() != null) {
+            userAccount.changePassword(application.getHashingAlgorithm().encrypt(request.password()));
+        }
 
-            emitter.success(new UserProfileResponse(userAccount));
-        });
+        return new UserProfileResponse(userAccount);
     }
 
     @Get(value = "/sessions")
@@ -78,9 +74,10 @@ public class ProfileResource {
             summary = "Active Sessions",
             description = "Get a list of active session for the current user."
     )
-    Publisher<SessionResponse> sessions() {
+    List<SessionResponse> sessions() {
         return userProvider.tokens(currentUserProvider.currentUser().getUsername())
-                .map(SessionResponse::new);
+                .map(SessionResponse::new)
+                .toJava();
     }
 
     @Put(value = "/sessions")
@@ -89,7 +86,7 @@ public class ProfileResource {
             summary = "Create session token",
             description = "Create a new session token that has a longer validity then default authentication tokens."
     )
-    Publisher<SessionResponse> createSession(@Body @Valid TokenCreateRequest request) {
+    List<SessionResponse> createSession(@Body @Valid TokenCreateRequest request) {
         application.registerToken(
                 currentUserProvider.currentUser().getUsername(),
                 UUID.randomUUID().toString(),
@@ -104,7 +101,8 @@ public class ProfileResource {
     void deleteSession(@PathVariable long id) {
         userProvider.tokens(currentUserProvider.currentUser().getUsername())
                 .filter(token -> token.getId() == id)
-                .subscribe(SessionToken::revoke);
+                .head()
+                .revoke();
     }
 
     @Get(value = "/multi-factor/qr-code", produces = MediaType.IMAGE_PNG)
@@ -112,24 +110,22 @@ public class ProfileResource {
             operationId = "getQrCode",
             summary = "QR Code",
             description = "Use this API to obtain a QR code that can be used to scan in a 2-factor application")
-    Publisher<byte[]> qrCode() {
-        return Mono.create(emitter -> {
-            var graphUri = TwoFactorHelper.build2FactorQr(currentUserProvider.currentUser());
+    byte[] qrCode() {
+        var graphUri = TwoFactorHelper.build2FactorQr(currentUserProvider.currentUser());
 
-            try (var inputStream = new URL(graphUri).openStream()) {
-                var reader = new ByteArrayOutputStream();
+        try (var inputStream = new URL(graphUri).openStream()) {
+            var reader = new ByteArrayOutputStream();
 
-                int read;
-                var byteChunk = new byte[4096];
-                while ((read = inputStream.read(byteChunk)) > 0) {
-                    reader.write(byteChunk, 0, read);
-                }
-
-                emitter.success(reader.toByteArray());
-            } catch (IOException e) {
-                emitter.error(StatusException.internalError("Could not successfully generate QR code"));
+            int read;
+            var byteChunk = new byte[4096];
+            while ((read = inputStream.read(byteChunk)) > 0) {
+                reader.write(byteChunk, 0, read);
             }
-        });
+
+            return reader.toByteArray();
+        } catch (IOException e) {
+            throw StatusException.internalError("Could not successfully generate QR code");
+        }
     }
 
     @Post("/multi-factor/enable")

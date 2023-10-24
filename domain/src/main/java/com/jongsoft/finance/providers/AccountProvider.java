@@ -1,12 +1,12 @@
 package com.jongsoft.finance.providers;
 
-import com.jongsoft.finance.core.SystemAccountTypes;
-import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.Exportable;
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.core.SystemAccountTypes;
+import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.lang.control.Optional;
 import com.jongsoft.lang.time.Range;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 
@@ -28,11 +28,11 @@ public interface AccountProvider extends DataProvider<Account>, Exportable<Accou
         double average();
     }
 
-    Mono<Account> synonymOf(String synonym);
+    Optional<Account> synonymOf(String synonym);
 
-    Mono<Account> lookup(String name);
+    Optional<Account> lookup(String name);
 
-    Mono<Account> lookup(SystemAccountTypes accountType);
+    Optional<Account> lookup(SystemAccountTypes accountType);
 
     ResultPage<Account> lookup(FilterCommand filter);
 

@@ -2,55 +2,38 @@ package com.jongsoft.finance.jpa.reactive;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.lang.collection.Map;
-import io.micronaut.transaction.SynchronousTransactionManager;
 import jakarta.inject.Singleton;
-
 import jakarta.persistence.EntityManager;
-import java.sql.Connection;
 
 @Singleton
 public class ReactiveEntityManager {
-
-    private final SynchronousTransactionManager<Connection> transactionManager;
     private final EntityManager entityManager;
 
-    ReactiveEntityManager(
-            SynchronousTransactionManager<Connection> transactionManager,
-            EntityManager entityManager) {
-        this.transactionManager = transactionManager;
+    ReactiveEntityManager(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
     public <T extends EntityJpa> void persist(T entity) {
-        transactionManager.executeWrite(status -> {
-            if (entity.getId() == null) {
-                entityManager.persist(entity);
-            } else{
-                entityManager.merge(entity);
-            }
-            entityManager.flush();
-            return entity;
-        });
-    }
-
-    public <T> ReactivePipe<T> reactive() {
-        return new ReactivePipe<>(entityManager, transactionManager);
+        if (entity.getId() == null) {
+            entityManager.persist(entity);
+        } else{
+            entityManager.merge(entity);
+        }
+        entityManager.flush();
     }
 
     public <T> NonReactivePipe<T> blocking() {
-        return new NonReactivePipe<T>(entityManager, transactionManager);
+        return new NonReactivePipe<T>(entityManager);
     }
 
     public <T> T getDetached(Class<T> type, Map<String, Object> filter) {
-        return transactionManager.executeRead(status -> {
-            var entity = getShared(type, filter);
-            entityManager.detach(entity);
-            return entity;
-        });
+        var entity = getShared(type, filter);
+        entityManager.detach(entity);
+        return entity;
     }
 
     public <T> T get(Class<T> type, Map<String, Object> filter) {
-        return transactionManager.executeRead(status -> getShared(type, filter));
+        return getShared(type, filter);
     }
 
     private <T> T getShared(Class<T> type, Map<String, Object> filter) {
@@ -64,7 +47,7 @@ public class ReactiveEntityManager {
     }
 
     public UpdatingPipe update() {
-        return new UpdatingPipe(transactionManager, entityManager);
+        return new UpdatingPipe(entityManager);
     }
 
 }

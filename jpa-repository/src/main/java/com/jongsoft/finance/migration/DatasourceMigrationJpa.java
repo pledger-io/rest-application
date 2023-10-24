@@ -7,6 +7,7 @@ import db.migration.V20200503171321__MigrateToDecryptDatabase;
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.flywaydb.core.api.exception.FlywayValidateException;
 import org.flywaydb.core.internal.command.DbMigrate;
 
 @Slf4j
@@ -25,6 +26,7 @@ class DatasourceMigrationJpa implements DataSourceMigration {
         var config = new FluentConfiguration();
         config.baselineOnMigrate(true)
                 .locations(datasourceConfiguration.getMigrationLocations())
+                .failOnMissingLocations(true)
                 .javaMigrations(
                         new V20200429151821__MigrateEncryptedStorage(),
                         new V20200430171321__MigrateToEncryptedDatabase(),
@@ -36,8 +38,12 @@ class DatasourceMigrationJpa implements DataSourceMigration {
                         datasourceConfiguration.getPassword()
                 );
 
+        var flyway = new Flyway(config);
         try {
-            new Flyway(config).migrate();
+            flyway.migrate();
+        } catch (FlywayValidateException e) {
+            log.error("Failed migrate schema, attempting repair: {}", e.getMessage());
+            flyway.repair();
         } catch (DbMigrate.FlywayMigrateException e) {
             log.error("Failed to migrate database from {} to {}: {}",
                     e.getErrorResult().initialSchemaVersion,

@@ -12,6 +12,7 @@ import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.AccountJson;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Mono;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,7 +61,7 @@ class ProcessAccountCreationDelegateTest {
 
     @Test
     void execute_alreadyExists() {
-        Mockito.when(accountProvider.lookup("Test account")).thenReturn(Mono.just(Account.builder().build()));
+        Mockito.when(accountProvider.lookup("Test account")).thenReturn(Control.Option(Account.builder().build()));
 
         subject.execute(execution);
 
@@ -72,8 +72,8 @@ class ProcessAccountCreationDelegateTest {
     void execute() {
         Account account = Account.builder().id(1L).build();
         Mockito.when(accountProvider.lookup("Test account"))
-                .thenReturn(Mono.empty())
-                .thenReturn(Mono.just(account));
+                .thenReturn(Control.Option())
+                .thenReturn(Control.Option(account));
 
         subject.execute(execution);
 

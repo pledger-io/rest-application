@@ -14,7 +14,6 @@ import io.micronaut.core.async.publisher.Publishers;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.AuthenticationProvider;
@@ -36,7 +35,6 @@ import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.reactivestreams.Publisher;
-import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.UUID;
@@ -67,10 +65,10 @@ public class AuthenticationResource {
             responseCode = "200",
             description = "Successfully authenticated",
             content = @Content(schema = @Schema(implementation = AccessRefreshToken.class)))
-    public Mono<AccessRefreshToken> authenticate(
+    public Publisher<AccessRefreshToken> authenticate(
             HttpRequest<?> request,
             @Valid @Body AuthenticationRequest authenticationRequest) {
-        return Mono.fromDirect(Publishers.map(
+        return Publishers.map(
                 authenticationProvider.authenticate(request, authenticationRequest),
                 (AuthenticationResponse authenticated) -> {
                     if (authenticated.isAuthenticated() && authenticated.getAuthentication().isPresent()) {
@@ -91,7 +89,7 @@ public class AuthenticationResource {
                     }
 
                     throw StatusException.notAuthorized("User cannot be found.");
-                }));
+                });
     }
 
     @ApiDefaults
@@ -119,11 +117,11 @@ public class AuthenticationResource {
             summary = "Verify MFA token",
             description = "Used to verify the user token against that what is expected. If valid the user will get a new JWT with updated authorizations."
     )
-    public Publisher<MutableHttpResponse<AccessRefreshToken>> mfaValidate(@Valid @Body MultiFactorRequest request) {
-        return Mono.just(userProvider.lookup(authenticationFacade.authenticated())
+    public AccessRefreshToken mfaValidate(@Valid @Body MultiFactorRequest request) {
+        return userProvider.lookup(authenticationFacade.authenticated())
                 .filter(user -> TwoFactorHelper.verifySecurityCode(user.getSecret(), request.getVerificationCode()))
                 .map(this::createAccessToken)
-                .getOrSupply(HttpResponse::unauthorized));
+                .getOrThrow(() -> StatusException.notAuthorized("Invalid verification code"));
     }
 
     @ApiDefaults
@@ -134,10 +132,10 @@ public class AuthenticationResource {
             description = "Renew the JWT token if it is about to expire",
             operationId = "refreshToken"
     )
-    public Publisher<MutableHttpResponse<AccessRefreshToken>> refresh(@Body @Valid TokenRefreshRequest request) {
+    public AccessRefreshToken refresh(@Body @Valid TokenRefreshRequest request) {
         return userProvider.refreshToken(request.getToken())
                 .map(this::createAccessToken)
-                .switchIfEmpty(Mono.just(HttpResponse.unauthorized()));
+                .getOrThrow(() -> StatusException.notAuthorized("Invalid refresh token"));
     }
 
     @Secured(SecurityRule.IS_ANONYMOUS)
@@ -150,20 +148,16 @@ public class AuthenticationResource {
         return Base64.encodeBase64String(rsaSignatureConfiguration.getPublicKey().getEncoded());
     }
 
-    private MutableHttpResponse<AccessRefreshToken> createAccessToken(UserAccount user) {
+    private AccessRefreshToken createAccessToken(UserAccount user) {
         var userDetails = new ClientAuthentication(
                 user.getUsername(),
                 Map.of("rolesKey", Collections.List(user.getRoles()).map(Role::getName).toJava()));
         var refresh = UUID.randomUUID().toString();
 
-        return accessRefreshTokenGenerator.generate(refresh, userDetails)
-                .stream()
-                .peek(token -> application.registerToken(
-                        user.getUsername(),
-                        token.getRefreshToken(),
-                        token.getExpiresIn()))
-                .map(HttpResponse::ok)
-                .findFirst()
-                .orElseGet(HttpResponse::unauthorized);
+        var token = accessRefreshTokenGenerator.generate(refresh, userDetails)
+                .orElseThrow(() -> StatusException.notAuthorized("Unable to generate token"));
+
+        application.registerToken(user.getUsername(), token.getRefreshToken(), token.getExpiresIn());
+        return token;
     }
 }

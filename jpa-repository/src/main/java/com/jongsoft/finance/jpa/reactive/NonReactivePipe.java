@@ -6,11 +6,9 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-import io.micronaut.transaction.SynchronousTransactionManager;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
-import jakarta.persistence.EntityManager;
-import java.sql.Connection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -25,7 +23,6 @@ import java.util.function.Function;
 public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
 
     private final EntityManager entityManager;
-    private final SynchronousTransactionManager<Connection> transactionManager;
 
     /**
      * Run the query in the pipeline and convert the result into an optional.
@@ -47,18 +44,16 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
      */
     @SuppressWarnings("unchecked")
     public <R> Optional<R> maybe(Function<T, R> converter) {
-        return transactionManager.executeRead(status -> {
-            var query = entityManager.createQuery(hql());
+        var query = entityManager.createQuery(hql());
 
-            applyParameters(query);
-            applyPaging(query);
+        applyParameters(query);
+        applyPaging(query);
 
-            return Control.Try(() -> (T) query.getSingleResult())
-                    .map(converter)
-                    .map(Control::Option)
-                    .recover(e -> Control.Option())
-                    .get();
-        });
+        return Control.Try(() -> (T) query.getSingleResult())
+                .map(converter)
+                .map(Control::Option)
+                .recover(e -> Control.Option())
+                .get();
     }
 
     /**
@@ -69,14 +64,12 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
      */
     @SuppressWarnings("unchecked")
     public Sequence<T> sequence() {
-        return transactionManager.executeRead(status -> {
-            var query = entityManager.createQuery(hql() + sort());
+        var query = entityManager.createQuery(hql() + sort());
 
-            applyParameters(query);
-            applyPaging(query);
+        applyParameters(query);
+        applyPaging(query);
 
-            return Collections.List(query.getResultList());
-        });
+        return Collections.List(query.getResultList());
     }
 
     /**
@@ -87,24 +80,22 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
      */
     @SuppressWarnings("unchecked")
     public ResultPage<T> page() {
-        return transactionManager.executeRead(status -> {
-            var countHql = "select count(distinct a.id) " + hql();
-            var selectHql = "select distinct a " + hql() + sort();
+        var countHql = "select count(distinct a.id) " + hql();
+        var selectHql = "select distinct a " + hql() + sort();
 
-            var countQuery = entityManager.createQuery(countHql, Long.class);
-            var selectQuery = entityManager.createQuery(selectHql);
+        var countQuery = entityManager.createQuery(countHql, Long.class);
+        var selectQuery = entityManager.createQuery(selectHql);
 
-            applyParameters(countQuery);
-            applyParameters(selectQuery);
-            applyPaging(selectQuery);
+        applyParameters(countQuery);
+        applyParameters(selectQuery);
+        applyPaging(selectQuery);
 
-            long hits = countQuery.getSingleResult();
+        long hits = countQuery.getSingleResult();
 
-            return new ResultPageImpl<>(
-                    Collections.List((List<T>) selectQuery.getResultList()),
-                    limit(),
-                    hits);
-        });
+        return new ResultPageImpl<>(
+                Collections.List((List<T>) selectQuery.getResultList()),
+                limit(),
+                hits);
     }
 
     @Override

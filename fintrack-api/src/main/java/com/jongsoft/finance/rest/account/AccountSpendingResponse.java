@@ -2,7 +2,9 @@ package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.rest.model.AccountResponse;
+import io.micronaut.serde.annotation.Serdeable;
 
+@Serdeable.Serializable
 public class AccountSpendingResponse {
 
     private final AccountProvider.AccountSpending wrapped;

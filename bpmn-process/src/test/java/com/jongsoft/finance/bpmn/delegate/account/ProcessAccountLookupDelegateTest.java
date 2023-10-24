@@ -10,7 +10,6 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.core.publisher.Mono;
 
 class ProcessAccountLookupDelegateTest {
 
@@ -59,7 +58,7 @@ class ProcessAccountLookupDelegateTest {
 
         Mockito.when(execution.hasVariableLocal("name")).thenReturn(true);
         Mockito.when(execution.getVariableLocal("name")).thenReturn("Test account");
-        Mockito.when(accountProvider.lookup("Test account")).thenReturn(Mono.just(account));
+        Mockito.when(accountProvider.lookup("Test account")).thenReturn(Control.Option(account));
 
         subject.execute(execution);
 

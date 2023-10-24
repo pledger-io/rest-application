@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.budget;
 
 import com.jongsoft.finance.core.DateUtils;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -21,12 +22,9 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -49,9 +47,10 @@ public class BudgetResource {
             summary = "First budget start",
             description = "Computes the date of the start of the first budget registered in FinTrack"
     )
-    Mono<LocalDate> firstBudget() {
+    LocalDate firstBudget() {
         return budgetProvider.first()
-                .map(Budget::getStart);
+                .map(Budget::getStart)
+                .getOrThrow(() -> StatusException.notFound("No budget found"));
     }
 
     @Get("/{year}/{month}")
@@ -63,9 +62,10 @@ public class BudgetResource {
                     @Parameter(name = "month", in = ParameterIn.PATH, schema = @Schema(implementation = Integer.class, description = "The month"))
             }
     )
-    Mono<BudgetResponse> budget(@PathVariable int year, @PathVariable int month) {
+    BudgetResponse budget(@PathVariable int year, @PathVariable int month) {
         return budgetProvider.lookup(year, month)
-                .map(BudgetResponse::new);
+                .map(BudgetResponse::new)
+                .getOrThrow(() -> StatusException.notFound("No budget found"));
     }
 
     @Get("/auto-complete{?token}")
@@ -86,15 +86,12 @@ public class BudgetResource {
             summary = "Create budget",
             description = "Create a new budget in the system with the provided start date"
     )
-    Mono<BudgetResponse> create(@Valid @Body BudgetCreateRequest budgetCreateRequest) {
+    BudgetResponse create(@Valid @Body BudgetCreateRequest budgetCreateRequest) {
         LocalDate startDate = LocalDate.of(budgetCreateRequest.getYear(), budgetCreateRequest.getMonth(), 1);
 
-        return Mono.create(
-                emitter -> {
-                    var budget = currentUserProvider.currentUser()
-                            .createBudget(startDate, budgetCreateRequest.getIncome());
-                    emitter.success(new BudgetResponse(budget));
-                });
+        var budget = currentUserProvider.currentUser()
+                .createBudget(startDate, budgetCreateRequest.getIncome());
+        return new BudgetResponse(budget);
     }
 
     @Post
@@ -102,12 +99,13 @@ public class BudgetResource {
             summary = "Index budget",
             description = "Indexing a budget will change it expenses and expected income by a percentage"
     )
-    Mono<BudgetResponse> index(@Valid @Body BudgetCreateRequest budgetUpdateRequest) {
+    BudgetResponse index(@Valid @Body BudgetCreateRequest budgetUpdateRequest) {
         var startDate = LocalDate.of(budgetUpdateRequest.getYear(), budgetUpdateRequest.getMonth(), 1);
 
         return budgetProvider.lookup(budgetUpdateRequest.getYear(), budgetUpdateRequest.getMonth())
                 .map(budget -> budget.indexBudget(startDate, budgetUpdateRequest.getIncome()))
-                .map(BudgetResponse::new);
+                .map(BudgetResponse::new)
+                .getOrThrow(() -> StatusException.notFound("No budget found"));
     }
 
     @Put("/expenses")
@@ -115,7 +113,7 @@ public class BudgetResource {
             summary = "Create expense",
             description = "Add a new expense to all existing budgets"
     )
-    Mono<BudgetResponse> createExpense(@Valid @Body ExpenseCreateRequest createRequest) {
+    BudgetResponse createExpense(@Valid @Body ExpenseCreateRequest createRequest) {
         var now = LocalDate.now();
 
         return budgetProvider.lookup(now.getYear(), now.getMonthValue())
@@ -123,7 +121,8 @@ public class BudgetResource {
                     budget.createExpense(createRequest.getName(), createRequest.getLowerBound(), createRequest.getUpperBound());
                     return budget;
                 })
-                .map(BudgetResponse::new);
+                .map(BudgetResponse::new)
+                .getOrThrow(() -> StatusException.notFound("No budget found"));
     }
 
     @Get("/expenses/{id}/{year}/{month}")
@@ -131,11 +130,12 @@ public class BudgetResource {
             summary = "Compute expense",
             description = "Computes the expense for the provided year and month"
     )
-    Publisher<ComputedExpenseResponse> computeExpense(@PathVariable long id, @PathVariable int year, @PathVariable int month) {
+    List<ComputedExpenseResponse> computeExpense(@PathVariable long id, @PathVariable int year, @PathVariable int month) {
         var dateRange = DateUtils.forMonth(year, month);
 
         return budgetProvider.lookup(year, month)
-                .flatMapMany(budget -> Flux.fromIterable(budget.getExpenses()))
+                .stream()
+                .flatMap(budget -> budget.getExpenses().stream())
                 .filter(expense -> expense.getId() == id)
                 .map(expense -> {
                     var filter = filterFactory.transaction()
@@ -148,6 +148,6 @@ public class BudgetResource {
                             transactionProvider.balance(filter).getOrSupply(() -> BigDecimal.ZERO).doubleValue(),
                             dateRange
                     );
-                });
+                }).toList();
     }
 }

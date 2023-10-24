@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1gaso3i" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.0.1">
-  <bpmn:process id="ProcessScheduler" name="Process Scheduler" isExecutable="true" camunda:versionTag="1.0.0">
+  <bpmn:process id="ProcessScheduler" name="Process Scheduler" isExecutable="true" camunda:versionTag="1.0.0" camunda:historyTimeToLive="P1000D">
     <bpmn:documentation>For this scheduler flow the following variables must be set upon startup:
 
 - start, ISO start date

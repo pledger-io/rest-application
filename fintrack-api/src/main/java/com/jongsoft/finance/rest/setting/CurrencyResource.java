@@ -16,12 +16,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Tag(name = "Application Settings")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -38,8 +36,10 @@ public class CurrencyResource {
             description = "List all available currencies in the system",
             operationId = "getAllCurrencies"
     )
-    public Publisher<CurrencyResponse> available() {
-        return Flux.fromIterable(currencyProvider.lookup().map(CurrencyResponse::new));
+    public List<CurrencyResponse> available() {
+        return currencyProvider.lookup()
+                .map(CurrencyResponse::new)
+                .toJava();
     }
 
     @Put
@@ -51,14 +51,17 @@ public class CurrencyResource {
             operationId = "createCurrency"
     )
     @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)))
-    public Publisher<CurrencyResponse> create(@Valid @Body CurrencyRequest request) {
-        return currencyProvider.lookup(request.getCode())
-                .switchIfEmpty(Mono.just(
-                        new Currency(
-                                request.getName(),
-                                request.getCode(),
-                                request.getSymbol())))
-                .map(CurrencyResponse::new);
+    public CurrencyResponse create(@Valid @Body CurrencyRequest request) {
+        var existing = currencyProvider.lookup(request.getCode());
+        if (existing.isPresent()) {
+            throw StatusException.badRequest("Currency with code " + request.getCode() + " already exists");
+        }
+
+        return new CurrencyResponse(new Currency(
+                request.getName(),
+                request.getCode(),
+                request.getSymbol()
+        ));
     }
 
     @Get("/{currencyCode}")
@@ -79,11 +82,10 @@ public class CurrencyResource {
     )
     @ApiDefaults
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)), description = "The currency entity")
-    public Publisher<CurrencyResponse> get(@PathVariable String currencyCode) {
+    public CurrencyResponse get(@PathVariable String currencyCode) {
         return currencyProvider.lookup(currencyCode)
-                .switchIfEmpty(Mono.error(
-                        StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode)))
-                .map(CurrencyResponse::new);
+                .map(CurrencyResponse::new)
+                .getOrThrow(() -> StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
     }
 
     @Secured("admin")
@@ -105,15 +107,14 @@ public class CurrencyResource {
     )
     @ApiDefaults
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)), description = "The currency entity")
-    public Publisher<CurrencyResponse> update(@PathVariable String currencyCode, @Valid @Body CurrencyRequest request) {
+    public CurrencyResponse update(@PathVariable String currencyCode, @Valid @Body CurrencyRequest request) {
         return currencyProvider.lookup(currencyCode)
-                .switchIfEmpty(Mono.error(
-                        StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode)))
                 .map(currency -> {
                     currency.rename(request.getName(), request.getCode(), request.getSymbol());
                     return currency;
                 })
-                .map(CurrencyResponse::new);
+                .map(CurrencyResponse::new)
+                .getOrThrow(() -> StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
     }
 
     @Secured("admin")
@@ -125,10 +126,8 @@ public class CurrencyResource {
     )
     @ApiDefaults
     @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)), description = "The currency entity")
-    public Publisher<CurrencyResponse> patch(@PathVariable String currencyCode, @Valid @Body CurrencyPatchRequest request) {
+    public CurrencyResponse patch(@PathVariable String currencyCode, @Valid @Body CurrencyPatchRequest request) {
         return currencyProvider.lookup(currencyCode)
-                .switchIfEmpty(Mono.error(
-                        StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode)))
                 .map(currency -> {
                     if (request.getEnabled() != null) {
                         if (request.getEnabled()) {
@@ -144,7 +143,8 @@ public class CurrencyResource {
 
                     return currency;
                 })
-                .map(CurrencyResponse::new);
+                .map(CurrencyResponse::new)
+                .getOrThrow(() -> StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
     }
 
 }

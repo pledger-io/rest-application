@@ -1,15 +1,14 @@
 package com.jongsoft.finance.rest.budget;
 
-import io.micronaut.core.annotation.Introspected;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
-@Introspected
 @NoArgsConstructor
+@Serdeable.Deserializable
 class ExpenseCreateRequest {
 
     @NotNull

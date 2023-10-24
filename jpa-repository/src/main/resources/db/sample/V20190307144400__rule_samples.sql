@@ -10,7 +10,7 @@ insert into rule_condition (id, field, operation, cond_value, rule_id) values
   (5, 3, 4, '20', 2),
   (6, 3, 3, '90', 2);
 
-insert into rule_change (id, field, value, rule_id) values
+insert into rule_change (id, field, `value`, rule_id) values
   (1, 4, '1', 1),
   (2, 4, '2', 2),
   (3, 1, '2', 2);

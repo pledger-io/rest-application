@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.model;
 
 import com.jongsoft.finance.domain.importer.BatchImport;
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Date;
 
-@Introspected
+@Serdeable.Serializable
 public class ImporterResponse {
 
     private final BatchImport wrapped;

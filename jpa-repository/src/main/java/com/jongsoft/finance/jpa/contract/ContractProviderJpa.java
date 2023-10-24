@@ -8,13 +8,13 @@ import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
+import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Slf4j
+@ReadOnly
 @Singleton
 public class ContractProviderJpa implements ContractProvider {
 
@@ -53,7 +53,7 @@ public class ContractProviderJpa implements ContractProvider {
     }
 
     @Override
-    public Mono<Contract> lookup(String name) {
+    public Optional<Contract> lookup(String name) {
         log.trace("Contract lookup by name: {}", name);
 
         var hql = """
@@ -62,7 +62,7 @@ public class ContractProviderJpa implements ContractProvider {
                     and c.archived = false
                     and c.user.username = :username""";
 
-        return entityManager.<ContractJpa>reactive()
+        return entityManager.<ContractJpa>blocking()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
                 .set("name", name)
@@ -71,7 +71,7 @@ public class ContractProviderJpa implements ContractProvider {
     }
 
     @Override
-    public Flux<Contract> search(String partialName) {
+    public Sequence<Contract> search(String partialName) {
         log.trace("Contract lookup by partial name: {}", partialName);
 
         var hql = """
@@ -80,11 +80,11 @@ public class ContractProviderJpa implements ContractProvider {
                     and c.archived = false
                     and c.user.username = :username""";
 
-        return entityManager.<ContractJpa>reactive()
+        return entityManager.<ContractJpa>blocking()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
                 .set("name", "%" + partialName + "%")
-                .flow()
+                .sequence()
                 .map(this::convert);
     }
 

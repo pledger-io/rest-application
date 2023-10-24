@@ -1,12 +1,11 @@
 package com.jongsoft.finance.rest.importer;
 
-import io.micronaut.core.annotation.Introspected;
-import lombok.Builder;
-
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
-@Introspected
+@Serdeable.Deserializable
 class ImporterCreateRequest {
 
     @NotNull

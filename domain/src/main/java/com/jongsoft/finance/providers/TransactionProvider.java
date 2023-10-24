@@ -6,7 +6,6 @@ import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import com.jongsoft.lang.time.Range;
-import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -143,9 +142,9 @@ public interface TransactionProvider extends DataProvider<Transaction> {
      * Locate the first ever transaction made that meets the preset given using the {@link FilterCommand}.
      *
      * @param filter the filter to be applied
-     * @return the first found transaction, or an {@link Mono#empty()} otherwise
+     * @return the first found transaction, or an empty otherwise
      */
-    Mono<Transaction> first(FilterCommand filter);
+    Optional<Transaction> first(FilterCommand filter);
 
     ResultPage<Transaction> lookup(FilterCommand filter);
 

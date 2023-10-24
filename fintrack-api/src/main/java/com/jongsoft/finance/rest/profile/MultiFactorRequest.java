@@ -1,13 +1,12 @@
 package com.jongsoft.finance.rest.profile;
 
-import io.micronaut.core.annotation.Introspected;
-import lombok.Setter;
-
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Setter;
 
 @Setter
-@Introspected
+@Serdeable.Deserializable
 class MultiFactorRequest {
 
     @NotNull
