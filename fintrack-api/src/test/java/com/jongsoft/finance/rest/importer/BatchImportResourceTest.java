@@ -1,15 +1,17 @@
 package com.jongsoft.finance.rest.importer;
 
-import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.core.DateUtils;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.CSVConfigProvider;
 import com.jongsoft.finance.providers.ImportProvider;
-import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
@@ -18,9 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -84,11 +83,10 @@ class BatchImportResourceTest extends TestSetup {
                 .configuration("sample-configuration")
                 .uploadToken("token-sample")
                 .build();
-        StepVerifier.create(subject.create(request))
-                .assertNext(response -> {
-                    assertThat(response.getSlug()).isEqualTo("xd2rsd-2fasd-q2ff-asd");
-                })
-                .verifyComplete();
+
+        Assertions.assertThat(subject.create(request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("slug", "xd2rsd-2fasd-q2ff-asd");
 
         Mockito.verify(mockConfig).createImport("token-sample");
     }
@@ -96,7 +94,7 @@ class BatchImportResourceTest extends TestSetup {
     @Test
     void get() {
         Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
-                Mono.just(BatchImport.builder()
+                Control.Option(BatchImport.builder()
                         .created(DateUtils.toDate(LocalDate.of(2019, 2, 1)))
                         .fileCode("token-sample")
                         .slug("xd2rsd-2fasd-q2ff-asd")
@@ -110,22 +108,19 @@ class BatchImportResourceTest extends TestSetup {
                         .totalIncome(303.40D)
                         .build()));
 
-        StepVerifier.create(subject.get("xd2rsd-2fasd-q2ff-asd"))
-                .assertNext(response -> {
-                    assertThat(response.getSlug()).isEqualTo("xd2rsd-2fasd-q2ff-asd");
-                    assertThat(response.getConfig().getFile()).isEqualTo("xd2rsd-2fasd-33dfd-ddfa");
-                    assertThat(response.getConfig().getName()).isEqualTo("sample-config.json");
-                    assertThat(response.getBalance().getTotalExpense()).isEqualTo(200.2D);
-                    assertThat(response.getBalance().getTotalIncome()).isEqualTo(303.4D);
-                })
-                .verifyComplete();
-
+        Assertions.assertThat(subject.get("xd2rsd-2fasd-q2ff-asd"))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("slug", "xd2rsd-2fasd-q2ff-asd")
+                .hasFieldOrPropertyWithValue("config.file", "xd2rsd-2fasd-33dfd-ddfa")
+                .hasFieldOrPropertyWithValue("config.name", "sample-config.json")
+                .hasFieldOrPropertyWithValue("balance.totalExpense", 200.2D)
+                .hasFieldOrPropertyWithValue("balance.totalIncome", 303.4D);
     }
 
     @Test
     void delete_success() {
         Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
-                Mono.just(BatchImport.builder()
+                Control.Option(BatchImport.builder()
                         .id(1L)
                         .created(DateUtils.toDate(LocalDate.of(2019, 2, 1)))
                         .fileCode("token-sample")
@@ -139,15 +134,14 @@ class BatchImportResourceTest extends TestSetup {
                         .totalIncome(303.40D)
                         .build()));
 
-        StepVerifier.create(subject.delete("xd2rsd-2fasd-q2ff-asd"))
-                .expectNextCount(1)
-                .verifyComplete();
+        Assertions.assertThat(subject.delete("xd2rsd-2fasd-q2ff-asd"))
+                .isEqualTo("xd2rsd-2fasd-q2ff-asd");
     }
 
     @Test
     void delete_alreadyFinished() {
         Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
-                Mono.just(BatchImport.builder()
+                Control.Option(BatchImport.builder()
                         .created(DateUtils.toDate(LocalDate.of(2019, 2, 1)))
                         .fileCode("token-sample")
                         .slug("xd2rsd-2fasd-q2ff-asd")
@@ -161,21 +155,24 @@ class BatchImportResourceTest extends TestSetup {
                         .totalIncome(303.40D)
                         .build()));
 
-        StepVerifier.create(subject.delete("xd2rsd-2fasd-q2ff-asd"))
-                .verifyErrorMessage("Cannot archive an import job that has finished running.");
+        Assertions.assertThatThrownBy(() -> subject.delete("xd2rsd-2fasd-q2ff-asd"))
+                .isInstanceOf(StatusException.class)
+                .hasMessage("Cannot archive an import job that has finished running.");
     }
 
     @Test
     void config() {
-        Mockito.when(csvConfigProvider.lookup()).thenReturn(Flux.just(
+        Mockito.when(csvConfigProvider.lookup()).thenReturn(Collections.List(
                 BatchImportConfig.builder()
                         .id(1L)
                         .name("Import config test")
                         .build()));
 
-        StepVerifier.create(subject.config())
-                .expectNextCount(1)
-                .verifyComplete();
+        Assertions.assertThat(subject.config())
+                .isNotNull()
+                .hasSize(1)
+                .first()
+                .hasFieldOrPropertyWithValue("name", "Import config test");
     }
 
     @Test
@@ -187,11 +184,9 @@ class BatchImportResourceTest extends TestSetup {
                 .fileCode("token-sample")
                 .build();
 
-        StepVerifier.create(subject.createConfig(request))
-                .assertNext(response -> {
-                    assertThat(response.getName()).isEqualTo("sample-configuration");
-                    assertThat(response.getFile()).isEqualTo("token-sample");
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.createConfig(request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("name", "sample-configuration")
+                .hasFieldOrPropertyWithValue("file", "token-sample");
     }
 }

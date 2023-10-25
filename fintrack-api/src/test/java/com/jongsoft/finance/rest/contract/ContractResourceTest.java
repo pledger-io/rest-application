@@ -3,14 +3,14 @@ package com.jongsoft.finance.rest.contract;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
 import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.providers.ContractProvider;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.rest.model.ContractResponse;
@@ -24,9 +24,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 
@@ -87,7 +84,7 @@ class ContractResourceTest extends TestSetup {
 
     @Test
     void autocomplete() {
-        when(contractProvider.search("cont")).thenReturn(Flux.just(
+        when(contractProvider.search("cont")).thenReturn(Collections.List(
                 Contract.builder()
                         .id(1L)
                         .name("Contract 1")
@@ -103,9 +100,10 @@ class ContractResourceTest extends TestSetup {
                         .build()
         ));
 
-        StepVerifier.create(subject.autocomplete("cont"))
-                .expectNextCount(2)
-                .verifyComplete();
+        Assertions.assertThat(subject.autocomplete("cont"))
+                .hasSize(2)
+                .extracting(ContractResponse::getId)
+                .containsExactly(1L, 2L);
     }
 
     @Test
@@ -119,7 +117,7 @@ class ContractResourceTest extends TestSetup {
 
         when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         when(contractProvider.lookup("Test Contract"))
-                .thenReturn(Mono.just(Contract.builder()
+                .thenReturn(Control.Option(Contract.builder()
                         .id(1L)
                         .name("Test Contract")
                         .company(account)
@@ -134,16 +132,13 @@ class ContractResourceTest extends TestSetup {
                 .end(LocalDate.of(2020, 2, 1))
                 .build();
 
-        StepVerifier.create(subject.create(request))
-                .assertNext(response -> {
-                    assertThat(response.getName()).isEqualTo("Test Contract");
-                    assertThat(response.isContractAvailable()).isFalse();
-                    assertThat(response.getCompany().getId()).isEqualTo(1L);
-                    assertThat(response.getCompany().getName()).isEqualTo("Sample account");
-                    assertThat(response.getStart()).isEqualTo(LocalDate.of(2019, 2, 1));
-                    assertThat(response.getEnd()).isEqualTo(LocalDate.of(2020, 2, 1));
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.create(request))
+                        .hasFieldOrPropertyWithValue("name", "Test Contract")
+                        .hasFieldOrPropertyWithValue("contractAvailable", false)
+                        .hasFieldOrPropertyWithValue("company.id", 1L)
+                        .hasFieldOrPropertyWithValue("company.name", "Sample account")
+                        .hasFieldOrPropertyWithValue("start", LocalDate.of(2019, 2, 1))
+                        .hasFieldOrPropertyWithValue("end", LocalDate.of(2020, 2, 1));
 
         verify(applicationEventPublisher).publishEvent(Mockito.any(CreateContractCommand.class));
     }
@@ -159,9 +154,9 @@ class ContractResourceTest extends TestSetup {
                 .end(LocalDate.of(2020, 2, 1))
                 .build();
 
-        StepVerifier.create(subject.create(request))
-                .expectErrorMessage("No account can be found for 1")
-                .verify();
+        Assertions.assertThatThrownBy(() -> subject.create(request))
+                .isInstanceOf(StatusException.class)
+                .hasMessage("No account can be found for 1");
     }
 
     @Test
@@ -184,9 +179,7 @@ class ContractResourceTest extends TestSetup {
                 .currency("EUR")
                 .build());
 
-        StepVerifier.create(subject.update(1L, request))
-                .expectNextCount(1)
-                .verifyComplete();
+        subject.update(1L, request);
 
         verify(contract).change(
                 "Test Contract",
@@ -206,9 +199,9 @@ class ContractResourceTest extends TestSetup {
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option());
 
-        StepVerifier.create(subject.update(1L, request))
-                .expectErrorMessage("No contract can be found for 1")
-                .verify();
+        Assertions.assertThatThrownBy(() -> subject.update(1L, request))
+                .isInstanceOf(StatusException.class)
+                .hasMessage("No contract can be found for 1");
     }
 
     @Test
@@ -229,12 +222,15 @@ class ContractResourceTest extends TestSetup {
                         .endDate(LocalDate.now().plusMonths(1))
                         .build()));
 
-        StepVerifier.create(subject.get(1L))
-                .assertNext(response -> {
-                    assertThat(response.getId()).isEqualTo(1L);
-                })
-                .verifyComplete();
-
+        Assertions.assertThat(subject.get(1L))
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "Test contract")
+                .hasFieldOrPropertyWithValue("description", "Sample contract")
+                .hasFieldOrPropertyWithValue("start", LocalDate.of(2019, 1, 1))
+                .hasFieldOrPropertyWithValue("end", LocalDate.now().plusMonths(1))
+                .hasFieldOrPropertyWithValue("company.id", 1L)
+                .hasFieldOrPropertyWithValue("company.name", "Sample account")
+                .hasFieldOrPropertyWithValue("company.account.currency", "EUR");
     }
 
     @Test
@@ -277,9 +273,7 @@ class ContractResourceTest extends TestSetup {
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
         when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
 
-        StepVerifier.create(subject.warnExpiry(1L))
-                .expectNextCount(1)
-                .verifyComplete();
+        subject.warnExpiry(1L);
 
         verify(contract).warnBeforeExpires();
     }
@@ -294,9 +288,7 @@ class ContractResourceTest extends TestSetup {
         var request = new ContractAttachmentRequest();
         request.setFileCode("file-code-1");
 
-        StepVerifier.create(subject.attachment(1L, request))
-                .expectNextCount(1)
-                .verifyComplete();
+        subject.attachment(1L, request);
 
         verify(contract).registerUpload("file-code-1");
     }

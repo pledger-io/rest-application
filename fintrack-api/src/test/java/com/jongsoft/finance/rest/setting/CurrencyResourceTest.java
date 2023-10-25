@@ -4,7 +4,9 @@ import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.currency.CreateCurrencyCommand;
 import com.jongsoft.finance.providers.CurrencyProvider;
+import com.jongsoft.finance.rest.model.CurrencyResponse;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,10 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,9 +60,10 @@ class CurrencyResourceTest {
                                 .build()
                 ));
 
-        StepVerifier.create(subject.available())
-                .expectNextCount(3)
-                .verifyComplete();
+        Assertions.assertThat(subject.available())
+                .hasSize(3)
+                .extracting(CurrencyResponse::getCode)
+                .containsExactly("EUR", "USD", "KWS");
     }
 
     @Test
@@ -74,16 +74,13 @@ class CurrencyResourceTest {
                 .name("Test currency")
                 .build();
 
-        when(currencyProvider.lookup("TCC")).thenReturn(Mono.empty());
+        when(currencyProvider.lookup("TCC")).thenReturn(Control.Option());
 
-        StepVerifier.create(subject.create(request))
-                .assertNext(response -> {
-                    assertThat(response.getCode()).isEqualTo("TCC");
-                    assertThat(response.getName()).isEqualTo("Test currency");
-                    assertThat(response.getSymbol()).isEqualTo('S');
-                })
-                .verifyComplete();
-
+        Assertions.assertThat(subject.create(request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("code", "TCC")
+                .hasFieldOrPropertyWithValue("name", "Test currency")
+                .hasFieldOrPropertyWithValue("symbol", 'S');
 
         verify(applicationEventPublisher).publishEvent(Mockito.any(CreateCurrencyCommand.class));
     }
@@ -96,14 +93,12 @@ class CurrencyResourceTest {
                 .code("EUR")
                 .build());
 
-        when(currencyProvider.lookup("EUR")).thenReturn(Mono.just(currency));
+        when(currencyProvider.lookup("EUR")).thenReturn(Control.Option(currency));
 
-        StepVerifier.create(subject.get("EUR"))
-                .assertNext(response -> {
-                    assertThat(response.getCode()).isEqualTo("EUR");
-                    assertThat(response.getName()).isEqualTo("Euro");
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.get("EUR"))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("code", "EUR")
+                .hasFieldOrPropertyWithValue("name", "Euro");
     }
 
     @Test
@@ -114,7 +109,7 @@ class CurrencyResourceTest {
                 .code("EUR")
                 .build());
 
-        when(currencyProvider.lookup("EUR")).thenReturn(Mono.just(currency));
+        when(currencyProvider.lookup("EUR")).thenReturn(Control.Option(currency));
 
         var request = CurrencyRequest.builder()
                 .code("TCC")
@@ -122,13 +117,11 @@ class CurrencyResourceTest {
                 .name("Test currency")
                 .build();
 
-        StepVerifier.create(subject.update("EUR", request))
-                .assertNext(response -> {
-                    assertThat(response.getCode()).isEqualTo("TCC");
-                    assertThat(response.getName()).isEqualTo("Test currency");
-                    assertThat(response.getSymbol()).isEqualTo('S');
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.update("EUR", request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("code", "TCC")
+                .hasFieldOrPropertyWithValue("name", "Test currency")
+                .hasFieldOrPropertyWithValue("symbol", 'S');
 
         verify(currency).rename("Test currency", "TCC", 'S');
     }
@@ -143,19 +136,19 @@ class CurrencyResourceTest {
                 .code("EUR")
                 .build());
 
-        when(currencyProvider.lookup("EUR")).thenReturn(Mono.just(currency));
+        when(currencyProvider.lookup("EUR")).thenReturn(Control.Option(currency));
 
         var request = CurrencyPatchRequest.builder()
                 .enabled(false)
                 .decimalPlaces(2)
                 .build();
 
-        StepVerifier.create(subject.patch("EUR", request))
-                .assertNext(response -> {
-                    assertThat(response.isEnabled()).isFalse();
-                    assertThat(response.getNumberDecimals()).isEqualTo(2);
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.patch("EUR", request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("code", "EUR")
+                .hasFieldOrPropertyWithValue("name", "Euro")
+                .hasFieldOrPropertyWithValue("enabled", false)
+                .hasFieldOrPropertyWithValue("numberDecimals", 2);
 
         verify(currency).disable();
         verify(currency).accuracy(2);

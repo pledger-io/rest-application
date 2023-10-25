@@ -28,12 +28,8 @@ public class ScheduledTransactionCreateRequest {
         }
     }
 
-    @Data
     @Serdeable.Deserializable
-    static class ScheduleValue {
-        private Periodicity periodicity;
-        private int interval;
-    }
+    record ScheduleValue(Periodicity periodicity, int interval) {}
 
     @NotBlank
     private String name;

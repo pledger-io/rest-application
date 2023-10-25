@@ -1,16 +1,16 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.core.DateUtils;
-import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 
@@ -66,9 +66,8 @@ class AccountTopResourceTest extends TestSetup {
                 Mockito.eq(true));
 
 
-        StepVerifier.create(subject.topDebtors(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2)))
-                .expectNextCount(1)
-                .verifyComplete();
+        Assertions.assertThat(subject.topDebtors(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2)))
+                        .hasSize(1);
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).top(
@@ -112,9 +111,8 @@ class AccountTopResourceTest extends TestSetup {
                 Mockito.eq(DateUtils.forMonth(2019, 1)),
                 Mockito.eq(false));
 
-        StepVerifier.create(subject.topCreditor(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2)))
-                .expectNextCount(1)
-                .verifyComplete();
+        Assertions.assertThat(subject.topCreditor(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2)))
+                .hasSize(1);
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).top(

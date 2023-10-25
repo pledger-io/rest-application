@@ -144,7 +144,20 @@ public class AccountResource {
                             accountEditRequest.getType());
 
             return accountProvider.lookup(accountEditRequest.getName())
-                    .map(AccountResponse::new)
+                    .map(inserted -> {
+                        if (accountEditRequest.getInterestPeriodicity() != null) {
+                            inserted.interest(
+                                    accountEditRequest.getInterest(),
+                                    accountEditRequest.getInterestPeriodicity());
+                        }
+
+                        inserted.changeAccount(
+                                accountEditRequest.getIban(),
+                                accountEditRequest.getBic(),
+                                accountEditRequest.getNumber());
+
+                        return new AccountResponse(inserted);
+                    })
                     .getOrThrow(() -> StatusException.internalError("Failed to create account"));
         }
 

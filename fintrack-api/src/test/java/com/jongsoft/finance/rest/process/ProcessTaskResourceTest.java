@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest.process;
 
-import com.jongsoft.finance.rest.model.ProcessTaskResponse;
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.test.StepVerifier;
 
 import java.util.List;
 
@@ -40,8 +39,8 @@ class ProcessTaskResourceTest {
         Mockito.when(taskMock.initializeFormKeys()).thenReturn(taskMock);
         Mockito.when(taskMock.list()).thenReturn(List.of());
 
-        StepVerifier.create(subject.tasks("reconcileAccount", "1"))
-                .verifyComplete();
+        Assertions.assertThat(subject.tasks("reconcileAccount", "1"))
+                .hasSize(0);
     }
 
     @Test

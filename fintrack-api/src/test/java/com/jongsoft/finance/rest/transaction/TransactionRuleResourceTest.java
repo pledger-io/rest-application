@@ -4,10 +4,10 @@ import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
 import com.jongsoft.finance.providers.TransactionRuleProvider;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
@@ -19,8 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
 
 import java.util.List;
 
@@ -55,7 +53,7 @@ class TransactionRuleResourceTest extends TestSetup {
 
     @Test
     void groups() {
-        Mockito.when(ruleGroupProvider.lookup()).thenReturn(Flux.just(
+        Mockito.when(ruleGroupProvider.lookup()).thenReturn(Collections.List(
                 TransactionRuleGroup.builder()
                         .id(1L)
                         .name("Grocery stores")
@@ -67,10 +65,11 @@ class TransactionRuleResourceTest extends TestSetup {
                         .sort(2)
                         .build()));
 
-        StepVerifier.create(subject.groups())
-                .assertNext(rule -> assertThat(rule.getName()).isEqualTo("Grocery stores"))
-                .assertNext(rule -> assertThat(rule.getName()).isEqualTo("Savings transactions"))
-                .verifyComplete();
+        Assertions.assertThat(subject.groups())
+                .isNotNull()
+                .hasSize(2)
+                .extracting("name")
+                .containsExactly("Grocery stores", "Savings transactions");
     }
 
     @Test
@@ -99,14 +98,13 @@ class TransactionRuleResourceTest extends TestSetup {
         transactionRule.new Change(1L, RuleColumn.TO_ACCOUNT, "2");
         transactionRule.new Change(2L, RuleColumn.CATEGORY, "3");
 
-        Mockito.when(ruleProvider.lookup("Grocery")).thenReturn(Flux.just(transactionRule));
+        Mockito.when(ruleProvider.lookup("Grocery")).thenReturn(Collections.List(transactionRule));
 
-        StepVerifier.create(subject.rules("Grocery"))
-                .assertNext(rule -> {
-                    assertThat(rule.getName()).isEqualTo("Grocery Store 1");
-                    assertThat(rule.getId()).isEqualTo(1L);
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.rules("Grocery"))
+                .isNotNull()
+                .hasSize(1)
+                .extracting("name")
+                .containsExactly("Grocery Store 1");
     }
 
     @Test
@@ -198,9 +196,16 @@ class TransactionRuleResourceTest extends TestSetup {
 
         Mockito.when(ruleProvider.lookup(1L)).thenReturn(Control.Option(transactionRule));
 
-        StepVerifier.create(subject.getRule("Grocery", 1L))
-                .assertNext(response -> assertThat(response.getId()).isEqualTo(1L))
-                .verifyComplete();
+        Assertions.assertThat(subject.getRule("Grocery", 1L))
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "Grocery Store 1")
+                .hasFieldOrPropertyWithValue("active", true)
+                .hasFieldOrPropertyWithValue("restrictive", false)
+                .satisfies(rule -> assertThat(rule.getConditions())
+                        .isNotNull()
+                        .hasSize(2)
+                        .extracting("id")
+                        .containsExactly(1L, 2L));
     }
 
     @Test
@@ -268,9 +273,12 @@ class TransactionRuleResourceTest extends TestSetup {
 
         Mockito.when(ruleProvider.lookup(1L)).thenReturn(Control.Option(transactionRule));
 
-        StepVerifier.create(subject.updateRule("Group 1", 1L, request))
-                .expectNextCount(1)
-                .verifyComplete();
+        Assertions.assertThat(subject.updateRule("Group 1", 1L, request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("name", "Grocery Matcher")
+                .hasFieldOrPropertyWithValue("active", true)
+                .hasFieldOrPropertyWithValue("restrictive", true);
 
         Mockito.verify(transactionRule).change("Grocery Matcher", "My sample rule", true, true);
         Mockito.verify(ruleProvider).save(transactionRule);

@@ -1,16 +1,18 @@
 package com.jongsoft.finance.rest.account;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.rest.TestSetup;
+import com.jongsoft.finance.rest.model.AccountResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,8 +42,10 @@ class AccountEditResourceTest extends TestSetup {
 
     @Test
     void get_missing() {
-        StepVerifier.create(subject.get(1L))
-                .verifyErrorMessage("Account not found");
+        Assertions.assertThrows(
+                StatusException.class,
+                () -> subject.get(1L),
+                "Account not found");
     }
 
     @Test
@@ -55,19 +59,20 @@ class AccountEditResourceTest extends TestSetup {
                         .currency("EUR")
                         .build()));
 
-        StepVerifier.create(subject.get(123L))
-                .assertNext(response -> {
-                    assertThat(response.getName()).isEqualTo("Sample account");
-                })
-                .verifyComplete();
+        assertThat(subject.get(123L))
+                .isNotNull()
+                .isInstanceOf(AccountResponse.class)
+                .hasFieldOrPropertyWithValue("name", "Sample account");
 
         Mockito.verify(accountProvider).lookup(123L);
     }
 
     @Test
     void update_missing() {
-        StepVerifier.create(subject.update(1L, new AccountEditRequest()))
-                .verifyErrorMessage("No account found with id 1");
+        Assertions.assertThrows(
+                StatusException.class,
+                () -> subject.update(1L, new AccountEditRequest()),
+                "Account not found");
 
         Mockito.verify(accountProvider).lookup(1L);
     }
@@ -89,11 +94,10 @@ class AccountEditResourceTest extends TestSetup {
                 .type("checking")
                 .build();
 
-        StepVerifier.create(subject.update(123L, request))
-                .assertNext(response -> {
-                    assertThat(response.getName()).isEqualTo("Sample account");
-                })
-                .verifyComplete();
+        assertThat(subject.update(123L, request))
+                .isNotNull()
+                .isInstanceOf(AccountResponse.class)
+                .hasFieldOrPropertyWithValue("name", "Sample account");
 
         Mockito.verify(accountProvider).lookup(123L);
     }
@@ -110,8 +114,7 @@ class AccountEditResourceTest extends TestSetup {
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
 
-        var response = subject.persistImage(1L, new AccountImageRequest("file-code"))
-                .block();
+        var response = subject.persistImage(1L, new AccountImageRequest("file-code"));
 
         assertThat(response.getIconFileCode()).isEqualTo("file-code");
         Mockito.verify(account).registerIcon("file-code");

@@ -8,10 +8,10 @@ import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.ApplicationContext;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 
@@ -42,9 +42,9 @@ class BalanceResourceTest extends TestSetup {
                 LocalDate.of(2019, 1, 1),
                 LocalDate.of(2019, 2, 1)));
 
-        StepVerifier.create(subject.calculate(request))
-                .expectNextCount(1)
-                .verifyComplete();
+        Assertions.assertThat(subject.calculate(request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("balance", 0.0);
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(transactionProvider).balance(Mockito.any());
@@ -60,8 +60,7 @@ class BalanceResourceTest extends TestSetup {
                 LocalDate.of(2019, 1, 1),
                 LocalDate.of(2019, 2, 1)));
 
-        StepVerifier.create(subject.daily(request))
-                .verifyComplete();
+        subject.daily(request);
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(transactionProvider).daily(Mockito.any());
@@ -83,8 +82,9 @@ class BalanceResourceTest extends TestSetup {
                 .thenReturn(accountMock);
         Mockito.when(accountMock.lookup()).thenReturn(Collections.List());
 
-        StepVerifier.create(subject.calculatePartitioned("account", request))
-                .expectNextCount(1)
-                .verifyComplete();
+        Assertions.assertThat(subject.calculatePartitioned("account", request))
+                .hasSize(1)
+                .extracting("balance")
+                .containsExactly(0.0);
     }
 }

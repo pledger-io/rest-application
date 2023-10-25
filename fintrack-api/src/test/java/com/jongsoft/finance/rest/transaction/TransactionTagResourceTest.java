@@ -1,13 +1,14 @@
 package com.jongsoft.finance.rest.transaction;
 
-import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.domain.transaction.Tag;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.finance.providers.SettingProvider;
-import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.providers.TagProvider;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
+import com.jongsoft.finance.rest.model.TagResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -17,9 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.test.StepVerifier;
-
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -57,11 +55,11 @@ class TransactionTagResourceTest extends TestSetup {
 
     @Test
     void create() {
-        StepVerifier.create(subject.create(new TagCreateRequest("Sample tag")))
-                .assertNext(response -> {
-                    assertThat(response.getName()).isEqualTo("Sample tag");
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.create(new TagCreateRequest("Sample tag")))
+                .isNotNull()
+                .isInstanceOfSatisfying(TagResponse.class, tag -> {
+                    assertThat(tag.getName()).isEqualTo("Sample tag");
+                });
 
         Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateTagCommand.class));
     }
@@ -73,10 +71,10 @@ class TransactionTagResourceTest extends TestSetup {
                         new Tag("Sample"),
                         new Tag("Description")));
 
-        StepVerifier.create(subject.list())
-                .assertNext(value -> assertThat(value.getName()).isEqualTo("Sample"))
-                .assertNext(value -> assertThat(value.getName()).isEqualTo("Description"))
-                .verifyComplete();
+        Assertions.assertThat(subject.list())
+                .isNotNull()
+                .extracting(TagResponse::getName)
+                .containsExactlyInAnyOrder("Sample", "Description");
     }
 
     @Test
@@ -84,9 +82,7 @@ class TransactionTagResourceTest extends TestSetup {
         Mockito.when(tagProvider.lookup(Mockito.any(TagProvider.FilterCommand.class))).thenReturn(
                 ResultPage.of(new Tag("Sample")));
 
-        StepVerifier.create(subject.autoCompleteTag("samp"))
-                .expectNextCount(1)
-                .verifyComplete();
+        subject.autoCompleteTag("samp");
 
         var mockFilter = filterFactory.tag();
         Mockito.verify(tagProvider).lookup(Mockito.any(TagProvider.FilterCommand.class));

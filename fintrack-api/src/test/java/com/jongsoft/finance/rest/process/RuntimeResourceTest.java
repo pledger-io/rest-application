@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.process;
 
-import com.jongsoft.finance.rest.model.ProcessResponse;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.test.StepVerifier;
 
 import java.util.List;
 import java.util.Map;
@@ -60,9 +59,14 @@ class RuntimeResourceTest {
         when(historyBuilder.processInstanceId("MockProcessInstance")).thenReturn(historyBuilder);
         when(historyBuilder.singleResult()).thenReturn(historyMock);
 
-        StepVerifier.create(subject.startProcess("testProcess", Map.of("businessKey", "sample-key")))
-                .expectNextCount(1)
-                .verifyComplete();
+        when(historyMock.getId()).thenReturn("MockProcessInstance");
+        when(historyMock.getBusinessKey()).thenReturn("sample-key");
+
+        Assertions.assertThat(subject.startProcess("testProcess", Map.of("businessKey", "sample-key")))
+                .satisfies(instance -> {
+                    Assertions.assertThat(instance.getId()).isEqualTo("MockProcessInstance");
+                    Assertions.assertThat(instance.getBusinessKey()).isEqualTo("sample-key");
+                });
 
         verify(runtimeService).createProcessInstanceByKey("testProcess");
         verify(instanceBuilder).businessKey("sample-key");
@@ -79,8 +83,7 @@ class RuntimeResourceTest {
         when(instanceBuilder.desc()).thenReturn(instanceBuilder);
         when(instanceBuilder.list()).thenReturn(List.of());
 
-        StepVerifier.create(subject.history("testProcess"))
-                .verifyComplete();
+        subject.history("testProcess");
 
         verify(historyService).createHistoricProcessInstanceQuery();
         verify(instanceBuilder).processDefinitionKey("testProcess");

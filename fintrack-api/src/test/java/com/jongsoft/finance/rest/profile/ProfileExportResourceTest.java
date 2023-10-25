@@ -1,22 +1,17 @@
 package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.StorageService;
-import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.providers.TagProvider;
-import com.jongsoft.finance.providers.TransactionRuleProvider;
-import com.jongsoft.finance.providers.BudgetProvider;
-import com.jongsoft.finance.providers.CategoryProvider;
-import com.jongsoft.finance.providers.ExpenseProvider;
+import com.jongsoft.finance.providers.*;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import io.micronaut.http.HttpHeaders;
+import io.micronaut.http.HttpResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.test.StepVerifier;
 
 import java.util.List;
 
@@ -78,12 +73,12 @@ class ProfileExportResourceTest {
     void export() {
         when(authenticationFacade.authenticated()).thenReturn("sample@gmail.com");
 
-        StepVerifier.create(subject.export())
-                .assertNext(response -> {
+        Assertions.assertThat(subject.export())
+                .isNotNull()
+                .isInstanceOfSatisfying(HttpResponse.class, response -> {
                     assertThat(response.status().getCode()).isEqualTo(200);
                     assertThat(response.header(HttpHeaders.CONTENT_TYPE)).isEqualTo("application/json");
                     assertThat(response.header(HttpHeaders.CONTENT_DISPOSITION)).isEqualTo("attachment; filename=\"sample@gmail.com-profile.json\"");
-                })
-                .verifyComplete();
+                });
     }
 }

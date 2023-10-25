@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 @Builder
 @Serdeable
+@NoArgsConstructor
+@AllArgsConstructor
 class AccountEditRequest {
 
     @NotNull

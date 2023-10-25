@@ -89,7 +89,7 @@ public class BatchImportResource {
         return importProvider.lookup(batchSlug)
                 .map(job -> {
                     job.archive();
-                    return "";
+                    return job.getSlug();
                 })
                 .getOrThrow(() -> StatusException.notFound("Cannot delete import with slug " + batchSlug));
     }

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.test.StepVerifier;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,8 +40,7 @@ class ProcessVariableResourceTest {
 
     @Test
     void variables() {
-        StepVerifier.create(subject.variables("procDefKey", "InstanceId"))
-                .verifyComplete();
+        subject.variables("procDefKey", "InstanceId");
 
         verify(variableInstanceQuery).processDefinitionKey("procDefKey");
         verify(variableInstanceQuery).processInstanceId("InstanceId");
@@ -50,8 +48,7 @@ class ProcessVariableResourceTest {
 
     @Test
     void variable() {
-        StepVerifier.create(subject.variable("procDefKey", "InstanceId", "variable"))
-                .verifyComplete();
+        subject.variable("procDefKey", "InstanceId", "variable");
 
         verify(variableInstanceQuery).processDefinitionKey("procDefKey");
         verify(variableInstanceQuery).processInstanceId("InstanceId");

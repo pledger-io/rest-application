@@ -2,17 +2,18 @@ package com.jongsoft.finance.rest.setting;
 
 import com.jongsoft.finance.core.SettingType;
 import com.jongsoft.finance.domain.core.Setting;
-import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.rest.model.SettingResponse;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
 
 class SettingResourceTest {
 
@@ -35,7 +36,7 @@ class SettingResourceTest {
 
     @Test
     void list() {
-        Mockito.when(settingProvider.lookup()).thenReturn(Flux.just(
+        Mockito.when(settingProvider.lookup()).thenReturn(Collections.List(
                 Setting.builder()
                         .name("RecordSetPageSize")
                         .type(SettingType.NUMBER)
@@ -48,9 +49,10 @@ class SettingResourceTest {
                         .build()
         ));
 
-        StepVerifier.create(subject.list())
-                .expectNextCount(2)
-                .verifyComplete();
+        Assertions.assertThat(subject.list())
+                .hasSize(2)
+                .extracting(SettingResponse::getName)
+                .containsExactlyInAnyOrder("RecordSetPageSize", "AutocompleteLimit");
     }
 
     @Test

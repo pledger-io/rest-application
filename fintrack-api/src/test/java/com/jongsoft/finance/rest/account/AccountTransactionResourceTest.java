@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -18,8 +19,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -95,7 +94,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .dateRange(new AccountTransactionSearchRequest.Range())
                 .build();
 
-        subject.search(1L, request).block();
+        subject.search(1L, request);
 
         Mockito.verify(accountProvider).lookup(1L);
         Mockito.verify(transactionProvider).lookup(Mockito.any());
@@ -105,8 +104,9 @@ class AccountTransactionResourceTest extends TestSetup {
     void search_notfound() {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option());
 
-        StepVerifier.create(subject.search(1L, new AccountTransactionSearchRequest()))
-            .verifyErrorMessage("Account not found with id 1");
+        Assertions.assertThatThrownBy(() -> subject.search(1L, new AccountTransactionSearchRequest()))
+                .isInstanceOf(StatusException.class)
+                .hasMessage("Account not found with id 1");
     }
 
     @Test
@@ -172,14 +172,12 @@ class AccountTransactionResourceTest extends TestSetup {
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(transactionProvider.first(Mockito.any(TransactionProvider.FilterCommand.class)))
-                .thenReturn(Mono.just(transaction));
+                .thenReturn(Control.Option(transaction));
 
-        StepVerifier.create(subject.first(1L, null))
-                .assertNext(response -> {
-                    Assertions.assertThat(response.getId()).isEqualTo(1L);
-                    Assertions.assertThat(response.getAmount()).isEqualTo(20D);
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.first(1L, null))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("amount", 20D);
     }
 
     @Test
@@ -216,14 +214,12 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
-        StepVerifier.create(subject.get(123L))
-                .assertNext(response -> {
-                    Assertions.assertThat(response.getId()).isEqualTo(1L);
-                    Assertions.assertThat(response.getAmount()).isEqualTo(20D);
-                    Assertions.assertThat(response.getDescription()).isEqualTo("Sample transaction");
-                    Assertions.assertThat(response.getCurrency()).isEqualTo("EUR");
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.get(123L))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("amount", 20D)
+                .hasFieldOrPropertyWithValue("description", "Sample transaction")
+                .hasFieldOrPropertyWithValue("currency", "EUR");
     }
 
     @Test
@@ -277,9 +273,12 @@ class AccountTransactionResourceTest extends TestSetup {
                 .budget(new AccountTransactionCreateRequest.EntityRef(3L, null))
                 .build();
 
-        StepVerifier.create(subject.update(123L, request))
-                .expectNextCount(1)
-                .verifyComplete();
+        Assertions.assertThat(subject.update(123L, request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("amount", 20.2D)
+                .hasFieldOrPropertyWithValue("description", "Updated transaction")
+                .hasFieldOrPropertyWithValue("currency", "EUR");
 
         Mockito.verify(transaction).changeAmount(20.2D, "EUR");
         Mockito.verify(transaction).changeAccount(true, account);
@@ -302,9 +301,9 @@ class AccountTransactionResourceTest extends TestSetup {
                 .build();
 
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option());
-        StepVerifier.create(subject.split(123L, request))
-                .expectErrorMessage("No transaction found for id 123")
-                .verify();
+        Assertions.assertThatThrownBy(() -> subject.split(123L, request))
+                .isInstanceOf(StatusException.class)
+                .hasMessage("No transaction found for id 123");
     }
 
     @Test
@@ -361,15 +360,19 @@ class AccountTransactionResourceTest extends TestSetup {
                 ))
                 .build();
 
-        StepVerifier.create(subject.split(123L, request))
-                .assertNext(response -> {
-                    Assertions.assertThat(response.getSplit().get(0))
+        Assertions.assertThat(subject.split(123L, request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("amount", 20D)
+                .hasFieldOrPropertyWithValue("currency", "EUR")
+                .satisfies(t -> {
+                    Assertions.assertThat(t.getSplit()).hasSize(2);
+                    Assertions.assertThat(t.getSplit().get(0))
                             .hasFieldOrPropertyWithValue("amount", 5D)
                             .hasFieldOrPropertyWithValue("description", "Part 1");
-                    Assertions.assertThat(response.getSplit().get(1))
+                    Assertions.assertThat(t.getSplit().get(1))
                             .hasFieldOrPropertyWithValue("description", "Part 2");
-                })
-                .verifyComplete();
+                });
     }
 
     @Test
@@ -388,7 +391,7 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
-        subject.delete(123L).block();
+        subject.delete(123L);
 
         Mockito.verify(transaction).delete();
     }

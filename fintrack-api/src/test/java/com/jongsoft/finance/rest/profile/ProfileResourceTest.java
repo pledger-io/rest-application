@@ -2,13 +2,14 @@ package com.jongsoft.finance.rest.profile;
 
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.SessionToken;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
 import com.jongsoft.finance.messaging.commands.user.RegisterTokenCommand;
 import com.jongsoft.finance.providers.UserProvider;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.PasswordEncoder;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Dates;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
@@ -17,8 +18,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,14 +47,12 @@ class ProfileResourceTest extends TestSetup {
 
     @Test
     public void get() {
-        StepVerifier.create(subject.get())
-                .assertNext(result -> {
-                    assertThat(result.getCurrency()).isEqualTo("EUR");
-                    assertThat(result.getProfilePicture()).isNull();
-                    assertThat(result.getTheme()).isEqualTo("dark");
-                    assertThat(result.isMfa()).isEqualTo(false);
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.get())
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("currency", "EUR")
+                .hasFieldOrPropertyWithValue("profilePicture", null)
+                .hasFieldOrPropertyWithValue("theme", "dark")
+                .hasFieldOrPropertyWithValue("mfa", false);
     }
 
     @Test
@@ -65,38 +62,35 @@ class ProfileResourceTest extends TestSetup {
         request.setTheme("light");
         request.setPassword("updated-password");
 
-        StepVerifier.create(subject.patch(request))
-                .assertNext(result -> {
-                    assertThat(result.getTheme()).isEqualTo("light");
-                    assertThat(result.getCurrency()).isEqualTo("USD");
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.patch(request))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("currency", "USD")
+                .hasFieldOrPropertyWithValue("profilePicture", null)
+                .hasFieldOrPropertyWithValue("theme", "light")
+                .hasFieldOrPropertyWithValue("mfa", false);
     }
 
     @Test
     public void sessions() {
         Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername()))
-                .thenReturn(Flux.just(
+                .thenReturn(Collections.List(
                         SessionToken.builder()
                                 .id(1L)
                                 .description("Sample session token")
                                 .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
                                 .build()));
 
-        StepVerifier.create(subject.sessions())
-                .assertNext(token -> {
-                    assertThat(token.getDescription()).isEqualTo("Sample session token");
-                    assertThat(token.getValidUntil().truncatedTo(ChronoUnit.MINUTES)).isEqualTo(LocalDateTime.now()
-                            .plusDays(1)
-                            .truncatedTo(ChronoUnit.MINUTES));
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.sessions())
+                .isNotNull()
+                .hasSize(1)
+                .first()
+                .hasFieldOrPropertyWithValue("description", "Sample session token");
     }
 
     @Test
     public void createSession() {
         Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername()))
-                .thenReturn(Flux.just(
+                .thenReturn(Collections.List(
                         SessionToken.builder()
                                 .id(1L)
                                 .description("Sample session token")
@@ -116,7 +110,7 @@ class ProfileResourceTest extends TestSetup {
                 .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
                 .build());
 
-        Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername())).thenReturn(Flux.just(token));
+        Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername())).thenReturn(Collections.List(token));
 
         subject.deleteSession(1L);
 

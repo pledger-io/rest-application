@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest.scheduler;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
@@ -12,15 +13,12 @@ import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.micronaut.http.HttpStatus;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ScheduledTransactionResourceTest extends TestSetup {
 
@@ -67,43 +65,49 @@ class ScheduledTransactionResourceTest extends TestSetup {
 
     @Test
     void list() {
-        StepVerifier.create(subject.list())
-                .assertNext(response -> assertThat(response.getName()).isEqualTo("Monthly gym membership"))
-                .verifyComplete();
+        Assertions.assertThat(subject.list())
+                .isNotNull()
+                .hasSize(1)
+                .first()
+                .hasFieldOrPropertyWithValue("name", "Monthly gym membership");
     }
 
     @Test
     void create() {
+        var destinationAccount = Account.builder().id(1L).build();
+        var sourceAccount = Mockito.spy(Account.builder().id(2L).build());
         var request = ScheduledTransactionCreateRequest.builder()
                 .amount(22.2)
                 .name("Sample schedule")
-                .schedule(new ScheduledTransactionCreateRequest.ScheduleValue())
+                .schedule(new ScheduledTransactionCreateRequest.ScheduleValue(Periodicity.WEEKS, 1))
                 .destination(ScheduledTransactionCreateRequest.EntityRef.builder().id(1L).build())
                 .source(ScheduledTransactionCreateRequest.EntityRef.builder().id(2L).build())
                 .build();
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(Account.builder().id(1L).build()));
-        Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(Account.builder().id(2L).build()));
+        Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(sourceAccount));
         Mockito.when(transactionScheduleProvider.lookup())
                 .thenReturn(Collections.List(scheduledTransaction, ScheduledTransaction.builder()
                         .name("Sample schedule")
                         .build()));
 
-        StepVerifier.create(subject.create(request))
-                .assertNext(response -> assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.CREATED.getCode()))
-                .verifyComplete();
+        subject.create(request);
+
+        Mockito.verify(sourceAccount).createSchedule(
+                "Sample schedule",
+                new ScheduleValue(Periodicity.WEEKS, 1),
+                destinationAccount,
+                22.2);
     }
 
     @Test
     void get() {
-        StepVerifier.create(subject.get(1L))
-                .assertNext(response -> {
-                    assertThat(response.getName()).isEqualTo("Monthly gym membership");
-                    assertThat(response.getDescription()).isEqualTo("Gym membership");
-                    assertThat(response.getRange().getStart()).isEqualTo(LocalDate.parse("2019-01-01"));
-                    assertThat(response.getRange().getEnd()).isEqualTo(LocalDate.parse("2021-01-01"));
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.get(1L))
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("name", "Monthly gym membership")
+                .hasFieldOrPropertyWithValue("description", "Gym membership")
+                .hasFieldOrPropertyWithValue("range.start", LocalDate.parse("2019-01-01"))
+                .hasFieldOrPropertyWithValue("range.end", LocalDate.parse("2021-01-01"));
     }
 
     @Test
@@ -116,12 +120,7 @@ class ScheduledTransactionResourceTest extends TestSetup {
                         LocalDate.of(2022, 1, 1)))
                 .build();
 
-        StepVerifier.create(subject.patch(1L, request))
-                .assertNext(response -> {
-                    assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
-
-                })
-                .verifyComplete();
+        subject.patch(1L, request);
 
         Mockito.verify(scheduledTransaction).describe("New name", "Updated description");
         Mockito.verify(scheduledTransaction).limit(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1));
@@ -129,17 +128,14 @@ class ScheduledTransactionResourceTest extends TestSetup {
 
     @Test
     void remove() {
-        var response = subject.remove(1L);
-
-        assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.OK.getCode());
-
+        subject.remove(1L);
         Mockito.verify(scheduledTransaction).terminate();
     }
 
     @Test
     void remove_notFound() {
-        var response = subject.remove(2L);
-
-        assertThat(response.getStatus().getCode()).isEqualTo(HttpStatus.NOT_FOUND.getCode());
+        Assertions.assertThatThrownBy(() -> subject.remove(2L))
+                .isInstanceOf(StatusException.class)
+                .hasMessage("No scheduled transaction found with id 2");
     }
 }

@@ -1,14 +1,15 @@
 package com.jongsoft.finance.rest.category;
 
-import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.messaging.commands.category.CreateCategoryCommand;
-import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.providers.CategoryProvider;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.category.CreateCategoryCommand;
+import com.jongsoft.finance.providers.CategoryProvider;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.TestSetup;
+import com.jongsoft.finance.rest.model.CategoryResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
@@ -19,8 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 
@@ -69,9 +68,10 @@ class CategoryResourceTest extends TestSetup {
                         .lastActivity(LocalDate.of(2019, 1, 2))
                         .build()));
 
-        StepVerifier.create(subject.list())
-                .expectNextCount(1)
-                .verifyComplete();
+        Assertions.assertThat(subject.list())
+                .hasSize(1)
+                .extracting(CategoryResponse::getId)
+                .containsExactly(1L);
     }
 
     @Test
@@ -101,9 +101,10 @@ class CategoryResourceTest extends TestSetup {
                         .lastActivity(LocalDate.of(2019, 1, 2))
                         .build()));
 
-        StepVerifier.create(subject.autocomplete("gro"))
-                .expectNextCount(1)
-                .verifyComplete();
+        Assertions.assertThat(subject.autocomplete("gro"))
+                .hasSize(1)
+                .extracting(CategoryResponse::getId)
+                .containsExactly(1L);
 
         var mockFilter = filterFactory.category();
         verify(categoryProvider).lookup(Mockito.any(CategoryProvider.FilterCommand.class));
@@ -113,7 +114,7 @@ class CategoryResourceTest extends TestSetup {
     @Test
     void create() {
         when(categoryProvider.lookup("grocery")).thenReturn(
-                Mono.just(Category.builder()
+                Control.Option(Category.builder()
                         .id(1L)
                         .build()));
 
@@ -122,11 +123,9 @@ class CategoryResourceTest extends TestSetup {
                 .description("Sample")
                 .build();
 
-        StepVerifier.create(subject.create(request))
-                .assertNext(response -> {
-                    assertThat(response.getId()).isEqualTo(1L);
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.create(request))
+                .extracting(CategoryResponse::getId)
+                .isEqualTo(1L);
 
         verify(eventPublisher).publishEvent(Mockito.any(CreateCategoryCommand.class));
     }
@@ -142,24 +141,20 @@ class CategoryResourceTest extends TestSetup {
                         .lastActivity(LocalDate.of(2019, 1, 2))
                         .build()));
 
-        StepVerifier.create(subject.get(1L))
-                .assertNext(response -> {
-                    assertThat(response.getId()).isEqualTo(1L);
-                    assertThat(response.getLabel()).isEqualTo("grocery");
-                    assertThat(response.getDescription()).isEqualTo("For groceries");
-                    assertThat(response.getLastUsed()).isEqualTo(LocalDate.of(2019, 1, 2));
-                })
-                .verifyComplete();
-
+        Assertions.assertThat(subject.get(1L))
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("label", "grocery")
+                .hasFieldOrPropertyWithValue("description", "For groceries")
+                .hasFieldOrPropertyWithValue("lastUsed", LocalDate.of(2019, 1, 2));
     }
 
     @Test
     void get_notFound() {
         when(categoryProvider.lookup(1L)).thenReturn(Control.Option());
 
-        StepVerifier.create(subject.get(1L))
-                .expectErrorMessage("No category found with id 1")
-                .verify();
+        Assertions.assertThatThrownBy(() -> subject.get(1L))
+                .isInstanceOf(StatusException.class)
+                .hasMessage("No category found with id 1");
     }
 
     @Test
@@ -179,14 +174,11 @@ class CategoryResourceTest extends TestSetup {
                 .description("Sample")
                 .build();
 
-        StepVerifier.create(subject.update(1L, request))
-                .assertNext(response -> {
-                    assertThat(response.getId()).isEqualTo(1L);
-                    assertThat(response.getLabel()).isEqualTo("grocery");
-                    assertThat(response.getDescription()).isEqualTo("Sample");
-                    assertThat(response.getLastUsed()).isEqualTo(LocalDate.of(2019, 1, 2));
-                })
-                .verifyComplete();
+        Assertions.assertThat(subject.update(1L, request))
+                .hasFieldOrPropertyWithValue("id", 1L)
+                .hasFieldOrPropertyWithValue("label", "grocery")
+                .hasFieldOrPropertyWithValue("description", "Sample")
+                .hasFieldOrPropertyWithValue("lastUsed", LocalDate.of(2019, 1, 2));
 
         verify(category).rename("grocery", "Sample");
     }
@@ -200,9 +192,9 @@ class CategoryResourceTest extends TestSetup {
                 .description("Sample")
                 .build();
 
-        StepVerifier.create(subject.update(1L, request))
-                .expectErrorMessage("No category found with id 1")
-                .verify();
+        Assertions.assertThatThrownBy(() -> subject.update(1L, request))
+                .isInstanceOf(StatusException.class)
+                .hasMessage("No category found with id 1");
     }
 
     @Test

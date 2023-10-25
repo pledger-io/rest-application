@@ -1,15 +1,15 @@
 package com.jongsoft.finance.rest.transaction;
 
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.DateUtils;
-import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.AccountTypeProvider;
-import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.providers.SettingProvider;
-import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.TransactionProvider;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.rest.process.RuntimeResource;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -22,13 +22,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class TransactionResourceTest extends TestSetup {
 
@@ -175,7 +172,7 @@ class TransactionResourceTest extends TestSetup {
 
     @Test
     void firstTransaction() {
-        Mockito.when(transactionProvider.first(Mockito.any())).thenReturn(Mono.just(
+        Mockito.when(transactionProvider.first(Mockito.any())).thenReturn(Control.Option(
                 Transaction.builder()
                         .date(LocalDate.of(2019, 1, 1))
                         .build()));
@@ -184,13 +181,13 @@ class TransactionResourceTest extends TestSetup {
                 .description("test")
                 .build();
 
-        StepVerifier.create(subject.firstTransaction(request))
-                .assertNext(response -> assertThat(response).isEqualTo(LocalDate.of(2019, 1, 1)))
-                .verifyComplete();
+        Assertions.assertThat(subject.firstTransaction(request))
+                .isNotNull()
+                .isEqualTo("2019-01-01");
     }
 
     @Test
-    void export() {
+    void export() throws IOException {
         Account account = Account.builder()
                 .id(1L)
                 .name("To account")
@@ -226,9 +223,9 @@ class TransactionResourceTest extends TestSetup {
                 ))
                 .thenReturn(ResultPage.empty());
 
-        StepVerifier.create(subject.export())
-                .expectNextCount(2)
-                .verifyComplete();
+        Assertions.assertThat(subject.export().toString())
+                        .isNotNull()
+                        .contains("Sample transaction");
     }
 
 }

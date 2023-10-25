@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.file;
 
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.lang.Control;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
@@ -40,7 +40,7 @@ class FileResourceTest {
 
     @Test
     void download() {
-        Mockito.when(storageService.read("fasjkdh8nfasd8")).thenReturn(Mono.just("sample-token".getBytes()));
+        Mockito.when(storageService.read("fasjkdh8nfasd8")).thenReturn(Control.Option("sample-token".getBytes()));
 
         var response = subject.download("fasjkdh8nfasd8");
 
