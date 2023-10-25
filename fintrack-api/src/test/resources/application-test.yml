@@ -4,7 +4,7 @@ datasources:
     driverClassName: org.h2.Driver
     username: ${DATABASE_USER:fintrack}
     password: ${DATABASE_PASSWORD:fintrack}
-    auto-update: true
+    auto-update: drop-create
     dialect: mysql
 
 
