@@ -1,53 +1,31 @@
 package com.jongsoft.finance.rest.transaction;
 
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
 import java.time.LocalDate;
 
 @Builder
-@NoArgsConstructor
+@Serdeable
 @AllArgsConstructor
-@Serdeable.Deserializable
-public class TransactionSearchRequest {
+class TransactionSearchRequest {
 
-    @Introspected
-    public static class DateRange {
-        @Schema(description = "Any matching transaction must be after this date")
-        private LocalDate start;
-        @Schema(description = "Any matching transaction must be before this date")
-        private LocalDate end;
-
-        public DateRange() {
-        }
-
-        public DateRange(LocalDate start, LocalDate end) {
-            this.start = start;
-            this.end = end;
-        }
-
-        public LocalDate getEnd() {
-            return end;
-        }
-
-        public LocalDate getStart() {
-            return start;
-        }
-
+    @Serdeable
+    public record DateRange(
+            @Schema(description = "Any matching transaction must be after this date")
+            LocalDate start,
+            @Schema(description = "Any matching transaction must be before this date")
+            LocalDate end) {
     }
 
-    @Data
-    @Introspected
-    public static class EntityRef {
-        @Schema(description = "The identifier of the relationship")
-        private long id;
+    @Serdeable
+    public record EntityRef(
+            @Schema(description = "The identifier of the relationship")
+            long id) {
     }
 
     @Schema(description = "The partial description the transaction should match", example = "saving tra")

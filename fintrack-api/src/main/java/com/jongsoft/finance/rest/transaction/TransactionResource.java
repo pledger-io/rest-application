@@ -65,16 +65,16 @@ public class TransactionResource {
         var command = filterFactory.transaction()
                 .ownAccounts()
                 .range(Dates.range(
-                        request.getDateRange().getStart(),
-                        request.getDateRange().getEnd()))
+                        request.getDateRange().start(),
+                        request.getDateRange().end()))
                 .pageSize(settingProvider.getPageSize())
                 .page(request.getPage());
 
         Control.Option(request.getCategory())
-                .map(e -> new EntityRef(e.getId()))
+                .map(e -> new EntityRef(e.id()))
                 .ifPresent(category -> command.categories(Collections.List(category)));
         Control.Option(request.getBudget())
-                .map(e -> new EntityRef(e.getId()))
+                .map(e -> new EntityRef(e.id()))
                 .ifPresent(category -> command.expenses(Collections.List(category)));
 
         if (request.getDescription() != null && !request.getDescription().isBlank()) {
@@ -161,8 +161,8 @@ public class TransactionResource {
 
         if (request.getDateRange() != null) {
             command.range(Dates.range(
-                    request.getDateRange().getStart(),
-                    request.getDateRange().getEnd()));
+                    request.getDateRange().start(),
+                    request.getDateRange().end()));
         }
 
         if (request.isTransfers()) {

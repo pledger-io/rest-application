@@ -3,14 +3,10 @@ package com.jongsoft.finance.rest.account;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 
 @Builder
 @Serdeable
-@NoArgsConstructor
-@AllArgsConstructor
 class AccountEditRequest {
 
     @NotNull

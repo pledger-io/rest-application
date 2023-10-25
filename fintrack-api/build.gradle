@@ -32,6 +32,8 @@ dependencies {
     // Investigate if this can be swapped for micronaut serde
     implementation("io.micronaut:micronaut-jackson-databind")
 
+    testImplementation("io.micronaut.test:micronaut-test-rest-assured")
+
     implementation project(':core'),
             project(':domain'),
             project(':jpa-repository'),

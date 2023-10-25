@@ -7,17 +7,14 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import com.jongsoft.finance.security.FintrackAuthenticationProvider;
 import com.jongsoft.finance.security.TwoFactorHelper;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import io.micronaut.core.async.publisher.Publishers;
-import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.authentication.AuthenticationProvider;
-import io.micronaut.security.authentication.AuthenticationResponse;
 import io.micronaut.security.authentication.ClientAuthentication;
 import io.micronaut.security.event.LoginSuccessfulEvent;
 import io.micronaut.security.rules.SecurityRule;
@@ -34,7 +31,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
-import org.reactivestreams.Publisher;
 
 import java.util.Map;
 import java.util.UUID;
@@ -45,9 +41,9 @@ import java.util.UUID;
 public class AuthenticationResource {
 
     private final AccessRefreshTokenGenerator accessRefreshTokenGenerator;
-    private final AuthenticationProvider authenticationProvider;
+    private final FintrackAuthenticationProvider authenticationProvider;
     private final RSASignatureConfiguration rsaSignatureConfiguration;
-    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher<LoginSuccessfulEvent> eventPublisher;
     private final UserProvider userProvider;
     private final AuthenticationFacade authenticationFacade;
     private final FinTrack application;
@@ -65,31 +61,25 @@ public class AuthenticationResource {
             responseCode = "200",
             description = "Successfully authenticated",
             content = @Content(schema = @Schema(implementation = AccessRefreshToken.class)))
-    public Publisher<AccessRefreshToken> authenticate(
-            HttpRequest<?> request,
-            @Valid @Body AuthenticationRequest authenticationRequest) {
-        return Publishers.map(
-                authenticationProvider.authenticate(request, authenticationRequest),
-                (AuthenticationResponse authenticated) -> {
-                    if (authenticated.isAuthenticated() && authenticated.getAuthentication().isPresent()) {
-                        var userDetails = authenticated.getAuthentication().get();
-                        var refresh = UUID.randomUUID().toString();
+    AccessRefreshToken authenticate(@Valid @Body AuthenticationRequest authenticationRequest) {
+        var authorization = authenticationProvider.authenticate(
+                authenticationRequest.getUsername(),
+                authenticationRequest.getSecret());
 
-                        eventPublisher.publishEvent(new LoginSuccessfulEvent(userDetails));
-                        var refreshToken = accessRefreshTokenGenerator.generate(refresh, userDetails);
-                        if (refreshToken.isPresent()) {
-                            var actualToken = refreshToken.get();
-                            application.registerToken(
-                                    userDetails.getName(),
-                                    actualToken.getRefreshToken(),
-                                    actualToken.getExpiresIn());
+        var userDetails = authorization.getAuthentication().get();
+        var refresh = UUID.randomUUID().toString();
 
-                            return actualToken;
-                        }
-                    }
+        eventPublisher.publishEvent(new LoginSuccessfulEvent(userDetails));
+        return accessRefreshTokenGenerator.generate(refresh, userDetails)
+                .map(token -> {
+                    application.registerToken(
+                            userDetails.getName(),
+                            token.getRefreshToken(),
+                            token.getExpiresIn());
 
-                    throw StatusException.notAuthorized("User cannot be found.");
-                });
+                    return token;
+                })
+                .orElseThrow(() -> StatusException.notAuthorized("Unable to generate token"));
     }
 
     @ApiDefaults

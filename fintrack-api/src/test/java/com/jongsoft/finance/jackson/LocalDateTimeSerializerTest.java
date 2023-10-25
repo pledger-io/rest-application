@@ -1,26 +1,25 @@
 package com.jongsoft.finance.jackson;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import io.micronaut.serde.ObjectMapper;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+@MicronautTest
 class LocalDateTimeSerializerTest {
 
     @Test
-    void serialize() throws IOException {
-        var serializer = new LocalDateTimeSerializer();
-        var generator = Mockito.mock(JsonGenerator.class);
-
-        serializer.serialize(LocalDateTime.of(2019, 2, 1, 12, 12), generator, Mockito.mock(SerializerProvider.class));
-
-        Mockito.verify(generator).writeString("2019-02-01T12:12:00");
+    void serialize(ObjectMapper objectMapper) throws IOException {
+        var serialized = objectMapper.writeValueAsString(LocalDateTime.of(2019, 2, 1, 12, 12));
+        Assertions.assertThat(serialized).isEqualTo("\"2019-02-01T12:12:00\"");
     }
 
+    @Test
+    void deserialize(ObjectMapper objectMapper) throws IOException {
+        var deserialized = objectMapper.readValue("\"2019-02-01T12:12:00\"", LocalDateTime.class);
+        Assertions.assertThat(deserialized).isEqualTo(LocalDateTime.of(2019, 2, 1, 12, 12));
+    }
 }

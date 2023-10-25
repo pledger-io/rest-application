@@ -1,15 +1,16 @@
 package com.jongsoft.finance.filter;
 
 import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.core.async.publisher.Publishers;
-import io.micronaut.http.HttpAttributes;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
+import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +24,9 @@ import java.time.Instant;
 @Filter("/**")
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class AuthenticationFilter implements HttpServerFilter {
-    public static final CharSequence AUTHENTICATION = HttpAttributes.PRINCIPAL.toString();
 
     private final ApplicationEventPublisher<InternalAuthenticationEvent> eventPublisher;
+    private final ObjectMapper objectMapper;
 
     @Override
     public int getOrder() {
@@ -42,7 +43,17 @@ public class AuthenticationFilter implements HttpServerFilter {
             if (request.getPath().contains("/api/localization/")) {
                 log.trace("{}: {}", request.getMethod(), request.getPath());
             } else {
-                log.debug("{}: {} in {} ms", request.getMethod(), request.getPath(), Duration.between(startTime, Instant.now()).toMillis());
+                if (log.isTraceEnabled() && request.getBody().isPresent()) {
+                    Object body = request.getBody().get();
+                    log.trace("{}: {} in {} ms, with request body {}.",
+                            request.getMethod(),
+                            request.getPath(),
+                            Duration.between(startTime, Instant.now()).toMillis(),
+                            Control.Try(() -> objectMapper.writeValueAsString(body))
+                                    .recover(Throwable::getMessage).get());
+                } else {
+                    log.debug("{}: {} in {} ms", request.getMethod(), request.getPath(), Duration.between(startTime, Instant.now()).toMillis());
+                }
             }
         });
     }

@@ -10,33 +10,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Setter
-@Serdeable.Deserializable
+@Serdeable
 public class BalanceRequest {
 
-    @Serdeable.Deserializable
-    public static class DateRange {
+    @Serdeable
+    public record DateRange(
         @Schema(description = "Earliest date a transaction may be.", implementation = String.class, format = "yyyy-mm-dd")
-        private LocalDate start;
+        LocalDate start,
         @Schema(description = "Latest date a transaction may be.", implementation = String.class, format = "yyyy-mm-dd")
-        private LocalDate end;
-
-        public DateRange() {
-        }
-
-        public DateRange(LocalDate start, LocalDate end) {
-            this.start = start;
-            this.end = end;
-        }
-
-        public LocalDate getEnd() {
-            return end;
-        }
-
-        public LocalDate getStart() {
-            return start;
-        }
-
-    }
+        LocalDate end
+    ) {}
 
     private List<EntityRef> accounts;
     private List<EntityRef> categories;
@@ -52,7 +35,7 @@ public class BalanceRequest {
     private String importSlug;
 
     @Setter
-    @Serdeable.Deserializable
+    @Serdeable
     public static class EntityRef implements AggregateBase {
 
         @Schema(description = "The unique identifier of the entity", required = true)

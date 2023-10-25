@@ -2,7 +2,7 @@ package com.jongsoft.finance.rest.statistic;
 
 import io.micronaut.serde.annotation.Serdeable;
 
-@Serdeable.Serializable
+@Serdeable
 class BalanceResponse {
 
     private double balance;

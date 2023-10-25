@@ -27,17 +27,28 @@ public class FintrackAuthenticationProvider implements AuthenticationProvider<Ht
     public Publisher<AuthenticationResponse> authenticate(
             final HttpRequest<?> httpRequest,
             final AuthenticationRequest<?, ?> authenticationRequest) {
-        log.info("Authentication request for user {}", authenticationRequest.getIdentity());
-        var authenticated = userProvider.lookup(authenticationRequest.getIdentity().toString());
-        if (authenticated.isPresent()) {
-            var userAccount = authenticated.get();
-            return validateUser(userAccount, authenticationRequest.getSecret().toString());
-        } else {
-            return Publishers.just(new AuthenticationFailed(AuthenticationFailureReason.USER_NOT_FOUND));
+        log.info("Authentication Http request for user {}", authenticationRequest.getIdentity());
+        try {
+            return Publishers.just(authenticate(
+                    authenticationRequest.getIdentity().toString(),
+                    authenticationRequest.getSecret().toString()));
+        } catch (AuthenticationException exception) {
+            return Publishers.just(exception);
         }
     }
 
-    private Publisher<AuthenticationResponse> validateUser(UserAccount userAccount, String secret) {
+    public AuthenticationResponse authenticate(String username, String password) {
+        log.info("Authentication basic request for user {}", username);
+        var authenticated = userProvider.lookup(username);
+        if (authenticated.isPresent()) {
+            var userAccount = authenticated.get();
+            return validateUser(userAccount, password);
+        } else {
+            throw AuthenticationResponse.exception(AuthenticationFailureReason.USER_NOT_FOUND);
+        }
+    }
+
+    private AuthenticationResponse validateUser(UserAccount userAccount, String secret) {
         boolean matches = application.getHashingAlgorithm().matches(userAccount.getPassword(), secret);
         if (matches) {
             List<String> roles = new ArrayList<>();
@@ -49,9 +60,9 @@ public class FintrackAuthenticationProvider implements AuthenticationProvider<Ht
                         .forEach(roles::add);
             }
 
-            return Publishers.just(AuthenticationResponse.success(userAccount.getUsername(), roles));
+            return AuthenticationResponse.success(userAccount.getUsername(), roles);
         } else {
-            return Publishers.just(AuthenticationResponse.exception(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH));
+            throw AuthenticationResponse.exception(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH);
         }
     }
 }

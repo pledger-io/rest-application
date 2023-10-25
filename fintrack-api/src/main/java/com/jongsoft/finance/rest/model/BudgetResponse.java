@@ -6,7 +6,7 @@ import io.micronaut.serde.annotation.Serdeable;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 
-@Serdeable.Serializable
+@Serdeable
 public class BudgetResponse {
 
     private final Budget wrapped;
@@ -29,6 +29,7 @@ public class BudgetResponse {
                 .stream();
     }
 
+    @Serdeable
     public class Period {
 
         public LocalDate getFrom() {

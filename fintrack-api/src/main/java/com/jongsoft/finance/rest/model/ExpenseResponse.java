@@ -28,6 +28,7 @@ public class ExpenseResponse {
         return new Bounds();
     }
 
+    @Serdeable.Serializable
     public class Bounds {
 
         public double getLower() {

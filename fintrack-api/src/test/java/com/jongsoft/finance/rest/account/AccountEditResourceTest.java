@@ -1,55 +1,65 @@
 package com.jongsoft.finance.rest.account;
 
-import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.account.SavingGoal;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.finance.rest.model.AccountResponse;
-import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import org.junit.jupiter.api.Assertions;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+@MicronautTest
+@DisplayName("Account edit resource")
 class AccountEditResourceTest extends TestSetup {
 
+    @Inject
     private AccountEditResource subject;
 
-    private CurrentUserProvider currentUserProvider;
+    @Inject
     private AccountProvider accountProvider;
 
     @BeforeEach
     void setup() {
-        accountProvider = Mockito.mock(AccountProvider.class);
-        currentUserProvider = Mockito.mock(CurrentUserProvider.class);
-
-        subject = new AccountEditResource(currentUserProvider, accountProvider);
-
-        Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
         Mockito.when(accountProvider.lookup(Mockito.anyLong())).thenReturn(Control.Option());
 
         var applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         new EventBus(applicationEventPublisher);
     }
 
-    @Test
-    void get_missing() {
-        Assertions.assertThrows(
-                StatusException.class,
-                () -> subject.get(1L),
-                "Account not found");
+    @AfterEach
+    void after() {
+        Mockito.reset(accountProvider, currentUserProvider);
     }
 
     @Test
-    void get() {
+    @DisplayName("Fetch a missing account")
+    void get_missing(RequestSpecification spec) {
+        // @formatter:off
+        spec.when()
+                .get("/api/accounts/{id}", "1")
+            .then()
+                .statusCode(404)
+                .body("message", CoreMatchers.equalTo("Account not found"));
+        // @formatter:on
+    }
+
+    @Test
+    @DisplayName("Create account")
+    void get(RequestSpecification spec) {
+        // @formatter:off
         Mockito.when(accountProvider.lookup(123L))
                 .thenReturn(Control.Option(Account.builder()
                         .id(1L)
@@ -59,26 +69,39 @@ class AccountEditResourceTest extends TestSetup {
                         .currency("EUR")
                         .build()));
 
-        assertThat(subject.get(123L))
-                .isNotNull()
-                .isInstanceOf(AccountResponse.class)
-                .hasFieldOrPropertyWithValue("name", "Sample account");
+        spec.when()
+                .get("/api/accounts/{id}", "123")
+            .then()
+                .statusCode(200)
+                .body("name", CoreMatchers.equalTo("Sample account"));
+
+        // @formatter:on
 
         Mockito.verify(accountProvider).lookup(123L);
     }
 
     @Test
-    void update_missing() {
-        Assertions.assertThrows(
-                StatusException.class,
-                () -> subject.update(1L, new AccountEditRequest()),
-                "Account not found");
+    @DisplayName("Update a missing account")
+    void update_missing(RequestSpecification spec) {
+        // @formatter:off
+        spec.when()
+                .body(AccountEditRequest.builder()
+                        .name("Sample account")
+                        .currency("EUR")
+                        .type("checking")
+                        .build())
+                .post("/api/accounts/{id}", "1")
+            .then()
+                .statusCode(404)
+                .body("message", CoreMatchers.equalTo("No account found with id 1"));
+        // @formatter:on
 
         Mockito.verify(accountProvider).lookup(1L);
     }
 
     @Test
-    void update() {
+    @DisplayName("Update account with valid data")
+    void update(RequestSpecification spec) {
         Mockito.when(accountProvider.lookup(123L))
                 .thenReturn(Control.Option(Account.builder()
                         .id(1L)
@@ -88,22 +111,25 @@ class AccountEditResourceTest extends TestSetup {
                         .currency("EUR")
                         .build()));
 
-        var request = AccountEditRequest.builder()
-                .name("Sample account")
-                .currency("EUR")
-                .type("checking")
-                .build();
-
-        assertThat(subject.update(123L, request))
-                .isNotNull()
-                .isInstanceOf(AccountResponse.class)
-                .hasFieldOrPropertyWithValue("name", "Sample account");
+        // @formatter:off
+        spec.when()
+                .body(AccountEditRequest.builder()
+                        .name("Sample account")
+                        .currency("EUR")
+                        .type("checking")
+                        .build())
+                .post("/api/accounts/{id}", "123")
+            .then()
+                .statusCode(200)
+                .body("name", CoreMatchers.equalTo("Sample account"));
+        // @formatter:on
 
         Mockito.verify(accountProvider).lookup(123L);
     }
 
     @Test
-    void updateIcon() {
+    @DisplayName("Set account image")
+    void updateIcon(RequestSpecification spec) {
         Account account = Mockito.spy(Account.builder()
                 .id(1L)
                 .user(ACTIVE_USER)
@@ -114,14 +140,21 @@ class AccountEditResourceTest extends TestSetup {
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
 
-        var response = subject.persistImage(1L, new AccountImageRequest("file-code"));
+        // @formatter:off
+        spec.when()
+                .body(new AccountImageRequest("file-code"))
+                .post("/api/accounts/{id}/image", "1")
+            .then()
+                .statusCode(200)
+                .body("iconFileCode", CoreMatchers.equalTo("file-code"));
+        // @formatter:on
 
-        assertThat(response.getIconFileCode()).isEqualTo("file-code");
         Mockito.verify(account).registerIcon("file-code");
     }
 
     @Test
-    void delete() {
+    @DisplayName("Delete existing account")
+    void delete(RequestSpecification spec) {
         Account account = Mockito.spy(Account.builder()
                 .id(1L)
                 .user(ACTIVE_USER)
@@ -132,13 +165,19 @@ class AccountEditResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(123L))
                 .thenReturn(Control.Option(account));
 
-        subject.delete(123L);
+        // @formatter:off
+        spec.when()
+                .delete("/api/accounts/{id}", "123")
+            .then()
+                .statusCode(200);
+        // @formatter:on
 
         Mockito.verify(account).terminate();
     }
 
     @Test
-    void createSavingGoal() {
+    @DisplayName("Create saving goal")
+    void createSavingGoal(RequestSpecification spec) {
         Account account = Mockito.spy(Account.builder()
                 .id(1L)
                 .user(ACTIVE_USER)
@@ -146,18 +185,32 @@ class AccountEditResourceTest extends TestSetup {
                 .name("Sample account")
                 .currency("EUR")
                 .type("savings")
+                .savingGoals(Collections.Set(
+                        SavingGoal.builder()
+                                .id(132L)
+                                .name("Saving for washer")
+                                .goal(BigDecimal.valueOf(1000))
+                                .targetDate(LocalDate.now().plusDays(300))
+                                .build()))
                 .build());
 
         Mockito.when(accountProvider.lookup(123L))
                 .thenReturn(Control.Option(account));
 
-        subject.createSavingGoal(
-                123L,
-                AccountSavingGoalCreateRequest.builder()
+        // @formatter:off
+        spec.when()
+                .body(AccountSavingGoalCreateRequest.builder()
                         .goal(BigDecimal.valueOf(1500))
                         .targetDate(LocalDate.now().plusDays(300))
                         .name("Saving for washer")
-                        .build());
+                        .build())
+                .post("/api/accounts/{id}/savings", "123")
+            .then()
+                .statusCode(200)
+                .assertThat()
+                .body("name", CoreMatchers.equalTo("Sample account"))
+                .body("savingGoals.name", CoreMatchers.hasItem("Saving for washer"));
+        // @formatter:on
 
         Mockito.verify(account).createSavingGoal(
                 "Saving for washer",

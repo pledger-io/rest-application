@@ -141,8 +141,8 @@ public class BalanceResource {
         if (request.getDateRange() != null) {
             filter.range(
                     Dates.range(
-                            request.getDateRange().getStart(),
-                            request.getDateRange().getEnd()
+                            request.getDateRange().start(),
+                            request.getDateRange().end()
                     )
             );
         }
