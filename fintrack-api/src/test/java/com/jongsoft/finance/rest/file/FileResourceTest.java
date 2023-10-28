@@ -2,55 +2,76 @@ package com.jongsoft.finance.rest.file;
 
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.lang.Control;
-import io.micronaut.http.multipart.CompletedFileUpload;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
+import java.io.File;
 import java.io.IOException;
 
+@MicronautTest
+@DisplayName("Attachment Resource")
 class FileResourceTest {
 
-    private FileResource subject;
-
-    @Mock
+    @Inject
     private StorageService storageService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        subject = new FileResource(storageService);
+    @Replaces
+    @MockBean
+    StorageService storageService() {
+        return Mockito.mock(StorageService.class);
     }
 
     @Test
-    void upload() throws IOException {
+    @DisplayName("Upload file")
+    void upload(RequestSpecification spec) throws IOException {
         Mockito.when(storageService.store("sample-data".getBytes())).thenReturn("sample-token");
 
-        var upload = Mockito.mock(CompletedFileUpload.class);
-        Mockito.when(upload.getInputStream()).thenReturn(getClass().getResourceAsStream("application.yml"));
-
-        subject.upload(upload);
+        // @formatter:off
+        spec
+            .given()
+                .multiPart("upload", new File(getClass().getResource("/application.yml").getFile()))
+            .when()
+                .post("/api/attachment")
+            .then()
+                .statusCode(201);
+        // @formatter:on
 
         Mockito.verify(storageService).store(Mockito.any());
     }
 
     @Test
-    void download() {
+    @DisplayName("Download file")
+    void download(RequestSpecification spec) {
         Mockito.when(storageService.read("fasjkdh8nfasd8")).thenReturn(Control.Option("sample-token".getBytes()));
 
-        var response = subject.download("fasjkdh8nfasd8");
+        // @formatter:off
+        spec.when()
+                .get("/api/attachment/fasjkdh8nfasd8")
+            .then()
+                .statusCode(200)
+                .body(Matchers.equalTo("sample-token"));
+        // @formatter:on
 
-        Assertions.assertThat(response).isEqualTo("sample-token".getBytes());
         Mockito.verify(storageService).read("fasjkdh8nfasd8");
     }
 
     @Test
-    void delete() {
-        subject.delete("fasjkdh8nfasd8");
+    @DisplayName("Delete file")
+    void delete(RequestSpecification spec) {
+
+        // @formatter:off
+        spec.when()
+                .delete("/api/attachment/fasjkdh8nfasd8")
+            .then()
+                .statusCode(204);
+        // @formatter:on
 
         Mockito.verify(storageService).remove("fasjkdh8nfasd8");
     }

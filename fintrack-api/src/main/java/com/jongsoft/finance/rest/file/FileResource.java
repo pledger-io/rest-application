@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.file;
 
 import com.jongsoft.finance.StorageService;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.multipart.CompletedFileUpload;
@@ -22,6 +23,7 @@ public class FileResource {
     private final StorageService storageService;
 
     @Post
+    @Status(HttpStatus.CREATED)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Operation(
             summary = "Upload attachment",
@@ -43,6 +45,7 @@ public class FileResource {
     }
 
     @Delete("/{fileCode}")
+    @Status(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Delete attachment",
             description = "Delete an existing attachment, if file encryption is enabled this will" +

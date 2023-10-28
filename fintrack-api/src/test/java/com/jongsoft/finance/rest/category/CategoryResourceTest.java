@@ -68,10 +68,11 @@ class CategoryResourceTest extends TestSetup {
 
         // @formatter:off
         spec
-            .when()
+            .given()
                 .body(CategorySearchRequest.builder()
                         .page(1)
                         .build())
+            .when()
                 .post("/api/categories")
             .then()
                 .statusCode(200)
@@ -116,15 +117,14 @@ class CategoryResourceTest extends TestSetup {
                         .id(1L)
                         .build()));
 
-        var request = CategoryCreateRequest.builder()
-                .name("grocery")
-                .description("Sample")
-                .build();
-
         // @formatter:off
         spec
+            .given()
+                .body(CategoryCreateRequest.builder()
+                        .name("grocery")
+                        .description("Sample")
+                        .build())
             .when()
-                .body(request)
                 .put("/api/categories")
             .then()
                 .statusCode(201)
@@ -187,11 +187,12 @@ class CategoryResourceTest extends TestSetup {
 
         // @formatter:off
         spec
-            .when()
+            .given()
                 .body(CategoryCreateRequest.builder()
                         .name("grocery")
                         .description("Sample")
                         .build())
+            .when()
                 .post("/api/categories/1")
             .then()
                 .statusCode(200)
@@ -209,15 +210,14 @@ class CategoryResourceTest extends TestSetup {
     void update_notFound(RequestSpecification spec) {
         when(categoryProvider.lookup(1L)).thenReturn(Control.Option());
 
-        var request = CategoryCreateRequest.builder()
-                .name("grocery")
-                .description("Sample")
-                .build();
-
         // @formatter:off
         spec
+            .given()
+                .body(CategoryCreateRequest.builder()
+                        .name("grocery")
+                        .description("Sample")
+                        .build())
             .when()
-                .body(request)
                 .post("/api/categories/{id}", 1L)
             .then()
                 .statusCode(404)

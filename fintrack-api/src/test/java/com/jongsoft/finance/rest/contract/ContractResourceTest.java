@@ -140,13 +140,14 @@ class ContractResourceTest extends TestSetup {
 
         // @formatter:off
         spec
-            .when()
+            .given()
                 .body(ContractCreateRequest.builder()
                         .name("Test Contract")
                         .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
                         .start(LocalDate.of(2019, 2, 1))
                         .end(LocalDate.of(2020, 2, 1))
                         .build())
+            .when()
                 .put("/api/contracts")
             .then()
                 .statusCode(201)
@@ -167,13 +168,14 @@ class ContractResourceTest extends TestSetup {
 
         // @formatter:off
         spec
-            .when()
+            .given()
                 .body(ContractCreateRequest.builder()
                         .name("Test Contract")
                         .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
                         .start(LocalDate.of(2019, 2, 1))
                         .end(LocalDate.of(2020, 2, 1))
                         .build())
+            .when()
                 .put("/api/contracts")
             .then()
                 .statusCode(404)
@@ -198,13 +200,14 @@ class ContractResourceTest extends TestSetup {
 
         // @formatter:off
         spec
-            .when()
+            .given()
                 .body(ContractCreateRequest.builder()
                         .name("Test Contract")
                         .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
                         .start(LocalDate.of(2019, 2, 1))
                         .end(LocalDate.of(2022, 2, 1))
                         .build())
+            .when()
                 .post("/api/contracts/1")
             .then()
                 .statusCode(200)
@@ -227,13 +230,14 @@ class ContractResourceTest extends TestSetup {
 
         // @formatter:off
         spec
-            .when()
+            .given()
                 .body(ContractCreateRequest.builder()
                         .name("Test Contract")
                         .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
                         .start(LocalDate.of(2019, 2, 1))
                         .end(LocalDate.of(2022, 2, 1))
                         .build())
+            .when()
                 .post("/api/contracts/{id}", 1)
             .then()
                 .statusCode(404)
