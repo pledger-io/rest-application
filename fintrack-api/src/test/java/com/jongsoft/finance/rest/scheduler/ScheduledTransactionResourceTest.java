@@ -35,7 +35,6 @@ class ScheduledTransactionResourceTest extends TestSetup {
     void setup() {
         accountProvider = Mockito.mock(AccountProvider.class);
         transactionScheduleProvider = Mockito.mock(TransactionScheduleProvider.class);
-        filterFactory = generateFilterMock();
 
         subject = new ScheduledTransactionResource(accountProvider, transactionScheduleProvider, filterFactory);
 

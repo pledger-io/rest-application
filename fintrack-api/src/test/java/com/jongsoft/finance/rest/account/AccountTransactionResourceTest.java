@@ -1,56 +1,52 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import io.micronaut.http.HttpStatus;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@MicronautTest
+@DisplayName("Account transaction resource")
 class AccountTransactionResourceTest extends TestSetup {
 
     private AccountTransactionResource subject;
 
-    private SettingProvider settingProvider;
-    private CurrentUserProvider currentUserProvider;
+    @Inject
     private AccountProvider accountProvider;
-    private FilterFactory filterFactory;
+    @Inject
     private TransactionProvider transactionProvider;
 
-    @BeforeEach
-    void setup() {
-        accountProvider = Mockito.mock(AccountProvider.class);
-        currentUserProvider = Mockito.mock(CurrentUserProvider.class);
-        filterFactory = generateFilterMock();
-        transactionProvider = Mockito.mock(TransactionProvider.class);
-        settingProvider = Mockito.mock(SettingProvider.class);
+    @Replaces
+    @MockBean
+    AccountProvider accountProvider() {
+        return Mockito.mock(AccountProvider.class);
+    }
 
-        subject = new AccountTransactionResource(filterFactory, transactionProvider, accountProvider, settingProvider);
-
-        Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
-
-        var applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        new EventBus(applicationEventPublisher);
+    @Replaces
+    @MockBean
+    TransactionProvider transactionProvider() {
+        return Mockito.mock(TransactionProvider.class);
     }
 
     @Test
-    void search() {
+    @DisplayName("Search for transactions")
+    void search(RequestSpecification spec) {
         Account account = Account.builder()
                 .id(1L)
                 .name("To account")
@@ -90,45 +86,77 @@ class AccountTransactionResourceTest extends TestSetup {
                                 .build()
                 ));
 
-        var request = AccountTransactionSearchRequest.builder()
-                .dateRange(new AccountTransactionSearchRequest.Range())
-                .build();
+        // @formatter:off
 
-        subject.search(1L, request);
+        spec.when()
+                .body(AccountTransactionSearchRequest.builder()
+                        .dateRange(new AccountTransactionSearchRequest.Range())
+                        .build())
+                .post("/api/accounts/{accountId}/transactions", 1)
+            .then()
+                .statusCode(200)
+                .body("info.records", Matchers.equalTo(1))
+                .body("content[0].id", Matchers.equalTo(1))
+                .body("content[0].description", Matchers.equalTo("Sample transaction"))
+                .body("content[0].currency", Matchers.equalTo("EUR"))
+                .body("content[0].type.code", Matchers.equalTo("DEBIT"))
+                .body("content[0].metadata.category", Matchers.equalTo("Grocery"))
+                .body("content[0].metadata.budget", Matchers.equalTo("Household"))
+                .body("content[0].dates.transaction", Matchers.equalTo("2019-01-15"))
+                .body("content[0].destination.id", Matchers.equalTo(1))
+                .body("content[0].source.id", Matchers.equalTo(2))
+                .body("content[0].amount", Matchers.equalTo(20.0F));
+
+        // @formatter:on
 
         Mockito.verify(accountProvider).lookup(1L);
         Mockito.verify(transactionProvider).lookup(Mockito.any());
     }
 
     @Test
-    void search_notfound() {
+    @DisplayName("Search for transactions with missing account")
+    void search_notfound(RequestSpecification spec) {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option());
 
-        Assertions.assertThatThrownBy(() -> subject.search(1L, new AccountTransactionSearchRequest()))
-                .isInstanceOf(StatusException.class)
-                .hasMessage("Account not found with id 1");
+        // @formatter:off
+        spec.when()
+                .body(AccountTransactionSearchRequest.builder()
+                        .dateRange(new AccountTransactionSearchRequest.Range())
+                        .build())
+                .post("/api/accounts/{accountId}/transactions", 1)
+            .then()
+                .statusCode(404)
+                .body("message", Matchers.equalTo("Account not found with id 1"));
+        // @formatter:on
     }
 
     @Test
-    void create() {
+    @DisplayName("Create a transaction for account")
+    void create(RequestSpecification spec) {
         final Account myAccount = Mockito.spy(Account.builder().id(1L).currency("EUR").type("checking").name("My account").build());
         final Account toAccount = Account.builder().id(2L).currency("EUR").type("creditor").name("Target account").build();
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(myAccount));
         Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(toAccount));
 
-        var request = AccountTransactionCreateRequest.builder()
-                .date(LocalDate.of(2019, 1, 1))
-                .currency("EUR")
-                .description("Sample transaction")
-                .amount(20.2)
-                .source(new AccountTransactionCreateRequest.EntityRef(1L, null))
-                .destination(new AccountTransactionCreateRequest.EntityRef(2L, null))
-                .category(new AccountTransactionCreateRequest.EntityRef(1L, null))
-                .budget(new AccountTransactionCreateRequest.EntityRef(3L, null))
-                .build();
+        // @formatter:off
 
-        subject.create(request);
+        spec.when()
+                .body(AccountTransactionCreateRequest.builder()
+                        .date(LocalDate.of(2019, 1, 1))
+                        .currency("EUR")
+                        .description("Sample transaction")
+                        .amount(20.2)
+                        .source(new AccountTransactionCreateRequest.EntityRef(1L, null))
+                        .destination(new AccountTransactionCreateRequest.EntityRef(2L, null))
+                        .category(new AccountTransactionCreateRequest.EntityRef(1L, null))
+                        .budget(new AccountTransactionCreateRequest.EntityRef(3L, null))
+                        .build())
+                .put("/api/accounts/{accountId}/transactions", 1)
+            .then()
+                .statusCode(204);
+
+        // @formatter:on
 
         Mockito.verify(accountProvider).lookup(1L);
         Mockito.verify(accountProvider).lookup(2L);
@@ -140,7 +168,8 @@ class AccountTransactionResourceTest extends TestSetup {
     }
 
     @Test
-    void first() {
+    @DisplayName("Fetch the first transaction for account")
+    void first(RequestSpecification spec) {
         Account account = Account.builder()
                 .id(1L)
                 .name("To account")
@@ -174,14 +203,29 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(transactionProvider.first(Mockito.any(TransactionProvider.FilterCommand.class)))
                 .thenReturn(Control.Option(transaction));
 
-        Assertions.assertThat(subject.first(1L, null))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("id", 1L)
-                .hasFieldOrPropertyWithValue("amount", 20D);
+        // @formatter:off
+
+        spec.when()
+                .get("/api/accounts/{accountId}/transactions/first", 1)
+            .then()
+                .statusCode(200)
+                .body("id", Matchers.equalTo(1))
+                .body("description", Matchers.equalTo("Sample transaction"))
+                .body("currency", Matchers.equalTo("EUR"))
+                .body("type.code", Matchers.equalTo("DEBIT"))
+                .body("metadata.category", Matchers.equalTo("Grocery"))
+                .body("metadata.budget", Matchers.equalTo("Household"))
+                .body("dates.transaction", Matchers.equalTo("2019-01-15"))
+                .body("destination.id", Matchers.equalTo(1))
+                .body("source.id", Matchers.equalTo(2))
+                .body("amount", Matchers.equalTo(20.0F));
+
+        // @formatter:on
     }
 
     @Test
-    void get() {
+    @DisplayName("Fetch transaction by id")
+    void get(RequestSpecification spec) {
         Account account = Account.builder()
                 .id(1L)
                 .name("To account")
@@ -214,16 +258,29 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
-        Assertions.assertThat(subject.get(123L))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("id", 1L)
-                .hasFieldOrPropertyWithValue("amount", 20D)
-                .hasFieldOrPropertyWithValue("description", "Sample transaction")
-                .hasFieldOrPropertyWithValue("currency", "EUR");
+        // @formatter:off
+
+        spec.when()
+                .get("/api/accounts/{accountId}/transactions/{transactionId}", 1, 123)
+            .then()
+                .statusCode(200)
+                .body("id", Matchers.equalTo(1))
+                .body("description", Matchers.equalTo("Sample transaction"))
+                .body("currency", Matchers.equalTo("EUR"))
+                .body("type.code", Matchers.equalTo("DEBIT"))
+                .body("metadata.category", Matchers.equalTo("Grocery"))
+                .body("metadata.budget", Matchers.equalTo("Household"))
+                .body("dates.transaction", Matchers.equalTo("2019-01-15"))
+                .body("destination.id", Matchers.equalTo(1))
+                .body("source.id", Matchers.equalTo(2))
+                .body("amount", Matchers.equalTo(20.0F));
+
+        // @formatter:on
     }
 
     @Test
-    void update() {
+    @DisplayName("Update transaction by id")
+    void update(RequestSpecification spec) {
         Account account = Account.builder()
                 .id(1L)
                 .name("To account")
@@ -262,23 +319,33 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(toAccount));
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
-        var request = AccountTransactionCreateRequest.builder()
-                .date(LocalDate.of(2019, 1, 1))
-                .currency("EUR")
-                .description("Updated transaction")
-                .amount(20.2)
-                .source(new AccountTransactionCreateRequest.EntityRef(1L, null))
-                .destination(new AccountTransactionCreateRequest.EntityRef(2L, null))
-                .category(new AccountTransactionCreateRequest.EntityRef(1L, null))
-                .budget(new AccountTransactionCreateRequest.EntityRef(3L, null))
-                .build();
+        // @formatter:off
 
-        Assertions.assertThat(subject.update(123L, request))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("id", 1L)
-                .hasFieldOrPropertyWithValue("amount", 20.2D)
-                .hasFieldOrPropertyWithValue("description", "Updated transaction")
-                .hasFieldOrPropertyWithValue("currency", "EUR");
+        spec.when()
+                .body(AccountTransactionCreateRequest.builder()
+                        .date(LocalDate.of(2019, 1, 1))
+                        .currency("EUR")
+                        .description("Updated transaction")
+                        .amount(20.2)
+                        .source(new AccountTransactionCreateRequest.EntityRef(1L, null))
+                        .destination(new AccountTransactionCreateRequest.EntityRef(2L, null))
+                        .category(new AccountTransactionCreateRequest.EntityRef(1L, null))
+                        .budget(new AccountTransactionCreateRequest.EntityRef(3L, null))
+                        .build())
+                .post("/api/accounts/{accountId}/transactions/{transactionId}", 1, 123)
+            .then()
+                .statusCode(200)
+                .body("id", Matchers.equalTo(1))
+                .body("description", Matchers.equalTo("Updated transaction"))
+                .body("currency", Matchers.equalTo("EUR"))
+                .body("type.code", Matchers.equalTo("CREDIT"))
+                .body("metadata.budget", Matchers.equalTo("Household"))
+                .body("dates.transaction", Matchers.equalTo("2019-01-01"))
+                .body("destination.id", Matchers.equalTo(2))
+                .body("source.id", Matchers.equalTo(1))
+                .body("amount", Matchers.equalTo(20.2F));
+
+        // @formatter:on
 
         Mockito.verify(transaction).changeAmount(20.2D, "EUR");
         Mockito.verify(transaction).changeAccount(true, account);
@@ -286,28 +353,30 @@ class AccountTransactionResourceTest extends TestSetup {
     }
 
     @Test
-    void split_noTransaction() {
-        var request = AccountTransactionSplitRequest.builder()
-                .splits(List.of(
-                        AccountTransactionSplitRequest.SplitRecord.builder()
-                                .description("Part 1")
-                                .amount(-5D)
-                                .build(),
-                        AccountTransactionSplitRequest.SplitRecord.builder()
-                                .description("Part 2")
-                                .amount(-15D)
-                                .build()
-                ))
-                .build();
-
+    @DisplayName("Split a transaction with missing transaction")
+    void split_noTransaction(RequestSpecification spec) {
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option());
-        Assertions.assertThatThrownBy(() -> subject.split(123L, request))
-                .isInstanceOf(StatusException.class)
-                .hasMessage("No transaction found for id 123");
+
+        // @formatter:off
+
+        spec.when()
+                .body(AccountTransactionSplitRequest.builder()
+                        .splits(List.of(
+                                new AccountTransactionSplitRequest.SplitRecord("Part 1", -5D),
+                                new AccountTransactionSplitRequest.SplitRecord("Part 2", -15D)
+                        ))
+                        .build())
+                .patch("/api/accounts/{accountId}/transactions/{transactionId}", 1, 123)
+            .then()
+                .statusCode(404)
+                .body("message", Matchers.equalTo("No transaction found for id 123"));
+
+        // @formatter:on
     }
 
     @Test
-    void split() {
+    @DisplayName("Split a transaction")
+    void split(RequestSpecification spec) {
         Account account = Account.builder()
                 .id(1L)
                 .user(ACTIVE_USER)
@@ -347,36 +416,39 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
-        var request = AccountTransactionSplitRequest.builder()
-                .splits(List.of(
-                        AccountTransactionSplitRequest.SplitRecord.builder()
-                                .description("Part 1")
-                                .amount(-5D)
-                                .build(),
-                        AccountTransactionSplitRequest.SplitRecord.builder()
-                                .description("Part 2")
-                                .amount(-15D)
-                                .build()
-                ))
-                .build();
+        // @formatter:off
 
-        Assertions.assertThat(subject.split(123L, request))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("id", 1L)
-                .hasFieldOrPropertyWithValue("amount", 20D)
-                .hasFieldOrPropertyWithValue("currency", "EUR")
-                .satisfies(t -> {
-                    Assertions.assertThat(t.getSplit()).hasSize(2);
-                    Assertions.assertThat(t.getSplit().get(0))
-                            .hasFieldOrPropertyWithValue("amount", 5D)
-                            .hasFieldOrPropertyWithValue("description", "Part 1");
-                    Assertions.assertThat(t.getSplit().get(1))
-                            .hasFieldOrPropertyWithValue("description", "Part 2");
-                });
+        spec.when()
+                .body(AccountTransactionSplitRequest.builder()
+                        .splits(List.of(
+                                new AccountTransactionSplitRequest.SplitRecord("Part 1", -5D),
+                                new AccountTransactionSplitRequest.SplitRecord("Part 2", -15D)
+                        ))
+                        .build())
+                .patch("/api/accounts/{accountId}/transactions/{transactionId}", 1, 123)
+            .then()
+                .statusCode(200)
+                .body("id", Matchers.equalTo(1))
+                .body("description", Matchers.equalTo("Sample transaction"))
+                .body("currency", Matchers.equalTo("EUR"))
+                .body("type.code", Matchers.equalTo("DEBIT"))
+                .body("metadata.category", Matchers.equalTo("Grocery"))
+                .body("metadata.budget", Matchers.equalTo("Household"))
+                .body("dates.transaction", Matchers.equalTo("2019-01-15"))
+                .body("destination.id", Matchers.equalTo(1))
+                .body("source.id", Matchers.equalTo(2))
+                .body("amount", Matchers.equalTo(20.0F))
+                .body("split[0].description", Matchers.equalTo("Part 1"))
+                .body("split[0].amount", Matchers.equalTo(5.0F))
+                .body("split[1].description", Matchers.equalTo("Part 2"))
+                .body("split[1].amount", Matchers.equalTo(15.0F));
+
+        // @formatter:on
     }
 
     @Test
-    void delete() {
+    @DisplayName("Delete a transaction by id")
+    void delete(RequestSpecification spec) {
         Transaction transaction = Mockito.mock(Transaction.class);
         Mockito.when(transaction.getUser()).thenReturn(ACTIVE_USER);
 
@@ -391,7 +463,14 @@ class AccountTransactionResourceTest extends TestSetup {
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(account));
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
-        subject.delete(123L);
+        // @formatter:off
+
+        spec.when()
+                .delete("/api/accounts/{accountId}/transactions/{transactionId}", 1, 123)
+            .then()
+                .statusCode(204);
+
+        // @formatter:on
 
         Mockito.verify(transaction).delete();
     }

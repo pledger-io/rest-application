@@ -26,7 +26,6 @@ class BalanceResourceTest extends TestSetup {
     @BeforeEach
     void setup() {
         applicationContext = Mockito.mock(ApplicationContext.class);
-        filterFactory = generateFilterMock();
         transactionProvider = Mockito.mock(TransactionProvider.class);
         subject = new BalanceResource(filterFactory, transactionProvider, applicationContext);
 

@@ -1,63 +1,63 @@
 package com.jongsoft.finance.rest.contract;
 
 import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.finance.rest.model.ContractResponse;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@MicronautTest
+@DisplayName("Contract Resource")
 class ContractResourceTest extends TestSetup {
 
-    private ContractResource subject;
-
-    @Mock
+    @Inject
     private AccountProvider accountProvider;
-    @Mock
+    @Inject
     private ContractProvider contractProvider;
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
-    @Mock
+    @Inject
     private TransactionScheduleProvider scheduleProvider;
 
-    private FilterFactory filterFactory;
+    @Replaces
+    @MockBean
+    AccountProvider accountProvider() {
+        return Mockito.mock(AccountProvider.class);
+    }
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @Replaces
+    @MockBean
+    ContractProvider contractProvider() {
+        return Mockito.mock(ContractProvider.class);
+    }
 
-        filterFactory = generateFilterMock();
-        subject = new ContractResource(accountProvider, contractProvider, scheduleProvider, filterFactory);
-
-        new EventBus(applicationEventPublisher);
+    @Replaces
+    @MockBean
+    TransactionScheduleProvider scheduleProvider() {
+        return Mockito.mock(TransactionScheduleProvider.class);
     }
 
     @Test
-    void list() {
+    @DisplayName("List all contracts")
+    void list(RequestSpecification spec) {
         when(contractProvider.lookup()).thenReturn(Collections.List(
                 Contract.builder()
                         .id(1L)
@@ -74,16 +74,22 @@ class ContractResourceTest extends TestSetup {
                         .build()
         ));
 
-        var response = subject.list();
-
-        assertThat(response.getActive()).hasSize(1);
-        assertThat(response.getActive().get(0).getId()).isEqualTo(1L);
-        assertThat(response.getTerminated()).hasSize(1);
-        assertThat(response.getTerminated().get(0).getId()).isEqualTo(2L);
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/contracts")
+            .then()
+                .statusCode(200)
+                .body("active", org.hamcrest.Matchers.hasSize(1))
+                .body("active[0].id", org.hamcrest.Matchers.equalTo(1))
+                .body("terminated", org.hamcrest.Matchers.hasSize(1))
+                .body("terminated[0].id", org.hamcrest.Matchers.equalTo(2));
+        // @formatter:on
     }
 
     @Test
-    void autocomplete() {
+    @DisplayName("Autocomplete contracts")
+    void autocomplete(RequestSpecification spec) {
         when(contractProvider.search("cont")).thenReturn(Collections.List(
                 Contract.builder()
                         .id(1L)
@@ -100,14 +106,21 @@ class ContractResourceTest extends TestSetup {
                         .build()
         ));
 
-        Assertions.assertThat(subject.autocomplete("cont"))
-                .hasSize(2)
-                .extracting(ContractResponse::getId)
-                .containsExactly(1L, 2L);
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/contracts/auto-complete?token=cont")
+            .then()
+                .statusCode(200)
+                .body("$", org.hamcrest.Matchers.hasSize(2))
+                .body("[0].id", org.hamcrest.Matchers.equalTo(1))
+                .body("[1].id", org.hamcrest.Matchers.equalTo(2));
+        // @formatter:on
     }
 
     @Test
-    void create() {
+    @DisplayName("Create contract")
+    void create(RequestSpecification spec) {
         var account = Account.builder()
                 .id(1L)
                 .balance(0D)
@@ -125,49 +138,53 @@ class ContractResourceTest extends TestSetup {
                         .endDate(LocalDate.of(2020, 2, 1))
                         .build()));
 
-        var request = ContractCreateRequest.builder()
-                .name("Test Contract")
-                .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
-                .start(LocalDate.of(2019, 2, 1))
-                .end(LocalDate.of(2020, 2, 1))
-                .build();
-
-        Assertions.assertThat(subject.create(request))
-                        .hasFieldOrPropertyWithValue("name", "Test Contract")
-                        .hasFieldOrPropertyWithValue("contractAvailable", false)
-                        .hasFieldOrPropertyWithValue("company.id", 1L)
-                        .hasFieldOrPropertyWithValue("company.name", "Sample account")
-                        .hasFieldOrPropertyWithValue("start", LocalDate.of(2019, 2, 1))
-                        .hasFieldOrPropertyWithValue("end", LocalDate.of(2020, 2, 1));
-
-        verify(applicationEventPublisher).publishEvent(Mockito.any(CreateContractCommand.class));
+        // @formatter:off
+        spec
+            .when()
+                .body(ContractCreateRequest.builder()
+                        .name("Test Contract")
+                        .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
+                        .start(LocalDate.of(2019, 2, 1))
+                        .end(LocalDate.of(2020, 2, 1))
+                        .build())
+                .put("/api/contracts")
+            .then()
+                .statusCode(201)
+                .body("id", org.hamcrest.Matchers.equalTo(1))
+                .body("name", org.hamcrest.Matchers.equalTo("Test Contract"))
+                .body("contractAvailable", org.hamcrest.Matchers.equalTo(false))
+                .body("company.id", org.hamcrest.Matchers.equalTo(1))
+                .body("company.name", org.hamcrest.Matchers.equalTo("Sample account"))
+                .body("start", org.hamcrest.Matchers.equalTo("2019-02-01"))
+                .body("end", org.hamcrest.Matchers.equalTo("2020-02-01"));
+        // @formatter:on
     }
 
     @Test
-    void create_accountNotFound() {
+    @DisplayName("Create contract with no account")
+    void create_accountNotFound(RequestSpecification spec) {
         when(accountProvider.lookup(1L)).thenReturn(Control.Option());
 
-        var request = ContractCreateRequest.builder()
-                .name("Test Contract")
-                .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
-                .start(LocalDate.of(2019, 2, 1))
-                .end(LocalDate.of(2020, 2, 1))
-                .build();
-
-        Assertions.assertThatThrownBy(() -> subject.create(request))
-                .isInstanceOf(StatusException.class)
-                .hasMessage("No account can be found for 1");
+        // @formatter:off
+        spec
+            .when()
+                .body(ContractCreateRequest.builder()
+                        .name("Test Contract")
+                        .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
+                        .start(LocalDate.of(2019, 2, 1))
+                        .end(LocalDate.of(2020, 2, 1))
+                        .build())
+                .put("/api/contracts")
+            .then()
+                .statusCode(404)
+                .body("message", org.hamcrest.Matchers.equalTo("No account can be found for 1"));
+        // @formatter:on
     }
 
     @Test
-    void update() {
+    @DisplayName("Update existing contract")
+    void update(RequestSpecification spec) {
         final Contract contract = Mockito.mock(Contract.class);
-        var request = ContractCreateRequest.builder()
-                .name("Test Contract")
-                .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
-                .start(LocalDate.of(2019, 2, 1))
-                .end(LocalDate.of(2022, 2, 1))
-                .build();
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
         when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
@@ -179,7 +196,22 @@ class ContractResourceTest extends TestSetup {
                 .currency("EUR")
                 .build());
 
-        subject.update(1L, request);
+        // @formatter:off
+        spec
+            .when()
+                .body(ContractCreateRequest.builder()
+                        .name("Test Contract")
+                        .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
+                        .start(LocalDate.of(2019, 2, 1))
+                        .end(LocalDate.of(2022, 2, 1))
+                        .build())
+                .post("/api/contracts/1")
+            .then()
+                .statusCode(200)
+                .body("contractAvailable", org.hamcrest.Matchers.equalTo(false))
+                .body("company.id", org.hamcrest.Matchers.equalTo(1))
+                .body("company.name", org.hamcrest.Matchers.equalTo("Sample account"));
+        // @formatter:on
 
         verify(contract).change(
                 "Test Contract",
@@ -189,23 +221,29 @@ class ContractResourceTest extends TestSetup {
     }
 
     @Test
-    void update_notFound() {
-        var request = ContractCreateRequest.builder()
-                .name("Test Contract")
-                .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
-                .start(LocalDate.of(2019, 2, 1))
-                .end(LocalDate.of(2022, 2, 1))
-                .build();
-
+    @DisplayName("Update contract not found")
+    void update_notFound(RequestSpecification spec) {
         when(contractProvider.lookup(1L)).thenReturn(Control.Option());
 
-        Assertions.assertThatThrownBy(() -> subject.update(1L, request))
-                .isInstanceOf(StatusException.class)
-                .hasMessage("No contract can be found for 1");
+        // @formatter:off
+        spec
+            .when()
+                .body(ContractCreateRequest.builder()
+                        .name("Test Contract")
+                        .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
+                        .start(LocalDate.of(2019, 2, 1))
+                        .end(LocalDate.of(2022, 2, 1))
+                        .build())
+                .post("/api/contracts/{id}", 1)
+            .then()
+                .statusCode(404)
+                .body("message", org.hamcrest.Matchers.equalTo("No contract can be found for 1"));
+        // @formatter:on
     }
 
     @Test
-    void get() {
+    @DisplayName("Get contract")
+    void get(RequestSpecification spec) {
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(
                 Contract.builder()
                         .id(1L)
@@ -222,19 +260,26 @@ class ContractResourceTest extends TestSetup {
                         .endDate(LocalDate.now().plusMonths(1))
                         .build()));
 
-        Assertions.assertThat(subject.get(1L))
-                .hasFieldOrPropertyWithValue("id", 1L)
-                .hasFieldOrPropertyWithValue("name", "Test contract")
-                .hasFieldOrPropertyWithValue("description", "Sample contract")
-                .hasFieldOrPropertyWithValue("start", LocalDate.of(2019, 1, 1))
-                .hasFieldOrPropertyWithValue("end", LocalDate.now().plusMonths(1))
-                .hasFieldOrPropertyWithValue("company.id", 1L)
-                .hasFieldOrPropertyWithValue("company.name", "Sample account")
-                .hasFieldOrPropertyWithValue("company.account.currency", "EUR");
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/contracts/{id}", 1)
+            .then()
+                .statusCode(200)
+                .body("id", org.hamcrest.Matchers.equalTo(1))
+                .body("name", org.hamcrest.Matchers.equalTo("Test contract"))
+                .body("description", org.hamcrest.Matchers.equalTo("Sample contract"))
+                .body("start", org.hamcrest.Matchers.equalTo("2019-01-01"))
+                .body("end", org.hamcrest.Matchers.equalTo(LocalDate.now().plusMonths(1).toString()))
+                .body("company.id", org.hamcrest.Matchers.equalTo(1))
+                .body("company.name", org.hamcrest.Matchers.equalTo("Sample account"))
+                .body("company.account.currency", org.hamcrest.Matchers.equalTo("EUR"));
+        // @formatter:on
     }
 
     @Test
-    void schedule() {
+    @DisplayName("Schedule transaction for contract")
+    void schedule(RequestSpecification spec) {
         var contract = Mockito.spy(Contract.builder()
                 .id(1L)
                 .startDate(LocalDate.of(2020, 1, 1))
@@ -257,50 +302,79 @@ class ContractResourceTest extends TestSetup {
                 .when(scheduleProvider)
                 .lookup(filterCommand);
 
-        subject.schedule(1L, new CreateScheduleRequest(
-                new CreateScheduleRequest.ScheduleValueJson(Periodicity.MONTHS, 3),
-                new CreateScheduleRequest.EntityRef(1L, null),
-                20.2));
+        // @formatter:off
+        spec
+            .when()
+                .body(CreateScheduleRequest.builder()
+                                .amount(20.2)
+                                .source(new CreateScheduleRequest.EntityRef(1L, null))
+                                .schedule(new CreateScheduleRequest.ScheduleValueJson(Periodicity.MONTHS, 3))
+                        .build())
+                .put("/api/contracts/1/schedule")
+            .then()
+                .statusCode(200);
+        // @formatter:on
 
         verify(contract).createSchedule(new ScheduleValue(Periodicity.MONTHS, 3), account, 20.2);
         verify(schedule).limitForContract();
     }
 
     @Test
-    void warnExpiry() {
+    @DisplayName("Warn before expiry date")
+    void warnExpiry(RequestSpecification spec) {
         final Contract contract = Mockito.mock(Contract.class);
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
         when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
 
-        subject.warnExpiry(1L);
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/contracts/{id}/expire-warning", 1)
+            .then()
+                .statusCode(200);
+        // @formatter:on
 
         verify(contract).warnBeforeExpires();
     }
 
     @Test
-    void attachment() {
+    @DisplayName("Attach PDF file for contract")
+    void attachment(RequestSpecification spec) {
         final Contract contract = Mockito.mock(Contract.class);
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
         when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
 
-        var request = new ContractAttachmentRequest();
-        request.setFileCode("file-code-1");
-
-        subject.attachment(1L, request);
+        // @formatter:off
+        spec
+            .when()
+                .body(ContractAttachmentRequest.builder()
+                        .fileCode("file-code-1")
+                        .build())
+                .post("/api/contracts/{id}/attachment", 1)
+            .then()
+                .statusCode(200);
+        // @formatter:on
 
         verify(contract).registerUpload("file-code-1");
     }
 
     @Test
-    void delete() {
+    @DisplayName("Delete contract")
+    void delete(RequestSpecification spec) {
         final Contract contract = Mockito.mock(Contract.class);
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
         when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
 
-        subject.delete(1L);
+        // @formatter:off
+        spec
+            .when()
+                .delete("/api/contracts/{id}", 1)
+            .then()
+                .statusCode(200);
+        // @formatter:on
 
         verify(contract).terminate();
     }

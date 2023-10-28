@@ -1,65 +1,41 @@
 package com.jongsoft.finance.rest.category;
 
 import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.messaging.commands.category.CreateCategoryCommand;
 import com.jongsoft.finance.providers.CategoryProvider;
-import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.finance.rest.model.CategoryResponse;
-import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@MicronautTest
+@DisplayName("Category Resource")
 class CategoryResourceTest extends TestSetup {
 
-    private CategoryResource subject;
-
-    private FilterFactory filterFactory;
-    @Mock
+    @Inject
     private CategoryProvider categoryProvider;
-    @Mock
-    private CurrentUserProvider currentUserProvider;
-    @Mock
-    private SettingProvider settingProvider;
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        filterFactory = generateFilterMock();
-
-        subject = new CategoryResource(
-                filterFactory,
-                categoryProvider,
-                currentUserProvider,
-                settingProvider);
-
-        new EventBus(eventPublisher);
-
-        when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
+    @Replaces
+    @MockBean
+    CategoryProvider categoryProvider() {
+        return Mockito.mock(CategoryProvider.class);
     }
 
     @Test
-    void list() {
+    @DisplayName("List all categories")
+    void list(RequestSpecification spec) {
         when(categoryProvider.lookup()).thenReturn(Collections.List(
                 Category.builder()
                         .id(1L)
@@ -68,14 +44,20 @@ class CategoryResourceTest extends TestSetup {
                         .lastActivity(LocalDate.of(2019, 1, 2))
                         .build()));
 
-        Assertions.assertThat(subject.list())
-                .hasSize(1)
-                .extracting(CategoryResponse::getId)
-                .containsExactly(1L);
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/categories")
+            .then()
+                .statusCode(200)
+                .body("$", org.hamcrest.Matchers.hasSize(1))
+                .body("[0].id", org.hamcrest.Matchers.equalTo(1));
+        // @formatter:on
     }
 
     @Test
-    void search() {
+    @DisplayName("Search categories")
+    void search(RequestSpecification spec) {
         when(categoryProvider.lookup(Mockito.any(CategoryProvider.FilterCommand.class))).thenReturn(ResultPage.of(
                 Category.builder()
                         .id(1L)
@@ -84,14 +66,24 @@ class CategoryResourceTest extends TestSetup {
                         .lastActivity(LocalDate.of(2019, 1, 2))
                         .build()));
 
-        var response = subject.search(new CategorySearchRequest(1));
-
-        assertThat(response.getInfo().getRecords()).isEqualTo(1);
-        assertThat(response.getContent().get(0).getId()).isEqualTo(1L);
+        // @formatter:off
+        spec
+            .when()
+                .body(CategorySearchRequest.builder()
+                        .page(1)
+                        .build())
+                .post("/api/categories")
+            .then()
+                .statusCode(200)
+                .body("info.records", org.hamcrest.Matchers.equalTo(1))
+                .body("content", org.hamcrest.Matchers.hasSize(1))
+                .body("content[0].id", org.hamcrest.Matchers.equalTo(1));
+        // @formatter:on
     }
 
     @Test
-    void autocomplete() {
+    @DisplayName("Autocomplete categories by token")
+    void autocomplete(RequestSpecification spec) {
         when(categoryProvider.lookup(Mockito.any(CategoryProvider.FilterCommand.class))).thenReturn(
                 ResultPage.of(Category.builder()
                         .id(1L)
@@ -101,10 +93,15 @@ class CategoryResourceTest extends TestSetup {
                         .lastActivity(LocalDate.of(2019, 1, 2))
                         .build()));
 
-        Assertions.assertThat(subject.autocomplete("gro"))
-                .hasSize(1)
-                .extracting(CategoryResponse::getId)
-                .containsExactly(1L);
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/categories/auto-complete?token=gro")
+            .then()
+                .statusCode(200)
+                .body("$", org.hamcrest.Matchers.hasSize(1))
+                .body("[0].id", org.hamcrest.Matchers.equalTo(1));
+        // @formatter:on
 
         var mockFilter = filterFactory.category();
         verify(categoryProvider).lookup(Mockito.any(CategoryProvider.FilterCommand.class));
@@ -112,7 +109,8 @@ class CategoryResourceTest extends TestSetup {
     }
 
     @Test
-    void create() {
+    @DisplayName("Create category")
+    void create(RequestSpecification spec) {
         when(categoryProvider.lookup("grocery")).thenReturn(
                 Control.Option(Category.builder()
                         .id(1L)
@@ -123,15 +121,20 @@ class CategoryResourceTest extends TestSetup {
                 .description("Sample")
                 .build();
 
-        Assertions.assertThat(subject.create(request))
-                .extracting(CategoryResponse::getId)
-                .isEqualTo(1L);
-
-        verify(eventPublisher).publishEvent(Mockito.any(CreateCategoryCommand.class));
+        // @formatter:off
+        spec
+            .when()
+                .body(request)
+                .put("/api/categories")
+            .then()
+                .statusCode(201)
+                .body("id", org.hamcrest.Matchers.equalTo(1));
+        // @formatter:on
     }
 
     @Test
-    void get() {
+    @DisplayName("Fetch category")
+    void get(RequestSpecification spec) {
         when(categoryProvider.lookup(1L)).thenReturn(
                 Control.Option(Category.builder()
                         .id(1L)
@@ -141,24 +144,37 @@ class CategoryResourceTest extends TestSetup {
                         .lastActivity(LocalDate.of(2019, 1, 2))
                         .build()));
 
-        Assertions.assertThat(subject.get(1L))
-                .hasFieldOrPropertyWithValue("id", 1L)
-                .hasFieldOrPropertyWithValue("label", "grocery")
-                .hasFieldOrPropertyWithValue("description", "For groceries")
-                .hasFieldOrPropertyWithValue("lastUsed", LocalDate.of(2019, 1, 2));
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/categories/1")
+            .then()
+                .statusCode(200)
+                .body("id", org.hamcrest.Matchers.equalTo(1))
+                .body("label", org.hamcrest.Matchers.equalTo("grocery"))
+                .body("description", org.hamcrest.Matchers.equalTo("For groceries"))
+                .body("lastUsed", org.hamcrest.Matchers.equalTo("2019-01-02"));
+        // @formatter:on
     }
 
     @Test
-    void get_notFound() {
+    @DisplayName("Fetch category not found")
+    void get_notFound(RequestSpecification spec) {
         when(categoryProvider.lookup(1L)).thenReturn(Control.Option());
 
-        Assertions.assertThatThrownBy(() -> subject.get(1L))
-                .isInstanceOf(StatusException.class)
-                .hasMessage("No category found with id 1");
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/categories/1")
+            .then()
+                .statusCode(404)
+                .body("message", org.hamcrest.Matchers.equalTo("No category found with id 1"));
+        // @formatter:on
     }
 
     @Test
-    void update() {
+    @DisplayName("Update category")
+    void update(RequestSpecification spec) {
         Category category = Mockito.spy(Category.builder()
                 .id(1L)
                 .label("grocery")
@@ -169,22 +185,28 @@ class CategoryResourceTest extends TestSetup {
 
         when(categoryProvider.lookup(1L)).thenReturn(Control.Option(category));
 
-        var request = CategoryCreateRequest.builder()
-                .name("grocery")
-                .description("Sample")
-                .build();
-
-        Assertions.assertThat(subject.update(1L, request))
-                .hasFieldOrPropertyWithValue("id", 1L)
-                .hasFieldOrPropertyWithValue("label", "grocery")
-                .hasFieldOrPropertyWithValue("description", "Sample")
-                .hasFieldOrPropertyWithValue("lastUsed", LocalDate.of(2019, 1, 2));
+        // @formatter:off
+        spec
+            .when()
+                .body(CategoryCreateRequest.builder()
+                        .name("grocery")
+                        .description("Sample")
+                        .build())
+                .post("/api/categories/1")
+            .then()
+                .statusCode(200)
+                .body("id", org.hamcrest.Matchers.equalTo(1))
+                .body("label", org.hamcrest.Matchers.equalTo("grocery"))
+                .body("description", org.hamcrest.Matchers.equalTo("Sample"))
+                .body("lastUsed", org.hamcrest.Matchers.equalTo("2019-01-02"));
+        // @formatter:on
 
         verify(category).rename("grocery", "Sample");
     }
 
     @Test
-    void update_notFound() {
+    @DisplayName("Update category not found")
+    void update_notFound(RequestSpecification spec) {
         when(categoryProvider.lookup(1L)).thenReturn(Control.Option());
 
         var request = CategoryCreateRequest.builder()
@@ -192,19 +214,32 @@ class CategoryResourceTest extends TestSetup {
                 .description("Sample")
                 .build();
 
-        Assertions.assertThatThrownBy(() -> subject.update(1L, request))
-                .isInstanceOf(StatusException.class)
-                .hasMessage("No category found with id 1");
+        // @formatter:off
+        spec
+            .when()
+                .body(request)
+                .post("/api/categories/{id}", 1L)
+            .then()
+                .statusCode(404)
+                .body("message", org.hamcrest.Matchers.equalTo("No category found with id 1"));
+        // @formatter:on
     }
 
     @Test
-    void delete() {
+    @DisplayName("Delete category")
+    void delete(RequestSpecification spec) {
         Category category = Mockito.mock(Category.class);
 
         when(category.getUser()).thenReturn(ACTIVE_USER);
         when(categoryProvider.lookup(1L)).thenReturn(Control.Option(category));
 
-        subject.delete(1L);
+        // @formatter:off
+        spec
+            .when()
+                .delete("/api/categories/1")
+            .then()
+                .statusCode(204);
+        // @formatter:on
 
         verify(category).remove();
     }

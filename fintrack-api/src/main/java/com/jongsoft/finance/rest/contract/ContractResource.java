@@ -10,6 +10,7 @@ import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.model.ContractResponse;
 import com.jongsoft.lang.Collections;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -64,6 +65,7 @@ public class ContractResource {
     }
 
     @Put
+    @Status(HttpStatus.CREATED)
     @Operation(
             summary = "Create contract",
             description = "Adds a new contract to FinTrack for the authenticated user",
@@ -123,7 +125,7 @@ public class ContractResource {
             parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
     )
     void schedule(@PathVariable long contractId, @Body @Valid CreateScheduleRequest request) {
-        var account = accountProvider.lookup(request.getSource().getId())
+        var account = accountProvider.lookup(request.getSource().id())
                 .getOrThrow(() -> StatusException.badRequest("No source account found with provided id."));
 
         var contract = contractProvider.lookup(contractId)

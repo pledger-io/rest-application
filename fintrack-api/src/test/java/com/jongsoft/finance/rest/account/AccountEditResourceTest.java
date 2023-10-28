@@ -2,12 +2,12 @@ package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.SavingGoal;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
@@ -26,22 +26,22 @@ import java.time.LocalDate;
 class AccountEditResourceTest extends TestSetup {
 
     @Inject
-    private AccountEditResource subject;
-
-    @Inject
     private AccountProvider accountProvider;
 
     @BeforeEach
     void setup() {
         Mockito.when(accountProvider.lookup(Mockito.anyLong())).thenReturn(Control.Option());
+    }
 
-        var applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        new EventBus(applicationEventPublisher);
+    @Replaces
+    @MockBean
+    AccountProvider accountProvider() {
+        return Mockito.mock(AccountProvider.class);
     }
 
     @AfterEach
     void after() {
-        Mockito.reset(accountProvider, currentUserProvider);
+        Mockito.reset(accountProvider);
     }
 
     @Test

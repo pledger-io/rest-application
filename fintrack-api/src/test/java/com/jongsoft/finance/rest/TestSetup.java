@@ -9,11 +9,13 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.*;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
@@ -41,30 +43,12 @@ public class TestSetup {
             .roles(Collections.List(new Role("admin")))
             .build();
 
-    @MockBean
-    @Replaces
-    protected FilterFactory generateFilterMock() {
-        final FilterFactory filterFactory = Mockito.mock(FilterFactory.class);
-        Mockito.when(filterFactory.transaction())
-                .thenReturn(Mockito.mock(TransactionProvider.FilterCommand.class, InvocationOnMock::getMock));
-        Mockito.when(filterFactory.account())
-                .thenReturn(Mockito.mock(AccountProvider.FilterCommand.class, InvocationOnMock::getMock));
-        Mockito.when(filterFactory.expense())
-                .thenReturn(Mockito.mock(ExpenseProvider.FilterCommand.class, InvocationOnMock::getMock));
-        Mockito.when(filterFactory.category())
-                .thenReturn(Mockito.mock(CategoryProvider.FilterCommand.class, InvocationOnMock::getMock));
-        Mockito.when(filterFactory.tag())
-                .thenReturn(Mockito.mock(TagProvider.FilterCommand.class, InvocationOnMock::getMock));
-        Mockito.when(filterFactory.schedule())
-                .thenReturn(Mockito.mock(TransactionScheduleProvider.FilterCommand.class, InvocationOnMock::getMock));
-        return filterFactory;
-    }
-
     @Inject
     protected CurrentUserProvider currentUserProvider;
     @Inject
     protected UserProvider userProvider;
-
+    @Inject
+    protected FilterFactory filterFactory;
 
     @BeforeEach
     void initialize() {
@@ -96,28 +80,46 @@ public class TestSetup {
 
         Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
         Mockito.when(userProvider.lookup(ACTIVE_USER.getUsername())).thenReturn(Control.Option(ACTIVE_USER));
+
+        // initialize the event bus
+        var applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
+        new EventBus(applicationEventPublisher);
     }
 
     @AfterEach
     void after() {
-        Mockito.reset(currentUserProvider, userProvider);
+        Mockito.reset(currentUserProvider, userProvider, filterFactory);
     }
 
     @Replaces
     @MockBean
-    protected AccountProvider accountProvider() {
-        return Mockito.mock(AccountProvider.class);
-    }
-
-    @Replaces
-    @MockBean
-    protected CurrentUserProvider currentUserProvider() {
+    CurrentUserProvider currentUserProvider() {
         return Mockito.mock(CurrentUserProvider.class);
     }
 
     @Replaces
     @MockBean
-    protected UserProvider userProvider() {
+    UserProvider userProvider() {
         return Mockito.mock(UserProvider.class);
+    }
+
+
+    @MockBean
+    @Replaces
+    FilterFactory generateFilterMock() {
+        final FilterFactory filterFactory = Mockito.mock(FilterFactory.class);
+        Mockito.when(filterFactory.transaction())
+                .thenReturn(Mockito.mock(TransactionProvider.FilterCommand.class, InvocationOnMock::getMock));
+        Mockito.when(filterFactory.account())
+                .thenReturn(Mockito.mock(AccountProvider.FilterCommand.class, InvocationOnMock::getMock));
+        Mockito.when(filterFactory.expense())
+                .thenReturn(Mockito.mock(ExpenseProvider.FilterCommand.class, InvocationOnMock::getMock));
+        Mockito.when(filterFactory.category())
+                .thenReturn(Mockito.mock(CategoryProvider.FilterCommand.class, InvocationOnMock::getMock));
+        Mockito.when(filterFactory.tag())
+                .thenReturn(Mockito.mock(TagProvider.FilterCommand.class, InvocationOnMock::getMock));
+        Mockito.when(filterFactory.schedule())
+                .thenReturn(Mockito.mock(TransactionScheduleProvider.FilterCommand.class, InvocationOnMock::getMock));
+        return filterFactory;
     }
 }

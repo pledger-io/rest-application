@@ -15,6 +15,7 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.Dates;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -62,7 +63,7 @@ public class AccountTransactionResource {
         var accountOption = accountProvider.lookup(accountId);
 
         if (!accountOption.isPresent()) {
-            throw StatusException.notAuthorized("Account not found with id " + accountId);
+            throw StatusException.notFound("Account not found with id " + accountId);
         }
         var command = filterFactory.transaction()
                 .accounts(Collections.List(new EntityRef(accountId)))
@@ -83,6 +84,7 @@ public class AccountTransactionResource {
     }
 
     @Put
+    @Status(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Create transaction",
             description = "Create a new transaction in the provided accounts",
@@ -91,7 +93,7 @@ public class AccountTransactionResource {
                     schema = @Schema(implementation = Long.class),
                     in = ParameterIn.PATH),
             responses = {
-                    @ApiResponse(responseCode = "200", description = "The transaction",
+                    @ApiResponse(responseCode = "204", description = "The transaction",
                             content = @Content(schema = @Schema(implementation = TransactionResponse.class))),
             }
     )
@@ -250,7 +252,7 @@ public class AccountTransactionResource {
         return transactionProvider.lookup(transactionId)
                 .map(transaction -> {
                     var splits = Collections.List(request.getSplits())
-                            .map(split -> new SplitRecord(split.getDescription(), split.getAmount()));
+                            .map(split -> new SplitRecord(split.description(), split.amount()));
                     transaction.split(splits);
 
                     return new TransactionResponse(transaction);
@@ -259,6 +261,7 @@ public class AccountTransactionResource {
     }
 
     @Delete("/{transactionId}")
+    @Status(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Delete transaction",
             description = "Delete a transaction from the account",

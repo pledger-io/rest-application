@@ -1,11 +1,9 @@
 package com.jongsoft.finance.rest.category;
 
 import io.micronaut.serde.annotation.Serdeable;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
 @Serdeable.Deserializable
 public class CategorySearchRequest {
 

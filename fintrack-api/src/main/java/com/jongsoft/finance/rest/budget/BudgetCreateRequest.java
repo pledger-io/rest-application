@@ -4,9 +4,8 @@ import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+@Builder
 @Serdeable.Deserializable
 class BudgetCreateRequest {
 
@@ -19,13 +18,6 @@ class BudgetCreateRequest {
 
     @Min(0)
     private double income;
-
-    @Builder
-    BudgetCreateRequest(int year, int month, double income) {
-        this.year = year;
-        this.month = month;
-        this.income = income;
-    }
 
     public int getYear() {
         return year;

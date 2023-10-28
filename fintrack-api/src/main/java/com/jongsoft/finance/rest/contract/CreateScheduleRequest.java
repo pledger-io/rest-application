@@ -3,59 +3,43 @@ package com.jongsoft.finance.rest.contract;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.serde.annotation.Serdeable;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Builder;
+import lombok.NonNull;
 
+@Builder
 @Serdeable.Deserializable
 class CreateScheduleRequest {
 
-    @Data
     @Serdeable.Deserializable
-    static class ScheduleValueJson {
-        private Periodicity periodicity;
-        private int interval;
-
-        public ScheduleValueJson() {
-        }
-
-        public ScheduleValueJson(Periodicity periodicity, int interval) {
-            this.periodicity = periodicity;
-            this.interval = interval;
-        }
+    public record ScheduleValueJson(
+            @NonNull
+            @Schema(description = "The periodicity of the schedule.", example = "MONTHS")
+            Periodicity periodicity,
+            @Min(1)
+            @Schema(description = "The interval a transaction should be created on.", example = "2")
+            int interval) {
     }
 
-    @Data
     @Serdeable.Deserializable
-    static class EntityRef {
-        @NotNull
-        private Long id;
-        private String name;
-
-        public EntityRef() {
-        }
-
-        public EntityRef(Long id, String name) {
-            this.id = id;
-            this.name = name;
-        }
+    record EntityRef(@NotNull
+                     @Schema(description = "The id of the account.", example = "1")
+                     Long id,
+                     String name) {
     }
 
     @NotNull
+    @Schema(description = "The schedule to create transactions on.")
     private ScheduleValueJson schedule;
 
     @NotNull
+    @Schema(description = "The account to charge for every scheduled transaction.")
     private EntityRef source;
 
+    @Schema(description = "The amount to charge for every scheduled transaction.", example = "100.00")
     private double amount;
-
-    public CreateScheduleRequest() {
-    }
-
-    public CreateScheduleRequest(ScheduleValueJson schedule, EntityRef source, double amount) {
-        this.schedule = schedule;
-        this.source = source;
-        this.amount = amount;
-    }
 
     public ScheduleValue getSchedule() {
         return new ScheduleValue(

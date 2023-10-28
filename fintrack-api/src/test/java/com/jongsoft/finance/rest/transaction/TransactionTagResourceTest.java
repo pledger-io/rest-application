@@ -40,7 +40,6 @@ class TransactionTagResourceTest extends TestSetup {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        filterFactory = generateFilterMock();
 
         subject = new TransactionTagResource(
                 settingProvider,

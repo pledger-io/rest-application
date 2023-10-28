@@ -110,7 +110,7 @@ public class TransactionResponse {
 
         @Schema(description = "The tags that the transaction has", example = "food,dining")
         public List<String> getTags() {
-            return wrapped.getTags().toJava();
+            return wrapped.getTags() != null ? wrapped.getTags().toJava() : null;
         }
     }
 

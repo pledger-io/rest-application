@@ -26,7 +26,6 @@ class ContractTransactionResourceTest extends TestSetup {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        filterFactory = generateFilterMock();
 
         subject = new ContractTransactionResource(
                 filterFactory,

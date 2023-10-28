@@ -31,7 +31,6 @@ class ImporterTransactionResourceTest extends TestSetup {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        filterFactory = generateFilterMock();
 
         subject = new ImporterTransactionResource(settingProvider, filterFactory, transactionProvider);
 

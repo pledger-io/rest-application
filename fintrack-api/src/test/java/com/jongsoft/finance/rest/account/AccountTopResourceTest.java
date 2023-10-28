@@ -4,35 +4,38 @@ import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
 
+@MicronautTest
+@DisplayName("Account Top Resource")
 class AccountTopResourceTest extends TestSetup {
 
-    private AccountTopResource subject;
-
+    @Inject
     private AccountProvider accountProvider;
+    @Inject
     private FilterFactory filterFactory;
-    private SettingProvider settingProvider;
 
-    @BeforeEach
-    void setup() {
-        accountProvider = Mockito.mock(AccountProvider.class);
-        filterFactory = generateFilterMock();
-        settingProvider = Mockito.mock(SettingProvider.class);
-
-        subject = new AccountTopResource(accountProvider, filterFactory, settingProvider);
+    @Replaces
+    @MockBean
+    AccountProvider accountProvider() {
+        return Mockito.mock(AccountProvider.class);
     }
 
     @Test
-    void topDebtors() {
+    @DisplayName("Compute the top debtors")
+    void topDebtors(RequestSpecification spec) {
         Account account = Account.builder()
                 .id(1L)
                 .name("Sample account")
@@ -65,9 +68,25 @@ class AccountTopResourceTest extends TestSetup {
                 Mockito.eq(DateUtils.forMonth(2019, 1)),
                 Mockito.eq(true));
 
+        // @formatter:off
 
-        Assertions.assertThat(subject.topDebtors(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2)))
-                        .hasSize(1);
+        spec.when()
+                .get("/api/accounts/top/debit/2019-01-01/2019-02-01")
+            .then()
+                .statusCode(200)
+                .body("$", Matchers.hasSize(1))
+                .body("[0].account.id", Matchers.equalTo(1))
+                .body("[0].account.name", Matchers.equalTo("Sample account"))
+                .body("[0].account.description", Matchers.equalTo("Long description"))
+                .body("[0].account.account.iban", Matchers.equalTo("NL123INGb23039283"))
+                .body("[0].account.account.currency", Matchers.equalTo("EUR"))
+                .body("[0].account.history.firstTransaction", Matchers.equalTo("2019-01-01"))
+                .body("[0].account.history.lastTransaction", Matchers.equalTo("2022-03-23"))
+                .body("[0].account.type", Matchers.equalTo("checking"))
+                .body("[0].total", Matchers.equalTo(1200F))
+                .body("[0].average", Matchers.equalTo(50F));
+
+        // @formatter:on
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).top(
@@ -78,7 +97,8 @@ class AccountTopResourceTest extends TestSetup {
     }
 
     @Test
-    void topCreditor() {
+    @DisplayName("Compute the top creditors")
+    void topCreditor(RequestSpecification spec) {
         Account account = Account.builder()
                 .id(1L)
                 .name("Sample account")
@@ -111,8 +131,25 @@ class AccountTopResourceTest extends TestSetup {
                 Mockito.eq(DateUtils.forMonth(2019, 1)),
                 Mockito.eq(false));
 
-        Assertions.assertThat(subject.topCreditor(DateUtils.startOfMonth(2019, 1), DateUtils.startOfMonth(2019, 2)))
-                .hasSize(1);
+        // @formatter:off
+
+        spec.when()
+                .get("/api/accounts/top/creditor/2019-01-01/2019-02-01")
+            .then()
+                .statusCode(200)
+                .body("$", Matchers.hasSize(1))
+                .body("[0].account.id", Matchers.equalTo(1))
+                .body("[0].account.name", Matchers.equalTo("Sample account"))
+                .body("[0].account.description", Matchers.equalTo("Long description"))
+                .body("[0].account.account.iban", Matchers.equalTo("NL123INGb23039283"))
+                .body("[0].account.account.currency", Matchers.equalTo("EUR"))
+                .body("[0].account.history.firstTransaction", Matchers.equalTo("2019-01-01"))
+                .body("[0].account.history.lastTransaction", Matchers.equalTo("2022-03-23"))
+                .body("[0].account.type", Matchers.equalTo("checking"))
+                .body("[0].total", Matchers.equalTo(1200F))
+                .body("[0].average", Matchers.equalTo(50F));
+
+        // @formatter:on
 
         var mockCommand = filterFactory.account();
         Mockito.verify(accountProvider).top(

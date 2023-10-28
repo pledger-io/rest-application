@@ -5,9 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+@Builder
 @Serdeable.Deserializable
 class ExpenseCreateRequest {
 
@@ -20,13 +19,6 @@ class ExpenseCreateRequest {
 
     @Min(1)
     private double upperBound;
-
-    @Builder
-    ExpenseCreateRequest(String name, double lowerBound, double upperBound) {
-        this.name = name;
-        this.lowerBound = lowerBound;
-        this.upperBound = upperBound;
-    }
 
     public String getName() {
         return name;

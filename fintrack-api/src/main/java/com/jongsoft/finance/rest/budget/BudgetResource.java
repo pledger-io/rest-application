@@ -119,9 +119,10 @@ public class BudgetResource {
         return budgetProvider.lookup(now.getYear(), now.getMonthValue())
                 .map(budget -> {
                     budget.createExpense(createRequest.getName(), createRequest.getLowerBound(), createRequest.getUpperBound());
-                    return budget;
+                    return budgetProvider.lookup(now.getYear(), now.getMonthValue())
+                            .map(BudgetResponse::new)
+                            .getOrThrow(() -> StatusException.notFound("No budget found"));
                 })
-                .map(BudgetResponse::new)
                 .getOrThrow(() -> StatusException.notFound("No budget found"));
     }
 

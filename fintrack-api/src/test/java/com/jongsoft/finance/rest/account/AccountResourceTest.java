@@ -3,7 +3,6 @@ package com.jongsoft.finance.rest.account;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.finance.rest.TestSetup;
@@ -11,14 +10,12 @@ import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
-import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -38,11 +35,10 @@ class AccountResourceTest extends TestSetup {
     @Inject
     private FilterFactory filterFactory;
 
-
-    @BeforeEach
-    void setup() {
-        var applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        new EventBus(applicationEventPublisher);
+    @Replaces
+    @MockBean
+    protected AccountProvider accountProvider() {
+        return Mockito.mock(AccountProvider.class);
     }
 
     @MockBean

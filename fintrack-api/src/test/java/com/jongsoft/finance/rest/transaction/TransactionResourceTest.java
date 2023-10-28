@@ -52,7 +52,6 @@ class TransactionResourceTest extends TestSetup {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        filterFactory = generateFilterMock();
 
         subject = new TransactionResource(
                 settingProvider,
