@@ -2,40 +2,35 @@ package com.jongsoft.finance.rest.setting;
 
 import com.jongsoft.finance.core.SettingType;
 import com.jongsoft.finance.domain.core.Setting;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.SettingProvider;
-import com.jongsoft.finance.rest.model.SettingResponse;
+import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
-class SettingResourceTest {
+@DisplayName("Setting resource")
+class SettingResourceTest extends TestSetup {
 
-    private SettingResource subject;
-
-    @Mock
+    @Inject
     private SettingProvider settingProvider;
 
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        subject = new SettingResource(settingProvider);
-
-        new EventBus(eventPublisher);
+    @Replaces
+    @MockBean
+    SettingProvider settingProvider() {
+        return Mockito.mock(SettingProvider.class);
     }
 
     @Test
-    void list() {
+    @DisplayName("Should return setting by name")
+    void list(RequestSpecification spec) {
         Mockito.when(settingProvider.lookup()).thenReturn(Collections.List(
                 Setting.builder()
                         .name("RecordSetPageSize")
@@ -49,14 +44,19 @@ class SettingResourceTest {
                         .build()
         ));
 
-        Assertions.assertThat(subject.list())
-                .hasSize(2)
-                .extracting(SettingResponse::getName)
-                .containsExactlyInAnyOrder("RecordSetPageSize", "AutocompleteLimit");
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/settings")
+            .then()
+                .statusCode(200)
+                .body("name", Matchers.hasItems("RecordSetPageSize", "AutocompleteLimit"));
+        // @formatter:on
     }
 
     @Test
-    void update() {
+    @DisplayName("Update setting by name")
+    void update(RequestSpecification spec) {
         var setting = Mockito.spy(Setting.builder()
                 .name("RecordSetPageSize")
                 .value("20")
@@ -66,7 +66,15 @@ class SettingResourceTest {
         Mockito.when(settingProvider.lookup("RecordSetPageSize")).thenReturn(
                 Control.Option(setting));
 
-        subject.update("RecordSetPageSize", new SettingUpdateRequest("30"));
+        // @formatter:off
+        spec
+            .given()
+                .body(new SettingUpdateRequest("30"))
+            .when()
+                .post("/api/settings/RecordSetPageSize")
+            .then()
+                .statusCode(200);
+        // @formatter:on
 
         Mockito.verify(setting).update("30");
     }

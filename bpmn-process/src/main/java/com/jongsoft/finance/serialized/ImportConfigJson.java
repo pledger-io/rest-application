@@ -4,13 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.serde.annotation.Serdeable;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.io.IOException;
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
 @Serdeable
 @ToString(of = {"accountId", "headers", "dateFormat", "delimiter"})
 public class ImportConfigJson implements Serializable {
@@ -70,7 +72,8 @@ public class ImportConfigJson implements Serializable {
 
     private Long accountId;
 
-    @Data
+    @Getter
+    @Setter
     @Serdeable
     public static class CustomIndicator implements Serializable {
         @JsonProperty("deposit")

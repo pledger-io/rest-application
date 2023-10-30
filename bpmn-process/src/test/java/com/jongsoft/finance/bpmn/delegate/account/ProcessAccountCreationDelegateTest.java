@@ -45,11 +45,12 @@ class ProcessAccountCreationDelegateTest {
         MockitoAnnotations.openMocks(this);
         subject = new ProcessAccountCreationDelegate(userService, accountProvider, storageService);
 
-        final AccountJson accountJson = new AccountJson();
-        accountJson.setName("Test account");
-        accountJson.setBic("1234");
-        accountJson.setNumber("9123");
-        accountJson.setCurrency("EUR");
+        final AccountJson accountJson = AccountJson.builder()
+                .name("Test account")
+                .bic("1234")
+                .number("9123")
+                .currency("EUR")
+                .build();
 
         StringValue value = new PrimitiveTypeValueImpl.StringValueImpl(ProcessMapper.INSTANCE.writeValueAsString(accountJson));
 

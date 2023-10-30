@@ -22,7 +22,6 @@ import org.mockito.Mockito;
 import java.time.LocalDate;
 import java.util.Date;
 
-@MicronautTest
 @DisplayName("Batch importing resource")
 class BatchImportResourceTest extends TestSetup {
 

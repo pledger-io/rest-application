@@ -10,7 +10,6 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.hamcrest.Matchers;
@@ -23,7 +22,6 @@ import java.time.LocalDate;
 
 import static org.mockito.Mockito.verify;
 
-@MicronautTest
 @DisplayName("Budget resources")
 class BudgetResourceTest extends TestSetup {
 

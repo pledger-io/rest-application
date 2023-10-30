@@ -1,43 +1,50 @@
 package com.jongsoft.finance.rest.scheduler;
 
-import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import org.assertj.core.api.Assertions;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
 
+@DisplayName("Scheduled transaction resource")
 class ScheduledTransactionResourceTest extends TestSetup {
 
-    private ScheduledTransactionResource subject;
-
+    @Inject
     private AccountProvider accountProvider;
+    @Inject
     private TransactionScheduleProvider transactionScheduleProvider;
-
     private ScheduledTransaction scheduledTransaction;
 
-    private FilterFactory filterFactory;
+    @Replaces
+    @MockBean
+    AccountProvider accountProvider() {
+        return Mockito.mock(AccountProvider.class);
+    }
+
+    @Replaces
+    @MockBean
+    TransactionScheduleProvider transactionScheduleProvider() {
+        return Mockito.mock(TransactionScheduleProvider.class);
+    }
 
     @BeforeEach
     void setup() {
-        accountProvider = Mockito.mock(AccountProvider.class);
-        transactionScheduleProvider = Mockito.mock(TransactionScheduleProvider.class);
-
-        subject = new ScheduledTransactionResource(accountProvider, transactionScheduleProvider, filterFactory);
-
         scheduledTransaction = Mockito.spy(ScheduledTransaction.builder()
                 .id(1L)
                 .name("Monthly gym membership")
@@ -55,33 +62,31 @@ class ScheduledTransactionResourceTest extends TestSetup {
                 .destination(Account.builder().id(2L).type("creditor").currency("EUR").name("Gym").build())
                 .build());
 
-        var applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        new EventBus(applicationEventPublisher);
-
         Mockito.when(accountProvider.lookup(Mockito.anyLong())).thenReturn(Control.Option());
         Mockito.when(transactionScheduleProvider.lookup()).thenReturn(Collections.List(scheduledTransaction));
     }
 
     @Test
-    void list() {
-        Assertions.assertThat(subject.list())
-                .isNotNull()
-                .hasSize(1)
-                .first()
-                .hasFieldOrPropertyWithValue("name", "Monthly gym membership");
+    @DisplayName("List all available transaction schedules")
+    void list(RequestSpecification spec) {
+        // @formatter:off
+        spec.when()
+                .get("/api/schedule/transaction")
+            .then()
+                .statusCode(200)
+                .body("$.size()", Matchers.equalTo(1))
+                .body("[0].name", Matchers.equalTo("Monthly gym membership"))
+                .body("[0].description", Matchers.equalTo("Gym membership"))
+                .body("[0].range.start", Matchers.equalTo("2019-01-01"))
+                .body("[0].range.end", Matchers.equalTo("2021-01-01"));
+        // @formatter:on
     }
 
     @Test
-    void create() {
+    @DisplayName("Create a new transaction schedule")
+    void create(RequestSpecification spec) {
         var destinationAccount = Account.builder().id(1L).build();
         var sourceAccount = Mockito.spy(Account.builder().id(2L).build());
-        var request = ScheduledTransactionCreateRequest.builder()
-                .amount(22.2)
-                .name("Sample schedule")
-                .schedule(new ScheduledTransactionCreateRequest.ScheduleValue(Periodicity.WEEKS, 1))
-                .destination(ScheduledTransactionCreateRequest.EntityRef.builder().id(1L).build())
-                .source(ScheduledTransactionCreateRequest.EntityRef.builder().id(2L).build())
-                .build();
 
         Mockito.when(accountProvider.lookup(1L)).thenReturn(Control.Option(Account.builder().id(1L).build()));
         Mockito.when(accountProvider.lookup(2L)).thenReturn(Control.Option(sourceAccount));
@@ -89,9 +94,33 @@ class ScheduledTransactionResourceTest extends TestSetup {
                 .thenReturn(Collections.List(scheduledTransaction, ScheduledTransaction.builder()
                         .name("Sample schedule")
                         .build()));
+        Mockito.when(transactionScheduleProvider.lookup())
+                .thenReturn(Collections.List(
+                                scheduledTransaction,
+                                ScheduledTransaction.builder()
+                                        .id(2L)
+                                        .amount(22.2)
+                                        .schedule(new ScheduleValue(Periodicity.WEEKS, 1))
+                                        .destination(destinationAccount)
+                                        .source(sourceAccount)
+                                        .name("Sample schedule")
+                                        .build()));
 
-        subject.create(request);
-
+        // @formatter:off
+        spec.given()
+                .body(ScheduledTransactionCreateRequest.builder()
+                        .amount(22.2)
+                        .name("Sample schedule")
+                        .schedule(new ScheduledTransactionCreateRequest.ScheduleValue(Periodicity.WEEKS, 1))
+                        .destination(ScheduledTransactionCreateRequest.EntityRef.builder().id(1L).build())
+                        .source(ScheduledTransactionCreateRequest.EntityRef.builder().id(2L).build())
+                        .build())
+            .when()
+                .put("/api/schedule/transaction")
+            .then()
+                .statusCode(201)
+                .body("name", Matchers.equalTo("Sample schedule"));
+        // @formatter:on
         Mockito.verify(sourceAccount).createSchedule(
                 "Sample schedule",
                 new ScheduleValue(Periodicity.WEEKS, 1),
@@ -100,41 +129,69 @@ class ScheduledTransactionResourceTest extends TestSetup {
     }
 
     @Test
-    void get() {
-        Assertions.assertThat(subject.get(1L))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("name", "Monthly gym membership")
-                .hasFieldOrPropertyWithValue("description", "Gym membership")
-                .hasFieldOrPropertyWithValue("range.start", LocalDate.parse("2019-01-01"))
-                .hasFieldOrPropertyWithValue("range.end", LocalDate.parse("2021-01-01"));
+    @DisplayName("Get a schedule by id")
+    void get(RequestSpecification spec) {
+        // @formatter:off
+        spec.when()
+                .get("/api/schedule/transaction/1")
+            .then()
+                .statusCode(200)
+                .body("name", Matchers.equalTo("Monthly gym membership"))
+                .body("description", Matchers.equalTo("Gym membership"))
+                .body("range.start", Matchers.equalTo("2019-01-01"))
+                .body("range.end", Matchers.equalTo("2021-01-01"));
+        // @formatter:on
     }
 
     @Test
-    void patch() {
-        var request = ScheduledTransactionPatchRequest.builder()
-                .description("Updated description")
-                .name("New name")
-                .range(new ScheduledTransactionPatchRequest.DateRange(
-                        LocalDate.of(2021, 1, 1),
-                        LocalDate.of(2022, 1, 1)))
-                .build();
-
-        subject.patch(1L, request);
+    @DisplayName("Patch a schedule")
+    void patch(RequestSpecification spec) {
+        // @formatter:off
+        spec.given()
+                .body(ScheduledTransactionPatchRequest.builder()
+                        .description("Updated description")
+                        .name("New name")
+                        .range(ScheduledTransactionPatchRequest.DateRange.builder()
+                                .start(LocalDate.of(2021, 1, 1))
+                                .end(LocalDate.of(2022, 1, 1))
+                                .build())
+                        .build())
+            .when()
+                .patch("/api/schedule/transaction/1")
+            .then()
+                .statusCode(200)
+                .body("name", Matchers.equalTo("New name"))
+                .body("description", Matchers.equalTo("Updated description"))
+                .body("range.start", Matchers.equalTo("2021-01-01"))
+                .body("range.end", Matchers.equalTo("2022-01-01"));
+        // @formatter:on
 
         Mockito.verify(scheduledTransaction).describe("New name", "Updated description");
         Mockito.verify(scheduledTransaction).limit(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1));
     }
 
     @Test
-    void remove() {
-        subject.remove(1L);
+    @DisplayName("Remove a schedule by id")
+    void remove(RequestSpecification spec) {
+        // @formatter:off
+        spec.when()
+                .delete("/api/schedule/transaction/1")
+            .then()
+                .statusCode(204);
+        // @formatter:on
+
         Mockito.verify(scheduledTransaction).terminate();
     }
 
     @Test
-    void remove_notFound() {
-        Assertions.assertThatThrownBy(() -> subject.remove(2L))
-                .isInstanceOf(StatusException.class)
-                .hasMessage("No scheduled transaction found with id 2");
+    @DisplayName("Remove a schedule by id - not found")
+    void remove_notFound(RequestSpecification spec) {
+        // @formatter:off
+        spec.when()
+                .delete("/api/schedule/transaction/2")
+            .then()
+                .statusCode(404)
+                .body("message", Matchers.equalTo("No scheduled transaction found with id 2"));
+        // @formatter:on
     }
 }

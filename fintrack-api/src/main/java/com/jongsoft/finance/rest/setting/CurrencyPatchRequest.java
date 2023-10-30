@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Serdeable.Deserializable
 public class CurrencyPatchRequest {
 

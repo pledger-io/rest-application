@@ -1,10 +1,10 @@
 package com.jongsoft.finance.rest.file;
 
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.hamcrest.Matchers;
@@ -15,9 +15,8 @@ import org.mockito.Mockito;
 import java.io.File;
 import java.io.IOException;
 
-@MicronautTest
 @DisplayName("Attachment Resource")
-class FileResourceTest {
+class FileResourceTest extends TestSetup {
 
     @Inject
     private StorageService storageService;
@@ -36,6 +35,7 @@ class FileResourceTest {
         // @formatter:off
         spec
             .given()
+                .contentType("multipart/form-data")
                 .multiPart("upload", new File(getClass().getResource("/application.yml").getFile()))
             .when()
                 .post("/api/attachment")

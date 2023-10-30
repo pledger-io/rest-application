@@ -18,6 +18,7 @@ import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.ObjectMapperConfig;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Currency;
 
+@MicronautTest(environments = {"no-camunda", "test"})
 public class TestSetup {
 
     protected final UserAccount ACTIVE_USER = UserAccount.builder()

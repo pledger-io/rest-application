@@ -9,22 +9,13 @@ import java.time.LocalDate;
 
 @Builder
 @Serdeable.Deserializable
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ScheduledTransactionPatchRequest {
 
+    @Builder
     @Serdeable.Deserializable
     public static class DateRange {
         private LocalDate start;
         private LocalDate end;
-
-        public DateRange() {
-        }
-
-        public DateRange(LocalDate start, LocalDate end) {
-            this.start = start;
-            this.end = end;
-        }
 
         public LocalDate getEnd() {
             return end;

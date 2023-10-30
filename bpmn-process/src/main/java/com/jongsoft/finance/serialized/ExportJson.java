@@ -4,12 +4,15 @@ import com.jongsoft.finance.ProcessMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 @Serdeable
 public class ExportJson implements Serializable {

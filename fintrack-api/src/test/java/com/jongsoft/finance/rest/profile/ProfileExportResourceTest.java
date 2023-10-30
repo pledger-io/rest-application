@@ -7,7 +7,6 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@MicronautTest
 @DisplayName("Profile export resource")
 class ProfileExportResourceTest extends TestSetup {
 

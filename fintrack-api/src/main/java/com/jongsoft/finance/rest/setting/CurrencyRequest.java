@@ -2,14 +2,11 @@ package com.jongsoft.finance.rest.setting;
 
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Serdeable.Deserializable
 public class CurrencyRequest {
 
@@ -21,7 +18,7 @@ public class CurrencyRequest {
     @Size(min = 1, max = 3)
     private String code;
 
-    @NotBlank
+    @NotNull
     private char symbol;
 
     public String getName() {

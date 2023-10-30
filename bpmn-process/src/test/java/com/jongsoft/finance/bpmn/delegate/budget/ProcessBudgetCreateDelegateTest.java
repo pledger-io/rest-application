@@ -41,20 +41,21 @@ class ProcessBudgetCreateDelegateTest {
 
         subject = new ProcessBudgetCreateDelegate(currentUserFacade, budgetProvider);
 
-        final BudgetJson budgetJson = new BudgetJson();
-        budgetJson.setStart(LocalDate.of(2019, 1, 1));
-        budgetJson.setExpectedIncome(1200);
-        budgetJson.setExpenses(Arrays.asList(
-                BudgetJson.ExpenseJson.builder()
-                        .lowerBound(5)
-                        .upperBound(10)
-                        .name("Expense 1")
-                        .build(),
-                BudgetJson.ExpenseJson.builder()
-                        .lowerBound(50)
-                        .upperBound(100)
-                        .name("Expense 2")
-                        .build()));
+        final BudgetJson budgetJson = BudgetJson.builder()
+                .start(LocalDate.of(2019, 1, 1))
+                .expectedIncome(1200)
+                .expenses(Arrays.asList(
+                        BudgetJson.ExpenseJson.builder()
+                                .lowerBound(5)
+                                .upperBound(10)
+                                .name("Expense 1")
+                                .build(),
+                        BudgetJson.ExpenseJson.builder()
+                                .lowerBound(50)
+                                .upperBound(100)
+                                .name("Expense 2")
+                                .build()))
+                .build();
 
         StringValue value = new PrimitiveTypeValueImpl.StringValueImpl(ProcessMapper.writeSafe(budgetJson));
 

@@ -20,7 +20,6 @@ import java.time.LocalDate;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@MicronautTest
 @DisplayName("Category Resource")
 class CategoryResourceTest extends TestSetup {
 

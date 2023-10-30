@@ -6,7 +6,8 @@ import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -14,12 +15,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
+@Setter
 @Builder
 @Serdeable
 public class RuleConfigJson implements Serializable {
 
-    @Data
+    @Getter
+    @Setter
     @Builder
     @Serdeable
     public static class RuleJson implements Serializable {
@@ -56,7 +59,8 @@ public class RuleConfigJson implements Serializable {
 
     }
 
-    @Data
+    @Getter
+    @Setter
     @Builder
     @Serdeable
     public static class ConditionJson implements Serializable {
@@ -65,7 +69,8 @@ public class RuleConfigJson implements Serializable {
         private String value;
     }
 
-    @Data
+    @Getter
+    @Setter
     @Builder
     @Serdeable
     public static class ChangeJson implements Serializable {

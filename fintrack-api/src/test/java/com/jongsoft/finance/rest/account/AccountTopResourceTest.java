@@ -18,7 +18,6 @@ import org.mockito.Mockito;
 
 import java.time.LocalDate;
 
-@MicronautTest
 @DisplayName("Account Top Resource")
 class AccountTopResourceTest extends TestSetup {
 

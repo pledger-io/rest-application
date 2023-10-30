@@ -26,7 +26,6 @@ import java.time.LocalDate;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@MicronautTest
 @DisplayName("Contract Resource")
 class ContractResourceTest extends TestSetup {
 

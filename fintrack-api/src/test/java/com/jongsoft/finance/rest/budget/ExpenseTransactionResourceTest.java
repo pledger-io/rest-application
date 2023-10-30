@@ -14,7 +14,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-@MicronautTest
 @DisplayName("Expenses for budget resource")
 class ExpenseTransactionResourceTest extends TestSetup {
 

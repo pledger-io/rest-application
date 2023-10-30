@@ -20,7 +20,6 @@ import java.time.temporal.ChronoUnit;
 
 import static org.mockito.Mockito.verify;
 
-@MicronautTest
 @DisplayName("Profile resource")
 class ProfileResourceTest extends TestSetup {
 

@@ -1,43 +1,38 @@
 package com.jongsoft.finance.rest.setting;
 
 import com.jongsoft.finance.domain.core.Currency;
-import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.messaging.commands.currency.CreateCurrencyCommand;
 import com.jongsoft.finance.providers.CurrencyProvider;
-import com.jongsoft.finance.rest.model.CurrencyResponse;
+import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class CurrencyResourceTest {
+@DisplayName("Currency resource")
+class CurrencyResourceTest extends TestSetup {
 
-    private CurrencyResource subject;
-
-    @Mock
+    @Inject
     private CurrencyProvider currencyProvider;
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-
-        subject = new CurrencyResource(currencyProvider);
-
-        new EventBus(applicationEventPublisher);
+    @Replaces
+    @MockBean
+    private CurrencyProvider currencyProvider() {
+        return Mockito.mock(CurrencyProvider.class);
     }
 
     @Test
-    void available() {
+    @DisplayName("List the available currencies")
+    void available(RequestSpecification spec) {
         when(currencyProvider.lookup()).thenReturn(
                 Collections.List(
                         Currency.builder()
@@ -60,33 +55,45 @@ class CurrencyResourceTest {
                                 .build()
                 ));
 
-        Assertions.assertThat(subject.available())
-                .hasSize(3)
-                .extracting(CurrencyResponse::getCode)
-                .containsExactly("EUR", "USD", "KWS");
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/settings/currencies")
+            .then()
+                .statusCode(200)
+                .body("size()", Matchers.equalTo(3))
+                .body("code", Matchers.hasItems("EUR", "USD", "KWS"))
+                .body("name", Matchers.hasItems("Euro", "Dollar", "Kwatsch"));
+        // @formatter:on
     }
 
     @Test
-    void create() {
-        var request = CurrencyRequest.builder()
-                .code("TCC")
-                .symbol('S')
-                .name("Test currency")
-                .build();
-
+    @DisplayName("Create a new currency")
+    void create(RequestSpecification spec) {
         when(currencyProvider.lookup("TCC")).thenReturn(Control.Option());
 
-        Assertions.assertThat(subject.create(request))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("code", "TCC")
-                .hasFieldOrPropertyWithValue("name", "Test currency")
-                .hasFieldOrPropertyWithValue("symbol", 'S');
-
-        verify(applicationEventPublisher).publishEvent(Mockito.any(CreateCurrencyCommand.class));
+        // @formatter:off
+        spec
+            .given()
+                .contentType("application/json")
+                .body(CurrencyRequest.builder()
+                        .code("TCC")
+                        .symbol('S')
+                        .name("Test currency")
+                        .build())
+            .when()
+                .put("/api/settings/currencies")
+            .then()
+                .statusCode(201)
+                .body("code", Matchers.equalTo("TCC"))
+                .body("name", Matchers.equalTo("Test currency"))
+                .body("symbol", Matchers.equalTo(83));
+        // @formatter:on
     }
 
     @Test
-    void get() {
+    @DisplayName("Get a currency")
+    void get(RequestSpecification spec) {
         var currency = Mockito.spy(Currency.builder()
                 .id(1L)
                 .name("Euro")
@@ -95,14 +102,20 @@ class CurrencyResourceTest {
 
         when(currencyProvider.lookup("EUR")).thenReturn(Control.Option(currency));
 
-        Assertions.assertThat(subject.get("EUR"))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("code", "EUR")
-                .hasFieldOrPropertyWithValue("name", "Euro");
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/settings/currencies/EUR")
+            .then()
+                .statusCode(200)
+                .body("code", Matchers.equalTo("EUR"))
+                .body("name", Matchers.equalTo("Euro"));
+        // @formatter:on
     }
 
     @Test
-    void update() {
+    @DisplayName("Update a currency")
+    void update(RequestSpecification spec) {
         var currency = Mockito.spy(Currency.builder()
                 .id(1L)
                 .name("Euro")
@@ -111,23 +124,30 @@ class CurrencyResourceTest {
 
         when(currencyProvider.lookup("EUR")).thenReturn(Control.Option(currency));
 
-        var request = CurrencyRequest.builder()
-                .code("TCC")
-                .symbol('S')
-                .name("Test currency")
-                .build();
-
-        Assertions.assertThat(subject.update("EUR", request))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("code", "TCC")
-                .hasFieldOrPropertyWithValue("name", "Test currency")
-                .hasFieldOrPropertyWithValue("symbol", 'S');
+        // @formatter:off
+        spec
+            .given()
+                .contentType("application/json")
+                .body(CurrencyRequest.builder()
+                        .code("TCC")
+                        .symbol('S')
+                        .name("Test currency")
+                        .build())
+            .when()
+                .post("/api/settings/currencies/EUR")
+            .then()
+                .statusCode(200)
+                .body("code", Matchers.equalTo("TCC"))
+                .body("name", Matchers.equalTo("Test currency"))
+                .body("symbol", Matchers.equalTo(83));
+        // @formatter:on
 
         verify(currency).rename("Test currency", "TCC", 'S');
     }
 
     @Test
-    void patch() {
+    @DisplayName("Patch a currency")
+    void patch(RequestSpecification spec) {
         var currency = Mockito.spy(Currency.builder()
                 .id(1L)
                 .enabled(true)
@@ -138,17 +158,21 @@ class CurrencyResourceTest {
 
         when(currencyProvider.lookup("EUR")).thenReturn(Control.Option(currency));
 
-        var request = CurrencyPatchRequest.builder()
-                .enabled(false)
-                .decimalPlaces(2)
-                .build();
-
-        Assertions.assertThat(subject.patch("EUR", request))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("code", "EUR")
-                .hasFieldOrPropertyWithValue("name", "Euro")
-                .hasFieldOrPropertyWithValue("enabled", false)
-                .hasFieldOrPropertyWithValue("numberDecimals", 2);
+        // @formatter:off
+        spec
+            .given()
+                .contentType("application/json")
+                .body(CurrencyPatchRequest.builder()
+                        .enabled(false)
+                        .decimalPlaces(2)
+                        .build())
+            .when()
+                .patch("/api/settings/currencies/EUR")
+            .then()
+                .statusCode(200)
+                .body("code", Matchers.equalTo("EUR"))
+                .body("name", Matchers.equalTo("Euro"));
+        // @formatter:on
 
         verify(currency).disable();
         verify(currency).accuracy(2);

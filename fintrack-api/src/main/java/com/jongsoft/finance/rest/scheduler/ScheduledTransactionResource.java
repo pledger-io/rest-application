@@ -146,6 +146,7 @@ public class ScheduledTransactionResource {
     }
 
     @Delete("/{scheduleId}")
+    @Status(HttpStatus.NO_CONTENT)
     @Operation(
             operationId = "removeTransactionSchedule",
             summary = "Remove a transaction schedule",

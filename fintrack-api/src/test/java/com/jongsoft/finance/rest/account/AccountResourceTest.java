@@ -23,7 +23,6 @@ import org.mockito.Mockito;
 import java.time.LocalDate;
 import java.util.List;
 
-@MicronautTest
 @DisplayName("Account list / create resource")
 class AccountResourceTest extends TestSetup {
 

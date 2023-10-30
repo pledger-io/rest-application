@@ -7,13 +7,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Setter
+@Builder
 @Serdeable.Deserializable
 public class ScheduledTransactionCreateRequest {
 
     @Builder
-    @NoArgsConstructor
     @Serdeable.Deserializable
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     static class EntityRef {
         @NotNull
         private Long id;
@@ -44,19 +43,6 @@ public class ScheduledTransactionCreateRequest {
 
     @NotNull
     private ScheduleValue schedule;
-
-    public ScheduledTransactionCreateRequest() {
-    }
-
-    @Builder
-    private ScheduledTransactionCreateRequest(@NotBlank final String name, final double amount, @NotNull final EntityRef source,
-            @NotNull final EntityRef destination, @NotNull final ScheduleValue schedule) {
-        this.name = name;
-        this.amount = amount;
-        this.source = source;
-        this.destination = destination;
-        this.schedule = schedule;
-    }
 
     public com.jongsoft.finance.domain.transaction.ScheduleValue getSchedule() {
         return new com.jongsoft.finance.domain.transaction.ScheduleValue(schedule.periodicity, schedule.interval);

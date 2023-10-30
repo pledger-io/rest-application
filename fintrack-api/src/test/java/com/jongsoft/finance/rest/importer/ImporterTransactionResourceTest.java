@@ -19,7 +19,6 @@ import org.mockito.Mockito;
 
 import java.time.LocalDate;
 
-@MicronautTest
 @DisplayName("Import transactions resource")
 class ImporterTransactionResourceTest extends TestSetup {
 

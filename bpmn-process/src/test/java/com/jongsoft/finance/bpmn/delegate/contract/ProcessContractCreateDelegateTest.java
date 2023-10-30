@@ -45,13 +45,14 @@ class ProcessContractCreateDelegateTest {
 
         subject = new ProcessContractCreateDelegate(accountProvider, contractProvider, storageService);
 
-        final ContractJson contractJson = new ContractJson();
-        contractJson.setName("Test contract");
-        contractJson.setCompany("Telfo");
-        contractJson.setDescription("My personal contract");
-        contractJson.setTerminated(true);
-        contractJson.setStart(LocalDate.of(2018, 1, 1));
-        contractJson.setEnd(LocalDate.of(2019, 1, 1));
+        final ContractJson contractJson = ContractJson.builder()
+                .name("Test contract")
+                .company("Telfo")
+                .description("My personal contract")
+                .terminated(true)
+                .start(LocalDate.of(2018, 1, 1))
+                .end(LocalDate.of(2019, 1, 1))
+                .build();
 
         final String value = ProcessMapper.writeSafe(contractJson);
         Mockito.when(execution.getVariableLocalTyped("contract")).thenReturn(new PrimitiveTypeValueImpl.StringValueImpl(value));

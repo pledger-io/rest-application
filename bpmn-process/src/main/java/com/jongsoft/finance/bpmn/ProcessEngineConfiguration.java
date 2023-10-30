@@ -23,7 +23,7 @@ import java.util.List;
 
 @Slf4j
 @Factory
-@Requires(beans = DataSourceMigration.class)
+@Requires(beans = DataSourceMigration.class, notEnv = "no-camunda")
 public class ProcessEngineConfiguration {
 
     private final ApplicationContext applicationContext;

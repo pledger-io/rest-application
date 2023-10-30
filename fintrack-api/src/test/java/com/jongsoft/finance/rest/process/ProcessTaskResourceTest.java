@@ -1,8 +1,8 @@
 package com.jongsoft.finance.rest.process;
 
+import com.jongsoft.finance.rest.TestSetup;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -15,9 +15,8 @@ import org.mockito.Mockito;
 
 import java.util.List;
 
-@MicronautTest
 @DisplayName("Process task resource")
-class ProcessTaskResourceTest {
+class ProcessTaskResourceTest extends TestSetup {
 
     private final TaskService taskService = Mockito.mock(TaskService.class);
 
