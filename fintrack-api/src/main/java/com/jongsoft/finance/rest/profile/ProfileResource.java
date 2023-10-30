@@ -7,6 +7,7 @@ import com.jongsoft.finance.rest.model.SessionResponse;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.TwoFactorHelper;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
@@ -98,6 +99,7 @@ public class ProfileResource {
     }
 
     @Delete(value = "/sessions/{id}")
+    @Status(HttpStatus.NO_CONTENT)
     void deleteSession(@PathVariable long id) {
         userProvider.tokens(currentUserProvider.currentUser().getUsername())
                 .filter(token -> token.getId() == id)
@@ -129,6 +131,7 @@ public class ProfileResource {
     }
 
     @Post("/multi-factor/enable")
+    @Status(HttpStatus.NO_CONTENT)
     @Operation(
             operationId = "enable2Factor",
             summary = "Enable 2-factor authentication",
@@ -143,6 +146,7 @@ public class ProfileResource {
     }
 
     @Post("/multi-factor/disable")
+    @Status(HttpStatus.NO_CONTENT)
     @Operation(
             operationId = "disable2Factor",
             summary = "Disable 2-factor authentication",

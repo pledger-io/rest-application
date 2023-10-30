@@ -1,27 +1,23 @@
 package com.jongsoft.finance.serialized;
 
+import com.jongsoft.finance.domain.user.Budget;
+import io.micronaut.serde.annotation.Serdeable;
+import lombok.Builder;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.jongsoft.finance.domain.user.Budget;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Serdeable
 public class BudgetJson implements Serializable {
 
     @Data
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @Serdeable
     public static class ExpenseJson implements Serializable {
         private String name;
         private double lowerBound;

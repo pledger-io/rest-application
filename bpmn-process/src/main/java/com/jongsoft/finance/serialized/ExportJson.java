@@ -1,20 +1,17 @@
 package com.jongsoft.finance.serialized;
 
+import com.jongsoft.finance.ProcessMapper;
+import io.micronaut.serde.annotation.Serdeable;
+import lombok.Builder;
+import lombok.Data;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
-import com.jongsoft.finance.ProcessMapper;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Serdeable
 public class ExportJson implements Serializable {
 
     private List<AccountJson> accounts;

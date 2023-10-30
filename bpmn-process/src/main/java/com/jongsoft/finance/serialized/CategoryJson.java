@@ -1,18 +1,15 @@
 package com.jongsoft.finance.serialized;
 
-import java.io.Serializable;
-
 import com.jongsoft.finance.domain.user.Category;
-
-import lombok.AllArgsConstructor;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Serdeable
 public class CategoryJson implements Serializable {
 
     private String label;

@@ -6,6 +6,7 @@ import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -15,10 +16,8 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-
 import jakarta.validation.Valid;
-import java.security.Principal;
+import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Importer")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -52,6 +51,7 @@ public class ImporterTransactionResource {
     }
 
     @Delete("/{transactionId}")
+    @Status(HttpStatus.NO_CONTENT)
     @Post
     @Operation(
             summary = "Delete transaction",
@@ -62,9 +62,8 @@ public class ImporterTransactionResource {
                     @Parameter(name = "transactionId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
             }
     )
-    void delete(@PathVariable long transactionId, Principal principal) {
+    void delete(@PathVariable long transactionId) {
         transactionProvider.lookup(transactionId)
-                .filter(transaction -> transaction.getUser().getUsername().equals(principal.getName()))
                 .ifPresent(Transaction::delete);
     }
 }

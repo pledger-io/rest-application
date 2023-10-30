@@ -1,44 +1,40 @@
 package com.jongsoft.finance.rest.importer;
 
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
-import java.security.Principal;
 import java.time.LocalDate;
 
+@MicronautTest
+@DisplayName("Import transactions resource")
 class ImporterTransactionResourceTest extends TestSetup {
 
-    private ImporterTransactionResource subject;
+    @Inject
+    private TransactionProvider transactionProvider;
 
-    private FilterFactory filterFactory;
-    @Mock private SettingProvider settingProvider;
-    @Mock private TransactionProvider transactionProvider;
-    @Mock private Principal principal;
-
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-
-        subject = new ImporterTransactionResource(settingProvider, filterFactory, transactionProvider);
-
-        Mockito.when(principal.getName()).thenReturn(ACTIVE_USER.getUsername());
+    @Replaces
+    @MockBean
+    TransactionProvider transactionProvider() {
+        return Mockito.mock(TransactionProvider.class);
     }
 
     @Test
-    void search() {
+    @DisplayName("Search transactions by batch slug")
+    void search(RequestSpecification spec) {
         Mockito.when(transactionProvider.lookup(Mockito.any()))
                 .thenReturn(ResultPage.of(
                         Transaction.builder()
@@ -67,23 +63,39 @@ class ImporterTransactionResourceTest extends TestSetup {
                                 ))
                                 .build()));
 
-        var response = subject.search("ads-fasdfa-fasd", new TransactionSearchRequest(0));
+        // @formatter:off
+        spec
+            .given()
+                .body(new TransactionSearchRequest(0))
+            .when()
+                .post("/api/import/{batchSlug}/transactions", "ads-fasdfa-fasd")
+            .then()
+                .statusCode(200)
+                .body("content[0].description", Matchers.equalTo("Sample transaction"));
+        // @formatter:on
+
         var mockFilter = filterFactory.transaction();
 
-        Assertions.assertThat(response.getContent().get(0).getDescription()).isEqualTo("Sample transaction");
         Mockito.verify(mockFilter).importSlug("ads-fasdfa-fasd");
         Mockito.verify(mockFilter).page(0);
         Mockito.verify(transactionProvider).lookup(Mockito.any());
     }
 
     @Test
-    void delete() {
+    @DisplayName("Delete transaction attached to batch job")
+    void delete(RequestSpecification spec) {
         Transaction transaction = Mockito.mock(Transaction.class);
 
         Mockito.when(transaction.getUser()).thenReturn(ACTIVE_USER);
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
-        subject.delete(123L, principal);
+        // @formatter:off
+        spec
+            .when()
+                .delete("/api/import/{batchSlug}/transactions/{transactionId}", "ads-fasdfa-fasd", 123L)
+            .then()
+                .statusCode(204);
+        // @formatter:on
 
         Mockito.verify(transactionProvider).lookup(123L);
         Mockito.verify(transaction).delete();

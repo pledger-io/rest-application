@@ -1,15 +1,14 @@
 package com.jongsoft.finance.serialized;
 
-import java.io.IOException;
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.lang.collection.Sequence;
-
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Data;
 import lombok.ToString;
+
+import java.io.IOException;
+import java.io.Serializable;
 
 @Data
 @Serdeable
@@ -72,6 +71,7 @@ public class ImportConfigJson implements Serializable {
     private Long accountId;
 
     @Data
+    @Serdeable
     public static class CustomIndicator implements Serializable {
         @JsonProperty("deposit")
         private String deposit;

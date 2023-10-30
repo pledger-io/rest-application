@@ -11,6 +11,7 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.*;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
@@ -46,6 +47,8 @@ public class TestSetup {
     @Inject
     protected CurrentUserProvider currentUserProvider;
     @Inject
+    protected AuthenticationFacade authenticationFacade;
+    @Inject
     protected UserProvider userProvider;
     @Inject
     protected FilterFactory filterFactory;
@@ -79,11 +82,11 @@ public class TestSetup {
                 .build();
 
         Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
+        Mockito.when(authenticationFacade.authenticated()).thenReturn(ACTIVE_USER.getUsername());
         Mockito.when(userProvider.lookup(ACTIVE_USER.getUsername())).thenReturn(Control.Option(ACTIVE_USER));
 
         // initialize the event bus
-        var applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        new EventBus(applicationEventPublisher);
+        new EventBus(Mockito.mock(ApplicationEventPublisher.class));
     }
 
     @AfterEach
@@ -99,10 +102,15 @@ public class TestSetup {
 
     @Replaces
     @MockBean
+    AuthenticationFacade authenticationFacade() {
+        return Mockito.mock(AuthenticationFacade.class);
+    }
+
+    @Replaces
+    @MockBean
     UserProvider userProvider() {
         return Mockito.mock(UserProvider.class);
     }
-
 
     @MockBean
     @Replaces

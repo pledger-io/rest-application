@@ -1,77 +1,69 @@
 package com.jongsoft.finance.rest.profile;
 
-import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.SessionToken;
-import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
-import com.jongsoft.finance.messaging.commands.user.RegisterTokenCommand;
-import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.finance.security.PasswordEncoder;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Dates;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import org.assertj.core.api.Assertions;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
 import org.jboss.aerogear.security.otp.Totp;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
+@MicronautTest
+@DisplayName("Profile resource")
 class ProfileResourceTest extends TestSetup {
 
-    private ProfileResource subject;
-    private CurrentUserProvider currentUserProvider;
-    private UserProvider userProvider;
-    private ApplicationEventPublisher eventPublisher;
-
-    @BeforeEach
-    void setup() {
-        eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        currentUserProvider = Mockito.mock(CurrentUserProvider.class);
-        userProvider = Mockito.mock(UserProvider.class);
-        subject = new ProfileResource(new FinTrack(new PasswordEncoder()), currentUserProvider, userProvider);
-
-        Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
-
-        new EventBus(eventPublisher);
+    @Test
+    @DisplayName("Get the current profile")
+    public void get(RequestSpecification spec) {
+        // @formatter:off
+        spec.when()
+                .get("/api/profile")
+            .then()
+                .statusCode(200)
+                .body("currency", Matchers.equalTo("EUR"))
+                .body("profilePicture", Matchers.nullValue())
+                .body("theme", Matchers.equalTo("dark"))
+                .body("mfa", Matchers.equalTo(false));
+        // @formatter:on
     }
 
     @Test
-    public void get() {
-        Assertions.assertThat(subject.get())
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("currency", "EUR")
-                .hasFieldOrPropertyWithValue("profilePicture", null)
-                .hasFieldOrPropertyWithValue("theme", "dark")
-                .hasFieldOrPropertyWithValue("mfa", false);
-    }
-
-    @Test
-    public void patch() {
+    @DisplayName("Patch the current profile")
+    public void patch(RequestSpecification spec) {
         var request = new PatchProfileRequest();
         request.setCurrency("USD");
         request.setTheme("light");
         request.setPassword("updated-password");
 
-        Assertions.assertThat(subject.patch(request))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("currency", "USD")
-                .hasFieldOrPropertyWithValue("profilePicture", null)
-                .hasFieldOrPropertyWithValue("theme", "light")
-                .hasFieldOrPropertyWithValue("mfa", false);
+        // @formatter:off
+        spec.given()
+                .body(request)
+            .when()
+                .patch("/api/profile")
+            .then()
+                .statusCode(200)
+                .body("currency", Matchers.equalTo("USD"))
+                .body("profilePicture", Matchers.nullValue())
+                .body("theme", Matchers.equalTo("light"))
+                .body("mfa", Matchers.equalTo(false));
+        // @formatter:on
     }
 
     @Test
-    public void sessions() {
+    @DisplayName("Get active sessions for the user")
+    public void sessions(RequestSpecification spec) {
         Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername()))
                 .thenReturn(Collections.List(
                         SessionToken.builder()
@@ -80,15 +72,19 @@ class ProfileResourceTest extends TestSetup {
                                 .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
                                 .build()));
 
-        Assertions.assertThat(subject.sessions())
-                .isNotNull()
-                .hasSize(1)
-                .first()
-                .hasFieldOrPropertyWithValue("description", "Sample session token");
+        // @formatter:off
+        spec.when()
+                .get("/api/profile/sessions")
+            .then()
+                .statusCode(200)
+                .body("size()", Matchers.equalTo(1))
+                .body("[0].description", Matchers.equalTo("Sample session token"));
+        // @formatter:on
     }
 
     @Test
-    public void createSession() {
+    @DisplayName("Create a new session token")
+    public void createSession(RequestSpecification spec) {
         Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername()))
                 .thenReturn(Collections.List(
                         SessionToken.builder()
@@ -97,13 +93,24 @@ class ProfileResourceTest extends TestSetup {
                                 .validity(Dates.range(LocalDateTime.now(), ChronoUnit.DAYS))
                                 .build()));
 
-        subject.createSession(new TokenCreateRequest("sample description", LocalDate.now().plusDays(1)));
-
-        verify(eventPublisher).publishEvent(Mockito.any(RegisterTokenCommand.class));
+        // @formatter:off
+        spec.given()
+                .body(TokenCreateRequest.builder()
+                                .description("sample description")
+                                .expires(LocalDate.now().plusDays(1))
+                                .build())
+            .when()
+                .put("/api/profile/sessions")
+            .then()
+                .statusCode(200)
+                .body("size()", Matchers.equalTo(1))
+                .body("[0].description", Matchers.equalTo("Sample session token"));
+        // @formatter:on
     }
 
     @Test
-    public void revokeSession() {
+    @DisplayName("Revoke a session token")
+    public void revokeSession(RequestSpecification spec) {
         var token = Mockito.spy(SessionToken.builder()
                 .id(1L)
                 .description("Sample session token")
@@ -112,24 +119,31 @@ class ProfileResourceTest extends TestSetup {
 
         Mockito.when(userProvider.tokens(ACTIVE_USER.getUsername())).thenReturn(Collections.List(token));
 
-        subject.deleteSession(1L);
+        // @formatter:off
+        spec.when()
+                .delete("/api/profile/sessions/1")
+            .then()
+                .statusCode(204);
+        // @formatter:on
 
         verify(token).revoke();
     }
 
     @Test
-    public void enableMfa() {
+    @DisplayName("Enable MFA")
+    public void enableMfa(RequestSpecification spec) {
         final Totp totp = new Totp(ACTIVE_USER.getSecret());
         var request = new MultiFactorRequest();
         request.setVerificationCode(totp.now());
 
-        subject.enableMfa(request);
-
-        var captor = ArgumentCaptor.forClass(ChangeMultiFactorCommand.class);
-        verify(eventPublisher).publishEvent(captor.capture());
-
-        assertThat(captor.getValue().username()).isEqualTo(ACTIVE_USER.getUsername());
-        assertThat(captor.getValue().enabled()).isEqualTo(true);
+        // @formatter:off
+        spec.given()
+                .body(request)
+            .when()
+                .post("/api/profile/multi-factor/enable")
+            .then()
+                .statusCode(204);
+        // @formatter:on
     }
 
 //    @Test

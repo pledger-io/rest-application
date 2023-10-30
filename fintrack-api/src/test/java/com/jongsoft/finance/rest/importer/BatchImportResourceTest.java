@@ -2,57 +2,50 @@ package com.jongsoft.finance.rest.importer;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.DateUtils;
-import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.CSVConfigProvider;
 import com.jongsoft.finance.providers.ImportProvider;
-import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.util.Date;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+@MicronautTest
+@DisplayName("Batch importing resource")
 class BatchImportResourceTest extends TestSetup {
 
-    private BatchImportResource subject;
-
-    @Mock
+    @Inject
     private ImportProvider importProvider;
-    @Mock
-    private CurrentUserProvider currentUserProvider;
-    @Mock
+    @Inject
     private CSVConfigProvider csvConfigProvider;
-    @Mock
-    private SettingProvider settingProvider;
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
+    @Replaces
+    @MockBean
+    CSVConfigProvider configProvider() {
+        return Mockito.mock(CSVConfigProvider.class);
+    }
 
-        subject = new BatchImportResource(currentUserProvider, csvConfigProvider, importProvider, settingProvider);
-
-        Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
-        new EventBus(applicationEventPublisher);
+    @Replaces
+    @MockBean
+    ImportProvider importProvider() {
+        return Mockito.mock(ImportProvider.class);
     }
 
     @Test
-    void list() {
+    @DisplayName("List all existing import jobs")
+    void list(RequestSpecification spec) {
         var resultPage = ResultPage.of(BatchImport.builder()
                 .id(1L)
                 .created(DateUtils.toDate(LocalDate.of(2019, 1, 1)))
@@ -61,14 +54,22 @@ class BatchImportResourceTest extends TestSetup {
                 .build());
         Mockito.when(importProvider.lookup(Mockito.any(ImportProvider.FilterCommand.class))).thenReturn(resultPage);
 
-        var response = subject.list(new ImportSearchRequest(0));
-
-        assertThat(response.getInfo().getRecords()).isEqualTo(1L);
-        assertThat(response.getContent().get(0).getSlug()).isEqualTo("batch-import-slug");
+        // @formatter:off
+        spec
+            .given()
+                .body(new ImportSearchRequest(0))
+            .when()
+                .post("/api/import")
+            .then()
+                .statusCode(200)
+                .body("info.records", Matchers.equalTo(1))
+                .body("content[0].slug", Matchers.equalTo("batch-import-slug"));
+        // @formatter:on
     }
 
     @Test
-    void create() {
+    @DisplayName("Create a new import job")
+    void create(RequestSpecification spec) {
         var mockConfig = Mockito.mock(BatchImportConfig.class);
 
         Mockito.when(csvConfigProvider.lookup("sample-configuration")).thenReturn(Control.Option(mockConfig));
@@ -79,20 +80,26 @@ class BatchImportResourceTest extends TestSetup {
                         .slug("xd2rsd-2fasd-q2ff-asd")
                         .build());
 
-        var request = ImporterCreateRequest.builder()
-                .configuration("sample-configuration")
-                .uploadToken("token-sample")
-                .build();
-
-        Assertions.assertThat(subject.create(request))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("slug", "xd2rsd-2fasd-q2ff-asd");
+        // @formatter:off
+        spec
+            .given()
+                .body(ImporterCreateRequest.builder()
+                        .configuration("sample-configuration")
+                        .uploadToken("token-sample")
+                        .build())
+            .when()
+                .put("/api/import")
+            .then()
+                .statusCode(200)
+                .body("slug", Matchers.equalTo("xd2rsd-2fasd-q2ff-asd"));
+        // @formatter:on
 
         Mockito.verify(mockConfig).createImport("token-sample");
     }
 
     @Test
-    void get() {
+    @DisplayName("Get an existing import job")
+    void get(RequestSpecification spec) {
         Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
                 Control.Option(BatchImport.builder()
                         .created(DateUtils.toDate(LocalDate.of(2019, 2, 1)))
@@ -108,17 +115,23 @@ class BatchImportResourceTest extends TestSetup {
                         .totalIncome(303.40D)
                         .build()));
 
-        Assertions.assertThat(subject.get("xd2rsd-2fasd-q2ff-asd"))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("slug", "xd2rsd-2fasd-q2ff-asd")
-                .hasFieldOrPropertyWithValue("config.file", "xd2rsd-2fasd-33dfd-ddfa")
-                .hasFieldOrPropertyWithValue("config.name", "sample-config.json")
-                .hasFieldOrPropertyWithValue("balance.totalExpense", 200.2D)
-                .hasFieldOrPropertyWithValue("balance.totalIncome", 303.4D);
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/import/xd2rsd-2fasd-q2ff-asd")
+            .then()
+                .statusCode(200)
+                .body("slug", Matchers.equalTo("xd2rsd-2fasd-q2ff-asd"))
+                .body("config.file", Matchers.equalTo("xd2rsd-2fasd-33dfd-ddfa"))
+                .body("config.name", Matchers.equalTo("sample-config.json"))
+                .body("balance.totalExpense", Matchers.equalTo(200.2F))
+                .body("balance.totalIncome", Matchers.equalTo(303.4F));
+        // @formatter:on
     }
 
     @Test
-    void delete_success() {
+    @DisplayName("Delete an existing import job")
+    void delete_success(RequestSpecification spec) {
         Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
                 Control.Option(BatchImport.builder()
                         .id(1L)
@@ -134,12 +147,18 @@ class BatchImportResourceTest extends TestSetup {
                         .totalIncome(303.40D)
                         .build()));
 
-        Assertions.assertThat(subject.delete("xd2rsd-2fasd-q2ff-asd"))
-                .isEqualTo("xd2rsd-2fasd-q2ff-asd");
+        // @formatter:off
+        spec
+            .when()
+                .delete("/api/import/xd2rsd-2fasd-q2ff-asd")
+            .then()
+                .statusCode(204);
+        // @formatter:on
     }
 
     @Test
-    void delete_alreadyFinished() {
+    @DisplayName("Delete an existing import job that has already finished")
+    void delete_alreadyFinished(RequestSpecification spec) {
         Mockito.when(importProvider.lookup("xd2rsd-2fasd-q2ff-asd")).thenReturn(
                 Control.Option(BatchImport.builder()
                         .created(DateUtils.toDate(LocalDate.of(2019, 2, 1)))
@@ -155,38 +174,54 @@ class BatchImportResourceTest extends TestSetup {
                         .totalIncome(303.40D)
                         .build()));
 
-        Assertions.assertThatThrownBy(() -> subject.delete("xd2rsd-2fasd-q2ff-asd"))
-                .isInstanceOf(StatusException.class)
-                .hasMessage("Cannot archive an import job that has finished running.");
+        // @formatter:off
+        spec
+            .when()
+                .delete("/api/import/xd2rsd-2fasd-q2ff-asd")
+            .then()
+                .statusCode(400)
+                .body("message", Matchers.equalTo("Cannot archive an import job that has finished running."));
+        // @formatter:on
     }
 
     @Test
-    void config() {
+    @DisplayName("List all existing import configurations")
+    void config(RequestSpecification spec) {
         Mockito.when(csvConfigProvider.lookup()).thenReturn(Collections.List(
                 BatchImportConfig.builder()
                         .id(1L)
                         .name("Import config test")
                         .build()));
 
-        Assertions.assertThat(subject.config())
-                .isNotNull()
-                .hasSize(1)
-                .first()
-                .hasFieldOrPropertyWithValue("name", "Import config test");
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/import/config")
+            .then()
+                .statusCode(200)
+                .body("size()", Matchers.equalTo(1))
+                .body("[0].name", Matchers.equalTo("Import config test"));
+        // @formatter:on
     }
 
     @Test
-    void createConfig() {
+    @DisplayName("Create a new import configuration")
+    void createConfig(RequestSpecification spec) {
         Mockito.when(csvConfigProvider.lookup("sample-configuration")).thenReturn(Control.Option());
 
-        var request = CSVImporterConfigCreateRequest.builder()
-                .name("sample-configuration")
-                .fileCode("token-sample")
-                .build();
-
-        Assertions.assertThat(subject.createConfig(request))
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("name", "sample-configuration")
-                .hasFieldOrPropertyWithValue("file", "token-sample");
+        // @formatter:off
+        spec
+            .given()
+                .body(CSVImporterConfigCreateRequest.builder()
+                        .name("sample-configuration")
+                        .fileCode("token-sample")
+                        .build())
+            .when()
+                .put("/api/import/config")
+            .then()
+                .statusCode(200)
+                .body("name", Matchers.equalTo("sample-configuration"))
+                .body("file", Matchers.equalTo("token-sample"));
+        // @formatter:on
     }
 }

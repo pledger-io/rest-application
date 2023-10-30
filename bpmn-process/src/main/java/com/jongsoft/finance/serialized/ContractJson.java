@@ -1,10 +1,9 @@
 package com.jongsoft.finance.serialized;
 
 import com.jongsoft.finance.domain.account.Contract;
-import lombok.AllArgsConstructor;
+import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.io.Serializable;
@@ -13,8 +12,7 @@ import java.util.function.Supplier;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Serdeable
 public class ContractJson implements Serializable {
 
     private String name;

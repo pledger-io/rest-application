@@ -1,31 +1,27 @@
 package com.jongsoft.finance.serialized;
 
+import com.jongsoft.finance.ProcessMapper;
+import com.jongsoft.finance.core.RuleColumn;
+import com.jongsoft.finance.core.RuleOperation;
+import com.jongsoft.finance.domain.transaction.TransactionRule;
+import io.micronaut.serde.annotation.Serdeable;
+import lombok.Builder;
+import lombok.Data;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import com.jongsoft.finance.ProcessMapper;
-import com.jongsoft.finance.core.RuleColumn;
-import com.jongsoft.finance.core.RuleOperation;
-import com.jongsoft.finance.domain.transaction.TransactionRule;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Serdeable
 public class RuleConfigJson implements Serializable {
 
     @Data
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @Serdeable
     public static class RuleJson implements Serializable {
         private String name;
         private String description;
@@ -62,8 +58,7 @@ public class RuleConfigJson implements Serializable {
 
     @Data
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @Serdeable
     public static class ConditionJson implements Serializable {
         private RuleColumn field;
         private RuleOperation operation;
@@ -72,8 +67,7 @@ public class RuleConfigJson implements Serializable {
 
     @Data
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @Serdeable
     public static class ChangeJson implements Serializable {
         private RuleColumn field;
         private String value;

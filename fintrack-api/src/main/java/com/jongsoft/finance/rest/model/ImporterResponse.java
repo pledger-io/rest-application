@@ -44,6 +44,7 @@ public class ImporterResponse {
         return new Balance();
     }
 
+    @Serdeable.Serializable
     public class Balance {
 
         @Schema(description = "The total amount of money earned in this import")

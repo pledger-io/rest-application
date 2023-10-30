@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
+@Builder
 @Serdeable.Deserializable
 class ImporterCreateRequest {
 
@@ -15,16 +16,6 @@ class ImporterCreateRequest {
     @NotNull
     @NotBlank
     private String uploadToken;
-
-    public ImporterCreateRequest() {
-        // left blank intentionally for deserializer
-    }
-
-    @Builder
-    private ImporterCreateRequest(String configuration, String uploadToken) {
-        this.configuration = configuration;
-        this.uploadToken = uploadToken;
-    }
 
     public String getConfiguration() {
         return configuration;
