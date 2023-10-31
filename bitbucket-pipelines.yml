@@ -24,7 +24,7 @@ pipelines:
           caches:
             - gradle
           script:
-            - bash ./gradlew sonarqube
+            - bash ./gradlew sonar
 
   branches:
     master:
@@ -54,7 +54,7 @@ pipelines:
               caches:
                 - gradle
               script:
-                - bash ./gradlew sonarqube
+                - bash ./gradlew sonar
 
     release/*:
       - step:
