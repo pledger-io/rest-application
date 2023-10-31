@@ -18,6 +18,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
 @Tag(name = "Contract")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @RequiredArgsConstructor(onConstructor_ = @Inject)
@@ -40,7 +42,7 @@ public class ContractTransactionResource {
                 .ownAccounts()
                 .onlyIncome(false)
                 .contracts(Collections.List(new EntityRef(contractId)))
-                .page(page)
+                .page(Optional.ofNullable(page).orElse(0))
                 .pageSize(settingProvider.getPageSize());
 
         return new ResultPageResponse<>(transactionService.lookup(filter)

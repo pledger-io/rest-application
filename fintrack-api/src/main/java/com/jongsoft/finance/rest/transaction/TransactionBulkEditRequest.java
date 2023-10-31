@@ -4,41 +4,26 @@ import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Serdeable.Deserializable
 public class TransactionBulkEditRequest {
 
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @Serdeable.Deserializable
     @Schema(name = "EntityRef")
-    static class EntityRef {
-        @NotNull
-        @Schema(description = "The unique identifier of the entity.")
-        private Long id;
-        private String name;
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
+    public record EntityRef(
+            @NotNull
+            @Schema(description = "The unique identifier of the entity.")
+            Long id,
+            String name) {}
 
     @NotNull
     @Size(min = 1)
     @Schema(
             description = "A list of all transaction identifiers that should be updated.",
-            required = true,
             minLength = 1)
     private List<Long> transactions;
 

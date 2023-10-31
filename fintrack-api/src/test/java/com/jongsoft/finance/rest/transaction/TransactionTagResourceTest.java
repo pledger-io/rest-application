@@ -2,86 +2,84 @@ package com.jongsoft.finance.rest.transaction;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Tag;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.finance.rest.model.TagResponse;
-import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class TransactionTagResourceTest extends TestSetup {
 
-    private TransactionTagResource subject;
-
-    @Mock
-    private SettingProvider settingProvider;
-    @Mock
-    private CurrentUserProvider currentUserProvider;
-    @Mock
+    @Inject
     private TagProvider tagProvider;
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-    private FilterFactory filterFactory;
 
+    @Replaces
+    @MockBean
+    TagProvider mockTagProvider() {
+        return Mockito.mock(TagProvider.class);
+    }
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-
-        subject = new TransactionTagResource(
-                settingProvider,
-                tagProvider,
-                filterFactory,
-                currentUserProvider);
-
-        Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
-
-        new EventBus(eventPublisher);
+    @Replaces
+    @MockBean
+    SettingProvider mockSettingProvider() {
+        return Mockito.mock(SettingProvider.class);
     }
 
     @Test
-    void create() {
-        Assertions.assertThat(subject.create(new TagCreateRequest("Sample tag")))
-                .isNotNull()
-                .isInstanceOfSatisfying(TagResponse.class, tag -> {
-                    assertThat(tag.getName()).isEqualTo("Sample tag");
-                });
-
-        Mockito.verify(eventPublisher).publishEvent(Mockito.any(CreateTagCommand.class));
+    void create(RequestSpecification spec) {
+        // @formatter:off
+        spec
+            .given()
+                .body(new TagCreateRequest("Sample tag"))
+            .when()
+                .post("/api/transactions/tags")
+            .then()
+                .statusCode(200)
+                .body("name", Matchers.equalTo("Sample tag"));
+        // @formatter:on
     }
 
     @Test
-    void list() {
+    @DisplayName("List available tags")
+    void list(RequestSpecification spec) {
         Mockito.when(tagProvider.lookup())
                 .thenReturn(Collections.List(
                         new Tag("Sample"),
                         new Tag("Description")));
 
-        Assertions.assertThat(subject.list())
-                .isNotNull()
-                .extracting(TagResponse::getName)
-                .containsExactlyInAnyOrder("Sample", "Description");
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/transactions/tags")
+            .then()
+                .statusCode(200)
+                .body("name", Matchers.hasItems("Sample", "Description"));
+        // @formatter:on
     }
 
     @Test
-    void autoCompleteTag() {
+    @DisplayName("should return a tag on autocomplete")
+    void autoCompleteTag(RequestSpecification spec) {
         Mockito.when(tagProvider.lookup(Mockito.any(TagProvider.FilterCommand.class))).thenReturn(
                 ResultPage.of(new Tag("Sample")));
 
-        subject.autoCompleteTag("samp");
+        // @formatter:off
+        spec
+            .given()
+                .queryParam("token", "samp")
+            .when()
+                .get("/api/transactions/tags/auto-complete")
+            .then()
+                .statusCode(200)
+                .body("name", Matchers.hasItems("Sample"));
+        // @formatter:on
 
         var mockFilter = filterFactory.tag();
         Mockito.verify(tagProvider).lookup(Mockito.any(TagProvider.FilterCommand.class));

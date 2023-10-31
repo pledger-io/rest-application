@@ -4,67 +4,63 @@ import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.AccountTypeProvider;
-import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.finance.rest.process.RuntimeResource;
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
+@DisplayName("Transaction resource")
 class TransactionResourceTest extends TestSetup {
 
-    private TransactionResource subject;
-
-    @Mock
-    private SettingProvider settingProvider;
-    @Mock
+    @Inject
     private TransactionProvider transactionProvider;
-    @Mock
+    @Inject
     private AccountProvider accountProvider;
-    @Mock
+    @Inject
     private AccountTypeProvider accountTypeProvider;
-    @Mock
-    private RuntimeResource runtimeResource;
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
-    @Mock
-    private AuthenticationFacade authenticationFacade;
 
-    private FilterFactory filterFactory;
+    @Replaces
+    @MockBean
+    TransactionProvider transactionProvider() {
+        return Mockito.mock(TransactionProvider.class);
+    }
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @Replaces
+    @MockBean
+    AccountProvider accountProvider() {
+        return Mockito.mock(AccountProvider.class);
+    }
 
+    @Replaces
+    @MockBean
+    AccountTypeProvider accountTypeProvider() {
+        return Mockito.mock(AccountTypeProvider.class);
+    }
 
-        subject = new TransactionResource(
-                settingProvider,
-                transactionProvider,
-                accountProvider,
-                filterFactory,
-                accountTypeProvider,
-                runtimeResource,
-                authenticationFacade, new EventBus(eventPublisher));
+    @Replaces
+    @MockBean
+    RuntimeResource runtimeResource() {
+        return Mockito.mock(RuntimeResource.class);
     }
 
     @Test
-    void search() {
+    @DisplayName("should return the search results")
+    void search(RequestSpecification spec) {
         Account account = Account.builder()
                 .id(1L)
                 .name("To account")
@@ -101,17 +97,29 @@ class TransactionResourceTest extends TestSetup {
                                 .build()
                 ));
 
-        var request = TransactionSearchRequest.builder()
-                .page(0)
-                .dateRange(new TransactionSearchRequest.DateRange(
-                        LocalDate.of(2019, 1, 1),
-                        LocalDate.of(2019, 2, 1)))
-                .onlyIncome(false)
-                .onlyExpense(false)
-                .description("samp")
-                .build();
-
-        subject.search(request);
+        // @formatter:off
+        spec.given()
+                .body(TransactionSearchRequest.builder()
+                        .page(0)
+                        .dateRange(new TransactionSearchRequest.DateRange(
+                                LocalDate.of(2019, 1, 1),
+                                LocalDate.of(2019, 2, 1)))
+                        .onlyIncome(false)
+                        .onlyExpense(false)
+                        .description("samp")
+                        .build())
+            .when()
+                .post("/api/transactions")
+            .then()
+                .statusCode(200)
+                .body("info.records", Matchers.equalTo(1))
+                .body("content[0].id", Matchers.equalTo(1))
+                .body("content[0].description", Matchers.equalTo("Sample transaction"))
+                .body("content[0].currency", Matchers.equalTo("EUR"))
+                .body("content[0].metadata.category", Matchers.equalTo("Grocery"))
+                .body("content[0].metadata.budget", Matchers.equalTo("Household"))
+                .body("content[0].dates.transaction", Matchers.equalTo("2019-01-15"));
+        // @formatter:on
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(transactionProvider).lookup(Mockito.any());
@@ -121,7 +129,8 @@ class TransactionResourceTest extends TestSetup {
     }
 
     @Test
-    void patch() {
+    @DisplayName("should update part of the transactions")
+    void patch(RequestSpecification spec) {
         var transaction = Mockito.spy(Transaction.builder()
                 .id(1L)
                 .description("Sample transaction")
@@ -149,19 +158,23 @@ class TransactionResourceTest extends TestSetup {
                 ))
                 .build());
 
-        Mockito.when(authenticationFacade.authenticated()).thenReturn(ACTIVE_USER.getUsername());
         Mockito.when(transactionProvider.lookup(Mockito.anyLong())).thenReturn(Control.Option());
         Mockito.when(transactionProvider.lookup(1L)).thenReturn(Control.Option(transaction));
 
-        var request = TransactionBulkEditRequest.builder()
-                .transactions(List.of(1L, 2L))
-                .budget(new TransactionBulkEditRequest.EntityRef(-1L, "Groceries"))
-                .category(new TransactionBulkEditRequest.EntityRef(-1L, "Category"))
-                .contract(new TransactionBulkEditRequest.EntityRef(-1L, "Wallmart"))
-                .tags(List.of("sample"))
-                .build();
-
-        subject.patch(request);
+        // @formatter:off
+        spec.given()
+                .body(TransactionBulkEditRequest.builder()
+                        .transactions(List.of(1L, 2L))
+                        .budget(new TransactionBulkEditRequest.EntityRef(-1L, "Groceries"))
+                        .category(new TransactionBulkEditRequest.EntityRef(-1L, "Category"))
+                        .contract(new TransactionBulkEditRequest.EntityRef(-1L, "Wallmart"))
+                        .tags(List.of("sample"))
+                        .build())
+            .when()
+                .patch("/api/transactions")
+            .then()
+                .statusCode(204);
+        // @formatter:on
 
         Mockito.verify(transaction).linkToCategory("Category");
         Mockito.verify(transaction).linkToBudget("Groceries");
@@ -170,23 +183,29 @@ class TransactionResourceTest extends TestSetup {
     }
 
     @Test
-    void firstTransaction() {
+    @DisplayName("should return the date of the first transaction")
+    void firstTransaction(RequestSpecification spec) {
         Mockito.when(transactionProvider.first(Mockito.any())).thenReturn(Control.Option(
                 Transaction.builder()
                         .date(LocalDate.of(2019, 1, 1))
                         .build()));
 
-        var request = TransactionSearchRequest.builder()
-                .description("test")
-                .build();
-
-        Assertions.assertThat(subject.firstTransaction(request))
-                .isNotNull()
-                .isEqualTo("2019-01-01");
+        // @formatter:off
+        spec.given()
+                .body(TransactionSearchRequest.builder()
+                        .description("test")
+                        .build())
+            .when()
+                .post("/api/transactions/locate-first")
+            .then()
+                .statusCode(200)
+                .body(Matchers.containsString("2019-01-01"));
+        // @formatter:on
     }
 
     @Test
-    void export() throws IOException {
+    @DisplayName("should export all known transactions")
+    void export(RequestSpecification spec) throws IOException {
         Account account = Account.builder()
                 .id(1L)
                 .name("To account")
@@ -222,9 +241,13 @@ class TransactionResourceTest extends TestSetup {
                 ))
                 .thenReturn(ResultPage.empty());
 
-        Assertions.assertThat(subject.export().toString())
-                        .isNotNull()
-                        .contains("Sample transaction");
+        // @formatter:off
+        spec.when()
+                .get("/api/transactions/export")
+            .then()
+                .statusCode(200)
+                .body(Matchers.containsString("Sample transaction"));
+        // @formatter:on
     }
 
 }

@@ -121,15 +121,15 @@ public class TransactionResource {
 
             var transaction = isPresent.get();
             Control.Option(request.getBudget())
-                    .map(TransactionBulkEditRequest.EntityRef::getName)
+                    .map(TransactionBulkEditRequest.EntityRef::name)
                     .ifPresent(transaction::linkToBudget);
 
             Control.Option(request.getCategory())
-                    .map(TransactionBulkEditRequest.EntityRef::getName)
+                    .map(TransactionBulkEditRequest.EntityRef::name)
                     .ifPresent(transaction::linkToCategory);
 
             Control.Option(request.getContract())
-                    .map(TransactionBulkEditRequest.EntityRef::getName)
+                    .map(TransactionBulkEditRequest.EntityRef::name)
                     .ifPresent(transaction::linkToContract);
 
             Control.Option(request.getTags())
@@ -210,40 +210,40 @@ public class TransactionResource {
     @Get("/apply-all-rules")
     @Operation(hidden = true)
     void applyRules() {
-        var executors = Executors.newFixedThreadPool(25);
+        try (var executors = Executors.newFixedThreadPool(25)) {
+            executors.execute(() -> {
+                eventBus.sendSystemEvent(new InternalAuthenticationEvent(
+                        this,
+                        authenticationFacade.authenticated()));
 
-        executors.execute(() -> {
-            eventBus.sendSystemEvent(new InternalAuthenticationEvent(
-                    this,
-                    authenticationFacade.authenticated()));
+                var filterCommand = filterFactory.transaction()
+                        .accounts(accountProvider.lookup(filterFactory.account()
+                                        .types(accountTypeProvider.lookup(false)))
+                                .content()
+                                .map(account -> new EntityRef(account.getId())))
+                        .pageSize(100);
 
-            var filterCommand = filterFactory.transaction()
-                    .accounts(accountProvider.lookup(filterFactory.account()
-                                    .types(accountTypeProvider.lookup(false)))
-                            .content()
-                            .map(account -> new EntityRef(account.getId())))
-                    .pageSize(100);
+                int currentPage = 0;
+                var page = transactionProvider.lookup(filterCommand);
+                do {
+                    page.content()
+                            .map(Transaction::getId)
+                            .forEach(transaction -> executors.execute(() -> {
+                                eventBus.sendSystemEvent(
+                                        new InternalAuthenticationEvent(
+                                                this,
+                                                authenticationFacade.authenticated()));
 
-            int currentPage = 0;
-            var page = transactionProvider.lookup(filterCommand);
-            do {
-                page.content()
-                        .map(Transaction::getId)
-                        .forEach(transaction -> executors.execute(() -> {
-                            eventBus.sendSystemEvent(
-                                    new InternalAuthenticationEvent(
-                                            this,
-                                            authenticationFacade.authenticated()));
+                                runtimeResource.startProcess(
+                                        "analyzeRule",
+                                        Map.of("transactionId", transaction));
+                            }));
 
-                            runtimeResource.startProcess(
-                                    "analyzeRule",
-                                    Map.of("transactionId", transaction));
-                        }));
-
-                filterCommand.page(++currentPage);
-                page = transactionProvider.lookup(filterCommand);
-            } while (page.hasNext());
-        });
+                    filterCommand.page(++currentPage);
+                    page = transactionProvider.lookup(filterCommand);
+                } while (page.hasNext());
+            });
+        }
     }
 
     private byte[] convertTransaction(Transaction transaction) {

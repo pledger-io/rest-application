@@ -1,43 +1,42 @@
 package com.jongsoft.finance.rest.contract;
 
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
+@DisplayName("Contract Transaction Resource")
 class ContractTransactionResourceTest extends TestSetup {
 
-    private ContractTransactionResource subject;
-
-    @Mock
+    @Inject
     private TransactionProvider transactionProvider;
-    @Mock
-    private SettingProvider settingProvider;
-    private FilterFactory filterFactory;
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-
-        subject = new ContractTransactionResource(
-                filterFactory,
-                transactionProvider,
-                settingProvider);
+    @Replaces
+    @MockBean
+    TransactionProvider transactionProvider() {
+        return Mockito.mock(TransactionProvider.class);
     }
 
     @Test
-    void transactions() {
+    @DisplayName("should return transactions for contract")
+    void transactions(RequestSpecification spec) {
         Mockito.when(transactionProvider.lookup(Mockito.any())).thenReturn(ResultPage.empty());
 
-        subject.transactions(1L, 1);
+        // @formatter:off
+        spec
+            .when()
+                .get("/api/contracts/{contractId}/transactions", 1)
+            .then()
+                .statusCode(200);
+        // @formatter:on
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(transactionProvider).lookup(Mockito.any());
