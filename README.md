@@ -15,7 +15,7 @@
 -----------------------
 
 ## About FinTrack
-FinTrack is a "self hosted" application that helps in keeping track of your personal finances. It helps you keep track
+FinTrack is a "self-hosted" application that helps in keeping track of your personal finances. It helps you keep track
 of your income and expenses to allow you to spend less many and save more.
 
 Using FinTrack you can keep track of your income vs spending as well as your credit card expenses. FinTrack has the 
@@ -36,7 +36,7 @@ In this repository you will find the backend REST application needed to run FinT
 
 To build the application the following needs to be present on your local PC:
 
-* JDK 19 or higher
+* JDK 21 or higher
 * GIT for completing the checkout
 
 You can build the application using the Gradle command:
@@ -51,7 +51,7 @@ API documentation use the url:
     http://localhost:8080/spec/index.html
 
 ## License
-Copyright 2022 Jong Soft Development
+Copyright 2023 Jong Soft Development
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
 associated documentation files (the "Software"), to deal in the Software without restriction, including 
