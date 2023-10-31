@@ -38,6 +38,7 @@ public interface ResultPage<T> {
         return ResultPage.of();
     }
 
+    @SafeVarargs
     static <T> ResultPage<T> of(T...elements) {
         return new ResultPage<T>() {
             @Override

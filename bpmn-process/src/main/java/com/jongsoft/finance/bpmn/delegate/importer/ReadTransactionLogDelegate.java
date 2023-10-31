@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
+import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
@@ -17,11 +18,13 @@ import java.util.ArrayList;
 public class ReadTransactionLogDelegate extends CSVReaderDelegate implements JavaDelegate {
 
     private final StorageService storageService;
+    private final ProcessMapper mapper;
 
     @Inject
-    public ReadTransactionLogDelegate(ImportProvider importProvider, StorageService storageService) {
-        super(importProvider, storageService);
+    public ReadTransactionLogDelegate(ImportProvider importProvider, StorageService storageService, ProcessMapper mapper) {
+        super(importProvider, storageService, mapper);
         this.storageService = storageService;
+        this.mapper = mapper;
     }
 
     @Override
@@ -37,7 +40,7 @@ public class ReadTransactionLogDelegate extends CSVReaderDelegate implements Jav
     protected void lineRead(DelegateExecution execution, ParsedTransaction parsedTransaction) {
         log.debug("Read line {} of file import", parsedTransaction);
 
-        var serialized = parsedTransaction.stringify()
+        var serialized = mapper.writeSafe(parsedTransaction)
                 .getBytes(StandardCharsets.UTF_8);
 
         String storageToken = storageService.store(serialized);

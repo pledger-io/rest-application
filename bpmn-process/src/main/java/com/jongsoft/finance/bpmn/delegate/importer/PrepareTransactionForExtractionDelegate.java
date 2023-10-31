@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
+import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.lang.collection.tuple.Triplet;
 import jakarta.inject.Singleton;
@@ -11,9 +12,11 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 public class PrepareTransactionForExtractionDelegate implements JavaDelegate {
 
     private final StorageService storageService;
+    private final ProcessMapper processMapper;
 
-    PrepareTransactionForExtractionDelegate(StorageService storageService) {
+    PrepareTransactionForExtractionDelegate(StorageService storageService, ProcessMapper processMapper) {
         this.storageService = storageService;
+        this.processMapper = processMapper;
     }
 
     @Override
@@ -27,7 +30,9 @@ public class PrepareTransactionForExtractionDelegate implements JavaDelegate {
         } else {
             String transactionToken = execution.<StringValue>getVariableLocalTyped("transactionToken").getValue();
 
-            ParsedTransaction transaction = ParsedTransaction.parse(storageService.read(transactionToken).get());
+            var transaction = processMapper.readSafe(
+                    new String(storageService.read(transactionToken).get()),
+                    ParsedTransaction.class);
 
             execution.setVariableLocal("iban", transaction.getOpposingIBAN());
             execution.setVariableLocal("name", transaction.getOpposingName());

@@ -13,9 +13,11 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 public class CreateUserDelegate implements JavaDelegate {
 
     private final FinTrack application;
+    private final ProcessMapper mapper;
 
-    CreateUserDelegate(FinTrack application) {
+    CreateUserDelegate(FinTrack application, ProcessMapper mapper) {
         this.application = application;
+        this.mapper = mapper;
     }
 
     @Override
@@ -32,7 +34,7 @@ public class CreateUserDelegate implements JavaDelegate {
                 .type(SystemAccountTypes.RECONCILE.label())
                 .build();
 
-        execution.setVariableLocal("account", ProcessMapper.writeSafe(reconcileAccount));
+        execution.setVariableLocal("account", mapper.writeSafe(reconcileAccount));
     }
 
 }

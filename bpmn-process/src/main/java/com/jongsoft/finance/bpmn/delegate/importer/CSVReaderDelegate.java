@@ -1,18 +1,20 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
+import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
-import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
 import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,17 +27,20 @@ abstract class CSVReaderDelegate implements JavaDelegate {
     private final ImportProvider importProvider;
     private final StorageService storageService;
 
-    protected CSVReaderDelegate(ImportProvider importProvider, StorageService storageService) {
+    private final ProcessMapper mapper;
+
+    protected CSVReaderDelegate(ImportProvider importProvider, StorageService storageService, ProcessMapper mapper) {
         this.importProvider = importProvider;
         this.storageService = storageService;
+        this.mapper = mapper;
     }
 
     @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        String batchImportSlug = (String) execution.getVariableLocal("batchImportSlug");
-        ImportConfigJson importConfigJson = getFromContext(execution);
+    public void execute(DelegateExecution execution) throws IOException, CsvValidationException {
+        var batchImportSlug = (String) execution.getVariableLocal("batchImportSlug");
+        var importConfigJson = getFromContext(execution);
 
-        BatchImport batchImport = importProvider.lookup(batchImportSlug).get();
+        var batchImport = importProvider.lookup(batchImportSlug).get();
         log.debug("{}: Processing transaction import CSV {}", execution.getCurrentActivityName(), batchImport.getSlug());
         if (importConfigJson == null) {
             throw new IllegalStateException("Cannot run account extraction without actual configuration.");
@@ -93,14 +98,13 @@ abstract class CSVReaderDelegate implements JavaDelegate {
     }
 
     private ImportConfigJson getFromContext(DelegateExecution execution) {
-        Object rawEntity = execution.getVariable("importConfig");
-        if (rawEntity instanceof String) {
-            return ImportConfigJson.read(rawEntity.toString());
-        } else if (rawEntity instanceof ImportConfigJson) {
-            return (ImportConfigJson) rawEntity;
-        }
+        var rawEntity = execution.getVariable("importConfig");
 
-        throw new IllegalArgumentException("Unsupported import configuration provided.");
+        return switch (rawEntity) {
+            case String json -> mapper.readSafe(json, ImportConfigJson.class);
+            case ImportConfigJson json -> json;
+            default -> throw new IllegalArgumentException("Unsupported import configuration provided.");
+        };
     }
 
     private ParsedTransaction transform(

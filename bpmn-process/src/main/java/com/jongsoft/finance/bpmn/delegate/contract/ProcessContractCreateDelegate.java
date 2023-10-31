@@ -19,19 +19,22 @@ public class ProcessContractCreateDelegate implements JavaDelegate {
     private final AccountProvider accountProvider;
     private final ContractProvider contractProvider;
     private final StorageService storageService;
+    private final ProcessMapper mapper;
 
     ProcessContractCreateDelegate(
             AccountProvider accountProvider,
             ContractProvider contractProvider,
-            StorageService storageService) {
+            StorageService storageService,
+            ProcessMapper mapper) {
         this.accountProvider = accountProvider;
         this.contractProvider = contractProvider;
         this.storageService = storageService;
+        this.mapper = mapper;
     }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        var contractJson = ProcessMapper.readSafe(
+        var contractJson = mapper.readSafe(
                 execution.<StringValue>getVariableLocalTyped("contract").getValue(),
                 ContractJson.class);
 

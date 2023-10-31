@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn;
 
+import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.domain.account.Account;
@@ -100,6 +101,8 @@ class BatchImportIT extends ProcessTestSetup {
     @Inject
     private ProcessEngine processEngine;
     @Inject
+    private ProcessMapper processMapper;
+    @Inject
     private CurrentUserProvider authenticationFacade;
 
     @Inject
@@ -173,8 +176,10 @@ class BatchImportIT extends ProcessTestSetup {
     @DisplayName("Convert a CSV file into transactions.")
     @Deployment(resources = {"/bpmn/transaction/transactions.import.bpmn", "/bpmn/transaction/transaction.rules.apply.bpmn"})
     @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_NONE)
-    void run() throws InterruptedException {
-        ImportConfigJson importConfigJson = ImportConfigJson.read(new String(readFile("import-test/import-config-test.json")));
+    void run() {
+        var importConfigJson = processMapper.readSafe(
+                        new String(readFile("import-test/import-config-test.json")),
+                        ImportConfigJson.class);
 
         BatchImport batchImport = BatchImport.builder()
                 .id(1L)
@@ -239,7 +244,7 @@ class BatchImportIT extends ProcessTestSetup {
 
         var process = processEngine.getRuntimeService().createProcessInstanceByKey("BatchTransactionImport")
                 .setVariable("slug", batchImport.getSlug())
-                .setVariable("importConfig", importConfigJson.write())
+                .setVariable("importConfig", processMapper.writeSafe(importConfigJson))
                 .setVariable("accountMapping", "account-mapping-token")
                 .setVariable("username", authenticationFacade.currentUser().getUsername())
                 .businessKey("sample-key")

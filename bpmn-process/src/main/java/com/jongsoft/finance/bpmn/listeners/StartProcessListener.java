@@ -13,10 +13,12 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 @Singleton
 public class StartProcessListener implements ExecutionListener {
 
-    private final ApplicationEventPublisher eventPublisher;
+    private final ApplicationEventPublisher<InternalAuthenticationEvent> eventPublisher;
     private final AuthenticationFacade authenticationFacade;
 
-    StartProcessListener(ApplicationEventPublisher eventPublisher, AuthenticationFacade authenticationFacade) {
+    StartProcessListener(
+            ApplicationEventPublisher<InternalAuthenticationEvent> eventPublisher,
+            AuthenticationFacade authenticationFacade) {
         this.eventPublisher = eventPublisher;
         this.authenticationFacade = authenticationFacade;
     }

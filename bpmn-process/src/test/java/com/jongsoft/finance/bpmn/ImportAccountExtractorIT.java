@@ -12,7 +12,6 @@ import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.finance.serialized.ImportConfigJson;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
@@ -155,8 +154,6 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
     @Deployment(resources = {"/bpmn/transaction/transactions.extract.accounts.bpmn"})
     @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_NONE)
     public void run() {
-        ImportConfigJson importConfigJson = ImportConfigJson.read(new String(readFile("import-test/import-config-test.json")));
-
         BatchImport batchImport = BatchImport.builder()
                 .id(1L)
                 .slug("account-test-import")
@@ -175,7 +172,7 @@ public class ImportAccountExtractorIT extends ProcessTestSetup {
 
         final ProcessInstanceWithVariables response = processEngine.getRuntimeService().createProcessInstanceByKey("ImportExtractAccounts")
                 .setVariable("slug", batchImport.getSlug())
-                .setVariable("importConfig", importConfigJson)
+                .setVariable("importConfig", new String(readFile("import-test/import-config-test.json")))
                 .setVariable("username", userService.currentUser().getUsername())
                 .businessKey("sample-key")
                 .executeWithVariablesInReturn();

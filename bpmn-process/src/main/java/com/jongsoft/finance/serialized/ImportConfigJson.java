@@ -1,15 +1,13 @@
 package com.jongsoft.finance.serialized;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.jongsoft.finance.ProcessMapper;
-import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
@@ -65,7 +63,7 @@ public class ImportConfigJson implements Serializable {
     private Character delimiter;
 
     @JsonProperty("column-roles")
-    private Sequence<MappingRole> columnRoles;
+    private List<MappingRole> columnRoles;
 
     @JsonProperty("custom-indicator")
     private CustomIndicator customIndicator;
@@ -81,22 +79,6 @@ public class ImportConfigJson implements Serializable {
 
         @JsonProperty("credit")
         private String credit;
-    }
-
-    public static ImportConfigJson read(String content) {
-        try {
-            return ProcessMapper.INSTANCE.readValue(content, ImportConfigJson.class);
-        } catch (IOException e) {
-            throw new IllegalStateException("Invalid configuration provided for import.", e);
-        }
-    }
-
-    public String write() {
-        try {
-            return ProcessMapper.INSTANCE.writeValueAsString(this);
-        } catch (IOException e) {
-            throw new IllegalStateException("Invalid configuration provided for import.");
-        }
     }
 
 }

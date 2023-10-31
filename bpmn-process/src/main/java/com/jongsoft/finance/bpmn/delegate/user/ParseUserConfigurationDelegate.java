@@ -19,9 +19,11 @@ import java.util.stream.Collectors;
 public class ParseUserConfigurationDelegate implements JavaDelegate {
 
     private final StorageService storageService;
+    private final ProcessMapper mapper;
 
-    ParseUserConfigurationDelegate(StorageService storageService) {
+    ParseUserConfigurationDelegate(StorageService storageService, ProcessMapper mapper) {
         this.storageService = storageService;
+        this.mapper = mapper;
     }
 
     @Override
@@ -32,14 +34,16 @@ public class ParseUserConfigurationDelegate implements JavaDelegate {
 
         String storageToken = (String) execution.getVariable("storageToken");
 
-        byte[] rawJsonContent = storageService.read(storageToken).get();
-        ExportJson profileJson = ExportJson.read(new String(rawJsonContent, StandardCharsets.UTF_8));
+        var profileJson = storageService.read(storageToken)
+                .map(String::new)
+                .map(json -> mapper.readSafe(json, ExportJson.class))
+                .getOrThrow(() -> new RuntimeException("Unable to parse json file"));
 
-        String ruleStorageToken = storageService.store(RuleConfigJson.builder()
-                .slug("profile-import")
-                .rules(profileJson.getRules())
-                .build()
-                .write().getBytes());
+        String ruleStorageToken = storageService.store(
+                mapper.writeSafe(RuleConfigJson.builder()
+                        .slug("profile-import")
+                        .rules(profileJson.getRules())
+                        .build()).getBytes(StandardCharsets.UTF_8));
 
         execution.setVariableLocal("accounts", serialize(profileJson.getAccounts()));
         execution.setVariableLocal("budgetPeriods", serialize(profileJson.getBudgetPeriods()));
@@ -51,7 +55,7 @@ public class ParseUserConfigurationDelegate implements JavaDelegate {
 
     List<String> serialize(List<?> input) {
         return input.stream()
-                .map(ProcessMapper::writeSafe)
+                .map(mapper::writeSafe)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }

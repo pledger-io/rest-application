@@ -1,8 +1,8 @@
 package com.jongsoft.finance.bpmn.delegate.contract;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.bpmn.TestUtilities;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.user.Role;
@@ -43,7 +43,7 @@ class ProcessContractCreateDelegateTest {
         execution = Mockito.mock(DelegateExecution.class);
         eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
 
-        subject = new ProcessContractCreateDelegate(accountProvider, contractProvider, storageService);
+        subject = new ProcessContractCreateDelegate(accountProvider, contractProvider, storageService, TestUtilities.getProcessMapper());
 
         final ContractJson contractJson = ContractJson.builder()
                 .name("Test contract")
@@ -54,7 +54,7 @@ class ProcessContractCreateDelegateTest {
                 .end(LocalDate.of(2019, 1, 1))
                 .build();
 
-        final String value = ProcessMapper.writeSafe(contractJson);
+        final String value = TestUtilities.getProcessMapper().writeSafe(contractJson);
         Mockito.when(execution.getVariableLocalTyped("contract")).thenReturn(new PrimitiveTypeValueImpl.StringValueImpl(value));
 
         new EventBus(eventPublisher);

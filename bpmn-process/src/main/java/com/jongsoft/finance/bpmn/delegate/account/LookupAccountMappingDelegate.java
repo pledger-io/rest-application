@@ -34,10 +34,12 @@ public class LookupAccountMappingDelegate implements JavaDelegate {
 
     private final AccountProvider accountProvider;
     private final StorageService storageService;
+    private final ProcessMapper mapper;
 
-    LookupAccountMappingDelegate(AccountProvider accountProvider, StorageService storageService) {
+    LookupAccountMappingDelegate(AccountProvider accountProvider, StorageService storageService, ProcessMapper mapper) {
         this.accountProvider = accountProvider;
         this.storageService = storageService;
+        this.mapper = mapper;
     }
 
     @Override
@@ -74,7 +76,7 @@ public class LookupAccountMappingDelegate implements JavaDelegate {
         var fileCode = execution.getVariable("accountMapping").toString();
 
         var rawValue = storageService.read(fileCode).get();
-        return ProcessMapper.INSTANCE.readValue(rawValue, Map.class);
+        return mapper.readSafe(new String(rawValue), Map.class);
     }
 
 }

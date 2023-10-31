@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.user;
 
+import com.jongsoft.finance.bpmn.TestUtilities;
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.user.CreateUserCommand;
@@ -24,7 +25,7 @@ class CreateUserDelegateTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        subject = new CreateUserDelegate(new FinTrack(null));
+        subject = new CreateUserDelegate(new FinTrack(null), TestUtilities.getProcessMapper());
 
         new EventBus(eventPublisher);
     }

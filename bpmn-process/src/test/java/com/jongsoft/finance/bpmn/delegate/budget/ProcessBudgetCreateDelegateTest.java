@@ -1,6 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
-import com.jongsoft.finance.ProcessMapper;
+import com.jongsoft.finance.bpmn.TestUtilities;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
@@ -39,7 +39,7 @@ class ProcessBudgetCreateDelegateTest {
         eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         currentUserFacade = Mockito.mock(CurrentUserProvider.class);
 
-        subject = new ProcessBudgetCreateDelegate(currentUserFacade, budgetProvider);
+        subject = new ProcessBudgetCreateDelegate(currentUserFacade, budgetProvider, TestUtilities.getProcessMapper());
 
         final BudgetJson budgetJson = BudgetJson.builder()
                 .start(LocalDate.of(2019, 1, 1))
@@ -57,7 +57,7 @@ class ProcessBudgetCreateDelegateTest {
                                 .build()))
                 .build();
 
-        StringValue value = new PrimitiveTypeValueImpl.StringValueImpl(ProcessMapper.writeSafe(budgetJson));
+        StringValue value = new PrimitiveTypeValueImpl.StringValueImpl(TestUtilities.getProcessMapper().writeSafe(budgetJson));
 
         Mockito.when(currentUserFacade.currentUser()).thenReturn(UserAccount.builder().roles(Collections.List(new Role("admin"))).build());
         Mockito.when(execution.getVariableLocalTyped("budget")).thenReturn(value);

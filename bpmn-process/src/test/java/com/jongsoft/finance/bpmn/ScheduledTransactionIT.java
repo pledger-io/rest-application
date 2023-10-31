@@ -101,7 +101,7 @@ class ScheduledTransactionIT extends ProcessTestSetup {
             return transactionId;
         });
 
-        var process = processEngine.getRuntimeService()
+        processEngine.getRuntimeService()
                 .createProcessInstanceByKey("ScheduledTransaction")
                 .setVariable("id", 1L)
                 .setVariable("scheduled", "2019-01-01")

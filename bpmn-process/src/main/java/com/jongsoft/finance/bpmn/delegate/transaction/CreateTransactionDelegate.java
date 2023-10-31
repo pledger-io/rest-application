@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
+import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
 import com.jongsoft.finance.domain.account.Account;
@@ -21,14 +22,17 @@ public class CreateTransactionDelegate implements JavaDelegate {
     private final StorageService storageService;
     private final AccountProvider accountProvider;
     private final TransactionCreationHandler creationHandler;
+    private final ProcessMapper mapper;
 
     CreateTransactionDelegate(
             StorageService storageService,
             AccountProvider accountProvider,
-            TransactionCreationHandler creationHandler) {
+            TransactionCreationHandler creationHandler,
+            ProcessMapper mapper) {
         this.storageService = storageService;
         this.accountProvider = accountProvider;
         this.creationHandler = creationHandler;
+        this.mapper = mapper;
     }
 
     @Override
@@ -38,7 +42,9 @@ public class CreateTransactionDelegate implements JavaDelegate {
         Account toAccount = accountProvider.lookup(execution.<LongValue>getVariableLocalTyped("accountId").getValue()).get();
         Account targetAccount = accountProvider.lookup(execution.<LongValue>getVariableLocalTyped("targetAccount").getValue()).get();
 
-        ParsedTransaction parsedTransaction = ParsedTransaction.parse(storageService.read(transactionToken).get());
+        var parsedTransaction = mapper.readSafe(
+                new String(storageService.read(transactionToken).get()),
+                ParsedTransaction.class);
         log.debug("{}: Creating transaction into {} from {} with amount {}",
                 execution.getCurrentActivityName(),
                 targetAccount.getName(),

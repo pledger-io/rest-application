@@ -1,21 +1,19 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.serialized.AccountJson;
+import io.micronaut.serde.annotation.Serdeable;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jongsoft.finance.ProcessMapper;
-import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.serialized.AccountJson;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
+@Serdeable
 @ToString(of = {"transactionDate", "opposingName"})
 public class ParsedTransaction implements Serializable {
 
@@ -36,13 +34,5 @@ public class ParsedTransaction implements Serializable {
                 .type(type == Transaction.Type.CREDIT ? "creditor" : "debtor")
                 .currency("EUR")// todo this needs to be fixed later on
                 .build();
-    }
-
-    public String stringify() {
-        return ProcessMapper.writeSafe(this);
-    }
-
-    public static ParsedTransaction parse(byte[] rawValue) {
-        return ProcessMapper.readSafe(new String(rawValue), ParsedTransaction.class);
     }
 }

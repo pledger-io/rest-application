@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
+import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
@@ -18,8 +19,9 @@ public class ExtractAccountDetailsDelegate extends CSVReaderDelegate {
     @Inject
     public ExtractAccountDetailsDelegate(
             ImportProvider importProvider,
-            StorageService storageService) {
-        super(importProvider, storageService);
+            StorageService storageService,
+            ProcessMapper mapper) {
+        super(importProvider, storageService, mapper);
     }
 
     @Override

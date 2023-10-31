@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.scheduler;
 
+import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
@@ -19,12 +20,15 @@ public class GenerateTransactionJsonDelegate implements JavaDelegate {
 
     private final TransactionScheduleProvider transactionScheduleProvider;
     private final StorageService storageService;
+    private final ProcessMapper mapper;
 
     GenerateTransactionJsonDelegate(
             TransactionScheduleProvider transactionScheduleProvider,
-            StorageService storageService) {
+            StorageService storageService,
+            ProcessMapper mapper) {
         this.transactionScheduleProvider = transactionScheduleProvider;
         this.storageService = storageService;
+        this.mapper = mapper;
     }
 
     @Override
@@ -34,17 +38,14 @@ public class GenerateTransactionJsonDelegate implements JavaDelegate {
 
         transactionScheduleProvider.lookup(scheduledTransactionId)
                 .ifPresent(schedule -> {
-                    var transaction = new ParsedTransaction(
-                            schedule.getAmount(),
-                            Transaction.Type.CREDIT,
-                            generateTransactionDescription(schedule),
-                            LocalDate.parse(isoDate),
-                            null,
-                            null,
-                            "",
-                            "");
+                    var transaction = ParsedTransaction.builder()
+                            .amount(schedule.getAmount())
+                            .type(Transaction.Type.CREDIT)
+                            .transactionDate(LocalDate.parse(isoDate))
+                            .description(generateTransactionDescription(schedule))
+                            .build();
 
-                    var transactionToken = storageService.store(transaction.stringify().getBytes(StandardCharsets.UTF_8));
+                    var transactionToken = storageService.store(mapper.writeSafe(transaction).getBytes(StandardCharsets.UTF_8));
 
                     execution.setVariable("destinationId", schedule.getDestination().getId());
                     execution.setVariable("sourceId", schedule.getSource().getId());

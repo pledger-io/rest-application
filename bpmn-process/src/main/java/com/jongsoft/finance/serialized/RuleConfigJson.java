@@ -1,6 +1,5 @@
 package com.jongsoft.finance.serialized;
 
-import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
@@ -9,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -80,20 +78,4 @@ public class RuleConfigJson implements Serializable {
 
     private String slug;
     private List<RuleJson> rules;
-
-    public static RuleConfigJson read(String content) {
-        try {
-            return ProcessMapper.INSTANCE.readValue(content, RuleConfigJson.class);
-        } catch (IOException e) {
-            throw new IllegalStateException("Invalid configuration for rules provided.", e);
-        }
-    }
-
-    public String write() {
-        try {
-            return ProcessMapper.INSTANCE.writeValueAsString(this);
-        } catch (IOException e) {
-            throw new IllegalStateException("Invalid configuration provided for rules.");
-        }
-    }
 }

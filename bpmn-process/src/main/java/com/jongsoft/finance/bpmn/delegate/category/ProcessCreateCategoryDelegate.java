@@ -28,15 +28,20 @@ public class ProcessCreateCategoryDelegate implements JavaDelegate {
 
     private final CurrentUserProvider currentUserProvider;
     private final CategoryProvider categoryProvider;
+    private final ProcessMapper mapper;
 
-    ProcessCreateCategoryDelegate(CurrentUserProvider currentUserProvider, CategoryProvider categoryProvider) {
+    ProcessCreateCategoryDelegate(
+            CurrentUserProvider currentUserProvider,
+            CategoryProvider categoryProvider,
+            ProcessMapper mapper) {
         this.currentUserProvider = currentUserProvider;
         this.categoryProvider = categoryProvider;
+        this.mapper = mapper;
     }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        var categoryJson = ProcessMapper.readSafe(
+        var categoryJson = mapper.readSafe(
                 execution.<StringValue>getVariableLocalTyped("category").getValue(),
                 CategoryJson.class);
 

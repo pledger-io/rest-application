@@ -26,18 +26,21 @@ public class ProcessBudgetCreateDelegate implements JavaDelegate {
 
     private final CurrentUserProvider currentUserProvider;
     private final BudgetProvider budgetProvider;
+    private final ProcessMapper mapper;
 
     ProcessBudgetCreateDelegate(
             CurrentUserProvider currentUserProvider,
-            BudgetProvider budgetProvider) {
+            BudgetProvider budgetProvider,
+            ProcessMapper mapper) {
         this.currentUserProvider = currentUserProvider;
         this.budgetProvider = budgetProvider;
+        this.mapper = mapper;
     }
 
     @Override
     public void execute(DelegateExecution execution) {
         var userAccount = currentUserProvider.currentUser();
-        var budgetJson = ProcessMapper.readSafe(
+        var budgetJson = mapper.readSafe(
                 execution.<StringValue>getVariableLocalTyped("budget").getValue(),
                 BudgetJson.class);
 

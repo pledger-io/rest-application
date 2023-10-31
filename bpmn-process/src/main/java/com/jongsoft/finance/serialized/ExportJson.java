@@ -1,13 +1,10 @@
 package com.jongsoft.finance.serialized;
 
-import com.jongsoft.finance.ProcessMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -24,12 +21,4 @@ public class ExportJson implements Serializable {
     private List<ContractJson> contracts;
     private List<String> tags;
 
-    public static ExportJson read(String value) {
-        try {
-            return ProcessMapper.INSTANCE.readValue(value, ExportJson.class);
-        } catch (IOException e) {
-            throw new IllegalStateException("Invalid configuration for configuration import provided.", e);
-        }
-    }
-    
 }

@@ -1,8 +1,8 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.bpmn.TestUtilities;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
@@ -43,7 +43,7 @@ class ProcessAccountCreationDelegateTest {
     @BeforeEach
     void setup() throws JsonProcessingException {
         MockitoAnnotations.openMocks(this);
-        subject = new ProcessAccountCreationDelegate(userService, accountProvider, storageService);
+        subject = new ProcessAccountCreationDelegate(userService, accountProvider, storageService, TestUtilities.getProcessMapper());
 
         final AccountJson accountJson = AccountJson.builder()
                 .name("Test account")
@@ -52,7 +52,7 @@ class ProcessAccountCreationDelegateTest {
                 .currency("EUR")
                 .build();
 
-        StringValue value = new PrimitiveTypeValueImpl.StringValueImpl(ProcessMapper.INSTANCE.writeValueAsString(accountJson));
+        StringValue value = new PrimitiveTypeValueImpl.StringValueImpl(TestUtilities.getProcessMapper().writeSafe(accountJson));
 
         Mockito.when(userService.currentUser()).thenReturn(UserAccount.builder().roles(Collections.List(new Role("admin"))).build());
         Mockito.when(execution.getVariableLocalTyped("account")).thenReturn(value);

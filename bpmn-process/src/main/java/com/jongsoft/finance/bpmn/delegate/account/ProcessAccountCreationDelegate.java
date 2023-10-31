@@ -31,19 +31,22 @@ public class ProcessAccountCreationDelegate implements JavaDelegate {
     private final CurrentUserProvider userProvider;
     private final AccountProvider accountProvider;
     private final StorageService storageService;
+    private final ProcessMapper mapper;
 
     ProcessAccountCreationDelegate(
             CurrentUserProvider userProvider,
             AccountProvider accountProvider,
-            StorageService storageService) {
+            StorageService storageService,
+            ProcessMapper mapper) {
         this.userProvider = userProvider;
         this.accountProvider = accountProvider;
         this.storageService = storageService;
+        this.mapper = mapper;
     }
 
     @Override
     public void execute(DelegateExecution execution) {
-        var accountJson = ProcessMapper.readSafe(
+        var accountJson = mapper.readSafe(
                 execution.<StringValue>getVariableLocalTyped("account").getValue(),
                 AccountJson.class);
 
