@@ -4,7 +4,7 @@
 ![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/jongsoftdev/fintrack-application/master)
 [![SonarCloud Quality](https://sonarcloud.io/api/project_badges/measure?project=FinTrack%3AAPI&metric=alert_status&style=flat-square)](https://sonarcloud.io/dashboard?id=FinTrack%3AAPI)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=FinTrack%3AAPI&metric=coverage&style=flat-square)](https://sonarcloud.io/dashboard?id=FinTrack%3AAPI)
-![APMLicense](https://img.shields.io/apm/l/vim-mode.svg?style=flat-square)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 -----------------------
 
