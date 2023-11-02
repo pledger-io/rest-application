@@ -29,6 +29,8 @@ public class AccountJpa extends EntityJpa {
     private String imageFileToken;
 
     private double interest;
+
+    @Enumerated(value = EnumType.STRING)
     private Periodicity interestPeriodicity;
 
     @ManyToOne
