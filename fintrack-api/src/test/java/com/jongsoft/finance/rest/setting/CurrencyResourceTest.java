@@ -7,7 +7,6 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.hamcrest.Matchers;
@@ -78,7 +77,7 @@ class CurrencyResourceTest extends TestSetup {
                 .contentType("application/json")
                 .body(CurrencyRequest.builder()
                         .code("TCC")
-                        .symbol('S')
+                        .symbol("S")
                         .name("Test currency")
                         .build())
             .when()
@@ -87,7 +86,7 @@ class CurrencyResourceTest extends TestSetup {
                 .statusCode(201)
                 .body("code", Matchers.equalTo("TCC"))
                 .body("name", Matchers.equalTo("Test currency"))
-                .body("symbol", Matchers.equalTo(83));
+                .body("symbol", Matchers.equalTo("S"));
         // @formatter:on
     }
 
@@ -130,7 +129,7 @@ class CurrencyResourceTest extends TestSetup {
                 .contentType("application/json")
                 .body(CurrencyRequest.builder()
                         .code("TCC")
-                        .symbol('S')
+                        .symbol("S")
                         .name("Test currency")
                         .build())
             .when()
@@ -139,7 +138,7 @@ class CurrencyResourceTest extends TestSetup {
                 .statusCode(200)
                 .body("code", Matchers.equalTo("TCC"))
                 .body("name", Matchers.equalTo("Test currency"))
-                .body("symbol", Matchers.equalTo(83));
+                .body("symbol", Matchers.equalTo("S"));
         // @formatter:on
 
         verify(currency).rename("Test currency", "TCC", 'S');

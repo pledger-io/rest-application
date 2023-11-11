@@ -19,7 +19,8 @@ public class CurrencyRequest {
     private String code;
 
     @NotNull
-    private char symbol;
+    @Size(min = 1, max = 1)
+    private String symbol;
 
     public String getName() {
         return name;
@@ -30,7 +31,7 @@ public class CurrencyRequest {
     }
 
     public char getSymbol() {
-        return symbol;
+        return symbol.charAt(0);
     }
 
 }
