@@ -52,7 +52,7 @@ public class AuthenticationFilter implements HttpServerFilter {
                             Control.Try(() -> objectMapper.writeValueAsString(body))
                                     .recover(Throwable::getMessage).get());
                 } else {
-                    log.debug("{}: {} in {} ms", request.getMethod(), request.getPath(), Duration.between(startTime, Instant.now()).toMillis());
+                    log.info("{}: {} in {} ms", request.getMethod(), request.getPath(), Duration.between(startTime, Instant.now()).toMillis());
                 }
             }
         });

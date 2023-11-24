@@ -13,6 +13,17 @@ import org.camunda.bpm.engine.variable.value.LongValue;
 
 import java.util.Map;
 
+/**
+ * This delegate is responsible for matching a transaction against the rules engine.
+ * <p>
+ *     The transaction is retrieved from the {@link TransactionProvider} and the rules engine is
+ *     invoked with the transaction data.
+ *     <br>
+ *     The output of the rules engine is then applied to the transaction.
+ *     <br>
+ *     The transaction is then persisted back to the {@link TransactionProvider}.
+ * </p>
+ */
 @Slf4j
 @Singleton
 public class TransactionRuleMatcherDelegate implements JavaDelegate {

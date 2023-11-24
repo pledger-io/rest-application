@@ -2,6 +2,8 @@ package com.jongsoft.finance.rest.transaction;
 
 import com.jongsoft.finance.core.Removable;
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.transaction.TransactionRule;
+import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
@@ -74,6 +76,21 @@ public class TransactionRuleResource {
                 .toJava();
     }
 
+    @Delete("/groups/{group}")
+    @Status(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "Delete rule group",
+            description = "Deletes the rule group from the system, including all rules within it",
+            operationId = "deleteRuleGroup"
+    )
+    void deleteGroup(@PathVariable String group) {
+        ruleProvider.lookup(group)
+                .forEach(TransactionRule::remove);
+
+        ruleGroupProvider.lookup(group)
+                .ifPresent(TransactionRuleGroup::delete);
+    }
+
     @Status(HttpStatus.NO_CONTENT)
     @Get("/groups/{group}/move-up")
     @Operation(
@@ -134,14 +151,14 @@ public class TransactionRuleResource {
 
         request.getChanges()
                 .forEach(change -> rule.registerChange(
-                        change.getColumn(),
-                        change.getValue()));
+                        change.column(),
+                        change.value()));
 
         request.getConditions()
                 .forEach(condition -> rule.registerCondition(
-                        condition.getColumn(),
-                        condition.getOperation(),
-                        condition.getValue()));
+                        condition.column(),
+                        condition.operation(),
+                        condition.value()));
 
         ruleProvider.save(rule);
     }
@@ -210,16 +227,16 @@ public class TransactionRuleResource {
                             .forEach(Removable::delete);
 
                     request.getChanges()
-                            .forEach(change -> rule.registerChange(change.getColumn(), change.getValue()));
+                            .forEach(change -> rule.registerChange(change.column(), change.value()));
 
                     rule.getConditions()
                             .forEach(Removable::delete);
 
                     request.getConditions()
                             .forEach(condition -> rule.registerCondition(
-                                    condition.getColumn(),
-                                    condition.getOperation(),
-                                    condition.getValue()));
+                                    condition.column(),
+                                    condition.operation(),
+                                    condition.value()));
 
                     ruleProvider.save(rule);
                     return ruleProvider.lookup(id).get();

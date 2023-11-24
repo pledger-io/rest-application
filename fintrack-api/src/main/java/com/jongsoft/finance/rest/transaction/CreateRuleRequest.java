@@ -2,106 +2,58 @@ package com.jongsoft.finance.rest.transaction;
 
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
+
 import java.util.List;
 
 @Builder
-@NoArgsConstructor
-@Serdeable.Deserializable
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Serdeable
 class CreateRuleRequest {
 
-    @Introspected
-    @NoArgsConstructor
-    public static class Condition {
+    @Serdeable
+    public record Condition(
         @Schema(description = "The identifier of an existing pre-condition")
-        private Long id;
+        Long id,
 
         @NotNull
         @Schema(description = "The column on which to look for the pre-condition")
-        private RuleColumn column;
+        RuleColumn column,
 
         @NotNull
         @Schema(description = "The type of comparison operation to perform")
-        private RuleOperation operation;
+        RuleOperation operation,
 
         @NotBlank
         @Schema(description = "The value the column must have to match the pre-condition", example = "My personal account")
-        private String value;
+        String value
+    ) {}
 
-        public Condition(Long id, RuleColumn column, RuleOperation operation, String value) {
-            this.id = id;
-            this.column = column;
-            this.operation = operation;
-            this.value = value;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public RuleColumn getColumn() {
-            return column;
-        }
-
-        public RuleOperation getOperation() {
-            return operation;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-    @Introspected
-    @NoArgsConstructor
-    public static class Change {
-
+    @Serdeable
+    public record Change (
         @Schema(description = "The identifier of an already existing change")
-        private Long id;
+        Long id,
+
         @NotNull
         @Schema(description = "The column on which the change is effected", example = "CATEGORY")
-        private RuleColumn column;
+        RuleColumn column,
+
         @NotBlank
         @Schema(description = "The value to be applied, this could be an identifier", example = "1")
-        private String value;
-
-        public Change(Long id, @NotNull RuleColumn column, @NotBlank String value) {
-            this.id = id;
-            this.column = column;
-            this.value = value;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public RuleColumn getColumn() {
-            return column;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
+        String value
+    ) {}
 
     @NotBlank
     @Size(max = 255)
-    @Schema(description = "The name of the rule", implementation = String.class, required = true)
+    @Schema(description = "The name of the rule", requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
     @Size(max = 1024)
-    @Schema(description = "A long description of the rule", implementation = String.class)
+    @Schema(description = "A long description of the rule")
     private String description;
 
     @Schema(description = "Should the rule execution stop after a positive match")

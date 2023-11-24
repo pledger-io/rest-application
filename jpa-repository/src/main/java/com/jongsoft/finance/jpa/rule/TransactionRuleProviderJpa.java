@@ -10,16 +10,15 @@ import com.jongsoft.finance.providers.TransactionRuleProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
-import io.micronaut.transaction.annotation.ReadOnly;
+import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import jakarta.transaction.Transactional;
 
 import java.util.Optional;
 
-@ReadOnly
 @Singleton
+@Transactional
 @Named("transactionRuleProvider")
 public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 
@@ -74,7 +73,6 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
     }
 
     @Override
-    @Transactional
     public void save(TransactionRule rule) {
         int sortOrder = rule.getSort();
         if (rule.getId() == null || rule.getSort() == 0) {

@@ -72,7 +72,7 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
                 .set("username", authenticationFacade.authenticated())
                 .set("label", label)
                 .maybe()
-                .getOrSupply(() -> null);
+                .getOrThrow(() -> new IllegalArgumentException("Category not found"));
     }
 
     private ExpenseJpa expense(String name) {
@@ -85,20 +85,20 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
                 .set("username", authenticationFacade.authenticated())
                 .set("name", name)
                 .maybe()
-                .getOrSupply(() -> null);
+                .getOrThrow(() -> new IllegalArgumentException("Budget not found"));
     }
 
     private ContractJpa contract(String name) {
         var hql = """
                 select e from ContractJpa e
-                where e.name = :name and e.user.username = :username""";
+                where e.name = :name and e.user.username = :username and e.archived = false""";
 
         return entityManager.<ContractJpa>blocking()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
                 .set("name", name)
                 .maybe()
-                .getOrSupply(() -> null);
+                .getOrThrow(() -> new IllegalArgumentException("Contract not found"));
     }
 
     private ImportJpa job(String slug) {
@@ -111,7 +111,7 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
                 .set("username", authenticationFacade.authenticated())
                 .set("slug", slug)
                 .maybe()
-                .getOrSupply(() -> null);
+                .getOrThrow(() -> new IllegalArgumentException("Job not found"));
     }
 
     private TagJpa tag(String name) {
@@ -124,6 +124,6 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
                 .set("username", authenticationFacade.authenticated())
                 .set("name", name)
                 .maybe()
-                .getOrSupply(() -> null);
+                .getOrThrow(() -> new IllegalArgumentException("tag not found"));
     }
 }

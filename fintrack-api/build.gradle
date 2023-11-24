@@ -26,6 +26,9 @@ dependencies {
 
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
 
+    // Contains the health checker
+    implementation("io.micronaut:micronaut-management")
+
     // needed for application.yml
     runtimeOnly("org.yaml:snakeyaml")
 
