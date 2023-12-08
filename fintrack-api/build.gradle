@@ -1,7 +1,6 @@
-apply plugin: 'application'
-apply plugin: 'io.micronaut.application'
 
-mainClassName = "com.jongsoft.finance.Application"
+
+//mainClassName = "com.jongsoft.finance.Application"
 
 jar {
     manifest {

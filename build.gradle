@@ -6,8 +6,8 @@ buildscript {
 
 plugins {
     id "com.diffplug.eclipse.apt" version "3.42.2"
-    id "io.micronaut.library" version '4.0.4'
-    id "io.micronaut.aot" version "4.0.4"
+    id "io.micronaut.library" version '4.2.1'
+    id "io.micronaut.aot" version "4.2.1"
     id "org.sonarqube" version "4.4.1.3373"
     id "io.freefair.lombok" version "8.4"
     id 'jacoco'
@@ -20,6 +20,8 @@ allprojects {
     apply plugin: 'signing'
     apply plugin: 'maven-publish'
     apply plugin: 'io.freefair.lombok'
+    apply plugin: 'io.micronaut.library'
+    apply plugin: 'io.micronaut.aot'
 
     repositories {
         mavenCentral()
@@ -51,11 +53,21 @@ allprojects {
         }
     }
 
+    micronaut {
+        version = "$micronautVersion"
+        runtime "jetty"
+        testRuntime "junit5"
+        processing {
+            incremental(true)
+            annotations("com.jongsoft.finance.*")
+        }
+    }
+
     dependencies {
-        annotationProcessor "io.micronaut.data:micronaut-data-hibernate-jpa:$micronautVersion"
+        annotationProcessor "io.micronaut.data:micronaut-data-hibernate-jpa"
         annotationProcessor "org.projectlombok:lombok"
-        annotationProcessor "io.micronaut:micronaut-inject-java:$micronautVersion"
-        testAnnotationProcessor "io.micronaut:micronaut-inject-java:$micronautVersion"
+        annotationProcessor "io.micronaut:micronaut-inject-java"
+        testAnnotationProcessor "io.micronaut:micronaut-inject-java"
     }
 }
 
@@ -73,15 +85,6 @@ subprojects {
 
         withJavadocJar()
         withSourcesJar()
-    }
-
-    micronaut {
-        runtime "jetty"
-        testRuntime "junit5"
-        processing {
-            incremental(true)
-            annotations("com.jongsoft.finance.*")
-        }
     }
 
     /**
@@ -140,7 +143,7 @@ subprojects {
                 from components.java
                 pom {
                     description = 'The REST-API for FinTrack'
-                    url = 'https://fintrack.jongsoft.com/'
+                    url = 'https://www.pledger.io/'
                     name = project.name
                     scm {
                         connection = 'scm:git:git@bitbucket.org:jongsoftdev/fintrack-application.git'
