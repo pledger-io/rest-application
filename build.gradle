@@ -122,7 +122,7 @@ subprojects {
         enabled = isReleaseVersion
 
         options.addBooleanOption('html5', true)
-        options.addStringOption('-release', '20')
+        options.addStringOption('-release', '21')
     }
 
     publishing {

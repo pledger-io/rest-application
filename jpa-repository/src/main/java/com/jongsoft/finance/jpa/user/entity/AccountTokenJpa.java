@@ -49,7 +49,7 @@ public class AccountTokenJpa extends EntityJpa {
         }
 
         if (description == null) {
-            description = "FinTrack Web Session";
+            description = "Pledger.io Web login";
         }
     }
 
