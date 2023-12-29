@@ -149,6 +149,16 @@ public interface TransactionProvider extends DataProvider<Transaction> {
     ResultPage<Transaction> lookup(FilterCommand filter);
 
     Sequence<DailySummary> daily(FilterCommand filter);
+
+    /**
+     * Retrieve a list of {@link DailySummary} for the given date range. The list will contain all days of the month
+     * and the aggregated value on the first of every month.
+     *
+     * @param filterCommand the filter to be applied
+     * @return the list of daily summaries
+     */
+    Sequence<DailySummary> monthly(FilterCommand filterCommand);
+
     Optional<BigDecimal> balance(FilterCommand filter);
 
     Sequence<Transaction> similar(EntityRef from, EntityRef to, double amount, LocalDate date);

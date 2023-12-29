@@ -56,7 +56,6 @@ public class BalanceResource {
         return new BalanceResponse(balance.doubleValue());
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Post("/partitioned/{partitionKey}")
     @Operation(
             summary = "Partitioned balance",
@@ -114,6 +113,17 @@ public class BalanceResource {
             operationId = "dailyBalance")
     public List<DailyResponse> daily(@Valid @Body BalanceRequest request) {
         return transactionProvider.daily(buildFilterCommand(request))
+                .map(DailyResponse::new)
+                .toJava();
+    }
+
+    @Post("/monthly")
+    @Operation(
+            summary = "Monthly balance",
+            description = "Compute the monthly balance based upon the provided request",
+            operationId = "monthlyBalance")
+    public List<DailyResponse> monthly(@Valid @Body BalanceRequest request) {
+        return transactionProvider.monthly(buildFilterCommand(request))
                 .map(DailyResponse::new)
                 .toJava();
     }

@@ -1,10 +1,10 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import com.jongsoft.finance.providers.TransactionProvider;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
-
-import com.jongsoft.finance.providers.TransactionProvider;
 
 public class DailySummaryImpl implements TransactionProvider.DailySummary {
     private LocalDate day;
@@ -13,6 +13,10 @@ public class DailySummaryImpl implements TransactionProvider.DailySummary {
     public DailySummaryImpl(LocalDate day, BigDecimal summary) {
         this.day = day;
         this.summary = summary;
+    }
+
+    public DailySummaryImpl(int year, int month, int day, BigDecimal summary) {
+        this(LocalDate.of(year, month, day), summary);
     }
 
     @Override

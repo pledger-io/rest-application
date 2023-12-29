@@ -2,6 +2,8 @@ INSERT INTO user_account (id, username, password, currency, gravatar, two_factor
 VALUES (1, 'sample@e', '$2a$10$yZfinpG8MZtbjfKeNnrwlu4GMJuQLAV1.QnzcJPyrxjVIZMuPLYpi', null, null, false,
         'G5GABYRVECPIDLLG', 'dark');
 
+insert into user_roles select 1, id from role;
+
 insert into category (id, label, description, archived, user_id)
 values (1, 'Groceries', 'Groceries', false, 1)
      , (2, 'Bus Fare', 'Transport', false, 1)

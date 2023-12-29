@@ -115,6 +115,30 @@ public class TransactionProviderJpa implements TransactionProvider {
     }
 
     @Override
+    public Sequence<DailySummary> monthly(FilterCommand filter) {
+        log.trace("Transactions monthly sum with filter: {}", filter);
+
+        if (filter instanceof TransactionFilterCommand delegate) {
+            delegate.user(authenticationFacade.authenticated());
+
+            var hql = """
+                    select new %s(
+                       year(a.date), month(a.date), 1,
+                       sum(t.amount))
+                       %s
+                       group by year(a.date), month(a.date)
+                       order by year(a.date) asc, month(a.date) asc""".formatted(DailySummaryImpl.class.getName(), delegate.generateHql());
+
+            return entityManager.<DailySummary>blocking()
+                    .hql(hql)
+                    .setAll(delegate.getParameters())
+                    .sequence();
+        }
+
+        throw new IllegalStateException("Cannot use non JPA filter on TransactionProviderJpa");
+    }
+
+    @Override
     public Optional<BigDecimal> balance(FilterCommand filter) {
         log.trace("Transaction balance with filter: {}", filter.toString());
 

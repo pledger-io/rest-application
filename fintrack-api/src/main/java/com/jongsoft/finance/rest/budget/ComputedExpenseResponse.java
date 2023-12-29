@@ -40,6 +40,10 @@ class ComputedExpenseResponse {
         this.dateRange = new DateRange(dateRange);
     }
 
+    public double getSpent() {
+        return spent;
+    }
+
     public double getDailySpent() {
         var days = (int) ChronoUnit.DAYS.between(dateRange.getStart(), dateRange.getEnd());
         return calculateDaily(spent, days).doubleValue();

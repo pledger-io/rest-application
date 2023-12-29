@@ -75,6 +75,14 @@ class TransactionProviderJpaIT extends JpaTestSetup {
     }
 
     @Test
+    void monthly() {
+        var check = transactionProvider.monthly(filterFactory.transaction().ownAccounts());
+        Assertions.assertThat(check).hasSize(1);
+        Assertions.assertThat(check).containsOnly(
+                new DailySummaryImpl(LocalDate.of(2019, 1, 1), BigDecimal.valueOf(40.4D)));
+    }
+
+    @Test
     void balance() {
         var check = transactionProvider.balance(filterFactory.transaction().ownAccounts());
 

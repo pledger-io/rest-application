@@ -8,7 +8,6 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.hamcrest.Matchers;
@@ -45,6 +44,7 @@ class BalanceResourceTest extends TestSetup {
     void setup() {
         Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option());
         Mockito.when(transactionProvider.daily(Mockito.any())).thenReturn(Collections.List());
+        Mockito.when(transactionProvider.monthly(Mockito.any())).thenReturn(Collections.List());
     }
 
     @Test
@@ -95,6 +95,32 @@ class BalanceResourceTest extends TestSetup {
 
         var mockFilter = filterFactory.transaction();
         Mockito.verify(transactionProvider).daily(Mockito.any());
+        Mockito.verify(mockFilter).onlyIncome(false);
+        Mockito.verify(mockFilter).range(DateUtils.forMonth(2019, 1));
+    }
+
+    @Test
+    @DisplayName("Calculate monthly balance")
+    void monthly(RequestSpecification spec) {
+        var request = new BalanceRequest();
+        request.setOnlyIncome(false);
+        request.setDateRange(new BalanceRequest.DateRange(
+                LocalDate.of(2019, 1, 1),
+                LocalDate.of(2019, 2, 1)));
+
+        // @formatter:off
+        spec
+            .given()
+                .body(request)
+            .when()
+                .post("/api/statistics/balance/monthly")
+            .then()
+                .statusCode(200)
+                .body("size()", Matchers.equalTo(0));
+        // @formatter:on
+
+        var mockFilter = filterFactory.transaction();
+        Mockito.verify(transactionProvider).monthly(Mockito.any());
         Mockito.verify(mockFilter).onlyIncome(false);
         Mockito.verify(mockFilter).range(DateUtils.forMonth(2019, 1));
     }
