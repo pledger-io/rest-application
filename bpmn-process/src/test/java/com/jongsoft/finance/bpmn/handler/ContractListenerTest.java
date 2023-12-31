@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.util.Date;
 
 class ContractListenerTest {
 
@@ -77,7 +75,8 @@ class ContractListenerTest {
         new WarnBeforeExpiryHandler(processEngine, authenticationFacade)
                 .handle(new WarnBeforeExpiryCommand(1L, LocalDate.now().plusMonths(2)));
 
-        var endDate = DateUtils.toDate(LocalDate.now().plusMonths(1));
+        // In some rare cases plus 1 month does not equal plus 2 months minus 1 month
+        var endDate = DateUtils.toDate(LocalDate.now().plusMonths(2).minusMonths(1));
 
         Mockito.verify(processEngine).getRuntimeService();
         Mockito.verify(processInstantiationBuilder).businessKey("contract_term_" + 1);
