@@ -1,7 +1,10 @@
 package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.core.Encoder;
+import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -70,4 +73,25 @@ class ProcessTestSetup {
         return Mockito.mock(Encoder.class);
     }
 
+    public static Transaction buildTransaction(double amount, String description, String to, String from) {
+        return Transaction.builder()
+                .description(description)
+                .transactions(Collections.List(
+                        Transaction.Part.builder()
+                                .amount(amount)
+                                .account(Account.builder()
+                                        .id(1L)
+                                        .name(to)
+                                        .build())
+                                .build(),
+                        Transaction.Part.builder()
+                                .amount(-amount)
+                                .account(Account.builder()
+                                        .id(2L)
+                                        .name(from)
+                                        .build())
+                                .build()
+                ))
+                .build();
+    }
 }

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1ku7t9u" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.17.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.20.0">
+  <bpmn:process id="budget_analysis" name="Budget analyzer" isExecutable="true" camunda:versionTag="1.0.0" camunda:historyTimeToLive="180">
+    <bpmn:serviceTask id="lookup_budgets" name="Lookup all budgets" camunda:modelerTemplate="com.jongsoft.finance.bpmn.budget.BudgetList" camunda:delegateExpression="${processBudgetMonthSelect}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="year">${scheduled.substring(0,4)}</camunda:inputParameter>
+          <camunda:inputParameter name="month">${scheduled.substring(6,7)}</camunda:inputParameter>
+          <camunda:outputParameter name="budgets">${expenses}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1n8zaza</bpmn:incoming>
+      <bpmn:outgoing>Flow_0tlql11</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1n8zaza" sourceRef="start" targetRef="lookup_budgets" />
+    <bpmn:subProcess id="budget_subprocess" name="Process budget">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_0tlql11</bpmn:incoming>
+      <bpmn:outgoing>Flow_0bh4qbk</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:asyncBefore="true" camunda:collection="${budgets}" camunda:elementVariable="budget" />
+      <bpmn:startEvent id="budget_start">
+        <bpmn:outgoing>Flow_1lfnzjr</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_1lfnzjr" sourceRef="budget_start" targetRef="Activity_10tlj1m" />
+      <bpmn:serviceTask id="Activity_10tlj1m" name="Analyze spending" camunda:modelerTemplate="com.jongsoft.finance.bpmn.budget.Analyze" camunda:delegateExpression="${processBudgetAnalysisDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="Budget">${budget}</camunda:inputParameter>
+            <camunda:inputParameter name="Date">${scheduled}</camunda:inputParameter>
+            <camunda:inputParameter name="expense">${budget}</camunda:inputParameter>
+            <camunda:inputParameter name="date">${scheduled}</camunda:inputParameter>
+            <camunda:outputParameter name="deviates">${deviates}</camunda:outputParameter>
+            <camunda:outputParameter name="deviation">${deviation}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1lfnzjr</bpmn:incoming>
+        <bpmn:outgoing>Flow_0ql8mgc</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="deviation_check" name="Deviates" default="deviate_no">
+        <bpmn:incoming>Flow_0ql8mgc</bpmn:incoming>
+        <bpmn:outgoing>deviate_no</bpmn:outgoing>
+        <bpmn:outgoing>deviate_yes</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_0ql8mgc" sourceRef="Activity_10tlj1m" targetRef="deviation_check" />
+      <bpmn:endEvent id="budget_end">
+        <bpmn:incoming>deviate_no</bpmn:incoming>
+        <bpmn:incoming>Flow_0nza8a3</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="deviate_no" name="no" sourceRef="deviation_check" targetRef="budget_end" />
+      <bpmn:sequenceFlow id="deviate_yes" name="yes" sourceRef="deviation_check" targetRef="handle_deviation">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${deviates== true}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_0nza8a3" sourceRef="handle_deviation" targetRef="budget_end" />
+      <bpmn:userTask id="handle_deviation" name="Handle deviation">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="needed_correction">${deviation}</camunda:inputParameter>
+            <camunda:inputParameter name="expense">${budget}</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>deviate_yes</bpmn:incoming>
+        <bpmn:outgoing>Flow_0nza8a3</bpmn:outgoing>
+      </bpmn:userTask>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_0tlql11" sourceRef="lookup_budgets" targetRef="budget_subprocess" />
+    <bpmn:startEvent id="start" name="Start analysis">
+      <bpmn:outgoing>Flow_1n8zaza</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="end">
+      <bpmn:incoming>Flow_0bh4qbk</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0bh4qbk" sourceRef="budget_subprocess" targetRef="end" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="budget_analysis">
+      <bpmndi:BPMNShape id="Activity_16qa37v_di" bpmnElement="lookup_budgets">
+        <dc:Bounds x="280" y="185" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1f8y8sj_di" bpmnElement="budget_subprocess" isExpanded="true">
+        <dc:Bounds x="450" y="80" width="700" height="350" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0ggzmt7_di" bpmnElement="budget_start">
+        <dc:Bounds x="490" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1t3wu9m_di" bpmnElement="Activity_10tlj1m">
+        <dc:Bounds x="640" y="180" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0kvtvao_di" bpmnElement="deviation_check" isMarkerVisible="true">
+        <dc:Bounds x="815" y="195" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="818" y="171" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0jm36to_di" bpmnElement="budget_end">
+        <dc:Bounds x="1082" y="202" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0cc6od5_di" bpmnElement="handle_deviation">
+        <dc:Bounds x="910" y="290" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1lfnzjr_di" bpmnElement="Flow_1lfnzjr">
+        <di:waypoint x="526" y="220" />
+        <di:waypoint x="640" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ql8mgc_di" bpmnElement="Flow_0ql8mgc">
+        <di:waypoint x="740" y="220" />
+        <di:waypoint x="815" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fpyy0e_di" bpmnElement="deviate_no">
+        <di:waypoint x="865" y="220" />
+        <di:waypoint x="1082" y="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="968" y="202" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0euknl9_di" bpmnElement="deviate_yes">
+        <di:waypoint x="840" y="245" />
+        <di:waypoint x="840" y="330" />
+        <di:waypoint x="910" y="330" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="847" y="285" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nza8a3_di" bpmnElement="Flow_0nza8a3">
+        <di:waypoint x="1010" y="330" />
+        <di:waypoint x="1100" y="330" />
+        <di:waypoint x="1100" y="238" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_04ik1x2_di" bpmnElement="start">
+        <dc:Bounds x="172" y="207" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="158" y="250" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1r5w4y8_di" bpmnElement="end">
+        <dc:Bounds x="1252" y="207" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1n8zaza_di" bpmnElement="Flow_1n8zaza">
+        <di:waypoint x="208" y="225" />
+        <di:waypoint x="280" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0tlql11_di" bpmnElement="Flow_0tlql11">
+        <di:waypoint x="380" y="225" />
+        <di:waypoint x="450" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bh4qbk_di" bpmnElement="Flow_0bh4qbk">
+        <di:waypoint x="1150" y="225" />
+        <di:waypoint x="1252" y="225" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,6 +1,6 @@
 datasources:
   default:
-    url: jdbc:h2:mem:FinTrack;DB_CLOSE_ON_EXIT=false;MODE=MYSQL
+    url: jdbc:h2:mem:FinTrack;DB_CLOSE_DELAY=-1;MODE=MariaDB
     driverClassName: org.h2.Driver
     username: sa
     password: ''

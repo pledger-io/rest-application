@@ -73,5 +73,114 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Budget: Fetch all budgets",
+    "id": "com.jongsoft.finance.bpmn.budget.BudgetList",
+    "description": "Exports a list of all budgets into the flow.",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${processBudgetMonthSelect}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Year",
+        "type": "String",
+        "description": "The year to analyze the budget for.",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "year",
+            "target": "${year}"
+        }
+      },
+      {
+        "label": "Month",
+        "type": "String",
+        "description": "The month to analyze the budget for.",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "month",
+          "target": "${month}"
+        }
+      },
+      {
+        "label": "Budgets",
+        "type": "String",
+        "description": "The list of budget items.",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${expenses}"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Budget: Analyze budget",
+    "id": "com.jongsoft.finance.bpmn.budget.Analyze",
+    "description": "Analyzes a single budget for the given date.",
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${processBudgetAnalysisDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Budget",
+        "type": "String",
+        "description": "The budget part to analyze.",
+        "binding": {
+          "name": "expense",
+          "type": "camunda:inputParameter"
+        }
+      },
+      {
+        "label": "Date",
+        "type": "String",
+        "description": "The date to analyze.",
+        "binding": {
+          "name": "date",
+          "type": "camunda:inputParameter"
+        }
+      },
+      {
+        "label": "Deviates",
+        "type": "String",
+        "description": "Boolean flag containing if the budget deviates or not.",
+        "binding": {
+          "name": "Result",
+          "type": "camunda:outputParameter",
+          "source": "${deviates}"
+        }
+      },
+      {
+        "label": "Deviation",
+        "type": "String",
+        "description": "The average deviation exceeding the budget.",
+        "binding": {
+          "name": "Result",
+          "type": "camunda:outputParameter",
+          "source": "${deviation}"
+        }
+      }
+    ]
   }
 ]

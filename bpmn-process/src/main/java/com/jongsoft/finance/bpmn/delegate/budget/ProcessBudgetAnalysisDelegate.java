@@ -11,6 +11,8 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.StringValue;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -43,14 +45,14 @@ public class ProcessBudgetAnalysisDelegate implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) {
-        Budget.Expense forExpense = (Budget.Expense) execution.getVariableLocal("expense");
-        LocalDate runningDate = (LocalDate) execution.getVariableLocal("date");
+        var forExpense = execution.<ObjectValue>getVariableLocalTyped("expense").getValue(Budget.Expense.class);
+        var runningDate = LocalDate.parse(execution.<StringValue>getVariableLocalTyped("date").getValue());
 
         log.debug("Running budget '{}' analysis for {}", forExpense.getName(), runningDate);
 
         runningDate = runningDate.minusMonths(1);
 
-        var deviation = 0;
+        var deviation = 0d;
         var dateRange = DateUtils.forMonth(runningDate.getYear(), runningDate.getMonthValue());
         var budgetAnalysisMonths = settingProvider.getBudgetAnalysisMonths();
         var searchCommand = filterFactory.transaction()
@@ -77,6 +79,7 @@ public class ProcessBudgetAnalysisDelegate implements JavaDelegate {
             execution.setVariableLocal("deviates", true);
         } else {
             execution.setVariableLocal("deviates", false);
+            execution.setVariableLocal("deviation", 0);
         }
     }
 
