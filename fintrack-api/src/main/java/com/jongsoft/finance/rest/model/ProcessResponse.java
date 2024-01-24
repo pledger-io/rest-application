@@ -39,6 +39,7 @@ public class ProcessResponse {
         return new Dates();
     }
 
+    @Serdeable.Serializable
     public class Dates {
 
         public Date getStart() {
