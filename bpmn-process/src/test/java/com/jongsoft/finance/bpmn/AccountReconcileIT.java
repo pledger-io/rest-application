@@ -73,30 +73,15 @@ class AccountReconcileIT extends ProcessTestSetup {
 
         waitForSuspended(processEngine, response.getProcessInstanceId());
 
-        var computedStartBalance = processEngine.getHistoryService()
-                .createHistoricVariableInstanceQuery()
-                .processInstanceId(response.getProcessInstanceId())
-                .variableName("computedStartBalance")
-                .singleResult();
-        var computedEndBalance = processEngine.getHistoryService()
-                .createHistoricVariableInstanceQuery()
-                .processInstanceId(response.getProcessInstanceId())
-                .variableName("computedEndBalance")
-                .singleResult();
-        var hasDifference = processEngine.getHistoryService()
-                .createHistoricVariableInstanceQuery()
-                .processInstanceId(response.getProcessInstanceId())
-                .variableName("balanceDifference")
-                .singleResult();
+        BigDecimal computedStartBalance = getVariable(response.getProcessInstanceId(), "computedStartBalance");
+
         var task = processEngine.getTaskService()
                 .createTaskQuery()
                 .processInstanceId(response.getProcessInstanceId())
                 .taskDefinitionKey("task_reconcile_before")
                 .singleResult();
 
-        Assertions.assertThat(computedStartBalance.getValue()).isEqualTo(BigDecimal.ZERO);
-        Assertions.assertThat(computedEndBalance).isNull();
-        Assertions.assertThat(hasDifference).isNull();
+        Assertions.assertThat(computedStartBalance).isEqualTo(BigDecimal.ZERO);
         Assertions.assertThat(task).isNotNull();
 
         // And: the user corrects the starting balance
@@ -143,28 +128,62 @@ class AccountReconcileIT extends ProcessTestSetup {
 
         waitForSuspended(processEngine, response.getProcessInstanceId());
 
-        var computedStartBalance = processEngine.getHistoryService()
-                .createHistoricVariableInstanceQuery()
-                .processInstanceId(response.getProcessInstanceId())
-                .variableName("computedStartBalance")
-                .singleResult();
-        var computedEndBalance = processEngine.getHistoryService()
-                .createHistoricVariableInstanceQuery()
-                .processInstanceId(response.getProcessInstanceId())
-                .variableName("computedEndBalance")
-                .singleResult();
-        var balanceDifference = processEngine.getHistoryService()
-                .createHistoricVariableInstanceQuery()
-                .processInstanceId(response.getProcessInstanceId())
-                .variableName("balanceDifference")
-                .singleResult();
+        BigDecimal computedStartBalance = getVariable(response.getProcessInstanceId(), "computedStartBalance");
+        BigDecimal computedEndBalance = getVariable(response.getProcessInstanceId(), "computedEndBalance");
+        BigDecimal balanceDifference = getVariable(response.getProcessInstanceId(), "balanceDifference");
 
-        Assertions.assertThat(computedStartBalance.getValue()).isEqualTo(BigDecimal.ZERO);
-        Assertions.assertThat(computedEndBalance.getValue()).isEqualTo(BigDecimal.valueOf(-20.0));
-        Assertions.assertThat(((BigDecimal) balanceDifference.getValue()).setScale(2, RoundingMode.HALF_UP))
+        Assertions.assertThat(computedStartBalance).isEqualTo(BigDecimal.ZERO);
+        Assertions.assertThat(computedEndBalance).isEqualTo(BigDecimal.valueOf(-20.0));
+        Assertions.assertThat(balanceDifference.setScale(2, RoundingMode.HALF_UP))
                 .isEqualByComparingTo(BigDecimal.valueOf(-120.2));
 
         Mockito.verify(reconcileAccount).createTransaction(Mockito.eq(reconcile), Mockito.eq(120.2D),
                 Mockito.eq(Transaction.Type.DEBIT), Mockito.any());
+    }
+
+    @Test
+    @DisplayName("Account reconcile with no differences.")
+    void runWithNoDifferences() {
+        Account reconcileAccount = Mockito.spy(Account.builder().id(1L).type("checking").name("Example Account").build());
+        Account reconcile = Account.builder().id(3L).type("reconcile").build();
+
+        Mockito.when(accountProvider.lookup(1L))
+                .thenReturn(Control.Option(reconcileAccount));
+        Mockito.when(accountProvider.lookup(SystemAccountTypes.RECONCILE))
+                .thenReturn(Control.Option(reconcile));
+        Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)))
+                .thenReturn(Control.Option())
+                .thenReturn(Control.Option(BigDecimal.valueOf(-20.0)));
+
+        var response = processEngine.getRuntimeService().startProcessInstanceByKey(
+                "AccountReconcile",
+                Variables.createVariables()
+                        .putValue("startDate", "2019-01-01")
+                        .putValue("endDate", "2019-12-31")
+                        .putValue("openBalance", 0)
+                        .putValue("endBalance", -20)
+                        .putValue("accountId", 1L));
+
+        waitForSuspended(processEngine, response.getProcessInstanceId());
+
+        BigDecimal computedStartBalance = getVariable(response.getProcessInstanceId(), "computedStartBalance");
+        BigDecimal computedEndBalance = getVariable(response.getProcessInstanceId(), "computedEndBalance");
+        BigDecimal balanceDifference = getVariable(response.getProcessInstanceId(), "balanceDifference");
+
+        Assertions.assertThat(computedStartBalance).isEqualTo(BigDecimal.ZERO);
+        Assertions.assertThat(computedEndBalance).isEqualTo(BigDecimal.valueOf(-20.0));
+        Assertions.assertThat(balanceDifference.setScale(0, RoundingMode.CEILING)).isEqualTo(BigDecimal.ZERO);
+
+        Mockito.verify(reconcileAccount, Mockito.never()).createTransaction(Mockito.any(), Mockito.anyDouble(),
+                Mockito.any(), Mockito.any());
+    }
+
+    private <T> T getVariable(String processInstanceId, String variableName) {
+        return (T) processEngine.getHistoryService()
+                .createHistoricVariableInstanceQuery()
+                .processInstanceIdIn(processInstanceId)
+                .variableName(variableName)
+                .singleResult()
+                .<T>getValue();
     }
 }

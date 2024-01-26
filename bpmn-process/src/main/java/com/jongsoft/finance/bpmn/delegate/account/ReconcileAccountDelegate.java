@@ -9,6 +9,8 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.variable.value.LongValue;
+import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
 import java.math.BigDecimal;
@@ -39,15 +41,14 @@ public class ReconcileAccountDelegate implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        Long accountId = ((Number) execution.getVariableLocal("accountId")).longValue();
-        BigDecimal amount = (BigDecimal) execution.getVariableLocal("amount");
-        String isoBookDate = execution.<StringValue>getVariableLocalTyped("bookDate").getValue();
-
-        Account toReconcile = accountProvider.lookup(accountId).get();
+        var accountId = execution.<LongValue>getVariableLocalTyped("accountId").getValue();
+        var amount = execution.<ObjectValue>getVariableLocalTyped("amount").getValue(BigDecimal.class);
+        var isoBookDate = execution.<StringValue>getVariableLocalTyped("bookDate").getValue();
 
         log.debug("{}: Reconciling account {} for book date {} with amount {}", execution.getCurrentActivityName(),
-                toReconcile.getName(), isoBookDate, amount);
+                accountId, isoBookDate, amount);
 
+        Account toReconcile = accountProvider.lookup(accountId).get();
         Account reconcileAccount = accountProvider.lookup(SystemAccountTypes.RECONCILE)
                 .getOrThrow(() -> StatusException.badRequest("Reconcile account not found"));
 
