@@ -9,7 +9,6 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
@@ -41,7 +40,7 @@ public class ReconcileAccountDelegate implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        var accountId = execution.<LongValue>getVariableLocalTyped("accountId").getValue();
+        var accountId = ((Number)execution.getVariableLocal("accountId")).longValue();
         var amount = execution.<ObjectValue>getVariableLocalTyped("amount").getValue(BigDecimal.class);
         var isoBookDate = execution.<StringValue>getVariableLocalTyped("bookDate").getValue();
 
