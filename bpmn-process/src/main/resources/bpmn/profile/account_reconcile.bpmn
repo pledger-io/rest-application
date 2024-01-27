@@ -20,7 +20,7 @@ It will then compute if there is a difference between the open en end balance pr
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="SequenceFlow_0foh2sn" sourceRef="st_compute_start" targetRef="xg_start_differs" />
     <bpmn:sequenceFlow id="sf_no_start_diff" name="no" sourceRef="xg_start_differs" targetRef="st_compute_end">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${openBalance == computedStartBalance}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${math:double(openBalance) == computedStartBalance.doubleValue()}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="sf_start_differs" name="yes" sourceRef="xg_start_differs" targetRef="task_reconcile_before" />
     <bpmn:exclusiveGateway id="xg_has_difference" name="has difference" default="sf_to_reconcile">
@@ -42,6 +42,7 @@ It will then compute if there is a difference between the open en end balance pr
         <camunda:inputOutput>
           <camunda:inputParameter name="endDate">${startDate}</camunda:inputParameter>
         </camunda:inputOutput>
+        <camunda:executionListener delegateExpression="${ startProcessListener }" event="start" />
       </bpmn:extensionElements>
       <bpmn:incoming>sf_start_differs</bpmn:incoming>
       <bpmn:outgoing>Flow_1uu32vr</bpmn:outgoing>
@@ -71,6 +72,7 @@ It will then compute if there is a difference between the open en end balance pr
           <camunda:inputParameter name="amount">${balanceDifference}</camunda:inputParameter>
           <camunda:inputParameter name="bookDate">${endDate}</camunda:inputParameter>
         </camunda:inputOutput>
+        <camunda:executionListener delegateExpression="${ startProcessListener }" event="start" />
       </bpmn:extensionElements>
       <bpmn:incoming>sf_to_reconcile</bpmn:incoming>
       <bpmn:outgoing>Flow_0rdtt24</bpmn:outgoing>

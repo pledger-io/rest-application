@@ -44,14 +44,14 @@ public class ReconcileAccountDelegate implements JavaDelegate {
         var amount = execution.<ObjectValue>getVariableLocalTyped("amount").getValue(BigDecimal.class);
         var isoBookDate = execution.<StringValue>getVariableLocalTyped("bookDate").getValue();
 
+        var transactionDate = LocalDate.parse(isoBookDate).minusDays(1);
         log.debug("{}: Reconciling account {} for book date {} with amount {}", execution.getCurrentActivityName(),
-                accountId, isoBookDate, amount);
+                accountId, transactionDate, amount);
 
         Account toReconcile = accountProvider.lookup(accountId).get();
         Account reconcileAccount = accountProvider.lookup(SystemAccountTypes.RECONCILE)
                 .getOrThrow(() -> StatusException.badRequest("Reconcile account not found"));
 
-        var transactionDate = LocalDate.parse(isoBookDate);
         Transaction.Type type = amount.compareTo(BigDecimal.ZERO) >= 0 ? Transaction.Type.CREDIT : Transaction.Type.DEBIT;
         Transaction transaction = toReconcile.createTransaction(
                 reconcileAccount,

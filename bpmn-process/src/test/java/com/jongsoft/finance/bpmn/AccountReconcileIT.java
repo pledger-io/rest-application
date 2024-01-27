@@ -66,8 +66,8 @@ class AccountReconcileIT extends ProcessTestSetup {
                 Variables.createVariables()
                         .putValue("startDate", "2019-01-01")
                         .putValue("endDate", "2019-12-31")
-                        .putValue("openBalance", 10.0)
-                        .putValue("endBalance", 100.2)
+                        .putValue("openBalance", "10.0")
+                        .putValue("endBalance", "100.2")
                         .putValue("accountId", 1L)
         );
 

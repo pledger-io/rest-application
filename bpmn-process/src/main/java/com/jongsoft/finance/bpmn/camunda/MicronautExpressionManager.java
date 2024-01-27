@@ -1,10 +1,10 @@
 package com.jongsoft.finance.bpmn.camunda;
 
 import org.camunda.bpm.engine.impl.el.JuelExpressionManager;
-import org.camunda.bpm.engine.impl.el.ReadOnlyMapELResolver;
-import org.camunda.bpm.engine.impl.el.VariableContextElResolver;
-import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
-import org.camunda.bpm.impl.juel.jakarta.el.*;
+import org.camunda.bpm.impl.juel.jakarta.el.CompositeELResolver;
+import org.camunda.bpm.impl.juel.jakarta.el.ELResolver;
+
+import java.time.LocalDate;
 
 public class MicronautExpressionManager extends JuelExpressionManager {
 
@@ -12,27 +12,22 @@ public class MicronautExpressionManager extends JuelExpressionManager {
 
     public MicronautExpressionManager(MicronautElResolver micronautElResolver) {
         this.micronautElResolver = micronautElResolver;
+
+        try {
+            addFunction("math:double", Double.class.getMethod("parseDouble", String.class));
+            addFunction("date:parse", LocalDate.class.getMethod("parse", CharSequence.class));
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     protected ELResolver createElResolver() {
-        CompositeELResolver compositeElResolver = new CompositeELResolver();
-        compositeElResolver.add(new VariableScopeElResolver());
-        compositeElResolver.add(new VariableContextElResolver());
-
-        if (beans != null) {
-            // Only expose limited set of beans in expressions
-            compositeElResolver.add(new ReadOnlyMapELResolver(beans));
-        } else {
-            // Expose full application-context in expressions
-            compositeElResolver.add(micronautElResolver);
+        var resolver = super.createElResolver();
+        if (resolver instanceof CompositeELResolver e) {
+            e.add(micronautElResolver);
         }
 
-        compositeElResolver.add(new ArrayELResolver());
-        compositeElResolver.add(new ListELResolver());
-        compositeElResolver.add(new MapELResolver());
-        compositeElResolver.add(new BeanELResolver());
-
-        return compositeElResolver;
+        return resolver;
     }
 }

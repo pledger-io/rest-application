@@ -131,6 +131,17 @@
         }
       },
       {
+        "label": "Execution listener",
+        "type": "Hidden",
+        "value": "${ startProcessListener }",
+        "editable": false,
+        "binding": {
+          "type": "camunda:executionListener",
+          "name": "delegateExpression",
+          "event": "start"
+        }
+      },
+      {
         "label": "Identifier",
         "type": "String",
         "description": "The identifier of the account.",
