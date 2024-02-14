@@ -25,8 +25,9 @@ public class ImportFinishedDelegate implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        var slug = execution.<StringValue>getVariableLocalTyped("slug").getValue();
-        var importTokens = (List<String>) execution.getVariable("transactionTokens");
+        var slug = execution.<StringValue>getVariableLocalTyped("importSlug").getValue();
+        @SuppressWarnings("unchecked")
+        var importTokens = (List<String>) execution.getVariable("storageToken");
 
         log.debug("{}: Finalizing importer job {}",
                 execution.getCurrentActivityName(),

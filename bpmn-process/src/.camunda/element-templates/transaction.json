@@ -34,6 +34,47 @@
   },
   {
     "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Transaction: Extract account from parsed transaction",
+    "description": "Extract the JSON version of the account from the parsed transaction.",
+    "id": "com.jongsoft.finance.bpmn.delegate.transaction.PrepareAccountGenerationDelegate",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${prepareAccountGenerationDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Transaction",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "transaction"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Account",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${accountJson}"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
     "name": "Transaction Scheduled Creator",
     "description": "Create a JSON representation of a transaction for the given date and provided schedule.",
     "id": "com.jongsoft.finance.bpmn.delegate.scheduler.GenerateTransactionJsonDelegate",
@@ -95,12 +136,12 @@
         }
       },
       {
-        "label": "File token",
-        "description": "The file token for the created JSON transaction.",
+        "label": "Transaction",
+        "description": "The transaction that is to be created.",
         "type": "String",
         "binding": {
           "type": "camunda:outputParameter",
-          "source": "${transactionToken}"
+          "source": "${transaction}"
         }
       }
     ]
@@ -131,16 +172,16 @@
         "type": "String",
         "binding": {
           "type": "camunda:inputParameter",
-          "name": "batchImportSlug"
+          "name": "importJobSlug"
         }
       },
       {
-        "label": "File token",
-        "description": "The token of the file containing the JSON transaction.",
+        "label": "Transaction",
+        "description": "The parsed transaction entity.",
         "type": "String",
         "binding": {
           "type": "camunda:inputParameter",
-          "name": "transactionToken"
+          "name": "transaction"
         },
         "constraint": {
           "notEmpty": true
@@ -149,7 +190,7 @@
       {
         "label": "Target account",
         "type": "String",
-        "description": "The account the money is transferred into.",
+        "description": "The account the money is transferred to.",
         "binding": {
           "type": "camunda:inputParameter",
           "name": "accountId"

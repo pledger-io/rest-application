@@ -1,0 +1,300 @@
+[
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Importer: Read CSV file",
+    "description": "Read in a CSV file that belongs to an import job.",
+    "id": "com.jongsoft.finance.bpmn.delegate.importer.ReadTransactionLogDelegate",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${readTransactionLogDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Import Job Slug",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "batchImportSlug"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Configuration JSON",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "importConfig"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Storage Tokens",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${storageTokens}"
+        }
+      },
+      {
+        "label": "Account generation",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${generateAccounts}"
+        }
+      },
+      {
+        "label": "Apply rules",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${applyRules}"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Importer: Load default import configuration",
+    "description": "Load the default import configuration from storage.",
+    "id": "com.jongsoft.finance.bpmn.delegate.importer.LoadImporterConfiguration",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${loadImporterConfiguration}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Import Job Slug",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "batchImportSlug"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Import Configuration",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${importConfig}"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Importer: Extract account information",
+    "description": "Extract the account information from the CSV file.",
+    "id": "com.jongsoft.finance.bpmn.delegate.importer.ExtractAccountDetailsDelegate",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${extractAccountDetailsDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Import Job Slug",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "batchImportSlug"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Configuration JSON",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "importConfig"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Account extracts",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${locatable}"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Importer: Lookup account with rules",
+    "description": "Locate an account by applying the rules on the name and description.",
+    "id": "com.jongsoft.finance.bpmn.delegate.importer.AccountRuleDelegate",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${accountRuleDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Account name",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "name"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Description",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "description"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Account Id",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${accountId}"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Importer: Read persisted transaction from storage",
+    "description": "Read in a previously persisted transaction from the storage system.",
+    "id": "com.jongsoft.finance.bpmn.delegate.importer.ReadTransactionFromStorage",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${readTransactionFromStorage}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Storage Token",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "storageToken"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Transaction",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${transaction}"
+        }
+      }
+    ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Importer: Finalize the import job",
+    "description": "Mark the import as complete and clean up storage.",
+    "id": "com.jongsoft.finance.bpmn.delegate.importer.ImportFinishedDelegate",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${importFinishedDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Storage Token",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "storageToken"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Import Slug",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "importSlug"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      }
+    ]
+  }
+]

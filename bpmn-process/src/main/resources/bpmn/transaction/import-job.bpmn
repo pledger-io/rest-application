@@ -1,0 +1,679 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_064fh2o" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.17.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.20.0">
+  <bpmn:process id="import_job" name="Import Job" isExecutable="true" camunda:versionTag="1.0.0" camunda:historyTimeToLive="P14D">
+    <bpmn:documentation>Start the import job that belongs to an import entity.
+
+When calling the flow the following variables must be set:
+- importJobSlug</bpmn:documentation>
+    <bpmn:startEvent id="startJob" name="Start">
+      <bpmn:outgoing>Flow_1nv7ilo</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="task_configure" name="Configure import">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="initialConfig">${importConfiguration}</camunda:inputParameter>
+          <camunda:outputParameter name="importConfiguration">${updatedConfig}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>arrow_to_config</bpmn:incoming>
+      <bpmn:incoming>arrow_account_missing</bpmn:incoming>
+      <bpmn:outgoing>Flow_088kfgl</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1nv7ilo" sourceRef="startJob" targetRef="read_import_config" />
+    <bpmn:serviceTask id="read_import_config" name="Read default configuration" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.LoadImporterConfiguration" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${loadImporterConfiguration}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="batchImportSlug">${importJobSlug}</camunda:inputParameter>
+          <camunda:outputParameter name="importConfiguration">importConfig</camunda:outputParameter>
+          <camunda:outputParameter name="importConfiguration">${importConfig}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1nv7ilo</bpmn:incoming>
+      <bpmn:outgoing>arrow_to_config</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="arrow_to_config" name="with config" sourceRef="read_import_config" targetRef="task_configure" />
+    <bpmn:sequenceFlow id="Flow_088kfgl" name="updated config" sourceRef="task_configure" targetRef="find_target_account" />
+    <bpmn:serviceTask id="find_target_account" name="Find target account" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountLookup" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${processAccountLookupDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="name" />
+          <camunda:inputParameter name="iban" />
+          <camunda:inputParameter name="id">${importConfiguration.getAccountId()}</camunda:inputParameter>
+          <camunda:outputParameter name="targetAccountId">${id}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_088kfgl</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xcxk57</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="target_account_exists" name="account found" default="arrow_account_missing">
+      <bpmn:incoming>Flow_0xcxk57</bpmn:incoming>
+      <bpmn:outgoing>arrow_account_missing</bpmn:outgoing>
+      <bpmn:outgoing>arrow_target_account_exists</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0xcxk57" name="with account id" sourceRef="find_target_account" targetRef="target_account_exists" />
+    <bpmn:sequenceFlow id="arrow_account_missing" name="reconfigure" sourceRef="target_account_exists" targetRef="task_configure" />
+    <bpmn:sequenceFlow id="arrow_target_account_exists" name="yes" sourceRef="target_account_exists" targetRef="extract_accounts">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${targetAccountId != null}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="read_csv_file" name="Read in CSV file" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.ReadTransactionLogDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${readTransactionLogDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="batchImportSlug">${importJobSlug}</camunda:inputParameter>
+          <camunda:inputParameter name="importConfig">${importConfiguration}</camunda:inputParameter>
+          <camunda:outputParameter name="transactionTokens">storageTokens</camunda:outputParameter>
+          <camunda:outputParameter name="allowGenerate">generateAccounts</camunda:outputParameter>
+          <camunda:outputParameter name="applyRules">applyRules</camunda:outputParameter>
+          <camunda:outputParameter name="transactionTokens">${storageTokens}</camunda:outputParameter>
+          <camunda:outputParameter name="allowGenerate">${generateAccounts}</camunda:outputParameter>
+          <camunda:outputParameter name="applyRules">${applyRules}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_11g50b7</bpmn:incoming>
+      <bpmn:outgoing>Flow_02v0o7o</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:subProcess id="process_account_mapping" name="Map accounts">
+      <bpmn:incoming>Flow_0ow7pbb</bpmn:incoming>
+      <bpmn:outgoing>Flow_0pngnev</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="${accounts_data}" camunda:elementVariable="account_extract" />
+      <bpmn:startEvent id="start_match_accounts">
+        <bpmn:outgoing>Flow_19239fp</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sequenceFlow id="Flow_19239fp" sourceRef="start_match_accounts" targetRef="lookup_account" />
+      <bpmn:exclusiveGateway id="account_found" name="match" default="Flow_179ti7r">
+        <bpmn:incoming>Flow_1eef867</bpmn:incoming>
+        <bpmn:outgoing>Flow_179ti7r</bpmn:outgoing>
+        <bpmn:outgoing>Flow_1dwm2lt</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_1eef867" sourceRef="lookup_account" targetRef="account_found" />
+      <bpmn:sequenceFlow id="Flow_179ti7r" name="no" sourceRef="account_found" targetRef="lookup_by_synonym" />
+      <bpmn:exclusiveGateway id="synonym_exists" name="match" default="Flow_0bwhd1j">
+        <bpmn:incoming>Flow_0s125kk</bpmn:incoming>
+        <bpmn:outgoing>Flow_0bwhd1j</bpmn:outgoing>
+        <bpmn:outgoing>Flow_0ry07sy</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_0s125kk" sourceRef="lookup_by_synonym" targetRef="synonym_exists" />
+      <bpmn:sequenceFlow id="Flow_0bwhd1j" name="no" sourceRef="synonym_exists" targetRef="map_with_rules" />
+      <bpmn:sequenceFlow id="Flow_1dwm2lt" name="yes" sourceRef="account_found" targetRef="finalize_mapping">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${accountId != null}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_1byl8hw" sourceRef="map_with_rules" targetRef="finalize_mapping" />
+      <bpmn:sequenceFlow id="Flow_0ry07sy" name="yes" sourceRef="synonym_exists" targetRef="finalize_mapping">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${accountId != null}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:endEvent id="end_match_accounts">
+        <bpmn:incoming>Flow_0czgnsv</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0czgnsv" sourceRef="finalize_mapping" targetRef="end_match_accounts" />
+      <bpmn:serviceTask id="lookup_account" name="Lookup by name &#38; IBAN" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountLookup" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${processAccountLookupDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="id" />
+            <camunda:inputParameter name="iban">${account_extract.iban}</camunda:inputParameter>
+            <camunda:inputParameter name="name">${account_extract.name}</camunda:inputParameter>
+            <camunda:outputParameter name="accountId">${id}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_19239fp</bpmn:incoming>
+        <bpmn:outgoing>Flow_1eef867</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="lookup_by_synonym" name="Lookup using synonyms" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.SynonymLookup" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${accountSynonymLookupDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="name">${account_extract.name}</camunda:inputParameter>
+            <camunda:outputParameter name="accountId">${id}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_179ti7r</bpmn:incoming>
+        <bpmn:outgoing>Flow_0s125kk</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="map_with_rules" name="Apply known rules to resolve account" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.AccountRuleDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${accountRuleDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="name">${account_extract.name}</camunda:inputParameter>
+            <camunda:inputParameter name="description">${account_extract.description}</camunda:inputParameter>
+            <camunda:outputParameter name="accountId">accountId</camunda:outputParameter>
+            <camunda:outputParameter name="accountId">${accountId}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0bwhd1j</bpmn:incoming>
+        <bpmn:outgoing>Flow_1byl8hw</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="finalize_mapping" name="Prepare output for user" camunda:class="com.jongsoft.finance.bpmn.delegate.importer.ImportAccountExtractorDelegate">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="name">${account_extract.name}</camunda:inputParameter>
+            <camunda:inputParameter name="accountId">${accountId}</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1dwm2lt</bpmn:incoming>
+        <bpmn:incoming>Flow_1byl8hw</bpmn:incoming>
+        <bpmn:incoming>Flow_0ry07sy</bpmn:incoming>
+        <bpmn:outgoing>Flow_0czgnsv</bpmn:outgoing>
+      </bpmn:serviceTask>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_0ow7pbb" name="extracts" sourceRef="extract_accounts" targetRef="process_account_mapping" />
+    <bpmn:sequenceFlow id="Flow_0pngnev" name="mappings" sourceRef="process_account_mapping" targetRef="confirm_mappings" />
+    <bpmn:userTask id="confirm_mappings" name="Confirm account mapping">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="account_mappings">${accountMappings}</camunda:inputParameter>
+          <camunda:outputParameter name="accountMappings">${account_mappings}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0pngnev</bpmn:incoming>
+      <bpmn:outgoing>Flow_11g50b7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_11g50b7" sourceRef="confirm_mappings" targetRef="read_csv_file" />
+    <bpmn:serviceTask id="extract_accounts" name="Extract accounts from CSV" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.ExtractAccountDetailsDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${extractAccountDetailsDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="batchImportSlug">${importJobSlug}</camunda:inputParameter>
+          <camunda:inputParameter name="importConfig">${importConfiguration}</camunda:inputParameter>
+          <camunda:outputParameter name="accounts_data">extractionResult</camunda:outputParameter>
+          <camunda:outputParameter name="accounts_data">${extractionResult}</camunda:outputParameter>
+          <camunda:outputParameter name="accounts_data">${locatable}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>arrow_target_account_exists</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ow7pbb</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:subProcess id="process_create_transactions" name="Process transactions">
+      <bpmn:incoming>Flow_02v0o7o</bpmn:incoming>
+      <bpmn:outgoing>Flow_16v2prx</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="${transactionTokens}" camunda:elementVariable="transactionToken" />
+      <bpmn:startEvent id="start_create_transaction">
+        <bpmn:outgoing>Flow_0upo10t</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:exclusiveGateway id="mapping_exists" name="exists" default="Flow_0prfhkh">
+        <bpmn:incoming>Flow_0xggr5k</bpmn:incoming>
+        <bpmn:outgoing>Flow_0b5s223</bpmn:outgoing>
+        <bpmn:outgoing>Flow_0prfhkh</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_0xggr5k" sourceRef="locate_account_mapping" targetRef="mapping_exists" />
+      <bpmn:sequenceFlow id="Flow_0b5s223" name="yes" sourceRef="mapping_exists" targetRef="create_transaction">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${accountId != null}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:exclusiveGateway id="create_allowed" name="generate" default="Flow_1n6qs8u">
+        <bpmn:incoming>Flow_0prfhkh</bpmn:incoming>
+        <bpmn:outgoing>Flow_01kp9n6</bpmn:outgoing>
+        <bpmn:outgoing>Flow_1n6qs8u</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_0prfhkh" name="no" sourceRef="mapping_exists" targetRef="create_allowed" />
+      <bpmn:sequenceFlow id="Flow_01kp9n6" name="yes" sourceRef="create_allowed" targetRef="create_account_extractor">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${allowGenerate == true}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_1n6qs8u" name="no" sourceRef="create_allowed" targetRef="user_create_account" />
+      <bpmn:sequenceFlow id="Flow_15uycxp" sourceRef="user_create_account" targetRef="create_transaction" />
+      <bpmn:sequenceFlow id="Flow_0y3m68u" sourceRef="create_account_extractor" targetRef="create_account" />
+      <bpmn:exclusiveGateway id="should_apply_rules" name="apply rules" default="Flow_0ycxqnq">
+        <bpmn:incoming>Flow_01c6qb3</bpmn:incoming>
+        <bpmn:outgoing>Flow_0ycxqnq</bpmn:outgoing>
+        <bpmn:outgoing>Flow_1pkda2y</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_01c6qb3" sourceRef="create_transaction" targetRef="should_apply_rules" />
+      <bpmn:sequenceFlow id="Flow_0ycxqnq" name="no" sourceRef="should_apply_rules" targetRef="detect_duplicates" />
+      <bpmn:sequenceFlow id="Flow_1pkda2y" name="yes" sourceRef="should_apply_rules" targetRef="apply_rules">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${applyRules == true}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_00vpxjj" sourceRef="apply_rules" targetRef="detect_duplicates" />
+      <bpmn:endEvent id="end_create_transaction">
+        <bpmn:incoming>Flow_0rz5nze</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0rz5nze" sourceRef="detect_duplicates" targetRef="end_create_transaction" />
+      <bpmn:userTask id="user_create_account" name="User create account">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="accountName">${transaction.opposingName}</camunda:inputParameter>
+            <camunda:inputParameter name="basedOnAccount">${targetAccountId}</camunda:inputParameter>
+            <camunda:outputParameter name="accountId">${accountId}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1n6qs8u</bpmn:incoming>
+        <bpmn:outgoing>Flow_15uycxp</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:sequenceFlow id="Flow_0upo10t" sourceRef="start_create_transaction" targetRef="read_transaction_storage" />
+      <bpmn:sequenceFlow id="Flow_17ta9lo" sourceRef="read_transaction_storage" targetRef="locate_account_mapping" />
+      <bpmn:serviceTask id="locate_account_mapping" name="Locate account in mapping" camunda:class="com.jongsoft.finance.bpmn.delegate.importer.LocateAccountInMapping">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="name">${transaction.opposingName}</camunda:inputParameter>
+            <camunda:outputParameter name="accountId">${accountId}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_17ta9lo</bpmn:incoming>
+        <bpmn:outgoing>Flow_0xggr5k</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="read_transaction_storage" name="Read in transaction" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.ReadTransactionFromStorage" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${readTransactionFromStorage}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="storageToken">${transactionToken}</camunda:inputParameter>
+            <camunda:outputParameter name="transaction">transaction</camunda:outputParameter>
+            <camunda:outputParameter name="transaction">${transaction}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0upo10t</bpmn:incoming>
+        <bpmn:outgoing>Flow_17ta9lo</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="create_transaction" name="Create transaction" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.scheduler.CreateTransactionDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${createTransactionDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="importJobSlug">${importJobSlug}</camunda:inputParameter>
+            <camunda:inputParameter name="transaction">${transaction}</camunda:inputParameter>
+            <camunda:inputParameter name="accountId">${accountId}</camunda:inputParameter>
+            <camunda:inputParameter name="targetAccount">${targetAccountId}</camunda:inputParameter>
+            <camunda:outputParameter name="transactionId">${transactionId}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0b5s223</bpmn:incoming>
+        <bpmn:incoming>Flow_15uycxp</bpmn:incoming>
+        <bpmn:incoming>Flow_1lz7czw</bpmn:incoming>
+        <bpmn:outgoing>Flow_01c6qb3</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="apply_rules" name="Apply rules" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.rule.TransactionRuleMatcherDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${transactionRuleMatcherDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="transactionId">${transactionId}</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1pkda2y</bpmn:incoming>
+        <bpmn:outgoing>Flow_00vpxjj</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="Flow_1b93w1q" sourceRef="create_account" targetRef="locate_created_account" />
+      <bpmn:serviceTask id="create_account_extractor" name="Extract account from transaction" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.transaction.PrepareAccountGenerationDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${prepareAccountGenerationDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="transaction">${transaction}</camunda:inputParameter>
+            <camunda:outputParameter name="account">${accountJson}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_01kp9n6</bpmn:incoming>
+        <bpmn:outgoing>Flow_0y3m68u</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="create_account" name="Create new account" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountCreate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${processAccountCreationDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="account">${account}</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0y3m68u</bpmn:incoming>
+        <bpmn:outgoing>Flow_1b93w1q</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="Flow_1lz7czw" sourceRef="locate_created_account" targetRef="create_transaction" />
+      <bpmn:serviceTask id="locate_created_account" name="Locate account by name" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountLookup" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${processAccountLookupDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="iban" />
+            <camunda:inputParameter name="id" />
+            <camunda:inputParameter name="name">${transaction.opposingName}</camunda:inputParameter>
+            <camunda:outputParameter name="accountId">${id}</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1b93w1q</bpmn:incoming>
+        <bpmn:outgoing>Flow_1lz7czw</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:serviceTask id="detect_duplicates" name="Duplicate transaction" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.scheduler.DuplicateTransactionFinderDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${duplicateTransactionFinderDelegate}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="transactionId">${transactionId}</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0ycxqnq</bpmn:incoming>
+        <bpmn:incoming>Flow_00vpxjj</bpmn:incoming>
+        <bpmn:outgoing>Flow_0rz5nze</bpmn:outgoing>
+      </bpmn:serviceTask>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_02v0o7o" sourceRef="read_csv_file" targetRef="process_create_transactions" />
+    <bpmn:sequenceFlow id="Flow_16v2prx" sourceRef="process_create_transactions" targetRef="mark_import_done" />
+    <bpmn:endEvent id="endJob">
+      <bpmn:incoming>Flow_06dyjk4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_06dyjk4" sourceRef="mark_import_done" targetRef="endJob" />
+    <bpmn:serviceTask id="mark_import_done" name="Finalize import job" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.ImportFinishedDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${importFinishedDelegate}">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="storageToken">${transactionTokens}</camunda:inputParameter>
+          <camunda:inputParameter name="importSlug">${importJobSlug}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_16v2prx</bpmn:incoming>
+      <bpmn:outgoing>Flow_06dyjk4</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="import_job">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startJob">
+        <dc:Bounds x="152" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="158" y="315" width="25" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1foc3ne_di" bpmnElement="task_configure">
+        <dc:Bounds x="490" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zxkkid_di" bpmnElement="read_import_config">
+        <dc:Bounds x="280" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1jwwb99_di" bpmnElement="find_target_account">
+        <dc:Bounds x="710" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0leoane_di" bpmnElement="target_account_exists" isMarkerVisible="true">
+        <dc:Bounds x="905" y="265" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="895" y="325" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1y5d1uo_di" bpmnElement="read_csv_file">
+        <dc:Bounds x="1480" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0bn3ft1_di" bpmnElement="process_account_mapping" isExpanded="true">
+        <dc:Bounds x="810" y="450" width="780" height="330" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0k6d1rv_di" bpmnElement="start_match_accounts">
+        <dc:Bounds x="842" y="552" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0nocczx_di" bpmnElement="account_found" isMarkerVisible="true">
+        <dc:Bounds x="1115" y="545" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1125" y="521" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1dbe9nr_di" bpmnElement="synonym_exists" isMarkerVisible="true">
+        <dc:Bounds x="1255" y="675" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1265" y="732" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0x6y06t_di" bpmnElement="end_match_accounts">
+        <dc:Bounds x="1532" y="552" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1nnpr6m_di" bpmnElement="lookup_account">
+        <dc:Bounds x="940" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_16munia_di" bpmnElement="lookup_by_synonym">
+        <dc:Bounds x="1090" y="660" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1xtyj6s_di" bpmnElement="map_with_rules">
+        <dc:Bounds x="1370" y="660" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ms88dj_di" bpmnElement="finalize_mapping">
+        <dc:Bounds x="1370" y="530" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_19239fp_di" bpmnElement="Flow_19239fp">
+        <di:waypoint x="878" y="570" />
+        <di:waypoint x="940" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1eef867_di" bpmnElement="Flow_1eef867">
+        <di:waypoint x="1040" y="570" />
+        <di:waypoint x="1115" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_179ti7r_di" bpmnElement="Flow_179ti7r">
+        <di:waypoint x="1140" y="595" />
+        <di:waypoint x="1140" y="660" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1149" y="625" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0s125kk_di" bpmnElement="Flow_0s125kk">
+        <di:waypoint x="1190" y="700" />
+        <di:waypoint x="1255" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bwhd1j_di" bpmnElement="Flow_0bwhd1j">
+        <di:waypoint x="1305" y="700" />
+        <di:waypoint x="1370" y="700" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1331" y="682" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dwm2lt_di" bpmnElement="Flow_1dwm2lt">
+        <di:waypoint x="1165" y="570" />
+        <di:waypoint x="1370" y="570" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1259" y="552" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1byl8hw_di" bpmnElement="Flow_1byl8hw">
+        <di:waypoint x="1420" y="660" />
+        <di:waypoint x="1420" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ry07sy_di" bpmnElement="Flow_0ry07sy">
+        <di:waypoint x="1280" y="675" />
+        <di:waypoint x="1280" y="590" />
+        <di:waypoint x="1370" y="590" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1287" y="630" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0czgnsv_di" bpmnElement="Flow_0czgnsv">
+        <di:waypoint x="1470" y="570" />
+        <di:waypoint x="1532" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0vbcm2j_di" bpmnElement="confirm_mappings">
+        <dc:Bounds x="1280" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0cfirls_di" bpmnElement="extract_accounts">
+        <dc:Bounds x="1070" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0nxa7la_di" bpmnElement="process_create_transactions" isExpanded="true">
+        <dc:Bounds x="1710" y="85" width="1220" height="410" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19sbqbc_di" bpmnElement="start_create_transaction">
+        <dc:Bounds x="1750" y="177" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ru77gs_di" bpmnElement="mapping_exists" isMarkerVisible="true">
+        <dc:Bounds x="2215" y="170" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2225" y="146" width="29" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0v83u3r_di" bpmnElement="create_allowed" isMarkerVisible="true">
+        <dc:Bounds x="2215" y="290" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2218" y="350" width="44" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_17mjkeb_di" bpmnElement="should_apply_rules" isMarkerVisible="true">
+        <dc:Bounds x="2585" y="170" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2583" y="146" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_16xo9rv_di" bpmnElement="end_create_transaction">
+        <dc:Bounds x="2872" y="297" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0lhktha_di" bpmnElement="user_create_account">
+        <dc:Bounds x="2340" y="275" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0zbcup5_di" bpmnElement="locate_account_mapping">
+        <dc:Bounds x="2040" y="155" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ky706b_di" bpmnElement="read_transaction_storage">
+        <dc:Bounds x="1860" y="155" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0z4z9ya_di" bpmnElement="create_transaction">
+        <dc:Bounds x="2440" y="155" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0o20b4a_di" bpmnElement="apply_rules">
+        <dc:Bounds x="2700" y="155" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1wb6lyp_di" bpmnElement="create_account_extractor">
+        <dc:Bounds x="2040" y="275" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_00e7v83_di" bpmnElement="create_account">
+        <dc:Bounds x="2040" y="385" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1thklz0_di" bpmnElement="locate_created_account">
+        <dc:Bounds x="2270" y="385" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1iov1tb_di" bpmnElement="detect_duplicates">
+        <dc:Bounds x="2700" y="275" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0xggr5k_di" bpmnElement="Flow_0xggr5k">
+        <di:waypoint x="2140" y="195" />
+        <di:waypoint x="2215" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0b5s223_di" bpmnElement="Flow_0b5s223">
+        <di:waypoint x="2265" y="195" />
+        <di:waypoint x="2440" y="195" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2345" y="177" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0prfhkh_di" bpmnElement="Flow_0prfhkh">
+        <di:waypoint x="2240" y="220" />
+        <di:waypoint x="2240" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2248" y="238" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01kp9n6_di" bpmnElement="Flow_01kp9n6">
+        <di:waypoint x="2215" y="315" />
+        <di:waypoint x="2140" y="315" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2184" y="293" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1n6qs8u_di" bpmnElement="Flow_1n6qs8u">
+        <di:waypoint x="2265" y="315" />
+        <di:waypoint x="2340" y="315" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2296" y="297" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15uycxp_di" bpmnElement="Flow_15uycxp">
+        <di:waypoint x="2390" y="275" />
+        <di:waypoint x="2390" y="255" />
+        <di:waypoint x="2480" y="255" />
+        <di:waypoint x="2480" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0y3m68u_di" bpmnElement="Flow_0y3m68u">
+        <di:waypoint x="2090" y="355" />
+        <di:waypoint x="2090" y="385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01c6qb3_di" bpmnElement="Flow_01c6qb3">
+        <di:waypoint x="2540" y="195" />
+        <di:waypoint x="2585" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ycxqnq_di" bpmnElement="Flow_0ycxqnq">
+        <di:waypoint x="2610" y="220" />
+        <di:waypoint x="2610" y="315" />
+        <di:waypoint x="2700" y="315" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2619" y="265" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1pkda2y_di" bpmnElement="Flow_1pkda2y">
+        <di:waypoint x="2635" y="195" />
+        <di:waypoint x="2700" y="195" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2659" y="177" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00vpxjj_di" bpmnElement="Flow_00vpxjj">
+        <di:waypoint x="2750" y="235" />
+        <di:waypoint x="2750" y="275" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0rz5nze_di" bpmnElement="Flow_0rz5nze">
+        <di:waypoint x="2800" y="315" />
+        <di:waypoint x="2872" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0upo10t_di" bpmnElement="Flow_0upo10t">
+        <di:waypoint x="1786" y="195" />
+        <di:waypoint x="1860" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17ta9lo_di" bpmnElement="Flow_17ta9lo">
+        <di:waypoint x="1960" y="195" />
+        <di:waypoint x="2040" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1b93w1q_di" bpmnElement="Flow_1b93w1q">
+        <di:waypoint x="2140" y="425" />
+        <di:waypoint x="2270" y="425" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1lz7czw_di" bpmnElement="Flow_1lz7czw">
+        <di:waypoint x="2370" y="425" />
+        <di:waypoint x="2510" y="425" />
+        <di:waypoint x="2510" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1y4khet_di" bpmnElement="endJob">
+        <dc:Bounds x="3192" y="272" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11rfwl4_di" bpmnElement="mark_import_done">
+        <dc:Bounds x="3010" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1nv7ilo_di" bpmnElement="Flow_1nv7ilo">
+        <di:waypoint x="188" y="290" />
+        <di:waypoint x="280" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09wisno_di" bpmnElement="arrow_to_config">
+        <di:waypoint x="380" y="290" />
+        <di:waypoint x="490" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="411" y="272" width="51" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_088kfgl_di" bpmnElement="Flow_088kfgl">
+        <di:waypoint x="590" y="290" />
+        <di:waypoint x="710" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="614" y="272" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xcxk57_di" bpmnElement="Flow_0xcxk57">
+        <di:waypoint x="810" y="290" />
+        <di:waypoint x="905" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="823" y="272" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1q5av68_di" bpmnElement="arrow_account_missing">
+        <di:waypoint x="930" y="265" />
+        <di:waypoint x="930" y="160" />
+        <di:waypoint x="540" y="160" />
+        <di:waypoint x="540" y="250" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="708" y="142" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fbjukg_di" bpmnElement="arrow_target_account_exists">
+        <di:waypoint x="955" y="290" />
+        <di:waypoint x="1070" y="290" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1005" y="272" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ow7pbb_di" bpmnElement="Flow_0ow7pbb">
+        <di:waypoint x="1120" y="330" />
+        <di:waypoint x="1120" y="450" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1130" y="383" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0pngnev_di" bpmnElement="Flow_0pngnev">
+        <di:waypoint x="1330" y="450" />
+        <di:waypoint x="1330" y="330" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1335" y="383" width="49" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11g50b7_di" bpmnElement="Flow_11g50b7">
+        <di:waypoint x="1380" y="290" />
+        <di:waypoint x="1480" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02v0o7o_di" bpmnElement="Flow_02v0o7o">
+        <di:waypoint x="1580" y="290" />
+        <di:waypoint x="1710" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16v2prx_di" bpmnElement="Flow_16v2prx">
+        <di:waypoint x="2930" y="290" />
+        <di:waypoint x="3010" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06dyjk4_di" bpmnElement="Flow_06dyjk4">
+        <di:waypoint x="3110" y="290" />
+        <di:waypoint x="3192" y="290" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,7 +1,5 @@
 package com.jongsoft.finance.bpmn.delegate.scheduler;
 
-import com.jongsoft.finance.ProcessMapper;
-import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.Transaction;
@@ -12,23 +10,15 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
 @Singleton
 public class GenerateTransactionJsonDelegate implements JavaDelegate {
 
     private final TransactionScheduleProvider transactionScheduleProvider;
-    private final StorageService storageService;
-    private final ProcessMapper mapper;
 
-    GenerateTransactionJsonDelegate(
-            TransactionScheduleProvider transactionScheduleProvider,
-            StorageService storageService,
-            ProcessMapper mapper) {
+    GenerateTransactionJsonDelegate(TransactionScheduleProvider transactionScheduleProvider) {
         this.transactionScheduleProvider = transactionScheduleProvider;
-        this.storageService = storageService;
-        this.mapper = mapper;
     }
 
     @Override
@@ -45,11 +35,10 @@ public class GenerateTransactionJsonDelegate implements JavaDelegate {
                             .description(generateTransactionDescription(schedule))
                             .build();
 
-                    var transactionToken = storageService.store(mapper.writeSafe(transaction).getBytes(StandardCharsets.UTF_8));
 
                     execution.setVariable("destinationId", schedule.getDestination().getId());
                     execution.setVariable("sourceId", schedule.getSource().getId());
-                    execution.setVariable("transactionToken", transactionToken);
+                    execution.setVariable("transaction", transaction);
                 }).elseThrow(() -> new IllegalStateException("Cannot find schedule with id " + scheduledTransactionId));
     }
 

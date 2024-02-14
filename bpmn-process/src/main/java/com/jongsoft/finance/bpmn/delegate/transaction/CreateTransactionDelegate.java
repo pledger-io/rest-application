@@ -1,7 +1,5 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
-import com.jongsoft.finance.ProcessMapper;
-import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
@@ -13,38 +11,26 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.LongValue;
-import org.camunda.bpm.engine.variable.value.StringValue;
 
 @Slf4j
 @Singleton
 public class CreateTransactionDelegate implements JavaDelegate {
 
-    private final StorageService storageService;
     private final AccountProvider accountProvider;
     private final TransactionCreationHandler creationHandler;
-    private final ProcessMapper mapper;
 
-    CreateTransactionDelegate(
-            StorageService storageService,
-            AccountProvider accountProvider,
-            TransactionCreationHandler creationHandler,
-            ProcessMapper mapper) {
-        this.storageService = storageService;
+    CreateTransactionDelegate(AccountProvider accountProvider, TransactionCreationHandler creationHandler) {
         this.accountProvider = accountProvider;
         this.creationHandler = creationHandler;
-        this.mapper = mapper;
     }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        String batchImportSlug = (String) execution.getVariableLocal("batchImportSlug");
-        String transactionToken = execution.<StringValue>getVariableLocalTyped("transactionToken").getValue();
-        Account toAccount = accountProvider.lookup(execution.<LongValue>getVariableLocalTyped("accountId").getValue()).get();
-        Account targetAccount = accountProvider.lookup(execution.<LongValue>getVariableLocalTyped("targetAccount").getValue()).get();
+        var batchImportSlug = (String) execution.getVariable("importJobSlug");
+        var parsedTransaction = (ParsedTransaction) execution.getVariableLocal("transaction");
+        var toAccount = lookupAccount(execution, "accountId");
+        var targetAccount = lookupAccount(execution, "targetAccount");
 
-        var parsedTransaction = mapper.readSafe(
-                new String(storageService.read(transactionToken).get()),
-                ParsedTransaction.class);
         log.debug("{}: Creating transaction into {} from {} with amount {}",
                 execution.getCurrentActivityName(),
                 targetAccount.getName(),
@@ -65,6 +51,12 @@ public class CreateTransactionDelegate implements JavaDelegate {
         long transactionId = creationHandler.handleCreatedEvent(new CreateTransactionCommand(transaction));
 
         execution.setVariable("transactionId", transactionId);
+    }
+
+    private Account lookupAccount(DelegateExecution execution, String variableName) {
+        var accountId = execution.<LongValue>getVariableLocalTyped(variableName).getValue();
+        return accountProvider.lookup(accountId)
+                .getOrThrow(() -> new IllegalStateException("Unable to find account with id " + accountId));
     }
 
 }

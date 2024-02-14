@@ -1,40 +1,21 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
-import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.io.Serializable;
-import java.util.Objects;
 
-@Introspected
+@Getter
+@Serdeable
+@EqualsAndHashCode(of = {"name"})
 public class ExtractionMapping implements Serializable {
 
-    private String name;
-    private Long accountId;
+    private final String name;
+    private final Long accountId;
 
     public ExtractionMapping(String name, Long accountId) {
         this.name = name;
         this.accountId = accountId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Long getAccountId() {
-        return accountId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof ExtractionMapping that) {
-            return name.equals(that.name);
-        }
-
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
     }
 }

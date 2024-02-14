@@ -3,14 +3,12 @@ package com.jongsoft.finance.bpmn.delegate.importer;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.providers.ImportProvider;
+import com.jongsoft.finance.serialized.ExtractedAccountLookup;
 import com.jongsoft.finance.serialized.ImportConfigJson;
-import com.jongsoft.lang.API;
-import com.jongsoft.lang.collection.tuple.Triplet;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 @Singleton
@@ -26,19 +24,19 @@ public class ExtractAccountDetailsDelegate extends CSVReaderDelegate {
 
     @Override
     protected void beforeProcess(DelegateExecution execution, ImportConfigJson configJson) {
-        execution.setVariableLocal("locatable", new ArrayList<Triplet<String, String, String>>());
+        execution.setVariableLocal("locatable", new HashSet<>());
     }
 
     @Override
     protected void lineRead(DelegateExecution execution, ParsedTransaction parsedTransaction) {
-        var triple = API.Tuple(
+        var extraction = new ExtractedAccountLookup(
                 parsedTransaction.getOpposingName(),
                 parsedTransaction.getOpposingIBAN(),
                 parsedTransaction.getDescription());
 
         @SuppressWarnings("unchecked")
-        var locatable = (ArrayList<Triplet<String, String, String>>) execution.getVariableLocal("locatable");
-        locatable.add(triple);
+        var locatable = (HashSet<ExtractedAccountLookup>) execution.getVariableLocal("locatable");
+        locatable.add(extraction);
     }
 
     @Override

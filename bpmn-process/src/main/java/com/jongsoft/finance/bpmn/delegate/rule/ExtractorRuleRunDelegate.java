@@ -9,6 +9,7 @@ import jakarta.inject.Singleton;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
+@Deprecated
 @Singleton
 public class ExtractorRuleRunDelegate implements JavaDelegate {
 

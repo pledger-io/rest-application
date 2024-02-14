@@ -1,7 +1,7 @@
 {
   "has-headers": true,
   "apply-rules": true,
-  "generate-accounts": true,
+  "generate-accounts": false,
   "date-format": "yyyyMMdd",
   "delimiter": ",",
   "column-roles": [

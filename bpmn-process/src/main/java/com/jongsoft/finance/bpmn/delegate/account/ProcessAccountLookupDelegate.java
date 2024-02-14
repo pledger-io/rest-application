@@ -42,7 +42,7 @@ public class ProcessAccountLookupDelegate implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         log.debug("{}: Processing account lookup '{}' - {} [{}]",
                 execution.getCurrentActivityName(),
-                execution.getVariable("name"),
+                execution.getVariableLocal("name"),
                 execution.getVariableLocal("iban"),
                 execution.getVariableLocal("id"));
 
@@ -53,7 +53,7 @@ public class ProcessAccountLookupDelegate implements JavaDelegate {
 
         if (!matchedAccount.isPresent() && execution.hasVariableLocal("iban")) {
             final String iban = (String) execution.getVariableLocal("iban");
-            if (iban != null && iban.trim().length() > 0) {
+            if (iban != null && !iban.trim().isEmpty()) {
                 matchedAccount = accountProvider.lookup(accountFilterFactory.account().iban(iban, true))
                         .content()
                         .first(x -> true);
@@ -62,7 +62,9 @@ public class ProcessAccountLookupDelegate implements JavaDelegate {
 
         if (!matchedAccount.isPresent() && execution.hasVariableLocal("name")) {
             final String accountName = (String) execution.getVariableLocal("name");
-            matchedAccount = accountProvider.lookup(accountName);
+            if (accountName != null && !accountName.trim().isEmpty()) {
+                matchedAccount = accountProvider.lookup(accountName);
+            }
         }
 
         log.trace("{}: Processing account located {}", execution.getCurrentActivityName(), matchedAccount);

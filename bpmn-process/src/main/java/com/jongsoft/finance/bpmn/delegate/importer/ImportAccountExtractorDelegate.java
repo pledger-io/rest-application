@@ -5,6 +5,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
@@ -12,19 +13,24 @@ public class ImportAccountExtractorDelegate implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        log.debug("{}: Processing import account extraction '{}' - {}",
+        log.debug("{}: Creating import transaction account mapping '{}' - {}",
                 execution.getCurrentActivityName(),
-                execution.getVariable("name"),
-                execution.getVariable("account"));
-
-        @SuppressWarnings("unchecked")
-        var results = (Set<ExtractionMapping>) execution.getVariable("extractionResult");
+                execution.getVariableLocal("name"),
+                execution.getVariableLocal("accountId"));
 
         var mapping = new ExtractionMapping(
                 execution.<StringValue>getVariableLocalTyped("name").getValue(),
-                (Long) execution.getVariableLocal("account"));
+                (Long) execution.getVariableLocal("accountId"));
 
-        results.add(mapping);
+        getAccountMappings(execution).add(mapping);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<ExtractionMapping> getAccountMappings(DelegateExecution execution) {
+        if (!execution.hasVariable("accountMappings")) {
+            execution.setVariable("accountMappings", new HashSet<>());
+        }
+        return (Set<ExtractionMapping>) execution.getVariable("accountMappings");
     }
 
 }
