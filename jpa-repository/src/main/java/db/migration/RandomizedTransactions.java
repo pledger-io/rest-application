@@ -23,6 +23,7 @@ public class RandomizedTransactions {
 
     static String loremIpsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
+    static Random rand = new Random();
 
     public static void create(int source, int destination,int transactionsPerMonth,
                               double lower, double upper, String description,
@@ -34,7 +35,6 @@ public class RandomizedTransactions {
                 VALUES (
                     (SELECT id FROM transaction_journal WHERE t_date = ? AND description = ? AND type = 'CREDIT' AND user_id = 1 limit 1),
                     ?,?,?,?,?)""";
-        Random rand = new Random();
 
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
             try (PreparedStatement journalStatement = conn.prepareStatement(transactionSql);

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import java.util.Set;
+import java.util.Collection;
 
 @Slf4j
 public class LocateAccountInMapping implements JavaDelegate {
@@ -12,7 +12,7 @@ public class LocateAccountInMapping implements JavaDelegate {
     public void execute(DelegateExecution delegateExecution) throws Exception {
         var accountName = (String) delegateExecution.getVariableLocal("name");
         @SuppressWarnings("unchecked")
-        var mappings = (Set<ExtractionMapping>) delegateExecution.getVariable("accountMappings");
+        var mappings = (Collection<ExtractionMapping>) delegateExecution.getVariable("accountMappings");
 
         log.debug("{}: Locating account mapping for {}.",
                 delegateExecution.getCurrentActivityName(),

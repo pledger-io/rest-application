@@ -8,18 +8,18 @@
 
 -----------------------
 
-**[Read the documentation](https://fintrack.jongsoft.com/)**
+**[Read the documentation](https://www.pledger.io/)**
 
 [Report Bug](https://jongsoftdev.atlassian.net/issues/?jql=issuetype%20%3D%20Bug%20AND%20project%20%3D%20FIN%20AND%20resolution%20%3D%20Unresolved%20ORDER%20BY%20priority%20DESC) - [Request Feature](https://jongsoftdev.atlassian.net/browse/FIN-23?jql=issuetype%20%3D%20Story%20AND%20project%20%3D%20FIN%20AND%20resolution%20%3D%20Unresolved%20ORDER%20BY%20priority%20DESC)
 
 -----------------------
 
-## About FinTrack
-FinTrack is a "self-hosted" application that helps in keeping track of your personal finances. It helps you keep track
-of your income and expenses to allow you to spend less many and save more.
+## About Pledger.io
+Pledger.io is a "self hosted" application that helps in keeping track of your personal finances.
+It helps you keep track of your income and expenses to allow you to spend less many and save more.
 
-Using FinTrack you can keep track of your income vs spending as well as your credit card expenses. FinTrack has the 
-following features:
+Using Pledger.io you can keep track of your income vs spending as well as your credit card expenses.
+Pledger.io has the following features:
 
 * Categories to group expenses
 * Budgets to track income vs. expenses
@@ -28,9 +28,9 @@ following features:
 
 ## Get started
 
-**Note:** the front-end application can be found in the [fintrack-ui](https://bitbucket.org/jongsoftdev/fintrack-ui) repository. The [deployment](https://bitbucket.org/jongsoftdev/fintrack-deployment) build will bundle the front-end with this backend system.
+**Note:** the front-end application can be found in the [user-interface](https://bitbucket.org/jongsoftdev/user-interface) repository. The [deployment](https://bitbucket.org/jongsoftdev/fintrack-deployment) build will bundle the front-end with this backend system.
 
-In this repository you will find the backend REST application needed to run FinTrack.
+In this repository you will find the backend REST application needed to run Pledger.io.
 
 ### Building the source
 
@@ -51,7 +51,7 @@ API documentation use the url:
     http://localhost:8080/spec/index.html
 
 ## License
-Copyright 2023 Jong Soft Development
+Copyright 2024 Jong Soft Development
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and 
 associated documentation files (the "Software"), to deal in the Software without restriction, including 

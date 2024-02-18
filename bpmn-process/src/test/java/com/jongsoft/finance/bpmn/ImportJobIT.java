@@ -154,6 +154,67 @@ public class ImportJobIT extends ProcessTestSetup {
     }
 
     @Test
+    void runWithAccountMappingAdjustments() {
+        // Given:
+        Mockito.when(accountProvider.lookup(TARGET_ACCOUNT_ID))
+                .thenReturn(Control.Option(createTargetAccount()));
+        Mockito.when(importProvider.lookup(IMPORT_JOB_SLUG))
+                .thenReturn(Control.Option(createBatchImport()));
+        Mockito.when(storageService.read(JSON_FILE_CODE))
+                .thenReturn(Control.Option(readResource("/import-test/import-config-test.json")));
+        Mockito.when(storageService.read(CSV_FILE_CODE))
+                .thenReturn(Control.Option(readResource("/import-test/import-test.csv")));
+
+        // Default account lookup shall yield no results
+        Mockito.when(accountProvider.lookup(Mockito.anyString()))
+                .thenReturn(Control.Option());
+        Mockito.when(accountProvider.synonymOf(Mockito.anyString()))
+                .thenReturn(Control.Option());
+        setupPostAccount();
+        setupPieterseAccount();
+
+        // When:
+        var process = processEngine.getRuntimeService().startProcessInstanceByKey("import_job",
+                Variables.createVariables()
+                        .putValue("importJobSlug", IMPORT_JOB_SLUG)
+        );
+
+        completeImportConfig(process, false);
+        var configureJsonTask = processEngine.getTaskService()
+                .createTaskQuery()
+                .taskDefinitionKey("confirm_mappings")
+                .processInstanceId(process.getProcessInstanceId())
+                .singleResult();
+        Assertions.assertThat(configureJsonTask).isNotNull();
+
+        processEngine.getTaskService()
+                .complete(configureJsonTask.getId(), Variables.createVariables()
+                        .putValue("account_mappings", Set.of(
+                                new ExtractionMapping("P. Post", 2L),
+                                new ExtractionMapping("Janssen PA", 2L),
+                                new ExtractionMapping("MW GA Pieterse", 4L)
+                        )));
+
+        // Then:
+        Mockito.verify(accountProvider).lookup("Janssen PA");
+        Mockito.verify(accountProvider).lookup("P. Post");
+
+        verifyStorageCleaned();
+
+        var createdTransactions = Mockito.mockingDetails(transactionCreationHandler).getInvocations().stream()
+                .filter(invocation -> invocation.getMethod().getName().equals("handleCreatedEvent"))
+                .map(invocation -> invocation.getArgument(0, CreateTransactionCommand.class))
+                .map(CreateTransactionCommand::transaction)
+                .toList();
+
+        Assertions.assertThat(createdTransactions)
+                .hasSize(4)
+                .anySatisfy(this::verifyPostTransaction)
+                .noneSatisfy(this::verifyJanssenTransaction)
+                .anySatisfy(this::verifyPieterseTransaction);
+    }
+
+    @Test
     @DisplayName("Run with manual account creation for Pieterse")
     void runWithManualAccountCreate() {
         // Given:

@@ -2,10 +2,8 @@ package com.jongsoft.finance.rest.process;
 
 import com.jongsoft.finance.rest.model.ProcessTaskResponse;
 import com.jongsoft.lang.Collections;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Delete;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,7 +11,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.variable.Variables;
 
+import java.util.HashMap;
 import java.util.List;
 
 @Tag(name = "Process Engine")
@@ -40,10 +40,41 @@ public class ProcessTaskResource {
                 .toJava();
     }
 
+    @Get("/{taskId}/variables")
+    @Operation(
+            summary = "Get Task",
+            description = "Get the details of the given task.",
+            operationId = "getTask"
+    )
+    public synchronized VariableMap variables(@PathVariable String taskId, @Nullable @QueryValue String variable) {
+        var variableMap = new VariableMap();
+        if (variable != null) {
+            variableMap.put(variable, taskService.getVariable(taskId, variable));
+        } else {
+            taskService.getVariables(taskId)
+                    .forEach(variableMap::put);
+        }
+
+        return variableMap;
+    }
+
+    @Post("/{taskId}/complete")
+    @Operation(
+            summary = "Complete Task",
+            description = "Completes the given task with the provided data.",
+            operationId = "completeTask"
+    )
+    public void complete(@PathVariable String taskId, @Body VariableMap variables) {
+        var javaMap = new HashMap<String, Object>();
+        variables.keySet()
+                .forEach(key -> javaMap.put(key, variables.get(key)));
+        taskService.complete(taskId, Variables.fromMap(javaMap));
+    }
+
     @Delete("/{taskId}")
     @Operation(
             summary = "Complete Task",
-            description = "Completes the given task",
+            description = "Completes the given task without any additional data.",
             operationId = "deleteTask"
     )
     public void complete(@PathVariable String taskId) {

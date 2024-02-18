@@ -95,12 +95,14 @@ public class AccountResource {
             }
     )
     List<AccountResponse> autocomplete(@Nullable String token, @Nullable String type) {
-        var accounts = accountProvider.lookup(
-                accountFilterFactory.account()
-                        .name(token, false)
-                        .pageSize(settingProvider.getAutocompleteLimit())
-                        .types(Collections.List(type)));
+        var filter =  accountFilterFactory.account()
+                .name(token, false)
+                .pageSize(settingProvider.getAutocompleteLimit());
+        if (type != null) {
+            filter.types(Collections.List(type));
+        }
 
+        var accounts = accountProvider.lookup(filter);
         return accounts.content()
                 .map(AccountResponse::new)
                 .toJava();

@@ -1,6 +1,7 @@
 package com.jongsoft.finance.serialized;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jongsoft.finance.ProcessVariable;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ import java.util.List;
 @Setter
 @Serdeable
 @ToString(of = {"accountId", "headers", "dateFormat", "delimiter"})
-public class ImportConfigJson implements Serializable {
+public class ImportConfigJson implements ProcessVariable {
 
     public enum MappingRole {
         IGNORE("_ignore"),
