@@ -80,7 +80,7 @@
         "description": "The JSON representation of the contract.",
         "binding": {
           "type": "camunda:inputParameter",
-          "name": "category"
+          "name": "contract"
         },
         "constraint": {
           "notEmpty": true

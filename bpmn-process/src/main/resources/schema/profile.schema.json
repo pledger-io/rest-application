@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.pledger.io/schemas/profile.schema.json",
+  "title": "Profile",
+  "type": "object",
+  "properties": {
+    "accounts": {
+      "type": "array",
+      "items": {
+        "ref": "https://www.pledger.io/schemas/account.schema.json"
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "$ref": "https://www.pledger.io/schemas/category.schema.json"
+      }
+    },
+    "contracts": {
+      "type": "array",
+      "items": {
+        "$ref": "https://www.pledger.io/schemas/contract.schema.json"
+      }
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "$ref": "https://www.pledger.io/schemas/rule.schema.json"
+      }
+    },
+    "budgetPeriods": {
+      "type": "array",
+      "items": {
+        "$ref": "https://www.pledger.io/schemas/budget.schema.json"
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

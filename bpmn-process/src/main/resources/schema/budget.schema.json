@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.yourwebsite.com/schemas/budget.schema.json",
+  "title": "Budget",
+  "type": "object",
+  "properties": {
+    "start": {
+      "type": "string",
+      "format": "date"
+    },
+    "end": {
+      "type": "string",
+      "format": "date"
+    },
+    "expectedIncome": {
+      "type": "number"
+    },
+    "expenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lowerBound": {
+            "type": "number"
+          },
+          "upperBound": {
+            "type": "number"
+          }
+        },
+        "required": ["name", "lowerBound", "upperBound"]
+      }
+    }
+  },
+  "required": ["start", "expectedIncome", "expenses"]
+}

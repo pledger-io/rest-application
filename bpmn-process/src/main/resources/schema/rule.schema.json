@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.pledger.io/schemas/rule.schema.json",
+  "title": "Transaction Rule",
+  "type": "object",
+  "properties": {
+    "rules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule"
+      }
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "restrictive": {
+          "type": "boolean"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "sort": {
+          "type": "number"
+        },
+        "group": {
+          "type": "string"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/change"
+          }
+        }
+      },
+      "required": [
+        "conditions",
+        "changes",
+        "name"
+      ]
+    },
+    "condition": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/$defs/column"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "value"
+      ]
+    },
+    "change": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/$defs/column"
+        },
+        "operation": {
+          "type": "string",
+          "enum": [
+            "EQUALS",
+            "CONTAINS",
+            "STARTS_WITH",
+            "LESS_THAN",
+            "MORE_THAN"
+          ]
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "value"
+      ]
+    },
+    "column": {
+      "type": "string",
+      "enum": [
+        "SOURCE_ACCOUNT",
+        "TO_ACCOUNT",
+        "DESCRIPTION",
+        "AMOUNT",
+        "CATEGORY",
+        "CHANGE_TRANSFER_TO",
+        "CHANGE_TRANSFER_FROM",
+        "BUDGET",
+        "CONTRACT",
+        "TAGS"
+      ]
+    }
+  }
+}

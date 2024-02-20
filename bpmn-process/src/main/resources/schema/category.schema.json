@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.pledger.io/schemas/category.schema.json",
+  "title": "Category",
+  "type": "object",
+  "properties": {
+    "label": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "label"
+  ]
+}

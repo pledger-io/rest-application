@@ -5,6 +5,7 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -14,6 +15,7 @@ import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 
+@Deprecated
 @MicronautTest(startApplication = false)
 class ProcessTestSetup {
 
@@ -93,5 +95,11 @@ class ProcessTestSetup {
                                 .build()
                 ))
                 .build();
+    }
+
+    protected byte[] readResource(String name) {
+        return Control.Option(getClass().getResourceAsStream(name))
+                .map(stream -> Control.Try(stream::readAllBytes).get())
+                .getOrThrow(() -> new IllegalStateException("Cannot read resource " + name));
     }
 }

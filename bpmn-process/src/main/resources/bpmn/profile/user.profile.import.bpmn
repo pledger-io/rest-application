@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1u19m6z" targetNamespace="http://jong-soft.org/fintrack/user/import" exporter="Camunda Modeler" exporterVersion="4.11.1">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitions_1u19m6z" targetNamespace="http://jong-soft.org/fintrack/user/import" exporter="Camunda Modeler" exporterVersion="5.17.0">
   <bpmn:process id="ImportUserProfile" name="Import User Profile" isExecutable="true" camunda:versionTag="1.0.0" camunda:historyTimeToLive="P100D">
     <bpmn:extensionElements>
       <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
@@ -23,23 +23,13 @@
       <bpmn:incoming>SequenceFlow_01bdvbn</bpmn:incoming>
       <bpmn:incoming>Flow_0x9yv8m</bpmn:incoming>
       <bpmn:incoming>Flow_012yxpj</bpmn:incoming>
-      <bpmn:incoming>Flow_0mm2spb</bpmn:incoming>
+      <bpmn:incoming>Flow_150pjkl</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0b3kjo9</bpmn:outgoing>
     </bpmn:parallelGateway>
-    <bpmn:sequenceFlow id="SequenceFlow_0b3kjo9" sourceRef="joiningGW" targetRef="processTransactionRuleTask" />
+    <bpmn:sequenceFlow id="SequenceFlow_0b3kjo9" sourceRef="joiningGW" targetRef="subProcessContracts" />
     <bpmn:endEvent id="endImportProfile">
       <bpmn:incoming>Flow_02hh0zq</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_1tsyjeh" sourceRef="processTransactionRuleTask" targetRef="st_cleanp_storage" />
-    <bpmn:callActivity id="processTransactionRuleTask" name="Process transaction rules" camunda:asyncBefore="true" calledElement="ImportTransactionRules">
-      <bpmn:extensionElements>
-        <camunda:in source="ruleStorageToken" target="storageToken" />
-        <camunda:in source="user" target="user" />
-        <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
-      </bpmn:extensionElements>
-      <bpmn:incoming>SequenceFlow_0b3kjo9</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1tsyjeh</bpmn:outgoing>
-    </bpmn:callActivity>
     <bpmn:serviceTask id="parseJsonTask" name="Parse JSON" camunda:delegateExpression="${parseUserConfigurationDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -55,22 +45,23 @@
       <bpmn:incoming>SequenceFlow_0g722sf</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1ks5mam</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:serviceTask id="st_process_tags" name="Process tags" camunda:asyncBefore="true" camunda:delegateExpression="${tagLookupDelegate}">
+    <bpmn:serviceTask id="st_process_tags" name="Process tags" camunda:delegateExpression="${tagLookupDelegate}">
       <bpmn:extensionElements>
         <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1qqsxik</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_01bdvbn</bpmn:outgoing>
-      <bpmn:multiInstanceLoopCharacteristics camunda:asyncBefore="true" camunda:collection="${tags}" camunda:elementVariable="name" />
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="${tags}" camunda:elementVariable="name" />
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_1qqsxik" sourceRef="parallelProcessGW" targetRef="st_process_tags" />
     <bpmn:sequenceFlow id="SequenceFlow_01bdvbn" sourceRef="st_process_tags" targetRef="joiningGW" />
-    <bpmn:serviceTask id="st_cleanp_storage" name="Cleanup storage" camunda:asyncBefore="true" camunda:expression="${storageService.remove(storageToken)}">
-      <bpmn:incoming>SequenceFlow_1tsyjeh</bpmn:incoming>
+    <bpmn:serviceTask id="st_cleanp_storage" name="Cleanup storage" camunda:expression="${storageService.remove(storageToken)}">
+      <bpmn:incoming>Flow_0hs6j2r</bpmn:incoming>
+      <bpmn:incoming>no_rules</bpmn:incoming>
       <bpmn:outgoing>Flow_02hh0zq</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="Flow_02hh0zq" sourceRef="st_cleanp_storage" targetRef="endImportProfile" />
-    <bpmn:subProcess id="subProcessBudgets" camunda:asyncBefore="true">
+    <bpmn:subProcess id="subProcessBudgets">
       <bpmn:extensionElements>
         <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
       </bpmn:extensionElements>
@@ -95,8 +86,8 @@
       <bpmn:sequenceFlow id="Flow_176cswr" sourceRef="Event_0s338os" targetRef="create_budget_task" />
       <bpmn:sequenceFlow id="Flow_19jmipg" sourceRef="create_budget_task" targetRef="Event_1wfqhwl" />
     </bpmn:subProcess>
-    <bpmn:sequenceFlow id="Flow_150pjkl" sourceRef="subProcessBudgets" targetRef="subProcessContracts" />
-    <bpmn:subProcess id="subProcessAccounts" camunda:asyncBefore="true">
+    <bpmn:sequenceFlow id="Flow_150pjkl" sourceRef="subProcessBudgets" targetRef="joiningGW" />
+    <bpmn:subProcess id="subProcessAccounts">
       <bpmn:extensionElements>
         <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
       </bpmn:extensionElements>
@@ -123,7 +114,7 @@
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="Flow_1jfwc0u" sourceRef="parallelProcessGW" targetRef="subProcessAccounts" />
     <bpmn:sequenceFlow id="Flow_0x9yv8m" sourceRef="subProcessAccounts" targetRef="joiningGW" />
-    <bpmn:subProcess id="subProcessCategories" camunda:asyncBefore="true">
+    <bpmn:subProcess id="subProcessCategories">
       <bpmn:extensionElements>
         <camunda:executionListener delegateExpression="${startProcessListener}" event="start" />
       </bpmn:extensionElements>
@@ -149,9 +140,9 @@
       </bpmn:serviceTask>
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="Flow_012yxpj" sourceRef="subProcessCategories" targetRef="joiningGW" />
-    <bpmn:subProcess id="subProcessContracts" camunda:asyncBefore="true">
-      <bpmn:incoming>Flow_150pjkl</bpmn:incoming>
-      <bpmn:outgoing>Flow_0mm2spb</bpmn:outgoing>
+    <bpmn:subProcess id="subProcessContracts">
+      <bpmn:incoming>SequenceFlow_0b3kjo9</bpmn:incoming>
+      <bpmn:outgoing>Flow_1mlb6fe</bpmn:outgoing>
       <bpmn:multiInstanceLoopCharacteristics camunda:collection="${contracts}" camunda:elementVariable="contract" />
       <bpmn:startEvent id="Event_1g3p1sp">
         <bpmn:outgoing>Flow_1t1rplr</bpmn:outgoing>
@@ -159,7 +150,7 @@
       <bpmn:serviceTask id="createContractTask" name="Create contract" camunda:modelerTemplate="com.jongsoft.finance.bpmn.contract.ContractCreate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${processContractCreateDelegate}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
-            <camunda:inputParameter name="category">${contract}</camunda:inputParameter>
+            <camunda:inputParameter name="contract">${contract}</camunda:inputParameter>
           </camunda:inputOutput>
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_1t1rplr</bpmn:incoming>
@@ -171,71 +162,27 @@
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="Flow_0zu810m" sourceRef="createContractTask" targetRef="Event_09i9yfb" />
     </bpmn:subProcess>
-    <bpmn:sequenceFlow id="Flow_0mm2spb" sourceRef="subProcessContracts" targetRef="joiningGW" />
+    <bpmn:sequenceFlow id="Flow_0hs6j2r" sourceRef="import_rules" targetRef="st_cleanp_storage" />
+    <bpmn:callActivity id="import_rules" name="Import rules" calledElement="ImportTransactionRules">
+      <bpmn:extensionElements>
+        <camunda:in sourceExpression="${ruleStorageToken}" target="storageToken" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>has_rules</bpmn:incoming>
+      <bpmn:outgoing>Flow_0hs6j2r</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:exclusiveGateway id="check_rules" name="has rules" default="no_rules">
+      <bpmn:incoming>Flow_1mlb6fe</bpmn:incoming>
+      <bpmn:outgoing>has_rules</bpmn:outgoing>
+      <bpmn:outgoing>no_rules</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="has_rules" name="yes" sourceRef="check_rules" targetRef="import_rules">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ruleStorageToken != null}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="no_rules" name="no" sourceRef="check_rules" targetRef="st_cleanp_storage" />
+    <bpmn:sequenceFlow id="Flow_1mlb6fe" sourceRef="subProcessContracts" targetRef="check_rules" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="ImportUserProfile">
-      <bpmndi:BPMNEdge id="Flow_012yxpj_di" bpmnElement="Flow_012yxpj">
-        <di:waypoint x="829" y="272" />
-        <di:waypoint x="895" y="272" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0x9yv8m_di" bpmnElement="Flow_0x9yv8m">
-        <di:waypoint x="828" y="425" />
-        <di:waypoint x="920" y="425" />
-        <di:waypoint x="920" y="297" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1jfwc0u_di" bpmnElement="Flow_1jfwc0u">
-        <di:waypoint x="461" y="297" />
-        <di:waypoint x="461" y="425" />
-        <di:waypoint x="530" y="425" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_150pjkl_di" bpmnElement="Flow_150pjkl">
-        <di:waypoint x="824" y="135" />
-        <di:waypoint x="860" y="135" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_02hh0zq_di" bpmnElement="Flow_02hh0zq">
-        <di:waypoint x="1273" y="272" />
-        <di:waypoint x="1335" y="272" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_01bdvbn_di" bpmnElement="SequenceFlow_01bdvbn">
-        <di:waypoint x="649" y="570" />
-        <di:waypoint x="920" y="570" />
-        <di:waypoint x="920" y="297" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_1qqsxik_di" bpmnElement="SequenceFlow_1qqsxik">
-        <di:waypoint x="461" y="297" />
-        <di:waypoint x="461" y="570" />
-        <di:waypoint x="549" y="570" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_1tsyjeh_di" bpmnElement="SequenceFlow_1tsyjeh">
-        <di:waypoint x="1104" y="272" />
-        <di:waypoint x="1173" y="272" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0b3kjo9_di" bpmnElement="SequenceFlow_0b3kjo9">
-        <di:waypoint x="945" y="272" />
-        <di:waypoint x="1004" y="272" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_09vnrcs_di" bpmnElement="SequenceFlow_09vnrcs">
-        <di:waypoint x="461" y="247" />
-        <di:waypoint x="461" y="135" />
-        <di:waypoint x="534" y="135" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0gpi7ne_di" bpmnElement="SequenceFlow_0gpi7ne">
-        <di:waypoint x="486" y="272" />
-        <di:waypoint x="529" y="272" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_1ks5mam_di" bpmnElement="SequenceFlow_1ks5mam">
-        <di:waypoint x="335" y="272" />
-        <di:waypoint x="436" y="272" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0g722sf_di" bpmnElement="SequenceFlow_0g722sf">
-        <di:waypoint x="187" y="272" />
-        <di:waypoint x="235" y="272" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0mm2spb_di" bpmnElement="Flow_0mm2spb">
-        <di:waypoint x="920" y="205" />
-        <di:waypoint x="920" y="247" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="startImportProfile">
         <dc:Bounds x="151" y="254" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -245,32 +192,31 @@
       <bpmndi:BPMNShape id="ParallelGateway_0aaqrmw_di" bpmnElement="joiningGW">
         <dc:Bounds x="895" y="247" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_1inyou0_di" bpmnElement="endImportProfile">
-        <dc:Bounds x="1335" y="254" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="CallActivity_1yk1l2i_di" bpmnElement="processTransactionRuleTask">
-        <dc:Bounds x="1004" y="232" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0lo97e5_di" bpmnElement="parseJsonTask">
         <dc:Bounds x="235" y="232" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_153d03l_di" bpmnElement="st_process_tags">
         <dc:Bounds x="549" y="530" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0qk7wwq_di" bpmnElement="check_rules" isMarkerVisible="true">
+        <dc:Bounds x="1395" y="232" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1398" y="289" width="46" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1gpm4r6_di" bpmnElement="import_rules">
+        <dc:Bounds x="1370" y="95" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_168vk1t_di" bpmnElement="st_cleanp_storage">
-        <dc:Bounds x="1173" y="232" width="100" height="80" />
+        <dc:Bounds x="1570" y="217" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1inyou0_di" bpmnElement="endImportProfile">
+        <dc:Bounds x="1732" y="239" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0lz5f8q_di" bpmnElement="subProcessBudgets" isExpanded="true">
         <dc:Bounds x="534" y="70" width="290" height="130" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_19jmipg_di" bpmnElement="Flow_19jmipg">
-        <di:waypoint x="734" y="130" />
-        <di:waypoint x="766" y="130" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_176cswr_di" bpmnElement="Flow_176cswr">
-        <di:waypoint x="590" y="130" />
-        <di:waypoint x="634" y="130" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_0s338os_di" bpmnElement="Event_0s338os">
         <dc:Bounds x="554" y="112" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -280,17 +226,17 @@
       <bpmndi:BPMNShape id="Event_1wfqhwl_di" bpmnElement="Event_1wfqhwl">
         <dc:Bounds x="766" y="112" width="36" height="36" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_176cswr_di" bpmnElement="Flow_176cswr">
+        <di:waypoint x="590" y="130" />
+        <di:waypoint x="634" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19jmipg_di" bpmnElement="Flow_19jmipg">
+        <di:waypoint x="734" y="130" />
+        <di:waypoint x="766" y="130" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_1kuhqpy_di" bpmnElement="subProcessAccounts" isExpanded="true">
         <dc:Bounds x="530" y="360" width="298" height="130" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0pkbgrq_di" bpmnElement="Flow_0pkbgrq">
-        <di:waypoint x="730" y="420" />
-        <di:waypoint x="772" y="420" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_08hgxdi_di" bpmnElement="Flow_08hgxdi">
-        <di:waypoint x="586" y="420" />
-        <di:waypoint x="630" y="420" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_038j89d_di" bpmnElement="Event_038j89d">
         <dc:Bounds x="550" y="402" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -300,17 +246,17 @@
       <bpmndi:BPMNShape id="Activity_1ytt1tn_di" bpmnElement="createAccountTask">
         <dc:Bounds x="630" y="380" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_08hgxdi_di" bpmnElement="Flow_08hgxdi">
+        <di:waypoint x="586" y="420" />
+        <di:waypoint x="630" y="420" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0pkbgrq_di" bpmnElement="Flow_0pkbgrq">
+        <di:waypoint x="730" y="420" />
+        <di:waypoint x="772" y="420" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0t3kj4g_di" bpmnElement="subProcessCategories" isExpanded="true">
         <dc:Bounds x="529" y="210" width="300" height="140" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0jjtcb9_di" bpmnElement="Flow_0jjtcb9">
-        <di:waypoint x="739" y="270" />
-        <di:waypoint x="771" y="270" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0djtv4i_di" bpmnElement="Flow_0djtv4i">
-        <di:waypoint x="597" y="270" />
-        <di:waypoint x="639" y="270" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1p8gdt9_di" bpmnElement="startProcessingCategory">
         <dc:Bounds x="561" y="252" width="36" height="36" />
       </bpmndi:BPMNShape>
@@ -320,26 +266,111 @@
       <bpmndi:BPMNShape id="Activity_0zx3lrv_di" bpmnElement="Activity_10ad95m">
         <dc:Bounds x="639" y="230" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0djtv4i_di" bpmnElement="Flow_0djtv4i">
+        <di:waypoint x="597" y="270" />
+        <di:waypoint x="639" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jjtcb9_di" bpmnElement="Flow_0jjtcb9">
+        <di:waypoint x="739" y="270" />
+        <di:waypoint x="771" y="270" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_1yhsr6k_di" bpmnElement="subProcessContracts" isExpanded="true">
-        <dc:Bounds x="860" y="65" width="290" height="140" />
+        <dc:Bounds x="1030" y="202" width="290" height="140" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1t1rplr_di" bpmnElement="Flow_1t1rplr">
-        <di:waypoint x="921" y="125" />
-        <di:waypoint x="960" y="125" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0zu810m_di" bpmnElement="Flow_0zu810m">
-        <di:waypoint x="1060" y="125" />
-        <di:waypoint x="1092" y="125" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1g3p1sp_di" bpmnElement="Event_1g3p1sp">
-        <dc:Bounds x="885" y="107" width="36" height="36" />
+        <dc:Bounds x="1055" y="244" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0ng5srz_di" bpmnElement="createContractTask">
-        <dc:Bounds x="960" y="85" width="100" height="80" />
+        <dc:Bounds x="1130" y="222" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_09i9yfb_di" bpmnElement="Event_09i9yfb">
-        <dc:Bounds x="1092" y="107" width="36" height="36" />
+        <dc:Bounds x="1262" y="244" width="36" height="36" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1t1rplr_di" bpmnElement="Flow_1t1rplr">
+        <di:waypoint x="1091" y="262" />
+        <di:waypoint x="1130" y="262" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zu810m_di" bpmnElement="Flow_0zu810m">
+        <di:waypoint x="1230" y="262" />
+        <di:waypoint x="1262" y="262" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0g722sf_di" bpmnElement="SequenceFlow_0g722sf">
+        <di:waypoint x="187" y="272" />
+        <di:waypoint x="235" y="272" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ks5mam_di" bpmnElement="SequenceFlow_1ks5mam">
+        <di:waypoint x="335" y="272" />
+        <di:waypoint x="436" y="272" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0gpi7ne_di" bpmnElement="SequenceFlow_0gpi7ne">
+        <di:waypoint x="486" y="272" />
+        <di:waypoint x="529" y="272" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_09vnrcs_di" bpmnElement="SequenceFlow_09vnrcs">
+        <di:waypoint x="461" y="247" />
+        <di:waypoint x="461" y="135" />
+        <di:waypoint x="534" y="135" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0b3kjo9_di" bpmnElement="SequenceFlow_0b3kjo9">
+        <di:waypoint x="945" y="272" />
+        <di:waypoint x="1030" y="272" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1qqsxik_di" bpmnElement="SequenceFlow_1qqsxik">
+        <di:waypoint x="461" y="297" />
+        <di:waypoint x="461" y="570" />
+        <di:waypoint x="549" y="570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_01bdvbn_di" bpmnElement="SequenceFlow_01bdvbn">
+        <di:waypoint x="649" y="570" />
+        <di:waypoint x="920" y="570" />
+        <di:waypoint x="920" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_150pjkl_di" bpmnElement="Flow_150pjkl">
+        <di:waypoint x="824" y="135" />
+        <di:waypoint x="920" y="135" />
+        <di:waypoint x="920" y="247" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jfwc0u_di" bpmnElement="Flow_1jfwc0u">
+        <di:waypoint x="461" y="297" />
+        <di:waypoint x="461" y="425" />
+        <di:waypoint x="530" y="425" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0x9yv8m_di" bpmnElement="Flow_0x9yv8m">
+        <di:waypoint x="828" y="425" />
+        <di:waypoint x="920" y="425" />
+        <di:waypoint x="920" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_012yxpj_di" bpmnElement="Flow_012yxpj">
+        <di:waypoint x="829" y="272" />
+        <di:waypoint x="895" y="272" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1mlb6fe_di" bpmnElement="Flow_1mlb6fe">
+        <di:waypoint x="1320" y="257" />
+        <di:waypoint x="1395" y="257" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02hh0zq_di" bpmnElement="Flow_02hh0zq">
+        <di:waypoint x="1670" y="257" />
+        <di:waypoint x="1732" y="257" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0hs6j2r_di" bpmnElement="Flow_0hs6j2r">
+        <di:waypoint x="1470" y="135" />
+        <di:waypoint x="1620" y="135" />
+        <di:waypoint x="1620" y="217" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fs80wj_di" bpmnElement="no_rules">
+        <di:waypoint x="1445" y="257" />
+        <di:waypoint x="1570" y="257" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1497" y="266" width="13" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_151a8nr_di" bpmnElement="has_rules">
+        <di:waypoint x="1420" y="232" />
+        <di:waypoint x="1420" y="175" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1421" y="193" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://www.pledger.io/schemas/profile.schema.json",
+  "categories": [
+    {
+      "label": "Salary",
+      "description": "Income by salary"
+    },
+    {
+      "label": "Groceries",
+      "description": "Spending on groceries"
+    },
+    {
+      "label": "Car",
+      "description": "Spending on car"
+    }
+  ]
+}

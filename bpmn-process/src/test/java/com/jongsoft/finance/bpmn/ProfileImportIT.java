@@ -1,138 +1,135 @@
 package com.jongsoft.finance.bpmn;
 
-import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.bpmn.process.ProcessExtension;
+import com.jongsoft.finance.bpmn.process.RuntimeContext;
+import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.domain.user.Role;
-import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.providers.CategoryProvider;
-import com.jongsoft.finance.providers.TransactionRuleProvider;
-import com.jongsoft.finance.providers.UserProvider;
-import com.jongsoft.finance.security.CurrentUserProvider;
-import com.jongsoft.lang.Collections;
-import com.jongsoft.lang.Control;
-import jakarta.inject.Inject;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.junit.jupiter.api.BeforeEach;
+import com.jongsoft.lang.collection.Sequence;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+@ProcessExtension
+@DisplayName("Profile import feature")
+public class ProfileImportIT {
 
-public class ProfileImportIT extends ProcessTestSetup {
+    @Test
+    @DisplayName("Import a profile with accounts")
+    void runWithAccounts(RuntimeContext context) {
+        context
+            .withStorage()
+            .withStorage("my-sample-token", "/profile-test/accounts-only.json");
 
-    @Inject
-    private ProcessEngine processEngine;
-    @Inject
-    private CurrentUserProvider authenticationFacade;
+        var process = context.execute("ImportUserProfile", Map.of(
+                "storageToken", "my-sample-token"
+        ));
 
-    @Inject
-    private UserProvider userProvider;
+        process.verifyCompleted();
 
-    @Inject
-    private AccountProvider accountProvider;
-    @Inject
-    private CategoryProvider categoryProvider;
-    @Inject
-    private TransactionRuleProvider transactionRuleProvider;
-    @Inject
-    private StorageService storageService;
-
-    @BeforeEach
-    void setup() {
-        Mockito.reset(
-                accountProvider,
-                authenticationFacade,
-                categoryProvider,
-                storageService,
-                userProvider,
-                transactionRuleProvider);
-
-        UserAccount userAccount = UserAccount.builder()
-                .id(1L)
-                .username("test-user")
-                .password("12345")
-                .roles(Collections.List(new Role("admin")))
-                .build();
-        Mockito.when(authenticationFacade.currentUser()).thenReturn(userAccount);
-        Mockito.when(userProvider.lookup("test-user")).thenReturn(Control.Option(userAccount));
-        Mockito.when(transactionRuleProvider.lookup()).thenReturn(Collections.List());
+        context
+            .verifyAccountCreated("Demo checking account", "EUR", "default")
+            .verifyAccountCreated("Groceries are us", "EUR", "creditor")
+            .verifyAccountCreated("Boss & Co.", "EUR", "debtor");
     }
 
     @Test
-    void run() {
-        InputStream resourceAsStream = getClass().getClassLoader().getResourceAsStream("profile-test/profile-export.json");
-        String configContent = new BufferedReader(new InputStreamReader(resourceAsStream)).lines().collect(Collectors.joining("\n"));
+    @DisplayName("Import a profile with rules")
+    void runWithRules(RuntimeContext context) {
+        context
+            .withStorage()
+            .withStorage("my-sample-token", "/profile-test/rules-only.json")
+            .withCategory("Salary")
+            .withCategory("Groceries")
+            .withAccount(Account.builder()
+                    .id(1L)
+                    .name("Groceries are us")
+                    .currency("EUR")
+                    .type("creditor")
+                    .build());
 
-        final Account accountDemo = Account.builder()
+        var process = context.execute("ImportUserProfile", Map.of(
+                "storageToken", "my-sample-token"
+        ));
+
+        process.verifyCompleted();
+
+        context
+            .verifyRuleCreated("Groceries matcher", rule -> {
+                rule.extracting("conditions")
+                        .isInstanceOf(Sequence.class)
+                        .satisfies(conditions -> {
+                            Assertions.assertThat((Sequence<?>)conditions)
+                                    .hasSize(3)
+                                    .extracting("field")
+                                    .containsExactly(RuleColumn.DESCRIPTION, RuleColumn.AMOUNT, RuleColumn.AMOUNT);
+                        });
+            });
+    }
+
+    @Test
+    @DisplayName("Import a profile with categories")
+    void runWithCategories(RuntimeContext context) {
+        context
+            .withStorage()
+            .withStorage("my-sample-token", "/profile-test/categories-only.json");
+
+        var process = context.execute("ImportUserProfile", Map.of(
+                "storageToken", "my-sample-token"
+        ));
+
+        process.verifyCompleted();
+
+        context
+            .verifyCategoryCreated("Salary")
+            .verifyCategoryCreated("Groceries");
+    }
+
+    @Test
+    @DisplayName("Import a profile with tags")
+    void runWithTags(RuntimeContext context) {
+        context
+            .withStorage()
+            .withStorage("my-sample-token", "/profile-test/tags-only.json")
+            .withTags();
+
+        var process = context.execute("ImportUserProfile", Map.of(
+                "storageToken", "my-sample-token"
+        ));
+
+        process.verifyCompleted();
+
+        context
+            .verifyTagCreated("cat")
+            .verifyTagCreated("dog");
+    }
+
+    @Test
+    @DisplayName("Import a profile with contracts")
+    void runWithContracts(RuntimeContext context) {
+        var account = Mockito.spy(Account.builder()
                 .id(1L)
-                .build();
-        final Account accountShop = Account.builder()
-                .id(2L)
-                .build();
-        final Account accountBoss = Account.builder()
-                .id(3L)
-                .build();
+                .name("Comcast")
+                .currency("USD")
+                .build());
+        context
+            .withAccount(account)
+            .withStorage()
+            .withStorage("my-sample-token", "/profile-test/contracts-only.json");
 
-        StringBuilder ruleJsonString = new StringBuilder();
+        var process = context.execute("ImportUserProfile", Map.of(
+                "storageToken", "my-sample-token"
+        ));
 
-        Mockito.when(storageService.read("my-sample-token")).thenReturn(
-                Control.Option(configContent.getBytes()));
-        Mockito.when(storageService.store(Mockito.any())).then((Answer<String>) invocation -> {
-            byte[] param = invocation.getArgument(0);
-            ruleJsonString.append(new String(param));
-            return "my-json-token";
-        });
-        Mockito.when(storageService.read("my-json-token")).thenAnswer(invocation -> Control.Option(ruleJsonString.toString().getBytes()));
-
-        Mockito.when(categoryProvider.lookup("Salary")).thenReturn(
-                Control.Option(),
-                Control.Option(Category.builder()
-                        .id(1L)
-                        .build()));
-        Mockito.when(categoryProvider.lookup("Groceries")).thenReturn(
-                Control.Option(),
-                Control.Option(Category.builder()
-                        .id(2L)
-                        .build()));
-        Mockito.when(categoryProvider.lookup("Car")).thenReturn(
-                Control.Option(),
-                Control.Option(Category.builder()
-                        .id(3L)
-                        .build()));
-        Mockito.when(accountProvider.lookup("Boss & Co."))
-                .thenReturn(Control.Option())
-                .thenReturn(Control.Option(accountBoss));
-        Mockito.when(accountProvider.lookup("Demo checking account"))
-                .thenReturn(Control.Option())
-                .thenReturn(Control.Option(accountDemo));
-        Mockito.when(accountProvider.lookup("Groceries are us"))
-                .thenReturn(Control.Option())
-                .thenReturn(Control.Option(accountShop));
-
-        var process = processEngine.getRuntimeService().createProcessInstanceByKey("ImportUserProfile")
-                .setVariable("storageToken", "my-sample-token")
-                .setVariable("username", authenticationFacade.currentUser().getUsername())
-                .execute();
-
-        waitForSuspended(processEngine, process.getProcessInstanceId());
-
-        assertThat(accountDemo.getName()).isEqualTo("Demo checking account");
-        assertThat(accountDemo.getCurrency()).isEqualTo("EUR");
-        assertThat(accountDemo.getType()).isEqualTo("default");
-
-        assertThat(accountShop.getName()).isEqualTo("Groceries are us");
-        assertThat(accountShop.getCurrency()).isEqualTo("EUR");
-        assertThat(accountShop.getType()).isEqualTo("creditor");
-
-        Mockito.verify(storageService).remove("my-sample-token");
+        process.verifyCompleted();
+        Mockito.verify(account).createContract(
+                "Cable subscription",
+                "Monthly cable subscription",
+                LocalDate.of(2018, 1, 1),
+                LocalDate.of(2018, 12, 31));
     }
 
 }

@@ -1,34 +1,5 @@
 {
   "$schema": "https://www.pledger.io/schemas/profile.schema.json",
-  "accounts": [
-    {
-      "name": "Demo checking account",
-      "description": null,
-      "currency": "EUR",
-      "iban": null,
-      "bic": null,
-      "number": null,
-      "type": "default"
-    },
-    {
-      "name": "Groceries are us",
-      "description": null,
-      "currency": "EUR",
-      "iban": null,
-      "bic": null,
-      "number": null,
-      "type": "creditor"
-    },
-    {
-      "name": "Boss & Co.",
-      "description": null,
-      "currency": "EUR",
-      "iban": null,
-      "bic": null,
-      "number": null,
-      "type": "debtor"
-    }
-  ],
   "rules": [
     {
       "name": "Income locator",
@@ -96,22 +67,5 @@
         }
       ]
     }
-  ],
-  "categories": [
-    {
-      "label": "Salary",
-      "description": "Income by salary"
-    },
-    {
-      "label": "Groceries",
-      "description": "Spending on groceries"
-    },
-    {
-      "label": "Car",
-      "description": "Spending on car"
-    }
-  ],
-  "budgetPeriods": [],
-  "contracts": [],
-  "tags": []
+  ]
 }

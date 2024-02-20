@@ -1,0 +1,13 @@
+{
+  "$schema": "https://www.pledger.io/schemas/profile.schema.json",
+  "contracts": [
+    {
+      "name": "Cable subscription",
+      "description": "Monthly cable subscription",
+      "company": "Comcast",
+      "start": "2018-01-01",
+      "end": "2018-12-31",
+      "terminated": false
+    }
+  ]
+}

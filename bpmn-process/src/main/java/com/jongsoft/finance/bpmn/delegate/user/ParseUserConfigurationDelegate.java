@@ -4,6 +4,7 @@ import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.serialized.ExportJson;
 import com.jongsoft.finance.serialized.RuleConfigJson;
+import com.jongsoft.lang.Control;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -39,21 +40,29 @@ public class ParseUserConfigurationDelegate implements JavaDelegate {
                 .map(json -> mapper.readSafe(json, ExportJson.class))
                 .getOrThrow(() -> new RuntimeException("Unable to parse json file"));
 
-        String ruleStorageToken = storageService.store(
-                mapper.writeSafe(RuleConfigJson.builder()
-                        .slug("profile-import")
-                        .rules(profileJson.getRules())
-                        .build()).getBytes(StandardCharsets.UTF_8));
+        if (profileJson.getRules() != null && !profileJson.getRules().isEmpty()) {
+            String ruleStorageToken = storageService.store(
+                    mapper.writeSafe(RuleConfigJson.builder()
+                            .slug("profile-import")
+                            .rules(profileJson.getRules())
+                            .build()).getBytes(StandardCharsets.UTF_8));
+            execution.setVariableLocal("ruleStorageToken", ruleStorageToken);
+        } else {
+            execution.setVariableLocal("ruleStorageToken", null);
+        }
 
         execution.setVariableLocal("accounts", serialize(profileJson.getAccounts()));
         execution.setVariableLocal("budgetPeriods", serialize(profileJson.getBudgetPeriods()));
         execution.setVariableLocal("contracts", serialize(profileJson.getContracts()));
         execution.setVariableLocal("categories", serialize(profileJson.getCategories()));
-        execution.setVariableLocal("tags", profileJson.getTags());
-        execution.setVariableLocal("ruleStorageToken", ruleStorageToken);
+        execution.setVariableLocal("tags", Control.Option(profileJson.getTags()).getOrSupply(List::of));
     }
 
     List<String> serialize(List<?> input) {
+        if (input == null) {
+            return List.of();
+        }
+
         return input.stream()
                 .map(mapper::writeSafe)
                 .filter(Objects::nonNull)
