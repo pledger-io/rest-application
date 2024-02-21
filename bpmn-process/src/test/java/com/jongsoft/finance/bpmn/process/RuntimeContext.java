@@ -167,8 +167,8 @@ public class RuntimeContext {
         return this;
     }
 
-    public ProcessExecution execute(String processKey, Map<String, Object> variables) {
-        return new ProcessExecution(processEngine, processKey, variables);
+    public RunningProcessExecution execute(String processKey, Map<String, Object> variables) {
+        return new RunningProcessExecution(processEngine, processKey, variables);
     }
 
     public RuntimeContext verifyAccountCreated(String name, String currency, String type) {

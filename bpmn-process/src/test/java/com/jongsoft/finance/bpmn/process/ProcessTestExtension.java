@@ -11,8 +11,15 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ProcessTestExtension extends MicronautJunit5Extension {
+
+    public interface ProcessExecution<T extends ProcessExecution> {
+        ProcessExecution<?> obtainChildProcess(String processKey);
+        T verifyCompleted();
+        <Y> T yankVariable(String variableName, Consumer<Y> consumer);
+    }
 
     @Override
     protected void beforeEach(ExtensionContext context, @Nullable Object testInstance, @Nullable AnnotatedElement method, List<Property> propertyAnnotations) {
