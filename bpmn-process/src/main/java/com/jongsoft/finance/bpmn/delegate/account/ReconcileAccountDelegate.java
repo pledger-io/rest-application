@@ -4,6 +4,8 @@ import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
+import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
 import com.jongsoft.finance.providers.AccountProvider;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +35,11 @@ import java.time.LocalDate;
 public class ReconcileAccountDelegate implements JavaDelegate {
 
     private final AccountProvider accountProvider;
+    private final TransactionCreationHandler creationHandler;
 
-    ReconcileAccountDelegate(AccountProvider accountProvider) {
+    ReconcileAccountDelegate(AccountProvider accountProvider, TransactionCreationHandler creationHandler) {
         this.accountProvider = accountProvider;
+        this.creationHandler = creationHandler;
     }
 
     @Override
@@ -61,7 +65,7 @@ public class ReconcileAccountDelegate implements JavaDelegate {
                         .currency(toReconcile.getCurrency())
                         .date(transactionDate));
 
-        transaction.register();
+        creationHandler.handleCreatedEvent(new CreateTransactionCommand(transaction));
     }
 
 }

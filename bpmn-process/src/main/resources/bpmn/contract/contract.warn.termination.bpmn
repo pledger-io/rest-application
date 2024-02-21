@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0owz5j0" targetNamespace="http://jong-soft.org/fintrack/transactions/contract" exporter="Camunda Modeler" exporterVersion="3.0.1">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_0owz5j0" targetNamespace="http://jong-soft.org/fintrack/transactions/contract" exporter="Camunda Modeler" exporterVersion="5.17.0">
   <bpmn:process id="ContractEndWarning" name="Contract expiry warning" isExecutable="true" camunda:historyTimeToLive="P1000D">
     <bpmn:documentation>This proces describes how a contract warning should be initiated in the system. 
 
@@ -13,7 +13,7 @@ This flow expects the following variables to be present:
     <bpmn:sequenceFlow id="SequenceFlow_0c8udwp" name="no" sourceRef="gw_in_past" targetRef="timer_activate">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${now().before(warnAt)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:intermediateCatchEvent id="timer_activate" name="Wait until end of contract&#10;&#10;" camunda:asyncBefore="true">
+    <bpmn:intermediateCatchEvent id="timer_activate" name="Wait until end of contract&#10;&#10;">
       <bpmn:incoming>SequenceFlow_0c8udwp</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0w3woqe</bpmn:outgoing>
       <bpmn:timerEventDefinition>
@@ -66,6 +66,30 @@ This flow expects the following variables to be present:
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="187" y="201" width="36" height="36" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateCatchEvent_1ex1k0b_di" bpmnElement="timer_activate">
+        <dc:Bounds x="497" y="201" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="475" y="247" width="79" height="53" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1d1y86l_di" bpmnElement="EndEvent_1d1y86l">
+        <dc:Bounds x="1119" y="81" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0lbu8jy_di" bpmnElement="gw_in_past" isMarkerVisible="true">
+        <dc:Bounds x="317" y="194" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="317" y="251" width="52" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0z0vqhn_di" bpmnElement="tsk_prepare_mail_properties">
+        <dc:Bounds x="851" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SendTask_0d1fghn_di" bpmnElement="task_send_alert">
+        <dc:Bounds x="1087" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_1aojn9d_di" bpmnElement="st_contract_lookup">
+        <dc:Bounds x="645" y="179" width="100" height="80" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0c8udwp_di" bpmnElement="SequenceFlow_0c8udwp">
         <di:waypoint x="367" y="219" />
         <di:waypoint x="497" y="219" />
@@ -73,29 +97,14 @@ This flow expects the following variables to be present:
           <dc:Bounds x="428" y="201" width="13" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="IntermediateCatchEvent_1ex1k0b_di" bpmnElement="timer_activate">
-        <dc:Bounds x="497" y="201" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="475" y="247" width="79" height="53" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0w3woqe_di" bpmnElement="SequenceFlow_0w3woqe">
         <di:waypoint x="533" y="219" />
         <di:waypoint x="645" y="219" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="EndEvent_1d1y86l_di" bpmnElement="EndEvent_1d1y86l">
-        <dc:Bounds x="1119" y="81" width="36" height="36" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1723bz3_di" bpmnElement="SequenceFlow_1723bz3">
         <di:waypoint x="1137" y="179" />
         <di:waypoint x="1137" y="117" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ExclusiveGateway_0lbu8jy_di" bpmnElement="gw_in_past" isMarkerVisible="true">
-        <dc:Bounds x="317" y="194" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="317" y="251" width="52" height="40" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_114x3a7_di" bpmnElement="SequenceFlow_114x3a7">
         <di:waypoint x="342" y="194" />
         <di:waypoint x="342" y="99" />
@@ -108,12 +117,6 @@ This flow expects the following variables to be present:
         <di:waypoint x="951" y="219" />
         <di:waypoint x="1087" y="219" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_0z0vqhn_di" bpmnElement="tsk_prepare_mail_properties">
-        <dc:Bounds x="851" y="179" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="SendTask_0d1fghn_di" bpmnElement="task_send_alert">
-        <dc:Bounds x="1087" y="179" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0b6wb04_di" bpmnElement="SequenceFlow_0b6wb04">
         <di:waypoint x="223" y="219" />
         <di:waypoint x="317" y="219" />
@@ -122,9 +125,6 @@ This flow expects the following variables to be present:
         <di:waypoint x="745" y="219" />
         <di:waypoint x="851" y="219" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="ServiceTask_1aojn9d_di" bpmnElement="st_contract_lookup">
-        <dc:Bounds x="645" y="179" width="100" height="80" />
-      </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>

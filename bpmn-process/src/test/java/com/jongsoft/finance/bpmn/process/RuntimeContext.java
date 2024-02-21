@@ -1,7 +1,9 @@
 package com.jongsoft.finance.bpmn.process;
 
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.Transaction;
@@ -17,6 +19,7 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
+import com.jongsoft.lang.control.Optional;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.core.reflect.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +30,9 @@ import org.assertj.core.api.ObjectAssert;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
+import org.mockito.stubbing.OngoingStubbing;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -104,6 +109,11 @@ public class RuntimeContext {
         return this;
     }
 
+    public OngoingStubbing<Optional<BigDecimal>> withBalance() {
+        var transactionProvider = applicationContext.getBean(TransactionProvider.class);
+        return Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)));
+    }
+
     public RuntimeContext withTags() {
         var tagProvider = applicationContext.getBean(TagProvider.class);
 
@@ -147,6 +157,19 @@ public class RuntimeContext {
         return this;
     }
 
+    public RuntimeContext withReconcileAccount() {
+        var accountProvider = applicationContext.getBean(AccountProvider.class);
+        var reconcileAccount = Account.builder().id(99L)
+                .type("reconcile")
+                .name("Reconcile account")
+                .build();
+        Mockito.when(accountProvider.lookup(SystemAccountTypes.RECONCILE))
+                .thenReturn(Control.Option(reconcileAccount));
+        Mockito.when(accountProvider.lookup(reconcileAccount.getId()))
+                .thenReturn(Control.Option(reconcileAccount));
+        return this;
+    }
+
     public RuntimeContext withCategory(String name) {
         var category = Category.builder()
                 .id(idGenerator.getAndAdd(1))
@@ -164,6 +187,12 @@ public class RuntimeContext {
     public RuntimeContext withImportJob(BatchImport batchImport) {
         Mockito.when(applicationContext.getBean(ImportProvider.class).lookup(batchImport.getSlug()))
                 .thenReturn(Control.Option(batchImport));
+        return this;
+    }
+
+    public RuntimeContext withContract(Contract contract) {
+        Mockito.when(applicationContext.getBean(ContractProvider.class).lookup(contract.getId()))
+                .thenReturn(Control.Option(contract));
         return this;
     }
 

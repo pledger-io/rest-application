@@ -51,6 +51,7 @@ public class ImportJobIT {
     }
 
     @Test
+    @DisplayName("Run with account mapping adjustments")
     void runWithAccountMappingAdjustments(RuntimeContext context) {
         context
             .withStorage()

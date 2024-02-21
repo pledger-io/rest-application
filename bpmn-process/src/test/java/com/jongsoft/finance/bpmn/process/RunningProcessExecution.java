@@ -30,8 +30,8 @@ public class RunningProcessExecution implements ProcessTestExtension.ProcessExec
     @Override
     @SuppressWarnings("unchecked")
     public <T> RunningProcessExecution yankVariable(String variableName, Consumer<T> consumer) {
-        var variable = processEngine.getRuntimeService()
-                .createVariableInstanceQuery()
+        var variable = processEngine.getHistoryService()
+                .createHistoricVariableInstanceQuery()
                 .processInstanceIdIn(processInstance.getProcessInstanceId())
                 .variableName(variableName)
                 .singleResult();
@@ -64,11 +64,17 @@ public class RunningProcessExecution implements ProcessTestExtension.ProcessExec
                 .createJobQuery()
                 .processInstanceId(processInstance.getProcessInstanceId())
                 .activityId(activityId)
+                .active()
                 .singleResult();
 
         Assertions.assertThat(job)
                 .as("Job for activity '%s' not found", activityId)
-                .isNotNull();
+                .isNotNull()
+                .satisfies(p -> {
+                    Assertions.assertThat(p.getDuedate())
+                            .as("Job for activity '%s' is not in the future", activityId)
+                            .isInTheFuture();
+                });
 
         processEngine.getManagementService()
                 .executeJob(job.getId());
@@ -89,7 +95,7 @@ public class RunningProcessExecution implements ProcessTestExtension.ProcessExec
                                 .unfinished()
                                 .list()
                                 .forEach(task -> {
-                                    log.error("Activity {} is not completed", task.getActivityName());
+                                    log.error("Activity [{}:'{}'] is not completed", task.getActivityId(), task.getActivityName());
                                 });
                     }
                     Assertions.assertThat(pi.isEnded())

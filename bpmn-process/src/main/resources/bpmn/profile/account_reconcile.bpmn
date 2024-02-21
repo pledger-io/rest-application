@@ -37,7 +37,7 @@ It will then compute if there is a difference between the open en end balance pr
     <bpmn:sequenceFlow id="sf_no_difference" name="no" sourceRef="xg_has_difference" targetRef="EndEvent_002t7o1">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${balanceDifference.doubleValue() == 0}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:userTask id="task_reconcile_before" name="Start differs warning" camunda:asyncBefore="true">
+    <bpmn:userTask id="task_reconcile_before" name="Start differs warning">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="endDate">${startDate}</camunda:inputParameter>
@@ -65,7 +65,7 @@ It will then compute if there is a difference between the open en end balance pr
     <bpmn:sequenceFlow id="SequenceFlow_16hoisl" sourceRef="st_compute_end" targetRef="compute_difference" />
     <bpmn:sequenceFlow id="Flow_1uu32vr" sourceRef="task_reconcile_before" targetRef="st_compute_start" />
     <bpmn:sequenceFlow id="Flow_1i4lt7y" sourceRef="StartEvent_1" targetRef="st_compute_start" />
-    <bpmn:serviceTask id="reconcile_account" name="Register reconcile transaction" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountReconcile" camunda:modelerTemplateVersion="1" camunda:asyncBefore="true" camunda:delegateExpression="${reconcileAccountDelegate}">
+    <bpmn:serviceTask id="reconcile_account" name="Register reconcile transaction" camunda:modelerTemplate="com.jongsoft.finance.bpmn.account.AccountReconcile" camunda:modelerTemplateVersion="1" camunda:asyncBefore="false" camunda:delegateExpression="${reconcileAccountDelegate}">
       <bpmn:extensionElements>
         <camunda:inputOutput>
           <camunda:inputParameter name="accountId">${accountId}</camunda:inputParameter>
