@@ -42,7 +42,7 @@ import java.util.function.Consumer;
 @Slf4j
 public class RuntimeContext {
 
-    private final ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
     private ProcessEngine processEngine;
 
@@ -63,8 +63,12 @@ public class RuntimeContext {
         this.processEngine = applicationContext.getBean(ProcessEngine.class);
         idGenerator = new MutableLong(100);
 
-        resetMocks();
         setupDefaultMocks();
+    }
+
+    void clean() {
+        processEngine.close();
+        storageTokens.clear();
     }
 
     public RuntimeContext withStorage() {
@@ -254,17 +258,22 @@ public class RuntimeContext {
         return Mockito.verify(applicationContext.getBean(type));
     }
 
-    private void resetMocks() {
-        Mockito.reset(applicationContext.getBean(AuthenticationFacade.class));
-        Mockito.reset(applicationContext.getBean(CurrentUserProvider.class));
-        Mockito.reset(applicationContext.getBean(AccountProvider.class));
-        Mockito.reset(applicationContext.getBean(TransactionProvider.class));
-        Mockito.reset(applicationContext.getBean(ImportProvider.class));
-        Mockito.reset(applicationContext.getBean(TransactionCreationHandler.class));
-        Mockito.reset(applicationContext.getBean(TransactionRuleProvider.class));
-        Mockito.reset(applicationContext.getBean(CategoryProvider.class));
-        Mockito.reset(userAccount);
+    void resetMocks() {
+        Mockito.reset(
+                applicationContext.getBean(AuthenticationFacade.class),
+                applicationContext.getBean(CurrentUserProvider.class),
+                applicationContext.getBean(AccountProvider.class),
+                applicationContext.getBean(TransactionProvider.class),
+                applicationContext.getBean(ImportProvider.class),
+                applicationContext.getBean(TransactionCreationHandler.class),
+                applicationContext.getBean(TransactionRuleProvider.class),
+                applicationContext.getBean(CategoryProvider.class),
+                applicationContext.getBean(StorageService.class),
+                userAccount);
+
+        setupDefaultMocks();
     }
+
     private void setupDefaultMocks() {
         Mockito.when(applicationContext.getBean(AuthenticationFacade.class).authenticated())
                 .thenReturn("test-user");

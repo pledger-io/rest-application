@@ -7,8 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-@MicronautTest(startApplication = false)
-@TestInstance(TestInstance.Lifecycle.PER_METHOD)
+@MicronautTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith({
         ProcessTestExtension.class
