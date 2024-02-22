@@ -1,13 +1,16 @@
 package com.jongsoft.finance.bpmn.process;
 
+import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.importer.BatchImport;
+import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
+import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
@@ -95,6 +98,13 @@ public class RuntimeContext {
         return this;
     }
 
+    public RuntimeContext withBudget(int year, int month, Budget budget) {
+        var budgetProvider = applicationContext.getBean(BudgetProvider.class);
+        Mockito.when(budgetProvider.lookup(year, month))
+                .thenReturn(Control.Option(budget));
+        return this;
+    }
+
     public RuntimeContext withTransactions() {
         var transactionProvider = applicationContext.getBean(TransactionProvider.class);
         var transactionCreationHandler = applicationContext.getBean(TransactionCreationHandler.class);
@@ -111,6 +121,18 @@ public class RuntimeContext {
         }).when(transactionCreationHandler).handleCreatedEvent(Mockito.any());
 
         return this;
+    }
+
+    public RuntimeContext withTransactionSchedule(ScheduledTransaction scheduledTransaction) {
+        var transactionProvider = applicationContext.getBean(TransactionScheduleProvider.class);
+        Mockito.when(transactionProvider.lookup(scheduledTransaction.getId()))
+                .thenReturn(Control.Option(scheduledTransaction));
+        return this;
+    }
+
+    public OngoingStubbing<ResultPage<Transaction>> withTransactionPages() {
+        var transactionProvider = applicationContext.getBean(TransactionProvider.class);
+        return Mockito.when(transactionProvider.lookup(Mockito.any(TransactionProvider.FilterCommand.class)));
     }
 
     public OngoingStubbing<Optional<BigDecimal>> withBalance() {
@@ -269,6 +291,7 @@ public class RuntimeContext {
                 applicationContext.getBean(TransactionRuleProvider.class),
                 applicationContext.getBean(CategoryProvider.class),
                 applicationContext.getBean(StorageService.class),
+                applicationContext.getBean(TransactionScheduleProvider.class),
                 userAccount);
 
         setupDefaultMocks();

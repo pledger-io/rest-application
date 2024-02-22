@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.process;
 
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ListAssert;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
@@ -41,6 +42,24 @@ public class RunningProcessExecution implements ProcessTestExtension.ProcessExec
                 .isNotNull();
 
         consumer.accept((T) variable.getValue());
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> RunningProcessExecution yankVariables(String variableName, Consumer<ListAssert<T>> consumer) {
+        var variable = processEngine.getHistoryService()
+                .createHistoricVariableInstanceQuery()
+                .processInstanceIdIn(processInstance.getProcessInstanceId())
+                .variableName(variableName)
+                .list();
+
+        Assertions.assertThat(variable)
+                .as("Variable %s not found", variableName)
+                .isNotNull();
+
+        consumer.accept(Assertions.assertThat(variable.stream()
+                .map(v -> (T) v.getValue())
+                .toList()));
         return this;
     }
 

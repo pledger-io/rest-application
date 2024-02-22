@@ -1,53 +1,32 @@
 package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.bpmn.process.ProcessExtension;
+import com.jongsoft.finance.bpmn.process.RuntimeContext;
+import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.providers.SettingProvider;
-import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.lang.Collections;
-import com.jongsoft.lang.Control;
 import jakarta.inject.Inject;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.junit.jupiter.api.BeforeEach;
+import org.assertj.core.api.Assertions;
+import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class BudgetAnalysisIT extends ProcessTestSetup {
-
-    @Inject
-    private BudgetProvider budgetProvider;
-
-    @Inject
-    private ProcessEngine processEngine;
-
-    @Inject
-    private FilterFactory filterFactory;
-
-    @Inject
-    private TransactionProvider transactionProvider;
+@ProcessExtension
+@DisplayName("Budget analysis feature")
+public class BudgetAnalysisIT {
 
     @Inject
     private SettingProvider applicationSettings;
 
-    private TransactionProvider.FilterCommand filterCommand;
-
-    @BeforeEach
-    void setup() {
-        Mockito.reset(budgetProvider, filterFactory, transactionProvider, applicationSettings);
-
-        Mockito.when(applicationSettings.getBudgetAnalysisMonths()).thenReturn(3);
-
-        Mockito.when(filterFactory.transaction())
-                .thenReturn(filterCommand = Mockito.mock(TransactionProvider.FilterCommand.class, InvocationOnMock::getMock));
-
-        Mockito.when(budgetProvider.lookup(2019, 1)).thenReturn(Control.Option(
-                Budget.builder()
+    @Test
+    @DisplayName("Budget analysis without a recorded deviation")
+    void budgetWithoutDeviation(RuntimeContext context) {
+        context
+                .withBudget(2019, 1, Budget.builder()
                         .expenses(Collections.List(
                                 Budget.Expense.builder()
                                         .id(1L)
@@ -56,14 +35,8 @@ public class BudgetAnalysisIT extends ProcessTestSetup {
                                         .name("Groceries")
                                         .build()))
                         .id(1L)
-                        .build()
-        ));
-    }
-
-    @Test
-    @DisplayName("Budget analysis without a recorded deviation")
-    void budgetWithoutDeviation() {
-        Mockito.when(transactionProvider.lookup(filterCommand))
+                        .build())
+                .withTransactionPages()
                 .thenReturn(ResultPage.of(
                         buildTransaction(50.2, "Groceries", "My Account", "To Account"),
                         buildTransaction(20.2, "Groceries", "My Account", "To Account"),
@@ -79,41 +52,35 @@ public class BudgetAnalysisIT extends ProcessTestSetup {
                         buildTransaction(12, "Groceries", "My Account", "To Account"),
                         buildTransaction(10, "Groceries", "My Account", "To Account")
                 ));
+
         Mockito.when(applicationSettings.getMaximumBudgetDeviation()).thenReturn(0.50);
+        Mockito.when(applicationSettings.getBudgetAnalysisMonths()).thenReturn(3);
 
-        var response = processEngine.getRuntimeService()
-                .createProcessInstanceByKey("budget_analysis")
-                .setVariable("id", 1L)
-                .setVariable("scheduled", "2019-01-01")
-                .execute();
+        context.execute("budget_analysis", Variables.createVariables()
+                        .putValue("id", 1L)
+                        .putValue("scheduled", "2019-01-01"))
+                .verifyCompleted()
+                .<Boolean>yankVariables("deviates", value ->
+                        value.hasSize(2)
+                                .allMatch(a-> !a));
 
-        waitForSuspended(processEngine, response.getProcessInstanceId());
-
-        // Validate the process completed successfully
-        var variables = processEngine.getHistoryService()
-                .createHistoricVariableInstanceQuery()
-                .processInstanceId(response.getProcessInstanceId())
-                .variableName("deviates")
-                .list();
-
-        assertThat(variables)
-                .hasSize(2)
-                .anySatisfy(variable -> assertThat(variable.getValue()).isEqualTo(false));
-
-        // Validate no tasks have been created
-        var tasks = processEngine.getTaskService()
-                .createTaskQuery()
-                .processInstanceId(response.getProcessInstanceId())
-                .active()
-                .list();
-
-        assertThat(tasks).isEmpty();
     }
 
     @Test
     @DisplayName("Budget analysis with a recorded deviation")
-    void budgetWithDeviation() {
-        Mockito.when(transactionProvider.lookup(filterCommand))
+    void budgetWithDeviation(RuntimeContext context) {
+        context
+                .withBudget(2019, 1, Budget.builder()
+                        .expenses(Collections.List(
+                                Budget.Expense.builder()
+                                        .id(1L)
+                                        .lowerBound(75)
+                                        .upperBound(100)
+                                        .name("Groceries")
+                                        .build()))
+                        .id(1L)
+                        .build())
+                .withTransactionPages()
                 .thenReturn(ResultPage.of(
                         buildTransaction(50.2, "Groceries", "My Account", "To Account"),
                         buildTransaction(20.2, "Groceries", "My Account", "To Account"),
@@ -129,47 +96,40 @@ public class BudgetAnalysisIT extends ProcessTestSetup {
                         buildTransaction(12, "Groceries", "My Account", "To Account"),
                         buildTransaction(13, "Groceries", "My Account", "To Account")
                 ));
+
+        Mockito.when(applicationSettings.getBudgetAnalysisMonths()).thenReturn(3);
         Mockito.when(applicationSettings.getMaximumBudgetDeviation()).thenReturn(0.05);
 
-        var response = processEngine.getRuntimeService()
-                .createProcessInstanceByKey("budget_analysis")
-                .setVariable("id", 1L)
-                .setVariable("scheduled", "2019-01-01")
-                .execute();
+        var execution = context.execute("budget_analysis", Variables.createVariables()
+                        .putValue("id", 1L)
+                        .putValue("scheduled", "2019-01-01"))
+                .<Boolean>yankVariables("deviates", value -> value.hasSize(2).allMatch(a-> a))
+                .<Number>yankVariables("deviation", value -> value.allMatch(v -> v.equals(-14.23)));
 
-        waitForSuspended(processEngine, response.getProcessInstanceId());
-
-        // Validate the process completed successfully
-        var variables = processEngine.getHistoryService()
-                .createHistoricVariableInstanceQuery()
-                .processInstanceId(response.getProcessInstanceId())
-                .variableName("deviation")
-                .list();
-
-        assertThat(variables)
-                .hasSize(2)
-                .anySatisfy(variable -> assertThat(variable.getValue()).isEqualTo(-14.23));
-
-        // Validate the tasks have been created according to the number of months
-
-        var tasks = processEngine.getTaskService()
-                .createTaskQuery()
-                .processInstanceId(response.getProcessInstanceId())
-                .active()
-                .taskDefinitionKey("handle_deviation")
-                .list();
-
-        assertThat(tasks)
-                .hasSize(1)
-                .anySatisfy(task -> {
-                    assertThat(task.getName()).isEqualTo("Handle deviation");
-                    assertThat(processEngine.getRuntimeService()
-                            .createVariableInstanceQuery()
-                            .processInstanceIdIn(response.getProcessInstanceId())
-                            .variableName("needed_correction")
-                            .list())
-                            .hasSize(1)
-                            .anySatisfy(variable -> assertThat(variable.getValue()).isEqualTo(-14.23));
-                });
+        execution.task("handle_deviation")
+                .verifyVariable("needed_correction", a -> Assertions.assertThat(a).isEqualTo(-14.23));
     }
+
+    public static Transaction buildTransaction(double amount, String description, String to, String from) {
+        return Transaction.builder()
+                .description(description)
+                .transactions(Collections.List(
+                        Transaction.Part.builder()
+                                .amount(amount)
+                                .account(Account.builder()
+                                        .id(1L)
+                                        .name(to)
+                                        .build())
+                                .build(),
+                        Transaction.Part.builder()
+                                .amount(-amount)
+                                .account(Account.builder()
+                                        .id(2L)
+                                        .name(from)
+                                        .build())
+                                .build()
+                ))
+                .build();
+    }
+
 }

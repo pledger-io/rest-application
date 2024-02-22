@@ -17,7 +17,7 @@
       <bpmn:extensionElements />
       <bpmn:incoming>Flow_0tlql11</bpmn:incoming>
       <bpmn:outgoing>Flow_0bh4qbk</bpmn:outgoing>
-      <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:asyncBefore="true" camunda:collection="${budgets}" camunda:elementVariable="budget" />
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="${budgets}" camunda:elementVariable="budget" />
       <bpmn:startEvent id="budget_start">
         <bpmn:outgoing>Flow_1lfnzjr</bpmn:outgoing>
       </bpmn:startEvent>
