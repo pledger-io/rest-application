@@ -1,13 +1,11 @@
 package com.jongsoft.finance.jpa.budget;
 
+import com.jongsoft.finance.jpa.core.entity.EntityJpa;
+import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
-import com.jongsoft.finance.jpa.core.entity.EntityJpa;
-
-import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import lombok.Builder;
 import lombok.Getter;
 

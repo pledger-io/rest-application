@@ -53,6 +53,7 @@ public class CreateBudgetHandler implements CommandHandler<CreateBudgetCommand> 
     }
 
     private Collection<ExpensePeriodJpa> createExpenses(BudgetJpa budget, Sequence<Budget.Expense> expenses) {
+        log.debug("Creating {} expenses for budget period {}", expenses.size(), budget.getFrom());
         return expenses.map(expense ->
                         ExpensePeriodJpa.builder()
                                 .budget(budget)

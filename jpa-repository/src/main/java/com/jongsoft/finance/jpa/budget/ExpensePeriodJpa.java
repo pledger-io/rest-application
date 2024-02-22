@@ -10,10 +10,12 @@ import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "budget_period")
 public class ExpensePeriodJpa extends EntityJpa {

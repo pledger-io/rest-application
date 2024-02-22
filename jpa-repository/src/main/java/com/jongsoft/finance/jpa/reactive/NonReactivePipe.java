@@ -8,6 +8,7 @@ import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.Function;
@@ -52,7 +53,11 @@ public class NonReactivePipe<T> extends JpaPipe<T, NonReactivePipe<T>> {
         return Control.Try(() -> (T) query.getSingleResult())
                 .map(converter)
                 .map(Control::Option)
-                .recover(e -> Control.Option())
+                .recover(e -> {
+                    LoggerFactory.getLogger(NonReactivePipe.class)
+                            .trace("Unable to find entity, cause: {}", e.getLocalizedMessage());
+                    return Control.Option();
+                })
                 .get();
     }
 

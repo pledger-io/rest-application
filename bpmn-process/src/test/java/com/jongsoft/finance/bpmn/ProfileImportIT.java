@@ -132,4 +132,15 @@ public class ProfileImportIT {
                 LocalDate.of(2018, 12, 31));
     }
 
+//    @Test
+//    @DisplayName("Import a profile with budgets")
+//    void runWithBudgets(RuntimeContext context) {
+//        context
+//            .withStorage()
+//            .withStorage("my-sample-token", "/profile-test/budget-only.json");
+//
+//        context.execute("ImportUserProfile", Map.of(
+//                "storageToken", "my-sample-token"))
+//                .verifyCompleted();
+//    }
 }

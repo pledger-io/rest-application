@@ -7,6 +7,7 @@ import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.budget.CloseBudgetCommand;
 import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
 import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
+import com.jongsoft.finance.messaging.commands.budget.UpdateExpenseCommand;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import lombok.AllArgsConstructor;
@@ -57,6 +58,17 @@ public class Budget implements AggregateBase {
                             .setScale(0, RoundingMode.CEILING)
                             .doubleValue())
                     .build();
+        }
+
+        @BusinessMethod
+        public void updateExpense(double expectedExpense) {
+            lowerBound = expectedExpense - .01;
+            upperBound = expectedExpense;
+
+            EventBus.getBus()
+                    .send(new UpdateExpenseCommand(
+                            id,
+                            BigDecimal.valueOf(expectedExpense)));
         }
 
         public double computeBudget() {

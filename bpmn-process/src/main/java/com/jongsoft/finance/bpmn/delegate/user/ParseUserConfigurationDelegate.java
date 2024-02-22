@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.user;
 
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.serialized.BudgetJson;
 import com.jongsoft.finance.serialized.ExportJson;
 import com.jongsoft.finance.serialized.RuleConfigJson;
 import com.jongsoft.lang.Control;
@@ -11,6 +12,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -51,8 +53,12 @@ public class ParseUserConfigurationDelegate implements JavaDelegate {
             execution.setVariableLocal("ruleStorageToken", null);
         }
 
+        var sortedBudgets = profileJson.getBudgetPeriods().stream()
+                .sorted(Comparator.comparing(BudgetJson::getStart))
+                .toList();
+
         execution.setVariableLocal("accounts", serialize(profileJson.getAccounts()));
-        execution.setVariableLocal("budgetPeriods", serialize(profileJson.getBudgetPeriods()));
+        execution.setVariableLocal("budgetPeriods", serialize(sortedBudgets));
         execution.setVariableLocal("contracts", serialize(profileJson.getContracts()));
         execution.setVariableLocal("categories", serialize(profileJson.getCategories()));
         execution.setVariableLocal("tags", Control.Option(profileJson.getTags()).getOrSupply(List::of));

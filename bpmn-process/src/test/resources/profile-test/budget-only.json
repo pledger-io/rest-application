@@ -1,0 +1,151 @@
+{
+  "budgetPeriods": [
+    {
+      "start": "2011-12-31",
+      "end": "2012-12-31",
+      "expectedIncome": 2500.0,
+      "expenses": [
+        {
+          "name": "Sparen",
+          "lowerBound": 50.0,
+          "upperBound": 150.0
+        },
+        {
+          "name": "Vervoer",
+          "lowerBound": 300.0,
+          "upperBound": 500.0
+        },
+        {
+          "name": "Abonnementen",
+          "lowerBound": 100.0,
+          "upperBound": 200.0
+        },
+        {
+          "name": "Huishoudelijke kosten",
+          "lowerBound": 700.0,
+          "upperBound": 800.0
+        },
+        {
+          "name": "Boodschappen",
+          "lowerBound": 250.0,
+          "upperBound": 350.0
+        }
+      ]
+    },
+    {
+      "start": "2012-12-31",
+      "end": "2016-05-31",
+      "expectedIncome": 3000.0,
+      "expenses": [
+        {
+          "name": "Vervoer",
+          "lowerBound": 360.0,
+          "upperBound": 600.0
+        },
+        {
+          "name": "Boodschappen",
+          "lowerBound": 300.0,
+          "upperBound": 420.0
+        },
+        {
+          "name": "Abonnementen",
+          "lowerBound": 120.0,
+          "upperBound": 240.0
+        },
+        {
+          "name": "Sparen",
+          "lowerBound": 60.0,
+          "upperBound": 180.0
+        },
+        {
+          "name": "Huishoudelijke kosten",
+          "lowerBound": 840.0,
+          "upperBound": 1440.0
+        }
+      ]
+    },
+    {
+      "start": "2016-05-31",
+      "end": "2018-07-31",
+      "expectedIncome": 3100.0,
+      "expenses": [
+        {
+          "name": "Huishoudelijke kosten",
+          "lowerBound": 868.0,
+          "upperBound": 1488.0
+        },
+        {
+          "name": "Vervoer",
+          "lowerBound": 372.0,
+          "upperBound": 620.0
+        },
+        {
+          "name": "Abonnementen",
+          "lowerBound": 124.0,
+          "upperBound": 248.0
+        },
+        {
+          "name": "Boodschappen",
+          "lowerBound": 310.0,
+          "upperBound": 434.0
+        },
+        {
+          "name": "Sparen",
+          "lowerBound": 62.0,
+          "upperBound": 186.0
+        }
+      ]
+    },
+    {
+      "start": "2018-07-31",
+      "expectedIncome": 3600.0,
+      "expenses": [
+        {
+          "name": "Vervoer",
+          "lowerBound": 432.0,
+          "upperBound": 720.0
+        },
+        {
+          "name": "Gezondheid & persoonlijke verzorging",
+          "lowerBound": 99.99,
+          "upperBound": 100.0
+        },
+        {
+          "name": "Restaurants & Bars",
+          "lowerBound": 199.99,
+          "upperBound": 200.0
+        },
+        {
+          "name": "Sparen",
+          "lowerBound": 72.0,
+          "upperBound": 216.0
+        },
+        {
+          "name": "Abonnementen",
+          "lowerBound": 144.0,
+          "upperBound": 288.0
+        },
+        {
+          "name": "Winkelen",
+          "lowerBound": 399.99,
+          "upperBound": 400.0
+        },
+        {
+          "name": "Vrije tijd",
+          "lowerBound": 149.99,
+          "upperBound": 150.0
+        },
+        {
+          "name": "Boodschappen",
+          "lowerBound": 360.0,
+          "upperBound": 504.0
+        },
+        {
+          "name": "Huishoudelijke kosten",
+          "lowerBound": 1008.0,
+          "upperBound": 1200.0
+        }
+      ]
+    }
+  ]
+}
