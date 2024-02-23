@@ -233,7 +233,7 @@ When calling the flow the following variables must be set:
       </bpmn:userTask>
       <bpmn:sequenceFlow id="Flow_0upo10t" sourceRef="start_create_transaction" targetRef="read_transaction_storage" />
       <bpmn:sequenceFlow id="Flow_17ta9lo" sourceRef="read_transaction_storage" targetRef="locate_account_mapping" />
-      <bpmn:serviceTask id="locate_account_mapping" name="Locate account in mapping" camunda:class="com.jongsoft.finance.bpmn.delegate.importer.LocateAccountInMapping">
+      <bpmn:serviceTask id="locate_account_mapping" name="Locate account in mapping" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.LocateAccountInMapping" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${locateAccountInMapping}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
             <camunda:inputParameter name="name">${transaction.opposingName}</camunda:inputParameter>

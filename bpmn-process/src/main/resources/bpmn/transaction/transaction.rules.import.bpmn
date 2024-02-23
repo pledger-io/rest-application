@@ -72,6 +72,7 @@
         <bpmn:sequenceFlow id="SequenceFlow_1owrbto" sourceRef="determineAccountTask" targetRef="persistChangeTask" />
         <bpmn:endEvent id="processChangeEnd">
           <bpmn:incoming>SequenceFlow_19r3dzy</bpmn:incoming>
+          <bpmn:incoming>entity_not_found</bpmn:incoming>
         </bpmn:endEvent>
         <bpmn:sequenceFlow id="SequenceFlow_19r3dzy" sourceRef="persistChangeTask" targetRef="processChangeEnd" />
         <bpmn:serviceTask id="determineAccountTask" name="Determine account" camunda:delegateExpression="${processAccountLookupDelegate}">
@@ -133,15 +134,13 @@
           <bpmn:incoming>sf_determineCategory</bpmn:incoming>
           <bpmn:outgoing>Flow_0va4wh6</bpmn:outgoing>
         </bpmn:serviceTask>
-        <bpmn:sequenceFlow id="Flow_0va4wh6" sourceRef="determineCategoryTask" targetRef="compute_entity_id" />
+        <bpmn:sequenceFlow id="Flow_0va4wh6" sourceRef="determineCategoryTask" targetRef="check_entity" />
         <bpmn:sequenceFlow id="Flow_0vivaah" sourceRef="compute_entity_id" targetRef="persistChangeTask" />
         <bpmn:serviceTask id="compute_entity_id" name="Grab Entity Id as String" camunda:expression="${entity.getId().toString()}" camunda:resultVariable="id">
-          <bpmn:incoming>Flow_0va4wh6</bpmn:incoming>
-          <bpmn:incoming>Flow_03rhrc4</bpmn:incoming>
-          <bpmn:incoming>Flow_1rdo73q</bpmn:incoming>
+          <bpmn:incoming>entity_exists</bpmn:incoming>
           <bpmn:outgoing>Flow_0vivaah</bpmn:outgoing>
         </bpmn:serviceTask>
-        <bpmn:sequenceFlow id="Flow_03rhrc4" sourceRef="lookupRelevantBudget" targetRef="compute_entity_id" />
+        <bpmn:sequenceFlow id="Flow_03rhrc4" sourceRef="lookupRelevantBudget" targetRef="check_entity" />
         <bpmn:serviceTask id="lookupRelevantBudget" name="Determine budget" camunda:modelerTemplate="com.jongsoft.finance.bpmn.budget.BudgetLookup" camunda:delegateExpression="${processBudgetLookupDelegate}">
           <bpmn:extensionElements>
             <camunda:inputOutput>
@@ -163,7 +162,18 @@
           <bpmn:incoming>sf_contract_lookup</bpmn:incoming>
           <bpmn:outgoing>Flow_1rdo73q</bpmn:outgoing>
         </bpmn:serviceTask>
-        <bpmn:sequenceFlow id="Flow_1rdo73q" sourceRef="locateContract" targetRef="compute_entity_id" />
+        <bpmn:sequenceFlow id="Flow_1rdo73q" sourceRef="locateContract" targetRef="check_entity" />
+        <bpmn:exclusiveGateway id="check_entity" name="entity exists" default="entity_not_found">
+          <bpmn:incoming>Flow_0va4wh6</bpmn:incoming>
+          <bpmn:incoming>Flow_03rhrc4</bpmn:incoming>
+          <bpmn:incoming>Flow_1rdo73q</bpmn:incoming>
+          <bpmn:outgoing>entity_exists</bpmn:outgoing>
+          <bpmn:outgoing>entity_not_found</bpmn:outgoing>
+        </bpmn:exclusiveGateway>
+        <bpmn:sequenceFlow id="entity_exists" name="yes" sourceRef="check_entity" targetRef="compute_entity_id">
+          <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${entity != null &amp;&amp; entity.getId() != null}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="entity_not_found" name="no" sourceRef="check_entity" targetRef="processChangeEnd" />
       </bpmn:subProcess>
       <bpmn:sequenceFlow id="SequenceFlow_1btdqvl" sourceRef="processRuleConfiguration" targetRef="hasGroup" />
       <bpmn:sequenceFlow id="SequenceFlow_03zw3cp" sourceRef="buildChangeSubProcess" targetRef="Task_1cw86mx" />
@@ -284,24 +294,30 @@
       <bpmndi:BPMNShape id="Activity_0kccv3o_di" bpmnElement="locateContract">
         <dc:Bounds x="1651" y="390" width="100" height="80" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_00b68d3_di" bpmnElement="check_entity" isMarkerVisible="true">
+        <dc:Bounds x="1895" y="605" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1891" y="665" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_0tlb203_di" bpmnElement="SequenceFlow_0tlb203">
         <di:waypoint x="1429" y="430" />
         <di:waypoint x="1506" y="430" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1tk5jhy_di" bpmnElement="sf_determineAccount">
-        <di:waypoint x="1540" y="414" />
-        <di:waypoint x="1540" y="330" />
+        <di:waypoint x="1550" y="424" />
+        <di:waypoint x="1550" y="330" />
         <di:waypoint x="1651" y="330" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1519" y="366" width="21" height="14" />
+          <dc:Bounds x="1529" y="371" width="21" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0co9o7z_di" bpmnElement="sf_determineBudget">
-        <di:waypoint x="1541" y="445" />
-        <di:waypoint x="1541" y="530" />
+        <di:waypoint x="1550" y="436" />
+        <di:waypoint x="1550" y="530" />
         <di:waypoint x="1651" y="530" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1561" y="586" width="35" height="14" />
+          <dc:Bounds x="1567" y="586" width="35" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_04kbwr8_di" bpmnElement="sf_determineCategory">
@@ -344,8 +360,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0va4wh6_di" bpmnElement="Flow_0va4wh6">
         <di:waypoint x="1751" y="630" />
-        <di:waypoint x="1920" y="630" />
-        <di:waypoint x="1920" y="520" />
+        <di:waypoint x="1895" y="630" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0vivaah_di" bpmnElement="Flow_0vivaah">
         <di:waypoint x="1970" y="480" />
@@ -356,14 +371,29 @@
       <bpmndi:BPMNEdge id="Flow_03rhrc4_di" bpmnElement="Flow_03rhrc4">
         <di:waypoint x="1751" y="530" />
         <di:waypoint x="1811" y="530" />
-        <di:waypoint x="1811" y="480" />
-        <di:waypoint x="1870" y="480" />
+        <di:waypoint x="1811" y="630" />
+        <di:waypoint x="1895" y="630" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1rdo73q_di" bpmnElement="Flow_1rdo73q">
         <di:waypoint x="1751" y="430" />
         <di:waypoint x="1811" y="430" />
-        <di:waypoint x="1811" y="470" />
-        <di:waypoint x="1870" y="470" />
+        <di:waypoint x="1811" y="630" />
+        <di:waypoint x="1895" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_045o8yc_di" bpmnElement="entity_exists">
+        <di:waypoint x="1920" y="605" />
+        <di:waypoint x="1920" y="520" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1927" y="560" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1t6r9sc_di" bpmnElement="entity_not_found">
+        <di:waypoint x="1945" y="630" />
+        <di:waypoint x="2201" y="630" />
+        <di:waypoint x="2201" y="418" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2067" y="612" width="13" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_1djjkjl_di" bpmnElement="analyzeRuleEnd">
         <dc:Bounds x="2543" y="403" width="36" height="36" />

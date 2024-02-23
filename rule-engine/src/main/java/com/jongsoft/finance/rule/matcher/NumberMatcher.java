@@ -1,8 +1,8 @@
 package com.jongsoft.finance.rule.matcher;
 
-import java.util.function.Supplier;
-
 import com.jongsoft.finance.core.RuleOperation;
+
+import java.util.function.Supplier;
 
 public class NumberMatcher implements ConditionMatcher {
 
@@ -12,6 +12,10 @@ public class NumberMatcher implements ConditionMatcher {
     public ConditionMatcher prepare(RuleOperation operation, String expectation, Object actual) {
         var checkAmount = Double.parseDouble(expectation);
         var castedActual = (Double) actual;
+        if (castedActual == null) {
+            innerMatcher = () -> false;
+            return this;
+        }
 
         innerMatcher = switch (operation) {
             case LESS_THAN -> () -> castedActual < checkAmount;
