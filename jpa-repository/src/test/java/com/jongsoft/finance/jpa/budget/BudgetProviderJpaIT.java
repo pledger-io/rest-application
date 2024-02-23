@@ -38,7 +38,8 @@ class BudgetProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_201901() throws IOException {
-        var check = budgetProvider.lookup(2019, 1).get();
+        var check = budgetProvider.lookup(2019, 1)
+                .get();
 
         Assertions.assertThat(check.getExpenses()).hasSize(2);
         Assertions.assertThat(check.getExpectedIncome()).isEqualTo(2500);

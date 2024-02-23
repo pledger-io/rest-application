@@ -53,12 +53,16 @@ public class ParseUserConfigurationDelegate implements JavaDelegate {
             execution.setVariableLocal("ruleStorageToken", null);
         }
 
-        var sortedBudgets = profileJson.getBudgetPeriods().stream()
-                .sorted(Comparator.comparing(BudgetJson::getStart))
-                .toList();
+        if (profileJson.getBudgetPeriods() != null) {
+            var sortedBudgets = profileJson.getBudgetPeriods().stream()
+                    .sorted(Comparator.comparing(BudgetJson::getStart))
+                    .toList();
+            execution.setVariableLocal("budgetPeriods", serialize(sortedBudgets));
+        } else {
+            execution.setVariableLocal("budgetPeriods", List.of());
+        }
 
         execution.setVariableLocal("accounts", serialize(profileJson.getAccounts()));
-        execution.setVariableLocal("budgetPeriods", serialize(sortedBudgets));
         execution.setVariableLocal("contracts", serialize(profileJson.getContracts()));
         execution.setVariableLocal("categories", serialize(profileJson.getCategories()));
         execution.setVariableLocal("tags", Control.Option(profileJson.getTags()).getOrSupply(List::of));

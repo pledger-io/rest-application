@@ -47,7 +47,7 @@ public class BudgetProviderJpa implements BudgetProvider {
                 select b from BudgetJpa b
                 where b.user.username = :username
                     and b.from <= :start
-                    and (b.until is null or b.until > :end)""";
+                    and (b.until is null or b.until >= :end)""";
 
         return reactiveEntityManager.<BudgetJpa>blocking()
                 .hql(hql)
