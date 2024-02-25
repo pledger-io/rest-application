@@ -39,6 +39,12 @@
       "items": {
         "type": "string"
       }
+    },
+    "transactions": {
+      "type": "array",
+      "items": {
+        "$ref": "https://www.pledger.io/schemas/transaction.schema.json"
+      }
     }
   }
 }

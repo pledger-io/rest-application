@@ -9,7 +9,9 @@ import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Category;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.DataProvider;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.serialized.*;
 import com.jongsoft.lang.Collections;
@@ -37,6 +39,8 @@ public class ProfileExportResource {
     private final List<Exportable<?>> exportable;
     private final List<DataProvider<?>> dataProviders;
     private final StorageService storageService;
+    private final TransactionProvider transactionProvider;
+    private final FilterFactory filterFactory;
 
     @Get
     @Operation(
@@ -65,6 +69,7 @@ public class ProfileExportResource {
                                 rule,
                                 this::loadRelation))
                         .toJava())
+                .transactions(lookupRelevantTransactions())
                 .build();
 
         return HttpResponse.ok(exportJson)
@@ -72,7 +77,7 @@ public class ProfileExportResource {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private <T> Sequence<T> lookupAllOf(Class<T> forClass) {
         for (Exportable exporter : exportable) {
             if (exporter.supports(forClass)) {
@@ -83,7 +88,21 @@ public class ProfileExportResource {
         return Collections.List();
     }
 
-    @SuppressWarnings("unchecked")
+    private List<TransactionJson> lookupRelevantTransactions() {
+        // we also want to export all opening balance transactions for liability accounts
+        var filter = filterFactory.transaction()
+                .page(0)
+                .pageSize(Integer.MAX_VALUE)
+                .onlyIncome(false)
+                .description("Opening balance", true);
+
+        return transactionProvider.lookup(filter)
+                .content()
+                .map(TransactionJson::fromDomain)
+                .toJava();
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private String loadRelation(RuleColumn column, String value) {
         if (column == RuleColumn.TAGS) {
             return value;

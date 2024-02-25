@@ -20,5 +20,6 @@ public class ExportJson implements Serializable {
     private List<BudgetJson> budgetPeriods;
     private List<ContractJson> contracts;
     private List<String> tags;
+    private List<TransactionJson> transactions;
 
 }
