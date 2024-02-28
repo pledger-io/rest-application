@@ -93,7 +93,6 @@ public class ProfileExportResource {
         var filter = filterFactory.transaction()
                 .page(0)
                 .pageSize(Integer.MAX_VALUE)
-                .onlyIncome(false)
                 .description("Opening balance", true);
 
         return transactionProvider.lookup(filter)
