@@ -313,5 +313,48 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Transaction: Create from TransactionJSON",
+    "id": "com.jongsoft.finance.bpmn.delegate.scheduler.ImportTransactionJsonDelegate",
+    "description": "Create a transaction in the application using a JSON representation stored on disk.",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${importTransactionJsonDelegate}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Transaction",
+        "description": "The JSON transaction.",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "transaction"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Transaction id",
+        "description": "The id of the created transaction",
+        "type": "String",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${transactionId}"
+        }
+      }
+    ]
   }
 ]

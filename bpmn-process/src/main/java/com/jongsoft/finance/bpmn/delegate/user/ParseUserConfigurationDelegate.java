@@ -62,11 +62,15 @@ public class ParseUserConfigurationDelegate implements JavaDelegate {
             execution.setVariableLocal("budgetPeriods", List.of());
         }
 
+        execution.setVariableLocal("transactions", Control.Option(profileJson.getTransactions())
+                    .getOrSupply(List::of));
+
         execution.setVariableLocal("accounts", serialize(profileJson.getAccounts()));
         execution.setVariableLocal("contracts", serialize(profileJson.getContracts()));
         execution.setVariableLocal("categories", serialize(profileJson.getCategories()));
         execution.setVariableLocal("tags", Control.Option(profileJson.getTags()).getOrSupply(List::of));
     }
+
 
     List<String> serialize(List<?> input) {
         if (input == null) {

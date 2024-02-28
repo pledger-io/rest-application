@@ -1,0 +1,21 @@
+{
+  "$schema": "https://www.pledger.io/schemas/profile.schema.json",
+  "transactions": [
+    {
+      "date": "2018-01-01",
+      "amount": 89.00,
+      "currency": "EUR",
+      "description": "Some groceries",
+      "fromAccount": "My personal account",
+      "toAccount": "Groceries are us"
+    },
+    {
+      "date": "2018-02-12",
+      "amount": 11.22,
+      "currency": "EUR",
+      "description": "Some more shopping",
+      "fromAccount": "My personal account",
+      "toAccount": "Groceries are us"
+    }
+  ]
+}

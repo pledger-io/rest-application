@@ -58,16 +58,12 @@ public class ProfileImportIT {
         process.verifyCompleted();
 
         context
-            .verifyRuleCreated("Groceries matcher", rule -> {
-                rule.extracting("conditions")
-                        .isInstanceOf(Sequence.class)
-                        .satisfies(conditions -> {
-                            Assertions.assertThat((Sequence<?>)conditions)
-                                    .hasSize(3)
-                                    .extracting("field")
-                                    .containsExactly(RuleColumn.DESCRIPTION, RuleColumn.AMOUNT, RuleColumn.AMOUNT);
-                        });
-            });
+            .verifyRuleCreated("Groceries matcher", rule -> rule.extracting("conditions")
+                    .isInstanceOf(Sequence.class)
+                    .satisfies(conditions -> Assertions.assertThat((Sequence<?>)conditions)
+                            .hasSize(3)
+                            .extracting("field")
+                            .containsExactly(RuleColumn.DESCRIPTION, RuleColumn.AMOUNT, RuleColumn.AMOUNT)));
     }
 
     @Test
@@ -130,6 +126,44 @@ public class ProfileImportIT {
                 "Monthly cable subscription",
                 LocalDate.of(2018, 1, 1),
                 LocalDate.of(2018, 12, 31));
+    }
+
+    @Test
+    void runWithTransactions(RuntimeContext context) {
+        context
+            .withTransactions()
+            .withStorage()
+            .withStorage("my-sample-token", "/profile-test/transactions-only.json")
+            .withAccount(Account.builder()
+                        .id(1L)
+                        .name("Groceries are us")
+                        .currency("EUR")
+                        .type("creditor")
+                        .build())
+            .withAccount(Account.builder()
+                    .id(2L)
+                    .name("My personal account")
+                    .currency("EUR")
+                    .type("checking")
+                    .build());
+
+        var process = context.execute("ImportUserProfile", Map.of(
+                "storageToken", "my-sample-token"
+        ));
+
+        process.verifyCompleted();
+
+        context
+            .verifyTransactions(transactions ->
+                    transactions.hasSize(2)
+                            .anySatisfy(transaction -> {
+                                Assertions.assertThat(transaction.getDescription()).isEqualTo("Some groceries");
+                                Assertions.assertThat(transaction.getDate()).isEqualTo(LocalDate.of(2018, 1, 1));
+                            })
+                            .anySatisfy(transaction -> {
+                                Assertions.assertThat(transaction.getDescription()).isEqualTo("Some more shopping");
+                                Assertions.assertThat(transaction.getDate()).isEqualTo(LocalDate.of(2018, 2, 12));
+                            }));
     }
 
 //    @Test
