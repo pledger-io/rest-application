@@ -28,6 +28,7 @@ import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 @Controller("/api/profile/export")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -53,21 +54,16 @@ public class ProfileExportResource {
         var exportJson = ExportJson.builder()
                 .accounts(lookupAllOf(Account.class)
                         .map(account -> AccountJson.fromDomain(
-                                account,
-                                () -> storageService.read(account.getImageFileToken()).get()))
+                                account, loadFromStorage(account.getImageFileToken())))
                         .toJava())
                 .budgetPeriods(lookupAllOf(Budget.class).map(BudgetJson::fromDomain).toJava())
                 .categories(lookupAllOf(Category.class).map(CategoryJson::fromDomain).toJava())
                 .tags(lookupAllOf(Tag.class).map(Tag::name).toJava())
                 .contracts(lookupAllOf(Contract.class)
-                        .map(c -> ContractJson.fromDomain(
-                                c,
-                                () -> storageService.read(c.getFileToken()).get()))
+                        .map(c -> ContractJson.fromDomain(c, loadFromStorage(c.getFileToken())))
                         .toJava())
                 .rules(lookupAllOf(TransactionRule.class)
-                        .map(rule -> RuleConfigJson.RuleJson.fromDomain(
-                                rule,
-                                this::loadRelation))
+                        .map(rule -> RuleConfigJson.RuleJson.fromDomain(rule, this::loadRelation))
                         .toJava())
                 .transactions(lookupRelevantTransactions())
                 .build();
@@ -75,6 +71,10 @@ public class ProfileExportResource {
         return HttpResponse.ok(exportJson)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + exportFileName + "\"")
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+    }
+
+    private Supplier<byte[]> loadFromStorage(String fileToken) {
+        return () -> storageService.read(fileToken).getOrSupply(() -> new byte[0]);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
