@@ -1,24 +1,17 @@
 package com.jongsoft.finance.bpmn.process;
 
-import com.jongsoft.finance.messaging.EventBus;
 import io.micronaut.context.annotation.Property;
-import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.test.extensions.junit5.MicronautJunit5Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.mockito.Mockito;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class ProcessTestExtension extends MicronautJunit5Extension {
-
-    static {
-        new EventBus(Mockito.mock(ApplicationEventPublisher.class));
-    }
 
     public interface ProcessExecution<T extends ProcessExecution> {
         ProcessExecution<?> obtainChildProcess(String processKey);

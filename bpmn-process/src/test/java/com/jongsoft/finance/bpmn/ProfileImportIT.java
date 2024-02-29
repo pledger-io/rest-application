@@ -4,6 +4,7 @@ import com.jongsoft.finance.bpmn.process.ProcessExtension;
 import com.jongsoft.finance.bpmn.process.RuntimeContext;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.lang.collection.Sequence;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -100,7 +101,8 @@ public class ProfileImportIT {
 
         context
             .verifyTagCreated("cat")
-            .verifyTagCreated("dog");
+            .verifyTagCreated("dog")
+            .verifyTagCreated("charity");
     }
 
     @Test
@@ -166,15 +168,31 @@ public class ProfileImportIT {
                             }));
     }
 
-//    @Test
-//    @DisplayName("Import a profile with budgets")
-//    void runWithBudgets(RuntimeContext context) {
-//        context
-//            .withStorage()
-//            .withStorage("my-sample-token", "/profile-test/budget-only.json");
-//
-//        context.execute("ImportUserProfile", Map.of(
-//                "storageToken", "my-sample-token"))
-//                .verifyCompleted();
-//    }
+    @Test
+    @DisplayName("Import a profile with budgets")
+    @SuppressWarnings("unchecked")
+    void runWithBudgets(RuntimeContext context) {
+        context
+            .withBudgets()
+            .withStorage()
+            .withStorage("my-sample-token", "/profile-test/budget-only.json");
+        context.execute("ImportUserProfile", Map.of(
+                "storageToken", "my-sample-token"))
+                .verifyCompleted();
+
+        context.verifyBudget(LocalDate.parse("2011-12-01"), budget -> {
+            budget.extracting("expectedIncome", "start")
+                    .containsExactlyInAnyOrder(2500D, LocalDate.parse("2011-12-01"));
+
+            budget.extracting("expenses")
+                    .satisfies(expenses -> {
+                        Assertions.assertThat((Sequence<Budget.Expense>) expenses)
+                                .extracting(Budget.Expense::getName)
+                                .containsExactlyInAnyOrder("Sparen", "Vervoer", "Abonnementen", "Huishoudelijke kosten", "Boodschappen");
+                    });
+        });
+        context.verifyBudget(LocalDate.parse("2012-12-01"), budget ->
+                budget.extracting("expectedIncome", "start")
+                        .containsExactlyInAnyOrder(3000D, LocalDate.parse("2012-12-01")));
+    }
 }

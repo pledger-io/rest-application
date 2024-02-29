@@ -15,6 +15,8 @@ import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.messaging.EventBus;
+import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
 import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
 import com.jongsoft.finance.providers.*;
@@ -24,6 +26,7 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.context.ApplicationContext;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.core.reflect.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.mutable.MutableLong;
@@ -36,16 +39,15 @@ import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.OngoingStubbing;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Slf4j
 public class RuntimeContext {
 
     private ApplicationContext applicationContext;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     private ProcessEngine processEngine;
 
@@ -53,6 +55,7 @@ public class RuntimeContext {
 
     private final List<String> storageTokens;
     private final MutableLong idGenerator;
+    private final List<Budget> registeredBudgets;
 
     public RuntimeContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
@@ -64,7 +67,9 @@ public class RuntimeContext {
                 .roles(Collections.List(new Role("admin")))
                 .build());
         this.processEngine = applicationContext.getBean(ProcessEngine.class);
+        this.applicationEventPublisher = Mockito.spy(applicationContext.getBean(ApplicationEventPublisher.class));
         idGenerator = new MutableLong(100);
+        registeredBudgets = new ArrayList<>();
 
         setupDefaultMocks();
     }
@@ -72,6 +77,7 @@ public class RuntimeContext {
     void clean() {
         processEngine.close();
         storageTokens.clear();
+        registeredBudgets.clear();
     }
 
     public RuntimeContext withStorage() {
@@ -95,6 +101,34 @@ public class RuntimeContext {
         Mockito.when(applicationContext.getBean(StorageService.class).read(token))
                 .thenReturn(Control.Option(bytes));
 
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    public RuntimeContext withBudgets() {
+        var budgetProvider = applicationContext.getBean(BudgetProvider.class);
+        Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt()))
+                .thenAnswer(invocation -> {
+                    var date = LocalDate.of(invocation.getArgument(0), invocation.getArgument(1, Integer.class), 1);
+
+                    return Control.Option(registeredBudgets.stream()
+                            .filter(budget -> budget.getStart().isBefore(date) || budget.getStart().isEqual(date))
+                            .max(Comparator.comparing(Budget::getStart))
+                            .orElse(null));
+                });
+
+        Mockito.doAnswer((Answer<Void>) invocation -> {
+                    var createCommand = invocation.getArgument(0, CreateBudgetCommand.class);
+
+                    var budget = Budget.builder()
+                            .start(createCommand.budget().getStart())
+                            .expectedIncome(createCommand.budget().getExpectedIncome())
+                            .id(idGenerator.getAndIncrement())
+                            .expenses(Collections.List())
+                            .build();
+                    registeredBudgets.add(budget);
+                    return null;
+                }).when(applicationEventPublisher).publishEvent(Mockito.any(CreateBudgetCommand.class));
         return this;
     }
 
@@ -232,12 +266,24 @@ public class RuntimeContext {
         return this;
     }
 
+    /**
+     * Verifies if a category with the specified name has been created.
+     *
+     * @param name the name of the category to be verified
+     * @return the current RuntimeContext instance
+     */
     public RuntimeContext verifyCategoryCreated(String name) {
         Mockito.verify(userAccount, Mockito.atMostOnce())
                 .createCategory(name);
         return this;
     }
 
+    /**
+     * Verifies the transactions by performing validations provided by the consumer.
+     *
+     * @param validations the consumer that accepts a ListAssert<Transaction> for performing validations
+     * @return the RuntimeContext instance
+     */
     public RuntimeContext verifyTransactions(Consumer<ListAssert<Transaction>> validations) {
         var createdTransactions = Mockito.mockingDetails(applicationContext.getBean(TransactionCreationHandler.class)).getInvocations().stream()
                 .filter(invocation -> invocation.getMethod().getName().equals("handleCreatedEvent"))
@@ -250,9 +296,31 @@ public class RuntimeContext {
         return this;
     }
 
+    /**
+     * Verifies that all storage tokens have been cleaned.
+     *
+     * @return The RuntimeContext object.
+     */
     public RuntimeContext verifyStorageCleaned() {
         storageTokens.forEach(token ->
                 Mockito.verify(applicationContext.getBean(StorageService.class)).remove(token));
+        return this;
+    }
+
+    /**
+     * Verifies the budget for the specified start date.
+     *
+     * @param startDate the start date of the budget to verify
+     * @param validations the consumer function that performs assertions on the budget
+     * @return the current RuntimeContext object
+     */
+    public RuntimeContext verifyBudget(LocalDate startDate, Consumer<ObjectAssert<Budget>> validations) {
+        validations.accept(
+                Assertions.assertThat(registeredBudgets.stream()
+                                .filter(budget -> budget.getStart().equals(startDate))
+                                .findFirst()
+                                .orElseThrow(() -> new AssertionError("Budget not found for start date: " + startDate)))
+                        .as("Budget created for start date: " + startDate));
         return this;
     }
 
@@ -282,6 +350,7 @@ public class RuntimeContext {
 
     void resetMocks() {
         Mockito.reset(
+                applicationContext.getBean(BudgetProvider.class),
                 applicationContext.getBean(AuthenticationFacade.class),
                 applicationContext.getBean(CurrentUserProvider.class),
                 applicationContext.getBean(AccountProvider.class),
@@ -302,6 +371,8 @@ public class RuntimeContext {
                 .thenReturn("test-user");
         Mockito.when(applicationContext.getBean(CurrentUserProvider.class).currentUser())
                 .thenReturn(userAccount);
+
+        new EventBus(applicationEventPublisher);
 
         // Prepare the mocks for the filter factory
         var filterFactory = applicationContext.getBean(FilterFactory.class);
