@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Builder;
 
+import java.time.LocalDate;
+
 @Builder
 @Serdeable.Deserializable
 class BudgetCreateRequest {
@@ -19,10 +21,16 @@ class BudgetCreateRequest {
     @Min(0)
     private double income;
 
+    public LocalDate getStart() {
+        return LocalDate.of(year, month, 1);
+    }
+
+    @Deprecated
     public int getYear() {
         return year;
     }
 
+    @Deprecated
     public int getMonth() {
         return month;
     }

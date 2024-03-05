@@ -120,7 +120,7 @@ public class Budget implements AggregateBase {
 
     @BusinessMethod
     public Budget indexBudget(LocalDate perDate, double expectedIncome) {
-        if (!Objects.equals(this.expectedIncome, expectedIncome)) {
+        if (!Objects.equals(this.start, perDate)) {
             this.close(perDate);
 
             var deviation = BigDecimal.ONE

@@ -36,7 +36,7 @@ import java.util.Currency;
 @MicronautTest(environments = {"no-camunda", "test"})
 public class TestSetup {
 
-    protected final UserAccount ACTIVE_USER = UserAccount.builder()
+    protected final UserAccount ACTIVE_USER = Mockito.spy(UserAccount.builder()
             .id(1L)
             .username("test-user")
             .password("1234")
@@ -44,7 +44,7 @@ public class TestSetup {
             .primaryCurrency(Currency.getInstance("EUR"))
             .secret(Base32.random())
             .roles(Collections.List(new Role("admin")))
-            .build();
+            .build());
 
     @Inject
     protected CurrentUserProvider currentUserProvider;
@@ -84,7 +84,7 @@ public class TestSetup {
                 .build();
 
         Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
-        Mockito.when(authenticationFacade.authenticated()).thenReturn(ACTIVE_USER.getUsername());
+        Mockito.when(authenticationFacade.authenticated()).thenReturn("test-user");
         Mockito.when(userProvider.lookup(ACTIVE_USER.getUsername())).thenReturn(Control.Option(ACTIVE_USER));
 
         // initialize the event bus

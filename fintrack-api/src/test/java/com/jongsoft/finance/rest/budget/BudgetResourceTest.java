@@ -9,21 +9,30 @@ import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
+import io.micronaut.core.reflect.ReflectionUtils;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.test.annotation.MockBean;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.mutable.MutableLong;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@DisplayName("Budget resources")
-class BudgetResourceTest extends TestSetup {
+@DisplayName("Budget resource")
+public class BudgetResourceTest extends TestSetup {
 
     @Inject
     private BudgetProvider budgetProvider;
@@ -50,9 +59,24 @@ class BudgetResourceTest extends TestSetup {
         return Mockito.mock(TransactionProvider.class);
     }
 
+    private List<Budget> knownBudgets;
+
+    @BeforeEach
+    void setup() {
+        knownBudgets = new ArrayList<>();
+
+        Mockito.doAnswer(invocation -> {
+            var date = LocalDate.of(invocation.getArgument(0), invocation.getArgument(1, Integer.class), 1);
+            return Control.Option(knownBudgets.stream()
+                    .filter(budget -> budget.getStart().isBefore(date) || budget.getStart().isEqual(date))
+                    .max(Comparator.comparing(Budget::getStart))
+                    .orElse(null));
+        }).when(budgetProvider).lookup(Mockito.anyInt(), Mockito.anyInt());
+    }
+
     @Test
-    @DisplayName("Fetch date earliest known budgetFirst")
-    void firstBudget(RequestSpecification spec) {
+    @DisplayName("First budget date when a budget exists")
+    void firstBudgetDate(RequestSpecification spec) {
         Mockito.when(budgetProvider.first()).thenReturn(
                 Control.Option(Budget.builder()
                         .expectedIncome(200.20D)
@@ -66,21 +90,42 @@ class BudgetResourceTest extends TestSetup {
                         .build()));
 
         // @formatter:off
+        var body = spec.given()
+                .contentType("application/json")
+            .when()
+                .get("/api/budgets")
+            .then()
+                .statusCode(HttpStatus.OK.getCode())
+                .extract()
+                .asString();
+        // @formatter:on
 
+        Assertions.assertThat(body)
+                .as("The first date of a budget")
+                .isEqualTo("\"2018-02-03\"");
+    }
+
+    @Test
+    @DisplayName("First budget without any budget existing")
+    void firstBudget_notFound(RequestSpecification spec) {
+        when(budgetProvider.first()).thenReturn(Control.Option());
+
+        // @formatter:off
         spec.when()
                 .get("/api/budgets")
             .then()
-                .statusCode(200);
+                .statusCode(HttpStatus.NOT_FOUND.getCode());
         // @formatter:on
-   }
+    }
 
     @Test
-    @DisplayName("Fetch budget for january 2019")
-    void budget(RequestSpecification spec) {
-        Mockito.when(budgetProvider.lookup(2019, 1)).thenReturn(
+    @DisplayName("Get the budget for the current month")
+    void currentMonth(RequestSpecification spec) {
+        var currentDate = LocalDate.now();
+        Mockito.when(budgetProvider.lookup(currentDate.getYear(), currentDate.getMonthValue())).thenReturn(
                 Control.Option(Budget.builder()
                         .expectedIncome(200.20D)
-                        .start(LocalDate.of(2018, 2, 3))
+                        .start(LocalDate.of(2018, 2, 1))
                         .expenses(Collections.List(Budget.Expense.builder()
                                 .id(1L)
                                 .name("Grocery")
@@ -91,11 +136,31 @@ class BudgetResourceTest extends TestSetup {
 
         // @formatter:off
         spec.when()
-                .get("/api/budgets/{year}/{month}", 2019, 1)
+                .get("/api/budgets/current")
             .then()
                 .statusCode(200)
                 .body("income", Matchers.equalTo(200.20F))
-                .body("period.from", Matchers.equalTo("2018-02-03"))
+                .body("period.from", Matchers.equalTo("2018-02-01"))
+                .body("expenses", Matchers.hasSize(1))
+                .body("expenses[0].id", Matchers.equalTo(1))
+                .body("expenses[0].name", Matchers.equalTo("Grocery"))
+                .body("expenses[0].bounds.lower", Matchers.equalTo(20F))
+                .body("expenses[0].bounds.upper", Matchers.equalTo(50F));
+        // @formatter:on
+    }
+
+    @Test
+    @DisplayName("Get the budget for the year 2019 and month Feb")
+    void givenMonth(RequestSpecification spec) {
+        knownBudgets.add(createBudget());
+
+        // @formatter:off
+        spec.when()
+                .get("/api/budgets/{year}/{month}", 2019, 2)
+                .then()
+                .statusCode(200)
+                .body("income", Matchers.equalTo(200.20F))
+                .body("period.from", Matchers.equalTo("2018-02-01"))
                 .body("expenses", Matchers.hasSize(1))
                 .body("expenses[0].id", Matchers.equalTo(1))
                 .body("expenses[0].name", Matchers.equalTo("Grocery"))
@@ -133,7 +198,25 @@ class BudgetResourceTest extends TestSetup {
     @Test
     @DisplayName("Start the first budget for an account")
     void create(RequestSpecification spec) {
-        Mockito.when(budgetProvider.first()).thenReturn(Control.Option());
+        // @formatter:off
+        spec.when()
+                .body(BudgetCreateRequest.builder()
+                        .month(2)
+                        .year(2019)
+                        .income(2300.33D)
+                        .build())
+                .put("/api/budgets")
+            .then()
+                .statusCode(201);
+        // @formatter:on
+
+        Mockito.verify(ACTIVE_USER).createBudget(LocalDate.of(2019, 2, 1), 2300.33);
+    }
+
+    @Test
+    @DisplayName("Start the first budget, but one already exists")
+    void create_alreadyPresent(RequestSpecification spec) {
+        knownBudgets.add(createBudget());
 
         // @formatter:off
         spec.when()
@@ -144,18 +227,14 @@ class BudgetResourceTest extends TestSetup {
                         .build())
                 .put("/api/budgets")
             .then()
-                .statusCode(200)
-                .body("income", Matchers.equalTo(2300.33F))
-                .body("period.from", Matchers.equalTo("2019-02-01"));
+                .statusCode(400)
+                .body("message", Matchers.equalTo("Cannot start a new budget, there is already a budget open."));
         // @formatter:on
     }
 
     @Test
-    @DisplayName("Attempt to index a budget that does not exist")
-    void index_noBudget(RequestSpecification spec) {
-        Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt()))
-                .thenReturn(Control.Option());
-
+    @DisplayName("Patch the budget, but there is no active budget")
+    void patchBudget_noActiveBudget(RequestSpecification spec) {
         // @formatter:off
         spec.when()
                 .body(BudgetCreateRequest.builder()
@@ -163,118 +242,83 @@ class BudgetResourceTest extends TestSetup {
                         .year(2019)
                         .income(2300.33D)
                         .build())
-                .post("/api/budgets")
+                .patch("/api/budgets")
             .then()
-                .statusCode(404);
+                .statusCode(404)
+                .body("message", Matchers.equalTo("No budget is active yet, create a budget first."));
         // @formatter:on
     }
 
-
     @Test
-    @DisplayName("Index an existing budget")
-    void index(RequestSpecification spec) {
-        var existingBudget = Mockito.spy(Budget.builder()
-                .start(LocalDate.of(2018, 1, 1))
-                .expectedIncome(2200)
-                .id(1L)
-                .expenses(Collections.List(Budget.Expense.builder()
-                        .lowerBound(22)
-                        .upperBound(44)
-                        .build())).build());
-
-        Mockito.when(budgetProvider.lookup(2019, 2))
-                .thenReturn(Control.Option(existingBudget));
+    @DisplayName("Patch the budget")
+    void patchBudget(RequestSpecification spec) {
+        var budget = createBudget();
+        knownBudgets.add(budget);
 
         // @formatter:off
         spec.when()
                 .body(BudgetCreateRequest.builder()
                         .month(2)
                         .year(2019)
-                        .income(2300.33D)
+                        .income(3500D)
                         .build())
-                .post("/api/budgets")
+                .patch("/api/budgets")
             .then()
                 .statusCode(200)
-                .body("income", Matchers.equalTo(2300.33F))
-                .body("period.from", Matchers.equalTo("2019-02-01"));
-        // @formatter:on
-
-        verify(existingBudget).indexBudget(LocalDate.of(2019, 2, 1), 2300.33D);
-    }
-
-    @Test
-    @DisplayName("Create a new expense on an existing budget")
-    void createExpense(RequestSpecification spec) {
-        var builder = Budget.builder()
-                .expectedIncome(200.20D)
-                .start(LocalDate.of(2018, 2, 3))
-                .expenses(Collections.List(Budget.Expense.builder()
-                        .id(1L)
-                        .name("Grocery")
-                        .lowerBound(20D)
-                        .upperBound(50D)
-                        .build()));
-        var budget = Mockito.spy(builder.build());
-
-        Mockito.when(budgetProvider.first()).thenReturn(Control.Option(Budget.builder().start(LocalDate.MIN).build()));
-        Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt()))
-                .thenReturn(Control.Option(budget))
-                .thenReturn(Control.Option(builder.build()));
-
-        // @formatter:off
-        spec.when()
-                .body(ExpenseCreateRequest.builder()
-                        .name("My new expense")
-                        .lowerBound(20)
-                        .upperBound(40)
-                        .build())
-                .put("/api/budgets/expenses")
-            .then()
-                .statusCode(200)
-                .body("expenses[0].id", Matchers.equalTo(1))
+                .body("period.from", Matchers.equalTo("2019-02-01"))
+                .body("income", Matchers.equalTo(3500F))
                 .body("expenses[0].name", Matchers.equalTo("Grocery"))
-                .body("expenses[0].bounds.lower", Matchers.equalTo(20F))
-                .body("expenses[0].bounds.upper", Matchers.equalTo(50F));
+                .body("expenses[0].expected", Matchers.equalTo(612.5F));
         // @formatter:on
 
-        verify(budget).createExpense("My new expense", 20, 40);
+        Mockito.verify(budget).indexBudget(LocalDate.of(2019, 2, 1), 3500D);
     }
 
     @Test
-    @DisplayName("Attempt to create a new expense on a budget that does not exist")
-    void createExpense_noBudget(RequestSpecification spec) {
-        Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt()))
-                .thenReturn(Control.Option());
+    @DisplayName("Create a new expense in an existing budget")
+    void createNewExpense(RequestSpecification spec) {
+        knownBudgets.add(createBudget());
 
         // @formatter:off
         spec.when()
-                .body(ExpenseCreateRequest.builder()
-                        .name("My new expense")
-                        .lowerBound(20)
-                        .upperBound(40)
-                        .build())
-                .put("/api/budgets/expenses")
+                .body(new ExpensePatchRequest(null, "Car", 10))
+                .patch("/api/budgets/expenses")
             .then()
-                .statusCode(404);
+                .statusCode(200)
+                .body("period.from", Matchers.equalTo("2018-02-01"))
+                .body("income", Matchers.equalTo(200.2F))
+                .body("expenses[0].name", Matchers.equalTo("Grocery"))
+                .body("expenses[0].expected", Matchers.equalTo(35F))
+                .body("expenses[1].name", Matchers.equalTo("Car"))
+                .body("expenses[1].expected", Matchers.equalTo(10F));
+        // @formatter:on
+    }
+
+    @Test
+    @DisplayName("Update expense forcing new budget period")
+    void updateExistingExpense(RequestSpecification spec) {
+        var now = LocalDate.now();
+        knownBudgets.add(createBudget());
+
+        // @formatter:off
+        spec.when()
+                .body(new ExpensePatchRequest(1L, "Grocery", 40))
+                .patch("/api/budgets/expenses")
+            .then()
+                .statusCode(200)
+                .body("period.from", Matchers.equalTo(now.withDayOfMonth(1).toString()))
+                .body("income", Matchers.equalTo(200.2F))
+                .body("expenses[0].name", Matchers.equalTo("Grocery"))
+                .body("expenses[0].expected", Matchers.equalTo(40F));
         // @formatter:on
     }
 
     @Test
     @DisplayName("Compute the daily expenses for a budget")
     void computeExpense(RequestSpecification spec) {
-        Mockito.when(budgetProvider.first()).thenReturn(Control.Option(Budget.builder().start(LocalDate.MIN).build()));
-        Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt())).thenReturn(
-                Control.Option(Budget.builder()
-                        .expectedIncome(200.20D)
-                        .start(LocalDate.of(2018, 2, 3))
-                        .expenses(Collections.List(Budget.Expense.builder()
-                                .id(1L)
-                                .name("Grocery")
-                                .lowerBound(20D)
-                                .upperBound(50D)
-                                .build()))
-                        .build()));
-        Mockito.when(transactionProvider.balance(Mockito.any())).thenReturn(Control.Option(BigDecimal.valueOf(200)));
+        knownBudgets.add(createBudget());
+        Mockito.when(transactionProvider.balance(Mockito.any()))
+                .thenReturn(Control.Option(BigDecimal.valueOf(200)));
 
         // @formatter:off
         spec.when()
@@ -286,5 +330,37 @@ class BudgetResourceTest extends TestSetup {
                 .body("[0].left", Matchers.equalTo(-165F))
                 .body("[0].dailyLeft", Matchers.equalTo(-5.32F));
         // @formatter:on
+    }
+
+    private Budget createBudget() {
+        var budget = Mockito.spy(Budget.builder()
+                .id(1L)
+                .expectedIncome(200.20D)
+                .start(LocalDate.of(2018, 2, 1))
+                .expenses(Collections.List(Budget.Expense.builder()
+                        .id(1L)
+                        .name("Grocery")
+                        .lowerBound(20D)
+                        .upperBound(50D)
+                        .build()))
+                .build());
+
+        var mutableId = new MutableLong(10);
+        Mockito.doAnswer(invocation -> {
+            invocation.callRealMethod();
+            var found = budget.getExpenses()
+                    .first(expense -> expense.getId() == null)
+                    .get();
+            ReflectionUtils.setField(Budget.Expense.class, "id", found, mutableId.incrementAndGet());
+            return null;
+        }).when(budget).createExpense(Mockito.any(), Mockito.anyDouble(), Mockito.anyDouble());
+
+        Mockito.doAnswer(invocationOnMock -> {
+            var updatedBudget = (Budget) invocationOnMock.callRealMethod();
+            knownBudgets.add(updatedBudget);
+            return updatedBudget;
+        }).when(budget).indexBudget(Mockito.any(LocalDate.class), Mockito.anyDouble());
+
+        return budget;
     }
 }
