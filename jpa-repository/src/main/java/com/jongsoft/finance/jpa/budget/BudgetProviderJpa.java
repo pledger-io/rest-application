@@ -5,7 +5,6 @@ import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.annotation.ReadOnly;
@@ -78,18 +77,20 @@ public class BudgetProviderJpa implements BudgetProvider {
             return null;
         }
 
-        return Budget.builder()
+        var budget = Budget.builder()
                 .id(source.getId())
                 .start(source.getFrom())
                 .end(source.getUntil())
                 .expectedIncome(source.getExpectedIncome())
-                .expenses(Collections.List(source.getExpenses())
-                        .map(e -> Budget.Expense.builder()
-                                .lowerBound(e.getLowerBound().doubleValue())
-                                .upperBound(e.getUpperBound().doubleValue())
-                                .name(e.getExpense().getName())
-                                .id(e.getExpense().getId())
-                                .build()))
                 .build();
+
+        for (var expense : source.getExpenses()) {
+            budget.new Expense(
+                    expense.getExpense().getId(),
+                    expense.getExpense().getName(),
+                    expense.getUpperBound().doubleValue());
+        }
+
+        return budget;
     }
 }

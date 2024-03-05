@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.budget;
 
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
-import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.core.reflect.ReflectionUtils;
@@ -77,17 +77,9 @@ public class BudgetResourceTest extends TestSetup {
     @Test
     @DisplayName("First budget date when a budget exists")
     void firstBudgetDate(RequestSpecification spec) {
+        var budget = createBudget();
         Mockito.when(budgetProvider.first()).thenReturn(
-                Control.Option(Budget.builder()
-                        .expectedIncome(200.20D)
-                        .start(LocalDate.of(2018, 2, 3))
-                        .expenses(Collections.List(Budget.Expense.builder()
-                                .id(1L)
-                                .name("Grocery")
-                                .lowerBound(20D)
-                                .upperBound(50D)
-                                .build()))
-                        .build()));
+                Control.Option(budget));
 
         // @formatter:off
         var body = spec.given()
@@ -102,7 +94,7 @@ public class BudgetResourceTest extends TestSetup {
 
         Assertions.assertThat(body)
                 .as("The first date of a budget")
-                .isEqualTo("\"2018-02-03\"");
+                .isEqualTo("\"2018-02-01\"");
     }
 
     @Test
@@ -121,18 +113,7 @@ public class BudgetResourceTest extends TestSetup {
     @Test
     @DisplayName("Get the budget for the current month")
     void currentMonth(RequestSpecification spec) {
-        var currentDate = LocalDate.now();
-        Mockito.when(budgetProvider.lookup(currentDate.getYear(), currentDate.getMonthValue())).thenReturn(
-                Control.Option(Budget.builder()
-                        .expectedIncome(200.20D)
-                        .start(LocalDate.of(2018, 2, 1))
-                        .expenses(Collections.List(Budget.Expense.builder()
-                                .id(1L)
-                                .name("Grocery")
-                                .lowerBound(20D)
-                                .upperBound(50D)
-                                .build()))
-                        .build()));
+        knownBudgets.add(createBudget());
 
         // @formatter:off
         spec.when()
@@ -144,8 +125,7 @@ public class BudgetResourceTest extends TestSetup {
                 .body("expenses", Matchers.hasSize(1))
                 .body("expenses[0].id", Matchers.equalTo(1))
                 .body("expenses[0].name", Matchers.equalTo("Grocery"))
-                .body("expenses[0].bounds.lower", Matchers.equalTo(20F))
-                .body("expenses[0].bounds.upper", Matchers.equalTo(50F));
+                .body("expenses[0].expected", Matchers.equalTo(40F));
         // @formatter:on
     }
 
@@ -164,8 +144,7 @@ public class BudgetResourceTest extends TestSetup {
                 .body("expenses", Matchers.hasSize(1))
                 .body("expenses[0].id", Matchers.equalTo(1))
                 .body("expenses[0].name", Matchers.equalTo("Grocery"))
-                .body("expenses[0].bounds.lower", Matchers.equalTo(20F))
-                .body("expenses[0].bounds.upper", Matchers.equalTo(50F));
+                .body("expenses[0].expected", Matchers.equalTo(40F));
         // @formatter:on
     }
 
@@ -173,21 +152,14 @@ public class BudgetResourceTest extends TestSetup {
     @DisplayName("Autocomplete expense based upon token")
     void autocomplete(RequestSpecification spec) {
         Mockito.when(expenseProvider.lookup(Mockito.any())).thenReturn(ResultPage.of(
-                Budget.Expense.builder()
-                        .id(1L)
-                        .name("Grocery")
-                        .lowerBound(20D)
-                        .upperBound(50D)
-                        .build()));
+                new EntityRef.NamedEntity(1, "Groceries")));
 
         // @formatter:off
         spec.when()
                 .get("/api/budgets/auto-complete?token=gro")
             .then()
                 .statusCode(200)
-                .body("name", Matchers.hasItem("Grocery"))
-                .body("bounds.lower", Matchers.hasItem(20F))
-                .body("bounds.upper", Matchers.hasItem(50F));
+                .body("name", Matchers.hasItem("Groceries"));
         // @formatter:on
 
         var mockFilter = filterFactory.expense();
@@ -268,7 +240,7 @@ public class BudgetResourceTest extends TestSetup {
                 .body("period.from", Matchers.equalTo("2019-02-01"))
                 .body("income", Matchers.equalTo(3500F))
                 .body("expenses[0].name", Matchers.equalTo("Grocery"))
-                .body("expenses[0].expected", Matchers.equalTo(612.5F));
+                .body("expenses[0].expected", Matchers.equalTo(700F));
         // @formatter:on
 
         Mockito.verify(budget).indexBudget(LocalDate.of(2019, 2, 1), 3500D);
@@ -287,10 +259,10 @@ public class BudgetResourceTest extends TestSetup {
                 .statusCode(200)
                 .body("period.from", Matchers.equalTo("2018-02-01"))
                 .body("income", Matchers.equalTo(200.2F))
-                .body("expenses[0].name", Matchers.equalTo("Grocery"))
-                .body("expenses[0].expected", Matchers.equalTo(35F))
-                .body("expenses[1].name", Matchers.equalTo("Car"))
-                .body("expenses[1].expected", Matchers.equalTo(10F));
+                .body("expenses[1].name", Matchers.equalTo("Grocery"))
+                .body("expenses[1].expected", Matchers.equalTo(40F))
+                .body("expenses[0].name", Matchers.equalTo("Car"))
+                .body("expenses[0].expected", Matchers.equalTo(10F));
         // @formatter:on
     }
 
@@ -327,8 +299,8 @@ public class BudgetResourceTest extends TestSetup {
                 .statusCode(200)
                 .body("$", Matchers.hasSize(1))
                 .body("[0].dailySpent", Matchers.equalTo(6.45F))
-                .body("[0].left", Matchers.equalTo(-165F))
-                .body("[0].dailyLeft", Matchers.equalTo(-5.32F));
+                .body("[0].left", Matchers.equalTo(-160F))
+                .body("[0].dailyLeft", Matchers.equalTo(-5.16F));
         // @formatter:on
     }
 
@@ -337,13 +309,8 @@ public class BudgetResourceTest extends TestSetup {
                 .id(1L)
                 .expectedIncome(200.20D)
                 .start(LocalDate.of(2018, 2, 1))
-                .expenses(Collections.List(Budget.Expense.builder()
-                        .id(1L)
-                        .name("Grocery")
-                        .lowerBound(20D)
-                        .upperBound(50D)
-                        .build()))
                 .build());
+        budget.new Expense(1, "Grocery", 40);
 
         var mutableId = new MutableLong(10);
         Mockito.doAnswer(invocation -> {

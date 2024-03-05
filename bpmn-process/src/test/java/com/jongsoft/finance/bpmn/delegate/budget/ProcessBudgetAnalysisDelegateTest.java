@@ -4,7 +4,6 @@ import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -22,8 +21,6 @@ import java.time.LocalDate;
 
 class ProcessBudgetAnalysisDelegateTest {
 
-    private FilterFactory filterFactory;
-    private SettingProvider applicationSettings;
     private TransactionProvider transactionProvider;
     private DelegateExecution execution;
 
@@ -35,9 +32,9 @@ class ProcessBudgetAnalysisDelegateTest {
     void setup() {
         execution = Mockito.mock(DelegateExecution.class);
         transactionProvider = Mockito.mock(TransactionProvider.class);
-        applicationSettings = Mockito.mock(SettingProvider.class);
-        filterFactory = Mockito.mock(FilterFactory.class);
         filterCommand = Mockito.mock(TransactionProvider.FilterCommand.class, InvocationOnMock::getMock);
+        var applicationSettings = Mockito.mock(SettingProvider.class);
+        var filterFactory = Mockito.mock(FilterFactory.class);
 
         subject = new ProcessBudgetAnalysisDelegate(transactionProvider, filterFactory, applicationSettings);
 
@@ -49,12 +46,12 @@ class ProcessBudgetAnalysisDelegateTest {
                 .build());
 
         Mockito.when(execution.getVariableLocal("date")).thenReturn(LocalDate.of(2019, 1, 23));
-        Mockito.when(execution.getVariableLocal("expense")).thenReturn(Budget.Expense.builder()
-                .lowerBound(100)
-                .upperBound(110)
-                .id(1L)
-                .name("test expense")
-                .build());
+//        Mockito.when(execution.getVariableLocal("expense")).thenReturn(Budget.Expense.builder()
+//                .lowerBound(100)
+//                .upperBound(110)
+//                .id(1L)
+//                .name("test expense")
+//                .build());
     }
 
     @Test

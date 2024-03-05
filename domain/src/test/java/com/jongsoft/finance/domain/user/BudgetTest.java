@@ -1,5 +1,6 @@
 package com.jongsoft.finance.domain.user;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.budget.CloseBudgetCommand;
 import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
@@ -53,7 +54,7 @@ class BudgetTest {
                 .expenses(Collections.List())
                 .build();
 
-        final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> budget.createExpense("Grocery", 200, 400));
+        var thrown = assertThrows(StatusException.class, () -> budget.createExpense("Grocery", 200, 400));
 
         assertThat(thrown.getMessage()).isEqualTo("Expected expenses exceeds the expected income.");
     }
@@ -68,7 +69,7 @@ class BudgetTest {
                 .expenses(Collections.List())
                 .build();
 
-        final IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> budget.createExpense("Grocery", 200, 400));
+        var thrown = assertThrows(StatusException.class, () -> budget.createExpense("Grocery", 200, 400));
 
         assertThat(thrown.getMessage()).isEqualTo("Cannot add expense to an already closed budget period.");
     }
@@ -79,20 +80,10 @@ class BudgetTest {
                 .id(1L)
                 .start(LocalDate.of(2019, 1, 1))
                 .expectedIncome(2300)
-                .expenses(Collections.List(
-                        Budget.Expense.builder()
-                                .id(1L)
-                                .lowerBound(250)
-                                .upperBound(350)
-                                .name("Grocery")
-                                .build(),
-                        Budget.Expense.builder()
-                                .id(1L)
-                                .lowerBound(650)
-                                .upperBound(850)
-                                .name("Mortgage")
-                                .build()))
                 .build();
+
+        budget.new Expense(1L, "Grocery", 300);
+        budget.new Expense(2L, "Mortgage", 750);
 
         Budget indexedBudget = budget.indexBudget(LocalDate.of(2019, 3, 1), 2550);
 
@@ -100,11 +91,11 @@ class BudgetTest {
         assertThat(indexedBudget.getExpenses()).hasSize(2);
 
         assertThat(indexedBudget.getExpenses().get(0).getName()).isEqualTo("Grocery");
-        assertThat(indexedBudget.getExpenses().get(0).getLowerBound()).isEqualTo(278D);
-        assertThat(indexedBudget.getExpenses().get(0).getUpperBound()).isEqualTo(389D);
+        assertThat(indexedBudget.getExpenses().get(0).getLowerBound()).isEqualTo(332.99);
+        assertThat(indexedBudget.getExpenses().get(0).getUpperBound()).isEqualTo(333.0);
         assertThat(indexedBudget.getExpenses().get(1).getName()).isEqualTo("Mortgage");
-        assertThat(indexedBudget.getExpenses().get(1).getLowerBound()).isEqualTo(721D);
-        assertThat(indexedBudget.getExpenses().get(1).getUpperBound()).isEqualTo(943D);
+        assertThat(indexedBudget.getExpenses().get(1).getLowerBound()).isEqualTo(831.99);
+        assertThat(indexedBudget.getExpenses().get(1).getUpperBound()).isEqualTo(832);
         assertThat(budget.getEnd()).isEqualTo(LocalDate.of(2019, 3, 1));
 
         Mockito.verify(eventPublisher).publishEvent(Mockito.any(CloseBudgetCommand.class));
@@ -117,20 +108,9 @@ class BudgetTest {
                 .id(1L)
                 .start(LocalDate.of(2019, 1, 1))
                 .expectedIncome(2300)
-                .expenses(Collections.List(
-                        Budget.Expense.builder()
-                                .id(1L)
-                                .lowerBound(250)
-                                .upperBound(350)
-                                .name("Grocery")
-                                .build(),
-                        Budget.Expense.builder()
-                                .id(1L)
-                                .lowerBound(650)
-                                .upperBound(850)
-                                .name("Mortgage")
-                                .build()))
                 .build();
+        budget.new Expense(1L, "Grocery", 300);
+        budget.new Expense(2L, "Mortgage", 750);
 
         final Budget.Expense expense = budget.determineExpense("grocery");
 

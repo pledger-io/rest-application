@@ -10,7 +10,6 @@ import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.BudgetResponse;
-import com.jongsoft.finance.rest.model.ExpenseResponse;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import io.micronaut.core.annotation.Nullable;
@@ -80,10 +79,9 @@ public class BudgetResource {
             description = "Search for expenses that match the provided token",
             parameters = @Parameter(name = "token", in = ParameterIn.QUERY, schema = @Schema(implementation = String.class))
     )
-    List<ExpenseResponse> autocomplete(@Nullable String token) {
+    List<EntityRef.NamedEntity> autocomplete(@Nullable String token) {
         return expenseProvider.lookup(filterFactory.expense().name(token, false))
                 .content()
-                .map(ExpenseResponse::new)
                 .toJava();
     }
 

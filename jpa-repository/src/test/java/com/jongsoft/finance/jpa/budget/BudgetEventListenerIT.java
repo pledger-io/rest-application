@@ -6,16 +6,15 @@ import com.jongsoft.finance.messaging.commands.budget.CloseBudgetCommand;
 import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
 import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -43,17 +42,13 @@ class BudgetEventListenerIT extends JpaTestSetup {
     void handleBudgetCreatedEvent() {
         Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user-not");
 
-        eventPublisher.publishEvent(new CreateBudgetCommand(
-                Budget.builder()
-                        .expectedIncome(2500)
-                        .start(LocalDate.of(2018, 1, 1))
-                        .expenses(Collections.List(Budget.Expense.builder()
-                                .id(2L)
-                                .name("Groceries")
-                                .upperBound(200)
-                                .lowerBound(100)
-                                .build()))
-                        .build()));
+        var budget = Budget.builder()
+                .expectedIncome(2500)
+                .start(LocalDate.of(2018, 1, 1))
+                .build();
+        budget.new Expense(2, "Groceries", 150);
+
+        eventPublisher.publishEvent(new CreateBudgetCommand(budget));
 
         var query = entityManager.createQuery("select b from BudgetJpa b where b.user.username = 'demo-user-not'");
         var check = (BudgetJpa) query.getSingleResult();

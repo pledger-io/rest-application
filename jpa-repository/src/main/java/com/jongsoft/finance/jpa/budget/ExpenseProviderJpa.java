@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.domain.user.Budget;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -26,7 +26,7 @@ public class ExpenseProviderJpa implements ExpenseProvider {
     }
 
     @Override
-    public Optional<Budget.Expense> lookup(long id) {
+    public Optional<EntityRef.NamedEntity> lookup(long id) {
         return entityManager.<ExpenseJpa>blocking()
                 .hql("from ExpenseJpa where id = :id and user.username = :username")
                 .set("id", id)
@@ -36,7 +36,7 @@ public class ExpenseProviderJpa implements ExpenseProvider {
     }
 
     @Override
-    public ResultPage<Budget.Expense> lookup(FilterCommand filter) {
+    public ResultPage<EntityRef.NamedEntity> lookup(FilterCommand filter) {
         if (filter instanceof ExpenseFilterCommand delegate) {
             delegate.user(authenticationFacadea.authenticated());
 
@@ -52,15 +52,12 @@ public class ExpenseProviderJpa implements ExpenseProvider {
         throw new IllegalStateException("Cannot use non JPA filter on ExpenseProviderJpa");
     }
 
-    protected Budget.Expense convert(ExpenseJpa source) {
+    protected EntityRef.NamedEntity convert(ExpenseJpa source) {
         if (source == null) {
             return null;
         }
 
-        return Budget.Expense.builder()
-                .name(source.getName())
-                .id(source.getId())
-                .build();
+        return new EntityRef.NamedEntity(source.getId(), source.getName());
     }
 
 }

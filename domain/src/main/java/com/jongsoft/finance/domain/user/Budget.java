@@ -3,6 +3,7 @@ package com.jongsoft.finance.domain.user;
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.budget.CloseBudgetCommand;
 import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
@@ -10,9 +11,7 @@ import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
 import com.jongsoft.finance.messaging.commands.budget.UpdateExpenseCommand;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -27,11 +26,11 @@ import java.util.Objects;
 public class Budget implements AggregateBase {
 
     @Getter
-    @Builder
-    @AllArgsConstructor
-    public static class Expense implements AggregateBase {
+    @ToString(of = "name")
+    @EqualsAndHashCode(of = "id")
+    public class Expense implements AggregateBase {
         private Long id;
-        private String name;
+        private final String name;
         private double lowerBound;
         private double upperBound;
 
@@ -45,23 +44,24 @@ public class Budget implements AggregateBase {
             this.upperBound = upperBound;
         }
 
-        Expense indexExpense(BigDecimal deviation) {
-            return Expense.builder()
-                    .id(id)
-                    .name(name)
-                    .lowerBound(BigDecimal.valueOf(lowerBound)
-                            .multiply(deviation)
-                            .setScale(0, RoundingMode.CEILING)
-                            .doubleValue())
-                    .upperBound(BigDecimal.valueOf(upperBound)
-                            .multiply(deviation)
-                            .setScale(0, RoundingMode.CEILING)
-                            .doubleValue())
-                    .build();
+        /**
+         * Create an expense and bind it to its parent budget.
+         * This will not register the expense in the system yet.
+         */
+        public Expense(long id, String name, double amount) {
+            this.id = id;
+            this.name = name;
+            this.upperBound = amount;
+            this.lowerBound = amount - 0.01;
+            expenses = expenses.append(this);
         }
 
         @BusinessMethod
         public void updateExpense(double expectedExpense) {
+            if (computeExpenses() + expectedExpense > expectedIncome) {
+                throw StatusException.badRequest("Expected expenses exceeds the expected income.");
+            }
+
             lowerBound = expectedExpense - .01;
             upperBound = expectedExpense;
 
@@ -78,39 +78,21 @@ public class Budget implements AggregateBase {
                     .setScale(2, RoundingMode.HALF_UP)
                     .doubleValue();
         }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof Expense other) {
-                return other.getId().equals(getId());
-            }
-
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return 7 + id.hashCode();
-        }
-
-        @Override
-        public String toString() {
-            return getName();
-        }
     }
 
     private Long id;
     private LocalDate start;
     private LocalDate end;
 
-    private Sequence<Expense> expenses;
+    @Builder.Default
+    private Sequence<Expense> expenses = Collections.List();
     private double expectedIncome;
 
     private transient boolean active;
 
     Budget(LocalDate start, double expectedIncome) {
         if (expectedIncome < 1) {
-            throw new IllegalStateException("Expected income cannot be less than 1.");
+            throw StatusException.internalError("Expected income cannot be less than 1.");
         }
 
         this.start = start;
@@ -129,7 +111,15 @@ public class Budget implements AggregateBase {
                             .divide(BigDecimal.valueOf(this.expectedIncome), 20, RoundingMode.HALF_UP));
 
             var newBudget = new Budget(perDate, expectedIncome);
-            newBudget.expenses = expenses.map(e -> e.indexExpense(deviation));
+            for (var expense : expenses) {
+                newBudget.new Expense(
+                        expense.id,
+                        expense.name,
+                        BigDecimal.valueOf(expense.computeBudget())
+                                .multiply(deviation)
+                                .setScale(0, RoundingMode.CEILING)
+                                .doubleValue());
+            }
             newBudget.activate();
 
             return newBudget;
@@ -141,11 +131,11 @@ public class Budget implements AggregateBase {
     @BusinessMethod
     public void createExpense(String name, double lowerBound, double upperBound) {
         if (end != null) {
-            throw new IllegalStateException("Cannot add expense to an already closed budget period.");
+            throw StatusException.badRequest("Cannot add expense to an already closed budget period.");
         }
 
         if (computeExpenses() + upperBound > expectedIncome) {
-            throw new IllegalStateException("Expected expenses exceeds the expected income.");
+            throw StatusException.badRequest("Expected expenses exceeds the expected income.");
         }
 
         expenses = expenses.append(new Expense(name, lowerBound, upperBound));
@@ -161,7 +151,7 @@ public class Budget implements AggregateBase {
 
     void close(LocalDate endDate) {
         if (this.end != null) {
-            throw new IllegalStateException("Already closed budget cannot be closed again.");
+            throw StatusException.badRequest("Already closed budget cannot be closed again.");
         }
 
         this.end = endDate;

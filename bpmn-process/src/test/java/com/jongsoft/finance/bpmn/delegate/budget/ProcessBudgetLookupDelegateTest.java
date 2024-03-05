@@ -1,14 +1,14 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
+import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.domain.core.EntityRef;
+import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.providers.ExpenseProvider;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
-import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.providers.ExpenseProvider;
 
 class ProcessBudgetLookupDelegateTest {
 
@@ -33,15 +33,13 @@ class ProcessBudgetLookupDelegateTest {
 
     @Test
     void execute() {
-        Budget.Expense budget = Budget.Expense.builder().build();
-
         Mockito.when(execution.getVariableLocal("name")).thenReturn("Group 1");
         Mockito.when(expenseProvider.lookup(Mockito.any(ExpenseProvider.FilterCommand.class)))
-                .thenReturn(ResultPage.of(budget));
+                .thenReturn(ResultPage.of(new EntityRef.NamedEntity(1, "Must have")));
 
         subject.execute(execution);
 
-        Mockito.verify(execution).setVariable("budget", budget);
+        Mockito.verify(execution).setVariable("budget", new EntityRef.NamedEntity(1, "Must have"));
         Mockito.verify(filterCommand).name("Group 1", true);
     }
 

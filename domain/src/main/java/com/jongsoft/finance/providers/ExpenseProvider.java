@@ -1,17 +1,17 @@
 package com.jongsoft.finance.providers;
 
 import com.jongsoft.finance.ResultPage;
-import com.jongsoft.finance.domain.user.Budget;
+import com.jongsoft.finance.domain.core.EntityRef;
 
-public interface ExpenseProvider extends DataProvider<Budget.Expense> {
+public interface ExpenseProvider extends DataProvider<EntityRef.NamedEntity> {
 
     interface FilterCommand {
         FilterCommand name(String value, boolean exact);
     }
 
-    ResultPage<Budget.Expense> lookup(FilterCommand filter);
+    ResultPage<EntityRef.NamedEntity> lookup(FilterCommand filter);
 
-    default boolean supports(Class<Budget.Expense> supportingClass) {
-        return Budget.Expense.class.equals(supportingClass);
+    default boolean supports(Class<EntityRef.NamedEntity> supportingClass) {
+        return EntityRef.NamedEntity.class.equals(supportingClass);
     }
 }

@@ -4,6 +4,7 @@ import com.jongsoft.finance.domain.user.Budget;
 import io.micronaut.serde.annotation.Serdeable;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.stream.Stream;
 
 @Serdeable
@@ -26,7 +27,8 @@ public class BudgetResponse {
     public Stream<ExpenseResponse> getExpenses() {
         return wrapped.getExpenses()
                 .map(ExpenseResponse::new)
-                .stream();
+                .stream()
+                .sorted(Comparator.comparing(ExpenseResponse::getName));
     }
 
     @Serdeable

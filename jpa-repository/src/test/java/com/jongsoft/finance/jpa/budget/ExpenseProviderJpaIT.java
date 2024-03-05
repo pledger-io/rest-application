@@ -37,8 +37,8 @@ class ExpenseProviderJpaIT extends JpaTestSetup {
         var response = expenseProvider.lookup(1L);
 
         Assertions.assertThat(response.isPresent()).isTrue();
-        Assertions.assertThat(response.get().getId()).isEqualTo(1L);
-        Assertions.assertThat(response.get().getName()).isEqualTo("Groceries");
+        Assertions.assertThat(response.get().id()).isEqualTo(1L);
+        Assertions.assertThat(response.get().name()).isEqualTo("Groceries");
     }
 
     @Test
@@ -56,7 +56,7 @@ class ExpenseProviderJpaIT extends JpaTestSetup {
         var response = expenseProvider.lookup(command);
 
         Assertions.assertThat(response.total()).isEqualTo(1);
-        Assertions.assertThat(response.content().get().getId()).isEqualTo(1L);
+        Assertions.assertThat(response.content().get().id()).isEqualTo(1L);
     }
 
     @MockBean

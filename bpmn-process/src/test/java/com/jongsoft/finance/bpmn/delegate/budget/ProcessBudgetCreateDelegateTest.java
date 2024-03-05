@@ -30,7 +30,6 @@ class ProcessBudgetCreateDelegateTest {
     private BudgetProvider budgetProvider;
     private DelegateExecution execution;
     private ApplicationEventPublisher eventPublisher;
-    private CurrentUserProvider currentUserFacade;
 
     private ProcessBudgetCreateDelegate subject;
 
@@ -39,7 +38,7 @@ class ProcessBudgetCreateDelegateTest {
         budgetProvider = Mockito.mock(BudgetProvider.class);
         execution = Mockito.mock(DelegateExecution.class);
         eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
-        currentUserFacade = Mockito.mock(CurrentUserProvider.class);
+        var currentUserFacade = Mockito.mock(CurrentUserProvider.class);
 
         subject = new ProcessBudgetCreateDelegate(currentUserFacade, budgetProvider, TestUtilities.getProcessMapper());
 
@@ -89,15 +88,8 @@ class ProcessBudgetCreateDelegateTest {
                 .id(1L)
                 .start(LocalDate.of(2018, 1, 1))
                 .expectedIncome(1100)
-                .expenses(Collections.List(
-                        Budget.Expense.builder()
-                                .id(1L)
-                                .name("Expense 1")
-                                .lowerBound(10)
-                                .upperBound(20)
-                                .build()
-                ))
                 .build());
+        initial.new Expense(1, "Expense 1", 15);
 
         Mockito.when(budgetProvider.lookup(2019, 1)).thenReturn(Control.Option(initial));
 
