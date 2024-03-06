@@ -3,6 +3,7 @@ package com.jongsoft.finance.domain.user;
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.Tag;
@@ -126,8 +127,8 @@ public class UserAccount implements AggregateBase, Serializable {
      */
     @BusinessMethod
     public Account createAccount(String name, String currency, String type) {
-        if (!fullUser()) {
-            throw new IllegalStateException("User cannot create accounts, incorrect privileges.");
+        if (notFullUser()) {
+            throw StatusException.notAuthorized("User cannot create accounts, incorrect privileges.");
         }
 
         return new Account(this, name, currency, type);
@@ -141,8 +142,8 @@ public class UserAccount implements AggregateBase, Serializable {
      */
     @BusinessMethod
     public Category createCategory(String label) {
-        if (!fullUser()) {
-            throw new IllegalStateException("User cannot create categories, incorrect privileges.");
+        if (notFullUser()) {
+            throw StatusException.notAuthorized("User cannot create categories, incorrect privileges.");
         }
 
         return new Category(this, label);
@@ -150,8 +151,8 @@ public class UserAccount implements AggregateBase, Serializable {
 
     @BusinessMethod
     public Tag createTag(String label) {
-        if (!fullUser()) {
-            throw new IllegalStateException("User cannot create tags, incorrect privileges.");
+        if (notFullUser()) {
+            throw StatusException.notAuthorized("User cannot create tags, incorrect privileges.");
         }
 
         EventBus.getBus().send(new CreateTagCommand(label));
@@ -167,8 +168,8 @@ public class UserAccount implements AggregateBase, Serializable {
      */
     @BusinessMethod
     public TransactionRule createRule(String name, boolean restrictive) {
-        if (!fullUser()) {
-            throw new IllegalStateException("User cannot create rules, incorrect privileges.");
+        if (notFullUser()) {
+            throw StatusException.notAuthorized("User cannot create rules, incorrect privileges.");
         }
 
         return new TransactionRule(this, name, restrictive);
@@ -182,8 +183,8 @@ public class UserAccount implements AggregateBase, Serializable {
      */
     @BusinessMethod
     public BatchImportConfig createImportConfiguration(String name, String fileCode) {
-        if (!fullUser()) {
-            throw new IllegalStateException("User cannot create import configuration, incorrect privileges.");
+        if (notFullUser()) {
+            throw StatusException.notAuthorized("User cannot create import configuration, incorrect privileges.");
         }
 
         return new BatchImportConfig(this, name, fileCode);
@@ -198,8 +199,8 @@ public class UserAccount implements AggregateBase, Serializable {
      */
     @BusinessMethod
     public Budget createBudget(LocalDate start, double expectedIncome) {
-        if (!fullUser()) {
-            throw new IllegalStateException("User cannot create budgets, incorrect privileges.");
+        if (notFullUser()) {
+            throw StatusException.notAuthorized("User cannot create budgets, incorrect privileges.");
         }
 
         var budget = new Budget(start, expectedIncome);
@@ -207,9 +208,9 @@ public class UserAccount implements AggregateBase, Serializable {
         return budget;
     }
 
-    public boolean fullUser() {
+    public boolean notFullUser() {
         return roles.stream()
-                .anyMatch(r -> Objects.equals(r.getName(), "accountant") || Objects.equals(r.getName(), "admin"));
+                .noneMatch(r -> Objects.equals(r.getName(), "accountant") || Objects.equals(r.getName(), "admin"));
     }
 
 }

@@ -59,7 +59,9 @@ public class Budget implements AggregateBase {
         @BusinessMethod
         public void updateExpense(double expectedExpense) {
             if (computeExpenses() + expectedExpense > expectedIncome) {
-                throw StatusException.badRequest("Expected expenses exceeds the expected income.");
+                throw StatusException.badRequest(
+                        "Expected expenses exceeds the expected income.",
+                        "validation.budget.expense.exceeds.income");
             }
 
             lowerBound = expectedExpense - .01;
@@ -92,7 +94,9 @@ public class Budget implements AggregateBase {
 
     Budget(LocalDate start, double expectedIncome) {
         if (expectedIncome < 1) {
-            throw StatusException.internalError("Expected income cannot be less than 1.");
+            throw StatusException.badRequest(
+                    "Expected income cannot be less than 1.",
+                    "validation.budget.income.too.low");
         }
 
         this.start = start;
@@ -131,11 +135,15 @@ public class Budget implements AggregateBase {
     @BusinessMethod
     public void createExpense(String name, double lowerBound, double upperBound) {
         if (end != null) {
-            throw StatusException.badRequest("Cannot add expense to an already closed budget period.");
+            throw StatusException.badRequest(
+                    "Cannot add expense to an already closed budget period.",
+                    "validation.budget.expense.add.budget.closed");
         }
 
         if (computeExpenses() + upperBound > expectedIncome) {
-            throw StatusException.badRequest("Expected expenses exceeds the expected income.");
+            throw StatusException.badRequest(
+                    "Expected expenses exceeds the expected income.",
+                    "validation.budget.expense.exceeds.income");
         }
 
         expenses = expenses.append(new Expense(name, lowerBound, upperBound));
@@ -151,7 +159,9 @@ public class Budget implements AggregateBase {
 
     void close(LocalDate endDate) {
         if (this.end != null) {
-            throw StatusException.badRequest("Already closed budget cannot be closed again.");
+            throw StatusException.badRequest(
+                    "Already closed budget cannot be closed again.",
+                    "validation.budget.already.closed");
         }
 
         this.end = endDate;

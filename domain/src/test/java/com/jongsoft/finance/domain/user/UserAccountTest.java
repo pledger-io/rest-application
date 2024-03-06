@@ -1,5 +1,6 @@
 package com.jongsoft.finance.domain.user;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
@@ -62,7 +63,7 @@ class UserAccountTest {
 
     @Test
     void createAccount_NotAllowed() {
-        IllegalStateException thrown = assertThrows(IllegalStateException.class,
+        var thrown = assertThrows(StatusException.class,
                 () -> readOnlyAccount.createAccount("Demo account", "EUR", "checking"));
 
         Mockito.verifyNoInteractions(applicationEventPublisher);
@@ -83,7 +84,7 @@ class UserAccountTest {
 
     @Test
     void createTag_NotAllowed() {
-        IllegalStateException thrown = assertThrows(IllegalStateException.class,
+        var thrown = assertThrows(StatusException.class,
                 () -> readOnlyAccount.createTag("Tag 1"));
 
         Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(Mockito.any());
@@ -109,7 +110,7 @@ class UserAccountTest {
 
     @Test
     void createCategory_NotAllowed() {
-        IllegalStateException thrown = assertThrows(IllegalStateException.class,
+        var thrown = assertThrows(StatusException.class,
                 () -> readOnlyAccount.createCategory("demo-cat"));
 
         assertThat(thrown.getMessage()).isEqualTo("User cannot create categories, incorrect privileges.");
@@ -126,7 +127,7 @@ class UserAccountTest {
 
     @Test
     void createBatchConfiguration_NotAllowed() {
-        IllegalStateException thrown = assertThrows(IllegalStateException.class,
+        var thrown = assertThrows(StatusException.class,
                 () -> readOnlyAccount.createImportConfiguration("test-config", "file-code-sample"));
 
         assertThat(thrown.getMessage()).isEqualTo("User cannot create import configuration, incorrect privileges.");
@@ -134,7 +135,7 @@ class UserAccountTest {
 
     @Test
     void createBudget_NotAllowed() {
-        IllegalStateException thrown = assertThrows(IllegalStateException.class,
+        var thrown = assertThrows(StatusException.class,
                 () -> readOnlyAccount.createBudget(LocalDate.of(2019, 1, 1), 2500));
 
         assertThat(thrown.getMessage()).isEqualTo("User cannot create budgets, incorrect privileges.");
