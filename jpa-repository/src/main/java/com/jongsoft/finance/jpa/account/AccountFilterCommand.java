@@ -1,9 +1,8 @@
 package com.jongsoft.finance.jpa.account;
 
-import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
+import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.lang.collection.Sequence;
-import io.micronaut.data.model.Sort;
 
 import java.util.Objects;
 
@@ -98,7 +97,7 @@ public class AccountFilterCommand extends FilterCommandJpa implements AccountPro
 
     @Override
     public Sort sort() {
-        return Sort.of(Sort.Order.asc("a.name"));
+        return new Sort("a.name", true);
     }
 
     @Override

@@ -1,4 +1,0 @@
-dependencies {
-    implementation("com.jongsoft.lang:language:$jongsoftLangVersion")
-    implementation project(':core')
-}

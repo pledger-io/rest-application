@@ -1,11 +1,9 @@
 package com.jongsoft.finance.jpa.tag;
 
-import java.util.Objects;
-
-import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
+import com.jongsoft.finance.providers.TagProvider;
 
-import io.micronaut.data.model.Sort;
+import java.util.Objects;
 
 public class TagFilterCommand extends FilterCommandJpa implements TagProvider.FilterCommand {
 
@@ -44,7 +42,7 @@ public class TagFilterCommand extends FilterCommandJpa implements TagProvider.Fi
 
     @Override
     public Sort sort() {
-        return Sort.of(Sort.Order.asc("a.name"));
+        return new Sort("a.name", true);
     }
 
     public int page() {
