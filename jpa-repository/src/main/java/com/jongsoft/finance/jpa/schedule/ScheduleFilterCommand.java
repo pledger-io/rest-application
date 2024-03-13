@@ -4,7 +4,6 @@ import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.lang.collection.Sequence;
-import io.micronaut.data.model.Sort;
 
 import java.time.LocalDate;
 
@@ -33,7 +32,7 @@ public class ScheduleFilterCommand extends FilterCommandJpa implements Transacti
 
     @Override
     public Sort sort() {
-        return Sort.of(Sort.Order.desc("a.start"));
+        return new Sort("a.start", false);
     }
 
     @Override

@@ -1,11 +1,12 @@
 package com.jongsoft.finance.jpa;
 
-import io.micronaut.data.model.Sort;
-
 import jakarta.persistence.Query;
+
 import java.util.Map;
 
 public interface FilterDelegate<T extends FilterDelegate<T>> {
+
+    record Sort(String field, boolean ascending) {}
 
     /**
      * Generates the HQL query that belongs to the command supported by the delegate.

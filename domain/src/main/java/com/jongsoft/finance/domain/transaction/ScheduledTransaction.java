@@ -54,7 +54,9 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
     @BusinessMethod
     public void limit(LocalDate start, LocalDate end) {
         if (start.isAfter(end)) {
-            throw new IllegalArgumentException("Start of scheduled transaction cannot be after end date.");
+            throw StatusException.badRequest(
+                    "Start of scheduled transaction cannot be after end date.",
+                    "validation.transaction.schedule.end.before.start");
         }
 
         var hasChanged = Control.Equal(this.start, start)

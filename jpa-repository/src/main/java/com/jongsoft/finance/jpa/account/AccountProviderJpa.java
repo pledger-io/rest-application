@@ -6,6 +6,7 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.SavingGoal;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.jpa.FilterDelegate;
 import com.jongsoft.finance.jpa.projections.TripleProjection;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.savings.SavingGoalJpa;
@@ -15,7 +16,6 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 import com.jongsoft.lang.time.Range;
-import io.micronaut.data.model.Sort;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -176,7 +176,7 @@ public class AccountProviderJpa implements AccountProvider {
                     .set("start", range.from())
                     .set("until", range.until())
                     .limit(delegate.pageSize())
-                    .sort(Sort.of(asc ? Sort.Order.asc("sum(t.amount)") : Sort.Order.desc("sum(t.amount)")))
+                    .sort(new FilterDelegate.Sort("sum(t.amount)", asc))
                     .sequence()
                     .map(projection -> new AccountSpendingImpl(
                             convert(projection.getFirst()),

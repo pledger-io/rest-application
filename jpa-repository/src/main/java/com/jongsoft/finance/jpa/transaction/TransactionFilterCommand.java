@@ -3,12 +3,11 @@ package com.jongsoft.finance.jpa.transaction;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
+import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.time.Range;
-import io.micronaut.data.model.Sort;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -159,7 +158,7 @@ public class TransactionFilterCommand extends FilterCommandJpa implements Transa
 
     @Override
     public Sort sort() {
-        return Sort.of(Sort.Order.desc("a.date"));
+        return new Sort("a.date",false);
     }
 
     public int page() {

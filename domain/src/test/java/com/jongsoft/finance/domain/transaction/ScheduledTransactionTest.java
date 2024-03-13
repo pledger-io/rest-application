@@ -45,7 +45,7 @@ class ScheduledTransactionTest {
 
     @Test
     void limit_endBeforeStart() {
-        var exception = Assertions.assertThrows(IllegalArgumentException.class, () ->
+        var exception = Assertions.assertThrows(StatusException.class, () ->
                 scheduledTransaction.limit(LocalDate.of(2022, 4, 5), LocalDate.of(2019, 1, 1)));
 
         assertThat(exception.getMessage()).isEqualTo("Start of scheduled transaction cannot be after end date.");

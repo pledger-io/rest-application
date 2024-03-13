@@ -31,6 +31,10 @@ public class StatusExceptionHandler implements ExceptionHandler<StatusException,
         var error = new JsonError(exception.getMessage());
         error.link(Link.SELF, Link.of(request.getUri()));
 
+        if (exception.getLocalizationMessage() != null) {
+            error.link(Link.HELP, exception.getLocalizationMessage());
+        }
+
         return HttpResponse
                 .status(HttpStatus.valueOf(exception.getStatusCode()))
                 .body(error);

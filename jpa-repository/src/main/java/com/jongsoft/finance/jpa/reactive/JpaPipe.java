@@ -1,8 +1,8 @@
 package com.jongsoft.finance.jpa.reactive;
 
+import com.jongsoft.finance.jpa.FilterDelegate;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.control.Optional;
-import io.micronaut.data.model.Sort;
 
 import jakarta.persistence.Query;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
     private String hql;
     private Optional<Integer> limit;
     private Optional<Integer> offset;
-    private Optional<Sort> sort;
+    private Optional<FilterDelegate.Sort> sort;
 
     private final Map<String, Object> parameters;
 
@@ -25,7 +25,7 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
     }
 
     /**
-     * Set a parameter to be replaced in the {@link #hql(java.lang.String)} operation. Note that
+     * Set a parameter to be replaced in the {@link JpaPipe#hql(java.lang.String)} operation. Note that
      * this will replace any parameter with the same name.
      *
      * @param parameter the name of the parameter
@@ -38,7 +38,7 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
     }
 
     public R setAll(Map<String, ?> parameters) {
-        parameters.forEach(this.parameters::put);
+        this.parameters.putAll(parameters);
         return self();
     }
 
@@ -82,7 +82,7 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
      * @param sort the actual sort to be applied
      * @return this instance
      */
-    public R sort(Sort sort) {
+    public R sort(FilterDelegate.Sort sort) {
         this.sort = Control.Option(sort);
         return self();
     }
@@ -105,17 +105,9 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
             return "";
         }
 
-        var sorting = new StringBuilder(" order by ");
-        for (var iterator = sort.get().getOrderBy().iterator(); iterator.hasNext(); ) {
-            var order = iterator.next();
-            sorting.append(order.getProperty())
-                    .append(" ")
-                    .append(order.isAscending() ? "asc" : "desc");
-            if (iterator.hasNext()) {
-                sorting.append(", ");
-            }
-        }
-        return sorting.toString();
+        return " order by %s %s".formatted(
+                sort.get().field(),
+                sort.get().ascending() ? "asc" : "desc");
     }
 
     int limit() {

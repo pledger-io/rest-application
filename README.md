@@ -28,7 +28,7 @@ Pledger.io has the following features:
 
 ## Get started
 
-**Note:** the front-end application can be found in the [user-interface](https://bitbucket.org/jongsoftdev/user-interface) repository. The [deployment](https://bitbucket.org/jongsoftdev/fintrack-deployment) build will bundle the front-end with this backend system.
+**Note:** the front-end application can be found in the [user-interface](https://github.com/pledger-io/user-interface) repository. The [deployment](https://github.com/pledger-io/build-tooling) build will bundle the front-end with this backend system.
 
 In this repository you will find the backend REST application needed to run Pledger.io.
 
@@ -45,7 +45,7 @@ You can build the application using the Gradle command:
 
 ### Running the backend
 
-The generated phat JAR in the ```fintrack-api``` module can be started, which will run the backend of FinTrack. To access the
+The generated phat JAR in the ```fintrack-api``` module can be started, which will run the backend of Pledger.io. To access the
 API documentation use the url:
 
     http://localhost:8080/spec/index.html

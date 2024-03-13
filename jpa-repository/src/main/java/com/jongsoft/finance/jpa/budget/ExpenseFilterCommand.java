@@ -2,7 +2,6 @@ package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
 import com.jongsoft.finance.providers.ExpenseProvider;
-import io.micronaut.data.model.Sort;
 import jakarta.inject.Singleton;
 
 @Singleton
@@ -35,7 +34,7 @@ public class ExpenseFilterCommand extends FilterCommandJpa implements ExpensePro
 
     @Override
     public Sort sort() {
-        return Sort.of(Sort.Order.asc("a.name"));
+        return new Sort("a.name", true);
     }
 
     @Override
