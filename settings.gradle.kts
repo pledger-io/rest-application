@@ -6,6 +6,9 @@ pluginManagement {
         id("io.micronaut.library").version("4.3.4")
         id("io.micronaut.application").version("4.3.4")
         id("io.freefair.lombok").version("8.4")
+
+        id("signing")
+        id("maven-publish")
     }
 }
 

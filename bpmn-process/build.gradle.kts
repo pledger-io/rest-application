@@ -1,23 +1,20 @@
-plugins {
-    java
-    id("io.micronaut.library")
-    id("io.freefair.lombok")
-}
-
 micronaut {
     testRuntime("junit5")
-    processing {
-        incremental(true)
-    }
 }
 
 dependencies {
+    annotationProcessor(mn.lombok)
+    testAnnotationProcessor(mn.lombok)
+
     implementation(libs.lang)
     implementation(libs.lang.xml)
     implementation(libs.camunda)
 
     implementation(libs.bouncy)
     implementation(libs.csv)
+
+    compileOnly(mn.lombok)
+    testCompileOnly(mn.lombok)
 
     // Investigate if this can be swapped for micronaut serde
     implementation(mn.micronaut.jackson.databind)

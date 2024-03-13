@@ -25,7 +25,7 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
     }
 
     /**
-     * Set a parameter to be replaced in the {@link #hql(java.lang.String)} operation. Note that
+     * Set a parameter to be replaced in the {@link JpaPipe#hql(java.lang.String)} operation. Note that
      * this will replace any parameter with the same name.
      *
      * @param parameter the name of the parameter
@@ -105,8 +105,7 @@ abstract class JpaPipe<T, R extends JpaPipe<T, R>> {
             return "";
         }
 
-        return """
-                order by %s %s""".formatted(
+        return " order by %s %s".formatted(
                 sort.get().field(),
                 sort.get().ascending() ? "asc" : "desc");
     }

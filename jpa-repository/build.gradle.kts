@@ -1,6 +1,3 @@
-plugins {
-    id("io.micronaut.library")
-}
 
 micronaut {
     testRuntime("junit5")
@@ -14,6 +11,7 @@ dependencies {
 
     implementation(mn.micronaut.jdbc.hikari)
     implementation(mn.micronaut.hibernate.jpa)
+    implementation(mn.micronaut.data.tx.hibernate)
     implementation(mn.micronaut.data.jpa)
     implementation(mn.micronaut.data.jdbc)
     implementation(mn.micronaut.flyway)
@@ -29,7 +27,7 @@ dependencies {
     runtimeOnly(mn.mysql.connector.java)
     runtimeOnly(mn.flyway.mysql)
 
-    testRuntimeOnly(mn.snakeyaml)
+    runtimeOnly(mn.snakeyaml)
     testRuntimeOnly(mn.logback.classic)
     testImplementation(mn.micronaut.test.junit5)
     testImplementation(libs.bundles.junit)

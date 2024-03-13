@@ -1,5 +1,4 @@
 plugins {
-    id("io.micronaut.library")
     id("io.freefair.lombok")
 }
 
