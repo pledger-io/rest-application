@@ -38,7 +38,7 @@ subprojects {
                     from(components["java"])
 
                     pom {
-                        description = "The REST-API for Pledger.ioS"
+                        description = "The REST-API for Pledger.io"
                         url = "https://www.pledger.io/"
                         name = project.name
                         scm {

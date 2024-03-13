@@ -1,4 +1,4 @@
-rootProject.name="FinTrack"
+rootProject.name="Pledger"
 
 pluginManagement {
     plugins {
