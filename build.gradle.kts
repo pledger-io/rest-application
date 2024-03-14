@@ -2,7 +2,9 @@ plugins {
     id("io.micronaut.library") apply false
     id("maven-publish")
     id("java")
+
     id("org.sonarqube")
+    id("jacoco")
 }
 
 sonar {
@@ -16,6 +18,17 @@ subprojects {
     apply(plugin = "java")
     apply(plugin = "io.micronaut.library")
     apply(plugin = "maven-publish")
+    apply(plugin = "jacoco")
+
+    tasks.test {
+        finalizedBy(tasks.jacocoTestReport)
+    }
+
+    tasks.jacocoTestReport {
+        reports {
+            xml.required = true
+        }
+    }
 
     publishing {
         publications {
