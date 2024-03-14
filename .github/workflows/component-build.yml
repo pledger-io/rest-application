@@ -1,0 +1,32 @@
+name: Build flow
+
+on: [workflow_call]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Java version
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          architecture: x64
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5
+      - name: Build code
+        run: ./gradlew check
+      - name: Upload build results
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact
+          path: |
+            **/build/classes/**
+            **/build/libs/*.jar
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifact
+          path: |
+            **/build/test-results/**
