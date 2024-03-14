@@ -41,7 +41,7 @@ subprojects {
 
         repositories {
             maven {
-                url = uri("https://maven.pkg.github.com/pledger-io/central")
+                url = uri("https://maven.pkg.github.com/pledger-io/rest-application")
                 credentials {
                     username = System.getenv("NEXUS_USER")
                     password = System.getenv("NEXUS_PASSWORD")
