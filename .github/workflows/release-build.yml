@@ -3,7 +3,7 @@ name: Build Rest Application Release
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   release:
