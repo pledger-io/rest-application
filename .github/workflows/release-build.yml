@@ -22,6 +22,6 @@ jobs:
       - name: Publish artifacts
         run: ./gradlew publish -x check
         env:
-          NEXUS_PASSWORD: ${{ GITHUB_ACTOR }}
-          NEXUS_USER: ${{ secrets.GITHUB_TOKEN }}
+          NEXUS_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          NEXUS_USER: ""
 
