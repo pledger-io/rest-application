@@ -9,7 +9,7 @@ plugins {
 
 sonar {
     properties {
-        property("sonar.projectKey", "rest-application")
+        property("sonar.projectKey", "pledger-io_rest-application")
         property("sonar.organization", "pledger-io")
     }
 }
