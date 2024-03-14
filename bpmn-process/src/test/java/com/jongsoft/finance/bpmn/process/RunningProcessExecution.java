@@ -1,18 +1,18 @@
 package com.jongsoft.finance.bpmn.process;
 
-import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-@Slf4j
 public class RunningProcessExecution implements ProcessTestExtension.ProcessExecution<RunningProcessExecution> {
-
+    private final static Logger log = LoggerFactory.getLogger(RunningProcessExecution.class);
     private final ProcessEngine processEngine;
     private final ProcessInstance processInstance;
 

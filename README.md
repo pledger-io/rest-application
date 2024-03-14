@@ -1,9 +1,9 @@
 # FinTrack
 ![Sonatype Nexus (Releases)](https://img.shields.io/nexus/r/com.jongsoft.finance/fintrack-api?server=https%3A%2F%2Foss.sonatype.org)
 ![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.jongsoft.finance/fintrack-api?server=https%3A%2F%2Foss.sonatype.org)
-![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/jongsoftdev/fintrack-application/master)
-[![SonarCloud Quality](https://sonarcloud.io/api/project_badges/measure?project=FinTrack%3AAPI&metric=alert_status&style=flat-square)](https://sonarcloud.io/dashboard?id=FinTrack%3AAPI)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=FinTrack%3AAPI&metric=coverage&style=flat-square)](https://sonarcloud.io/dashboard?id=FinTrack%3AAPI)
+![Release Build](https://github.com/pledger-io/rest-application/actions/workflows/release-build.yml/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pledger-io_rest-application&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=pledger-io_rest-application)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pledger-io_rest-application&metric=coverage)](https://sonarcloud.io/summary/new_code?id=pledger-io_rest-application)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 -----------------------

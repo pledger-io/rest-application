@@ -5,6 +5,7 @@ import com.jongsoft.finance.bpmn.process.RuntimeContext;
 import com.jongsoft.finance.core.MailDaemon;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
 
+@MicronautTest
 @ProcessExtension
 @DisplayName("Contract warning feature")
 public class ContractWarningIT {

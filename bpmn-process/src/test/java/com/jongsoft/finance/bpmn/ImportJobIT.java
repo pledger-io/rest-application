@@ -9,6 +9,7 @@ import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.serialized.ImportConfigJson;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+@MicronautTest
 @ProcessExtension
 @DisplayName("CSV Import feature")
 public class ImportJobIT {

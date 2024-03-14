@@ -4,6 +4,7 @@ import com.jongsoft.finance.bpmn.process.ProcessExtension;
 import com.jongsoft.finance.bpmn.process.RuntimeContext;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
+@MicronautTest
 @ProcessExtension
 @DisplayName("Scheduled Transaction feature")
 class ScheduledTransactionIT {

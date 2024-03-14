@@ -1,0 +1,27 @@
+name: Validate Pull Request
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    uses: ./.github/workflows/component-build.yml
+  code-quality:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Java version
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          architecture: x64
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact
+      - name: Quality gate
+        run: ./gradlew sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.gradle.skipCompile=true -Dsonar.host.url=https://sonarcloud.io
