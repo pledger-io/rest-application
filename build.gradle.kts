@@ -10,6 +10,13 @@ subprojects {
     apply(plugin = "io.micronaut.library")
     apply(plugin = "maven-publish")
 
+    sonar {
+        properties {
+            property("sonar.projectKey", "FinTrack:API")
+            property("sonar.organization", "jongsoft")
+        }
+    }
+
     publishing {
         publications {
             create<MavenPublication>("maven") {
