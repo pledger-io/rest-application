@@ -1,0 +1,30 @@
+name: Build Rest Application Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Java version
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          architecture: x64
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5
+      - name: Build code
+        run: ./gradlew build
+      - name: Quality gate
+        run: ./gradlew sonar -Dsonar.gradle.skipCompile=true -Dsonar.host.url=https://sonarcloud.io -Dsonar.projectKey=Fintrack:API -Dsonar.organization=jongsoft -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+      - name: Publish artifacts
+        run: ./gradlew publish
+        env:
+          NEXUS_PASSWORD: ${{ GITHUB_ACTOR }}
+          NEXUS_USER: ${{ secrets.GITHUB_TOKEN }}
+

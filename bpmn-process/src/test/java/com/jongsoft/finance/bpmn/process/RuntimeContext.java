@@ -28,7 +28,6 @@ import com.jongsoft.lang.control.Optional;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.core.reflect.ReflectionUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
@@ -37,14 +36,17 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.OngoingStubbing;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Consumer;
 
-@Slf4j
 public class RuntimeContext {
+
+    private static final Logger log = LoggerFactory.getLogger(RuntimeContext.class);
 
     private ApplicationContext applicationContext;
     private ApplicationEventPublisher applicationEventPublisher;

@@ -6,6 +6,7 @@ import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.lang.collection.Sequence;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.mockito.Mockito;
 import java.time.LocalDate;
 import java.util.Map;
 
+@MicronautTest
 @ProcessExtension
 @DisplayName("Profile import feature")
 public class ProfileImportIT {

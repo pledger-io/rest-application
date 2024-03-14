@@ -3,6 +3,7 @@ package com.jongsoft.finance.bpmn;
 import com.jongsoft.finance.bpmn.process.ProcessExtension;
 import com.jongsoft.finance.bpmn.process.RuntimeContext;
 import com.jongsoft.finance.schedule.Periodicity;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
+@MicronautTest
 @ProcessExtension
 @DisplayName("Process Scheduler feature")
 class ProcessSchedulerIT  {

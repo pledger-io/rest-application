@@ -8,6 +8,7 @@ import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.lang.Collections;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.variable.Variables;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+@MicronautTest
 @ProcessExtension
 @DisplayName("Budget analysis feature")
 public class BudgetAnalysisIT {

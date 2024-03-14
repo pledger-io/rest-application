@@ -4,6 +4,7 @@ import com.jongsoft.finance.bpmn.process.ProcessExtension;
 import com.jongsoft.finance.bpmn.process.RuntimeContext;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.lang.Control;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.variable.Variables;
@@ -14,6 +15,7 @@ import org.mockito.Mockito;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@MicronautTest
 @ProcessExtension
 @DisplayName("Account reconciliation feature")
 class AccountReconcileIT {
