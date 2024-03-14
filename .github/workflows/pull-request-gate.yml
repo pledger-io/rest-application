@@ -18,7 +18,6 @@ jobs:
           architecture: x64
       - name: Quality gate
         uses: sonarsource/sonarcloud-github-action@master
-        with:
-          sonar-token: ${{ secrets.SONAR_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          java-version: 21
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
