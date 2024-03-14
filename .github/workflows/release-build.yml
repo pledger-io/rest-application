@@ -23,5 +23,5 @@ jobs:
         run: ./gradlew publish -x check
         env:
           NEXUS_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-          NEXUS_USER: ""
+          NEXUS_USER: ${{ secrets.GITHUB_ACTOR }}
 
