@@ -7,8 +7,8 @@ plugins {
 
 sonar {
     properties {
-        property("sonar.projectKey", "FinTrack:API")
-        property("sonar.organization", "jongsoft")
+        property("sonar.projectKey", "rest-application")
+        property("sonar.organization", "pledger-io")
     }
 }
 
