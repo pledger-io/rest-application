@@ -1,8 +1,9 @@
-name: Build Rest Application Release
+name: Build Snapshot
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - master
 
 permissions:
   packages: write
@@ -23,10 +24,7 @@ jobs:
           architecture: x64
       - name: Publish artifacts
         run: |
-          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
-          echo "New version: ${NEW_VERSION}"
           echo "Github username: ${GITHUB_ACTOR}"
-          ./gradlew -Pversion=${NEW_VERSION} publish -x check
+          ./gradlew publish -x check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-

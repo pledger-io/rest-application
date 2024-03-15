@@ -34,13 +34,14 @@ subprojects {
         publications {
             create<MavenPublication>("maven") {
                 groupId = "com.jongsoft.finance"
-                version = "3.3.0-SNAPSHOT"
+                version = System.getProperty("version")
                 from(components["java"])
             }
         }
 
         repositories {
             maven {
+                name = "GitHubPackages"
                 url = uri("https://maven.pkg.github.com/pledger-io/rest-application")
                 credentials {
                     username = System.getenv("GITHUB_ACTOR")
