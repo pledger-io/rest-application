@@ -1,16 +1,14 @@
 # FinTrack
-![Sonatype Nexus (Releases)](https://img.shields.io/nexus/r/com.jongsoft.finance/fintrack-api?server=https%3A%2F%2Foss.sonatype.org)
-![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.jongsoft.finance/fintrack-api?server=https%3A%2F%2Foss.sonatype.org)
+![Sonatype Nexus (Releases)](https://img.shields.io/github/v/release/pledger-io/rest-application?display_name=release&label=Stable)
 ![Release Build](https://github.com/pledger-io/rest-application/actions/workflows/release-build.yml/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pledger-io_rest-application&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=pledger-io_rest-application)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=pledger-io_rest-application&metric=coverage)](https://sonarcloud.io/summary/new_code?id=pledger-io_rest-application)
+![Coverage](https://img.shields.io/sonar/coverage/pledger-io_rest-application?server=https%3A%2F%2Fsonarcloud.io
+)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 -----------------------
 
 **[Read the documentation](https://www.pledger.io/)**
-
-[Report Bug](https://jongsoftdev.atlassian.net/issues/?jql=issuetype%20%3D%20Bug%20AND%20project%20%3D%20FIN%20AND%20resolution%20%3D%20Unresolved%20ORDER%20BY%20priority%20DESC) - [Request Feature](https://jongsoftdev.atlassian.net/browse/FIN-23?jql=issuetype%20%3D%20Story%20AND%20project%20%3D%20FIN%20AND%20resolution%20%3D%20Unresolved%20ORDER%20BY%20priority%20DESC)
 
 -----------------------
 
