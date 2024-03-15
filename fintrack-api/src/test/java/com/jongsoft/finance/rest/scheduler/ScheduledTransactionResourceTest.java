@@ -108,13 +108,22 @@ class ScheduledTransactionResourceTest extends TestSetup {
 
         // @formatter:off
         spec.given()
-                .body(ScheduledTransactionCreateRequest.builder()
-                        .amount(22.2)
-                        .name("Sample schedule")
-                        .schedule(new ScheduledTransactionCreateRequest.ScheduleValue(Periodicity.WEEKS, 1))
-                        .destination(ScheduledTransactionCreateRequest.EntityRef.builder().id(1L).build())
-                        .source(ScheduledTransactionCreateRequest.EntityRef.builder().id(2L).build())
-                        .build())
+                .body("""
+                        {
+                            "amount": 22.2,
+                            "name": "Sample schedule",
+                            "schedule": {
+                                "periodicity": "WEEKS",
+                                "value": 1
+                            },
+                            "destination": {
+                                "id": 1
+                            },
+                            "source": {
+                                "id": 2
+                            }
+                        }
+                        """)
             .when()
                 .put("/api/schedule/transaction")
             .then()
@@ -148,14 +157,16 @@ class ScheduledTransactionResourceTest extends TestSetup {
     void patch(RequestSpecification spec) {
         // @formatter:off
         spec.given()
-                .body(ScheduledTransactionPatchRequest.builder()
-                        .description("Updated description")
-                        .name("New name")
-                        .range(ScheduledTransactionPatchRequest.DateRange.builder()
-                                .start(LocalDate.of(2021, 1, 1))
-                                .end(LocalDate.of(2022, 1, 1))
-                                .build())
-                        .build())
+                .body("""
+                        {
+                            "description": "Updated description",
+                            "name": "New name",
+                            "range": {
+                                "start": "2021-01-01",
+                                "end": "2022-01-01"
+                            }
+                        }
+                        """)
             .when()
                 .patch("/api/schedule/transaction/1")
             .then()

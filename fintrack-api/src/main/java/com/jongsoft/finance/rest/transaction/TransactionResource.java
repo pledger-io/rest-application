@@ -28,9 +28,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,7 +41,6 @@ import java.util.concurrent.Executors;
 @Tag(name = "Transactions")
 @Controller("/api/transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionResource {
 
     private final SettingProvider settingProvider;
@@ -53,7 +50,16 @@ public class TransactionResource {
     private final AccountTypeProvider accountTypeProvider;
     private final RuntimeResource runtimeResource;
     private final AuthenticationFacade authenticationFacade;
-    private final EventBus eventBus;
+
+    public TransactionResource(SettingProvider settingProvider, TransactionProvider transactionProvider, AccountProvider accountProvider, FilterFactory filterFactory, AccountTypeProvider accountTypeProvider, RuntimeResource runtimeResource, AuthenticationFacade authenticationFacade) {
+        this.settingProvider = settingProvider;
+        this.transactionProvider = transactionProvider;
+        this.accountProvider = accountProvider;
+        this.filterFactory = filterFactory;
+        this.accountTypeProvider = accountTypeProvider;
+        this.runtimeResource = runtimeResource;
+        this.authenticationFacade = authenticationFacade;
+    }
 
     @Post
     @Operation(
@@ -212,7 +218,7 @@ public class TransactionResource {
     void applyRules() {
         try (var executors = Executors.newFixedThreadPool(25)) {
             executors.execute(() -> {
-                eventBus.sendSystemEvent(new InternalAuthenticationEvent(
+                EventBus.getBus().sendSystemEvent(new InternalAuthenticationEvent(
                         this,
                         authenticationFacade.authenticated()));
 
@@ -229,7 +235,7 @@ public class TransactionResource {
                     page.content()
                             .map(Transaction::getId)
                             .forEach(transaction -> executors.execute(() -> {
-                                eventBus.sendSystemEvent(
+                                EventBus.getBus().sendSystemEvent(
                                         new InternalAuthenticationEvent(
                                                 this,
                                                 authenticationFacade.authenticated()));

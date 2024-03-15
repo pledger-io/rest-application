@@ -6,12 +6,13 @@ import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.event.LoginSuccessfulEvent;
 import io.micronaut.security.event.LogoutEvent;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Singleton
 public class AuthenticationFacadeImpl implements AuthenticationFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationFacadeImpl.class);
     private static final ThreadLocal<String> AUTHENTICATED_USER = new ThreadLocal<>();
 
     @EventListener

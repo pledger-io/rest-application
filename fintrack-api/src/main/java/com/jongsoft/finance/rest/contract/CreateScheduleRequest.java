@@ -6,16 +6,13 @@ import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.NonNull;
 
-@Builder
 @Serdeable.Deserializable
 class CreateScheduleRequest {
 
     @Serdeable.Deserializable
     public record ScheduleValueJson(
-            @NonNull
+            @NotNull
             @Schema(description = "The periodicity of the schedule.", example = "MONTHS")
             Periodicity periodicity,
             @Min(1)

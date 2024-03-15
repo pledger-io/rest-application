@@ -1,26 +1,28 @@
 plugins {
     id("io.micronaut.application")
-    id("io.freefair.lombok")
 }
-//mainClassName = "com.jongsoft.finance.Application"
 
+application {
+    mainClass.set("com.jongsoft.finance.Application")
+}
 
-//jar {
-//    manifest {
-//        attributes('Main-Class': 'com.jongsoft.finance.Application')
-//    }
-//}
+micronaut {
+    runtime("jetty")
+    testRuntime("junit5")
+}
 
 dependencies {
-    annotationProcessor("io.micronaut.openapi:micronaut-openapi")
+    annotationProcessor(mn.micronaut.openapi.asProvider())
+    annotationProcessor(mn.micronaut.http.validation)
+    annotationProcessor(mn.micronaut.inject.java)
 
     implementation(libs.camunda)
     implementation(mn.swagger.annotations)
+
     implementation(mn.micronaut.security.annotations)
     implementation(mn.micronaut.security.jwt)
-    implementation(mn.micronaut.http.server.jetty)
-
     implementation(mn.micronaut.hibernate.validator)
+    implementation(mn.micronaut.http.server.jetty)
 
     implementation("at.favre.lib:bcrypt:0.9.0")
     implementation(libs.bouncy)

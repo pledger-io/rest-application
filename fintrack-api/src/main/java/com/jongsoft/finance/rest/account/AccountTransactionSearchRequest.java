@@ -3,17 +3,12 @@ package com.jongsoft.finance.rest.account;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Generated;
-import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Setter
 @Serdeable.Deserializable
 class AccountTransactionSearchRequest {
 
-    @Setter
     @Serdeable.Deserializable
     public static class Range {
         private LocalDate start;
@@ -36,12 +31,7 @@ class AccountTransactionSearchRequest {
     @NotNull
     private Range dateRange;
 
-    @Generated
-    public AccountTransactionSearchRequest() {
-    }
-
-    @Builder
-    private AccountTransactionSearchRequest(String text, @Min(0) int page, @NotNull Range dateRange) {
+    public AccountTransactionSearchRequest(String text, int page, Range dateRange) {
         this.text = text;
         this.page = page;
         this.dateRange = dateRange;

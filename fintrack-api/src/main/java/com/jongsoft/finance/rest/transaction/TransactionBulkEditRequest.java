@@ -4,11 +4,9 @@ import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 
 import java.util.List;
 
-@Builder
 @Serdeable.Deserializable
 public class TransactionBulkEditRequest {
 

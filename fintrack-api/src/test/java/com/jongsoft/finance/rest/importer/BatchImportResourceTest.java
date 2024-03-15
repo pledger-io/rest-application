@@ -21,6 +21,7 @@ import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.Map;
 
 @DisplayName("Batch importing resource")
 class BatchImportResourceTest extends TestSetup {
@@ -82,10 +83,7 @@ class BatchImportResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(ImporterCreateRequest.builder()
-                        .configuration("sample-configuration")
-                        .uploadToken("token-sample")
-                        .build())
+                .body(Map.of("configuration", "sample-configuration", "uploadToken", "token-sample"))
             .when()
                 .put("/api/import")
             .then()
@@ -211,10 +209,7 @@ class BatchImportResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(CSVImporterConfigCreateRequest.builder()
-                        .name("sample-configuration")
-                        .fileCode("token-sample")
-                        .build())
+                .body(Map.of("configuration", "sample-configuration", "uploadToken", "token-sample"))
             .when()
                 .put("/api/import/config")
             .then()

@@ -15,20 +15,21 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Tag(name = "Application Settings")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/settings/currencies")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CurrencyResource {
 
     private static final String NO_CURRENCY_WITH_CODE_MESSAGE = "No currency exists with code ";
     private final CurrencyProvider currencyProvider;
+
+    public CurrencyResource(CurrencyProvider currencyProvider) {
+        this.currencyProvider = currencyProvider;
+    }
 
     @Get
     @Operation(

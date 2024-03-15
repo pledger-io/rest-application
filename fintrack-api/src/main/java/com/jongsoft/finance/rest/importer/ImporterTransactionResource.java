@@ -15,19 +15,25 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Importer")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/import/{batchSlug}/transactions")
 public class ImporterTransactionResource {
 
     private final SettingProvider settingProvider;
     private final FilterFactory filterFactory;
     private final TransactionProvider transactionProvider;
+
+    public ImporterTransactionResource(
+            SettingProvider settingProvider,
+            FilterFactory filterFactory,
+            TransactionProvider transactionProvider) {
+        this.settingProvider = settingProvider;
+        this.filterFactory = filterFactory;
+        this.transactionProvider = transactionProvider;
+    }
 
     @Post
     @Operation(

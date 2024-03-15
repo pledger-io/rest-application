@@ -39,7 +39,7 @@ class StaticResourceTest {
 
     @Test
     void refresh() {
-        var response = subject.refresh();
+        var response = subject.refresh("");
 
         assertThat(new String((byte[]) response.body())).isEqualTo("It works!!!!");
     }

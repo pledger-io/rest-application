@@ -16,9 +16,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,12 +24,17 @@ import java.util.Objects;
 @Tag(name = "Scheduling agent")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/schedule/transaction")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ScheduledTransactionResource {
 
     private final AccountProvider accountProvider;
     private final TransactionScheduleProvider scheduleProvider;
     private final FilterFactory filterFactory;
+
+    public ScheduledTransactionResource(AccountProvider accountProvider, TransactionScheduleProvider scheduleProvider, FilterFactory filterFactory) {
+        this.accountProvider = accountProvider;
+        this.scheduleProvider = scheduleProvider;
+        this.filterFactory = filterFactory;
+    }
 
     @Get
     @Operation(
@@ -51,8 +54,8 @@ public class ScheduledTransactionResource {
     )
     @Status(HttpStatus.CREATED)
     public ScheduledTransactionResponse create(@Valid @Body ScheduledTransactionCreateRequest request) {
-        var account = accountProvider.lookup(request.getSource().getId());
-        var destination = accountProvider.lookup(request.getDestination().getId());
+        var account = accountProvider.lookup(request.getSource().id());
+        var destination = accountProvider.lookup(request.getDestination().id());
 
         if (!account.isPresent() || !destination.isPresent()) {
             throw StatusException.badRequest("Either source or destination account cannot be located.");
@@ -77,7 +80,7 @@ public class ScheduledTransactionResource {
     )
     public List<ScheduledTransactionResponse> search(@Valid @Body ScheduleSearchRequest request) {
         var filter = filterFactory.schedule()
-                .contract(Collections.List(request.getContracts()).map(c -> new EntityRef(c.getId())))
+                .contract(Collections.List(request.getContracts()).map(c -> new EntityRef(c.id())))
                 .activeOnly();
 
         return scheduleProvider.lookup(filter)
@@ -139,7 +142,7 @@ public class ScheduledTransactionResource {
         }
 
         if (Objects.nonNull(request.getRange())) {
-            schedule.limit(request.getRange().getStart(), request.getRange().getEnd());
+            schedule.limit(request.getRange().start(), request.getRange().end());
         }
 
         return new ScheduledTransactionResponse(schedule);

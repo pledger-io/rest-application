@@ -23,6 +23,7 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @DisplayName("Transaction resource")
 class TransactionResourceTest extends TestSetup {
@@ -99,15 +100,17 @@ class TransactionResourceTest extends TestSetup {
 
         // @formatter:off
         spec.given()
-                .body(TransactionSearchRequest.builder()
-                        .page(0)
-                        .dateRange(new TransactionSearchRequest.DateRange(
-                                LocalDate.of(2019, 1, 1),
-                                LocalDate.of(2019, 2, 1)))
-                        .onlyIncome(false)
-                        .onlyExpense(false)
-                        .description("samp")
-                        .build())
+                .body("""
+                        {
+                            "page": 0,
+                            "dateRange": {
+                                "start": "2019-01-01",
+                                "end": "2019-02-01"
+                            },
+                            "onlyIncome": false,
+                            "onlyExpense": false,
+                            "description": "samp"
+                        }""")
             .when()
                 .post("/api/transactions")
             .then()
@@ -163,13 +166,23 @@ class TransactionResourceTest extends TestSetup {
 
         // @formatter:off
         spec.given()
-                .body(TransactionBulkEditRequest.builder()
-                        .transactions(List.of(1L, 2L))
-                        .budget(new TransactionBulkEditRequest.EntityRef(-1L, "Groceries"))
-                        .category(new TransactionBulkEditRequest.EntityRef(-1L, "Category"))
-                        .contract(new TransactionBulkEditRequest.EntityRef(-1L, "Wallmart"))
-                        .tags(List.of("sample"))
-                        .build())
+                .body("""
+                        {
+                            "transactions": [1, 2],
+                            "budget": {
+                                "id": -1,
+                                "name": "Groceries"
+                            },
+                            "category": {
+                                "id": -1,
+                                "name": "Category"
+                            },
+                            "contract": {
+                                "id": -1,
+                                "name": "Wallmart"
+                            },
+                            "tags": ["sample"]
+                        }""")
             .when()
                 .patch("/api/transactions")
             .then()
@@ -192,9 +205,7 @@ class TransactionResourceTest extends TestSetup {
 
         // @formatter:off
         spec.given()
-                .body(TransactionSearchRequest.builder()
-                        .description("test")
-                        .build())
+                .body(Map.of("description", "test"))
             .when()
                 .post("/api/transactions/locate-first")
             .then()

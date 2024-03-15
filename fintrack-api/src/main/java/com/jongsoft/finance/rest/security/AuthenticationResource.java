@@ -26,9 +26,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 
@@ -36,7 +34,6 @@ import java.util.Map;
 import java.util.UUID;
 
 @Tag(name = "Authentication")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller(consumes = MediaType.APPLICATION_JSON)
 public class AuthenticationResource {
 
@@ -48,6 +45,17 @@ public class AuthenticationResource {
     private final AuthenticationFacade authenticationFacade;
     private final FinTrack application;
     private final ProcessEngine processEngine;
+
+    public AuthenticationResource(AccessRefreshTokenGenerator accessRefreshTokenGenerator, FintrackAuthenticationProvider authenticationProvider, RSASignatureConfiguration rsaSignatureConfiguration, ApplicationEventPublisher<LoginSuccessfulEvent> eventPublisher, UserProvider userProvider, AuthenticationFacade authenticationFacade, FinTrack application, ProcessEngine processEngine) {
+        this.accessRefreshTokenGenerator = accessRefreshTokenGenerator;
+        this.authenticationProvider = authenticationProvider;
+        this.rsaSignatureConfiguration = rsaSignatureConfiguration;
+        this.eventPublisher = eventPublisher;
+        this.userProvider = userProvider;
+        this.authenticationFacade = authenticationFacade;
+        this.application = application;
+        this.processEngine = processEngine;
+    }
 
     @ApiDefaults
     @Secured(SecurityRule.IS_ANONYMOUS)
@@ -109,7 +117,7 @@ public class AuthenticationResource {
     )
     public AccessRefreshToken mfaValidate(@Valid @Body MultiFactorRequest request) {
         return userProvider.lookup(authenticationFacade.authenticated())
-                .filter(user -> TwoFactorHelper.verifySecurityCode(user.getSecret(), request.getVerificationCode()))
+                .filter(user -> TwoFactorHelper.verifySecurityCode(user.getSecret(), request.verificationCode()))
                 .map(this::createAccessToken)
                 .getOrThrow(() -> StatusException.notAuthorized("Invalid verification code"));
     }

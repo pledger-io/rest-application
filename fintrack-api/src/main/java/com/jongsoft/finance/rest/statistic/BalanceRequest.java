@@ -4,12 +4,10 @@ import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.lang.Control;
 import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Setter
 @Serdeable
 public class BalanceRequest {
 
@@ -34,7 +32,6 @@ public class BalanceRequest {
     private String currency;
     private String importSlug;
 
-    @Setter
     @Serdeable
     public static class EntityRef implements AggregateBase {
 

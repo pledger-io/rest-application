@@ -3,9 +3,6 @@ package com.jongsoft.finance.rest.process;
 import com.jongsoft.finance.ProcessVariable;
 import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,8 +22,6 @@ public class VariableMap {
     public record WrappedVariable<T>(T value) implements ProcessVariable {
     }
 
-    @Setter
-    @Getter(value = AccessLevel.PACKAGE)
     @Schema(description = "The actual map of all the variables set for the task.")
     private HashMap<String, ProcessVariable> variables = new HashMap<>();
 
@@ -40,6 +35,14 @@ public class VariableMap {
 
     public Set<String> keySet() {
         return variables.keySet();
+    }
+
+    public void setVariables(HashMap<String, ProcessVariable> variables) {
+        this.variables = variables;
+    }
+
+    HashMap<String, ProcessVariable> getVariables() {
+        return variables;
     }
 
     private ProcessVariable convertTo(Object value) {

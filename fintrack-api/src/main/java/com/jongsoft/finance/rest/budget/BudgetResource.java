@@ -25,22 +25,21 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-@Slf4j
 @Tag(name = "Budget")
 @Controller("/api/budgets")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class BudgetResource {
+
+    private final Logger log = LoggerFactory.getLogger(BudgetResource.class);
 
     private final BudgetProvider budgetProvider;
     private final ExpenseProvider expenseProvider;
@@ -48,6 +47,19 @@ public class BudgetResource {
 
     private final CurrentUserProvider currentUserProvider;
     private final TransactionProvider transactionProvider;
+
+    public BudgetResource(
+            BudgetProvider budgetProvider,
+            ExpenseProvider expenseProvider,
+            FilterFactory filterFactory,
+            CurrentUserProvider currentUserProvider,
+            TransactionProvider transactionProvider) {
+        this.budgetProvider = budgetProvider;
+        this.expenseProvider = expenseProvider;
+        this.filterFactory = filterFactory;
+        this.currentUserProvider = currentUserProvider;
+        this.transactionProvider = transactionProvider;
+    }
 
     @Get("/current")
     @Operation(

@@ -22,9 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -34,12 +32,17 @@ import java.util.function.Function;
 @Tag(name = "Reports")
 @Controller("/api/statistics/balance")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class BalanceResource {
 
     private final FilterFactory filterFactory;
     private final TransactionProvider transactionProvider;
     private final ApplicationContext applicationContext;
+
+    public BalanceResource(FilterFactory filterFactory, TransactionProvider transactionProvider, ApplicationContext applicationContext) {
+        this.filterFactory = filterFactory;
+        this.transactionProvider = transactionProvider;
+        this.applicationContext = applicationContext;
+    }
 
     @Post
     @Operation(

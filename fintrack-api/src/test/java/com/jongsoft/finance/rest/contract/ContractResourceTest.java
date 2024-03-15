@@ -140,12 +140,15 @@ class ContractResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(ContractCreateRequest.builder()
-                        .name("Test Contract")
-                        .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
-                        .start(LocalDate.of(2019, 2, 1))
-                        .end(LocalDate.of(2020, 2, 1))
-                        .build())
+                .body("""
+                        {
+                            "name": "Test Contract",
+                            "company": {
+                                "id": 1
+                            },
+                            "start": "2019-02-01",
+                            "end": "2020-02-01"
+                        }""")
             .when()
                 .put("/api/contracts")
             .then()
@@ -168,12 +171,15 @@ class ContractResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(ContractCreateRequest.builder()
-                        .name("Test Contract")
-                        .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
-                        .start(LocalDate.of(2019, 2, 1))
-                        .end(LocalDate.of(2020, 2, 1))
-                        .build())
+                .body("""
+                        {
+                            "name": "Test Contract",
+                            "company": {
+                                "id": 1
+                            },
+                            "start": "2019-02-01",
+                            "end": "2020-02-01"
+                        }""")
             .when()
                 .put("/api/contracts")
             .then()
@@ -200,12 +206,15 @@ class ContractResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(ContractCreateRequest.builder()
-                        .name("Test Contract")
-                        .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
-                        .start(LocalDate.of(2019, 2, 1))
-                        .end(LocalDate.of(2022, 2, 1))
-                        .build())
+                .body("""
+                        {
+                            "name": "Test Contract",
+                            "company": {
+                                "id": 1
+                            },
+                            "start": "2019-02-01",
+                            "end": "2022-02-01"
+                        }""")
             .when()
                 .post("/api/contracts/1")
             .then()
@@ -230,12 +239,15 @@ class ContractResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(ContractCreateRequest.builder()
-                        .name("Test Contract")
-                        .company(ContractCreateRequest.EntityRef.builder().id(1L).build())
-                        .start(LocalDate.of(2019, 2, 1))
-                        .end(LocalDate.of(2022, 2, 1))
-                        .build())
+                .body("""
+                        {
+                            "name": "Test Contract",
+                            "company": {
+                                "id": 1
+                            },
+                            "start": "2019-02-01",
+                            "end": "2022-02-01"
+                        }""")
             .when()
                 .post("/api/contracts/{id}", 1)
             .then()
@@ -308,11 +320,17 @@ class ContractResourceTest extends TestSetup {
         // @formatter:off
         spec
             .when()
-                .body(CreateScheduleRequest.builder()
-                                .amount(20.2)
-                                .source(new CreateScheduleRequest.EntityRef(1L, null))
-                                .schedule(new CreateScheduleRequest.ScheduleValueJson(Periodicity.MONTHS, 3))
-                        .build())
+                .body("""
+                        {
+                            "amount": 20.2,
+                            "source": {
+                                "id": 1
+                            },
+                            "schedule": {
+                                "periodicity": "MONTHS",
+                                "value": 3
+                            }
+                        }""")
                 .put("/api/contracts/1/schedule")
             .then()
                 .statusCode(200);
@@ -352,9 +370,10 @@ class ContractResourceTest extends TestSetup {
         // @formatter:off
         spec
             .when()
-                .body(ContractAttachmentRequest.builder()
-                        .fileCode("file-code-1")
-                        .build())
+                .body("""
+                        {
+                            "fileCode": "file-code-1"
+                        }""")
                 .post("/api/contracts/{id}/attachment", 1)
             .then()
                 .statusCode(200);

@@ -41,10 +41,7 @@ class ProfileResourceTest extends TestSetup {
     @Test
     @DisplayName("Patch the current profile")
     public void patch(RequestSpecification spec) {
-        var request = new PatchProfileRequest();
-        request.setCurrency("USD");
-        request.setTheme("light");
-        request.setPassword("updated-password");
+        var request = new PatchProfileRequest("updated-password", "USD", "light");
 
         // @formatter:off
         spec.given()
@@ -94,10 +91,7 @@ class ProfileResourceTest extends TestSetup {
 
         // @formatter:off
         spec.given()
-                .body(TokenCreateRequest.builder()
-                                .description("sample description")
-                                .expires(LocalDate.now().plusDays(1))
-                                .build())
+                .body(new TokenCreateRequest("sample description", LocalDate.now().plusDays(1)))
             .when()
                 .put("/api/profile/sessions")
             .then()
@@ -132,8 +126,7 @@ class ProfileResourceTest extends TestSetup {
     @DisplayName("Enable MFA")
     public void enableMfa(RequestSpecification spec) {
         final Totp totp = new Totp(ACTIVE_USER.getSecret());
-        var request = new MultiFactorRequest();
-        request.setVerificationCode(totp.now());
+        var request = new MultiFactorRequest(totp.now());
 
         // @formatter:off
         spec.given()

@@ -5,7 +5,6 @@ import com.jongsoft.finance.domain.account.SavingGoal;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -75,10 +74,13 @@ public class AccountResponse {
     }
 
     @Serdeable.Serializable
-    @RequiredArgsConstructor
     public class SavingGoalResponse {
 
         private final SavingGoal wrapped;
+
+        public SavingGoalResponse(SavingGoal wrapped) {
+            this.wrapped = wrapped;
+        }
 
         @Schema(description = "The identifier of the saving goal", example = "132", required = true)
         public long getId() {

@@ -15,16 +15,13 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Tag(name = "Category")
 @Controller("/api/categories")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CategoryResource {
 
     private final FilterFactory filterFactory;
@@ -32,6 +29,17 @@ public class CategoryResource {
     private final CurrentUserProvider currentUserProvider;
 
     private final SettingProvider settingProvider;
+
+    public CategoryResource(
+            FilterFactory filterFactory,
+            CategoryProvider categoryService,
+            CurrentUserProvider currentUserProvider,
+            SettingProvider settingProvider) {
+        this.filterFactory = filterFactory;
+        this.categoryService = categoryService;
+        this.currentUserProvider = currentUserProvider;
+        this.settingProvider = settingProvider;
+    }
 
     @Get
     @Operation(
@@ -85,11 +93,11 @@ public class CategoryResource {
     )
     CategoryResponse create(@Valid @Body CategoryCreateRequest createRequest) {
         currentUserProvider.currentUser()
-                .createCategory(createRequest.getName());
+                .createCategory(createRequest.name());
 
-        return categoryService.lookup(createRequest.getName())
+        return categoryService.lookup(createRequest.name())
                 .map(category -> {
-                    category.rename(createRequest.getName(), createRequest.getDescription());
+                    category.rename(createRequest.name(), createRequest.description());
                     return category;
                 })
                 .map(CategoryResponse::new)
@@ -119,7 +127,7 @@ public class CategoryResource {
             @Valid @Body CategoryCreateRequest updateRequest) {
         return categoryService.lookup(id)
                 .map(category -> {
-                    category.rename(updateRequest.getName(), updateRequest.getDescription());
+                    category.rename(updateRequest.name(), updateRequest.description());
                     return new CategoryResponse(category);
                 })
                 .getOrThrow(() -> StatusException.notFound("No category found with id " + id));

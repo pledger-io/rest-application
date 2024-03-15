@@ -10,8 +10,6 @@ import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RuntimeService;
 
@@ -21,13 +19,18 @@ import java.util.Map;
 @Tag(name = "Process Engine")
 @Controller("/api/runtime-process")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RuntimeResource {
 
     private static final String KEY_USERNAME = "username";
     private final HistoryService historyService;
     private final RuntimeService runtimeService;
     private final AuthenticationFacade authenticationFacade;
+
+    public RuntimeResource(HistoryService historyService, RuntimeService runtimeService, AuthenticationFacade authenticationFacade) {
+        this.historyService = historyService;
+        this.runtimeService = runtimeService;
+        this.authenticationFacade = authenticationFacade;
+    }
 
     @Put("/{processDefinitionKey}/start")
     @Operation(

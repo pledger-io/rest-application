@@ -12,15 +12,12 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/transactions/tags")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 @io.swagger.v3.oas.annotations.tags.Tag(name = "Transactions")
 public class TransactionTagResource {
 
@@ -30,6 +27,13 @@ public class TransactionTagResource {
 
     private final CurrentUserProvider currentUserProvider;
 
+    public TransactionTagResource(SettingProvider settingProvider, TagProvider tagProvider, FilterFactory filterFactory, CurrentUserProvider currentUserProvider) {
+        this.settingProvider = settingProvider;
+        this.tagProvider = tagProvider;
+        this.filterFactory = filterFactory;
+        this.currentUserProvider = currentUserProvider;
+    }
+
     @Post
     @Operation(
             summary = "Create tag",
@@ -37,7 +41,7 @@ public class TransactionTagResource {
             operationId = "createTag"
     )
     TagResponse create(@Valid @Body TagCreateRequest tag) {
-        return new TagResponse(currentUserProvider.currentUser().createTag(tag.getTag()));
+        return new TagResponse(currentUserProvider.currentUser().createTag(tag.tag()));
     }
 
     @Get

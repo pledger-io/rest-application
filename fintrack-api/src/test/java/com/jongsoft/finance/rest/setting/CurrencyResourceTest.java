@@ -14,6 +14,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Map;
+
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,11 +77,10 @@ class CurrencyResourceTest extends TestSetup {
         spec
             .given()
                 .contentType("application/json")
-                .body(CurrencyRequest.builder()
-                        .code("TCC")
-                        .symbol("S")
-                        .name("Test currency")
-                        .build())
+                .body(Map.of(
+                        "code", "TCC",
+                        "symbol", "S",
+                        "name", "Test currency"))
             .when()
                 .put("/api/settings/currencies")
             .then()
@@ -127,11 +128,10 @@ class CurrencyResourceTest extends TestSetup {
         spec
             .given()
                 .contentType("application/json")
-                .body(CurrencyRequest.builder()
-                        .code("TCC")
-                        .symbol("S")
-                        .name("Test currency")
-                        .build())
+                .body(Map.of(
+                        "code", "TCC",
+                        "symbol", "S",
+                        "name", "Test currency"))
             .when()
                 .post("/api/settings/currencies/EUR")
             .then()
@@ -161,10 +161,9 @@ class CurrencyResourceTest extends TestSetup {
         spec
             .given()
                 .contentType("application/json")
-                .body(CurrencyPatchRequest.builder()
-                        .enabled(false)
-                        .decimalPlaces(2)
-                        .build())
+                .body(Map.of(
+                        "enabled", false,
+                        "decimalPlaces", 2))
             .when()
                 .patch("/api/settings/currencies/EUR")
             .then()

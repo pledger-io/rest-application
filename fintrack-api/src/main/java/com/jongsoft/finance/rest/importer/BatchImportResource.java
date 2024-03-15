@@ -16,22 +16,30 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Tag(name = "Importer")
 @Controller("/api/import")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class BatchImportResource {
 
     private final CurrentUserProvider currentUserProvider;
     private final CSVConfigProvider csvConfigProvider;
     private final ImportProvider importProvider;
     private final SettingProvider settingProvider;
+
+    public BatchImportResource(
+            CurrentUserProvider currentUserProvider,
+            CSVConfigProvider csvConfigProvider,
+            ImportProvider importProvider,
+            SettingProvider settingProvider) {
+        this.currentUserProvider = currentUserProvider;
+        this.csvConfigProvider = csvConfigProvider;
+        this.importProvider = importProvider;
+        this.settingProvider = settingProvider;
+    }
 
     @Post
     @Operation(
@@ -60,8 +68,8 @@ public class BatchImportResource {
             description = "Creates a new importer job in FinTrack, which can be used to import a CSV of transactions"
     )
     ImporterResponse create(@Valid @Body ImporterCreateRequest request) {
-        return csvConfigProvider.lookup(request.getConfiguration())
-                .map(config -> config.createImport(request.getUploadToken()))
+        return csvConfigProvider.lookup(request.configuration())
+                .map(config -> config.createImport(request.uploadToken()))
                 .map(ImporterResponse::new)
                 .getOrThrow(() -> StatusException.notFound("CSV configuration not found"));
     }
@@ -111,13 +119,13 @@ public class BatchImportResource {
             description = "Creates a new importer configuration in FinTrack, using the provided file token"
     )
     CSVImporterConfigResponse createConfig(@Valid @Body CSVImporterConfigCreateRequest request) {
-        var existing = csvConfigProvider.lookup(request.getName());
+        var existing = csvConfigProvider.lookup(request.name());
         if (existing.isPresent()) {
-            throw StatusException.badRequest("Configuration with name " + request.getName() + " already exists.");
+            throw StatusException.badRequest("Configuration with name " + request.name() + " already exists.");
         }
 
         return new CSVImporterConfigResponse(currentUserProvider.currentUser().createImportConfiguration(
-                request.getName(),
-                request.getFileCode()));
+                request.name(),
+                request.fileCode()));
     }
 }

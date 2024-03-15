@@ -14,9 +14,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,12 +29,17 @@ import java.util.UUID;
 @Tag(name = "User profile")
 @Controller("/api/profile")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ProfileResource {
 
     private final FinTrack application;
     private final CurrentUserProvider currentUserProvider;
     private final UserProvider userProvider;
+
+    public ProfileResource(FinTrack application, CurrentUserProvider currentUserProvider, UserProvider userProvider) {
+        this.application = application;
+        this.currentUserProvider = currentUserProvider;
+        this.userProvider = userProvider;
+    }
 
     @Get
     @Operation(
@@ -93,7 +96,7 @@ public class ProfileResource {
                 UUID.randomUUID().toString(),
                 (int) ChronoUnit.SECONDS.between(
                         LocalDateTime.now(),
-                        request.getExpires().atTime(LocalTime.MIN)));
+                        request.expires().atTime(LocalTime.MIN)));
 
         return sessions();
     }
@@ -138,7 +141,7 @@ public class ProfileResource {
             description = "This will activate 2-factor authentication when the security code matches the one recorded")
     void enableMfa(@Body @Valid MultiFactorRequest multiFactorRequest) {
         var userAccount = currentUserProvider.currentUser();
-        if (!TwoFactorHelper.verifySecurityCode(userAccount.getSecret(), multiFactorRequest.getVerificationCode())) {
+        if (!TwoFactorHelper.verifySecurityCode(userAccount.getSecret(), multiFactorRequest.verificationCode())) {
             throw StatusException.badRequest("Invalid verification code provided.");
         }
 

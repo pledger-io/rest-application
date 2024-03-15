@@ -8,12 +8,13 @@ import io.micronaut.security.token.jwt.signature.SignatureGeneratorConfiguration
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGenerator;
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGeneratorConfiguration;
 import jakarta.inject.Named;
-import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMException;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -26,10 +27,10 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Optional;
 
-@Slf4j
 @Factory
 public class SignatureConfiguration implements RSASignatureGeneratorConfiguration {
 
+    private static final Logger log = LoggerFactory.getLogger(SignatureConfiguration.class);
     private RSAPrivateKey rsaPrivateKey;
     private RSAPublicKey rsaPublicKey;
 

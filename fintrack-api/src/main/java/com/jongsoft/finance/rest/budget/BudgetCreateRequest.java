@@ -3,11 +3,9 @@ package com.jongsoft.finance.rest.budget;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import lombok.Builder;
 
 import java.time.LocalDate;
 
-@Builder
 @Serdeable.Deserializable
 class BudgetCreateRequest {
 

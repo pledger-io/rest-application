@@ -17,21 +17,21 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Controller("/api/accounts/{accountId}")
 @Tag(name = "Account information")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class AccountEditResource {
 
-    private final CurrentUserProvider currentUserProvider;
     private final AccountProvider accountProvider;
+
+    public AccountEditResource(AccountProvider accountProvider) {
+        this.accountProvider = accountProvider;
+    }
 
     @Get
     @Operation(
@@ -155,9 +155,9 @@ public class AccountEditResource {
         accountProvider.lookup(accountId)
                 .ifPresent(account ->
                         account.createSavingGoal(
-                                request.getName(),
-                                request.getGoal(),
-                                request.getTargetDate()))
+                                request.name(),
+                                request.goal(),
+                                request.targetDate()))
                 .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
 
         return accountProvider.lookup(accountId)
@@ -181,7 +181,7 @@ public class AccountEditResource {
                         account.getSavingGoals()
                                 .filter(goal -> goal.getId() == savingId)
                                 .head()
-                                .adjustGoal(request.getGoal(), request.getTargetDate()))
+                                .adjustGoal(request.goal(), request.targetDate()))
                 .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
 
         return accountProvider.lookup(accountId)
