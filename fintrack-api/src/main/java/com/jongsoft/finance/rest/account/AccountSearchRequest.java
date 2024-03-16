@@ -6,11 +6,9 @@ import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.*;
 
 import java.util.List;
 
-@Builder
 @Serdeable
 public class AccountSearchRequest {
 
@@ -19,6 +17,12 @@ public class AccountSearchRequest {
     @Min(0)
     private int page;
     private String name;
+
+    public AccountSearchRequest(List<String> accountTypes, int page, String name) {
+        this.accountTypes = accountTypes;
+        this.page = page;
+        this.name = name;
+    }
 
     public Sequence<String> accountTypes() {
         return Control.Option(accountTypes)

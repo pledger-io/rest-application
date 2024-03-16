@@ -9,18 +9,19 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
 @Tag(name = "Attachments")
 @Controller("/api/attachment")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class FileResource {
 
     private final StorageService storageService;
+
+    public FileResource(StorageService storageService) {
+        this.storageService = storageService;
+    }
 
     @Post
     @Status(HttpStatus.CREATED)

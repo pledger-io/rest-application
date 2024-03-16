@@ -50,16 +50,17 @@ class BalanceResourceTest extends TestSetup {
     @Test
     @DisplayName("Calculate balance")
     void calculate(RequestSpecification spec) {
-        var request = new BalanceRequest();
-        request.setOnlyIncome(false);
-        request.setDateRange(new BalanceRequest.DateRange(
-                LocalDate.of(2019, 1, 1),
-                LocalDate.of(2019, 2, 1)));
-
         // @formatter:off
         spec
             .given()
-                .body(request)
+                .body("""
+                        {
+                            "onlyIncome": false,
+                            "dateRange": {
+                                "start": "2019-01-01",
+                                "end": "2019-02-01"
+                            }
+                        }""")
             .when()
                 .post("/api/statistics/balance")
             .then()
@@ -76,16 +77,17 @@ class BalanceResourceTest extends TestSetup {
     @Test
     @DisplayName("Calculate daily balance")
     void daily(RequestSpecification spec) {
-        var request = new BalanceRequest();
-        request.setOnlyIncome(false);
-        request.setDateRange(new BalanceRequest.DateRange(
-                LocalDate.of(2019, 1, 1),
-                LocalDate.of(2019, 2, 1)));
-
         // @formatter:off
         spec
             .given()
-                .body(request)
+                .body("""
+                        {
+                            "onlyIncome": false,
+                            "dateRange": {
+                                "start": "2019-01-01",
+                                "end": "2019-02-01"
+                            }
+                        }""")
             .when()
                 .post("/api/statistics/balance/daily")
             .then()
@@ -102,16 +104,17 @@ class BalanceResourceTest extends TestSetup {
     @Test
     @DisplayName("Calculate monthly balance")
     void monthly(RequestSpecification spec) {
-        var request = new BalanceRequest();
-        request.setOnlyIncome(false);
-        request.setDateRange(new BalanceRequest.DateRange(
-                LocalDate.of(2019, 1, 1),
-                LocalDate.of(2019, 2, 1)));
-
         // @formatter:off
         spec
             .given()
-                .body(request)
+                .body("""
+                        {
+                            "onlyIncome": false,
+                            "dateRange": {
+                                "start": "2019-01-01",
+                                "end": "2019-02-01"
+                            }
+                        }""")
             .when()
                 .post("/api/statistics/balance/monthly")
             .then()
@@ -128,18 +131,19 @@ class BalanceResourceTest extends TestSetup {
     @Test
     @DisplayName("Calculate partitioned balance")
     void calculatePartitioned(RequestSpecification spec) {
-        var request = new BalanceRequest();
-        request.setOnlyIncome(false);
-        request.setDateRange(new BalanceRequest.DateRange(
-                LocalDate.of(2019, 1, 1),
-                LocalDate.of(2019, 2, 1)));
-
         Mockito.when(accountProvider.lookup()).thenReturn(Collections.List());
 
         // @formatter:off
         spec
             .given()
-                .body(request)
+                .body("""
+                        {
+                            "onlyIncome": false,
+                            "dateRange": {
+                                "start": "2019-01-01",
+                                "end": "2019-02-01"
+                            }
+                        }""")
             .when()
                 .post("/api/statistics/balance/partitioned/{partitionKey}", "account")
             .then()

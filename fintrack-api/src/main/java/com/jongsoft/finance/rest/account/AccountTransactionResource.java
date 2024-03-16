@@ -26,15 +26,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.util.function.Consumer;
 
 @Tag(name = "Transactions")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/accounts/{accountId}/transactions")
 public class AccountTransactionResource {
 
@@ -42,6 +39,17 @@ public class AccountTransactionResource {
     private final TransactionProvider transactionProvider;
     private final AccountProvider accountProvider;
     private final SettingProvider settingProvider;
+
+    public AccountTransactionResource(
+            FilterFactory filterFactory,
+            TransactionProvider transactionProvider,
+            AccountProvider accountProvider,
+            SettingProvider settingProvider) {
+        this.filterFactory = filterFactory;
+        this.transactionProvider = transactionProvider;
+        this.accountProvider = accountProvider;
+        this.settingProvider = settingProvider;
+    }
 
     @Post
     @Operation(
@@ -68,8 +76,8 @@ public class AccountTransactionResource {
         var command = filterFactory.transaction()
                 .accounts(Collections.List(new EntityRef(accountId)))
                 .range(Dates.range(
-                        request.getDateRange().getStart(),
-                        request.getDateRange().getEnd()))
+                        request.getDateRange().start(),
+                        request.getDateRange().end()))
                 .pageSize(settingProvider.getPageSize())
                 .page(request.getPage());
 
@@ -98,20 +106,20 @@ public class AccountTransactionResource {
             }
     )
     void create(@Valid @Body AccountTransactionCreateRequest request) {
-        Account fromAccount = accountProvider.lookup(request.getSource().getId()).get();
-        Account toAccount = accountProvider.lookup(request.getDestination().getId()).get();
+        Account fromAccount = accountProvider.lookup(request.getSource().id()).get();
+        Account toAccount = accountProvider.lookup(request.getDestination().id()).get();
 
         final Consumer<Transaction.TransactionBuilder> builderConsumer =
                 transactionBuilder -> transactionBuilder.currency(request.getCurrency())
                         .description(request.getDescription())
                         .budget(Control.Option(request.getBudget())
-                                .map(AccountTransactionCreateRequest.EntityRef::getName)
+                                .map(AccountTransactionCreateRequest.EntityRef::name)
                                 .getOrSupply(() -> null))
                         .category(Control.Option(request.getCategory())
-                                .map(AccountTransactionCreateRequest.EntityRef::getName)
+                                .map(AccountTransactionCreateRequest.EntityRef::name)
                                 .getOrSupply(() -> null))
                         .contract(Control.Option(request.getContract())
-                                .map(AccountTransactionCreateRequest.EntityRef::getName)
+                                .map(AccountTransactionCreateRequest.EntityRef::name)
                                 .getOrSupply(() -> null))
                         .date(request.getDate())
                         .bookDate(request.getBookDate())
@@ -209,8 +217,8 @@ public class AccountTransactionResource {
         if (!presence.isPresent()) {
             throw StatusException.notFound("No transaction found for id " + transactionId);
         }
-        var fromAccount = accountProvider.lookup(request.getSource().getId()).get();
-        var toAccount = accountProvider.lookup(request.getDestination().getId()).get();
+        var fromAccount = accountProvider.lookup(request.getSource().id()).get();
+        var toAccount = accountProvider.lookup(request.getDestination().id()).get();
         var transaction = presence.get();
 
         transaction.changeAccount(true, fromAccount);
@@ -224,13 +232,13 @@ public class AccountTransactionResource {
 
         // update meta-data
         transaction.linkToBudget(Control.Option(request.getBudget())
-                .map(AccountTransactionCreateRequest.EntityRef::getName)
+                .map(AccountTransactionCreateRequest.EntityRef::name)
                 .getOrSupply(() -> null));
         transaction.linkToCategory(Control.Option(request.getCategory())
-                .map(AccountTransactionCreateRequest.EntityRef::getName)
+                .map(AccountTransactionCreateRequest.EntityRef::name)
                 .getOrSupply(() -> null));
         transaction.linkToContract(Control.Option(request.getContract())
-                .map(AccountTransactionCreateRequest.EntityRef::getName)
+                .map(AccountTransactionCreateRequest.EntityRef::name)
                 .getOrSupply(() -> null));
 
         Control.Option(request.getTags())
@@ -269,9 +277,7 @@ public class AccountTransactionResource {
     )
     void delete(@PathVariable long transactionId) {
         transactionProvider.lookup(transactionId)
-                .ifPresent(transaction -> {
-                    transaction.delete();
-                })
+                .ifPresent(Transaction::delete)
                 .elseThrow(() -> StatusException.notFound("No transaction found with id " + transactionId));
     }
 

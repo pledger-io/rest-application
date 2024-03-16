@@ -4,28 +4,19 @@ import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 
 import java.time.LocalDate;
 
-@Builder
 @Serdeable.Deserializable
 class ContractCreateRequest {
 
-    @Builder
     @Serdeable.Deserializable
-    static class EntityRef {
-        @NotNull
-        private Long id;
-        private String name;
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
+    public record EntityRef(
+            @NotNull
+            @Schema(description = "The id of the company.", example = "1")
+            Long id,
+            @Schema(description = "The name of the company.", example = "Company 1")
+            String name){
     }
 
     @NotNull
@@ -47,6 +38,14 @@ class ContractCreateRequest {
     @NotNull
     @Schema(description = "The end date of the contract.")
     private LocalDate end;
+
+    public ContractCreateRequest(String name, String description, EntityRef company, LocalDate start, LocalDate end) {
+        this.name = name;
+        this.description = description;
+        this.company = company;
+        this.start = start;
+        this.end = end;
+    }
 
     public String getName() {
         return name;

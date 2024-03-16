@@ -6,15 +6,16 @@ import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
-import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 
 @Filter("/**")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CurrencyHeaderFilter implements HttpServerFilter {
 
     private final CurrencyProvider currencyProvider;
+
+    public CurrencyHeaderFilter(CurrencyProvider currencyProvider) {
+        this.currencyProvider = currencyProvider;
+    }
 
     @Override
     public Publisher<MutableHttpResponse<?>> doFilter(final HttpRequest<?> request, final ServerFilterChain chain) {

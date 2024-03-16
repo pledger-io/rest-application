@@ -4,23 +4,18 @@ import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Setter
 @Serdeable.Deserializable
 class AccountTransactionCreateRequest {
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
     @Serdeable.Deserializable
-    static class EntityRef {
-        @NotNull
-        private Long id;
-        private String name;
+    record EntityRef(
+            @NotNull
+            Long id,
+            String name) {
     }
 
     @NotNull
@@ -49,8 +44,6 @@ class AccountTransactionCreateRequest {
     private EntityRef contract;
     private List<String> tags;
 
-    @Builder
-    @Generated
     public AccountTransactionCreateRequest(@NotNull LocalDate date, LocalDate interestDate, LocalDate bookDate, @NotNull @NotBlank String currency, @NotBlank @Size(max = 1024) String description, @NotNull double amount, @NotNull EntityRef source, @NotNull EntityRef destination, EntityRef category, EntityRef budget, EntityRef contract, List<String> tags) {
         this.date = date;
         this.interestDate = interestDate;

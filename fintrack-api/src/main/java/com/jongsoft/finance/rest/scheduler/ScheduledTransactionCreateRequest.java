@@ -2,47 +2,40 @@ package com.jongsoft.finance.rest.scheduler;
 
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
 
-@Setter
-@Builder
 @Serdeable.Deserializable
 public class ScheduledTransactionCreateRequest {
 
-    @Builder
     @Serdeable.Deserializable
-    static class EntityRef {
-        @NotNull
-        private Long id;
-        private String name;
-
-        public Long getId() {
-            return id;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
+    public record EntityRef(@NotNull Long id, String name) {}
 
     @Serdeable.Deserializable
-    record ScheduleValue(Periodicity periodicity, int interval) {}
+    public record ScheduleValue(@NotNull Periodicity periodicity, @Min(1) int interval) {}
 
     @NotBlank
-    private String name;
+    private final String name;
 
-    private double amount;
-
-    @NotNull
-    private EntityRef source;
+    private final double amount;
 
     @NotNull
-    private EntityRef destination;
+    private final EntityRef source;
 
     @NotNull
-    private ScheduleValue schedule;
+    private final EntityRef destination;
+
+    @NotNull
+    private final ScheduleValue schedule;
+
+    public ScheduledTransactionCreateRequest(String name, double amount, EntityRef source, EntityRef destination, ScheduleValue schedule) {
+        this.name = name;
+        this.amount = amount;
+        this.source = source;
+        this.destination = destination;
+        this.schedule = schedule;
+    }
 
     public com.jongsoft.finance.domain.transaction.ScheduleValue getSchedule() {
         return new com.jongsoft.finance.domain.transaction.ScheduleValue(schedule.periodicity, schedule.interval);

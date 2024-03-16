@@ -1,7 +1,5 @@
 package com.jongsoft.finance.security;
 
-import com.jongsoft.finance.configuration.SecuritySettings;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;

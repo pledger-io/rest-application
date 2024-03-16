@@ -24,15 +24,12 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 @Controller("/api/profile/export")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 @io.swagger.v3.oas.annotations.tags.Tag(name = "User profile")
 public class ProfileExportResource {
 
@@ -42,6 +39,15 @@ public class ProfileExportResource {
     private final StorageService storageService;
     private final TransactionProvider transactionProvider;
     private final FilterFactory filterFactory;
+
+    public ProfileExportResource(AuthenticationFacade authenticationFacade, List<Exportable<?>> exportable, List<DataProvider<?>> dataProviders, StorageService storageService, TransactionProvider transactionProvider, FilterFactory filterFactory) {
+        this.authenticationFacade = authenticationFacade;
+        this.exportable = exportable;
+        this.dataProviders = dataProviders;
+        this.storageService = storageService;
+        this.transactionProvider = transactionProvider;
+        this.filterFactory = filterFactory;
+    }
 
     @Get
     @Operation(

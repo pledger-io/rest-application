@@ -167,10 +167,11 @@ class AccountResourceTest extends TestSetup {
 
         // @formatter:off
         spec.when()
-                .body(AccountSearchRequest.builder()
-                    .accountTypes(List.of("creditor"))
-                    .page(0)
-                    .build())
+                .body("""
+                        {
+                            "accountTypes": ["creditor"],
+                            "page": 0
+                        }""")
                 .post("/api/accounts")
             .then()
                 .statusCode(200)
@@ -200,18 +201,17 @@ class AccountResourceTest extends TestSetup {
                 .thenReturn(Control.Option())
                 .thenReturn(Control.Option(account));
 
-        var request = AccountEditRequest.builder()
-                .name("Sample account")
-                .currency("EUR")
-                .type("checking")
-                .iban("NL45RABO1979747032")
-                .interest(0.22)
-                .interestPeriodicity(Periodicity.MONTHS)
-                .build();
-
         // @formatter:off
         spec.when()
-                .body(request)
+                .body("""
+                        {
+                            "name": "Sample account",
+                            "currency": "EUR",
+                            "type": "checking",
+                            "iban": "NL45RABO1979747032",
+                            "interest": 0.22,
+                            "interestPeriodicity": "MONTHS"
+                        }""")
                 .put("/api/accounts")
             .then()
                 .statusCode(200)

@@ -6,6 +6,7 @@ micronaut {
 dependencies {
     annotationProcessor(mn.lombok)
     annotationProcessor(mn.micronaut.data.processor)
+    annotationProcessor(mn.micronaut.validation.processor)
 
     compileOnly(mn.lombok)
 

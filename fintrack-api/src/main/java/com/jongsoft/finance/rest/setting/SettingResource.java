@@ -8,18 +8,19 @@ import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Secured("admin")
 @Controller("/api/settings")
 @Tag(name = "Application Settings")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SettingResource {
 
     private final SettingProvider settingProvider;
+
+    public SettingResource(SettingProvider settingProvider) {
+        this.settingProvider = settingProvider;
+    }
 
     @Get
     @Operation(
@@ -46,7 +47,7 @@ public class SettingResource {
     @ApiResponse(responseCode = "204")
     void update(@PathVariable String setting, @Body SettingUpdateRequest request) {
         settingProvider.lookup(setting)
-                .ifPresent(value -> value.update(request.getValue()));
+                .ifPresent(value -> value.update(request.value()));
     }
 
 }

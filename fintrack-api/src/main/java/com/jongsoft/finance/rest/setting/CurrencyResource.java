@@ -15,20 +15,21 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Tag(name = "Application Settings")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Controller("/api/settings/currencies")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class CurrencyResource {
 
     private static final String NO_CURRENCY_WITH_CODE_MESSAGE = "No currency exists with code ";
     private final CurrencyProvider currencyProvider;
+
+    public CurrencyResource(CurrencyProvider currencyProvider) {
+        this.currencyProvider = currencyProvider;
+    }
 
     @Get
     @Operation(
@@ -52,14 +53,14 @@ public class CurrencyResource {
     )
     @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = CurrencyResponse.class)))
     public CurrencyResponse create(@Valid @Body CurrencyRequest request) {
-        var existing = currencyProvider.lookup(request.getCode());
+        var existing = currencyProvider.lookup(request.code());
         if (existing.isPresent()) {
-            throw StatusException.badRequest("Currency with code " + request.getCode() + " already exists");
+            throw StatusException.badRequest("Currency with code " + request.code() + " already exists");
         }
 
         return new CurrencyResponse(new Currency(
-                request.getName(),
-                request.getCode(),
+                request.name(),
+                request.code(),
                 request.getSymbol()
         ));
     }
@@ -110,7 +111,7 @@ public class CurrencyResource {
     public CurrencyResponse update(@PathVariable String currencyCode, @Valid @Body CurrencyRequest request) {
         return currencyProvider.lookup(currencyCode)
                 .map(currency -> {
-                    currency.rename(request.getName(), request.getCode(), request.getSymbol());
+                    currency.rename(request.name(), request.code(), request.getSymbol());
                     return currency;
                 })
                 .map(CurrencyResponse::new)
@@ -129,16 +130,16 @@ public class CurrencyResource {
     public CurrencyResponse patch(@PathVariable String currencyCode, @Valid @Body CurrencyPatchRequest request) {
         return currencyProvider.lookup(currencyCode)
                 .map(currency -> {
-                    if (request.getEnabled() != null) {
-                        if (request.getEnabled()) {
+                    if (request.enabled() != null) {
+                        if (request.enabled()) {
                             currency.enable();
                         } else {
                             currency.disable();
                         }
                     }
 
-                    if (request.getDecimalPlaces() != null) {
-                        currency.accuracy(request.getDecimalPlaces());
+                    if (request.decimalPlaces() != null) {
+                        currency.accuracy(request.decimalPlaces());
                     }
 
                     return currency;

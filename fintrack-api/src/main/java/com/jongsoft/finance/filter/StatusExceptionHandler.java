@@ -9,12 +9,14 @@ import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.http.hateoas.Link;
 import io.micronaut.http.server.exceptions.ExceptionHandler;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Produces
 @Singleton
 public class StatusExceptionHandler implements ExceptionHandler<StatusException, HttpResponse<JsonError>> {
+
+    private final Logger log = LoggerFactory.getLogger(StatusExceptionHandler.class);
 
     @Override
     public HttpResponse<JsonError> handle(HttpRequest request, StatusException exception) {

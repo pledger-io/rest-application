@@ -88,9 +88,13 @@ class AccountTransactionResourceTest extends TestSetup {
         // @formatter:off
 
         spec.when()
-                .body(AccountTransactionSearchRequest.builder()
-                        .dateRange(new AccountTransactionSearchRequest.Range())
-                        .build())
+                .body("""
+                        {
+                            "dateRange": {
+                                "from": "2019-01-01",
+                                "until": "2019-12-31"
+                            }
+                        }""")
                 .post("/api/accounts/{accountId}/transactions", 1)
             .then()
                 .statusCode(200)
@@ -119,9 +123,13 @@ class AccountTransactionResourceTest extends TestSetup {
 
         // @formatter:off
         spec.when()
-                .body(AccountTransactionSearchRequest.builder()
-                        .dateRange(new AccountTransactionSearchRequest.Range())
-                        .build())
+                .body("""
+                        {
+                            "dateRange": {
+                                "from": "2019-01-01",
+                                "until": "2019-12-31"
+                            }
+                        }""")
                 .post("/api/accounts/{accountId}/transactions", 1)
             .then()
                 .statusCode(404)
@@ -141,16 +149,25 @@ class AccountTransactionResourceTest extends TestSetup {
         // @formatter:off
 
         spec.when()
-                .body(AccountTransactionCreateRequest.builder()
-                        .date(LocalDate.of(2019, 1, 1))
-                        .currency("EUR")
-                        .description("Sample transaction")
-                        .amount(20.2)
-                        .source(new AccountTransactionCreateRequest.EntityRef(1L, null))
-                        .destination(new AccountTransactionCreateRequest.EntityRef(2L, null))
-                        .category(new AccountTransactionCreateRequest.EntityRef(1L, null))
-                        .budget(new AccountTransactionCreateRequest.EntityRef(3L, null))
-                        .build())
+                .body("""
+                        {
+                            "date": "2019-01-01",
+                            "currency": "EUR",
+                            "description": "Sample transaction",
+                            "amount": 20.2,
+                            "source": {
+                                "id": 1
+                            },
+                            "destination": {
+                                "id": 2
+                            },
+                            "category": {
+                                "id": 1
+                            },
+                            "budget": {
+                                "id": 3
+                            }
+                        }""")
                 .put("/api/accounts/{accountId}/transactions", 1)
             .then()
                 .statusCode(204);
@@ -321,16 +338,25 @@ class AccountTransactionResourceTest extends TestSetup {
         // @formatter:off
 
         spec.when()
-                .body(AccountTransactionCreateRequest.builder()
-                        .date(LocalDate.of(2019, 1, 1))
-                        .currency("EUR")
-                        .description("Updated transaction")
-                        .amount(20.2)
-                        .source(new AccountTransactionCreateRequest.EntityRef(1L, null))
-                        .destination(new AccountTransactionCreateRequest.EntityRef(2L, null))
-                        .category(new AccountTransactionCreateRequest.EntityRef(1L, null))
-                        .budget(new AccountTransactionCreateRequest.EntityRef(3L, null))
-                        .build())
+                .body("""
+                        {
+                            "date": "2019-01-01",
+                            "currency": "EUR",
+                            "description": "Updated transaction",
+                            "amount": 20.2,
+                            "source": {
+                                "id": 1
+                            },
+                            "destination": {
+                                "id": 2
+                            },
+                            "category": {
+                                "id": 1
+                            },
+                            "budget": {
+                                "id": 3
+                            }
+                        }""")
                 .post("/api/accounts/{accountId}/transactions/{transactionId}", 1, 123)
             .then()
                 .statusCode(200)
@@ -359,12 +385,19 @@ class AccountTransactionResourceTest extends TestSetup {
         // @formatter:off
 
         spec.when()
-                .body(AccountTransactionSplitRequest.builder()
-                        .splits(List.of(
-                                new AccountTransactionSplitRequest.SplitRecord("Part 1", -5D),
-                                new AccountTransactionSplitRequest.SplitRecord("Part 2", -15D)
-                        ))
-                        .build())
+                .body("""
+                        {
+                            "splits": [
+                                {
+                                    "description": "Part 1",
+                                    "amount": -5
+                                },
+                                {
+                                    "description": "Part 2",
+                                    "amount": -15
+                                }
+                            ]
+                        }""")
                 .patch("/api/accounts/{accountId}/transactions/{transactionId}", 1, 123)
             .then()
                 .statusCode(404)
@@ -418,12 +451,19 @@ class AccountTransactionResourceTest extends TestSetup {
         // @formatter:off
 
         spec.when()
-                .body(AccountTransactionSplitRequest.builder()
-                        .splits(List.of(
-                                new AccountTransactionSplitRequest.SplitRecord("Part 1", -5D),
-                                new AccountTransactionSplitRequest.SplitRecord("Part 2", -15D)
-                        ))
-                        .build())
+                .body("""
+                        {
+                            "splits": [
+                                {
+                                    "description": "Part 1",
+                                    "amount": -5
+                                },
+                                {
+                                    "description": "Part 2",
+                                    "amount": -15
+                                }
+                            ]
+                        }""")
                 .patch("/api/accounts/{accountId}/transactions/{transactionId}", 1, 123)
             .then()
                 .statusCode(200)

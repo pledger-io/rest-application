@@ -11,22 +11,26 @@ import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
 import io.micronaut.serde.ObjectMapper;
-import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
 
-@Slf4j
 @Filter("/**")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class AuthenticationFilter implements HttpServerFilter {
+
+    private final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);
 
     private final ApplicationEventPublisher<InternalAuthenticationEvent> eventPublisher;
     private final ObjectMapper objectMapper;
+
+    public AuthenticationFilter(ApplicationEventPublisher<InternalAuthenticationEvent> eventPublisher, ObjectMapper objectMapper) {
+        this.eventPublisher = eventPublisher;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public int getOrder() {

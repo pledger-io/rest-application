@@ -20,18 +20,24 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Budget")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/budgets/expenses/{expenseId}/{year}/{month}/transactions")
 public class ExpenseTransactionResource {
 
     private final FilterFactory filterFactory;
     private final TransactionProvider transactionService;
     private final SettingProvider settingProvider;
+
+    public ExpenseTransactionResource(
+            FilterFactory filterFactory,
+            TransactionProvider transactionService,
+            SettingProvider settingProvider) {
+        this.filterFactory = filterFactory;
+        this.transactionService = transactionService;
+        this.settingProvider = settingProvider;
+    }
 
     @Get("{?page}")
     @Operation(

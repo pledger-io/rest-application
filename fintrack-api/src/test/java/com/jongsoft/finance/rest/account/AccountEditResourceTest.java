@@ -22,6 +22,12 @@ import java.time.LocalDate;
 
 @DisplayName("Account edit resource")
 class AccountEditResourceTest extends TestSetup {
+    private static final String CREATE_ACCOUNT_JSON = """
+            {
+                "name": "Sample account",
+                "currency": "EUR",
+                "type": "checking"
+            }""";
 
     @Inject
     private AccountProvider accountProvider;
@@ -83,11 +89,7 @@ class AccountEditResourceTest extends TestSetup {
     void update_missing(RequestSpecification spec) {
         // @formatter:off
         spec.when()
-                .body(AccountEditRequest.builder()
-                        .name("Sample account")
-                        .currency("EUR")
-                        .type("checking")
-                        .build())
+                .body(CREATE_ACCOUNT_JSON)
                 .post("/api/accounts/{id}", "1")
             .then()
                 .statusCode(404)
@@ -111,11 +113,7 @@ class AccountEditResourceTest extends TestSetup {
 
         // @formatter:off
         spec.when()
-                .body(AccountEditRequest.builder()
-                        .name("Sample account")
-                        .currency("EUR")
-                        .type("checking")
-                        .build())
+                .body(CREATE_ACCOUNT_JSON)
                 .post("/api/accounts/{id}", "123")
             .then()
                 .statusCode(200)
@@ -197,11 +195,12 @@ class AccountEditResourceTest extends TestSetup {
 
         // @formatter:off
         spec.when()
-                .body(AccountSavingGoalCreateRequest.builder()
-                        .goal(BigDecimal.valueOf(1500))
-                        .targetDate(LocalDate.now().plusDays(300))
-                        .name("Saving for washer")
-                        .build())
+                .body("""
+                        {
+                            "goal": 1500,
+                            "targetDate": "%s",
+                            "name": "Saving for washer"
+                        }""".formatted(LocalDate.now().plusDays(300)))
                 .post("/api/accounts/{id}/savings", "123")
             .then()
                 .statusCode(200)

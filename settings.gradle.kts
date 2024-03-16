@@ -27,6 +27,7 @@ dependencyResolutionManagement {
             library("camunda", "org.camunda.bpm", "camunda-engine").version("7.20.0")
             library("bouncy", "org.bouncycastle", "bcprov-jdk15on").version("1.70")
             library("bcpkix", "org.bouncycastle", "bcpkix-jdk15on").version("1.70")
+            library("bcrypt", "at.favre.lib", "bcrypt").version("0.9.0")
             library("csv", "com.opencsv", "opencsv").version("5.7.1")
 
             // testing dependencies

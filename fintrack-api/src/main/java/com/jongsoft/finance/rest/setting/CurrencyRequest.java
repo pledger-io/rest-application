@@ -4,34 +4,19 @@ import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 
-@Builder
 @Serdeable.Deserializable
-public class CurrencyRequest {
-
-    @NotBlank
-    @Size(max = 255)
-    private String name;
-
-    @NotBlank
-    @Size(min = 1, max = 3)
-    private String code;
-
-    @NotNull
-    @Size(min = 1, max = 1)
-    private String symbol;
-
-    public String getName() {
-        return name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
+public record CurrencyRequest(
+        @NotBlank
+        @Size(max = 255)
+        String name,
+        @NotBlank
+        @Size(min = 1, max = 3)
+        String code,
+        @NotNull
+        @Size(min = 1, max = 1)
+        String symbol) {
     public char getSymbol() {
         return symbol.charAt(0);
     }
-
 }

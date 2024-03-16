@@ -4,11 +4,13 @@ import com.jongsoft.finance.messaging.EventBus;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.event.ApplicationEventPublisher;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Factory
 public class EventBusFactory {
+
+    private final Logger log = LoggerFactory.getLogger(EventBusFactory.class);
 
     @Context
     public EventBus eventBus(ApplicationEventPublisher eventPublisher) {

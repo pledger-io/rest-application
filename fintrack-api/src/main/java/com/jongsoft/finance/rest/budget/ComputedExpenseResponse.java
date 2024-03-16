@@ -2,8 +2,6 @@ package com.jongsoft.finance.rest.budget;
 
 import com.jongsoft.lang.time.Range;
 import io.micronaut.serde.annotation.Serdeable;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -11,15 +9,16 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-@EqualsAndHashCode
 @Serdeable.Serializable
 class ComputedExpenseResponse {
 
-    @EqualsAndHashCode
-    @AllArgsConstructor
     public static class DateRange {
 
         private Range<LocalDate> range;
+
+        public DateRange(Range<LocalDate> range) {
+            this.range = range;
+        }
 
         public LocalDate getStart() {
             return range.from();

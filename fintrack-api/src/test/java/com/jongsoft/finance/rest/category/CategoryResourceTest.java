@@ -68,9 +68,10 @@ class CategoryResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(CategorySearchRequest.builder()
-                        .page(1)
-                        .build())
+                .body("""
+                        {
+                            "page": 1
+                        }""")
             .when()
                 .post("/api/categories")
             .then()
@@ -119,10 +120,11 @@ class CategoryResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(CategoryCreateRequest.builder()
-                        .name("grocery")
-                        .description("Sample")
-                        .build())
+                .body("""
+                        {
+                            "name": "grocery",
+                            "description": "Sample"
+                        }""")
             .when()
                 .put("/api/categories")
             .then()
@@ -187,10 +189,11 @@ class CategoryResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(CategoryCreateRequest.builder()
-                        .name("grocery")
-                        .description("Sample")
-                        .build())
+                .body("""
+                        {
+                            "name": "grocery",
+                            "description": "Sample"
+                        }""")
             .when()
                 .post("/api/categories/1")
             .then()
@@ -212,10 +215,11 @@ class CategoryResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(CategoryCreateRequest.builder()
-                        .name("grocery")
-                        .description("Sample")
-                        .build())
+                .body("""
+                        {
+                            "name": "grocery",
+                            "description": "Sample"
+                        }""")
             .when()
                 .post("/api/categories/{id}", 1L)
             .then()

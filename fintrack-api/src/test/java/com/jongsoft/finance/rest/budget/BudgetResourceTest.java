@@ -172,11 +172,13 @@ public class BudgetResourceTest extends TestSetup {
     void create(RequestSpecification spec) {
         // @formatter:off
         spec.when()
-                .body(BudgetCreateRequest.builder()
-                        .month(2)
-                        .year(2019)
-                        .income(2300.33D)
-                        .build())
+                .body("""
+                        {
+                            "month": 2,
+                            "year": 2019,
+                            "income": 2300.33
+                        }
+                        """)
                 .put("/api/budgets")
             .then()
                 .statusCode(201);
@@ -192,11 +194,13 @@ public class BudgetResourceTest extends TestSetup {
 
         // @formatter:off
         spec.when()
-                .body(BudgetCreateRequest.builder()
-                        .month(2)
-                        .year(2019)
-                        .income(2300.33D)
-                        .build())
+                .body("""
+                        {
+                            "month": 2,
+                            "year": 2019,
+                            "income": 2300.33
+                        }
+                        """)
                 .put("/api/budgets")
             .then()
                 .statusCode(400)
@@ -209,11 +213,13 @@ public class BudgetResourceTest extends TestSetup {
     void patchBudget_noActiveBudget(RequestSpecification spec) {
         // @formatter:off
         spec.when()
-                .body(BudgetCreateRequest.builder()
-                        .month(2)
-                        .year(2019)
-                        .income(2300.33D)
-                        .build())
+                .body("""
+                        {
+                            "month": 2,
+                            "year": 2019,
+                            "income": 2300.33
+                        }
+                        """)
                 .patch("/api/budgets")
             .then()
                 .statusCode(404)
@@ -229,11 +235,13 @@ public class BudgetResourceTest extends TestSetup {
 
         // @formatter:off
         spec.when()
-                .body(BudgetCreateRequest.builder()
-                        .month(2)
-                        .year(2019)
-                        .income(3500D)
-                        .build())
+                .body("""
+                        {
+                            "month": 2,
+                            "year": 2019,
+                            "income": 3500.00
+                        }
+                        """)
                 .patch("/api/budgets")
             .then()
                 .statusCode(200)

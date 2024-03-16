@@ -21,21 +21,24 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @Tag(name = "Transaction Rules")
 @Controller("/api/transaction-rules")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class TransactionRuleResource {
 
     private final TransactionRuleGroupProvider ruleGroupProvider;
     private final TransactionRuleProvider ruleProvider;
     private final CurrentUserProvider currentUserProvider;
+
+    public TransactionRuleResource(TransactionRuleGroupProvider ruleGroupProvider, TransactionRuleProvider ruleProvider, CurrentUserProvider currentUserProvider) {
+        this.ruleGroupProvider = ruleGroupProvider;
+        this.ruleProvider = ruleProvider;
+        this.currentUserProvider = currentUserProvider;
+    }
 
     @Get("/groups")
     @Operation(
@@ -57,11 +60,11 @@ public class TransactionRuleResource {
     )
     @ApiResponse(responseCode = "204", description = "Group successfully created")
     void createGroup(@Body GroupRenameRequest request) {
-        if (ruleGroupProvider.lookup(request.getName()).isPresent()) {
+        if (ruleGroupProvider.lookup(request.name()).isPresent()) {
             throw new IllegalArgumentException("Group name not unique.");
         }
 
-        EventBus.getBus().send(new CreateRuleGroupCommand(request.getName()));
+        EventBus.getBus().send(new CreateRuleGroupCommand(request.name()));
     }
 
     @Get("/groups/{group}")
@@ -127,7 +130,7 @@ public class TransactionRuleResource {
     @ApiResponse(responseCode = "204", description = "Successfully updated name")
     void rename(@PathVariable String group, @Body GroupRenameRequest request) {
         ruleGroupProvider.lookup(group)
-                .ifPresent(g -> g.rename(request.getName()));
+                .ifPresent(g -> g.rename(request.name()));
     }
 
     @Put("/groups/{group}")

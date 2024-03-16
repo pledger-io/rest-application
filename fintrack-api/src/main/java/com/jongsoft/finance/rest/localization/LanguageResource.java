@@ -10,8 +10,6 @@ import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
-import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,10 +20,13 @@ import java.util.Properties;
 @Tags(@Tag(name = "Localization"))
 @Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/api/localization/lang")
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class LanguageResource {
 
     private final MessageSource messageSource;
+
+    public LanguageResource(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     @Get("/{language}")
     @Operation(
@@ -51,7 +52,7 @@ public class LanguageResource {
             summary = "Get single translation",
             operationId = "getTranslation"
     )
-    public LanguageResponse getText(@PathVariable String language, @PathVariable String textKey) {
+    LanguageResponse getText(@PathVariable String language, @PathVariable String textKey) {
         var message = messageSource.getMessage(
                 textKey,
                 MessageSource.MessageContext.of(Locale.forLanguageTag(language)))

@@ -3,9 +3,7 @@ package com.jongsoft.finance.rest.account;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.*;
-import lombok.Builder;
 
-@Builder
 @Serdeable
 class AccountEditRequest {
 
@@ -33,6 +31,18 @@ class AccountEditRequest {
 
     @NotNull
     private String type;
+
+    public AccountEditRequest(String name, String description,String currency, String iban, String bic, String number, double interest, Periodicity interestPeriodicity, String type) {
+        this.name = name;
+        this.description = description;
+        this.currency = currency;
+        this.iban = iban;
+        this.bic = bic;
+        this.number = number;
+        this.interest = interest;
+        this.interestPeriodicity = interestPeriodicity;
+        this.type = type;
+    }
 
     public String getName() {
         return name;

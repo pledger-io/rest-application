@@ -3,45 +3,35 @@ package com.jongsoft.finance.rest.scheduler;
 import com.jongsoft.finance.schedule.Periodicity;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.Valid;
-import lombok.*;
 
 import java.time.LocalDate;
 
-@Builder
 @Serdeable.Deserializable
 public class ScheduledTransactionPatchRequest {
 
-    @Builder
-    @Serdeable.Deserializable
-    public static class DateRange {
-        private LocalDate start;
-        private LocalDate end;
-
-        public LocalDate getEnd() {
-            return end;
-        }
-
-        public LocalDate getStart() {
-            return start;
-        }
-
+    public ScheduledTransactionPatchRequest(DateRange range, ScheduleValue schedule, String name, String description) {
+        this.range = range;
+        this.schedule = schedule;
+        this.name = name;
+        this.description = description;
     }
 
-    @Data
     @Serdeable.Deserializable
-    static class ScheduleValue {
-        private Periodicity periodicity;
-        private int interval;
+    public record DateRange(LocalDate start, LocalDate end) {
+    }
+
+    @Serdeable.Deserializable
+    public record ScheduleValue(Periodicity periodicity, int interval) {
     }
 
     @Valid
-    private DateRange range;
+    private final DateRange range;
 
     @Valid
-    private ScheduleValue schedule;
+    private final ScheduleValue schedule;
 
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
 
     public com.jongsoft.finance.domain.transaction.ScheduleValue getSchedule() {
         if (schedule != null) {

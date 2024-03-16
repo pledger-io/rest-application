@@ -15,20 +15,26 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.inject.Inject;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
 @Tag(name = "Contract")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 @Controller("/api/contracts/{contractId}/transactions")
 public class ContractTransactionResource {
 
     private final FilterFactory filterFactory;
     private final TransactionProvider transactionService;
     private final SettingProvider settingProvider;
+
+    public ContractTransactionResource(
+            FilterFactory filterFactory,
+            TransactionProvider transactionService,
+            SettingProvider settingProvider) {
+        this.filterFactory = filterFactory;
+        this.transactionService = transactionService;
+        this.settingProvider = settingProvider;
+    }
 
     @Get("{?page}")
     @Operation(

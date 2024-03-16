@@ -7,11 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 
 import java.util.List;
 
-@Builder
 @Serdeable
 class CreateRuleRequest {
 
@@ -50,27 +48,37 @@ class CreateRuleRequest {
     @NotBlank
     @Size(max = 255)
     @Schema(description = "The name of the rule", requiredMode = Schema.RequiredMode.REQUIRED)
-    private String name;
+    private final String name;
 
     @Size(max = 1024)
     @Schema(description = "A long description of the rule")
-    private String description;
+    private final String description;
 
     @Schema(description = "Should the rule execution stop after a positive match")
-    private boolean restrictive;
+    private final boolean restrictive;
 
     @Schema(description = "Should the rule be executed when the engine runs")
-    private boolean active;
+    private final boolean active;
 
     @NotNull
     @Size(min = 1)
     @Schema(description = "List of all pre-conditions that must be met")
-    private List<Condition> conditions;
+    private final List<Condition> conditions;
 
     @NotNull
     @Size(min = 1)
     @Schema(description = "List of all the changes to be applied")
-    private List<Change> changes;
+    private final List<Change> changes;
+
+    public CreateRuleRequest(String name, String description, boolean restrictive,
+                             boolean active, List<Condition> conditions, List<Change> changes) {
+        this.name = name;
+        this.description = description;
+        this.restrictive = restrictive;
+        this.active = active;
+        this.conditions = conditions;
+        this.changes = changes;
+    }
 
     public String getName() {
         return name;

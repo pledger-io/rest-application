@@ -13,17 +13,18 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-@Slf4j
 @Controller
 @Secured(SecurityRule.IS_ANONYMOUS)
 public class StaticResource {
+    private final Logger log = LoggerFactory.getLogger(StaticResource.class);
 
     @Inject
     ResourceResolver res;
@@ -42,7 +43,7 @@ public class StaticResource {
     @Operation(hidden = true)
     @Get("/ui/{path:([^\\.]+)$}")
     @Produces(MediaType.TEXT_HTML)
-    public HttpResponse<?> refresh() {
+    public HttpResponse<?> refresh(@PathVariable String path) {
         return resource("index.html");
     }
 

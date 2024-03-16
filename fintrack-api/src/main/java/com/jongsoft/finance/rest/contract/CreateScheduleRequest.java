@@ -6,16 +6,13 @@ import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.NonNull;
 
-@Builder
-@Serdeable.Deserializable
+@Serdeable
 class CreateScheduleRequest {
 
-    @Serdeable.Deserializable
+    @Serdeable
     public record ScheduleValueJson(
-            @NonNull
+            @NotNull
             @Schema(description = "The periodicity of the schedule.", example = "MONTHS")
             Periodicity periodicity,
             @Min(1)
@@ -40,6 +37,12 @@ class CreateScheduleRequest {
 
     @Schema(description = "The amount to charge for every scheduled transaction.", example = "100.00")
     private double amount;
+
+    public CreateScheduleRequest(ScheduleValueJson schedule, EntityRef source, double amount) {
+        this.schedule = schedule;
+        this.source = source;
+        this.amount = amount;
+    }
 
     public ScheduleValue getSchedule() {
         return new ScheduleValue(
