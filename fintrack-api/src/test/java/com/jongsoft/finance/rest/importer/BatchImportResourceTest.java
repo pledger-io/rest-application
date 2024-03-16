@@ -209,7 +209,7 @@ class BatchImportResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(Map.of("configuration", "sample-configuration", "uploadToken", "token-sample"))
+                .body(Map.of("name", "sample-configuration", "fileCode", "token-sample"))
             .when()
                 .put("/api/import/config")
             .then()

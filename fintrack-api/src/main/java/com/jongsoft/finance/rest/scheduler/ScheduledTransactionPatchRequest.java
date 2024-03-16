@@ -9,6 +9,13 @@ import java.time.LocalDate;
 @Serdeable.Deserializable
 public class ScheduledTransactionPatchRequest {
 
+    public ScheduledTransactionPatchRequest(DateRange range, ScheduleValue schedule, String name, String description) {
+        this.range = range;
+        this.schedule = schedule;
+        this.name = name;
+        this.description = description;
+    }
+
     @Serdeable.Deserializable
     public record DateRange(LocalDate start, LocalDate end) {
     }
@@ -18,13 +25,13 @@ public class ScheduledTransactionPatchRequest {
     }
 
     @Valid
-    private DateRange range;
+    private final DateRange range;
 
     @Valid
-    private ScheduleValue schedule;
+    private final ScheduleValue schedule;
 
-    private String name;
-    private String description;
+    private final String name;
+    private final String description;
 
     public com.jongsoft.finance.domain.transaction.ScheduleValue getSchedule() {
         if (schedule != null) {

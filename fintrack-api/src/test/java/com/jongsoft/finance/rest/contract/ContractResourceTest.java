@@ -328,7 +328,7 @@ class ContractResourceTest extends TestSetup {
                             },
                             "schedule": {
                                 "periodicity": "MONTHS",
-                                "value": 3
+                                "interval": 3
                             }
                         }""")
                 .put("/api/contracts/1/schedule")

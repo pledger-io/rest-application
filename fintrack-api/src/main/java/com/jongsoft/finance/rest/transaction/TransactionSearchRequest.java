@@ -25,31 +25,46 @@ class TransactionSearchRequest {
     }
 
     @Schema(description = "The partial description the transaction should match", example = "saving tra")
-    private String description;
+    private final String description;
     @Schema(description = "The partial name of one of the accounts involved in the transaction")
-    private String account;
+    private final String account;
     @Schema(description = "The currency the transaction must have")
-    private String currency;
+    private final String currency;
     @Schema(description = "Only include transactions considered as expense from one own accounts")
-    private boolean onlyExpense;
+    private final boolean onlyExpense;
     @Schema(description = "Only include transactions considered as income from one own accounts")
-    private boolean onlyIncome;
+    private final boolean onlyIncome;
 
     @Schema(description = "The category that the transaction must have")
-    private EntityRef category;
+    private final EntityRef category;
     @Schema(description = "The budget expense that the transaction must have")
-    private EntityRef budget;
+    private final EntityRef budget;
 
     @Min(0)
     @Schema(description = "Set the page number in the resulting pages")
-    private int page;
+    private final int page;
 
     @Schema(description = "Only include transactions between one own accounts")
-    private boolean transfers;
+    private final boolean transfers;
 
     @NotNull
     @Schema(description = "The range wherein the transaction date must be")
-    private DateRange dateRange;
+    private final DateRange dateRange;
+
+    TransactionSearchRequest(String description, String account, String currency, boolean onlyExpense,
+                             boolean onlyIncome, EntityRef category, EntityRef budget, int page,
+                             boolean transfers, DateRange dateRange) {
+        this.description = description;
+        this.account = account;
+        this.currency = currency;
+        this.onlyExpense = onlyExpense;
+        this.onlyIncome = onlyIncome;
+        this.category = category;
+        this.budget = budget;
+        this.page = page;
+        this.transfers = transfers;
+        this.dateRange = dateRange;
+    }
 
     public String getDescription() {
         return description;

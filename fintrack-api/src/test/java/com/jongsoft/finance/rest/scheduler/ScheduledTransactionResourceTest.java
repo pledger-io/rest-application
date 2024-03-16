@@ -45,6 +45,7 @@ class ScheduledTransactionResourceTest extends TestSetup {
 
     @BeforeEach
     void setup() {
+        Mockito.reset(accountProvider, transactionScheduleProvider);
         scheduledTransaction = Mockito.spy(ScheduledTransaction.builder()
                 .id(1L)
                 .name("Monthly gym membership")
@@ -114,7 +115,7 @@ class ScheduledTransactionResourceTest extends TestSetup {
                             "name": "Sample schedule",
                             "schedule": {
                                 "periodicity": "WEEKS",
-                                "value": 1
+                                "interval": 1
                             },
                             "destination": {
                                 "id": 1

@@ -18,6 +18,12 @@ public class AccountSearchRequest {
     private int page;
     private String name;
 
+    public AccountSearchRequest(List<String> accountTypes, int page, String name) {
+        this.accountTypes = accountTypes;
+        this.page = page;
+        this.name = name;
+    }
+
     public Sequence<String> accountTypes() {
         return Control.Option(accountTypes)
                 .map(Collections::List)

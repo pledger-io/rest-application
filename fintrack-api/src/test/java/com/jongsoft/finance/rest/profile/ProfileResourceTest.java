@@ -41,7 +41,7 @@ class ProfileResourceTest extends TestSetup {
     @Test
     @DisplayName("Patch the current profile")
     public void patch(RequestSpecification spec) {
-        var request = new PatchProfileRequest("updated-password", "USD", "light");
+        var request = new PatchProfileRequest("light", "USD", "updated-password");
 
         // @formatter:off
         spec.given()

@@ -6,21 +6,11 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-@Serdeable.Deserializable
+@Serdeable
 class AccountTransactionSearchRequest {
 
-    @Serdeable.Deserializable
-    public static class Range {
-        private LocalDate start;
-        private LocalDate end;
-
-        public LocalDate getStart() {
-            return start;
-        }
-
-        public LocalDate getEnd() {
-            return end;
-        }
+    @Serdeable
+    public record Range(LocalDate start, LocalDate end) {
     }
 
     private String text;

@@ -18,6 +18,7 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.micronaut.validation.Validated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -118,8 +119,9 @@ public class BudgetResource {
             content = @Content(schema = @Schema(implementation = JsonError.class)),
             description = "There is already an open budget."
     )
+    @Validated
     @Status(HttpStatus.CREATED)
-    void create(@Valid @Body BudgetCreateRequest createRequest) {
+    void create(@Body BudgetCreateRequest createRequest) {
         var startDate = createRequest.getStart();
         var existing = budgetProvider.lookup(startDate.getYear(), startDate.getMonthValue());
         if (existing.isPresent()) {

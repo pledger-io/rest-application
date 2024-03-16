@@ -8,16 +8,15 @@ import java.time.LocalDate;
 
 @Serdeable.Deserializable
 class BudgetCreateRequest {
-
-    @Min(1900)
     private int year;
+    @Max(12) @Min(1) private int month;
+    @Min(0) private double income;
 
-    @Max(12)
-    @Min(1)
-    private int month;
-
-    @Min(0)
-    private double income;
+    public BudgetCreateRequest(@Min(1900) int year, int month, double income) {
+        this.year = year;
+        this.month = month;
+        this.income = income;
+    }
 
     public LocalDate getStart() {
         return LocalDate.of(year, month, 1);

@@ -76,8 +76,8 @@ public class AccountTransactionResource {
         var command = filterFactory.transaction()
                 .accounts(Collections.List(new EntityRef(accountId)))
                 .range(Dates.range(
-                        request.getDateRange().getStart(),
-                        request.getDateRange().getEnd()))
+                        request.getDateRange().start(),
+                        request.getDateRange().end()))
                 .pageSize(settingProvider.getPageSize())
                 .page(request.getPage());
 

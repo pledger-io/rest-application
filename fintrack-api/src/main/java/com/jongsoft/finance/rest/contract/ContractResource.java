@@ -14,6 +14,7 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.micronaut.validation.Validated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -73,14 +74,15 @@ public class ContractResource {
     }
 
     @Put
+    @Validated
     @Status(HttpStatus.CREATED)
     @Operation(
             summary = "Create contract",
             description = "Adds a new contract to FinTrack for the authenticated user",
             operationId = "createContract"
     )
-    ContractResponse create(@Body @Valid ContractCreateRequest createRequest) {
-        return accountProvider.lookup(createRequest.getCompany().getId())
+    ContractResponse create(@Body ContractCreateRequest createRequest) {
+        return accountProvider.lookup(createRequest.getCompany().id())
                 .map(account -> account.createContract(
                         createRequest.getName(),
                         createRequest.getDescription(),
@@ -89,7 +91,7 @@ public class ContractResource {
                 .map(account -> contractProvider.lookup(createRequest.getName())
                         .getOrThrow(() -> StatusException.internalError("Error creating contract")))
                 .map(ContractResponse::new)
-                .getOrThrow(() -> StatusException.notFound("No account can be found for " + createRequest.getCompany().getId()));
+                .getOrThrow(() -> StatusException.notFound("No account can be found for " + createRequest.getCompany().id()));
     }
 
     @Post("/{contractId}")
