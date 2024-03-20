@@ -35,9 +35,6 @@ dependencies {
     // Contains the health checker
     implementation(mn.micronaut.management)
 
-    // needed for application.yml
-    runtimeOnly(mn.snakeyaml)
-
     // Investigate if this can be swapped for micronaut serde
     implementation(mn.micronaut.jackson.databind)
     implementation(mn.micronaut.serde.jackson)
@@ -47,6 +44,9 @@ dependencies {
     implementation(project(":jpa-repository"))
     implementation(project(":rule-engine"))
     implementation(project(":bpmn-process"))
+
+    // needed for application.yml
+    runtimeOnly(mn.snakeyaml)
 
     testImplementation(mn.micronaut.test.rest.assured)
     testImplementation(mn.micronaut.test.junit5)
