@@ -58,7 +58,7 @@ public class Budget implements AggregateBase {
 
         @BusinessMethod
         public void updateExpense(double expectedExpense) {
-            if (computeExpenses() + expectedExpense > expectedIncome) {
+            if ((computeExpenses() - computeBudget() + expectedExpense) > expectedIncome) {
                 throw StatusException.badRequest(
                         "Expected expenses exceeds the expected income.",
                         "validation.budget.expense.exceeds.income");
