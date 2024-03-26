@@ -21,6 +21,11 @@ public class EntityRef implements AggregateBase {
         public Long getId() {
             return id;
         }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
 }
