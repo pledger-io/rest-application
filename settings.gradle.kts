@@ -45,4 +45,12 @@ dependencyResolutionManagement {
     }
 }
 
-include("core", "domain", "rule-engine", "bpmn-process", "jpa-repository", "fintrack-api")
+include(
+    "core",
+    "domain",
+    "transaction-importer:transaction-importer-api",
+    "transaction-importer:transaction-importer-csv",
+    "rule-engine",
+    "bpmn-process",
+    "jpa-repository",
+    "fintrack-api")
