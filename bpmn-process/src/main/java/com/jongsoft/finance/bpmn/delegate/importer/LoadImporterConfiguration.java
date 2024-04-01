@@ -1,33 +1,23 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
-import com.jongsoft.finance.ProcessMapper;
-import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.importer.ImporterProvider;
 import com.jongsoft.finance.providers.ImportProvider;
-import com.jongsoft.finance.serialized.ImportConfigJson;
-import jakarta.inject.Inject;
+import com.jongsoft.finance.serialized.ImportJobSettings;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Singleton
 public class LoadImporterConfiguration implements JavaDelegate {
 
     private final ImportProvider importProvider;
-    private final StorageService storageService;
-    private final ProcessMapper mapper;
+    private final ImporterProvider<?> importerProvider;
 
-    @Inject
-    public LoadImporterConfiguration(
-            ImportProvider importProvider,
-            StorageService storageService,
-            ProcessMapper mapper) {
+    public LoadImporterConfiguration(ImportProvider importProvider, ImporterProvider<?> importerProvider) {
         this.importProvider = importProvider;
-        this.storageService = storageService;
-        this.mapper = mapper;
+        this.importerProvider = importerProvider;
     }
 
     @Override
@@ -41,15 +31,10 @@ public class LoadImporterConfiguration implements JavaDelegate {
         var importJob = importProvider.lookup(batchImportSlug)
                 .getOrThrow(() -> new IllegalStateException("Cannot find batch import with slug " + batchImportSlug));
 
-        var importConfig = readConfiguration(importJob.getConfig().getFileCode());
+        var configuration = importerProvider.loadConfiguration(importJob.getConfig());
 
-        delegateExecution.setVariableLocal("importConfig", importConfig);
-    }
-
-    private ImportConfigJson readConfiguration(String fileCode) {
-        return storageService.read(fileCode)
-                .map(bytes -> new String(bytes, StandardCharsets.UTF_8))
-                .map(json -> mapper.readSafe(json, ImportConfigJson.class))
-                .getOrThrow(() -> new IllegalStateException("Cannot read import configuration from file " + fileCode));
+        delegateExecution.setVariableLocal(
+                "importConfig",
+                new ImportJobSettings(configuration, false, false, null));
     }
 }

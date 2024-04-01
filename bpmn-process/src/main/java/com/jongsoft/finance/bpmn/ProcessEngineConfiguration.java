@@ -2,10 +2,12 @@ package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.bpmn.camunda.*;
 import com.jongsoft.finance.core.DataSourceMigration;
+import com.jongsoft.finance.serialized.ImportJobSettings;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.serde.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -54,6 +56,8 @@ public class ProcessEngineConfiguration {
         configuration.setHistoryCleanupBatchWindowEndTime("03:00");
         configuration.setHistoryTimeToLive("P1D");
         configuration.setResolverFactories(List.of(new MicronautBeanResolver(applicationContext)));
+        configuration.setCustomPreVariableSerializers(List.of(
+                new JsonRecordSerializer<>(applicationContext.getBean(ObjectMapper.class), ImportJobSettings.class)));
 
         var processEngine = configuration.buildProcessEngine();
         log.info("Created camunda process engine");

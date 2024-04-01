@@ -4,7 +4,8 @@ import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.core.TransactionType;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
-import com.jongsoft.finance.importer.ImportProvider;
+import com.jongsoft.finance.importer.ImporterProvider;
+import com.jongsoft.finance.importer.api.ImporterConfiguration;
 import com.jongsoft.finance.importer.api.TransactionConsumer;
 import com.jongsoft.finance.importer.api.TransactionDTO;
 import com.jongsoft.lang.Control;
@@ -25,7 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.function.Function;
 
 @Singleton
-public class CSVImportProvider implements ImportProvider<CSVConfiguration> {
+public class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
     private final Logger logger = LoggerFactory.getLogger(CSVImportProvider.class);
 
     private final StorageService storageService;
@@ -38,8 +39,9 @@ public class CSVImportProvider implements ImportProvider<CSVConfiguration> {
     }
 
     @Override
-    public void readTransactions(TransactionConsumer consumer, CSVConfiguration configuration, BatchImport importJob) {
+    public void readTransactions(TransactionConsumer consumer, ImporterConfiguration configuration, BatchImport importJob) {
         logger.info("Reading transactions from CSV file: {}", importJob.getSlug());
+        var csvConfiguration = (CSVConfiguration) configuration;
 
         try {
             var inputStream = storageService.read(importJob.getFileCode())
@@ -49,23 +51,26 @@ public class CSVImportProvider implements ImportProvider<CSVConfiguration> {
 
             try (var reader = new CSVReaderBuilder(inputStream)
                     .withCSVParser(new CSVParserBuilder()
-                            .withSeparator(configuration.delimiter())
+                            .withSeparator(csvConfiguration.delimiter())
                             .build())
                     .build()) {
 
-                if (configuration.headers()) {
+                if (csvConfiguration.headers()) {
                     logger.debug("CSV file has headers, skipping first line");
                     reader.skip(1);
                 }
 
                 String[] line;
                 while ((line = reader.readNext()) != null) {
-                    if (line.length != configuration.columnRoles().size()) {
-                        logger.warn("Skipping line, columns found {} but expected is {}: {}", line.length, configuration.columnRoles().size(), line);
+                    if (line.length != csvConfiguration.columnRoles().size()) {
+                        logger.warn("Skipping line, columns found {} but expected is {}: {}",
+                                line.length,
+                                csvConfiguration.columnRoles().size(),
+                                line);
                         continue;
                     }
 
-                    consumer.accept(readLine(line, configuration));
+                    consumer.accept(readLine(line, csvConfiguration));
                 }
             }
         } catch (IOException | CsvValidationException e) {
@@ -89,6 +94,11 @@ public class CSVImportProvider implements ImportProvider<CSVConfiguration> {
             logger.warn("Could not load CSV configuration from disk: {}", batchImportConfig.getFileCode(), e);
             throw new IllegalStateException("Failed to load CSV configuration from disk: " + batchImportConfig.getFileCode());
         }
+    }
+
+    @Override
+    public <X extends ImporterConfiguration> boolean supports(X configuration) {
+        return configuration instanceof CSVConfiguration;
     }
 
     private TransactionDTO readLine(String[] line, CSVConfiguration configuration) {

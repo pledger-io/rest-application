@@ -8,7 +8,7 @@ import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.AccountProvider;
-import com.jongsoft.finance.serialized.ImportConfigJson;
+import com.jongsoft.finance.serialized.ImportJobSettings;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -42,10 +42,14 @@ public class ImportJobIT {
 
         process
             .task("task_configure")
-            .<ImportConfigJson>updateVariable("initialConfig", "updatedConfig", config -> {
-                config.setAccountId(TARGET_ACCOUNT_ID);
-                return config;
-            })
+            .<ImportJobSettings>updateVariable(
+                    "initialConfig",
+                    "updatedConfig",
+                    config -> new ImportJobSettings(
+                            config.importConfiguration(),
+                            config.applyRules(),
+                            config.generateAccounts(),
+                            TARGET_ACCOUNT_ID))
             .complete();
 
         // Task should be active again
@@ -70,10 +74,14 @@ public class ImportJobIT {
         ));
 
         process.task("task_configure")
-                .<ImportConfigJson>updateVariable("initialConfig", "updatedConfig", config -> {
-                    config.setAccountId(TARGET_ACCOUNT_ID);
-                    return config;
-                })
+                .<ImportJobSettings>updateVariable(
+                        "initialConfig",
+                        "updatedConfig",
+                        config -> new ImportJobSettings(
+                                config.importConfiguration(),
+                                config.applyRules(),
+                                config.generateAccounts(),
+                                TARGET_ACCOUNT_ID))
                 .complete();
 
         process.task("confirm_mappings")
@@ -118,11 +126,14 @@ public class ImportJobIT {
         ));
 
         process.task("task_configure")
-                .<ImportConfigJson>updateVariable("initialConfig", "updatedConfig", config -> {
-                    config.setAccountId(TARGET_ACCOUNT_ID);
-                    config.setGenerateAccounts(false);
-                    return config;
-                })
+                .<ImportJobSettings>updateVariable(
+                        "initialConfig",
+                        "updatedConfig",
+                        config -> new ImportJobSettings(
+                                config.importConfiguration(),
+                                config.applyRules(),
+                                false,
+                                TARGET_ACCOUNT_ID))
                 .complete();
 
         process.task("confirm_mappings")
@@ -165,11 +176,14 @@ public class ImportJobIT {
         ));
 
         process.task("task_configure")
-                .<ImportConfigJson>updateVariable("initialConfig", "updatedConfig", config -> {
-                    config.setAccountId(TARGET_ACCOUNT_ID);
-                    config.setGenerateAccounts(true);
-                    return config;
-                })
+                .<ImportJobSettings>updateVariable(
+                        "initialConfig",
+                        "updatedConfig",
+                        config -> new ImportJobSettings(
+                                config.importConfiguration(),
+                                config.applyRules(),
+                                true,
+                                TARGET_ACCOUNT_ID))
                 .complete();
 
         process.task("confirm_mappings")
