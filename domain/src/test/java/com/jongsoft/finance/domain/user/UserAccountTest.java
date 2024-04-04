@@ -118,7 +118,7 @@ class UserAccountTest {
 
     @Test
     void createBatchConfiguration() {
-        final BatchImportConfig configuration = fullAccount.createImportConfiguration("test-config", "file-code-sample");
+        final BatchImportConfig configuration = fullAccount.createImportConfiguration("CSV", "test-config", "file-code-sample");
 
         assertThat(configuration.getName()).isEqualTo("test-config");
         assertThat(configuration.getFileCode()).isEqualTo("file-code-sample");
@@ -128,7 +128,7 @@ class UserAccountTest {
     @Test
     void createBatchConfiguration_NotAllowed() {
         var thrown = assertThrows(StatusException.class,
-                () -> readOnlyAccount.createImportConfiguration("test-config", "file-code-sample"));
+                () -> readOnlyAccount.createImportConfiguration("CSV", "test-config", "file-code-sample"));
 
         assertThat(thrown.getMessage()).isEqualTo("User cannot create import configuration, incorrect privileges.");
     }

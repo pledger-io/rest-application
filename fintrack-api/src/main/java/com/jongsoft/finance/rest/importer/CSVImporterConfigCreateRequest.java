@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 @Serdeable.Deserializable
 record CSVImporterConfigCreateRequest(
         @NotBlank
+        String type,
+        @NotBlank
         String name,
         @NotBlank
         String fileCode) {

@@ -8,14 +8,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
+import java.util.List;
+
 @Slf4j
 @Singleton
 public class LoadImporterConfiguration implements JavaDelegate {
 
     private final ImportProvider importProvider;
-    private final ImporterProvider<?> importerProvider;
+    private final List<ImporterProvider<?>> importerProvider;
 
-    public LoadImporterConfiguration(ImportProvider importProvider, ImporterProvider<?> importerProvider) {
+    public LoadImporterConfiguration(ImportProvider importProvider, List<ImporterProvider<?>> importerProvider) {
         this.importProvider = importProvider;
         this.importerProvider = importerProvider;
     }
@@ -31,10 +33,22 @@ public class LoadImporterConfiguration implements JavaDelegate {
         var importJob = importProvider.lookup(batchImportSlug)
                 .getOrThrow(() -> new IllegalStateException("Cannot find batch import with slug " + batchImportSlug));
 
-        var configuration = importerProvider.loadConfiguration(importJob.getConfig());
-
-        delegateExecution.setVariableLocal(
-                "importConfig",
-                new ImportJobSettings(configuration, false, false, null));
+        importerProvider.stream()
+                .filter(importer -> importer.getImporterType().equalsIgnoreCase(importJob.getConfig().getType()))
+                .findFirst()
+                .ifPresentOrElse(
+                        importer -> {
+                            delegateExecution.setVariableLocal(
+                                    "importConfig",
+                                    new ImportJobSettings(
+                                            importer.loadConfiguration(importJob.getConfig()),
+                                            false,
+                                            false,
+                                            null));
+                        },
+                        () -> {
+                            throw new IllegalStateException("Cannot find importer for type " + importJob.getConfig().getType());
+                        }
+                );
     }
 }

@@ -283,6 +283,7 @@ public class ImportJobIT {
                 .created(new Date())
                 .fileCode(CSV_FILE_CODE)
                 .config(BatchImportConfig.builder()
+                        .type("CSVImportProvider")
                         .fileCode(JSON_FILE_CODE)
                         .build())
                 .build();

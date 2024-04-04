@@ -126,6 +126,12 @@ class CSVImportProviderTest {
         Assertions.assertThat(transaction.type()).isEqualTo(TransactionType.CREDIT);
     }
 
+    @Test
+    void exposesCorrectType() {
+        Assertions.assertThat(csvImportProvider.getImporterType())
+                .isEqualTo("CSVImportProvider");
+    }
+
     private BatchImport createBatchImport() {
         return BatchImport.builder()
                 .fileCode("my-secret-import-files")

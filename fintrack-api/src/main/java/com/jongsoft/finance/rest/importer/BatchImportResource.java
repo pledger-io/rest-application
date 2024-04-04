@@ -1,7 +1,7 @@
 package com.jongsoft.finance.rest.importer;
 
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.providers.CSVConfigProvider;
+import com.jongsoft.finance.providers.ImportConfigurationProvider;
 import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.model.CSVImporterConfigResponse;
@@ -26,13 +26,13 @@ import java.util.List;
 public class BatchImportResource {
 
     private final CurrentUserProvider currentUserProvider;
-    private final CSVConfigProvider csvConfigProvider;
+    private final ImportConfigurationProvider csvConfigProvider;
     private final ImportProvider importProvider;
     private final SettingProvider settingProvider;
 
     public BatchImportResource(
             CurrentUserProvider currentUserProvider,
-            CSVConfigProvider csvConfigProvider,
+            ImportConfigurationProvider csvConfigProvider,
             ImportProvider importProvider,
             SettingProvider settingProvider) {
         this.currentUserProvider = currentUserProvider;
@@ -125,6 +125,7 @@ public class BatchImportResource {
         }
 
         return new CSVImporterConfigResponse(currentUserProvider.currentUser().createImportConfiguration(
+                request.type(),
                 request.name(),
                 request.fileCode()));
     }

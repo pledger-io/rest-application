@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.importer;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.importer.entity.CSVImportConfig;
+import com.jongsoft.finance.jpa.importer.entity.ImportConfig;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -32,9 +32,10 @@ public class CreateConfigurationHandler implements CommandHandler<CreateConfigur
     public void handle(CreateConfigurationCommand command) {
         log.info("[{}] - Processing CSV configuration create event", command.name());
 
-        var entity = CSVImportConfig.builder()
+        var entity = ImportConfig.builder()
                 .fileCode(command.fileCode())
                 .name(command.name())
+                .type(command.type())
                 .user(entityManager.get(UserAccountJpa.class, Collections.Map("username", authenticationFacade.authenticated())))
                 .build();
 

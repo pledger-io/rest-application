@@ -15,24 +15,28 @@ import lombok.Getter;
 @Entity
 @Getter
 @Table(name = "import_config")
-public class CSVImportConfig extends EntityJpa {
+public class ImportConfig extends EntityJpa {
 
     private String name;
 
     @Column
     private String fileCode;
 
+    @Column
+    private String type;
+
     @ManyToOne
     @JoinColumn
     private UserAccountJpa user;
 
     @Builder
-    private CSVImportConfig(String name, String fileCode, UserAccountJpa user) {
+    private ImportConfig(String name, String fileCode, String type, UserAccountJpa user) {
         this.name = name;
         this.fileCode = fileCode;
         this.user = user;
+        this.type = type;
     }
 
-    protected CSVImportConfig() {
+    protected ImportConfig() {
     }
 }

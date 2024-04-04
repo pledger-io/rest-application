@@ -142,8 +142,8 @@ public class ApplicationContext {
     }
 
     @Singleton
-    CSVConfigProvider csvConfigProvider() {
-        return Mockito.mock(CSVConfigProvider.class);
+    ImportConfigurationProvider csvConfigProvider() {
+        return Mockito.mock(ImportConfigurationProvider.class);
     }
 
     @Singleton

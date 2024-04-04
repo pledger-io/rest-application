@@ -13,4 +13,8 @@ public interface ImporterProvider<T extends ImporterConfiguration> {
 
     <X extends ImporterConfiguration> boolean supports(X configuration);
 
+    default String getImporterType() {
+        return this.getClass().getSimpleName();
+    }
+
 }

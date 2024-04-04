@@ -2,9 +2,9 @@ package com.jongsoft.finance.jpa.importer;
 
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.jpa.importer.entity.CSVImportConfig;
+import com.jongsoft.finance.jpa.importer.entity.ImportConfig;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
-import com.jongsoft.finance.providers.CSVConfigProvider;
+import com.jongsoft.finance.providers.ImportConfigurationProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
@@ -15,27 +15,27 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ReadOnly
 @Singleton
-public class CSVConfigProviderJpa implements CSVConfigProvider {
+public class ImportConfigurationProviderJpa implements ImportConfigurationProvider {
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
 
-    public CSVConfigProviderJpa(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+    public ImportConfigurationProviderJpa(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
         this.entityManager = entityManager;
         this.authenticationFacade = authenticationFacade;
     }
 
     @Override
     public Optional<BatchImportConfig> lookup(String name) {
-        log.trace("CSVConfiguration lookup by name {}", name);
+        log.trace("Import configuration lookup by name {}", name);
 
         var hql = """
-                select b from CSVImportConfig b 
+                select b from ImportConfig b
                 where b.name = :name
                     and b.user.username = :username
                 """;
 
-        return entityManager.<CSVImportConfig>blocking()
+        return entityManager.<ImportConfig>blocking()
                 .hql(hql)
                 .set("name", name)
                 .set("username", authenticationFacade.authenticated())
@@ -48,17 +48,17 @@ public class CSVConfigProviderJpa implements CSVConfigProvider {
         log.trace("CSVConfiguration listing");
 
         var hql = """
-                select b from CSVImportConfig b
+                select b from ImportConfig b
                 where b.user.username = :username""";
 
-        return entityManager.<CSVImportConfig>blocking()
+        return entityManager.<ImportConfig>blocking()
                 .hql(hql)
                 .set("username", authenticationFacade.authenticated())
                 .sequence()
                 .map(this::convert);
     }
 
-    private BatchImportConfig convert(CSVImportConfig source) {
+    private BatchImportConfig convert(ImportConfig source) {
         if (source == null) {
             return null;
         }

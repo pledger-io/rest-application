@@ -22,21 +22,23 @@ public class BatchImportConfig implements AggregateBase, Serializable {
 
     private String name;
     private String fileCode;
+    private String type;
 
     private transient UserAccount user;
 
     @BusinessMethod
-    public BatchImportConfig(UserAccount user, String name, String fileCode) {
+    public BatchImportConfig(UserAccount user, String type, String name, String fileCode) {
         this.user = user;
         this.name = name;
         this.fileCode = fileCode;
+        this.type = type;
 
         EventBus.getBus().send(
-                new CreateConfigurationCommand(name, fileCode));
+                new CreateConfigurationCommand(type, name, fileCode));
     }
 
-    public BatchImport createImport(String content) {
-        return new BatchImport(this, this.user, content);
+    public BatchImport createImport(String fileCode) {
+        return new BatchImport(this, this.user, fileCode);
     }
 
 }
