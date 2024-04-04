@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest.process;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.jongsoft.finance.ProcessVariable;
 import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +20,9 @@ public class VariableMap {
 
     @Serdeable
     @Schema(name = "WrappedVariable", description = "A variable wrapped for the task.")
-    public record WrappedVariable<T>(T value) implements ProcessVariable {
+    public record WrappedVariable<T>(
+            @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "_type")
+            T value) implements ProcessVariable {
     }
 
     @Schema(description = "The actual map of all the variables set for the task.")

@@ -45,6 +45,7 @@ class CSVConfigEventListenerIT extends JpaTestSetup {
 
         Assertions.assertThat(check.getName()).isEqualTo("test-config");
         Assertions.assertThat(check.getFileCode()).isEqualTo("file-code-3");
+        Assertions.assertThat(check.getType()).isEqualTo("CSVImportProvider");
     }
 
     @MockBean

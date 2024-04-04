@@ -10,10 +10,6 @@ import java.util.List;
 public record CSVConfiguration(
         @JsonProperty("has-headers")
         boolean headers,
-        @JsonProperty("apply-rules")
-        boolean applyRules,
-        @JsonProperty("generate-accounts")
-        boolean generateAccounts,
         @JsonProperty("date-format")
         String dateFormat,
         @JsonProperty("delimiter")

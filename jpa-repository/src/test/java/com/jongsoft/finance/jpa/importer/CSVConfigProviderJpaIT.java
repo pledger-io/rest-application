@@ -33,7 +33,10 @@ class CSVConfigProviderJpaIT extends JpaTestSetup {
         Assertions.assertThat(csvConfigProvider.lookup())
                 .hasSize(1)
                 .first()
-                .satisfies(batch -> Assertions.assertThat(batch.getFileCode()).isEqualTo("file-code-1"));
+                .satisfies(batch -> {
+                    Assertions.assertThat(batch.getFileCode()).isEqualTo("file-code-1");
+                    Assertions.assertThat(batch.getType()).isEqualTo("CSVImportProvider");
+                });
     }
 
     @Test

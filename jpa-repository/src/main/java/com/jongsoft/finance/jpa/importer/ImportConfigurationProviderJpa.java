@@ -66,6 +66,7 @@ public class ImportConfigurationProviderJpa implements ImportConfigurationProvid
         return BatchImportConfig.builder()
                 .id(source.getId())
                 .name(source.getName())
+                .type(source.getType())
                 .fileCode(source.getFileCode())
                 .user(UserAccount.builder()
                         .id(source.getUser().getId())

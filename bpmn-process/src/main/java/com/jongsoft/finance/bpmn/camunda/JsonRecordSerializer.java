@@ -8,10 +8,13 @@ import org.camunda.bpm.engine.variable.impl.type.ObjectTypeImpl;
 import org.camunda.bpm.engine.variable.impl.value.UntypedValueImpl;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedValue> {
+    private static final Logger logger = LoggerFactory.getLogger(JsonRecordSerializer.class);
 
     final ObjectMapper objectMapper;
     final Class<T> supportedClass;
@@ -34,6 +37,8 @@ public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedV
 
     @Override
     public TypedValue convertToTypedValue(UntypedValueImpl untypedValue) {
+        logger.debug("Converting untyped value to typed value: {}", untypedValue.getType());
+
         var importJobSettings = (Record) untypedValue.getValue();
         String jsonString;
         try {
@@ -54,6 +59,7 @@ public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedV
 
     @Override
     public TypedValue readValue(ValueFields valueFields, boolean b, boolean b1) {
+        logger.debug("Reading value from value fields: {}", valueFields.getName());
         try {
             return Variables.objectValue(objectMapper.readValue(
                             new String(valueFields.getByteArrayValue()),
@@ -67,6 +73,7 @@ public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedV
 
     @Override
     protected boolean canWriteValue(TypedValue typedValue) {
-        return supportedClass.isAssignableFrom(typedValue.getValue().getClass());
+        logger.trace("Checking if value can be written: {}", typedValue.getValue().getClass().getSimpleName());
+        return supportedClass.isInstance(typedValue.getValue());
     }
 }

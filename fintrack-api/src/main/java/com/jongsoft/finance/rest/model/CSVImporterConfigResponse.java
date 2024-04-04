@@ -13,14 +13,19 @@ public class CSVImporterConfigResponse {
         this.wrapped = wrapped;
     }
 
-    @Schema(description = "The CSV configuration identifier")
+    @Schema(description = "The configuration identifier")
     public Long getId() {
         return wrapped.getId();
     }
 
-    @Schema(description = "The name of the CSV configuration")
+    @Schema(description = "The name of the configuration")
     public String getName() {
         return wrapped.getName();
+    }
+
+    @Schema(description = "The type of importer that will be used")
+    public String getType() {
+        return wrapped.getType();
     }
 
     @Schema(description = "The file code to get the contents of the configuration")
