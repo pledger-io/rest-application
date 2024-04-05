@@ -17,6 +17,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Fetches the transaction details from the import job and extracts the information needed to locate the account.
+ * <p>
+ *     The extracted information is stored in the {@code locatable} variable in the execution context.
+ *     The locatable contains a set of {@link ExtractedAccountLookup} objects that can be used to locate the account.
+ * </p>
+ */
 @Singleton
 public class ExtractAccountDetailsDelegate implements JavaDelegate {
     private final static Logger logger = LoggerFactory.getLogger(ExtractAccountDetailsDelegate.class);
@@ -43,12 +50,10 @@ public class ExtractAccountDetailsDelegate implements JavaDelegate {
                 .findFirst()
                 .ifPresentOrElse(
                         provider -> provider.readTransactions(
-                                transactionDTO -> {
-                                    locatable.add(new ExtractedAccountLookup(
-                                            transactionDTO.opposingName(),
-                                            transactionDTO.opposingIBAN(),
-                                            transactionDTO.description()));
-                                },
+                                transactionDTO -> locatable.add(new ExtractedAccountLookup(
+                                        transactionDTO.opposingName(),
+                                        transactionDTO.opposingIBAN(),
+                                        transactionDTO.description())),
                                 importJobSettings.importConfiguration(),
                                 importJob),
                         () -> logger.warn("No importer provider found for configuration: {}", importJobSettings.importConfiguration())

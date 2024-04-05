@@ -10,6 +10,10 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 import java.util.List;
 
+/**
+ * Loads the importer configuration for the given batch import.
+ * The importer configuration is loaded from the importer provider that matches the import type and is stored in the {@code importConfig} variable.
+ **/
 @Slf4j
 @Singleton
 public class LoadImporterConfiguration implements JavaDelegate {
@@ -37,15 +41,13 @@ public class LoadImporterConfiguration implements JavaDelegate {
                 .filter(importer -> importer.getImporterType().equalsIgnoreCase(importJob.getConfig().getType()))
                 .findFirst()
                 .ifPresentOrElse(
-                        importer -> {
-                            delegateExecution.setVariableLocal(
-                                    "importConfig",
-                                    new ImportJobSettings(
-                                            importer.loadConfiguration(importJob.getConfig()),
-                                            false,
-                                            false,
-                                            null));
-                        },
+                        importer -> delegateExecution.setVariableLocal(
+                                "importConfig",
+                                new ImportJobSettings(
+                                        importer.loadConfiguration(importJob.getConfig()),
+                                        false,
+                                        false,
+                                        null)),
                         () -> {
                             throw new IllegalStateException("Cannot find importer for type " + importJob.getConfig().getType());
                         }

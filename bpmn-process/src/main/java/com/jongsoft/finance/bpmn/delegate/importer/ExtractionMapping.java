@@ -7,6 +7,9 @@ import lombok.Getter;
 
 import java.io.Serializable;
 
+/**
+ * Represents a mapping between an account name and an account ID.
+ */
 @Getter
 @Serdeable
 @EqualsAndHashCode(of = {"name"})
