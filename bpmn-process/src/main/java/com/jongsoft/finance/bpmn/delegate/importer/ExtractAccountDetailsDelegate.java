@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.importer.ImporterProvider;
 import com.jongsoft.finance.importer.api.ImporterConfiguration;
 import com.jongsoft.finance.providers.ImportProvider;
@@ -52,6 +53,11 @@ public class ExtractAccountDetailsDelegate implements JavaDelegate {
                                 importJob),
                         () -> logger.warn("No importer provider found for configuration: {}", importJobSettings.importConfiguration())
                 );
+
+        if (locatable.isEmpty()) {
+            logger.warn("No accounts found for import job {}", batchImportSlug);
+            throw StatusException.internalError("No parsable accounts found for import job", "bpmn.transaction.import.no-accounts-found");
+        }
 
         execution.setVariableLocal("locatable", locatable);
     }
