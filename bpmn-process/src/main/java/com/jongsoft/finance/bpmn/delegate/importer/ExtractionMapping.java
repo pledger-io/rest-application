@@ -5,10 +5,15 @@ import io.micronaut.serde.annotation.Serdeable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+import java.io.Serializable;
+
+/**
+ * Represents a mapping between an account name and an account ID.
+ */
 @Getter
 @Serdeable
 @EqualsAndHashCode(of = {"name"})
-public class ExtractionMapping implements ProcessVariable {
+public class ExtractionMapping implements ProcessVariable, Serializable {
 
     private final String name;
     private final Long accountId;

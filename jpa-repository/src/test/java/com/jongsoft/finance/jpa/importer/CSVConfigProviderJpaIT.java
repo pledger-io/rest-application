@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.importer;
 
 import com.jongsoft.finance.jpa.JpaTestSetup;
-import com.jongsoft.finance.providers.CSVConfigProvider;
+import com.jongsoft.finance.providers.ImportConfigurationProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
@@ -16,7 +16,7 @@ class CSVConfigProviderJpaIT extends JpaTestSetup {
     private AuthenticationFacade authenticationFacade;
 
     @Inject
-    private CSVConfigProvider csvConfigProvider;
+    private ImportConfigurationProvider csvConfigProvider;
 
     @BeforeEach
     void setup() {
@@ -33,7 +33,10 @@ class CSVConfigProviderJpaIT extends JpaTestSetup {
         Assertions.assertThat(csvConfigProvider.lookup())
                 .hasSize(1)
                 .first()
-                .satisfies(batch -> Assertions.assertThat(batch.getFileCode()).isEqualTo("file-code-1"));
+                .satisfies(batch -> {
+                    Assertions.assertThat(batch.getFileCode()).isEqualTo("file-code-1");
+                    Assertions.assertThat(batch.getType()).isEqualTo("CSVImportProvider");
+                });
     }
 
     @Test

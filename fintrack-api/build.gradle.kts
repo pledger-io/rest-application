@@ -44,6 +44,8 @@ dependencies {
     implementation(project(":jpa-repository"))
     implementation(project(":rule-engine"))
     implementation(project(":bpmn-process"))
+    implementation(project(":transaction-importer:transaction-importer-api"))
+    implementation(project(":transaction-importer:transaction-importer-csv"))
 
     // needed for application.yml
     runtimeOnly(mn.snakeyaml)

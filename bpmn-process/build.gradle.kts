@@ -23,6 +23,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":domain"))
     implementation(project(":rule-engine"))
+    implementation(project(":transaction-importer:transaction-importer-api"))
 
     // needed for the testing of the application
     runtimeOnly(mn.h2)
@@ -30,4 +31,5 @@ dependencies {
     testRuntimeOnly(mn.logback.classic)
     testImplementation(mn.micronaut.test.junit5)
     testImplementation(libs.bundles.junit)
+    testRuntimeOnly(project(":transaction-importer:transaction-importer-csv"))
 }

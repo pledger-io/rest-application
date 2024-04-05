@@ -1,0 +1,22 @@
+{
+  "has-headers": true,
+  "apply-rules": true,
+  "generate-accounts": false,
+  "date-format": "yyyyMMdd",
+  "delimiter": ",",
+  "column-roles": [
+    "transaction-date",
+    "opposing-name",
+    "account-iban",
+    "opposing-iban",
+    "_ignore",
+    "custom-indicator",
+    "amount",
+    "_ignore",
+    "description"
+  ],
+  "custom-indicator": {
+    "deposit": "Bij",
+    "credit": "Af"
+  }
+}

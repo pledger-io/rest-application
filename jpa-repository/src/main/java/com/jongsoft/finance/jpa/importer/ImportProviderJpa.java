@@ -72,6 +72,7 @@ public class ImportProviderJpa implements ImportProvider {
                 .slug(source.getSlug())
                 .finished(source.getFinished())
                 .config(BatchImportConfig.builder()
+                        .type(source.getConfig().getType())
                         .name(source.getConfig().getName())
                         .fileCode(source.getConfig().getFileCode())
                         .build())

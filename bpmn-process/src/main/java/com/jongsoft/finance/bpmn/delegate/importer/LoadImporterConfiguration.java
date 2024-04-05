@@ -1,33 +1,29 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
-import com.jongsoft.finance.ProcessMapper;
-import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.importer.ImporterProvider;
 import com.jongsoft.finance.providers.ImportProvider;
-import com.jongsoft.finance.serialized.ImportConfigJson;
-import jakarta.inject.Inject;
+import com.jongsoft.finance.serialized.ImportJobSettings;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 
+/**
+ * Loads the importer configuration for the given batch import.
+ * The importer configuration is loaded from the importer provider that matches the import type and is stored in the {@code importConfig} variable.
+ **/
 @Slf4j
 @Singleton
 public class LoadImporterConfiguration implements JavaDelegate {
 
     private final ImportProvider importProvider;
-    private final StorageService storageService;
-    private final ProcessMapper mapper;
+    private final List<ImporterProvider<?>> importerProvider;
 
-    @Inject
-    public LoadImporterConfiguration(
-            ImportProvider importProvider,
-            StorageService storageService,
-            ProcessMapper mapper) {
+    public LoadImporterConfiguration(ImportProvider importProvider, List<ImporterProvider<?>> importerProvider) {
         this.importProvider = importProvider;
-        this.storageService = storageService;
-        this.mapper = mapper;
+        this.importerProvider = importerProvider;
     }
 
     @Override
@@ -41,15 +37,20 @@ public class LoadImporterConfiguration implements JavaDelegate {
         var importJob = importProvider.lookup(batchImportSlug)
                 .getOrThrow(() -> new IllegalStateException("Cannot find batch import with slug " + batchImportSlug));
 
-        var importConfig = readConfiguration(importJob.getConfig().getFileCode());
-
-        delegateExecution.setVariableLocal("importConfig", importConfig);
-    }
-
-    private ImportConfigJson readConfiguration(String fileCode) {
-        return storageService.read(fileCode)
-                .map(bytes -> new String(bytes, StandardCharsets.UTF_8))
-                .map(json -> mapper.readSafe(json, ImportConfigJson.class))
-                .getOrThrow(() -> new IllegalStateException("Cannot read import configuration from file " + fileCode));
+        importerProvider.stream()
+                .filter(importer -> importer.getImporterType().equalsIgnoreCase(importJob.getConfig().getType()))
+                .findFirst()
+                .ifPresentOrElse(
+                        importer -> delegateExecution.setVariableLocal(
+                                "importConfig",
+                                new ImportJobSettings(
+                                        importer.loadConfiguration(importJob.getConfig()),
+                                        false,
+                                        false,
+                                        null)),
+                        () -> {
+                            throw new IllegalStateException("Cannot find importer for type " + importJob.getConfig().getType());
+                        }
+                );
     }
 }

@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.importer;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.jpa.importer.entity.CSVImportConfig;
+import com.jongsoft.finance.jpa.importer.entity.ImportConfig;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -29,8 +29,8 @@ public class CreateImportJobHandler implements CommandHandler<CreateImportJobCom
     public void handle(CreateImportJobCommand command) {
         log.info("[{}] - Processing import create event", command.slug());
 
-        var configJpa = entityManager.<CSVImportConfig>blocking()
-                .hql("from CSVImportConfig where id = :id")
+        var configJpa = entityManager.<ImportConfig>blocking()
+                .hql("from ImportConfig where id = :id")
                 .set("id", command.configId())
                 .maybe()
                 .getOrThrow(() ->

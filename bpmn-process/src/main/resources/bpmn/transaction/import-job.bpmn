@@ -38,7 +38,7 @@ When calling the flow the following variables must be set:
         <camunda:inputOutput>
           <camunda:inputParameter name="name" />
           <camunda:inputParameter name="iban" />
-          <camunda:inputParameter name="id">${importConfiguration.getAccountId()}</camunda:inputParameter>
+          <camunda:inputParameter name="id">${importConfiguration.accountId()}</camunda:inputParameter>
           <camunda:outputParameter name="targetAccountId">${id}</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -60,9 +60,6 @@ When calling the flow the following variables must be set:
         <camunda:inputOutput>
           <camunda:inputParameter name="batchImportSlug">${importJobSlug}</camunda:inputParameter>
           <camunda:inputParameter name="importConfig">${importConfiguration}</camunda:inputParameter>
-          <camunda:outputParameter name="transactionTokens">storageTokens</camunda:outputParameter>
-          <camunda:outputParameter name="allowGenerate">generateAccounts</camunda:outputParameter>
-          <camunda:outputParameter name="applyRules">applyRules</camunda:outputParameter>
           <camunda:outputParameter name="transactionTokens">${storageTokens}</camunda:outputParameter>
           <camunda:outputParameter name="allowGenerate">${generateAccounts}</camunda:outputParameter>
           <camunda:outputParameter name="applyRules">${applyRules}</camunda:outputParameter>
@@ -131,7 +128,6 @@ When calling the flow the following variables must be set:
           <camunda:inputOutput>
             <camunda:inputParameter name="name">${account_extract.name}</camunda:inputParameter>
             <camunda:inputParameter name="description">${account_extract.description}</camunda:inputParameter>
-            <camunda:outputParameter name="accountId">accountId</camunda:outputParameter>
             <camunda:outputParameter name="accountId">${accountId}</camunda:outputParameter>
           </camunda:inputOutput>
         </bpmn:extensionElements>
@@ -169,8 +165,6 @@ When calling the flow the following variables must be set:
         <camunda:inputOutput>
           <camunda:inputParameter name="batchImportSlug">${importJobSlug}</camunda:inputParameter>
           <camunda:inputParameter name="importConfig">${importConfiguration}</camunda:inputParameter>
-          <camunda:outputParameter name="accounts_data">extractionResult</camunda:outputParameter>
-          <camunda:outputParameter name="accounts_data">${extractionResult}</camunda:outputParameter>
           <camunda:outputParameter name="accounts_data">${locatable}</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
@@ -247,7 +241,6 @@ When calling the flow the following variables must be set:
         <bpmn:extensionElements>
           <camunda:inputOutput>
             <camunda:inputParameter name="storageToken">${transactionToken}</camunda:inputParameter>
-            <camunda:outputParameter name="transaction">transaction</camunda:outputParameter>
             <camunda:outputParameter name="transaction">${transaction}</camunda:outputParameter>
           </camunda:inputOutput>
         </bpmn:extensionElements>

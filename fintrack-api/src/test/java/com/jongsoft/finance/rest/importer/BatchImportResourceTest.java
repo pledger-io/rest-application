@@ -4,14 +4,13 @@ import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
-import com.jongsoft.finance.providers.CSVConfigProvider;
+import com.jongsoft.finance.providers.ImportConfigurationProvider;
 import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.hamcrest.Matchers;
@@ -29,12 +28,12 @@ class BatchImportResourceTest extends TestSetup {
     @Inject
     private ImportProvider importProvider;
     @Inject
-    private CSVConfigProvider csvConfigProvider;
+    private ImportConfigurationProvider csvConfigProvider;
 
     @Replaces
     @MockBean
-    CSVConfigProvider configProvider() {
-        return Mockito.mock(CSVConfigProvider.class);
+    ImportConfigurationProvider configProvider() {
+        return Mockito.mock(ImportConfigurationProvider.class);
     }
 
     @Replaces
@@ -209,7 +208,10 @@ class BatchImportResourceTest extends TestSetup {
         // @formatter:off
         spec
             .given()
-                .body(Map.of("name", "sample-configuration", "fileCode", "token-sample"))
+                .body(Map.of(
+                        "type", "csv",
+                        "name", "sample-configuration",
+                        "fileCode", "token-sample"))
             .when()
                 .put("/api/import/config")
             .then()

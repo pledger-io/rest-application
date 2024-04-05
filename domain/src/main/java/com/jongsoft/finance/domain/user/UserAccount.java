@@ -182,12 +182,12 @@ public class UserAccount implements AggregateBase, Serializable {
      * @return          the newly created configuration
      */
     @BusinessMethod
-    public BatchImportConfig createImportConfiguration(String name, String fileCode) {
+    public BatchImportConfig createImportConfiguration(String type, String name, String fileCode) {
         if (notFullUser()) {
             throw StatusException.notAuthorized("User cannot create import configuration, incorrect privileges.");
         }
 
-        return new BatchImportConfig(this, name, fileCode);
+        return new BatchImportConfig(this, type, name, fileCode);
     }
 
     /**

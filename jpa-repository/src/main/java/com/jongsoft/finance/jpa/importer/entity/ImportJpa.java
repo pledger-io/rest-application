@@ -25,7 +25,7 @@ public class ImportJpa extends EntityJpa {
 
     @ManyToOne
     @JoinColumn
-    private CSVImportConfig config;
+    private ImportConfig config;
 
     @ManyToOne
     @JoinColumn
@@ -40,7 +40,7 @@ public class ImportJpa extends EntityJpa {
             Date finished,
             String slug,
             String fileCode,
-            CSVImportConfig config,
+            ImportConfig config,
             UserAccountJpa user,
             boolean archived,
             List<TransactionJournal> transactions) {

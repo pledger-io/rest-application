@@ -16,11 +16,16 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = @Inject)
 public class RuleEngineImpl implements RuleEngine {
 
     private final TransactionRuleProvider transactionRuleProvider;
     private final List<ChangeLocator> locators;
+
+    @Inject
+    public RuleEngineImpl(TransactionRuleProvider transactionRuleProvider, List<ChangeLocator> locators) {
+        this.transactionRuleProvider = transactionRuleProvider;
+        this.locators = locators;
+    }
 
     @Override
     public RuleDataSet run(RuleDataSet input) {
