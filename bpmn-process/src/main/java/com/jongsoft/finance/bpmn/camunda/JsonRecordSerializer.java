@@ -27,7 +27,7 @@ public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedV
 
     @Override
     public String getName() {
-        return "record-json";
+        return supportedClass.getName();
     }
 
     @Override
@@ -37,7 +37,7 @@ public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedV
 
     @Override
     public TypedValue convertToTypedValue(UntypedValueImpl untypedValue) {
-        logger.debug("Converting untyped value to typed value: {}", untypedValue.getType());
+        logger.trace("Converting untyped value to typed value: {}", untypedValue.getValue().getClass().getSimpleName());
 
         var importJobSettings = (Record) untypedValue.getValue();
         String jsonString;
@@ -46,8 +46,9 @@ public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedV
         } catch (IOException e) {
             throw new RuntimeException("Could not serialize ImportJobSettings", e);
         }
+
         return Variables.serializedObjectValue(jsonString)
-                .serializationDataFormat(getName())
+                .serializationDataFormat("application/json")
                 .create();
     }
 
@@ -59,12 +60,12 @@ public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedV
 
     @Override
     public TypedValue readValue(ValueFields valueFields, boolean b, boolean b1) {
-        logger.debug("Reading value from value fields: {}", valueFields.getName());
+        logger.trace("Reading value from value fields: {}", valueFields.getName());
         try {
             return Variables.objectValue(objectMapper.readValue(
                             new String(valueFields.getByteArrayValue()),
                             supportedClass))
-                    .serializationDataFormat(getName())
+                    .serializationDataFormat("application/json")
                     .create();
         } catch (IOException e) {
             throw new RuntimeException("Could not deserialize ImportJobSettings", e);

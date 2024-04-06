@@ -8,6 +8,18 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 import java.util.Collection;
 
+/**
+ * Locates an account in a mapping and sets the account ID as a process variable.
+ * <p>
+ *     The account name is retrieved from a process variable named {@code name}.
+ *     The account mappings are retrieved from a process variable named {@code accountMappings}
+ * </p>
+ * <p>
+ *     The account ID is set as a process variable named {@code accountId}.
+ *     If the account name does not match the account name in the mapping, a synonym is registered.
+ *     The synonym is the account name from the mapping.
+ * </p>
+ **/
 @Slf4j
 @Singleton
 public class LocateAccountInMapping implements JavaDelegate {

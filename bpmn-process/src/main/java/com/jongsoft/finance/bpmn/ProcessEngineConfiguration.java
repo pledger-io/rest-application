@@ -3,7 +3,7 @@ package com.jongsoft.finance.bpmn;
 import com.jongsoft.finance.ProcessVariable;
 import com.jongsoft.finance.bpmn.camunda.*;
 import com.jongsoft.finance.core.DataSourceMigration;
-import com.jongsoft.finance.serialized.ImportJobSettings;
+import com.jongsoft.finance.importer.api.TransactionDTO;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.context.annotation.Context;
 import io.micronaut.context.annotation.Factory;
@@ -58,7 +58,8 @@ public class ProcessEngineConfiguration {
         configuration.setHistoryTimeToLive("P1D");
         configuration.setResolverFactories(List.of(new MicronautBeanResolver(applicationContext)));
         configuration.setCustomPreVariableSerializers(List.of(
-                new JsonRecordSerializer<>(applicationContext.getBean(ObjectMapper.class), ProcessVariable.class)));
+                new JsonRecordSerializer<>(applicationContext.getBean(ObjectMapper.class), ProcessVariable.class),
+                new JsonRecordSerializer<>(applicationContext.getBean(ObjectMapper.class), TransactionDTO.class)));
 
         var processEngine = configuration.buildProcessEngine();
         log.info("Created camunda process engine");

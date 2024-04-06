@@ -8,6 +8,14 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Extracts account mappings from the import transaction.
+ * <p>
+ *     This delegate is used to extract account mappings from the imported transaction.
+ *     The account mappings are stored in a set of {@link ExtractionMapping} objects.
+ *     The account mappings are used to map the account names in the import transaction to the account IDs in the finance system.
+ * <p>
+ */
 @Slf4j
 public class ImportAccountExtractorDelegate implements JavaDelegate {
 

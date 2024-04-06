@@ -16,6 +16,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Delegate to trigger the actual {@link ImporterProvider} to start the job of fetching and converting the transactions.
+ * <p>
+ *     The delegate will look up the {@link ImporterProvider} that supports the {@link ImporterConfiguration} of the
+ *     current import job and start the process of reading the transactions.
+ *     The transactions are then serialized and stored in the {@link StorageService} and the tokens are stored in the
+ *     process variables called {@code storageTokens}.
+ * </p>
+ * <p>
+ *     The delegate will also set the process variables {@code generateAccounts}, {@code applyRules} and {@code targetAccountId}
+ *     based on the {@link ImportJobSettings} of the current import job.
+ *     The delegate will log a warning if no {@link ImporterProvider} is found for the {@link ImporterConfiguration} of the
+ *     current import job.
+ * </p>
+ */
 @Slf4j
 @Singleton
 public class ReadTransactionLogDelegate implements JavaDelegate {
