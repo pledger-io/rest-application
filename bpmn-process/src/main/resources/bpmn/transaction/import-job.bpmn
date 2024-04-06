@@ -217,7 +217,7 @@ When calling the flow the following variables must be set:
       <bpmn:userTask id="user_create_account" name="User create account">
         <bpmn:extensionElements>
           <camunda:inputOutput>
-            <camunda:inputParameter name="accountName">${transaction.opposingName}</camunda:inputParameter>
+            <camunda:inputParameter name="accountName">${transaction.opposingName()}</camunda:inputParameter>
             <camunda:inputParameter name="basedOnAccount">${targetAccountId}</camunda:inputParameter>
             <camunda:outputParameter name="accountId">${accountId}</camunda:outputParameter>
           </camunda:inputOutput>
@@ -230,7 +230,7 @@ When calling the flow the following variables must be set:
       <bpmn:serviceTask id="locate_account_mapping" name="Locate account in mapping" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.LocateAccountInMapping" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${locateAccountInMapping}">
         <bpmn:extensionElements>
           <camunda:inputOutput>
-            <camunda:inputParameter name="name">${transaction.opposingName}</camunda:inputParameter>
+            <camunda:inputParameter name="name">${transaction.opposingName()}</camunda:inputParameter>
             <camunda:outputParameter name="accountId">${accountId}</camunda:outputParameter>
           </camunda:inputOutput>
         </bpmn:extensionElements>
@@ -297,7 +297,7 @@ When calling the flow the following variables must be set:
           <camunda:inputOutput>
             <camunda:inputParameter name="iban" />
             <camunda:inputParameter name="id" />
-            <camunda:inputParameter name="name">${transaction.opposingName}</camunda:inputParameter>
+            <camunda:inputParameter name="name">${transaction.opposingName()}</camunda:inputParameter>
             <camunda:outputParameter name="accountId">${id}</camunda:outputParameter>
           </camunda:inputOutput>
         </bpmn:extensionElements>

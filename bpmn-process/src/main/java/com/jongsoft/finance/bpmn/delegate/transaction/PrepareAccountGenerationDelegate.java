@@ -1,7 +1,9 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
 import com.jongsoft.finance.ProcessMapper;
-import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
+import com.jongsoft.finance.core.TransactionType;
+import com.jongsoft.finance.importer.api.TransactionDTO;
+import com.jongsoft.finance.serialized.AccountJson;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -23,15 +25,22 @@ public class PrepareAccountGenerationDelegate implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        var transaction = (ParsedTransaction) execution.getVariableLocal("transaction");
+        var transaction = (TransactionDTO) execution.getVariableLocal("transaction");
 
         log.debug("{}: Extracting the account to be created from the transaction {}.",
                 execution.getCurrentActivityName(),
-                transaction.getAccount().getName());
+                transaction.opposingName());
+
+        var accountJson = AccountJson.builder()
+                .name(transaction.opposingName())
+                .iban(transaction.opposingIBAN())
+                .type(transaction.type() == TransactionType.CREDIT ? "creditor" : "debtor")
+                .currency("EUR")// todo this needs to be fixed later on
+                .build();
 
         execution.setVariableLocal(
                 "accountJson",
-                mapper.writeSafe(transaction.getAccount()));
+                mapper.writeSafe(accountJson));
     }
 
 }

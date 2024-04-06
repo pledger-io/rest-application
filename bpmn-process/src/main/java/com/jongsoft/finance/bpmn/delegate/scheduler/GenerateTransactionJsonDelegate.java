@@ -1,8 +1,8 @@
 package com.jongsoft.finance.bpmn.delegate.scheduler;
 
-import com.jongsoft.finance.bpmn.delegate.importer.ParsedTransaction;
+import com.jongsoft.finance.core.TransactionType;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
-import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.importer.api.TransactionDTO;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import jakarta.inject.Singleton;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -28,13 +28,15 @@ public class GenerateTransactionJsonDelegate implements JavaDelegate {
 
         transactionScheduleProvider.lookup(scheduledTransactionId)
                 .ifPresent(schedule -> {
-                    var transaction = ParsedTransaction.builder()
-                            .amount(schedule.getAmount())
-                            .type(Transaction.Type.CREDIT)
-                            .transactionDate(LocalDate.parse(isoDate))
-                            .description(generateTransactionDescription(schedule))
-                            .build();
-
+                    var transaction = new TransactionDTO(
+                            schedule.getAmount(),
+                            TransactionType.CREDIT,
+                            generateTransactionDescription(schedule),
+                            LocalDate.parse(isoDate),
+                            null,
+                            null,
+                            schedule.getDestination().getIban(),
+                            schedule.getDestination().getName());
 
                     execution.setVariable("destinationId", schedule.getDestination().getId());
                     execution.setVariable("sourceId", schedule.getSource().getId());
