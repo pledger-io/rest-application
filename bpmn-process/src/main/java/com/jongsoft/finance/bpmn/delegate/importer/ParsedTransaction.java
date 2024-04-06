@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @Getter
 @Builder
 @Serdeable
+@Deprecated
 @ToString(of = {"transactionDate", "opposingName"})
 public class ParsedTransaction implements Serializable {
 
