@@ -2,6 +2,7 @@ package com.jongsoft.finance.rule.locator;
 
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Contract;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.providers.DataProvider;
@@ -27,7 +28,7 @@ public class RelationLocator implements ChangeLocator {
     public Object locate(RuleColumn column, String change) {
         Class<?> genericType = switch (column) {
             case CATEGORY -> Category.class;
-            case BUDGET -> Budget.Expense.class;
+            case BUDGET -> EntityRef.NamedEntity.class;
             case CONTRACT -> Contract.class;
             default -> throw new IllegalArgumentException("Unsupported type");
         };
@@ -39,7 +40,6 @@ public class RelationLocator implements ChangeLocator {
 
         if (dataProvider.isPresent()) {
             var entity = dataProvider.get().lookup(Long.parseLong(change));
-
             return entity.get().toString();
         }
 
