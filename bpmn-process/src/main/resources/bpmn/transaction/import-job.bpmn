@@ -52,7 +52,7 @@ When calling the flow the following variables must be set:
     </bpmn:exclusiveGateway>
     <bpmn:sequenceFlow id="Flow_0xcxk57" name="with account id" sourceRef="find_target_account" targetRef="target_account_exists" />
     <bpmn:sequenceFlow id="arrow_account_missing" name="reconfigure" sourceRef="target_account_exists" targetRef="task_configure" />
-    <bpmn:sequenceFlow id="arrow_target_account_exists" name="yes" sourceRef="target_account_exists" targetRef="extract_accounts">
+    <bpmn:sequenceFlow id="arrow_target_account_exists" name="yes" sourceRef="target_account_exists" targetRef="read_csv_file">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${targetAccountId != null}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:serviceTask id="read_csv_file" name="Read in CSV file" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.ReadTransactionLogDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${readTransactionLogDelegate}">
@@ -63,13 +63,14 @@ When calling the flow the following variables must be set:
           <camunda:outputParameter name="transactionTokens">${storageTokens}</camunda:outputParameter>
           <camunda:outputParameter name="allowGenerate">${generateAccounts}</camunda:outputParameter>
           <camunda:outputParameter name="applyRules">${applyRules}</camunda:outputParameter>
+          <camunda:outputParameter name="accounts_data">${locatable}</camunda:outputParameter>
         </camunda:inputOutput>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_11g50b7</bpmn:incoming>
-      <bpmn:outgoing>Flow_02v0o7o</bpmn:outgoing>
+      <bpmn:incoming>arrow_target_account_exists</bpmn:incoming>
+      <bpmn:outgoing>Flow_03qkx35</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:subProcess id="process_account_mapping" name="Map accounts">
-      <bpmn:incoming>Flow_0ow7pbb</bpmn:incoming>
+      <bpmn:incoming>Flow_03qkx35</bpmn:incoming>
       <bpmn:outgoing>Flow_0pngnev</bpmn:outgoing>
       <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="${accounts_data}" camunda:elementVariable="account_extract" />
       <bpmn:startEvent id="start_match_accounts">
@@ -147,7 +148,6 @@ When calling the flow the following variables must be set:
         <bpmn:outgoing>Flow_0czgnsv</bpmn:outgoing>
       </bpmn:serviceTask>
     </bpmn:subProcess>
-    <bpmn:sequenceFlow id="Flow_0ow7pbb" name="extracts" sourceRef="extract_accounts" targetRef="process_account_mapping" />
     <bpmn:sequenceFlow id="Flow_0pngnev" name="mappings" sourceRef="process_account_mapping" targetRef="confirm_mappings" />
     <bpmn:userTask id="confirm_mappings" name="Confirm account mapping">
       <bpmn:extensionElements>
@@ -159,20 +159,9 @@ When calling the flow the following variables must be set:
       <bpmn:incoming>Flow_0pngnev</bpmn:incoming>
       <bpmn:outgoing>Flow_11g50b7</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:sequenceFlow id="Flow_11g50b7" sourceRef="confirm_mappings" targetRef="read_csv_file" />
-    <bpmn:serviceTask id="extract_accounts" name="Extract accounts from CSV" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.ExtractAccountDetailsDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${extractAccountDetailsDelegate}">
-      <bpmn:extensionElements>
-        <camunda:inputOutput>
-          <camunda:inputParameter name="batchImportSlug">${importJobSlug}</camunda:inputParameter>
-          <camunda:inputParameter name="importConfig">${importConfiguration}</camunda:inputParameter>
-          <camunda:outputParameter name="accounts_data">${locatable}</camunda:outputParameter>
-        </camunda:inputOutput>
-      </bpmn:extensionElements>
-      <bpmn:incoming>arrow_target_account_exists</bpmn:incoming>
-      <bpmn:outgoing>Flow_0ow7pbb</bpmn:outgoing>
-    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_11g50b7" sourceRef="confirm_mappings" targetRef="process_create_transactions" />
     <bpmn:subProcess id="process_create_transactions" name="Process transactions">
-      <bpmn:incoming>Flow_02v0o7o</bpmn:incoming>
+      <bpmn:incoming>Flow_11g50b7</bpmn:incoming>
       <bpmn:outgoing>Flow_16v2prx</bpmn:outgoing>
       <bpmn:multiInstanceLoopCharacteristics isSequential="true" camunda:collection="${transactionTokens}" camunda:elementVariable="transactionToken" />
       <bpmn:startEvent id="start_create_transaction">
@@ -315,7 +304,6 @@ When calling the flow the following variables must be set:
         <bpmn:outgoing>Flow_0rz5nze</bpmn:outgoing>
       </bpmn:serviceTask>
     </bpmn:subProcess>
-    <bpmn:sequenceFlow id="Flow_02v0o7o" sourceRef="read_csv_file" targetRef="process_create_transactions" />
     <bpmn:sequenceFlow id="Flow_16v2prx" sourceRef="process_create_transactions" targetRef="mark_import_done" />
     <bpmn:endEvent id="endJob">
       <bpmn:incoming>Flow_06dyjk4</bpmn:incoming>
@@ -331,6 +319,7 @@ When calling the flow the following variables must be set:
       <bpmn:incoming>Flow_16v2prx</bpmn:incoming>
       <bpmn:outgoing>Flow_06dyjk4</bpmn:outgoing>
     </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_03qkx35" sourceRef="read_csv_file" targetRef="process_account_mapping" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="import_job">
@@ -357,7 +346,7 @@ When calling the flow the following variables must be set:
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1y5d1uo_di" bpmnElement="read_csv_file">
-        <dc:Bounds x="1480" y="250" width="100" height="80" />
+        <dc:Bounds x="1060" y="260" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0bn3ft1_di" bpmnElement="process_account_mapping" isExpanded="true">
         <dc:Bounds x="810" y="450" width="780" height="330" />
@@ -444,9 +433,6 @@ When calling the flow the following variables must be set:
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_0vbcm2j_di" bpmnElement="confirm_mappings">
         <dc:Bounds x="1280" y="250" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0cfirls_di" bpmnElement="extract_accounts">
-        <dc:Bounds x="1070" y="250" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0nxa7la_di" bpmnElement="process_create_transactions" isExpanded="true">
         <dc:Bounds x="1710" y="85" width="1220" height="410" />
@@ -632,16 +618,9 @@ When calling the flow the following variables must be set:
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1fbjukg_di" bpmnElement="arrow_target_account_exists">
         <di:waypoint x="955" y="290" />
-        <di:waypoint x="1070" y="290" />
+        <di:waypoint x="1060" y="290" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1005" y="272" width="17" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0ow7pbb_di" bpmnElement="Flow_0ow7pbb">
-        <di:waypoint x="1120" y="330" />
-        <di:waypoint x="1120" y="450" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1130" y="383" width="40" height="14" />
+          <dc:Bounds x="985" y="272" width="17" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0pngnev_di" bpmnElement="Flow_0pngnev">
@@ -653,10 +632,6 @@ When calling the flow the following variables must be set:
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_11g50b7_di" bpmnElement="Flow_11g50b7">
         <di:waypoint x="1380" y="290" />
-        <di:waypoint x="1480" y="290" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_02v0o7o_di" bpmnElement="Flow_02v0o7o">
-        <di:waypoint x="1580" y="290" />
         <di:waypoint x="1710" y="290" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_16v2prx_di" bpmnElement="Flow_16v2prx">
@@ -666,6 +641,10 @@ When calling the flow the following variables must be set:
       <bpmndi:BPMNEdge id="Flow_06dyjk4_di" bpmnElement="Flow_06dyjk4">
         <di:waypoint x="3110" y="290" />
         <di:waypoint x="3192" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03qkx35_di" bpmnElement="Flow_03qkx35">
+        <di:waypoint x="1110" y="340" />
+        <di:waypoint x="1110" y="450" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

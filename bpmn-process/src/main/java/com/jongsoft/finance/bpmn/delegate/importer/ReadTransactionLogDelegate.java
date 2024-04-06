@@ -2,9 +2,11 @@ package com.jongsoft.finance.bpmn.delegate.importer;
 
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.importer.ImporterProvider;
 import com.jongsoft.finance.importer.api.ImporterConfiguration;
 import com.jongsoft.finance.providers.ImportProvider;
+import com.jongsoft.finance.serialized.ExtractedAccountLookup;
 import com.jongsoft.finance.serialized.ImportJobSettings;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -14,7 +16,9 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Delegate to trigger the actual {@link ImporterProvider} to start the job of fetching and converting the transactions.
@@ -60,6 +64,7 @@ public class ReadTransactionLogDelegate implements JavaDelegate {
 
         var importJob = importProvider.lookup(batchImportSlug).get();
         List<String> storageTokens = new ArrayList<>();
+        Set<ExtractedAccountLookup> locatable = new HashSet<>();
 
         importerProviders.stream()
                         .filter(provider -> provider.supports(importJobSettings.importConfiguration()))
@@ -67,15 +72,28 @@ public class ReadTransactionLogDelegate implements JavaDelegate {
                         .ifPresentOrElse(
                                 provider -> provider.readTransactions(
                                         transactionDTO -> {
+                                            // write the serialized transaction to storage and store the token
                                             var serialized = mapper.writeSafe(transactionDTO)
                                                     .getBytes(StandardCharsets.UTF_8);
                                             storageTokens.add(storageService.store(serialized));
+
+                                            // write the extracted account lookup to the locatable set
+                                            locatable.add(new ExtractedAccountLookup(
+                                                    transactionDTO.opposingName(),
+                                                    transactionDTO.opposingIBAN(),
+                                                    transactionDTO.description()));
                                         },
                                         importJobSettings.importConfiguration(),
                                         importJob),
                                 () -> log.warn("No importer provider found for configuration: {}", importJobSettings.importConfiguration())
                         );
 
+        if (locatable.isEmpty()) {
+            log.warn("No accounts found for import job {}", batchImportSlug);
+            throw StatusException.internalError("No parsable accounts found for import job", "bpmn.transaction.import.no-accounts-found");
+        }
+
+        execution.setVariableLocal("locatable", locatable);
         execution.setVariableLocal("generateAccounts", importJobSettings.generateAccounts());
         execution.setVariableLocal("applyRules", importJobSettings.applyRules());
         execution.setVariableLocal("targetAccountId", importJobSettings.accountId());

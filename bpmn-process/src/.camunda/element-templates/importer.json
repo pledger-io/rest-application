@@ -50,6 +50,15 @@
         }
       },
       {
+        "label": "Account locatable",
+        "type": "String",
+        "description": "A set containing all account information in this import job.",
+        "binding": {
+          "type": "camunda:outputParameter",
+          "source": "${locatable}"
+        }
+      },
+      {
         "label": "Account generation",
         "type": "String",
         "binding": {
@@ -104,58 +113,6 @@
         "binding": {
           "type": "camunda:outputParameter",
           "source": "${importConfig}"
-        }
-      }
-    ]
-  },
-  {
-    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
-    "name": "Importer: Extract account information",
-    "description": "Extract the account information from the CSV file.",
-    "id": "com.jongsoft.finance.bpmn.delegate.importer.ExtractAccountDetailsDelegate",
-    "version": 1,
-    "appliesTo": [
-      "bpmn:ServiceTask"
-    ],
-    "properties": [
-      {
-        "label": "Implementation",
-        "type": "String",
-        "value": "${extractAccountDetailsDelegate}",
-        "editable": false,
-        "binding": {
-          "type": "property",
-          "name": "camunda:delegateExpression"
-        }
-      },
-      {
-        "label": "Import Job Slug",
-        "type": "String",
-        "binding": {
-          "type": "camunda:inputParameter",
-          "name": "batchImportSlug"
-        },
-        "constraint": {
-          "notEmpty": true
-        }
-      },
-      {
-        "label": "Configuration JSON",
-        "type": "String",
-        "binding": {
-          "type": "camunda:inputParameter",
-          "name": "importConfig"
-        },
-        "constraint": {
-          "notEmpty": true
-        }
-      },
-      {
-        "label": "Account extracts",
-        "type": "String",
-        "binding": {
-          "type": "camunda:outputParameter",
-          "source": "${locatable}"
         }
       }
     ]
