@@ -4,5 +4,6 @@ datasources:
     driverClassName: org.h2.Driver
     username: ${DATABASE_USER:fintrack}
     password: ${DATABASE_PASSWORD:fintrack}
+    historyLevel: none
     dialect: mysql
     migration-locations: ["classpath:db/camunda/h2", "classpath:db/migration", "classpath:db/sample"]

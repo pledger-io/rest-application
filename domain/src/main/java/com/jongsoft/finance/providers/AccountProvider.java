@@ -39,7 +39,7 @@ public interface AccountProvider extends DataProvider<Account>, Exportable<Accou
     Sequence<AccountSpending> top(FilterCommand filter, Range<LocalDate> range, boolean asc);
 
     @Override
-    default boolean supports(Class<Account> supportingClass) {
+    default boolean supports(Class<?> supportingClass) {
         return Account.class.equals(supportingClass);
     }
 }

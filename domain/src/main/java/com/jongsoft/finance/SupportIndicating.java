@@ -8,6 +8,6 @@ package com.jongsoft.finance;
  */
 public interface SupportIndicating<T> {
 
-    boolean supports(Class<T> supportingClass);
+    boolean supports(Class<?> supportingClass);
 
 }

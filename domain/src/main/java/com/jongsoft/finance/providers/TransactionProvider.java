@@ -163,7 +163,7 @@ public interface TransactionProvider extends DataProvider<Transaction> {
 
     Sequence<Transaction> similar(EntityRef from, EntityRef to, double amount, LocalDate date);
 
-    default boolean supports(Class<Transaction> supportingClass) {
+    default boolean supports(Class<?> supportingClass) {
         return Transaction.class.equals(supportingClass);
     }
 }

@@ -9,7 +9,7 @@ public interface CurrencyProvider extends DataProvider<Currency>, Exportable<Cur
     Optional<Currency> lookup(String code);
 
     @Override
-    default boolean supports(Class<Currency> supportingClass) {
+    default boolean supports(Class<?> supportingClass) {
         return Currency.class.equals(supportingClass);
     }
 }

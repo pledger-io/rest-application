@@ -12,7 +12,7 @@ public interface TransactionRuleProvider extends DataProvider<TransactionRule>, 
     void save(TransactionRule rule);
 
     @Override
-    default boolean supports(Class<TransactionRule> supportingClass) {
+    default boolean supports(Class<?> supportingClass) {
         return TransactionRule.class.equals(supportingClass);
     }
 }

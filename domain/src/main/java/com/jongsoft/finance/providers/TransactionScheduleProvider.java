@@ -17,7 +17,7 @@ public interface TransactionScheduleProvider extends DataProvider<ScheduledTrans
     ResultPage<ScheduledTransaction> lookup(FilterCommand filterCommand);
 
     @Override
-    default boolean supports(Class<ScheduledTransaction> supportingClass) {
+    default boolean supports(Class<?> supportingClass) {
         return ScheduledTransaction.class.equals(supportingClass);
     }
 }

@@ -9,7 +9,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.RuntimeService;
 
 import java.util.List;
 
@@ -18,10 +18,10 @@ import java.util.List;
 @Controller("/api/runtime-process/{processDefinitionKey}/{businessKey}/{instanceId}/variables")
 public class ProcessVariableResource {
 
-    private final HistoryService historyService;
+    private final RuntimeService runtimeService;
 
-    public ProcessVariableResource(HistoryService historyService) {
-        this.historyService = historyService;
+    public ProcessVariableResource(RuntimeService runtimeService) {
+        this.runtimeService = runtimeService;
     }
 
     @Get
@@ -33,9 +33,8 @@ public class ProcessVariableResource {
     public List<ProcessVariableResponse> variables(
             @PathVariable String processDefinitionKey,
             @PathVariable String instanceId) {
-        return Collections.List(historyService.createHistoricVariableInstanceQuery()
-                        .processDefinitionKey(processDefinitionKey)
-                        .processInstanceId(instanceId)
+        return Collections.List(runtimeService.createVariableInstanceQuery()
+                        .processInstanceIdIn(instanceId)
                         .list())
                 .map(ProcessVariableResponse::new)
                 .toJava();
@@ -51,9 +50,8 @@ public class ProcessVariableResource {
             @PathVariable String processDefinitionKey,
             @PathVariable String instanceId,
             @PathVariable String variable) {
-        return Collections.List(historyService.createHistoricVariableInstanceQuery()
-                        .processDefinitionKey(processDefinitionKey)
-                        .processInstanceId(instanceId)
+        return Collections.List(runtimeService.createVariableInstanceQuery()
+                        .processInstanceIdIn(instanceId)
                         .variableName(variable)
                         .list())
                 .map(ProcessVariableResponse::new)

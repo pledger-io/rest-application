@@ -5,9 +5,8 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,14 +47,14 @@ class RuntimeResourceTest {
     @Test
     void startProcess() {
         var mockInstance = Mockito.mock(ProcessInstance.class);
-        var historyMock = Mockito.mock(HistoricProcessInstance.class);
+        var historyMock = Mockito.mock(ProcessInstance.class);
         var instanceBuilder = Mockito.mock(ProcessInstantiationBuilder.class);
-        var historyBuilder = Mockito.mock(HistoricProcessInstanceQuery.class);
+        var historyBuilder = Mockito.mock(ProcessInstanceQuery.class);
 
         when(runtimeService.createProcessInstanceByKey("testProcess")).thenReturn(instanceBuilder);
         when(instanceBuilder.execute()).thenReturn(mockInstance);
         when(mockInstance.getProcessInstanceId()).thenReturn("MockProcessInstance");
-        when(historyService.createHistoricProcessInstanceQuery()).thenReturn(historyBuilder);
+        when(runtimeService.createProcessInstanceQuery()).thenReturn(historyBuilder);
         when(historyBuilder.processInstanceId("MockProcessInstance")).thenReturn(historyBuilder);
         when(historyBuilder.singleResult()).thenReturn(historyMock);
 
@@ -66,6 +65,8 @@ class RuntimeResourceTest {
                 .satisfies(instance -> {
                     Assertions.assertThat(instance.getId()).isEqualTo("MockProcessInstance");
                     Assertions.assertThat(instance.getBusinessKey()).isEqualTo("sample-key");
+                    Assertions.assertThat(instance.getProcess()).isNull();
+                    Assertions.assertThat(instance.getState()).isEqualTo("ACTIVE");
                 });
 
         verify(runtimeService).createProcessInstanceByKey("testProcess");
@@ -74,18 +75,36 @@ class RuntimeResourceTest {
 
     @Test
     void history() {
-        final HistoricProcessInstanceQuery instanceBuilder = Mockito.mock(HistoricProcessInstanceQuery.class);
+        final var instanceBuilder = Mockito.mock(ProcessInstanceQuery.class);
 
-        when(historyService.createHistoricProcessInstanceQuery()).thenReturn(instanceBuilder);
+        when(runtimeService.createProcessInstanceQuery()).thenReturn(instanceBuilder);
         when(instanceBuilder.processDefinitionKey("testProcess")).thenReturn(instanceBuilder);
         when(instanceBuilder.variableValueEquals("username", "test-user")).thenReturn(instanceBuilder);
-        when(instanceBuilder.orderByProcessInstanceStartTime()).thenReturn(instanceBuilder);
+        when(instanceBuilder.orderByProcessInstanceId()).thenReturn(instanceBuilder);
         when(instanceBuilder.desc()).thenReturn(instanceBuilder);
         when(instanceBuilder.list()).thenReturn(List.of());
 
         subject.history("testProcess");
 
-        verify(historyService).createHistoricProcessInstanceQuery();
+        verify(runtimeService).createProcessInstanceQuery();
+        verify(instanceBuilder).processDefinitionKey("testProcess");
+    }
+
+    @Test
+    void historyBusinessKey() {
+        final var instanceBuilder = Mockito.mock(ProcessInstanceQuery.class);
+
+        when(runtimeService.createProcessInstanceQuery()).thenReturn(instanceBuilder);
+        when(instanceBuilder.processDefinitionKey("testProcess")).thenReturn(instanceBuilder);
+        when(instanceBuilder.processInstanceBusinessKey("key1")).thenReturn(instanceBuilder);
+        when(instanceBuilder.variableValueEquals("username", "test-user")).thenReturn(instanceBuilder);
+        when(instanceBuilder.orderByProcessInstanceId()).thenReturn(instanceBuilder);
+        when(instanceBuilder.desc()).thenReturn(instanceBuilder);
+        when(instanceBuilder.list()).thenReturn(List.of());
+
+        subject.history("testProcess","key1");
+
+        verify(runtimeService).createProcessInstanceQuery();
         verify(instanceBuilder).processDefinitionKey("testProcess");
     }
 
