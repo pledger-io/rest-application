@@ -57,6 +57,35 @@ public class ImportJobIT {
     }
 
     @Test
+    @DisplayName("Run with incorrect configuration causing an error")
+    void runWithIncorrectConfiguration(RuntimeContext context) {
+        context
+            .withAccount(createTargetAccount())
+            .withStorage()
+            .withStorage(JSON_FILE_CODE, "/import-test/import-config-test.json")
+            .withStorage(CSV_FILE_CODE, "/import-test/incorrect-columns.csv")
+            .withImportJob(createBatchImport());
+
+        var process = context.execute("import_job", Map.of(
+                "importJobSlug", IMPORT_JOB_SLUG
+        ));
+
+        process.task("task_configure")
+                .<ImportJobSettings>updateVariable(
+                        "initialConfig",
+                        "updatedConfig",
+                        config -> new ImportJobSettings(
+                                config.importConfiguration(),
+                                config.applyRules(),
+                                config.generateAccounts(),
+                                TARGET_ACCOUNT_ID))
+                .complete();
+
+        // Task should be active again
+        process.task("task_configure");
+    }
+
+    @Test
     @DisplayName("Run with account mapping adjustments")
     void runWithAccountMappingAdjustments(RuntimeContext context) {
         context

@@ -5,8 +5,6 @@ import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstantiationBuilder;
@@ -85,6 +83,24 @@ class RuntimeResourceTest {
         when(instanceBuilder.list()).thenReturn(List.of());
 
         subject.history("testProcess");
+
+        verify(runtimeService).createProcessInstanceQuery();
+        verify(instanceBuilder).processDefinitionKey("testProcess");
+    }
+
+    @Test
+    void historyBusinessKey() {
+        final var instanceBuilder = Mockito.mock(ProcessInstanceQuery.class);
+
+        when(runtimeService.createProcessInstanceQuery()).thenReturn(instanceBuilder);
+        when(instanceBuilder.processDefinitionKey("testProcess")).thenReturn(instanceBuilder);
+        when(instanceBuilder.processInstanceBusinessKey("key1")).thenReturn(instanceBuilder);
+        when(instanceBuilder.variableValueEquals("username", "test-user")).thenReturn(instanceBuilder);
+        when(instanceBuilder.orderByProcessInstanceId()).thenReturn(instanceBuilder);
+        when(instanceBuilder.desc()).thenReturn(instanceBuilder);
+        when(instanceBuilder.list()).thenReturn(List.of());
+
+        subject.history("testProcess","key1");
 
         verify(runtimeService).createProcessInstanceQuery();
         verify(instanceBuilder).processDefinitionKey("testProcess");
