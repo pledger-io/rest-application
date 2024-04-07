@@ -65,6 +65,8 @@ class RuntimeResourceTest {
                 .satisfies(instance -> {
                     Assertions.assertThat(instance.getId()).isEqualTo("MockProcessInstance");
                     Assertions.assertThat(instance.getBusinessKey()).isEqualTo("sample-key");
+                    Assertions.assertThat(instance.getProcess()).isNull();
+                    Assertions.assertThat(instance.getState()).isEqualTo("ACTIVE");
                 });
 
         verify(runtimeService).createProcessInstanceByKey("testProcess");
