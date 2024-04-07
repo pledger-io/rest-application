@@ -3,7 +3,6 @@ package com.jongsoft.finance.rule.locator;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.providers.DataProvider;
 import io.micronaut.context.ApplicationContext;

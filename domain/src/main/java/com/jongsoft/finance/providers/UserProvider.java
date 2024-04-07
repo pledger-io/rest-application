@@ -15,7 +15,7 @@ public interface UserProvider extends DataProvider<UserAccount> {
 
     Sequence<SessionToken> tokens(String username);
 
-    default boolean supports(Class<UserAccount> supportingClass) {
+    default boolean supports(Class<?> supportingClass) {
         return UserAccount.class.equals(supportingClass);
     }
 }

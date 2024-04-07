@@ -40,7 +40,7 @@ public class ProcessEngineConfiguration {
     public ProcessEngine processEngine() throws IOException {
         var configuration = new StandaloneProcessEngineConfiguration();
 
-        configuration.setHistory(org.camunda.bpm.engine.ProcessEngineConfiguration.HISTORY_AUTO)
+        configuration.setHistory(camundaDatasourceConfiguration.getHistoryLevel())
                 .setJobExecutorActivate(true)
                 .setMetricsEnabled(true)
                 .setJdbcDriver(camundaDatasourceConfiguration.getDriverClassName())

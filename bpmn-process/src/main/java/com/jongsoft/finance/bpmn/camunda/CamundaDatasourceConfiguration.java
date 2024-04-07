@@ -28,4 +28,7 @@ public interface CamundaDatasourceConfiguration {
     @NotBlank
     String getAutoUpdate();
 
+    @Bindable(defaultValue = "auto")
+    String getHistoryLevel();
+
 }

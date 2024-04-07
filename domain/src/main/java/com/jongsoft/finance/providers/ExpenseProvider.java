@@ -11,7 +11,7 @@ public interface ExpenseProvider extends DataProvider<EntityRef.NamedEntity> {
 
     ResultPage<EntityRef.NamedEntity> lookup(FilterCommand filter);
 
-    default boolean supports(Class<EntityRef.NamedEntity> supportingClass) {
+    default boolean supports(Class<?> supportingClass) {
         return EntityRef.NamedEntity.class.equals(supportingClass);
     }
 }

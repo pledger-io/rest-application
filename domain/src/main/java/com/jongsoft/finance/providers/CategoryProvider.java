@@ -18,7 +18,7 @@ public interface CategoryProvider extends DataProvider<Category>, Exportable<Cat
     ResultPage<Category> lookup(FilterCommand filterCommand);
 
     @Override
-    default boolean supports(Class<Category> supportingClass) {
+    default boolean supports(Class<?> supportingClass) {
         return Category.class.equals(supportingClass);
     }
 }

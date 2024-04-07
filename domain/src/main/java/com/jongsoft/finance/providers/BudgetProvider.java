@@ -15,7 +15,7 @@ public interface BudgetProvider extends Exportable<Budget> {
     Optional<Budget> first();
 
     @Override
-    default boolean supports(Class<Budget> supportingClass) {
+    default boolean supports(Class<?> supportingClass) {
         return Budget.class.equals(supportingClass);
     }
 }

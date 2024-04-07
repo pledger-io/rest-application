@@ -11,7 +11,7 @@ public interface ContractProvider extends DataProvider<Contract>, Exportable<Con
 
     Sequence<Contract> search(String partialName);
 
-    default boolean supports(Class<Contract> supportingClass) {
+    default boolean supports(Class<?> supportingClass) {
         return Contract.class.equals(supportingClass);
     }
 }

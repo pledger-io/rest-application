@@ -53,7 +53,7 @@ public class RuntimeResource {
 
         var process = instanceBuilder.execute();
         return new ProcessResponse(
-                historyService.createHistoricProcessInstanceQuery()
+                runtimeService.createProcessInstanceQuery()
                         .processInstanceId(process.getProcessInstanceId())
                         .singleResult());
     }
@@ -65,10 +65,10 @@ public class RuntimeResource {
             operationId = "getProcessHistory"
     )
     public List<ProcessResponse> history(@PathVariable String processDefinitionKey) {
-        return Collections.List(historyService.createHistoricProcessInstanceQuery()
+        return Collections.List(runtimeService.createProcessInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
-                .orderByProcessInstanceStartTime().desc()
+                .orderByProcessInstanceId().desc()
                 .list())
                 .map(ProcessResponse::new)
                 .toJava();
@@ -83,11 +83,11 @@ public class RuntimeResource {
     public List<ProcessResponse> history(
             @PathVariable String processDefinitionKey,
             @PathVariable String businessKey) {
-        return Collections.List(historyService.createHistoricProcessInstanceQuery()
+        return Collections.List(runtimeService.createProcessInstanceQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .processInstanceBusinessKey(businessKey)
                 .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
-                .orderByProcessInstanceStartTime().desc()
+                .orderByProcessInstanceId().desc()
                 .list())
                 .map(ProcessResponse::new)
                 .toJava();
