@@ -1,11 +1,14 @@
 package com.jongsoft.finance.bpmn.process;
 
+import com.jongsoft.finance.core.Encoder;
+import com.jongsoft.finance.domain.FinTrack;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.test.extensions.junit5.MicronautJunit5Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.mockito.Mockito;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
@@ -15,7 +18,7 @@ public class ProcessTestExtension extends MicronautJunit5Extension {
 
     public interface ProcessExecution<T extends ProcessExecution> {
         ProcessExecution<?> obtainChildProcess(String processKey);
-        T verifyCompleted();
+        HistoricProcessExecution verifyCompleted();
         <Y> T yankVariable(String variableName, Consumer<Y> consumer);
     }
 
@@ -24,6 +27,10 @@ public class ProcessTestExtension extends MicronautJunit5Extension {
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception {
         super.beforeAll(extensionContext);
+
+        var applicationBean = Mockito.spy(new FinTrack(Mockito.mock(Encoder.class)));
+        applicationContext.registerSingleton(FinTrack.class, applicationBean);
+
         runtimeContext = new RuntimeContext(applicationContext);
     }
 

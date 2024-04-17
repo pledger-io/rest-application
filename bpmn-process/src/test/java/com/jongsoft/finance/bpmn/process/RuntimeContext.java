@@ -2,7 +2,9 @@ package com.jongsoft.finance.bpmn.process;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.MailDaemon;
 import com.jongsoft.finance.core.SystemAccountTypes;
+import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.importer.BatchImport;
@@ -31,8 +33,10 @@ import io.micronaut.core.reflect.ReflectionUtils;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
+import org.assertj.core.api.MapAssert;
 import org.assertj.core.api.ObjectAssert;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.OngoingStubbing;
@@ -80,6 +84,28 @@ public class RuntimeContext {
         processEngine.close();
         storageTokens.clear();
         registeredBudgets.clear();
+    }
+
+    public RuntimeContext withoutUser() {
+        userAccount = null;
+
+        Mockito.when(applicationContext.getBean(FinTrack.class).createUser(Mockito.anyString(), Mockito.anyString()))
+                .thenAnswer((Answer<UserAccount>) invocation -> {
+                    String username = invocation.getArgument(0);
+                    String password = invocation.getArgument(1);
+                    var user = UserAccount.builder()
+                            .id(idGenerator.getAndIncrement())
+                            .username(username)
+                            .password(password)
+                            .roles(Collections.List(new Role("user")))
+                            .build();
+
+                    Mockito.when(applicationContext.getBean(UserProvider.class).lookup(username))
+                            .thenReturn(Control.Option(user));
+                    return user;
+                });
+
+        return this;
     }
 
     public RuntimeContext withStorage() {
@@ -341,6 +367,16 @@ public class RuntimeContext {
         return this;
     }
 
+    public RuntimeContext verifyMailSent(String emailAddress, String template, Consumer<MapAssert<?, ?>> properties) {
+        var argumentCaptor = ArgumentCaptor.forClass(Properties.class);
+        Mockito.verify(applicationContext.getBean(MailDaemon.class))
+                .send(Mockito.eq(emailAddress), Mockito.eq(template), argumentCaptor.capture());
+
+        properties.accept(Assertions.assertThat(argumentCaptor.getValue()));
+
+        return this;
+    }
+
     public RuntimeContext verifyTagCreated(String name) {
         Mockito.verify(userAccount).createTag(name);
         return this;
@@ -363,6 +399,7 @@ public class RuntimeContext {
                 applicationContext.getBean(CategoryProvider.class),
                 applicationContext.getBean(StorageService.class),
                 applicationContext.getBean(TransactionScheduleProvider.class),
+                applicationContext.getBean(UserProvider.class),
                 userAccount);
 
         setupDefaultMocks();
@@ -373,6 +410,10 @@ public class RuntimeContext {
                 .thenReturn("test-user");
         Mockito.when(applicationContext.getBean(CurrentUserProvider.class).currentUser())
                 .thenReturn(userAccount);
+        Mockito.when(applicationContext.getBean(UserProvider.class).available(Mockito.anyString()))
+                .thenReturn(true);
+        Mockito.when(applicationContext.getBean(UserProvider.class).available("test-user"))
+                .thenReturn(false);
 
         new EventBus(applicationEventPublisher);
 

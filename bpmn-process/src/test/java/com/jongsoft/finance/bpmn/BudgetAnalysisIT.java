@@ -53,11 +53,10 @@ public class BudgetAnalysisIT {
         context.execute("budget_analysis", Variables.createVariables()
                         .putValue("id", 1L)
                         .putValue("scheduled", "2019-01-01"))
-                .verifyCompleted()
                 .<Boolean>yankVariables("deviates", value ->
                         value.hasSize(2)
-                                .allMatch(a-> !a));
-
+                                .allMatch(a-> !a))
+                .verifyCompleted();
     }
 
     @Test

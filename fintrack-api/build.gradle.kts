@@ -25,6 +25,12 @@ dependencies {
     implementation(mn.micronaut.security.jwt)
     implementation(mn.micronaut.http.server.jetty)
     implementation(mn.micronaut.http.validation)
+    implementation(mn.micronaut.email.template)
+    implementation(mn.micronaut.views.velocity)
+
+    // Email dependencies
+    implementation(mn.micronaut.email.postmark)
+    implementation(mn.micronaut.email.javamail)
 
     implementation(libs.bcrypt)
     implementation(libs.bouncy)
@@ -49,6 +55,8 @@ dependencies {
 
     // needed for application.yml
     runtimeOnly(mn.snakeyaml)
+    runtimeOnly(mn.eclipse.angus)
+    runtimeOnly(mn.postmark)
 
     testImplementation(mn.micronaut.test.rest.assured)
     testImplementation(mn.micronaut.test.junit5)
