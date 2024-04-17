@@ -1,0 +1,5 @@
+application:
+  mail: postmark
+
+postmark:
+  api-token: ${POSTMARK_API_TOKEN:}

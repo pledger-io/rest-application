@@ -22,7 +22,9 @@ public class RunningProcessExecution implements ProcessTestExtension.ProcessExec
         log.debug("Running process with key: {}", processKey);
 
         Map<String, Object> expandedVariables = new HashMap<>(variables);
-        expandedVariables.put("username", "test-user");
+        if (!variables.containsKey("username")) {
+            expandedVariables.put("username", "test-user");
+        }
 
         processInstance = processEngine.getRuntimeService()
                 .startProcessInstanceByKey(processKey, expandedVariables);
@@ -102,27 +104,30 @@ public class RunningProcessExecution implements ProcessTestExtension.ProcessExec
     }
 
     @Override
-    public RunningProcessExecution verifyCompleted() {
-        processEngine.getRuntimeService().createProcessInstanceQuery()
+    public HistoricProcessExecution verifyCompleted() {
+        var historicProcess = processEngine.getHistoryService().createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstance.getId())
-                .list()
-                .forEach(pi -> {
-                    if (!pi.isEnded()) {
-                        processEngine.getHistoryService()
-                                .createHistoricActivityInstanceQuery()
-                                .processInstanceId(pi.getId())
-                                .unfinished()
-                                .list()
-                                .forEach(task -> {
-                                    log.error("Activity [{}:'{}'] is not completed", task.getActivityId(), task.getActivityName());
-                                });
-                    }
-                    Assertions.assertThat(pi.isEnded())
+                .singleResult();
+
+        Assertions.assertThat(historicProcess)
+                .as("Process instance %s not found", processInstance.getId())
+                .isNotNull()
+                .satisfies(pi -> {
+                    processEngine.getHistoryService()
+                            .createHistoricActivityInstanceQuery()
+                            .processInstanceId(pi.getId())
+                            .unfinished()
+                            .list()
+                            .forEach(ai -> {
+                                log.error("Activity {} is not completed", ai.getActivityId());
+                            });
+
+                    Assertions.assertThat(pi.getEndTime())
                             .as("Process instance %s is not ended", pi.getId())
-                            .isTrue();
+                            .isNotNull();
                 });
 
-        return this;
+        return new HistoricProcessExecution(processEngine, historicProcess);
     }
 
     public RunningProcessExecution verifyPendingActivity(String activityId) {

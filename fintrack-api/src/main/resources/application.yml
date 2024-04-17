@@ -39,6 +39,13 @@ micronaut:
     io:
       type: fixed
       n-threads: 75
+  email:
+    from:
+      email: noreply@pledger.local
+      name: Pledger.io
+
+application:
+  mail: mock
 
 endpoints:
   health:

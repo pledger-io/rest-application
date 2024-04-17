@@ -48,6 +48,34 @@ public class HistoricProcessExecution implements ProcessTestExtension.ProcessExe
         return this;
     }
 
+    public HistoricProcessExecution verifySuccess() {
+        var successEndEvent = processEngine.getHistoryService()
+                .createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("noneEndEvent")
+                .singleResult();
+
+        Assertions.assertThat(successEndEvent)
+                .as("Process '%s' not completed successfully", processInstance.getProcessDefinitionKey())
+                .isNotNull();
+
+        return this;
+    }
+
+    public HistoricProcessExecution verifyErrorCompletion() {
+        var successEndEvent = processEngine.getHistoryService()
+                .createHistoricActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityType("errorEndEvent")
+                .singleResult();
+
+        Assertions.assertThat(successEndEvent)
+                .as("Process '%s' not completed with error", processInstance.getProcessDefinitionKey())
+                .isNotNull();
+
+        return this;
+    }
+
     @Override
     public HistoricProcessExecution verifyCompleted() {
         Assertions.assertThat(processInstance.getEndTime())
