@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.TransactionProvider;
@@ -17,7 +18,7 @@ import java.time.LocalDate;
 
 @Slf4j
 @Singleton
-public class ComputeBalanceDelegate implements JavaDelegate {
+public class ComputeBalanceDelegate implements JavaDelegate, JavaBean {
 
     private final FilterFactory filterFactory;
     private final TransactionProvider transactionProvider;

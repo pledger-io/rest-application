@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
 import com.jongsoft.finance.core.FailureCode;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.TransactionProvider;
@@ -13,7 +14,7 @@ import org.camunda.bpm.engine.variable.value.LongValue;
 
 @Slf4j
 @Singleton
-public class DuplicateTransactionFinderDelegate implements JavaDelegate {
+public class DuplicateTransactionFinderDelegate implements JavaDelegate, JavaBean {
 
     private final TransactionProvider transactionProvider;
 

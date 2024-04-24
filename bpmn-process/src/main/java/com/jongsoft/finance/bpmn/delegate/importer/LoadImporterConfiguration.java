@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.importer.ImporterProvider;
 import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.serialized.ImportJobSettings;
@@ -16,7 +17,7 @@ import java.util.List;
  **/
 @Slf4j
 @Singleton
-public class LoadImporterConfiguration implements JavaDelegate {
+public class LoadImporterConfiguration implements JavaDelegate, JavaBean {
 
     private final ImportProvider importProvider;
     private final List<ImporterProvider<?>> importerProvider;

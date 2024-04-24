@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.importer.api.TransactionDTO;
@@ -31,7 +32,7 @@ import org.camunda.bpm.engine.variable.value.LongValue;
  */
 @Slf4j
 @Singleton
-public class CreateTransactionDelegate implements JavaDelegate {
+public class CreateTransactionDelegate implements JavaDelegate, JavaBean {
 
     private final AccountProvider accountProvider;
     private final TransactionCreationHandler creationHandler;

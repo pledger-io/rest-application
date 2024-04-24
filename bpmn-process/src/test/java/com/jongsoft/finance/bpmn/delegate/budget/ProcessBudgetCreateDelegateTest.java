@@ -40,7 +40,7 @@ class ProcessBudgetCreateDelegateTest {
         eventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         var currentUserFacade = Mockito.mock(CurrentUserProvider.class);
 
-        subject = new ProcessBudgetCreateDelegate(currentUserFacade, budgetProvider, TestUtilities.getProcessMapper());
+        subject = new ProcessBudgetCreateDelegate(budgetProvider, TestUtilities.getProcessMapper());
 
         final BudgetJson budgetJson = BudgetJson.builder()
                 .start(LocalDate.of(2019, 1, 1))

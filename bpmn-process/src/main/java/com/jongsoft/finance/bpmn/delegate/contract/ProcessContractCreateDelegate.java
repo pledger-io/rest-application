@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.contract;
 
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.serialized.ContractJson;
@@ -14,7 +15,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 
 @Slf4j
 @Singleton
-public class ProcessContractCreateDelegate implements JavaDelegate {
+public class ProcessContractCreateDelegate implements JavaDelegate, JavaBean {
 
     private final AccountProvider accountProvider;
     private final ContractProvider contractProvider;

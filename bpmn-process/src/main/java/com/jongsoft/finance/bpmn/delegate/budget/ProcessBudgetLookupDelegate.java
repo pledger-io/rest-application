@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.ExpenseProvider;
@@ -21,7 +22,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  */
 @Slf4j
 @Singleton
-public class ProcessBudgetLookupDelegate implements JavaDelegate {
+public class ProcessBudgetLookupDelegate implements JavaDelegate, JavaBean {
 
     private final FilterFactory filterFactory;
     private final ExpenseProvider expenseProvider;

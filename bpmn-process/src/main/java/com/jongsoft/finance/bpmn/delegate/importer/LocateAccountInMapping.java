@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.providers.AccountProvider;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ import java.util.Collection;
  **/
 @Slf4j
 @Singleton
-public class LocateAccountInMapping implements JavaDelegate {
+public class LocateAccountInMapping implements JavaDelegate, JavaBean {
 
     private final AccountProvider accountProvider;
 

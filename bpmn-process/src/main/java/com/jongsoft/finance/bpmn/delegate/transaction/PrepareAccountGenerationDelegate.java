@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
 import com.jongsoft.finance.ProcessMapper;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.core.TransactionType;
 import com.jongsoft.finance.importer.api.TransactionDTO;
 import com.jongsoft.finance.serialized.AccountJson;
@@ -16,7 +17,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  */
 @Slf4j
 @Singleton
-public class PrepareAccountGenerationDelegate implements JavaDelegate {
+public class PrepareAccountGenerationDelegate implements JavaDelegate, JavaBean {
     private final ProcessMapper mapper;
 
     PrepareAccountGenerationDelegate(ProcessMapper mapper) {

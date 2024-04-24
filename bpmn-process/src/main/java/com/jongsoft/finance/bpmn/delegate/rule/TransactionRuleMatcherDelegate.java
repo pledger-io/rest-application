@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.rule;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.providers.TransactionProvider;
@@ -26,7 +27,7 @@ import java.util.Map;
  */
 @Slf4j
 @Singleton
-public class TransactionRuleMatcherDelegate implements JavaDelegate {
+public class TransactionRuleMatcherDelegate implements JavaDelegate, JavaBean {
 
     private final RuleEngine ruleEngine;
     private final TransactionProvider transactionProvider;

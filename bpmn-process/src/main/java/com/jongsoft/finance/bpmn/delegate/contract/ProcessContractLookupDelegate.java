@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.contract;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.providers.ContractProvider;
 import jakarta.inject.Singleton;
@@ -9,7 +10,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Slf4j
 @Singleton
-public class ProcessContractLookupDelegate implements JavaDelegate {
+public class ProcessContractLookupDelegate implements JavaDelegate, JavaBean {
 
     private final ContractProvider contractProvider;
 

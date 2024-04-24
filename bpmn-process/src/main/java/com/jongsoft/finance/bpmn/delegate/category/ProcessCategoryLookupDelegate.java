@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.category;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.providers.CategoryProvider;
 import jakarta.inject.Singleton;
@@ -27,7 +28,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  */
 @Slf4j
 @Singleton
-public class ProcessCategoryLookupDelegate implements JavaDelegate {
+public class ProcessCategoryLookupDelegate implements JavaDelegate, JavaBean {
 
     private final CategoryProvider categoryProvider;
 

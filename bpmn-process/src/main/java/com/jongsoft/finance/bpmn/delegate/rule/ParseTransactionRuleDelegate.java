@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.rule;
 
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.serialized.RuleConfigJson;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Slf4j
 @Singleton
-public class ParseTransactionRuleDelegate implements JavaDelegate {
+public class ParseTransactionRuleDelegate implements JavaDelegate, JavaBean {
 
     private final StorageService storageService;
     private final ProcessMapper mapper;

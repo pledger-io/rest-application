@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.transaction;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.providers.TagProvider;
@@ -12,7 +13,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 
 @Slf4j
 @Singleton
-public class TagLookupDelegate implements JavaDelegate {
+public class TagLookupDelegate implements JavaDelegate, JavaBean {
 
     private final CurrentUserProvider currentUserProvider;
     private final TagProvider tagProvider;

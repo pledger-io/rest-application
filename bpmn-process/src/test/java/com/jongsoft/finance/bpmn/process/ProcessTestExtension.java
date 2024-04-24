@@ -2,19 +2,15 @@ package com.jongsoft.finance.bpmn.process;
 
 import com.jongsoft.finance.core.Encoder;
 import com.jongsoft.finance.domain.FinTrack;
-import io.micronaut.context.annotation.Property;
-import io.micronaut.core.annotation.Nullable;
+import io.micronaut.context.ApplicationContext;
 import io.micronaut.test.extensions.junit5.MicronautJunit5Extension;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.*;
 import org.mockito.Mockito;
 
-import java.lang.reflect.AnnotatedElement;
-import java.util.List;
 import java.util.function.Consumer;
 
-public class ProcessTestExtension extends MicronautJunit5Extension {
+public class ProcessTestExtension implements BeforeAllCallback, AfterAllCallback,
+        BeforeEachCallback, ParameterResolver {
 
     public interface ProcessExecution<T extends ProcessExecution> {
         ProcessExecution<?> obtainChildProcess(String processKey);
@@ -25,31 +21,30 @@ public class ProcessTestExtension extends MicronautJunit5Extension {
     private RuntimeContext runtimeContext;
 
     @Override
-    public void beforeAll(ExtensionContext extensionContext) throws Exception {
-        super.beforeAll(extensionContext);
-
+    public void beforeAll(ExtensionContext extensionContext) {
         var applicationBean = Mockito.spy(new FinTrack(Mockito.mock(Encoder.class)));
+
+        var store = extensionContext.getRoot()
+                .getStore(ExtensionContext.Namespace.create(MicronautJunit5Extension.class));
+        var applicationContext = store.get(ApplicationContext.class, ApplicationContext.class);
         applicationContext.registerSingleton(FinTrack.class, applicationBean);
 
         runtimeContext = new RuntimeContext(applicationContext);
     }
 
     @Override
-    public void afterAll(ExtensionContext extensionContext) throws Exception {
+    public void afterAll(ExtensionContext extensionContext) {
         runtimeContext.clean();
-        super.afterAll(extensionContext);
     }
 
     @Override
-    protected void beforeEach(ExtensionContext context, @Nullable Object testInstance, @Nullable AnnotatedElement method, List<Property> propertyAnnotations) {
-        super.beforeEach(context, testInstance, method, propertyAnnotations);
+    public void beforeEach(ExtensionContext extensionContext) {
         runtimeContext.resetMocks();
     }
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return isProcessContext(parameterContext)
-                || super.supportsParameter(parameterContext, extensionContext);
+        return isProcessContext(parameterContext);
     }
 
     @Override
@@ -57,7 +52,8 @@ public class ProcessTestExtension extends MicronautJunit5Extension {
         if (isProcessContext(parameterContext)) {
             return runtimeContext;
         }
-        return super.resolveParameter(parameterContext, extensionContext);
+
+        return null;
     }
 
     private static boolean isProcessContext(ParameterContext parameterContext) {

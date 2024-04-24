@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.account;
 
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -26,7 +27,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
  */
 @Slf4j
 @Singleton
-public class ProcessAccountCreationDelegate implements JavaDelegate {
+public class ProcessAccountCreationDelegate implements JavaDelegate, JavaBean {
 
     private final CurrentUserProvider userProvider;
     private final AccountProvider accountProvider;
@@ -79,7 +80,6 @@ public class ProcessAccountCreationDelegate implements JavaDelegate {
 
                                 if (accountJson.getIcon() != null) {
                                     account.registerIcon(storageService.store(Hex.decode(accountJson.getIcon())));
-                                    ;
                                 }
                             });
                 });
