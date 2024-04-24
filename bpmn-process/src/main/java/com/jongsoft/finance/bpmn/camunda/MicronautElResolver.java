@@ -50,10 +50,10 @@ public class MicronautElResolver extends ELResolver {
 
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
-        if (base == null) {
-            getBeanForKey((String) property)
-                    .orElseThrow(() -> new ProcessEngineException("Cannot set value of '" + property +
-                            "', it resolves to a bean defined in the Micronaut application-context."));
+        if (base == null && !applicationContext.containsBean(TYPE, Qualifiers.byName(property.toString()))) {
+            throw new ProcessEngineException("Cannot set value of '"
+                    + property +
+                    "', it resolves to a bean defined in the Micronaut application-context.");
         }
     }
 
