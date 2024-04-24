@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
+import com.jongsoft.finance.core.JavaBean;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -17,7 +18,7 @@ import java.util.Set;
  * <p>
  */
 @Slf4j
-public class ImportAccountExtractorDelegate implements JavaDelegate {
+public class ImportAccountExtractorDelegate implements JavaDelegate, JavaBean {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

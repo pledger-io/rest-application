@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
@@ -26,7 +27,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  */
 @Slf4j
 @Singleton
-public class ProcessAccountLookupDelegate implements JavaDelegate {
+public class ProcessAccountLookupDelegate implements JavaDelegate, JavaBean {
 
     private final AccountProvider accountProvider;
     private final FilterFactory accountFilterFactory;

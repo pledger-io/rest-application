@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
 import com.jongsoft.finance.ProcessMapper;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.budget.CloseBudgetCommand;
@@ -27,17 +28,14 @@ import org.camunda.bpm.engine.variable.value.StringValue;
  */
 @Slf4j
 @Singleton
-public class ProcessBudgetCreateDelegate implements JavaDelegate {
+public class ProcessBudgetCreateDelegate implements JavaDelegate, JavaBean {
 
-    private final CurrentUserProvider currentUserProvider;
     private final BudgetProvider budgetProvider;
     private final ProcessMapper mapper;
 
     ProcessBudgetCreateDelegate(
-            CurrentUserProvider currentUserProvider,
             BudgetProvider budgetProvider,
             ProcessMapper mapper) {
-        this.currentUserProvider = currentUserProvider;
         this.budgetProvider = budgetProvider;
         this.mapper = mapper;
     }

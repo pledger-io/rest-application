@@ -1,8 +1,9 @@
 package com.jongsoft.finance;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.lang.control.Optional;
 
-public interface StorageService {
+public interface StorageService extends JavaBean {
 
     /**
      * Creates a file on disk containing the given content.

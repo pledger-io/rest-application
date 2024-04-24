@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.importer;
 
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.importer.api.TransactionDTO;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -19,7 +20,7 @@ import java.nio.charset.StandardCharsets;
  * </p>
  */
 @Singleton
-public class ReadTransactionFromStorage implements JavaDelegate {
+public class ReadTransactionFromStorage implements JavaDelegate, JavaBean {
 
     private final StorageService storageService;
     private final ProcessMapper processMapper;

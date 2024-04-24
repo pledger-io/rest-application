@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.user;
 
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.serialized.BudgetJson;
 import com.jongsoft.finance.serialized.ExportJson;
 import com.jongsoft.finance.serialized.RuleConfigJson;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Singleton
-public class ParseUserConfigurationDelegate implements JavaDelegate {
+public class ParseUserConfigurationDelegate implements JavaDelegate, JavaBean {
 
     private final StorageService storageService;
     private final ProcessMapper mapper;

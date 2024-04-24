@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.providers.AccountProvider;
 import jakarta.inject.Singleton;
@@ -26,7 +27,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
  */
 @Slf4j
 @Singleton
-public class AccountSynonymLookupDelegate implements JavaDelegate {
+public class AccountSynonymLookupDelegate implements JavaDelegate, JavaBean {
 
     private final AccountProvider accountProvider;
 

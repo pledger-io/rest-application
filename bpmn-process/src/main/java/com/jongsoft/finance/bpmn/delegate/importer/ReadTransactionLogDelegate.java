@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.delegate.importer;
 
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.importer.ImporterProvider;
 import com.jongsoft.finance.importer.api.ImporterConfiguration;
 import com.jongsoft.finance.providers.ImportProvider;
@@ -36,7 +37,7 @@ import java.util.Set;
  */
 @Slf4j
 @Singleton
-public class ReadTransactionLogDelegate implements JavaDelegate {
+public class ReadTransactionLogDelegate implements JavaDelegate, JavaBean {
 
     private final List<ImporterProvider<? extends ImporterConfiguration>> importerProviders;
     private final ImportProvider importProvider;

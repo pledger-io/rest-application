@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.scheduler;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.core.TransactionType;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.importer.api.TransactionDTO;
@@ -13,7 +14,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 import java.time.LocalDate;
 
 @Singleton
-public class GenerateTransactionJsonDelegate implements JavaDelegate {
+public class GenerateTransactionJsonDelegate implements JavaDelegate, JavaBean {
 
     private final TransactionScheduleProvider transactionScheduleProvider;
 

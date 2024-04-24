@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.category;
 
 import com.jongsoft.finance.ProcessMapper;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -24,7 +25,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
  */
 @Slf4j
 @Singleton
-public class ProcessCreateCategoryDelegate implements JavaDelegate {
+public class ProcessCreateCategoryDelegate implements JavaDelegate, JavaBean {
 
     private final CurrentUserProvider currentUserProvider;
     private final CategoryProvider categoryProvider;

@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate;
 
+import com.jongsoft.finance.core.JavaBean;
 import jakarta.inject.Singleton;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
@@ -10,7 +11,7 @@ import java.util.Properties;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @Singleton
-public class PropertyConversionDelegate implements JavaDelegate {
+public class PropertyConversionDelegate implements JavaDelegate, JavaBean {
 
     private static final Logger log = getLogger(PropertyConversionDelegate.class);
 

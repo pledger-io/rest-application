@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.account;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
@@ -32,7 +33,7 @@ import java.time.LocalDate;
  */
 @Slf4j
 @Singleton
-public class ReconcileAccountDelegate implements JavaDelegate {
+public class ReconcileAccountDelegate implements JavaDelegate, JavaBean {
 
     private final AccountProvider accountProvider;
     private final TransactionCreationHandler creationHandler;

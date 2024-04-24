@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.providers.BudgetProvider;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -9,7 +10,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Slf4j
 @Singleton
-public class ProcessBudgetMonthSelect implements JavaDelegate {
+public class ProcessBudgetMonthSelect implements JavaDelegate, JavaBean {
 
     private final BudgetProvider budgetProvider;
 

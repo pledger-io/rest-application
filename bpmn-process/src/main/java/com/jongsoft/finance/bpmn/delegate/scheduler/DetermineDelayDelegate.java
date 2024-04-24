@@ -5,6 +5,7 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
+import com.jongsoft.finance.core.JavaBean;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import com.jongsoft.finance.schedule.Periodicity;
@@ -12,7 +13,7 @@ import com.jongsoft.finance.schedule.Periodicity;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DetermineDelayDelegate implements JavaDelegate {
+public class DetermineDelayDelegate implements JavaDelegate, JavaBean {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {

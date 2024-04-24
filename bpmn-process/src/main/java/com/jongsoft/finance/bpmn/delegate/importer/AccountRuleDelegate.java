@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.rule.RuleDataSet;
@@ -12,7 +13,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Slf4j
 @Singleton
-public class AccountRuleDelegate implements JavaDelegate {
+public class AccountRuleDelegate implements JavaDelegate, JavaBean {
 
     private final RuleEngine ruleEngine;
 

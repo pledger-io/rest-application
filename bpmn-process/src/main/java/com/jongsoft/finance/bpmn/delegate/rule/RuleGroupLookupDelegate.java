@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.rule;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
@@ -11,7 +12,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Slf4j
 @Singleton
-public class RuleGroupLookupDelegate implements JavaDelegate {
+public class RuleGroupLookupDelegate implements JavaDelegate, JavaBean {
 
     private final TransactionRuleGroupProvider ruleGroupProvider;
 

@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.user;
 
 import com.jongsoft.finance.ProcessMapper;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.serialized.AccountJson;
@@ -10,7 +11,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
 @Singleton
-public class CreateUserDelegate implements JavaDelegate {
+public class CreateUserDelegate implements JavaDelegate, JavaBean {
 
     private final FinTrack application;
     private final ProcessMapper mapper;
@@ -23,7 +24,7 @@ public class CreateUserDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         var toCreateUsername = execution.<StringValue>getVariableLocalTyped("username").getValue();
-        var toCreatePassword = execution.<StringValue>getVariableLocalTyped("password").getValue();;
+        var toCreatePassword = execution.<StringValue>getVariableLocalTyped("password").getValue();
 
         application.createUser(toCreateUsername, toCreatePassword);
 

@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.budget;
 
 import com.jongsoft.finance.core.DateUtils;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -28,7 +29,7 @@ import java.time.LocalDate;
  */
 @Slf4j
 @Singleton
-public class ProcessBudgetAnalysisDelegate implements JavaDelegate {
+public class ProcessBudgetAnalysisDelegate implements JavaDelegate, JavaBean {
 
     private final TransactionProvider transactionProvider;
     private final FilterFactory filterFactory;

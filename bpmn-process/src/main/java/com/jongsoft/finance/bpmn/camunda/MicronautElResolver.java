@@ -1,18 +1,27 @@
 package com.jongsoft.finance.bpmn.camunda;
 
+import com.jongsoft.finance.core.JavaBean;
 import io.micronaut.context.ApplicationContext;
+import io.micronaut.core.type.Argument;
 import io.micronaut.inject.qualifiers.Qualifiers;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.impl.juel.jakarta.el.ELContext;
 import org.camunda.bpm.impl.juel.jakarta.el.ELResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * This ELResolver implementation allows to resolve beans from the Micronaut application-context.
  */
 public class MicronautElResolver extends ELResolver {
+
+    private static final Argument<JavaBean> TYPE = Argument.of(JavaBean.class);
+
+    private static final Logger log = LoggerFactory.getLogger(MicronautElResolver.class);
 
     protected final ApplicationContext applicationContext;
 
@@ -23,13 +32,11 @@ public class MicronautElResolver extends ELResolver {
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
-            // according to javadoc, can only be a String
-            var key = (String) property;
-
-            var qualifier = Qualifiers.byName(key);
-            if (applicationContext.containsBean(Object.class, qualifier)) {
+            log.debug("Looking up bean '{}' in Micronaut application-context", property);
+            var resolvedBean = getBeanForKey(property.toString());
+            if (resolvedBean.isPresent()) {
                 context.setPropertyResolved(true);
-                return applicationContext.getBean(Object.class, qualifier);
+                return resolvedBean.get();
             }
         }
 
@@ -43,12 +50,10 @@ public class MicronautElResolver extends ELResolver {
 
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
-        if (base == null) {
-            var key = (String) property;
-            if (applicationContext.containsBean(Object.class, Qualifiers.byName(key))) {
-                throw new ProcessEngineException("Cannot set value of '" + property +
-                        "', it resolves to a bean defined in the Micronaut application-context.");
-            }
+        if (base == null && !applicationContext.containsBean(TYPE, Qualifiers.byName(property.toString()))) {
+            throw new ProcessEngineException("Cannot set value of '"
+                    + property +
+                    "', it resolves to a bean defined in the Micronaut application-context.");
         }
     }
 
@@ -65,6 +70,14 @@ public class MicronautElResolver extends ELResolver {
     @Override
     public Class<?> getType(ELContext context, Object arg1, Object arg2) {
         return Object.class;
+    }
+
+    private Optional<?> getBeanForKey(String key) {
+        if (applicationContext.containsBean(TYPE, Qualifiers.byName(key))) {
+            return Optional.of(applicationContext.getBean(TYPE, Qualifiers.byName(key)));
+        }
+
+        return Optional.empty();
     }
 
 }

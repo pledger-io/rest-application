@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn.listeners;
 
 import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import jakarta.inject.Singleton;
@@ -11,7 +12,7 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 
 @Slf4j
 @Singleton
-public class StartProcessListener implements ExecutionListener {
+public class StartProcessListener implements ExecutionListener, JavaBean {
 
     private final ApplicationEventPublisher<InternalAuthenticationEvent> eventPublisher;
     private final AuthenticationFacade authenticationFacade;
@@ -24,7 +25,7 @@ public class StartProcessListener implements ExecutionListener {
     }
 
     @Override
-    public void notify(DelegateExecution execution) throws Exception {
+    public void notify(DelegateExecution execution) {
         if (execution.hasVariable("username") && authenticationFacade.authenticated() == null) {
             var username = execution.<StringValue>getVariableTyped("username").getValue();
 

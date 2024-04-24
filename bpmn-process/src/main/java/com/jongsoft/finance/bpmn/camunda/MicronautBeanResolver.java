@@ -30,14 +30,14 @@ public class MicronautBeanResolver implements ResolverFactory, Resolver {
 
     @Override
     public boolean containsKey(Object key) {
-        log.trace("Looking up key {} in {}", key, getKeySet());
+        log.debug("Looking up key {} in {}", key, getKeySet());
         return key instanceof String && getKeySet().contains(key);
     }
 
     @Override
     public Object get(Object key) {
         if (key instanceof String) {
-            log.trace("Looking up bean {} in {}", key, getKeySet());
+            log.debug("Looking up bean {} in {}", key, getKeySet());
             Qualifier<Object> qualifier = Qualifiers.byName((String) key);
             if (applicationContext.containsBean(Object.class, qualifier)) {
                 return applicationContext.getBean(Object.class, qualifier);

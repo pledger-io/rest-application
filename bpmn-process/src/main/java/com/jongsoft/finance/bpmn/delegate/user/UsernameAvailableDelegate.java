@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.user;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.providers.UserProvider;
 import jakarta.inject.Singleton;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -8,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class UsernameAvailableDelegate implements JavaDelegate {
+public class UsernameAvailableDelegate implements JavaDelegate, JavaBean {
 
     private static final String USERNAME = "username";
     private static final Logger log = LoggerFactory.getLogger(UsernameAvailableDelegate.class);

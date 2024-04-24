@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.rule;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.providers.TransactionRuleProvider;
 import jakarta.inject.Singleton;
@@ -9,7 +10,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Slf4j
 @Singleton
-public class PersistTransactionRuleDelegate implements JavaDelegate {
+public class PersistTransactionRuleDelegate implements JavaDelegate, JavaBean {
 
     private final TransactionRuleProvider ruleProvider;
 

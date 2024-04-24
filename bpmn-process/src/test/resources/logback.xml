@@ -10,6 +10,7 @@
     </appender>
 
     <logger name="com.jongsoft.finance" level="debug" />
+    <logger name="com.jongsoft.finance.bpmn" level="debug" />
     <logger name="org.camunda.bpm" level="warn" />
     <root level="info">
         <appender-ref ref="STDOUT" />

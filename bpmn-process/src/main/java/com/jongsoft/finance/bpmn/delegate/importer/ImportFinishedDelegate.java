@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.importer;
 
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.providers.ImportProvider;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @Singleton
-public class ImportFinishedDelegate implements JavaDelegate {
+public class ImportFinishedDelegate implements JavaDelegate, JavaBean {
 
     private final StorageService storageService;
     private final ImportProvider importProvider;

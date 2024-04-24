@@ -1,5 +1,6 @@
 package com.jongsoft.finance.bpmn.delegate.rule;
 
+import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.providers.TransactionRuleProvider;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +11,7 @@ import java.util.Objects;
 
 @Slf4j
 @Singleton
-public class TransactionRuleLookupDelegate implements JavaDelegate {
+public class TransactionRuleLookupDelegate implements JavaDelegate, JavaBean {
 
     private final TransactionRuleProvider transactionRuleProvider;
 
