@@ -4,6 +4,7 @@ import com.jongsoft.finance.core.TransactionType;
 import io.micronaut.serde.annotation.Serdeable;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Serdeable
 public record TransactionDTO(
@@ -22,7 +23,13 @@ public record TransactionDTO(
         // The IBAN of the opposing account
         String opposingIBAN,
         // The name of the opposing account
-        String opposingName) {
+        String opposingName,
+        // Optional: The name of the budget the transaction falls under
+        String budget,
+        // Optional: The category of the transaction
+        String category,
+        // Optional: The tags of the transaction
+        List<String> tags) {
 
     @Override
     public String toString() {
