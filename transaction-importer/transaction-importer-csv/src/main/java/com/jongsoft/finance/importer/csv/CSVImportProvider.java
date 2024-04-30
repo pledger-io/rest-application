@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.function.Function;
 
 @Singleton
@@ -129,6 +130,9 @@ public class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
                 parseDate.apply(columnLocator.apply(ColumnRole.INTEREST_DATE)),
                 parseDate.apply(columnLocator.apply(ColumnRole.BOOK_DATE)),
                 columnLocator.apply(ColumnRole.OPPOSING_IBAN),
-                columnLocator.apply(ColumnRole.OPPOSING_NAME));
+                columnLocator.apply(ColumnRole.OPPOSING_NAME),
+                columnLocator.apply(ColumnRole.BUDGET),
+                columnLocator.apply(ColumnRole.CATEGORY),
+                List.of());
     }
 }

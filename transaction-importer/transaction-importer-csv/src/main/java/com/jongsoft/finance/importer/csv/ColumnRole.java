@@ -10,6 +10,9 @@ public enum ColumnRole {
     ACCOUNT_IBAN("account-iban"),
     AMOUNT("amount"),
     CUSTOM_INDICATOR("custom-indicator"),
+    TAGS("tags"),
+    BUDGET("budget"),
+    CATEGORY("category"),
     DESCRIPTION("description");
 
     private final String label;

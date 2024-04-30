@@ -12,6 +12,7 @@ import org.camunda.bpm.engine.variable.value.LongValue;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Singleton
 public class GenerateTransactionJsonDelegate implements JavaDelegate, JavaBean {
@@ -37,7 +38,10 @@ public class GenerateTransactionJsonDelegate implements JavaDelegate, JavaBean {
                             null,
                             null,
                             schedule.getDestination().getIban(),
-                            schedule.getDestination().getName());
+                            schedule.getDestination().getName(),
+                            null,
+                            null,
+                            List.of());
 
                     execution.setVariable("destinationId", schedule.getDestination().getId());
                     execution.setVariable("sourceId", schedule.getSource().getId());

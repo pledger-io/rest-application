@@ -7,6 +7,8 @@ import com.jongsoft.finance.importer.api.TransactionDTO;
 import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
 import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -70,6 +72,11 @@ public class CreateTransactionDelegate implements JavaDelegate, JavaBean {
                         .bookDate(parsedTransaction.bookDate())
                         .interestDate(parsedTransaction.interestDate())
                         .description(parsedTransaction.description())
+                        .category(parsedTransaction.category())
+                        .budget(parsedTransaction.budget())
+                        .tags(Control.Option(parsedTransaction.tags())
+                                .map(Collections::List)
+                                .getOrSupply(() -> null))
                         .importSlug(batchImportSlug));
 
         long transactionId = creationHandler.handleCreatedEvent(new CreateTransactionCommand(transaction));
