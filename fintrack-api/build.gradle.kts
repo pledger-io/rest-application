@@ -11,6 +11,25 @@ micronaut {
     testRuntime("junit5")
 }
 
+val integration by sourceSets.creating
+
+configurations[integration.implementationConfigurationName].extendsFrom(configurations.testImplementation.get())
+configurations[integration.runtimeOnlyConfigurationName].extendsFrom(configurations.testRuntimeOnly.get())
+
+tasks.register<Test>("itTest") {
+    description = "Runs the integration tests."
+    group = "verification"
+
+    testClassesDirs = integration.output.classesDirs
+    classpath = configurations[integration.runtimeClasspathConfigurationName] + integration.output + sourceSets.main.get().output
+
+    shouldRunAfter(tasks.test)
+}
+
+tasks.check {
+    dependsOn("itTest")
+}
+
 dependencies {
     annotationProcessor(mn.micronaut.openapi.asProvider())
     annotationProcessor(mn.micronaut.http.validation)
@@ -61,4 +80,8 @@ dependencies {
     testImplementation(mn.micronaut.test.rest.assured)
     testImplementation(mn.micronaut.test.junit5)
     testImplementation(libs.bundles.junit)
+
+    configurations["integrationImplementation"](libs.bundles.junit)
+    configurations["integrationImplementation"](mn.micronaut.test.junit5)
+    configurations["integrationImplementation"](mn.micronaut.test.rest.assured)
 }
