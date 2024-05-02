@@ -89,6 +89,14 @@ public class TestContext {
         return this;
     }
 
+    public AccountContext accounts() {
+        return new AccountContext(authRequest());
+    }
+
+    public TransactionContext transactions() {
+        return new TransactionContext(authRequest());
+    }
+
     public String upload(InputStream inputStream) {
         return authRequest()
                 .contentType("multipart/form-data")
@@ -100,17 +108,6 @@ public class TestContext {
                 .body()
                 .jsonPath()
                 .getString("fileCode");
-    }
-
-    public Number locateAccountId(String accountName) {
-        return authRequest()
-                .get("/accounts/all")
-            .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .<Number>getList("findAll { it.name == '%s' }.id".formatted(accountName))
-                .getFirst();
     }
 
     public RequestSpecification authRequest() {

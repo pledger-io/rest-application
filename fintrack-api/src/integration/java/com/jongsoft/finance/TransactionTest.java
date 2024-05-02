@@ -1,11 +1,14 @@
 package com.jongsoft.finance;
 
+import com.jongsoft.finance.extension.AccountContext;
 import com.jongsoft.finance.extension.IntegrationTest;
 import com.jongsoft.finance.extension.TestContext;
-import org.apache.http.HttpStatus;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
 
 @IntegrationTest(phase = 2)
 @DisplayName("User creates the initial transactions:")
@@ -16,27 +19,20 @@ public class TransactionTest {
     @DisplayName("Book the first salary income")
     void firstIncome(TestContext context) {
         context.authenticate("sample@e", "Zomer2020");
-        var checkingAccountId = context.locateAccountId("My checking account");
-        var employerId = context.locateAccountId("Chicko Cointer");
 
-        context.authRequest()
-                .body("""
-                        {
-                            "amount": 1000,
-                            "description": "First income",
-                            "date": "2020-01-01",
-                            "currency": "EUR",
-                            "source": {
-                                "id": %s
-                            },
-                            "destination": {
-                                "id": %s
-                            }
-                        }
-                        """.formatted(checkingAccountId, employerId))
-                .pathParam("id", checkingAccountId)
-                .put("/accounts/{id}/transactions")
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT);
+        var checkingAccount = new MutableObject<AccountContext.Account>();
+        var employer = new MutableObject<AccountContext.Account>();
+
+        context.accounts()
+                .locate("My checking account", checkingAccount::setValue)
+                .locate("Chicko Cointer", employer::setValue);
+
+        context.transactions()
+                .create(
+                        checkingAccount.getValue(),
+                        employer.getValue(),
+                        1000,
+                        "First income",
+                        LocalDate.parse("2020-01-01"));
     }
 }
