@@ -94,7 +94,11 @@ public class TestContext {
     }
 
     public TransactionContext transactions() {
-        return new TransactionContext(authRequest());
+        return new TransactionContext(this::authRequest);
+    }
+
+    public BudgetContext budgets() {
+        return new BudgetContext(this::authRequest);
     }
 
     public String upload(InputStream inputStream) {

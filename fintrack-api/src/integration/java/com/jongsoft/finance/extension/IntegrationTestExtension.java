@@ -35,6 +35,7 @@ public class IntegrationTestExtension implements ParameterResolver, BeforeAllCal
                 .ifPresent(ApplicationContextLifeCycle::start);
         Control.Option(applicationContext.getBean(EmbeddedServer.class))
                 .ifPresent(server -> {
+                    log.info("Server started on {}:{}", server.getHost(), server.getPort());
                     testContext = new TestContext(new TestContext.Server(
                             server.getScheme() + "://" + server.getHost(),
                             server.getPort()

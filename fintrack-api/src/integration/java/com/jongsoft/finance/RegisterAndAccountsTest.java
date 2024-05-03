@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+
 import static org.hamcrest.Matchers.*;
 
 @IntegrationTest(phase = 1)
@@ -35,7 +37,38 @@ public class RegisterAndAccountsTest {
 
     @Test
     @Order(3)
-    @DisplayName("Step 3: User loads the account pages")
+    @DisplayName("Step 3: User adds a budget")
+    void addBudget(TestContext context) {
+        var now = LocalDate.now();
+        context.budgets()
+                .create(2021, 1, 1000.00)
+                .createExpense("Rent", 500.00)
+                .createExpense("Groceries", 200.00)
+                .validateBudget(2021, 1, budget -> budget
+                        .body("income", equalTo(1000.00F))
+                        .body("expenses.size()", equalTo(2))
+                        .body("expenses.name", hasItems("Rent", "Groceries"))
+                        .body("expenses.expected", hasItems(500.00F, 200F)))
+                .updateIncome(2200)
+                .updateExpense("Rent", 600.00)
+                .updateExpense("Groceries", 250.00)
+                .createExpense("Car", 300.00)
+                .validateBudget(now.getYear(), now.getMonthValue(), budget -> budget
+                        .body("income", equalTo(2200.00F))
+                        .body("expenses.size()", equalTo(3))
+                        .body("expenses.name", hasItems("Rent", "Groceries", "Car"))
+                        .body("expenses.expected", hasItems(600.00F, 250.00F, 300.00F)))
+                .validateBudget(2021, 1, budget -> budget
+                        .body("income", equalTo(1000.00F))
+                        .body("period.until", equalTo(now.withDayOfMonth(1).toString()))
+                        .body("expenses.size()", equalTo(2))
+                        .body("expenses.name", hasItems("Rent", "Groceries"))
+                        .body("expenses.expected", hasItems(500.00F, 200F)));
+    }
+
+    @Test
+    @Order(4)
+    @DisplayName("Step 4: User loads the account pages")
     void validateAccount(TestContext context) {
         context.accounts()
                 .own(response -> response
@@ -50,7 +83,7 @@ public class RegisterAndAccountsTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     @DisplayName("Step 4: Update the shopping account with image")
     void editShoppingAccount(TestContext context) {
         var uploadId = context.upload(RegisterAndAccountsTest.class.getResourceAsStream("/assets/account1.svg"));
