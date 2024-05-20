@@ -23,11 +23,6 @@ public class AuthenticationFacadeImpl implements AuthenticationFacade {
         }
     }
 
-    public void authenticate(String username) {
-        log.trace("[{}] - Setting forced authentication on thread", username);
-        AUTHENTICATED_USER.set(username);
-    }
-
     @EventListener
     void internalAuthenticated(InternalAuthenticationEvent event) {
         log.trace("[{}] - Setting internal authentication on thread", event.getUsername());

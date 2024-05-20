@@ -15,6 +15,7 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
+import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
@@ -23,7 +24,6 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.ObjectMapperConfig;
 import jakarta.inject.Inject;
-import org.jboss.aerogear.security.otp.api.Base32;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
@@ -42,7 +42,7 @@ public class TestSetup {
             .password("1234")
             .theme("dark")
             .primaryCurrency(Currency.getInstance("EUR"))
-            .secret(Base32.random())
+            .secret(new DefaultSecretGenerator().generate())
             .roles(Collections.List(new Role("admin")))
             .build());
 

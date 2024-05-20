@@ -23,7 +23,7 @@ dependencyResolutionManagement {
         create("libs") {
             library("lang", "com.jongsoft.lang", "language").version("1.1.6")
             library("lang.xml", "com.jongsoft.lang", "language-fasterxml").version("1.1.0")
-            library("otp", "org.jboss.aerogear", "aerogear-otp-java").version("1.0.0")
+            library("otp", "dev.samstevens.totp", "totp").version("1.7.1")
             library("camunda", "org.camunda.bpm", "camunda-engine").version("7.20.0")
             library("bouncy", "org.bouncycastle", "bcprov-jdk15on").version("1.70")
             library("bcpkix", "org.bouncycastle", "bcpkix-jdk15on").version("1.70")

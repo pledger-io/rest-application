@@ -1,26 +1,38 @@
 package com.jongsoft.finance.security;
 
 import com.jongsoft.finance.domain.user.UserAccount;
-import org.jboss.aerogear.security.otp.Totp;
+import dev.samstevens.totp.code.CodeGenerator;
+import dev.samstevens.totp.code.DefaultCodeGenerator;
+import dev.samstevens.totp.code.DefaultCodeVerifier;
+import dev.samstevens.totp.code.HashingAlgorithm;
+import dev.samstevens.totp.qr.QrData;
+import dev.samstevens.totp.time.SystemTimeProvider;
+import dev.samstevens.totp.time.TimeProvider;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
 public class TwoFactorHelper {
 
+    private static final TimeProvider timeProvider = new SystemTimeProvider();
+    private static final CodeGenerator codeGenerator = new DefaultCodeGenerator();
+
     private static final Pattern SECURITY_CODE_PATTER = Pattern.compile("[0-9]{6}");
 
-    private static final String GENERATOR_URL = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
-
-    public static String build2FactorQr(UserAccount userAccount) {
-        return GENERATOR_URL + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s",
-                "FinTrack", userAccount.getUsername(), userAccount.getSecret(), "FinTrack"), StandardCharsets.UTF_8);
+    public static QrData build2FactorQr(UserAccount userAccount) {
+        return new QrData.Builder()
+                .label("Pledger.io: " + userAccount.getUsername())
+                .secret(userAccount.getSecret())
+                .issuer("Pledger.io")
+                .algorithm(HashingAlgorithm.SHA1)
+                .digits(6)
+                .period(30)
+                .build();
     }
 
     public static boolean verifySecurityCode(String secret, String securityCode) {
         if (securityCode != null && SECURITY_CODE_PATTER.matcher(securityCode).matches()) {
-            return new Totp(secret).verify(securityCode);
+            var verifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
+            return verifier.isValidCode(secret, securityCode);
         }
 
         return false;

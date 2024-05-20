@@ -7,6 +7,7 @@ import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Sequence;
@@ -16,7 +17,6 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -31,7 +31,7 @@ import java.util.function.Function;
 
 @Tag(name = "Reports")
 @Controller("/api/statistics/balance")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class BalanceResource {
 
     private final FilterFactory filterFactory;

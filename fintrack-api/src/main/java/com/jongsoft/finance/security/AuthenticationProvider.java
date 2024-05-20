@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Singleton
-public class FintrackAuthenticationProvider implements HttpRequestAuthenticationProvider<HttpRequest<?>> {
+public class AuthenticationProvider implements HttpRequestAuthenticationProvider<HttpRequest<?>> {
 
-    private final Logger log = LoggerFactory.getLogger(FintrackAuthenticationProvider.class);
+    private final Logger log = LoggerFactory.getLogger(AuthenticationProvider.class);
 
     private final FinTrack application;
     private final UserProvider userProvider;
 
-    public FintrackAuthenticationProvider(FinTrack application, UserProvider userProvider) {
+    public AuthenticationProvider(FinTrack application, UserProvider userProvider) {
         this.application = application;
         this.userProvider = userProvider;
     }
