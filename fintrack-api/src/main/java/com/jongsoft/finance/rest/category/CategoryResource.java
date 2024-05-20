@@ -7,12 +7,12 @@ import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.model.CategoryResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @Tag(name = "Category")
 @Controller("/api/categories")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class CategoryResource {
 
     private final FilterFactory filterFactory;

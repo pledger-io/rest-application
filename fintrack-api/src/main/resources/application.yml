@@ -13,6 +13,17 @@ micronaut:
         enabled: true
         bearer:
           enabled: true
+    endpoints:
+      oauth:
+        path: /api/security/oauth
+        enabled: true
+      login:
+        path: /api/security/authenticate
+        enabled: true
+      logout:
+        enabled: true
+        path: /api/security/logout
+        get-allowed: true
   router:
     static-resources:
       favicon:
@@ -33,8 +44,8 @@ micronaut:
     multipart:
       enabled: true
       location: "${micronaut.application.storage.location}/temp"
-      max-file-size: 20MB
-    max-request-size: 20MB
+      max-file-size: 20971520
+    max-request-size: 20971520
   executors:
     io:
       type: fixed

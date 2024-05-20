@@ -5,11 +5,11 @@ import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.CurrencyResponse;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @Tag(name = "Application Settings")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/settings/currencies")
 public class CurrencyResource {
 
@@ -44,7 +44,7 @@ public class CurrencyResource {
     }
 
     @Put
-    @Secured("admin")
+    @Secured(AuthenticationRoles.IS_ADMIN)
     @Status(HttpStatus.CREATED)
     @Operation(
             summary = "Create currency",
@@ -89,7 +89,7 @@ public class CurrencyResource {
                 .getOrThrow(() -> StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
     }
 
-    @Secured("admin")
+    @Secured(AuthenticationRoles.IS_ADMIN)
     @Post("/{currencyCode}")
     @Operation(
             summary = "Update currency",
@@ -118,7 +118,7 @@ public class CurrencyResource {
                 .getOrThrow(() -> StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
     }
 
-    @Secured("admin")
+    @Secured(AuthenticationRoles.IS_ADMIN)
     @Patch("/{currencyCode}")
     @Operation(
             summary = "Patch currency",

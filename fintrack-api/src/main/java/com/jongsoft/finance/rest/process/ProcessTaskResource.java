@@ -1,11 +1,11 @@
 package com.jongsoft.finance.rest.process;
 
 import com.jongsoft.finance.rest.model.ProcessTaskResponse;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.lang.Collections;
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.camunda.bpm.engine.TaskService;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Tag(name = "Process Engine")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/runtime-process/{processDefinitionKey}/{businessKey}/{instanceId}/tasks")
 public class ProcessTaskResource {
 

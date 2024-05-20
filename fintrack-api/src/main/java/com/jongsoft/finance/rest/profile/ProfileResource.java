@@ -5,20 +5,21 @@ import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.rest.model.SessionResponse;
 import com.jongsoft.finance.rest.model.UserProfileResponse;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.security.TwoFactorHelper;
+import dev.samstevens.totp.exceptions.QrGenerationException;
+import dev.samstevens.totp.qr.ZxingPngQrGenerator;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -28,12 +29,13 @@ import java.util.UUID;
 
 @Tag(name = "User profile")
 @Controller("/api/profile")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class ProfileResource {
 
     private final FinTrack application;
     private final CurrentUserProvider currentUserProvider;
     private final UserProvider userProvider;
+    private final Logger logger = LoggerFactory.getLogger(ProfileResource.class);
 
     public ProfileResource(FinTrack application, CurrentUserProvider currentUserProvider, UserProvider userProvider) {
         this.application = application;
@@ -116,19 +118,12 @@ public class ProfileResource {
             summary = "QR Code",
             description = "Use this API to obtain a QR code that can be used to scan in a 2-factor application")
     byte[] qrCode() {
-        var graphUri = TwoFactorHelper.build2FactorQr(currentUserProvider.currentUser());
-
-        try (var inputStream = new URL(graphUri).openStream()) {
-            var reader = new ByteArrayOutputStream();
-
-            int read;
-            var byteChunk = new byte[4096];
-            while ((read = inputStream.read(byteChunk)) > 0) {
-                reader.write(byteChunk, 0, read);
-            }
-
-            return reader.toByteArray();
-        } catch (IOException e) {
+        var qrCode = TwoFactorHelper.build2FactorQr(currentUserProvider.currentUser());
+        try {
+            var generator = new ZxingPngQrGenerator();
+            generator.setImageSize(150);
+            return generator.generate(qrCode);
+        } catch (QrGenerationException e) {
             throw StatusException.internalError("Could not successfully generate QR code");
         }
     }

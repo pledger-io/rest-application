@@ -10,6 +10,7 @@ import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.BudgetResponse;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Collections;
 import io.micronaut.core.annotation.Nullable;
@@ -17,7 +18,6 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.validation.Validated;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,7 +37,7 @@ import java.util.Objects;
 
 @Tag(name = "Budget")
 @Controller("/api/budgets")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class BudgetResource {
 
     private final Logger log = LoggerFactory.getLogger(BudgetResource.class);
