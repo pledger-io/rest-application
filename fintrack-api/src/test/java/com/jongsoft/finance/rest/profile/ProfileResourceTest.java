@@ -4,12 +4,11 @@ import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.rest.TestSetup;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Dates;
-import io.micronaut.context.event.ApplicationEventPublisher;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import dev.samstevens.totp.code.DefaultCodeGenerator;
+import dev.samstevens.totp.exceptions.CodeGenerationException;
+import dev.samstevens.totp.time.SystemTimeProvider;
 import io.restassured.specification.RequestSpecification;
-import jakarta.inject.Inject;
 import org.hamcrest.Matchers;
-import org.jboss.aerogear.security.otp.Totp;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -124,9 +123,10 @@ class ProfileResourceTest extends TestSetup {
 
     @Test
     @DisplayName("Enable MFA")
-    public void enableMfa(RequestSpecification spec) {
-        final Totp totp = new Totp(ACTIVE_USER.getSecret());
-        var request = new MultiFactorRequest(totp.now());
+    public void enableMfa(RequestSpecification spec) throws CodeGenerationException {
+        var generated = new DefaultCodeGenerator()
+                .generate(ACTIVE_USER.getSecret(), Math.floorDiv(new SystemTimeProvider().getTime(), 30));
+        var request = new MultiFactorRequest(generated);
 
         // @formatter:off
         spec.given()

@@ -5,8 +5,8 @@ import com.jongsoft.finance.configuration.StorageSettings;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.commands.storage.ReplaceFileCommand;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import org.assertj.core.api.Assertions;
-import org.jboss.aerogear.security.otp.api.Base32;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -37,7 +37,7 @@ class DiskStorageServiceTest {
 
         Mockito.when(currentUserProvider.currentUser()).thenReturn(
                 UserAccount.builder()
-                        .secret(Base32.random())
+                        .secret(new DefaultSecretGenerator().generate())
                         .build());
     }
 

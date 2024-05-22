@@ -1,10 +1,10 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.providers.AccountTypeProvider;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Singleton;
@@ -14,7 +14,7 @@ import java.util.List;
 @Singleton
 @Tag(name = "Account information")
 @Controller("/api/account-types")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class AccountTypeResource {
 
     private final AccountTypeProvider accountTypeProvider;

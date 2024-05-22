@@ -6,10 +6,10 @@ import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -18,7 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @Tag(name = "Importer")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/import/{batchSlug}/transactions")
 public class ImporterTransactionResource {
 

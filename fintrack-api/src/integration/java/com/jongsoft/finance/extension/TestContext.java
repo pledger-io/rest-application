@@ -6,10 +6,18 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.providers.UserProvider;
+import com.jongsoft.lang.Control;
+import dev.samstevens.totp.code.DefaultCodeGenerator;
+import dev.samstevens.totp.time.SystemTimeProvider;
+import io.micronaut.context.ApplicationContext;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.specification.RequestSpecification;
+import org.apache.http.HttpStatus;
+import org.assertj.core.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +32,12 @@ public class TestContext {
     public record Server(String baseUri, int port) {
     }
 
+    private String authenticatedWith;
     private String authenticationToken;
+    private final ApplicationContext applicationContext;
 
-    public TestContext(Server server) {
+    public TestContext(Server server, ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
         RestAssured.requestSpecification = new RequestSpecBuilder()
                 .setBaseUri(server.baseUri)
                 .setPort(server.port)
@@ -73,7 +84,7 @@ public class TestContext {
 
     public TestContext authenticate(String username, String password) {
         log.info("Authenticating user: {}", username);
-        authenticationToken = RestAssured.given()
+        var jsonPath = RestAssured.given()
                 .body("""
                         {
                             "username": "%s",
@@ -84,9 +95,50 @@ public class TestContext {
                 .statusCode(200)
                 .extract()
                 .body()
+                .jsonPath();
+
+        authenticationToken = jsonPath.getString("access_token");
+        authenticatedWith = username;
+        return this;
+    }
+
+    public TestContext multiFactor() {
+        authenticationToken = authRequest()
+            .given()
+                .contentType("application/json")
+                .body("""
+                        {
+                          "verificationCode": "%s"
+                        }""".formatted(generateToken()))
+            .when()
+                .post("/security/2-factor")
+            .then()
+                .statusCode(HttpStatus.SC_OK)
+                .extract()
                 .jsonPath()
                 .getString("access_token");
+
         return this;
+    }
+
+    public TestContext enableMFA() {
+        authRequest()
+            .given()
+                .contentType("application/json")
+                .body("""
+                        {
+                          "verificationCode": "%s"
+                        }""".formatted(generateToken()))
+            .when()
+                .post("/profile/multi-factor/enable")
+            .then()
+                .statusCode(HttpStatus.SC_NO_CONTENT);
+
+        return this;
+    }
+
+    public ProfileContext profile() {
+        return new ProfileContext(this::authRequest);
     }
 
     public AccountContext accounts() {
@@ -106,7 +158,7 @@ public class TestContext {
                 .contentType("multipart/form-data")
                 .multiPart("upload", "account1.svg", inputStream)
                 .post("/attachment")
-                .then()
+            .then()
                 .statusCode(201)
                 .extract()
                 .body()
@@ -117,5 +169,17 @@ public class TestContext {
     public RequestSpecification authRequest() {
         return RestAssured.given()
                 .header("Authorization", "Bearer " + authenticationToken);
+    }
+
+    private String generateToken() {
+        var optionalUser = applicationContext.getBean(UserProvider.class)
+                .lookup(authenticatedWith);
+        Assertions.assertThat(optionalUser.isPresent()).isTrue();
+
+        return optionalUser.map(UserAccount::getSecret)
+                .map(secret -> Control.Try(() -> new DefaultCodeGenerator()
+                                .generate(secret, Math.floorDiv(new SystemTimeProvider().getTime(), 30)))
+                        .get())
+                .get();
     }
 }

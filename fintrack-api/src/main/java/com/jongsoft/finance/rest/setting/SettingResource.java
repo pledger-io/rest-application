@@ -2,6 +2,7 @@ package com.jongsoft.finance.rest.setting;
 
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.model.SettingResponse;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -11,7 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
-@Secured("admin")
+@Secured(AuthenticationRoles.IS_ADMIN)
 @Controller("/api/settings")
 @Tag(name = "Application Settings")
 public class SettingResource {

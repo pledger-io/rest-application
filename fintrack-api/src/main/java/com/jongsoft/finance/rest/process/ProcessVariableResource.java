@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.process;
 
 import com.jongsoft.finance.rest.model.ProcessVariableResponse;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.lang.Collections;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.camunda.bpm.engine.RuntimeService;
@@ -14,7 +14,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import java.util.List;
 
 @Tag(name = "Process Engine")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/runtime-process/{processDefinitionKey}/{businessKey}/{instanceId}/variables")
 public class ProcessVariableResource {
 

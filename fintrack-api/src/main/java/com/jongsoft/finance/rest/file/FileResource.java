@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest.file;
 
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @Tag(name = "Attachments")
 @Controller("/api/attachment")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class FileResource {
 
     private final StorageService storageService;

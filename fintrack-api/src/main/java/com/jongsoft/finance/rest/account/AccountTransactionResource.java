@@ -11,6 +11,7 @@ import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.Dates;
@@ -18,7 +19,6 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -31,7 +31,7 @@ import jakarta.validation.Valid;
 import java.util.function.Consumer;
 
 @Tag(name = "Transactions")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/accounts/{accountId}/transactions")
 public class AccountTransactionResource {
 

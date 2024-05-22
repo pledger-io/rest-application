@@ -14,6 +14,7 @@ import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
 import com.jongsoft.finance.rest.process.RuntimeResource;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.Dates;
@@ -22,7 +23,6 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.security.annotation.Secured;
-import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,7 +40,7 @@ import java.util.concurrent.Executors;
 
 @Tag(name = "Transactions")
 @Controller("/api/transactions")
-@Secured(SecurityRule.IS_AUTHENTICATED)
+@Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class TransactionResource {
 
     private final SettingProvider settingProvider;
