@@ -20,7 +20,7 @@ subprojects {
     apply(plugin = "maven-publish")
     apply(plugin = "jacoco")
 
-    tasks.test {
+    tasks.check {
         finalizedBy(tasks.jacocoTestReport)
     }
 

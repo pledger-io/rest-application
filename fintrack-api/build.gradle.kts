@@ -26,6 +26,10 @@ tasks.register<Test>("itTest") {
     shouldRunAfter(tasks.test)
 }
 
+tasks.jacocoTestReport {
+    executionData(layout.buildDirectory.files("/jacoco/test.exec", "jacoco/itTest.exec"))
+}
+
 tasks.check {
     dependsOn("itTest")
 }
