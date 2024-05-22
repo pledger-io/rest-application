@@ -13,9 +13,12 @@ import io.micronaut.security.token.refresh.RefreshTokenPersistence;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
 public class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
+    private final Logger logger = LoggerFactory.getLogger(CustomRefreshTokenPersistence.class);
 
     private final UserProvider userProvider;
     private final FinTrack application;
@@ -30,6 +33,8 @@ public class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
 
     @Override
     public void persistToken(RefreshTokenGeneratedEvent event) {
+        logger.debug("Persisting refresh token for user: {}", event.getAuthentication().getName());
+
         application.registerToken(
                 event.getAuthentication().getName(),
                 event.getRefreshToken(),
@@ -38,6 +43,8 @@ public class CustomRefreshTokenPersistence implements RefreshTokenPersistence {
 
     @Override
     public Publisher<Authentication> getAuthentication(String refreshToken) {
+        logger.debug("Retrieving authentication for refresh token: {}", refreshToken);
+
         return userProvider.refreshToken(refreshToken)
                 .map(account -> {
                     var roles = account.getRoles().stream().map(Role::getName).toList();

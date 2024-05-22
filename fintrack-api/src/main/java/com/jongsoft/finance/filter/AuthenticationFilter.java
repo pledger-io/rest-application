@@ -63,7 +63,7 @@ public class AuthenticationFilter implements HttpServerFilter {
     }
 
     private void handleAuthentication(Principal principal) {
-        log.debug("Authenticated user {}", principal.getName());
+        log.trace("Authenticated user {}", principal.getName());
         eventPublisher.publishEvent(new InternalAuthenticationEvent(this, principal.getName()));
     }
 }

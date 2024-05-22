@@ -39,7 +39,7 @@ public class IntegrationTestExtension implements ParameterResolver, BeforeAllCal
                     testContext = new TestContext(new TestContext.Server(
                             server.getScheme() + "://" + server.getHost(),
                             server.getPort()
-                    ));
+                    ), applicationContext);
                 });
     }
 
