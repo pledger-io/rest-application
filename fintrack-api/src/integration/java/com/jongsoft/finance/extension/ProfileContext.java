@@ -1,5 +1,6 @@
 package com.jongsoft.finance.extension;
 
+import io.micronaut.http.MediaType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
@@ -22,6 +23,18 @@ public class ProfileContext {
                 .statusCode(HttpStatus.SC_OK);
 
         validator.accept(response);
+
+        return this;
+    }
+
+    public ProfileContext qrCode() {
+        requestSpecification.get()
+            .when()
+                .accept(MediaType.IMAGE_PNG)
+                .get("/profile/multi-factor/qr-code")
+            .then()
+                .statusCode(HttpStatus.SC_OK)
+                .contentType(MediaType.IMAGE_PNG);
 
         return this;
     }

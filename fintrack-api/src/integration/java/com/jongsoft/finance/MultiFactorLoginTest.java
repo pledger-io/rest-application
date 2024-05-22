@@ -22,7 +22,8 @@ public class MultiFactorLoginTest {
                 .get(response -> response
                         .body("theme", equalTo("dark"))
                         .body("currency", equalTo("EUR"))
-                        .body("mfa", equalTo(false)));
+                        .body("mfa", equalTo(false)))
+                .qrCode();
 
         testContext.enableMFA();
 
