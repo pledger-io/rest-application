@@ -34,6 +34,10 @@ public class StatusException extends RuntimeException {
         return new StatusException(401, message, null);
     }
 
+    public static StatusException forbidden(String message) {
+        return new StatusException(403, message, null);
+    }
+
     public static StatusException internalError(String message) {
         return new StatusException(500, message, null);
     }
