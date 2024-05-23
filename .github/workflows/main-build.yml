@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+permissions:
+  packages: write
+
 jobs:
   build:
     uses: ./.github/workflows/component-build.yml
