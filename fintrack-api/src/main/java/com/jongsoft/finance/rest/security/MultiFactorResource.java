@@ -46,7 +46,7 @@ public class MultiFactorResource {
     public HttpResponse<?> validateToken(@Valid @Body MultiFactorRequest verification, HttpRequest<?> request) {
         var user = currentUserProvider.currentUser();
         if (!TwoFactorHelper.verifySecurityCode(user.getSecret(), verification.verificationCode())) {
-            throw StatusException.notAuthorized("Invalid verification code");
+            throw StatusException.forbidden("Invalid verification code");
         }
 
         var authentication = Authentication.build(
