@@ -40,9 +40,8 @@ jobs:
         run: |
           echo "Github ref: ${GITHUB_REF}"
           NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
-          echo "New version: ${NEW_VERSION}-SNAPSHOT"
           echo "Github username: ${GITHUB_ACTOR}"
-          ./gradlew -Pversion=${NEW_VERSION}-SNAPSHOT publish -x check
+          ./gradlew -Pversion=1.0.0-SNAPSHOT publish -x check
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
