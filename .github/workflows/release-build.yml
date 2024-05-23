@@ -23,6 +23,7 @@ jobs:
           architecture: x64
       - name: Publish artifacts
         run: |
+          echo "Github ref: ${GITHUB_REF}"
           NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
           echo "New version: ${NEW_VERSION}"
           echo "Github username: ${GITHUB_ACTOR}"
