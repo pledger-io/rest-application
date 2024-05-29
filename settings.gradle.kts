@@ -25,10 +25,10 @@ dependencyResolutionManagement {
             library("lang.xml", "com.jongsoft.lang", "language-fasterxml").version("1.1.0")
             library("otp", "dev.samstevens.totp", "totp").version("1.7.1")
             library("camunda", "org.camunda.bpm", "camunda-engine").version("7.20.0")
-            library("bouncy", "org.bouncycastle", "bcprov-jdk15on").version("1.70")
-            library("bcpkix", "org.bouncycastle", "bcpkix-jdk15on").version("1.70")
-            library("bcrypt", "at.favre.lib", "bcrypt").version("0.9.0")
-            library("csv", "com.opencsv", "opencsv").version("5.7.1")
+            library("bouncy", "org.bouncycastle", "bcprov-jdk18on").version("1.78.1")
+            library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.78.1")
+            library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
+            library("csv", "com.opencsv", "opencsv").version("5.9")
 
             // testing dependencies
             version("junit.version", "5.10.2")
