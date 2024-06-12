@@ -7,8 +7,6 @@ on:
 
 permissions:
   packages: write
-  actions: read
-  checks: write
 
 jobs:
   build:
@@ -30,41 +28,4 @@ jobs:
           name: build-artifact
       - name: Quality gate
         run: ./gradlew sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.gradle.skipCompile=true -Dsonar.host.url=https://sonarcloud.io
-  snapshot:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-      - name: Configure Java version
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          architecture: x64
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifact
-      - name: Publish artifacts
-        run: |
-          echo "Github ref: ${GITHUB_REF}"
-          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
-          echo "Github username: ${GITHUB_ACTOR}"
-          ./gradlew -Pversion=1.0.0-SNAPSHOT publish -x check
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  test-report:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-      - name: test-report
-        uses: dorny/test-reporter@v1
-        if: success() || failure()
-        with:
-          artifact: test-artifact
-          name: Junit Test
-          path: ./**/TEST-*.xml
-          reporter: java-junit
-
 

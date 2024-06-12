@@ -12,19 +12,6 @@ permissions:
 jobs:
   build:
     uses: ./.github/workflows/component-build.yml
-  test-report:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-      - name: test-report
-        uses: dorny/test-reporter@v1
-        if: success() || failure()
-        with:
-          artifact: test-artifact
-          name: Junit Test
-          path: ./**/TEST-*.xml
-          reporter: java-junit
   code-quality:
     runs-on: ubuntu-latest
     needs: build

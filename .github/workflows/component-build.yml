@@ -2,6 +2,10 @@ name: Build flow
 
 on: [workflow_call]
 
+permissions:
+  actions: read
+  checks: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,3 +35,11 @@ jobs:
           name: test-artifact
           path: |
             **/build/test-results/**
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          artifact: test-artifact
+          name: Junit Test
+          path: ./**/TEST-*.xml
+          reporter: java-junit
