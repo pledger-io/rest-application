@@ -43,3 +43,5 @@ jobs:
           name: Junit Test
           path: ./**/TEST-*.xml
           reporter: java-junit
+          list-suites: 'failed'
+          list-tests: 'failed'
