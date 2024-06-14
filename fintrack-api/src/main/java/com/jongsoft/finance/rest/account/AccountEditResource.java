@@ -6,7 +6,6 @@ import com.jongsoft.finance.domain.account.SavingGoal;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.AccountResponse;
-import com.jongsoft.finance.security.CurrentUserProvider;
 import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
@@ -199,13 +198,13 @@ public class AccountEditResource {
     AccountResponse reservationForSavingGoal(
             @PathVariable long accountId,
             @PathVariable long savingId,
-            @Valid @QueryValue @Positive BigDecimal amount) {
+            @Valid @QueryValue @Positive double amount) {
         accountProvider.lookup(accountId)
                 .ifPresent(account ->
                         account.getSavingGoals()
                                 .filter(goal -> goal.getId() == savingId)
                                 .head()
-                                .registerPayment(amount))
+                                .registerPayment(BigDecimal.valueOf(amount)))
                 .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
 
         return accountProvider.lookup(accountId)
