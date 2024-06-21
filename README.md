@@ -1,4 +1,4 @@
-# FinTrack
+# Pledger.io
 ![Sonatype Nexus (Releases)](https://img.shields.io/github/v/release/pledger-io/rest-application?display_name=release&label=Stable)
 ![Release Build](https://github.com/pledger-io/rest-application/actions/workflows/release-build.yml/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pledger-io_rest-application&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=pledger-io_rest-application)
