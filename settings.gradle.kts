@@ -6,7 +6,7 @@ pluginManagement {
         id("io.micronaut.library").version("4.4.0")
         id("io.micronaut.application").version("4.4.0")
         id("io.freefair.lombok").version("8.6")
-        id("org.sonarqube").version("4.4.1.3373")
+        id("org.sonarqube").version("5.0.0.4638")
 
         id("signing")
         id("maven-publish")
