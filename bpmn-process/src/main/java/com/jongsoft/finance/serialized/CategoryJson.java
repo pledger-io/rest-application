@@ -1,20 +1,25 @@
 package com.jongsoft.finance.serialized;
 
 import com.jongsoft.finance.domain.user.Category;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.jsonschema.JsonSchema;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
+@Data
 @Builder
 @Serdeable
+@JsonSchema(
+        title = "Category",
+        description = "Category of a transaction",
+        uri = "/category"
+)
 public class CategoryJson implements Serializable {
 
+    @NonNull
     private String label;
     private String description;
 

@@ -1,6 +1,8 @@
 package com.jongsoft.finance.serialized;
 
 import com.jongsoft.finance.domain.account.Contract;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.jsonschema.JsonSchema;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
 import lombok.Data;
@@ -12,18 +14,25 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.function.Supplier;
 
-@Getter
-@Setter
+@Data
 @Builder
 @Serdeable
+@JsonSchema(title = "Contract", description = "Contract details", uri = "/contract")
 public class ContractJson implements Serializable {
 
+    @NonNull
     private String name;
     private String description;
+    @NonNull
     private String company;
+    /**
+     * The contract attachment as a hex string.
+     */
     private String contract;
     private boolean terminated;
+    @NonNull
     private LocalDate start;
+    @NonNull
     private LocalDate end;
 
     public static ContractJson fromDomain(Contract contract, Supplier<byte[]> attachmentSupplier) {

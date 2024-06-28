@@ -2,7 +2,12 @@ micronaut {
     testRuntime("junit5")
 }
 
+tasks.compileJava {
+    options.compilerArgs.add("-Amicronaut.jsonschema.baseUri=https://www.pledger.io/schemas") // (1)
+}
+
 dependencies {
+    annotationProcessor(mn.micronaut.json.schema.processor)
     annotationProcessor(mn.lombok)
 
     implementation(libs.lang)
@@ -19,6 +24,7 @@ dependencies {
     implementation(mn.micronaut.jackson.databind)
     implementation(mn.micronaut.serde.jackson)
     implementation(mn.validation)
+    implementation(mn.micronaut.json.schema.annotations)
 
     implementation(project(":core"))
     implementation(project(":domain"))

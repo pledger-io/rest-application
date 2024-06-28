@@ -1,36 +1,49 @@
 package com.jongsoft.finance.serialized;
 
 import com.jongsoft.finance.domain.user.Budget;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.jsonschema.JsonSchema;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
+@Data
 @Builder
 @Serdeable
+@JsonSchema(title = "Budget", description = "Budget for a user", uri = "/budget")
 public class BudgetJson implements Serializable {
 
-    @Getter
-    @Setter
+    @Data
     @Builder
     @Serdeable
+    @JsonSchema(title = "Expense", description = "Expense for a budget", uri = "/budget-expense")
     public static class ExpenseJson implements Serializable {
+        @NonNull
         private String name;
         private double lowerBound;
         private double upperBound;
     }
 
+    /**
+     * Start date of the budget, in ISO 8601 format.
+     */
+    @NonNull
     private LocalDate start;
     private LocalDate end;
 
+    /**
+     * Expected income for the budget.
+     */
     private double expectedIncome;
+    /**
+     * List of expenses for the budget.
+     */
+    @NonNull
     private List<ExpenseJson> expenses;
 
     public static BudgetJson fromDomain(Budget budget) {
