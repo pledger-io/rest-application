@@ -22,7 +22,7 @@ public class V20200429151821__MigrateEncryptedStorage extends BaseJavaMigration 
 
     @Override
     public void migrate(Context context) throws Exception {
-        jdbcTemplate = new JdbcTemplate(context.getConnection());
+//        jdbcTemplate = new JdbcTemplate(context.getConnection());
 
 //        jdbcTemplate.query("select id, username, two_factor_secret from user_account", this::processUser);
     }

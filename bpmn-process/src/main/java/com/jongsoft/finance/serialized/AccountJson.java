@@ -2,8 +2,12 @@ package com.jongsoft.finance.serialized;
 
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.schedule.Periodicity;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.annotation.Nullable;
+import io.micronaut.jsonschema.JsonSchema;
 import io.micronaut.serde.annotation.Serdeable;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.bouncycastle.util.encoders.Hex;
@@ -11,16 +15,30 @@ import org.bouncycastle.util.encoders.Hex;
 import java.io.Serializable;
 import java.util.function.Supplier;
 
-@Getter
-@Setter
+@Data
 @Builder
 @Serdeable
+@JsonSchema(uri = "/account", title = "Account", description = "A account is a financial account that can be used to record transactions.")
 public class AccountJson implements Serializable {
 
+    /**
+     * The name of the account.
+     */
+    @NonNull
     private String name;
+    /**
+     * The description of the account.
+     */
     private String description;
+    /**
+     * The currency of the account, in a 3-letter ISO currency code.
+     */
+    @NonNull
     private String currency;
 
+    /**
+     * The icon of the account, in a base64 encoded string.
+     */
     private String icon;
 
     private double interest;
@@ -29,6 +47,10 @@ public class AccountJson implements Serializable {
     private String iban;
     private String bic;
     private String number;
+    /**
+     * The type of the account.
+     */
+    @NonNull
     private String type;
 
     public static AccountJson fromDomain(Account account, Supplier<byte[]> iconSupplier) {

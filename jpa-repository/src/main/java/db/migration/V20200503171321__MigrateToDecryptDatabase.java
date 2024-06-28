@@ -19,7 +19,7 @@ public class V20200503171321__MigrateToDecryptDatabase extends BaseJavaMigration
 
     @Override
     public void migrate(Context context) throws Exception {
-        jdbcTemplate = new JdbcTemplate(context.getConnection());
+//        jdbcTemplate = new JdbcTemplate(context.getConnection());
 
 //        jdbcTemplate.query("select id, username from user_account", this::processUser);
     }

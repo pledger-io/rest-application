@@ -186,7 +186,7 @@ public class TransactionResource {
             summary = "Export transactions",
             description = "Creates a CSV export of all transactions in the system."
     )
-    OutputStream export() throws IOException {
+    String export() throws IOException {
         var outputStream = new ByteArrayOutputStream();
         outputStream.write(("Date,Booking Date,Interest Date,From name,From IBAN," +
                 "To name,To IBAN,Description,Category,Budget,Contract,Amount\n").getBytes(StandardCharsets.UTF_8));
@@ -210,7 +210,7 @@ public class TransactionResource {
             page = transactionProvider.lookup(filterCommand);
         } while (page.hasNext());
 
-        return outputStream;
+        return outputStream.toString();
     }
 
     @Get("/apply-all-rules")
