@@ -1,5 +1,6 @@
 package com.jongsoft.finance.filter;
 
+import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -7,6 +8,7 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.hateoas.JsonError;
 import io.micronaut.http.server.exceptions.ExceptionHandler;
+import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.authentication.AuthorizationException;
 import io.micronaut.security.authentication.DefaultAuthorizationExceptionHandler;
 import jakarta.inject.Singleton;
@@ -36,7 +38,9 @@ public class AuthenticationFailureHandler implements ExceptionHandler<Authorizat
         log.info("{}: {} - User {} is not authenticated.",
                 request.getMethod(),
                 request.getPath(),
-                exception.getAuthentication().getName());
+                Control.Option(exception.getAuthentication())
+                        .map(Authentication::getName)
+                        .getOrSupply(() -> "Unknown"));
 
         return HttpResponse.unauthorized();
     }

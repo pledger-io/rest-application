@@ -19,7 +19,7 @@ public class V20200430171321__MigrateToEncryptedDatabase extends BaseJavaMigrati
 
     @Override
     public void migrate(Context context) throws Exception {
-        jdbcTemplate = new JdbcTemplate(context.getConnection());
+//        jdbcTemplate = new JdbcTemplate(context.getConnection());
 
 //        jdbcTemplate.query("select id, username from user_account", this::processUser);
     }
