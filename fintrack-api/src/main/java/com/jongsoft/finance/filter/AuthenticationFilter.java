@@ -49,12 +49,13 @@ public class AuthenticationFilter implements HttpServerFilter {
             } else {
                 if (log.isTraceEnabled() && request.getBody().isPresent()) {
                     Object body = request.getBody().get();
-                    log.trace("{}: {} in {} ms, with request body {}.",
-                            request.getMethod(),
-                            request.getPath(),
-                            Duration.between(startTime, Instant.now()).toMillis(),
-                            Control.Try(() -> objectMapper.writeValueAsString(body))
-                                    .recover(Throwable::getMessage).get());
+                    log.atTrace()
+                            .addArgument(request::getMethod)
+                            .addArgument(request::getPath)
+                            .addArgument(() -> Duration.between(startTime, Instant.now()).toMillis())
+                            .addArgument(() -> Control.Try(() -> objectMapper.writeValueAsString(body))
+                                    .recover(Throwable::getMessage).get())
+                            .log("{}: {} in {} ms, with request body {}.");
                 } else {
                     log.info("{}: {} in {} ms", request.getMethod(), request.getPath(), Duration.between(startTime, Instant.now()).toMillis());
                 }
