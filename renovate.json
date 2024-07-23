@@ -4,5 +4,6 @@
     "config:recommended"
   ],
   "addLabels": ["dependency", "triage"],
-  "assignees": ["@gjong"]
+  "assignees": ["@gjong"],
+  "automerge": true
 }
