@@ -17,10 +17,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           architecture: x64
-      - name: Build the application
+      - name: Prepare gradle installation
         uses: gradle/actions/setup-gradle@v4
-        with:
-          arguments: 'check'
+      - name: Build with Gradle
+        run: ./gradlew check
       - name: Upload build results
         uses: actions/upload-artifact@v4
         with:
