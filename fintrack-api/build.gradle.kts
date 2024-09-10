@@ -53,9 +53,8 @@ tasks.jacocoTestReport {
 tasks.check {
     dependsOn("itTest")
 }
-
-tasks.publish {
-    dependsOn(tasks.openApiGenerate)
+tasks.publishMavenPublicationToGitHubPackagesRepository {
+    dependsOn("openApiGenerate")
 }
 
 tasks.compileJava {
