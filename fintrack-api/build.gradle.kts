@@ -1,5 +1,6 @@
 plugins {
     id("io.micronaut.application")
+    id("org.openapi.generator")
 }
 
 application {
@@ -9,6 +10,24 @@ application {
 micronaut {
     runtime("jetty")
     testRuntime("junit5")
+}
+
+openApiGenerate {
+    inputSpec.set(layout.buildDirectory.dir("classes/java/main/META-INF/swagger").get().file("pledger-2.0.0.yml").toString())
+    outputDir.set(layout.buildDirectory.dir("asciidoc").get().toString())
+    cleanupOutput.set(true)
+    generatorName.set("asciidoc")
+    skipValidateSpec.set(true)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("documentation") {
+            groupId = "com.jongsoft.finance"
+            version = System.getProperty("version")
+            artifacts.add(artifact(layout.buildDirectory.dir("asciidoc").get().file("index.adoc")))
+        }
+    }
 }
 
 val integration by sourceSets.creating
