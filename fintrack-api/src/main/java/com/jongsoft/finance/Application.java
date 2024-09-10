@@ -11,12 +11,12 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "FinTrack",
+                title = "Pledger",
                 version = "2.0.0",
                 license = @License(name = "MIT", url = "https://opensource.org/licenses/MIT"),
                 contact = @Contact(
                         name = "Jong Soft Development",
-                        url = "https://bitbucket.org/jongsoftdev/workspace/projects/FIN"
+                        url = "https://github.com/pledger-io/rest-application"
                 )
         ),
         security = @SecurityRequirement(name = "bearer")
