@@ -3,7 +3,12 @@
   "extends": [
     "config:recommended"
   ],
+  "packageRules": [
+    {
+      "groupName": "Non-major dependency updates",
+      "matchUpdateTypes": ["minor", "patch"]
+    }
+  ],
   "addLabels": ["dependency", "triage"],
-  "assignees": ["@gjong"],
-  "automerge": true
+  "assignees": ["@gjong"]
 }

@@ -11,13 +11,6 @@ import jakarta.inject.Inject;
 @Connectable
 public class DatabaseMigrationFactory {
 
-    private final Environment environment;
-
-    @Inject
-    public DatabaseMigrationFactory(Environment environment) {
-        this.environment = environment;
-    }
-
     @Context
     public DataSourceMigration datasourceMigration(MigrationDatasourceConfiguration configuration) {
         return new DatasourceMigrationJpa(configuration);
