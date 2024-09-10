@@ -29,6 +29,7 @@ jobs:
             **/build/classes/**
             **/build/libs/*.jar
             **/build/reports/jacoco/test/*.xml
+            **/build/asciidoc/**
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
