@@ -53,6 +53,10 @@ tasks.check {
     dependsOn("itTest")
 }
 
+tasks.compileJava {
+    finalizedBy(tasks.openApiGenerate)
+}
+
 dependencies {
     annotationProcessor(mn.micronaut.openapi.asProvider())
     annotationProcessor(mn.micronaut.http.validation)
