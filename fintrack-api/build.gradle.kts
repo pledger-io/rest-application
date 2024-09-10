@@ -24,6 +24,7 @@ publishing {
     publications {
         create<MavenPublication>("documentation") {
             groupId = "com.jongsoft.finance"
+            artifactId = "api-docs"
             version = System.getProperty("version")
             artifacts.add(artifact(layout.buildDirectory.dir("asciidoc").get().file("index.adoc")))
         }
