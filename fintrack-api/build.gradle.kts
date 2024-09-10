@@ -54,6 +54,10 @@ tasks.check {
     dependsOn("itTest")
 }
 
+tasks.publish {
+    dependsOn(tasks.openApiGenerate)
+}
+
 tasks.compileJava {
     finalizedBy(tasks.openApiGenerate)
 }
