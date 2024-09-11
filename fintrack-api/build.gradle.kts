@@ -20,17 +20,6 @@ openApiGenerate {
     skipValidateSpec.set(true)
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("documentation") {
-            groupId = "com.jongsoft.finance"
-            artifactId = "api-docs"
-            version = System.getProperty("version")
-            artifacts.add(artifact(layout.buildDirectory.dir("asciidoc").get().file("index.adoc")))
-        }
-    }
-}
-
 val integration by sourceSets.creating
 
 configurations[integration.implementationConfigurationName].extendsFrom(configurations.testImplementation.get())
@@ -53,12 +42,27 @@ tasks.jacocoTestReport {
 tasks.check {
     dependsOn("itTest")
 }
-tasks.publishMavenPublicationToGitHubPackagesRepository {
-    dependsOn("openApiGenerate")
+
+tasks.withType<JavaCompile> {
+    finalizedBy(tasks.getByName("openApiGenerate"))
 }
 
-tasks.compileJava {
-    finalizedBy(tasks.openApiGenerate)
+configurations {
+    create("api-docs")
+}
+
+val apiArtifact = artifacts.add("api-docs", layout.buildDirectory.file("asciidoc/index.adoc")) {
+    type = "asciidoc"
+    builtBy(tasks.getByName("openApiGenerate"))
+}
+
+publishing.publications {
+    create<MavenPublication>("maven") {
+        groupId = "com.jongsoft.finance"
+        version = System.getProperty("version")
+        from(components["java"])
+        artifact(apiArtifact)
+    }
 }
 
 dependencies {

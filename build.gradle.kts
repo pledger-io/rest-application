@@ -31,11 +31,13 @@ subprojects {
     }
 
     publishing {
-        publications {
-            create<MavenPublication>("maven") {
-                groupId = "com.jongsoft.finance"
-                version = System.getProperty("version")
-                from(components["java"])
+        if (project.name != "fintrack-api") {
+            publications {
+                create<MavenPublication>("maven") {
+                    groupId = "com.jongsoft.finance"
+                    version = System.getProperty("version")
+                    from(components["java"])
+                }
             }
         }
 
