@@ -6,6 +6,7 @@ import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
+import com.jongsoft.finance.rest.process.RuntimeResource;
 import com.jongsoft.finance.security.AuthenticationRoles;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.http.annotation.*;
@@ -17,6 +18,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
+import java.util.Map;
+
 @Tag(name = "Importer")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/import/{batchSlug}/transactions")
@@ -26,13 +29,17 @@ public class ImporterTransactionResource {
     private final FilterFactory filterFactory;
     private final TransactionProvider transactionProvider;
 
+    private final RuntimeResource runtimeResource;
+
     public ImporterTransactionResource(
             SettingProvider settingProvider,
             FilterFactory filterFactory,
-            TransactionProvider transactionProvider) {
+            TransactionProvider transactionProvider,
+            RuntimeResource runtimeResource) {
         this.settingProvider = settingProvider;
         this.filterFactory = filterFactory;
         this.transactionProvider = transactionProvider;
+        this.runtimeResource = runtimeResource;
     }
 
     @Post
@@ -54,6 +61,28 @@ public class ImporterTransactionResource {
                 .map(TransactionResponse::new);
 
         return new ResultPageResponse<>(response);
+    }
+
+    @Post("/run-rule-automation")
+    @Status(HttpStatus.NO_CONTENT)
+    @Operation(
+            summary = "Run rule automation",
+            operationId = "runRuleAutomation",
+            description = "Run rule automation on transactions created by the importer job",
+            parameters = @Parameter(name = "batchSlug", in = ParameterIn.PATH, schema = @Schema(implementation = String.class))
+    )
+    void runRuleAutomation(@PathVariable String batchSlug) {
+        var searchFilter = filterFactory.transaction()
+                .importSlug(batchSlug)
+                .pageSize(Integer.MAX_VALUE)
+                .page(0);
+
+        transactionProvider.lookup(searchFilter)
+                .content()
+                .map(Transaction::getId)
+                .forEach(transactionId -> runtimeResource.startProcess(
+                        "analyzeRule",
+                        Map.of("transactionId", transactionId)));
     }
 
     @Delete("/{transactionId}")

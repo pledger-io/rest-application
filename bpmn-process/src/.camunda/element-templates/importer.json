@@ -294,5 +294,49 @@
         }
       }
     ]
+  },
+  {
+    "$schema": "https://unpkg.com/@camunda/element-templates-json-schema/resources/schema.json",
+    "name": "Importer: Add account in mapping",
+    "description": "Add the account id in the mapping configuration.",
+    "id": "com.jongsoft.finance.bpmn.delegate.importer.AddToAccountMapping",
+    "version": 1,
+    "appliesTo": [
+      "bpmn:ServiceTask"
+    ],
+    "properties": [
+      {
+        "label": "Implementation",
+        "type": "String",
+        "value": "${addToAccountMapping}",
+        "editable": false,
+        "binding": {
+          "type": "property",
+          "name": "camunda:delegateExpression"
+        }
+      },
+      {
+        "label": "Account name",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "name"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      },
+      {
+        "label": "Account id",
+        "type": "String",
+        "binding": {
+          "type": "camunda:inputParameter",
+          "name": "accountId"
+        },
+        "constraint": {
+          "notEmpty": true
+        }
+      }
+    ]
   }
 ]

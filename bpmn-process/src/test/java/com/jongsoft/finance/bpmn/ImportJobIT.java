@@ -180,6 +180,14 @@ public class ImportJobIT {
         process.task("user_create_account")
                 .complete(Map.of("accountId", 4L));
 
+        process.<Set<ExtractionMapping>>yankVariable("accountMappings", mappings -> {
+            Assertions.assertThat(mappings)
+                    .hasSize(3)
+                    .anySatisfy(mapping -> {
+                        Assertions.assertThat(mapping.getName()).isEqualTo("MW GA Pieterse");
+                        Assertions.assertThat(mapping.getAccountId()).isEqualTo(4L);
+                    });
+        });
         context.verifyTransactions(assertion -> assertion.hasSize(4)
                 .anySatisfy(this::verifyPostTransaction)
                 .anySatisfy(this::verifyJanssenTransaction)

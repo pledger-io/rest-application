@@ -62,6 +62,9 @@ endpoints:
   health:
     enabled: true
     details-visible: anonymous
+  loggers:
+    enabled: true
+    write-sensitive: true
 
 jackson:
   serialization-inclusion: non_absent
