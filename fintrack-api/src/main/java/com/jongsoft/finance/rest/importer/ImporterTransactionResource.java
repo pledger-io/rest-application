@@ -64,6 +64,7 @@ public class ImporterTransactionResource {
     }
 
     @Post("/run-rule-automation")
+    @Status(HttpStatus.NO_CONTENT)
     @Operation(
             summary = "Run rule automation",
             operationId = "runRuleAutomation",
