@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_064fh2o" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.17.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.20.0">
-  <bpmn:process id="import_job" name="Import Job" isExecutable="true" camunda:versionTag="1.0.0" camunda:historyTimeToLive="P14D">
+  <bpmn:process id="import_job" name="Import Job" isExecutable="true" camunda:versionTag="1.1.0" camunda:historyTimeToLive="P14D">
     <bpmn:documentation>Start the import job that belongs to an import entity.
 
 When calling the flow the following variables must be set:
@@ -187,7 +187,7 @@ When calling the flow the following variables must be set:
         <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${allowGenerate == true}</bpmn:conditionExpression>
       </bpmn:sequenceFlow>
       <bpmn:sequenceFlow id="Flow_1n6qs8u" name="no" sourceRef="create_allowed" targetRef="user_create_account" />
-      <bpmn:sequenceFlow id="Flow_15uycxp" sourceRef="user_create_account" targetRef="create_transaction" />
+      <bpmn:sequenceFlow id="Flow_15uycxp" sourceRef="user_create_account" targetRef="add_account_mapping" />
       <bpmn:sequenceFlow id="Flow_0y3m68u" sourceRef="create_account_extractor" targetRef="create_account" />
       <bpmn:exclusiveGateway id="should_apply_rules" name="apply rules" default="Flow_0ycxqnq">
         <bpmn:incoming>Flow_01c6qb3</bpmn:incoming>
@@ -248,8 +248,8 @@ When calling the flow the following variables must be set:
           </camunda:inputOutput>
         </bpmn:extensionElements>
         <bpmn:incoming>Flow_0b5s223</bpmn:incoming>
-        <bpmn:incoming>Flow_15uycxp</bpmn:incoming>
         <bpmn:incoming>Flow_1lz7czw</bpmn:incoming>
+        <bpmn:incoming>Flow_18qem83</bpmn:incoming>
         <bpmn:outgoing>Flow_01c6qb3</bpmn:outgoing>
       </bpmn:serviceTask>
       <bpmn:serviceTask id="apply_rules" name="Apply rules" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.rule.TransactionRuleMatcherDelegate" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${transactionRuleMatcherDelegate}">
@@ -304,6 +304,17 @@ When calling the flow the following variables must be set:
         <bpmn:incoming>Flow_00vpxjj</bpmn:incoming>
         <bpmn:outgoing>Flow_0rz5nze</bpmn:outgoing>
       </bpmn:serviceTask>
+      <bpmn:serviceTask id="add_account_mapping" name="Add account mapping" camunda:modelerTemplate="com.jongsoft.finance.bpmn.delegate.importer.AddToAccountMapping" camunda:modelerTemplateVersion="1" camunda:delegateExpression="${addToAccountMapping}">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="name">${transaction.opposingName()}</camunda:inputParameter>
+            <camunda:inputParameter name="accountId">${accountId}</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_15uycxp</bpmn:incoming>
+        <bpmn:outgoing>Flow_18qem83</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="Flow_18qem83" sourceRef="add_account_mapping" targetRef="create_transaction" />
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="Flow_16v2prx" sourceRef="process_create_transactions" targetRef="mark_import_done" />
     <bpmn:endEvent id="endJob">
@@ -357,12 +368,6 @@ When calling the flow the following variables must be set:
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1y5d1uo_di" bpmnElement="read_csv_file">
         <dc:Bounds x="1060" y="260" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_02tmvr8_di" bpmnElement="no_transactions" isMarkerVisible="true">
-        <dc:Bounds x="1085" y="365" width="50" height="50" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1010" y="383" width="65" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0bn3ft1_di" bpmnElement="process_account_mapping" isExpanded="true">
         <dc:Bounds x="810" y="450" width="780" height="330" />
@@ -451,7 +456,7 @@ When calling the flow the following variables must be set:
         <dc:Bounds x="1280" y="250" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0nxa7la_di" bpmnElement="process_create_transactions" isExpanded="true">
-        <dc:Bounds x="1710" y="85" width="1220" height="410" />
+        <dc:Bounds x="1710" y="85" width="1220" height="535" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_19sbqbc_di" bpmnElement="start_create_transaction">
@@ -464,9 +469,9 @@ When calling the flow the following variables must be set:
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0v83u3r_di" bpmnElement="create_allowed" isMarkerVisible="true">
-        <dc:Bounds x="2215" y="290" width="50" height="50" />
+        <dc:Bounds x="2215" y="355" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2218" y="350" width="44" height="14" />
+          <dc:Bounds x="2218" y="415" width="44" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_17mjkeb_di" bpmnElement="should_apply_rules" isMarkerVisible="true">
@@ -479,7 +484,7 @@ When calling the flow the following variables must be set:
         <dc:Bounds x="2872" y="297" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0lhktha_di" bpmnElement="user_create_account">
-        <dc:Bounds x="2340" y="275" width="100" height="80" />
+        <dc:Bounds x="2340" y="340" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0zbcup5_di" bpmnElement="locate_account_mapping">
         <dc:Bounds x="2040" y="155" width="100" height="80" />
@@ -494,17 +499,20 @@ When calling the flow the following variables must be set:
         <dc:Bounds x="2700" y="155" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1wb6lyp_di" bpmnElement="create_account_extractor">
-        <dc:Bounds x="2040" y="275" width="100" height="80" />
+        <dc:Bounds x="2040" y="340" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_00e7v83_di" bpmnElement="create_account">
-        <dc:Bounds x="2040" y="385" width="100" height="80" />
+        <dc:Bounds x="2040" y="460" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1thklz0_di" bpmnElement="locate_created_account">
-        <dc:Bounds x="2270" y="385" width="100" height="80" />
+        <dc:Bounds x="2270" y="460" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1iov1tb_di" bpmnElement="detect_duplicates">
         <dc:Bounds x="2700" y="275" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_11t29lj_di" bpmnElement="add_account_mapping">
+        <dc:Bounds x="2340" y="230" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0xggr5k_di" bpmnElement="Flow_0xggr5k">
         <di:waypoint x="2140" y="195" />
@@ -519,34 +527,32 @@ When calling the flow the following variables must be set:
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0prfhkh_di" bpmnElement="Flow_0prfhkh">
         <di:waypoint x="2240" y="220" />
-        <di:waypoint x="2240" y="290" />
+        <di:waypoint x="2240" y="355" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2248" y="238" width="13" height="14" />
+          <dc:Bounds x="2248" y="261" width="13" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_01kp9n6_di" bpmnElement="Flow_01kp9n6">
-        <di:waypoint x="2215" y="315" />
-        <di:waypoint x="2140" y="315" />
+        <di:waypoint x="2215" y="380" />
+        <di:waypoint x="2140" y="380" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2184" y="293" width="17" height="14" />
+          <dc:Bounds x="2184" y="358" width="17" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1n6qs8u_di" bpmnElement="Flow_1n6qs8u">
-        <di:waypoint x="2265" y="315" />
-        <di:waypoint x="2340" y="315" />
+        <di:waypoint x="2265" y="380" />
+        <di:waypoint x="2340" y="380" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2296" y="297" width="13" height="14" />
+          <dc:Bounds x="2296" y="362" width="13" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_15uycxp_di" bpmnElement="Flow_15uycxp">
-        <di:waypoint x="2390" y="275" />
-        <di:waypoint x="2390" y="255" />
-        <di:waypoint x="2480" y="255" />
-        <di:waypoint x="2480" y="235" />
+        <di:waypoint x="2390" y="340" />
+        <di:waypoint x="2390" y="310" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0y3m68u_di" bpmnElement="Flow_0y3m68u">
-        <di:waypoint x="2090" y="355" />
-        <di:waypoint x="2090" y="385" />
+        <di:waypoint x="2090" y="420" />
+        <di:waypoint x="2090" y="460" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_01c6qb3_di" bpmnElement="Flow_01c6qb3">
         <di:waypoint x="2540" y="195" />
@@ -584,19 +590,30 @@ When calling the flow the following variables must be set:
         <di:waypoint x="2040" y="195" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1b93w1q_di" bpmnElement="Flow_1b93w1q">
-        <di:waypoint x="2140" y="425" />
-        <di:waypoint x="2270" y="425" />
+        <di:waypoint x="2140" y="500" />
+        <di:waypoint x="2270" y="500" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1lz7czw_di" bpmnElement="Flow_1lz7czw">
-        <di:waypoint x="2370" y="425" />
-        <di:waypoint x="2510" y="425" />
+        <di:waypoint x="2370" y="500" />
+        <di:waypoint x="2510" y="500" />
         <di:waypoint x="2510" y="235" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18qem83_di" bpmnElement="Flow_18qem83">
+        <di:waypoint x="2440" y="255" />
+        <di:waypoint x="2480" y="255" />
+        <di:waypoint x="2480" y="235" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_1y4khet_di" bpmnElement="endJob">
         <dc:Bounds x="3192" y="272" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_11rfwl4_di" bpmnElement="mark_import_done">
         <dc:Bounds x="3010" y="250" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_02tmvr8_di" bpmnElement="no_transactions" isMarkerVisible="true">
+        <dc:Bounds x="1085" y="365" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1010" y="383" width="65" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1nv7ilo_di" bpmnElement="Flow_1nv7ilo">
         <di:waypoint x="188" y="290" />

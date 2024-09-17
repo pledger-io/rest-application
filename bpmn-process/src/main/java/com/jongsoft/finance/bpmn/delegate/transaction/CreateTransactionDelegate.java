@@ -13,7 +13,6 @@ import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
-import org.camunda.bpm.engine.variable.value.LongValue;
 
 /**
  * Delegate for creating a transaction in the system.
@@ -85,8 +84,8 @@ public class CreateTransactionDelegate implements JavaDelegate, JavaBean {
     }
 
     private Account lookupAccount(DelegateExecution execution, String variableName) {
-        var accountId = execution.<LongValue>getVariableLocalTyped(variableName).getValue();
-        return accountProvider.lookup(accountId)
+        var accountId = (Number) execution.getVariableLocal(variableName);
+        return accountProvider.lookup(accountId.longValue())
                 .getOrThrow(() -> new IllegalStateException("Unable to find account with id " + accountId));
     }
 
