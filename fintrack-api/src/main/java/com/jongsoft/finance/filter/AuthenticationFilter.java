@@ -57,7 +57,11 @@ public class AuthenticationFilter implements HttpServerFilter {
                                     .recover(Throwable::getMessage).get())
                             .log("{}: {} in {} ms, with request body {}.");
                 } else {
-                    log.info("{}: {} in {} ms", request.getMethod(), request.getPath(), Duration.between(startTime, Instant.now()).toMillis());
+                    log.info("{}: {} in {} ms - Status Code {}.",
+                            request.getMethod(),
+                            request.getPath(),
+                            Duration.between(startTime, Instant.now()).toMillis(),
+                            response.status());
                 }
             }
         });
