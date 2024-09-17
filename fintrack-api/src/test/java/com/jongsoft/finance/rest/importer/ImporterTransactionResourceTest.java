@@ -5,11 +5,11 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.TestSetup;
+import com.jongsoft.finance.rest.process.RuntimeResource;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.hamcrest.Matchers;
@@ -29,6 +29,12 @@ class ImporterTransactionResourceTest extends TestSetup {
     @MockBean
     TransactionProvider transactionProvider() {
         return Mockito.mock(TransactionProvider.class);
+    }
+
+    @Replaces
+    @MockBean
+    RuntimeResource runtimeResource() {
+        return Mockito.mock(RuntimeResource.class);
     }
 
     @Test
