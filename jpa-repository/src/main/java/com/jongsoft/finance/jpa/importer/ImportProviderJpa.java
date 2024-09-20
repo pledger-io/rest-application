@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.importer;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ReadOnly
 @Singleton
+@RequiresJpa
 public class ImportProviderJpa implements ImportProvider {
 
     private final AuthenticationFacade authenticationFacade;

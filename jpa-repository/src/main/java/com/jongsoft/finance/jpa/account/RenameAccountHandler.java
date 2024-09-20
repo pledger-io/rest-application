@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.currency.CurrencyJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class RenameAccountHandler implements CommandHandler<RenameAccountCommand> {
 

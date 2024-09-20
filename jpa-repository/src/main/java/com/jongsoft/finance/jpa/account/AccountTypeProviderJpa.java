@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.lang.collection.Sequence;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 @ReadOnly
 @Singleton
+@RequiresJpa
 @Named("accountTypeProvider")
 public class AccountTypeProviderJpa implements AccountTypeProvider {
 

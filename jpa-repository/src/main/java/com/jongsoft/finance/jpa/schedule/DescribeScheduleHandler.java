@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.schedule;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class DescribeScheduleHandler implements CommandHandler<DescribeScheduleCommand> {
 
@@ -27,7 +29,7 @@ public class DescribeScheduleHandler implements CommandHandler<DescribeScheduleC
         log.info("[{}] - Processing schedule describe event", command.id());
 
         var hql = """
-                update ScheduledTransactionJpa 
+                update ScheduledTransactionJpa
                 set description = :description,
                     name = :name
                 where id = :id""";

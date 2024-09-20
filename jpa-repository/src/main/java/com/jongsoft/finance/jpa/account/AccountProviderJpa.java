@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.account.Account;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @ReadOnly
 @Singleton
+@RequiresJpa
 @Named("accountProvider")
 public class AccountProviderJpa implements AccountProvider {
 
@@ -67,9 +69,9 @@ public class AccountProviderJpa implements AccountProvider {
         log.trace("Account listing");
 
         String hql = """
-                select a 
+                select a
                 from AccountJpa a
-                where a.user.username = :username 
+                where a.user.username = :username
                   and a.archived = false""";
 
         return entityManager.<AccountJpa>blocking()
@@ -114,9 +116,9 @@ public class AccountProviderJpa implements AccountProvider {
         log.trace("Account type lookup: {}", accountType);
 
         var hql = """
-                select a 
+                select a
                 from AccountJpa a
-                where 
+                where
                     a.type.label = :label
                     and a.user.username = :username
                     and a.archived = false""";

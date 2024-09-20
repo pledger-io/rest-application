@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 @MicronautTest(
-        environments = "application"
+        environments = {"application", "h2"}
 )
 public abstract class JpaTestSetup {
 
@@ -36,7 +36,7 @@ public abstract class JpaTestSetup {
 
                 var stream = getClass().getClassLoader().getResourceAsStream(file);
                 if (stream == null) {
-                    Assertions.assertFalse(true, "Could not load dataset " + file);
+                    Assertions.fail("Could not load dataset " + file);
                 }
 
                 var sql = IOUtils.readText(new BufferedReader(new InputStreamReader(stream)));

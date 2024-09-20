@@ -11,8 +11,7 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.*;
-import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
@@ -39,17 +38,13 @@ public class TestSetup {
     protected final UserAccount ACTIVE_USER = Mockito.spy(UserAccount.builder()
             .id(1L)
             .username("test-user")
-            .password("1234")
+            .password("$2a$10$mgkjpf4nZqCLqAzFCjv5F.2Sj1b8k7yFJZVM0MZ4J9dJKzgBYPKDi")
             .theme("dark")
             .primaryCurrency(Currency.getInstance("EUR"))
             .secret(new DefaultSecretGenerator().generate())
-            .roles(Collections.List(new Role("admin")))
+            .roles(Collections.List(new Role(AuthenticationRoles.IS_ADMIN), new Role(AuthenticationRoles.IS_AUTHENTICATED)))
             .build());
 
-    @Inject
-    protected CurrentUserProvider currentUserProvider;
-    @Inject
-    protected AuthenticationFacade authenticationFacade;
     @Inject
     protected UserProvider userProvider;
     @Inject
@@ -81,10 +76,9 @@ public class TestSetup {
                                         ))
                         .logConfig(RestAssured.config().getLogConfig()
                                 .enableLoggingOfRequestAndResponseIfValidationFails()))
+                .addHeader("Authorization", "Basic dGVzdC11c2VyOjEyMzQ=")
                 .build();
 
-        Mockito.when(currentUserProvider.currentUser()).thenReturn(ACTIVE_USER);
-        Mockito.when(authenticationFacade.authenticated()).thenReturn("test-user");
         Mockito.when(userProvider.lookup(ACTIVE_USER.getUsername())).thenReturn(Control.Option(ACTIVE_USER));
 
         // initialize the event bus
@@ -93,25 +87,22 @@ public class TestSetup {
 
     @AfterEach
     void after() {
-        Mockito.reset(currentUserProvider, userProvider, filterFactory);
+        Mockito.reset(userProvider, filterFactory);
     }
 
-    @Replaces
-    @MockBean
-    CurrentUserProvider currentUserProvider() {
-        return Mockito.mock(CurrentUserProvider.class);
-    }
-
-    @Replaces
-    @MockBean
-    AuthenticationFacade authenticationFacade() {
-        return Mockito.mock(AuthenticationFacade.class);
-    }
-
-    @Replaces
     @MockBean
     UserProvider userProvider() {
         return Mockito.mock(UserProvider.class);
+    }
+
+    @MockBean
+    CurrencyProvider currencyProvider() {
+        return Mockito.mock(CurrencyProvider.class);
+    }
+
+    @MockBean
+    SettingProvider settingProvider() {
+        return Mockito.mock(SettingProvider.class);
     }
 
     @MockBean

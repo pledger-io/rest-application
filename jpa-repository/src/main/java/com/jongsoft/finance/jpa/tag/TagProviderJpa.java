@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.tag;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ReadOnly
 @Singleton
+@RequiresJpa
 @Named("tagProvider")
 public class TagProviderJpa implements TagProvider {
 

@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class DescribeTransactionHandler implements CommandHandler<DescribeTransactionCommand> {
 
@@ -26,7 +28,7 @@ public class DescribeTransactionHandler implements CommandHandler<DescribeTransa
     public void handle(DescribeTransactionCommand command) {
         log.info("[{}] - Processing transaction describe event", command.id());
         var hqlTransaction = """
-                update TransactionJournal 
+                update TransactionJournal
                 set description = :description
                 where id = :id""";
 

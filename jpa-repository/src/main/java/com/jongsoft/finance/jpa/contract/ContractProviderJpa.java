@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.contract;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.user.UserAccount;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ReadOnly
+@RequiresJpa
 @Singleton
 public class ContractProviderJpa implements ContractProvider {
 

@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.schedule;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 
 @ReadOnly
 @Singleton
+@RequiresJpa
 @Named("transactionScheduleProvider")
 public class TransactionScheduleProviderJpa implements TransactionScheduleProvider {
 

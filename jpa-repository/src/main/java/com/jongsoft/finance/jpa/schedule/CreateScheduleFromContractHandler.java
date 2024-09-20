@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.schedule;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.account.AccountJpa;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class CreateScheduleFromContractHandler implements CommandHandler<CreateScheduleForContractCommand> {
 

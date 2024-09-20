@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.budget.ExpenseJpa;
 import com.jongsoft.finance.jpa.category.CategoryJpa;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class LinkTransactionHandler implements CommandHandler<LinkTransactionCommand> {
 
@@ -65,7 +67,7 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
 
     private CategoryJpa category(String label) {
         var hql = """
-                select c from CategoryJpa c 
+                select c from CategoryJpa c
                 where c.label = :label and c.user.username = :username""";
         return entityManager.<CategoryJpa>blocking()
                 .hql(hql)

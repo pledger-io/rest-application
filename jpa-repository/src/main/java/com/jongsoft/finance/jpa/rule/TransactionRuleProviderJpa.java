@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.rule;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
@@ -19,6 +20,7 @@ import java.util.Optional;
 
 @Singleton
 @Transactional
+@RequiresJpa
 @Named("transactionRuleProvider")
 public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 
@@ -77,7 +79,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
         int sortOrder = rule.getSort();
         if (rule.getId() == null || rule.getSort() == 0) {
             var hql = """
-                    select max(sort) + 1 from RuleJpa 
+                    select max(sort) + 1 from RuleJpa
                     where user.username = :username and archived = false and group.name = :group""";
 
             sortOrder = entityManager.<Integer>blocking()

@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.category;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.domain.user.UserAccount;
@@ -15,6 +16,7 @@ import jakarta.inject.Singleton;
 
 @ReadOnly
 @Singleton
+@RequiresJpa
 @Named("categoryProvider")
 public class CategoryProviderJpa implements CategoryProvider {
 
@@ -60,7 +62,7 @@ public class CategoryProviderJpa implements CategoryProvider {
             return entityManager.<CategoryJpa>blocking()
                     .hql(delegate.generateHql())
                     .setAll(delegate.getParameters())
-                    .limit(((CategoryFilterCommand) filterCommand).pageSize())
+                    .limit(delegate.pageSize())
                     .offset(delegate.pageSize() * delegate.page())
                     .page()
                     .map(this::convert);

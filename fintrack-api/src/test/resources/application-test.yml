@@ -15,4 +15,10 @@ micronaut:
   server:
     log-handled-exceptions: true
   security:
-    enabled: false
+    basic-auth:
+      enabled: true
+    token:
+      jwt:
+        enabled: false
+        bearer:
+          enabled: false

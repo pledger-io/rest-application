@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.budget;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
@@ -13,6 +14,7 @@ import jakarta.inject.Singleton;
 
 @ReadOnly
 @Singleton
+@RequiresJpa
 @Named("budgetProvider")
 public class BudgetProviderJpa implements BudgetProvider {
 

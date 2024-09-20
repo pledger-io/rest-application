@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -30,6 +31,7 @@ import java.util.Objects;
 @Slf4j
 @ReadOnly
 @Singleton
+@RequiresJpa
 @Named("transactionProvider")
 public class TransactionProviderJpa implements TransactionProvider {
 
@@ -157,18 +159,18 @@ public class TransactionProviderJpa implements TransactionProvider {
     @Override
     public Sequence<Transaction> similar(EntityRef from, EntityRef to, double amount, LocalDate date) {
         var hql = """
-                select distinct t from TransactionJournal t 
-                where t.user.username = :username 
+                select distinct t from TransactionJournal t
+                where t.user.username = :username
                     and t.date = :date
                     and exists (
-                        select 1 from t.transactions tj 
-                        where abs(tj.amount) = abs(:amount) 
+                        select 1 from t.transactions tj
+                        where abs(tj.amount) = abs(:amount)
                             and tj.account.id = :fromAccount
                             and tj.deleted is null)
                     and exists (
                         select 1 from t.transactions tj
                         where abs(tj.amount) = abs(:amount)
-                            and tj.account.id = :toAccount 
+                            and tj.account.id = :toAccount
                             and tj.deleted is null)""";
 
         return entityManager.<TransactionJournal>blocking()
