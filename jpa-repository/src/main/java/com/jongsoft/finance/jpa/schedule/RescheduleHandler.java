@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.schedule;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class RescheduleHandler implements CommandHandler<RescheduleCommand> {
 
@@ -27,7 +29,7 @@ public class RescheduleHandler implements CommandHandler<RescheduleCommand> {
         log.info("[{}] - Processing schedule reschedule event", command.id());
 
         var hql = """
-                update ScheduledTransactionJpa 
+                update ScheduledTransactionJpa
                 set interval = :interval,
                     periodicity = :periodicity
                 where id = :id""";

@@ -1,10 +1,12 @@
 package com.jongsoft.finance.jpa.category;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.jpa.core.FilterCommandJpa;
 import com.jongsoft.finance.providers.CategoryProvider;
 import jakarta.inject.Singleton;
 
 @Singleton
+@RequiresJpa
 public class CategoryFilterCommand extends FilterCommandJpa implements CategoryProvider.FilterCommand {
     
     private int page;

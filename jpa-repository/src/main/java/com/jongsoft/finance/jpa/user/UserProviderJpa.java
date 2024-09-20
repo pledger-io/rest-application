@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.user;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.domain.user.UserAccount;
@@ -22,6 +23,7 @@ import java.util.Currency;
 
 @Singleton
 @ReadOnly
+@RequiresJpa
 @Named("userProvider")
 public class UserProviderJpa implements UserProvider {
 

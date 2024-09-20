@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.core.TransactionType;
 import com.jongsoft.finance.domain.transaction.Transaction;
@@ -29,6 +30,7 @@ import java.util.HashSet;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class CreateTransactionHandler implements CommandHandler<CreateTransactionCommand>, TransactionCreationHandler {
 
@@ -102,7 +104,7 @@ public class CreateTransactionHandler implements CommandHandler<CreateTransactio
 
     private CategoryJpa category(String label) {
         var hql = """
-                select c from CategoryJpa c 
+                select c from CategoryJpa c
                 where c.label = :label and c.user.username = :username""";
         return entityManager.<CategoryJpa>blocking()
                 .hql(hql)

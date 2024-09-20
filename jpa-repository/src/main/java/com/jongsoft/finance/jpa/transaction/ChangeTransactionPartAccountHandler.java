@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class ChangeTransactionPartAccountHandler implements CommandHandler<ChangeTransactionPartAccount> {
 
@@ -27,7 +29,7 @@ public class ChangeTransactionPartAccountHandler implements CommandHandler<Chang
         log.info("[{}] - Processing transaction account change", command.id());
 
         var hql = """
-                update TransactionJpa 
+                update TransactionJpa
                 set account.id = :accountId
                 where id = :id""";
 

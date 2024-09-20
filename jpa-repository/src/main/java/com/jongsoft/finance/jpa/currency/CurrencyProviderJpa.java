@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.currency;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.CurrencyProvider;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @ReadOnly
 @Singleton
+@RequiresJpa
 public class CurrencyProviderJpa implements CurrencyProvider {
 
     private final ReactiveEntityManager entityManager;
@@ -51,7 +53,7 @@ public class CurrencyProviderJpa implements CurrencyProvider {
         log.trace("Currency listing");
 
         var hql = """
-                select c from CurrencyJpa c 
+                select c from CurrencyJpa c
                 where c.archived = false""";
 
         return entityManager.<CurrencyJpa>blocking()

@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.jpa.account.AccountJpa;
@@ -18,6 +19,7 @@ import java.util.Objects;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class SplitTransactionHandler implements CommandHandler<SplitTransactionCommand> {
 
@@ -46,7 +48,7 @@ public class SplitTransactionHandler implements CommandHandler<SplitTransactionC
                 .reject(t -> survivors.contains(t.getId()))
                 .map(TransactionJpa::getId);
         var deleteHql = """
-                update TransactionJpa 
+                update TransactionJpa
                 set deleted = :now
                 where id in (:ids)""";
 

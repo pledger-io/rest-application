@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class RegisterFailureHandler implements CommandHandler<RegisterFailureCommand> {
 
@@ -27,7 +29,7 @@ public class RegisterFailureHandler implements CommandHandler<RegisterFailureCom
         log.info("[{}] - Processing transaction failed register event", command.id());
 
         var hql = """
-                update TransactionJournal 
+                update TransactionJournal
                 set failureCode = :failureCode
                 where id = :id""";
 

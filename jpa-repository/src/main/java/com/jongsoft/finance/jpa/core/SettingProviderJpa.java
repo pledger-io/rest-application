@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.core;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.core.Setting;
 import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ReadOnly
+@RequiresJpa
 @Singleton
 public class SettingProviderJpa implements SettingProvider {
 

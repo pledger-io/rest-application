@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.importer;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.importer.entity.ImportConfig;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ReadOnly
+@RequiresJpa
 @Singleton
 public class ImportConfigurationProviderJpa implements ImportConfigurationProvider {
 

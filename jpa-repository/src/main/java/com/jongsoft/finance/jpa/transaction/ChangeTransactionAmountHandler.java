@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.currency.CurrencyJpa;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class ChangeTransactionAmountHandler implements CommandHandler<ChangeTransactionAmountCommand> {
 
@@ -29,8 +31,8 @@ public class ChangeTransactionAmountHandler implements CommandHandler<ChangeTran
         log.info("[{}] - Processing transaction amount change event", command.id());
 
         var hql = """
-                update TransactionJpa 
-                set amount = case when amount >= 0 
+                update TransactionJpa
+                set amount = case when amount >= 0
                                 then :amount 
                                 else :negAmount end
                 where journal.id = :id""";
@@ -43,7 +45,7 @@ public class ChangeTransactionAmountHandler implements CommandHandler<ChangeTran
                 .execute();
 
         var hqlTransaction = """
-                update TransactionJournal 
+                update TransactionJournal
                 set currency = :currency
                 where id = :id""";
 

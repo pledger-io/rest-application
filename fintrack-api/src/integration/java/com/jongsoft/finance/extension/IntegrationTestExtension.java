@@ -30,7 +30,7 @@ public class IntegrationTestExtension implements ParameterResolver, BeforeAllCal
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        applicationContext = ApplicationContext.run("test");
+        applicationContext = ApplicationContext.run("test", "h2");
         Control.Option(applicationContext.getBean(EmbeddedApplication.class))
                 .ifPresent(ApplicationContextLifeCycle::start);
         Control.Option(applicationContext.getBean(EmbeddedServer.class))

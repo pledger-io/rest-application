@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.currency;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class RenameCurrencyHandler implements CommandHandler<RenameCurrencyCommand> {
 
@@ -27,7 +29,7 @@ public class RenameCurrencyHandler implements CommandHandler<RenameCurrencyComma
         log.info("[{}] - Processing currency rename event", command.id());
 
         var hql = """
-                update CurrencyJpa c 
+                update CurrencyJpa c
                 set c.name = :name,
                     c.code = :code,
                     c.symbol = :symbol

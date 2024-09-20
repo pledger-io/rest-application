@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class ChangeAccountInterestHandler implements CommandHandler<ChangeInterestCommand> {
 
@@ -27,7 +29,7 @@ public class ChangeAccountInterestHandler implements CommandHandler<ChangeIntere
         log.info("[{}] - Processing account interest event", command.id());
 
         var hql = """
-                update AccountJpa 
+                update AccountJpa
                 set interest = :interest,
                     interestPeriodicity = :periodicity
                 where id = :id""";

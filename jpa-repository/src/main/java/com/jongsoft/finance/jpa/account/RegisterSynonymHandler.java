@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.account;
 
+import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@RequiresJpa
 @Transactional
 public class RegisterSynonymHandler implements CommandHandler<RegisterSynonymCommand> {
 
@@ -47,8 +49,8 @@ public class RegisterSynonymHandler implements CommandHandler<RegisterSynonymCom
 
         if (existingId.isPresent()) {
             var updateHql = """
-                    update AccountSynonymJpa 
-                    set account = :account 
+                    update AccountSynonymJpa
+                    set account = :account
                     where id = :id""";
 
             entityManager.update()

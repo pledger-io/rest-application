@@ -1,7 +1,8 @@
-package com.jongsoft.finance.bpmn.process;
+package com.jongsoft.finance.bpmn.feature.junit;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.core.DataSourceMigration;
 import com.jongsoft.finance.core.MailDaemon;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.FinTrack;
@@ -72,12 +73,13 @@ public class RuntimeContext {
                 .password("12345")
                 .roles(Collections.List(new Role("admin")))
                 .build());
+        getOrInstantiateBean(DataSourceMigration.class);
         this.processEngine = applicationContext.getBean(ProcessEngine.class);
-        this.applicationEventPublisher = Mockito.spy(applicationContext.getBean(ApplicationEventPublisher.class));
+        this.applicationEventPublisher = Mockito.spy(getOrInstantiateBean(ApplicationEventPublisher.class));
         idGenerator = new MutableLong(100);
         registeredBudgets = new ArrayList<>();
 
-        setupDefaultMocks();
+        resetMocks();
     }
 
     void clean() {
@@ -89,7 +91,7 @@ public class RuntimeContext {
     public RuntimeContext withoutUser() {
         userAccount = null;
 
-        Mockito.when(applicationContext.getBean(FinTrack.class).createUser(Mockito.anyString(), Mockito.anyString()))
+        Mockito.when(getOrInstantiateBean(FinTrack.class).createUser(Mockito.anyString(), Mockito.anyString()))
                 .thenAnswer((Answer<UserAccount>) invocation -> {
                     String username = invocation.getArgument(0);
                     String password = invocation.getArgument(1);
@@ -100,7 +102,7 @@ public class RuntimeContext {
                             .roles(Collections.List(new Role("user")))
                             .build();
 
-                    Mockito.when(applicationContext.getBean(UserProvider.class).lookup(username))
+                    Mockito.when(getOrInstantiateBean(UserProvider.class).lookup(username))
                             .thenReturn(Control.Option(user));
                     return user;
                 });
@@ -109,7 +111,7 @@ public class RuntimeContext {
     }
 
     public RuntimeContext withStorage() {
-        var storageService = applicationContext.getBean(StorageService.class);
+        var storageService = getOrInstantiateBean(StorageService.class);
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);
             String token = UUID.randomUUID().toString();
@@ -126,7 +128,7 @@ public class RuntimeContext {
                 .map(stream -> Control.Try(stream::readAllBytes).get())
                 .getOrThrow(() -> new IllegalStateException("Cannot read resource " + resource));
 
-        Mockito.when(applicationContext.getBean(StorageService.class).read(token))
+        Mockito.when(getOrInstantiateBean(StorageService.class).read(token))
                 .thenReturn(Control.Option(bytes));
 
         return this;
@@ -134,7 +136,7 @@ public class RuntimeContext {
 
     @SuppressWarnings("unchecked")
     public RuntimeContext withBudgets() {
-        var budgetProvider = applicationContext.getBean(BudgetProvider.class);
+        var budgetProvider = getOrInstantiateBean(BudgetProvider.class);
         Mockito.when(budgetProvider.lookup(Mockito.anyInt(), Mockito.anyInt()))
                 .thenAnswer(invocation -> {
                     var date = LocalDate.of(invocation.getArgument(0), invocation.getArgument(1, Integer.class), 1);
@@ -161,15 +163,15 @@ public class RuntimeContext {
     }
 
     public RuntimeContext withBudget(int year, int month, Budget budget) {
-        var budgetProvider = applicationContext.getBean(BudgetProvider.class);
+        var budgetProvider = getOrInstantiateBean(BudgetProvider.class);
         Mockito.when(budgetProvider.lookup(year, month))
                 .thenReturn(Control.Option(budget));
         return this;
     }
 
     public RuntimeContext withTransactions() {
-        var transactionProvider = applicationContext.getBean(TransactionProvider.class);
-        var transactionCreationHandler = applicationContext.getBean(TransactionCreationHandler.class);
+        var transactionProvider = getOrInstantiateBean(TransactionProvider.class);
+        var transactionCreationHandler = getOrInstantiateBean(TransactionCreationHandler.class);
 
         Mockito.doAnswer((Answer<Long>) invocation -> {
             CreateTransactionCommand event = invocation.getArgument(0);
@@ -186,24 +188,24 @@ public class RuntimeContext {
     }
 
     public RuntimeContext withTransactionSchedule(ScheduledTransaction scheduledTransaction) {
-        var transactionProvider = applicationContext.getBean(TransactionScheduleProvider.class);
+        var transactionProvider = getOrInstantiateBean(TransactionScheduleProvider.class);
         Mockito.when(transactionProvider.lookup(scheduledTransaction.getId()))
                 .thenReturn(Control.Option(scheduledTransaction));
         return this;
     }
 
     public OngoingStubbing<ResultPage<Transaction>> withTransactionPages() {
-        var transactionProvider = applicationContext.getBean(TransactionProvider.class);
+        var transactionProvider = getOrInstantiateBean(TransactionProvider.class);
         return Mockito.when(transactionProvider.lookup(Mockito.any(TransactionProvider.FilterCommand.class)));
     }
 
     public OngoingStubbing<Optional<BigDecimal>> withBalance() {
-        var transactionProvider = applicationContext.getBean(TransactionProvider.class);
+        var transactionProvider = getOrInstantiateBean(TransactionProvider.class);
         return Mockito.when(transactionProvider.balance(Mockito.any(TransactionProvider.FilterCommand.class)));
     }
 
     public RuntimeContext withTags() {
-        var tagProvider = applicationContext.getBean(TagProvider.class);
+        var tagProvider = getOrInstantiateBean(TagProvider.class);
 
         Mockito.when(userAccount.createTag(Mockito.anyString()))
                 .thenAnswer((Answer<Tag>) invocation -> {
@@ -216,7 +218,7 @@ public class RuntimeContext {
     }
 
     public RuntimeContext withAccounts() {
-        var accountProvider = applicationContext.getBean(AccountProvider.class);
+        var accountProvider = getOrInstantiateBean(AccountProvider.class);
 
         Mockito.when(userAccount.createAccount(Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenAnswer((Answer<Account>) invocation -> {
@@ -238,15 +240,15 @@ public class RuntimeContext {
     }
 
     public RuntimeContext withAccount(Account account) {
-        Mockito.when(applicationContext.getBean(AccountProvider.class).lookup(account.getName()))
+        Mockito.when(getOrInstantiateBean(AccountProvider.class).lookup(account.getName()))
                 .thenReturn(Control.Option(account));
-        Mockito.when(applicationContext.getBean(AccountProvider.class).lookup(account.getId()))
+        Mockito.when(getOrInstantiateBean(AccountProvider.class).lookup(account.getId()))
                 .thenReturn(Control.Option(account));
         return this;
     }
 
     public RuntimeContext withReconcileAccount() {
-        var accountProvider = applicationContext.getBean(AccountProvider.class);
+        var accountProvider = getOrInstantiateBean(AccountProvider.class);
         var reconcileAccount = Account.builder().id(99L)
                 .type("reconcile")
                 .name("Reconcile account")
@@ -264,22 +266,22 @@ public class RuntimeContext {
                 .label(name)
                 .build();
 
-        Mockito.when(applicationContext.getBean(CategoryProvider.class).lookup(category.getLabel()))
+        Mockito.when(getOrInstantiateBean(CategoryProvider.class).lookup(category.getLabel()))
                 .thenReturn(Control.Option(category));
-        Mockito.when(applicationContext.getBean(CategoryProvider.class).lookup(category.getId()))
+        Mockito.when(getOrInstantiateBean(CategoryProvider.class).lookup(category.getId()))
                 .thenReturn(Control.Option(category));
 
         return this;
     }
 
     public RuntimeContext withImportJob(BatchImport batchImport) {
-        Mockito.when(applicationContext.getBean(ImportProvider.class).lookup(batchImport.getSlug()))
+        Mockito.when(getOrInstantiateBean(ImportProvider.class).lookup(batchImport.getSlug()))
                 .thenReturn(Control.Option(batchImport));
         return this;
     }
 
     public RuntimeContext withContract(Contract contract) {
-        Mockito.when(applicationContext.getBean(ContractProvider.class).lookup(contract.getId()))
+        Mockito.when(getOrInstantiateBean(ContractProvider.class).lookup(contract.getId()))
                 .thenReturn(Control.Option(contract));
         return this;
     }
@@ -313,7 +315,7 @@ public class RuntimeContext {
      * @return the RuntimeContext instance
      */
     public RuntimeContext verifyTransactions(Consumer<ListAssert<Transaction>> validations) {
-        var createdTransactions = Mockito.mockingDetails(applicationContext.getBean(TransactionCreationHandler.class)).getInvocations().stream()
+        var createdTransactions = Mockito.mockingDetails(getOrInstantiateBean(TransactionCreationHandler.class)).getInvocations().stream()
                 .filter(invocation -> invocation.getMethod().getName().equals("handleCreatedEvent"))
                 .map(invocation -> invocation.getArgument(0, CreateTransactionCommand.class))
                 .map(CreateTransactionCommand::transaction)
@@ -331,7 +333,7 @@ public class RuntimeContext {
      */
     public RuntimeContext verifyStorageCleaned() {
         storageTokens.forEach(token ->
-                Mockito.verify(applicationContext.getBean(StorageService.class)).remove(token));
+                Mockito.verify(getOrInstantiateBean(StorageService.class)).remove(token));
         return this;
     }
 
@@ -353,7 +355,7 @@ public class RuntimeContext {
     }
 
     public RuntimeContext verifyRuleCreated(String name, Consumer<ObjectAssert<TransactionRule>> validations) {
-        var matchedRule = Mockito.mockingDetails(applicationContext.getBean(TransactionRuleProvider.class))
+        var matchedRule = Mockito.mockingDetails(getOrInstantiateBean(TransactionRuleProvider.class))
                 .getInvocations().stream()
                 .filter(invocation -> invocation.getMethod().getName().equals("save"))
                 .map(invocation -> invocation.getArgument(0, TransactionRule.class))
@@ -369,7 +371,7 @@ public class RuntimeContext {
 
     public RuntimeContext verifyMailSent(String emailAddress, String template, Consumer<MapAssert<?, ?>> properties) {
         var argumentCaptor = ArgumentCaptor.forClass(Properties.class);
-        Mockito.verify(applicationContext.getBean(MailDaemon.class))
+        Mockito.verify(getOrInstantiateBean(MailDaemon.class))
                 .send(Mockito.eq(emailAddress), Mockito.eq(template), argumentCaptor.capture());
 
         properties.accept(Assertions.assertThat(argumentCaptor.getValue()));
@@ -383,43 +385,53 @@ public class RuntimeContext {
     }
 
     public <T> T verifyInteraction(Class<T> type) {
-        return Mockito.verify(applicationContext.getBean(type));
+        return Mockito.verify(getOrInstantiateBean(type));
     }
 
     void resetMocks() {
         Mockito.reset(
-                applicationContext.getBean(BudgetProvider.class),
-                applicationContext.getBean(AuthenticationFacade.class),
-                applicationContext.getBean(CurrentUserProvider.class),
-                applicationContext.getBean(AccountProvider.class),
-                applicationContext.getBean(TransactionProvider.class),
-                applicationContext.getBean(ImportProvider.class),
-                applicationContext.getBean(TransactionCreationHandler.class),
-                applicationContext.getBean(TransactionRuleProvider.class),
-                applicationContext.getBean(CategoryProvider.class),
-                applicationContext.getBean(StorageService.class),
-                applicationContext.getBean(TransactionScheduleProvider.class),
-                applicationContext.getBean(UserProvider.class),
+                getOrInstantiateBean(MailDaemon.class),
+                getOrInstantiateBean(ContractProvider.class),
+                getOrInstantiateBean(SettingProvider.class),
+                getOrInstantiateBean(BudgetProvider.class),
+                getOrInstantiateBean(AuthenticationFacade.class),
+                getOrInstantiateBean(CurrentUserProvider.class),
+                getOrInstantiateBean(AccountProvider.class),
+                getOrInstantiateBean(TransactionProvider.class),
+                getOrInstantiateBean(ImportProvider.class),
+                getOrInstantiateBean(TransactionCreationHandler.class),
+                getOrInstantiateBean(TransactionRuleProvider.class),
+                getOrInstantiateBean(CategoryProvider.class),
+                getOrInstantiateBean(StorageService.class),
+                getOrInstantiateBean(TransactionScheduleProvider.class),
+                getOrInstantiateBean(UserProvider.class),
                 userAccount);
 
         setupDefaultMocks();
     }
 
     private void setupDefaultMocks() {
-        Mockito.when(applicationContext.getBean(AuthenticationFacade.class).authenticated())
+        Mockito.when(getOrInstantiateBean(AuthenticationFacade.class).authenticated())
                 .thenReturn("test-user");
-        Mockito.when(applicationContext.getBean(CurrentUserProvider.class).currentUser())
+        Mockito.when(getOrInstantiateBean(CurrentUserProvider.class).currentUser())
                 .thenReturn(userAccount);
-        Mockito.when(applicationContext.getBean(UserProvider.class).available(Mockito.anyString()))
+        Mockito.when(getOrInstantiateBean(UserProvider.class).available(Mockito.anyString()))
                 .thenReturn(true);
-        Mockito.when(applicationContext.getBean(UserProvider.class).available("test-user"))
+        Mockito.when(getOrInstantiateBean(UserProvider.class).available("test-user"))
                 .thenReturn(false);
 
         new EventBus(applicationEventPublisher);
 
         // Prepare the mocks for the filter factory
-        var filterFactory = applicationContext.getBean(FilterFactory.class);
+        var filterFactory = getOrInstantiateBean(FilterFactory.class);
         Mockito.when(filterFactory.account()).thenReturn(Mockito.mock(AccountProvider.FilterCommand.class, Mockito.RETURNS_DEEP_STUBS));
         Mockito.when(filterFactory.transaction()).thenReturn(Mockito.mock(TransactionProvider.FilterCommand.class, Mockito.RETURNS_DEEP_STUBS));
+    }
+
+    private <T> T getOrInstantiateBean(Class<T> type) {
+        if (!applicationContext.containsBean(type)) {
+            applicationContext.registerSingleton(Mockito.mock(type), true);
+        }
+        return applicationContext.getBean(type);
     }
 }
