@@ -1,7 +1,7 @@
-package com.jongsoft.finance.bpmn;
+package com.jongsoft.finance.bpmn.feature;
 
-import com.jongsoft.finance.bpmn.process.ProcessExtension;
-import com.jongsoft.finance.bpmn.process.RuntimeContext;
+import com.jongsoft.finance.bpmn.feature.junit.ProcessExtension;
+import com.jongsoft.finance.bpmn.feature.junit.RuntimeContext;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.lang.Control;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;

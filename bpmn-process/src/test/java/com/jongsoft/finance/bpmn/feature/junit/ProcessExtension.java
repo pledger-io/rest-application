@@ -1,4 +1,4 @@
-package com.jongsoft.finance.bpmn.process;
+package com.jongsoft.finance.bpmn.feature.junit;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 

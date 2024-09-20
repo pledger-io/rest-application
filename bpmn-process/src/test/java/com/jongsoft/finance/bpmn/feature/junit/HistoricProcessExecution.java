@@ -1,4 +1,4 @@
-package com.jongsoft.finance.bpmn.process;
+package com.jongsoft.finance.bpmn.feature.junit;
 
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.ProcessEngine;
