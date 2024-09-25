@@ -32,7 +32,7 @@ dependencyResolutionManagement {
             library("csv", "com.opencsv", "opencsv").version("5.9")
 
             // testing dependencies
-            version("junit.version", "5.11.0")
+            version("junit.version", "5.11.1")
             library("junit.jupiter", "org.junit.jupiter", "junit-jupiter-api").versionRef("junit.version")
             library("assertj","org.assertj", "assertj-core").version("3.26.3")
             library("mockito","org.mockito", "mockito-core").version("5.13.0")
