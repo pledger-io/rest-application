@@ -76,13 +76,13 @@ public class AccountTransactionResource {
         var command = filterFactory.transaction()
                 .accounts(Collections.List(new EntityRef(accountId)))
                 .range(Dates.range(
-                        request.getDateRange().start(),
-                        request.getDateRange().end()))
+                        request.dateRange().start(),
+                        request.dateRange().end()))
                 .pageSize(settingProvider.getPageSize())
                 .page(request.getPage());
 
-        if (request.getText() != null) {
-            command.description(request.getText(), false);
+        if (request.text() != null) {
+            command.description(request.text(), false);
         }
 
         var results = transactionProvider.lookup(command)
@@ -106,29 +106,29 @@ public class AccountTransactionResource {
             }
     )
     void create(@Valid @Body AccountTransactionCreateRequest request) {
-        Account fromAccount = accountProvider.lookup(request.getSource().id()).get();
-        Account toAccount = accountProvider.lookup(request.getDestination().id()).get();
+        Account fromAccount = accountProvider.lookup(request.source().id()).get();
+        Account toAccount = accountProvider.lookup(request.destination().id()).get();
 
         final Consumer<Transaction.TransactionBuilder> builderConsumer =
-                transactionBuilder -> transactionBuilder.currency(request.getCurrency())
-                        .description(request.getDescription())
-                        .budget(Control.Option(request.getBudget())
+                transactionBuilder -> transactionBuilder.currency(request.currency())
+                        .description(request.description())
+                        .budget(Control.Option(request.budget())
                                 .map(AccountTransactionCreateRequest.EntityRef::name)
                                 .getOrSupply(() -> null))
-                        .category(Control.Option(request.getCategory())
+                        .category(Control.Option(request.category())
                                 .map(AccountTransactionCreateRequest.EntityRef::name)
                                 .getOrSupply(() -> null))
-                        .contract(Control.Option(request.getContract())
+                        .contract(Control.Option(request.contract())
                                 .map(AccountTransactionCreateRequest.EntityRef::name)
                                 .getOrSupply(() -> null))
-                        .date(request.getDate())
-                        .bookDate(request.getBookDate())
-                        .interestDate(request.getInterestDate())
-                        .tags(Control.Option(request.getTags()).map(Collections::List).getOrSupply(Collections::List));
+                        .date(request.date())
+                        .bookDate(request.bookDate())
+                        .interestDate(request.interestDate())
+                        .tags(Control.Option(request.tags()).map(Collections::List).getOrSupply(Collections::List));
 
         final Transaction transaction = fromAccount.createTransaction(
                 toAccount,
-                request.getAmount(),
+                request.amount(),
                 determineType(fromAccount, toAccount),
                 builderConsumer);
 
@@ -217,31 +217,31 @@ public class AccountTransactionResource {
         if (!presence.isPresent()) {
             throw StatusException.notFound("No transaction found for id " + transactionId);
         }
-        var fromAccount = accountProvider.lookup(request.getSource().id()).get();
-        var toAccount = accountProvider.lookup(request.getDestination().id()).get();
+        var fromAccount = accountProvider.lookup(request.source().id()).get();
+        var toAccount = accountProvider.lookup(request.destination().id()).get();
         var transaction = presence.get();
 
         transaction.changeAccount(true, fromAccount);
         transaction.changeAccount(false, toAccount);
-        transaction.book(request.getDate(), request.getBookDate(), request.getInterestDate());
-        transaction.describe(request.getDescription());
+        transaction.book(request.date(), request.bookDate(), request.interestDate());
+        transaction.describe(request.description());
 
         if (!transaction.isSplit()) {
-            transaction.changeAmount(request.getAmount(), request.getCurrency());
+            transaction.changeAmount(request.amount(), request.currency());
         }
 
         // update meta-data
-        transaction.linkToBudget(Control.Option(request.getBudget())
+        transaction.linkToBudget(Control.Option(request.budget())
                 .map(AccountTransactionCreateRequest.EntityRef::name)
                 .getOrSupply(() -> null));
-        transaction.linkToCategory(Control.Option(request.getCategory())
+        transaction.linkToCategory(Control.Option(request.category())
                 .map(AccountTransactionCreateRequest.EntityRef::name)
                 .getOrSupply(() -> null));
-        transaction.linkToContract(Control.Option(request.getContract())
+        transaction.linkToContract(Control.Option(request.contract())
                 .map(AccountTransactionCreateRequest.EntityRef::name)
                 .getOrSupply(() -> null));
 
-        Control.Option(request.getTags())
+        Control.Option(request.tags())
                 .map(Collections::List)
                 .ifPresent(transaction::tag);
 

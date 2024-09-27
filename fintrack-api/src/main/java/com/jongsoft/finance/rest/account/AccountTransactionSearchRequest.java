@@ -7,32 +7,16 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Serdeable
-class AccountTransactionSearchRequest {
+record AccountTransactionSearchRequest(
+        String text,
+        @Min(0)
+        int page,
+        @NotNull
+        Range dateRange
+) {
 
     @Serdeable
     public record Range(LocalDate start, LocalDate end) {
-    }
-
-    private String text;
-
-    @Min(0)
-    private int page;
-
-    @NotNull
-    private Range dateRange;
-
-    public AccountTransactionSearchRequest(String text, int page, Range dateRange) {
-        this.text = text;
-        this.page = page;
-        this.dateRange = dateRange;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public Range getDateRange() {
-        return dateRange;
     }
 
     public int getPage() {
