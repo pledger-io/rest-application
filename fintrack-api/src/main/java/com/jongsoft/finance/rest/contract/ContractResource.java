@@ -82,16 +82,16 @@ public class ContractResource {
             operationId = "createContract"
     )
     ContractResponse create(@Body ContractCreateRequest createRequest) {
-        return accountProvider.lookup(createRequest.getCompany().id())
+        return accountProvider.lookup(createRequest.company().id())
                 .map(account -> account.createContract(
-                        createRequest.getName(),
-                        createRequest.getDescription(),
-                        createRequest.getStart(),
-                        createRequest.getEnd()))
-                .map(account -> contractProvider.lookup(createRequest.getName())
+                        createRequest.name(),
+                        createRequest.description(),
+                        createRequest.start(),
+                        createRequest.end()))
+                .map(account -> contractProvider.lookup(createRequest.name())
                         .getOrThrow(() -> StatusException.internalError("Error creating contract")))
                 .map(ContractResponse::new)
-                .getOrThrow(() -> StatusException.notFound("No account can be found for " + createRequest.getCompany().id()));
+                .getOrThrow(() -> StatusException.notFound("No account can be found for " + createRequest.company().id()));
     }
 
     @Post("/{contractId}")
@@ -106,10 +106,10 @@ public class ContractResource {
         return contractProvider.lookup(contractId)
                 .map(contract -> {
                     contract.change(
-                            updateRequest.getName(),
-                            updateRequest.getDescription(),
-                            updateRequest.getStart(),
-                            updateRequest.getEnd());
+                            updateRequest.name(),
+                            updateRequest.description(),
+                            updateRequest.start(),
+                            updateRequest.end());
                     return contract;
                 })
                 .map(ContractResponse::new)
@@ -135,7 +135,7 @@ public class ContractResource {
             parameters = @Parameter(name = "contractId", in = ParameterIn.PATH, schema = @Schema(implementation = Long.class))
     )
     void schedule(@PathVariable long contractId, @Body @Valid CreateScheduleRequest request) {
-        var account = accountProvider.lookup(request.getSource().id())
+        var account = accountProvider.lookup(request.source().id())
                 .getOrThrow(() -> StatusException.badRequest("No source account found with provided id."));
 
         var contract = contractProvider.lookup(contractId)
@@ -144,7 +144,7 @@ public class ContractResource {
         contract.createSchedule(
                 request.getSchedule(),
                 account,
-                request.getAmount());
+                request.amount());
 
         // update the schedule start / end date
         scheduleProvider.lookup(

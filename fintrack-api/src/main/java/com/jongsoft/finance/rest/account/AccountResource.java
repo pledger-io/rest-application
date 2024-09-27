@@ -135,28 +135,28 @@ public class AccountResource {
             description = "This operation will allow for adding new accounts to the system",
             operationId = "createAccount"
     )
-    public AccountResponse create(@Valid @Body AccountEditRequest accountEditRequest) {
-        var existing = accountProvider.lookup(accountEditRequest.getName());
+    AccountResponse create(@Valid @Body AccountEditRequest accountEditRequest) {
+        var existing = accountProvider.lookup(accountEditRequest.name());
 
         if (!existing.isPresent()) {
             currentUserProvider.currentUser()
                     .createAccount(
-                            accountEditRequest.getName(),
-                            accountEditRequest.getCurrency(),
-                            accountEditRequest.getType());
+                            accountEditRequest.name(),
+                            accountEditRequest.currency(),
+                            accountEditRequest.type());
 
-            return accountProvider.lookup(accountEditRequest.getName())
+            return accountProvider.lookup(accountEditRequest.name())
                     .map(inserted -> {
-                        if (accountEditRequest.getInterestPeriodicity() != null) {
+                        if (accountEditRequest.interestPeriodicity() != null) {
                             inserted.interest(
-                                    accountEditRequest.getInterest(),
-                                    accountEditRequest.getInterestPeriodicity());
+                                    accountEditRequest.interest(),
+                                    accountEditRequest.interestPeriodicity());
                         }
 
                         inserted.changeAccount(
-                                accountEditRequest.getIban(),
-                                accountEditRequest.getBic(),
-                                accountEditRequest.getNumber());
+                                accountEditRequest.iban(),
+                                accountEditRequest.bic(),
+                                accountEditRequest.number());
 
                         return new AccountResponse(inserted);
                     })

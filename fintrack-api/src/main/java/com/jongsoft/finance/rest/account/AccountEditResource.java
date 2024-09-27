@@ -79,18 +79,18 @@ public class AccountEditResource {
                 .getOrThrow(() -> StatusException.notFound("No account found with id " + accountId));
 
         account.rename(
-                accountEditRequest.getName(),
-                accountEditRequest.getDescription(),
-                accountEditRequest.getCurrency(),
-                accountEditRequest.getType());
+                accountEditRequest.name(),
+                accountEditRequest.description(),
+                accountEditRequest.currency(),
+                accountEditRequest.type());
 
         account.changeAccount(
-                accountEditRequest.getIban(),
-                accountEditRequest.getBic(),
-                accountEditRequest.getNumber());
+                accountEditRequest.iban(),
+                accountEditRequest.bic(),
+                accountEditRequest.number());
 
-        if (accountEditRequest.getInterestPeriodicity() != null) {
-            account.interest(accountEditRequest.getInterest(), accountEditRequest.getInterestPeriodicity());
+        if (accountEditRequest.interestPeriodicity() != null) {
+            account.interest(accountEditRequest.interest(), accountEditRequest.interestPeriodicity());
         }
 
         return new AccountResponse(account);
@@ -114,7 +114,7 @@ public class AccountEditResource {
 
         if (accountPromise.isPresent()) {
             accountPromise.get()
-                    .registerIcon(imageRequest.getFileCode());
+                    .registerIcon(imageRequest.fileCode());
 
             return new AccountResponse(accountPromise.get());
         } else {

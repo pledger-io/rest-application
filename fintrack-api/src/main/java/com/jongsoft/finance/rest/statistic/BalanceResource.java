@@ -50,7 +50,7 @@ public class BalanceResource {
             description = "This operation will calculate the balance for the current user based upon the given filters",
             operationId = "getBalance"
     )
-    public BalanceResponse calculate(@Valid @Body BalanceRequest request) {
+    BalanceResponse calculate(@Valid @Body BalanceRequest request) {
         TransactionProvider.FilterCommand filter = buildFilterCommand(request);
 
         var balance = transactionProvider.balance(filter)
@@ -114,7 +114,7 @@ public class BalanceResource {
             summary = "Daily balance",
             description = "Compute the daily balance based upon the provided request",
             operationId = "dailyBalance")
-    public List<DailyResponse> daily(@Valid @Body BalanceRequest request) {
+    List<DailyResponse> daily(@Valid @Body BalanceRequest request) {
         return transactionProvider.daily(buildFilterCommand(request))
                 .map(DailyResponse::new)
                 .toJava();
@@ -125,7 +125,7 @@ public class BalanceResource {
             summary = "Monthly balance",
             description = "Compute the monthly balance based upon the provided request",
             operationId = "monthlyBalance")
-    public List<DailyResponse> monthly(@Valid @Body BalanceRequest request) {
+    List<DailyResponse> monthly(@Valid @Body BalanceRequest request) {
         return transactionProvider.monthly(buildFilterCommand(request))
                 .map(DailyResponse::new)
                 .toJava();
