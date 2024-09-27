@@ -129,7 +129,7 @@ public class BudgetResource {
         }
 
         currentUserProvider.currentUser()
-                .createBudget(startDate, createRequest.getIncome());
+                .createBudget(startDate, createRequest.income());
     }
 
     @Patch
@@ -143,7 +143,7 @@ public class BudgetResource {
         var budget = budgetProvider.lookup(startDate.getYear(), startDate.getMonthValue())
                 .getOrThrow(() -> StatusException.notFound("No budget is active yet, create a budget first."));
 
-        budget.indexBudget(startDate, patchRequest.getIncome());
+        budget.indexBudget(startDate, patchRequest.income());
         return budgetProvider.lookup(startDate.getYear(), startDate.getMonthValue())
                 .map(BudgetResponse::new)
                 .getOrThrow(() -> StatusException.internalError("Could not get budget after updating the period."));
