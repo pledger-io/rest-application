@@ -42,7 +42,7 @@ public class RegistrationResource {
             operationId = "createAccount"
     )
     @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(nullable = true)))
-    public HttpResponse<Void> createAccount(@Valid @Body AuthenticationRequest authenticationRequest) {
+    HttpResponse<Void> createAccount(@Valid @Body AuthenticationRequest authenticationRequest) {
         processEngine.getRuntimeService()
                 .startProcessInstanceByKey("RegisterUserAccount", Map.of(
                         "username", authenticationRequest.getIdentity(),

@@ -74,7 +74,7 @@ public class AccountResponse {
     }
 
     @Serdeable.Serializable
-    public class SavingGoalResponse {
+    public static class SavingGoalResponse {
 
         private final SavingGoal wrapped;
 

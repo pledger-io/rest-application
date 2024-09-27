@@ -43,7 +43,7 @@ public class MultiFactorResource {
             summary = "Verify MFA token",
             description = "Used to verify the user token against that what is expected. If valid the user will get a new JWT with updated authorizations."
     )
-    public HttpResponse<?> validateToken(@Valid @Body MultiFactorRequest verification, HttpRequest<?> request) {
+    HttpResponse<?> validateToken(@Valid @Body MultiFactorRequest verification, HttpRequest<?> request) {
         var user = currentUserProvider.currentUser();
         if (!TwoFactorHelper.verifySecurityCode(user.getSecret(), verification.verificationCode())) {
             throw StatusException.forbidden("Invalid verification code");
