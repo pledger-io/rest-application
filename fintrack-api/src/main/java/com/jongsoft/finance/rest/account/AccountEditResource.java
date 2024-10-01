@@ -21,6 +21,7 @@ import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 
+@ApiDefaults
 @Controller("/api/accounts/{accountId}")
 @Tag(name = "Account information")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -147,7 +148,6 @@ public class AccountEditResource {
             summary = "Create saving goal",
             description = "Creates a saving goal into the account, only valid for accounts of types SAVINGS and JOINED_SAVINGS"
     )
-    @ApiDefaults
     AccountResponse createSavingGoal(
             @PathVariable long accountId,
             @Body @Valid AccountSavingGoalCreateRequest request) {
@@ -170,7 +170,6 @@ public class AccountEditResource {
             summary = "Adjust Saving Goal",
             description = "Adjust a saving goal already attached to the savings account."
     )
-    @ApiDefaults
     AccountResponse adjustSavingGoal(
             @PathVariable long accountId,
             @PathVariable long savingId,
@@ -194,7 +193,6 @@ public class AccountEditResource {
             summary = "Reserve Saving Goal",
             description = "Reserve money from the account towards the saving goal."
     )
-    @ApiDefaults
     AccountResponse reservationForSavingGoal(
             @PathVariable long accountId,
             @PathVariable long savingId,
@@ -218,7 +216,6 @@ public class AccountEditResource {
             summary = "Delete saving goal",
             description = "Removes a saving goal from the account."
     )
-    @ApiDefaults
     void deleteSavingGoal(@PathVariable long accountId, @PathVariable long savingId) {
         accountProvider.lookup(accountId)
                 .ifPresent(account ->

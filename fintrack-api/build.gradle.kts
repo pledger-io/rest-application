@@ -1,6 +1,5 @@
 plugins {
     id("io.micronaut.application")
-    id("org.openapi.generator")
 }
 
 application {
@@ -10,14 +9,6 @@ application {
 micronaut {
     runtime("jetty")
     testRuntime("junit5")
-}
-
-openApiGenerate {
-    inputSpec.set(layout.buildDirectory.dir("classes/java/main/META-INF/swagger").get().file("pledger-2.0.0.yml").toString())
-    outputDir.set(layout.buildDirectory.dir("asciidoc").get().toString())
-    cleanupOutput.set(true)
-    generatorName.set("asciidoc")
-    skipValidateSpec.set(true)
 }
 
 val integration by sourceSets.creating
@@ -41,28 +32,6 @@ tasks.jacocoTestReport {
 
 tasks.check {
     dependsOn("itTest")
-}
-
-tasks.withType<JavaCompile> {
-    finalizedBy(tasks.getByName("openApiGenerate"))
-}
-
-configurations {
-    create("api-docs")
-}
-
-val apiArtifact = artifacts.add("api-docs", layout.buildDirectory.file("asciidoc/index.adoc")) {
-    type = "asciidoc"
-    builtBy(tasks.getByName("openApiGenerate"))
-}
-
-publishing.publications {
-    create<MavenPublication>("maven") {
-        groupId = "com.jongsoft.finance"
-        version = System.getProperty("version")
-        from(components["java"])
-        artifact(apiArtifact)
-    }
 }
 
 dependencies {

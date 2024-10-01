@@ -30,7 +30,9 @@ import jakarta.validation.Valid;
 
 import java.util.function.Consumer;
 
-@Tag(name = "Transactions")
+@Tag(
+        name = "Account Transactions",
+        description = "Operations on transactions based on a given account.")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/accounts/{accountId}/transactions")
 public class AccountTransactionResource {

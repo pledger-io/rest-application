@@ -1,6 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
 import com.jongsoft.finance.providers.AccountTypeProvider;
+import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.security.AuthenticationRoles;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
@@ -11,6 +12,7 @@ import jakarta.inject.Singleton;
 
 import java.util.List;
 
+@ApiDefaults
 @Singleton
 @Tag(name = "Account information")
 @Controller("/api/account-types")

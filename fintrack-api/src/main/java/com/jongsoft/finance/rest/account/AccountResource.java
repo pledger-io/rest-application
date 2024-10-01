@@ -5,6 +5,7 @@ import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.model.AccountResponse;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.security.AuthenticationRoles;
@@ -22,6 +23,7 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
+@ApiDefaults
 @Controller("/api/accounts")
 @Tag(name = "Account information")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)

@@ -30,6 +30,7 @@ public class StaticResource {
     ResourceResolver res;
 
     @Get
+    @Operation(hidden = true)
     public HttpResponse<?> index() throws URISyntaxException {
         return HttpResponse.redirect(new URI("/ui/dashboard"));
     }

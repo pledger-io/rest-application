@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
         info = @Info(
                 title = "Pledger",
                 version = "2.0.0",
+                description = "Pledger.io is a self-hosted personal finance application that helps you track your income and expenses.",
                 license = @License(name = "MIT", url = "https://opensource.org/licenses/MIT"),
                 contact = @Contact(
                         name = "Jong Soft Development",

@@ -3,6 +3,7 @@ package com.jongsoft.finance.rest.account;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.SettingProvider;
+import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.rest.DateFormat;
 import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.lang.Collections;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 
+@ApiDefaults
 @Controller("/api/accounts/top")
 @Tag(name = "Account information")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
