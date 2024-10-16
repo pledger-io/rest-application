@@ -36,7 +36,7 @@ public class AuthenticationProvider implements HttpRequestAuthenticationProvider
     }
 
     public AuthenticationResponse authenticate(String username, String password) {
-        log.info("Authentication basic request for user {}", username);
+        log.debug("Authentication basic request for user {}", username);
         var authenticated = userProvider.lookup(username);
         if (authenticated.isPresent()) {
             var userAccount = authenticated.get();

@@ -5,4 +5,8 @@ datasources:
     username: ${DATABASE_USER:fintrack}
     password: ${DATABASE_PASSWORD:fintrack}
     dialect: mysql
-    migration-locations: ["classpath:db/camunda/h2", "classpath:db/migration"]
+
+flyway:
+  datasources:
+    default:
+      locations: ["classpath:db/camunda/h2", "classpath:db/migration"]

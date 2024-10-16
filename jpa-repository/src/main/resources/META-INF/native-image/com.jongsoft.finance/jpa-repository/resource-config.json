@@ -1,0 +1,18 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "db/camunda/h2/.*"
+      },
+      {
+        "pattern": "db/camunda/mysql/.*"
+      },
+      {
+        "pattern": "db/migration/.*"
+      },
+      {
+        "pattern": "db/sample/.*"
+      }
+    ]
+  }
+}

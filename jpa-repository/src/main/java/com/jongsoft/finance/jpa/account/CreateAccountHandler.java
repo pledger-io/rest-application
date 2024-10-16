@@ -12,13 +12,14 @@ import com.jongsoft.lang.Collections;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 @Singleton
 @RequiresJpa
 @Transactional
 public class CreateAccountHandler implements CommandHandler<CreateAccountCommand> {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;

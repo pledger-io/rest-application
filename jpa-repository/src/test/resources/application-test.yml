@@ -7,6 +7,14 @@ datasources:
     dialect: mysql
     migration-locations: ["classpath:db/camunda/h2", "classpath:db/migration"]
 
+flyway:
+  datasources:
+    default:
+      url: ${datasources.default.url}
+      driver: ${datasources.default.driverClassName}
+      username: ${datasources.default.username}
+      password: ${datasources.default.password}
+
 jpa:
   default:
     packages-to-scan:

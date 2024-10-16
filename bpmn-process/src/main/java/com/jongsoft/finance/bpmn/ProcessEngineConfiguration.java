@@ -2,11 +2,11 @@ package com.jongsoft.finance.bpmn;
 
 import com.jongsoft.finance.ProcessVariable;
 import com.jongsoft.finance.bpmn.camunda.*;
-import com.jongsoft.finance.core.DataSourceMigration;
 import com.jongsoft.finance.importer.api.TransactionDTO;
 import io.micronaut.context.ApplicationContext;
-import io.micronaut.context.annotation.Context;
+import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
+import io.micronaut.context.annotation.Requirements;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.serde.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +23,8 @@ import java.util.List;
 
 @Slf4j
 @Factory
-@Requires(beans = DataSourceMigration.class, notEnv = "no-camunda")
+@Requirements({
+        @Requires(notEnv = "no-camunda")})
 public class ProcessEngineConfiguration {
 
     private final ApplicationContext applicationContext;
@@ -36,7 +37,7 @@ public class ProcessEngineConfiguration {
         this.camundaDatasourceConfiguration = camundaDatasourceConfiguration;
     }
 
-    @Context
+    @Bean
     public ProcessEngine processEngine() throws IOException {
         var configuration = new StandaloneProcessEngineConfiguration();
 
@@ -68,17 +69,17 @@ public class ProcessEngineConfiguration {
         return processEngine;
     }
 
-    @Context
+    @Bean
     public HistoryService historyService(ProcessEngine processEngine) {
         return processEngine.getHistoryService();
     }
 
-    @Context
+    @Bean
     public TaskService taskService(ProcessEngine processEngine) {
         return processEngine.getTaskService();
     }
 
-    @Context
+    @Bean
     public RuntimeService runtimeService(ProcessEngine processEngine) {
         return processEngine.getRuntimeService();
     }
