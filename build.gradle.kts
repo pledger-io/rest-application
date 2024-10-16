@@ -14,11 +14,16 @@ sonar {
     }
 }
 
+group = "com.jongsoft.finance"
+
 subprojects {
     apply(plugin = "java")
-    apply(plugin = "io.micronaut.library")
     apply(plugin = "maven-publish")
     apply(plugin = "jacoco")
+
+    if (project.name != "fintrack-api") {
+        apply(plugin = "io.micronaut.library")
+    }
 
     tasks.check {
         finalizedBy(tasks.jacocoTestReport)

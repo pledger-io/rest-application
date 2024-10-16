@@ -9,7 +9,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.jongsoft.finance" level="info" />
+    <logger name="com.jongsoft.finance" level="debug" />
     <logger name="com.jongsoft.finance.bpmn.delegate" level="debug" />
     <logger name="com.jongsoft.finance.filter" level="warn" />
     <root level="info">

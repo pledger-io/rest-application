@@ -22,18 +22,20 @@ import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Slf4j
 @ReadOnly
 @Singleton
 @RequiresJpa
 @Named("transactionProvider")
 public class TransactionProviderJpa implements TransactionProvider {
+
+    private final Logger log = LoggerFactory.getLogger(TransactionProviderJpa.class);
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;

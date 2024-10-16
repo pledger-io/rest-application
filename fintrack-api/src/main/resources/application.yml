@@ -71,6 +71,7 @@ jackson:
 
 jpa:
   default:
+    compile-time-hibernate-proxies: true
     packages-to-scan:
       - 'com.jongsoft.finance.jpa'
     properties:
