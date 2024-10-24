@@ -28,7 +28,7 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":domain"))
-    implementation(project(":rule-engine"))
+    implementation(project(":learning:rule-engine"))
     implementation(project(":transaction-importer:transaction-importer-api"))
 
     // needed for the testing of the application

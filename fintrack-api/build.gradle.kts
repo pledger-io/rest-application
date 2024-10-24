@@ -71,7 +71,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":domain"))
     implementation(project(":jpa-repository"))
-    implementation(project(":rule-engine"))
+    implementation(project(":learning:rule-engine"))
     implementation(project(":bpmn-process"))
     implementation(project(":transaction-importer:transaction-importer-api"))
     implementation(project(":transaction-importer:transaction-importer-csv"))

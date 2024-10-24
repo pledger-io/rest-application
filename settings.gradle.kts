@@ -43,6 +43,18 @@ dependencyResolutionManagement {
             val micronautVersion: String by settings
             from("io.micronaut.platform:micronaut-platform:${micronautVersion}")
         }
+
+        create("llm") {
+            val langchain4jVersion: String = "0.35.0"
+            library("core", "dev.langchain4j", "langchain4j").version(langchain4jVersion)
+            library("rag", "dev.langchain4j", "langchain4j-easy-rag").version(langchain4jVersion)
+            library("store", "dev.langchain4j", "langchain4j-embeddings-all-minilm-l6-v2").version(langchain4jVersion)
+            library("model-jlama", "dev.langchain4j", "langchain4j-jlama").version(langchain4jVersion)
+            library("model-openai", "dev.langchain4j", "langchain4j-open-ai").version(langchain4jVersion)
+            library("native", "com.github.tjake", "jlama-native").version("0.7.0")
+
+            bundle("langchain4j", listOf("core", "rag", "store", "model-openai", "model-jlama"))
+        }
     }
 }
 
@@ -51,7 +63,8 @@ include(
     "domain",
     "transaction-importer:transaction-importer-api",
     "transaction-importer:transaction-importer-csv",
-    "rule-engine",
+    "learning:rule-engine",
+    "learning:language-engine",
     "bpmn-process",
     "jpa-repository",
     "fintrack-api")
