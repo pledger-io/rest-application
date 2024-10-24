@@ -1,8 +1,8 @@
 package com.jongsoft.finance.rule.matcher;
 
-import java.util.function.Supplier;
-
 import com.jongsoft.finance.core.RuleOperation;
+
+import java.util.function.Supplier;
 
 public class StringMatcher implements ConditionMatcher {
 
