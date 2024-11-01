@@ -17,7 +17,7 @@ public class RandomizedTransactions {
 
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(RandomizedTransactions.class);
 
-    static String url = "jdbc:h2:mem:FinTrack;DB_CLOSE_DELAY=-1;MODE=MariaDB"; // replace with your database url
+    static String url = "jdbc:h2:mem:Pledger;DB_CLOSE_DELAY=-1;MODE=MariaDB"; // replace with your database url
     static String user = "fintrack"; // replace with your database user
     static String password = "fintrack"; // replace with your database password
 

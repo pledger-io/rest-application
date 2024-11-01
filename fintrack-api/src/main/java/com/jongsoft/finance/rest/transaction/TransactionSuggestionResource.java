@@ -3,11 +3,7 @@ package com.jongsoft.finance.rest.transaction;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.rest.model.AccountResponse;
-import com.jongsoft.finance.rest.model.CategoryResponse;
-import com.jongsoft.finance.rest.model.ExpenseResponse;
 import com.jongsoft.finance.rest.model.TagResponse;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
@@ -50,11 +46,11 @@ class TransactionSuggestionResource {
         for (var suggestion : ruleEngine.run(ruleDataset).entrySet()) {
             var outputSuggestion = switch (suggestion.getValue()) {
                 case Account account -> new AccountResponse(account);
-                case Category category -> new CategoryResponse(category);
-                case Budget.Expense expense -> new ExpenseResponse(expense);
+                // This is the case for category, budget
+                case String value -> value;
                 case com.jongsoft.finance.domain.transaction.Tag tag -> new TagResponse(tag);
 
-                default -> throw StatusException.internalError("Could not convert suggestion correctly for type " + suggestion.getValue());
+                default -> throw StatusException.internalError("Could not convert suggestion correctly for type " + suggestion.getValue().getClass());
             };
 
             suggestions.put(suggestion.getKey().toString(), outputSuggestion);

@@ -136,3 +136,21 @@ where exists (select 1
               from transaction_part
               where transaction_journal.id = transaction_part.journal_id
                 and transaction_part.account_id in (112));
+
+insert into rule_group(id, name, sort, user_id)
+values (1,'Shopping classification', 0, 1),
+       (2, 'Trading group', 1, 1);
+
+insert into rule (id, name, restrictive, user_id, group_id, sort)
+values (1, 'Grocery shopping', 0, 1, 1, 0),
+       (2, 'Car shopping', 0, 1, 1, 1);
+
+insert into rule_condition(cond_value, rule_id, field, operation)
+values ('grocery', 1, 'DESCRIPTION', 'CONTAINS'),
+       ('groceries', 1, 'DESCRIPTION', 'CONTAINS'),
+       ('car', 2, 'DESCRIPTION', 'CONTAINS');
+
+insert into rule_change("value", rule_id, field)
+values ('1', 1, 'CATEGORY'),
+       ('1', 1, 'BUDGET'),
+       ('12', 2, 'CATEGORY');
