@@ -39,17 +39,15 @@ public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedV
     public TypedValue convertToTypedValue(UntypedValueImpl untypedValue) {
         logger.trace("Converting untyped value to typed value: {}", untypedValue.getValue().getClass().getSimpleName());
 
-        var importJobSettings = (Record) untypedValue.getValue();
-        String jsonString;
         try {
-            jsonString = objectMapper.writeValueAsString(importJobSettings);
+            var jsonString = objectMapper.writeValueAsString(untypedValue.getValue());
+            return Variables.serializedObjectValue(jsonString)
+                    .objectTypeName(supportedClass.getName())
+                    .serializationDataFormat("application/json")
+                    .create();
         } catch (IOException e) {
             throw new RuntimeException("Could not serialize ImportJobSettings", e);
         }
-
-        return Variables.serializedObjectValue(jsonString)
-                .serializationDataFormat("application/json")
-                .create();
     }
 
     @Override
@@ -73,8 +71,21 @@ public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedV
     }
 
     @Override
+    public boolean canHandle(TypedValue value) {
+        if (value instanceof ObjectValue objectValue) {
+            return supportedClass.getName().equals(objectValue.getObjectTypeName());
+        }
+
+        return canWriteValue(value);
+    }
+
+    @Override
     protected boolean canWriteValue(TypedValue typedValue) {
-        logger.trace("Checking if value can be written: {}", typedValue.getValue().getClass().getSimpleName());
-        return supportedClass.isInstance(typedValue.getValue());
+        if (typedValue instanceof UntypedValueImpl) {
+            logger.trace("Checking if un-typed value can be written: {}", typedValue.getValue().getClass().getSimpleName());
+            return supportedClass.isInstance(typedValue.getValue());
+        }
+
+        return false;
     }
 }
