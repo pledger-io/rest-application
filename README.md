@@ -1,6 +1,6 @@
 # Pledger.io
 ![Sonatype Nexus (Releases)](https://img.shields.io/github/v/release/pledger-io/rest-application?display_name=release&label=Stable)
-![Release Build](https://github.com/pledger-io/rest-application/actions/workflows/release-build.yml/badge.svg)
+[![Build Snapshot](https://github.com/pledger-io/rest-application/actions/workflows/main-build.yml/badge.svg?branch=master)](https://github.com/pledger-io/rest-application/actions/workflows/main-build.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=pledger-io_rest-application&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=pledger-io_rest-application)
 ![Coverage](https://img.shields.io/sonar/coverage/pledger-io_rest-application?server=https%3A%2F%2Fsonarcloud.io
 )
