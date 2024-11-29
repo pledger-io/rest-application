@@ -51,6 +51,7 @@ public class ProcessEngineConfiguration {
                 .setDatabaseSchemaUpdate(camundaDatasourceConfiguration.getAutoUpdate())
                 .setProcessEngineName("fintrack")
                 .setHistoryCleanupEnabled(true)
+                .setSkipIsolationLevelCheck(true)
                 .setExpressionManager(new MicronautExpressionManager(new MicronautElResolver(applicationContext)));
 
         configuration.setHistoryCleanupBatchSize(250);
