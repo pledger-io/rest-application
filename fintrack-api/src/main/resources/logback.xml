@@ -5,7 +5,7 @@
         <!-- encoders are assigned the type
              ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
-            <pattern>%cyan(%d{HH:mm:ss.SSS}) %green(%-36X{correlationId}) %highlight(%-5level) %gray([%thread])  %magenta(%logger{36}) - %msg%n</pattern>
+            <pattern>%magenta(%d{YYYY-MM-DD}) %cyan(%d{HH:mm:ss.SSS}) %green(%-36X{correlationId}) %highlight(%-5level) %gray([%thread])  %magenta(%logger{36}) - %msg%n</pattern>
         </encoder>
     </appender>
 
