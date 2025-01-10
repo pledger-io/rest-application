@@ -21,9 +21,10 @@ public interface TransactionSupportAgent {
         Do not give any other feedback other than the desired format.""")
     @UserMessage({
             """
-               You must choose one of the following budgets: {{budgets}}.
-               You must choose one of the following categories: {{categories}}.
+               You can choose one of the following budgets: {{budgets}}.
+               You can choose one of the following categories: {{categories}}.
                You can choose multiple of the following tags: {{tags}}.
+               If no budget or categories match then provide an empty string as value.
                Given the following description: {{description}}, can you classify the payment?"""
     })
     AiMessage classify(

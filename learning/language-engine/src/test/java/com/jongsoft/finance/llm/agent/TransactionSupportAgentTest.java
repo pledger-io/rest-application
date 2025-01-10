@@ -21,8 +21,6 @@ class TransactionSupportAgentTest {
 
     @Inject
     private TransactionSupportAgent transactionSupportAgent;
-    @Inject
-    private BudgetProvider budgetProvider;
 
     @MockBean
     BudgetProvider budgetProvider() {
@@ -44,17 +42,20 @@ class TransactionSupportAgentTest {
 
     @Test
     void askForSupport() {
-        var budget = List.of("Travel Expenses", "Fixed expenses", "Insurances", "Entertainment");
-        var categories = List.of("Mortgage payments", "Savings", "Investments", "Groceries", "Healthcare");
-        var tags = List.of("Spending", "Health", "Phone", "Streaming service", "Insurances", "Vacation 2022", "Vacation 2023");
+        var budget = List.of("Travel Expenses", "Fixed expenses", "Insurances", "Entertainment", "Health Expenses");
+        var categories = List.of("Mortgage payments", "Savings", "Investments", "Groceries", "Healthcare", "Online shopping");
+        var tags = List.of("Health", "Phone", "Streaming service", "Insurances", "Vacation 2022", "Vacation 2023", "Music");
 
-        var response = transactionSupportAgent.classify(budget, categories, tags, "Monthly health insurance payment");
-        LoggerFactory.getLogger(getClass()).info(response.text());
+        LoggerFactory.getLogger(getClass())
+                .info(transactionSupportAgent.classify(budget, categories, tags, "Breezy Point Smile Appointment").text());
 
-        response = transactionSupportAgent.classify(budget, categories, tags, "Monthly payment to Netflix");
-        LoggerFactory.getLogger(getClass()).info(response.text());
+        LoggerFactory.getLogger(getClass())
+                .info(transactionSupportAgent.classify(budget, categories, tags, "Netflix Monthly").text());
 
-        response = transactionSupportAgent.classify(budget, categories, tags, "Hotel costs 2022");
-        LoggerFactory.getLogger(getClass()).info(response.text());
+        LoggerFactory.getLogger(getClass())
+                .info(transactionSupportAgent.classify(budget, categories, tags, "Day at Fern River Resorts 2022").text());
+
+        LoggerFactory.getLogger(getClass())
+                .info(transactionSupportAgent.classify(budget, categories, tags, "Azure bill").text());
     }
 }
