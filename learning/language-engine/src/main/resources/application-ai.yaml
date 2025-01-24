@@ -5,7 +5,7 @@ application:
 
     jlama:
       # alternative models can be found here: https://huggingface.co/tjake
-      model: tjake/Llama-3.2-3B-Instruct-JQ4
+      model: nttaii/llmlingua-2-bert-base-multilingual-cased-meetingbank
     openai:
       model: gpt-4o-mini
       key: ${OPENAI_TOKEN}

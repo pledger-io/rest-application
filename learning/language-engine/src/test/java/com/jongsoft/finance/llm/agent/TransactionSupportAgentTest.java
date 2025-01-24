@@ -7,7 +7,6 @@ import com.jongsoft.finance.providers.TransactionProvider;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
@@ -15,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-@Disabled("Only ran locally to test this new module. Not production ready yet.")
+//@Disabled("Only ran locally to test this new module. Not production ready yet.")
 @MicronautTest(environments = "ai")
 class TransactionSupportAgentTest {
 
