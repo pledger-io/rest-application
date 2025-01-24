@@ -3,7 +3,6 @@ package com.jongsoft.finance.domain.user;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.exception.StatusException;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.user.RevokeTokenCommand;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.time.Range;
@@ -15,9 +14,9 @@ import java.time.LocalDateTime;
 @Getter
 public class SessionToken implements AggregateBase {
 
-    private Long id;
-    private String token;
-    private String description;
+    private final Long id;
+    private final String token;
+    private final String description;
     private Range<LocalDateTime> validity;
 
     @Builder
@@ -35,6 +34,6 @@ public class SessionToken implements AggregateBase {
         }
 
         this.validity = Dates.range(this.validity.from(), LocalDateTime.now());
-        EventBus.getBus().send(new RevokeTokenCommand(this.token));
+        RevokeTokenCommand.tokenRevoked(token);
     }
 }

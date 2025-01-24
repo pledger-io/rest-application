@@ -1,7 +1,5 @@
 package com.jongsoft.finance.messaging;
 
-import com.jongsoft.finance.core.ApplicationEvent;
-
 import io.micronaut.context.event.ApplicationEventPublisher;
 
 import java.io.Serializable;

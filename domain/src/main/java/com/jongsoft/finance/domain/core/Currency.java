@@ -3,7 +3,6 @@ package com.jongsoft.finance.domain.core;
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.currency.ChangeCurrencyPropertyCommand;
 import com.jongsoft.finance.messaging.commands.currency.CreateCurrencyCommand;
 import com.jongsoft.finance.messaging.commands.currency.CurrencyCommandType;
@@ -32,13 +31,7 @@ public class Currency implements AggregateBase {
         this.decimalPlaces = 2;
         this.enabled = true;
 
-        EventBus.getBus().send(
-                new CreateCurrencyCommand(
-                        name,
-                        symbol,
-                        code
-                )
-        );
+        CreateCurrencyCommand.currencyCreated(name, symbol, code);
     }
 
     @BusinessMethod
@@ -52,15 +45,7 @@ public class Currency implements AggregateBase {
             this.name = name;
             this.code = code;
             this.symbol = symbol;
-
-            EventBus.getBus().send(
-                    new RenameCurrencyCommand(
-                            id,
-                            name,
-                            symbol,
-                            code
-                    )
-            );
+            RenameCurrencyCommand.currencyRenamed(id, name, symbol, code);
         }
     }
 
@@ -68,14 +53,7 @@ public class Currency implements AggregateBase {
     public void disable() {
         if (enabled) {
             enabled = false;
-
-            EventBus.getBus().send(
-                    new ChangeCurrencyPropertyCommand<>(
-                            code,
-                            false,
-                            CurrencyCommandType.ENABLED
-                    )
-            );
+            ChangeCurrencyPropertyCommand.currencyPropertyChanged(code, false, CurrencyCommandType.ENABLED);
         }
     }
 
@@ -83,14 +61,7 @@ public class Currency implements AggregateBase {
     public void enable() {
         if (!enabled) {
             enabled = true;
-
-            EventBus.getBus().send(
-                    new ChangeCurrencyPropertyCommand<>(
-                            code,
-                            true,
-                            CurrencyCommandType.ENABLED
-                    )
-            );
+            ChangeCurrencyPropertyCommand.currencyPropertyChanged(code, true, CurrencyCommandType.ENABLED);
         }
     }
 
@@ -98,15 +69,7 @@ public class Currency implements AggregateBase {
     public void accuracy(int decimalPlaces) {
         if (decimalPlaces != this.decimalPlaces) {
             this.decimalPlaces = decimalPlaces;
-
-
-            EventBus.getBus().send(
-                    new ChangeCurrencyPropertyCommand<>(
-                            code,
-                            decimalPlaces,
-                            CurrencyCommandType.DECIMAL_PLACES
-                    )
-            );
+            ChangeCurrencyPropertyCommand.currencyPropertyChanged(code, decimalPlaces, CurrencyCommandType.DECIMAL_PLACES);
         }
     }
 }

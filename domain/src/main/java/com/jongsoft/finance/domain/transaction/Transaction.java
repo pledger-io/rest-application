@@ -6,7 +6,6 @@ import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.transaction.*;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
@@ -106,9 +105,7 @@ public class Transaction implements AggregateBase, Serializable {
             this.date = date;
             this.bookDate = bookDate;
             this.interestDate = interestDate;
-
-            EventBus.getBus().send(
-                    new ChangeTransactionDatesCommand(id, date, bookDate, interestDate));
+            ChangeTransactionDatesCommand.transactionDatesChanged(id, date, bookDate, interestDate);
         }
     }
 
@@ -116,8 +113,7 @@ public class Transaction implements AggregateBase, Serializable {
     public void describe(String description) {
         if (Control.Equal(this.description, description).isNotEqual()) {
             this.description = description;
-            EventBus.getBus().send(
-                    new DescribeTransactionCommand(id, description));
+            DescribeTransactionCommand.transactionDescribed(id, description);
         }
     }
 
@@ -134,8 +130,7 @@ public class Transaction implements AggregateBase, Serializable {
 
             this.currency = currency;
             this.transactions.forEach(t -> t.amount = t.amount < 0 ? 0 - Math.abs(amount) : Math.abs(amount));
-            EventBus.getBus().send(
-                    new ChangeTransactionAmountCommand(id, BigDecimal.valueOf(amount), currency));
+            ChangeTransactionAmountCommand.amountChanged(id, BigDecimal.valueOf(amount), currency);
         }
     }
 
@@ -168,7 +163,7 @@ public class Transaction implements AggregateBase, Serializable {
                 .reject(t -> t.getAccount().equals(notOwn))
                 .union(splitParts);
 
-        EventBus.getBus().send(new SplitTransactionCommand(id, transactions));
+        SplitTransactionCommand.transactionSplit(id, transactions);
     }
 
     @BusinessMethod
@@ -185,7 +180,7 @@ public class Transaction implements AggregateBase, Serializable {
                     .filter(isFromAccount ? FROM_PREDICATE : TO_PREDICATE)
                     .forEach(t -> {
                         t.account = account;
-                        EventBus.getBus().send(new ChangeTransactionPartAccount(t.getId(), account.getId()));
+                        ChangeTransactionPartAccount.transactionPartAccountChanged(t.getId(), account.getId());
                     });
         }
     }
@@ -194,8 +189,7 @@ public class Transaction implements AggregateBase, Serializable {
     public void linkToCategory(String label) {
         if (!Objects.equals(this.category, label)) {
             this.category = label;
-            EventBus.getBus().send(
-                    new LinkTransactionCommand(id, LinkTransactionCommand.LinkType.CATEGORY, category));
+            LinkTransactionCommand.linkCreated(id, LinkTransactionCommand.LinkType.CATEGORY, category);
         }
     }
 
@@ -203,8 +197,7 @@ public class Transaction implements AggregateBase, Serializable {
     public void linkToBudget(String budget) {
         if (budget != null && !Objects.equals(this.budget, budget)) {
             this.budget = budget;
-            EventBus.getBus().send(
-                    new LinkTransactionCommand(id, LinkTransactionCommand.LinkType.EXPENSE, budget));
+            LinkTransactionCommand.linkCreated(id, LinkTransactionCommand.LinkType.EXPENSE, budget);
         }
     }
 
@@ -212,8 +205,7 @@ public class Transaction implements AggregateBase, Serializable {
     public void linkToContract(String contract) {
         if (!Objects.equals(this.contract, contract)) {
             this.contract = contract;
-            EventBus.getBus().send(
-                    new LinkTransactionCommand(id, LinkTransactionCommand.LinkType.CONTRACT, contract));
+            LinkTransactionCommand.linkCreated(id, LinkTransactionCommand.LinkType.CONTRACT, contract);
         }
     }
 
@@ -221,14 +213,14 @@ public class Transaction implements AggregateBase, Serializable {
     public void tag(Sequence<String> tags) {
         if (!Objects.equals(this.tags, tags)) {
             this.tags = tags;
-            EventBus.getBus().send(new TagTransactionCommand(id, tags));
+            TagTransactionCommand.tagCreated(id, tags);
         }
     }
 
     @BusinessMethod
     public void registerFailure(FailureCode failureCode) {
         this.failureCode = failureCode;
-        EventBus.getBus().send(new RegisterFailureCommand(this.id, this.failureCode));
+        RegisterFailureCommand.registerFailure(id, failureCode);
     }
 
     @BusinessMethod
@@ -252,7 +244,7 @@ public class Transaction implements AggregateBase, Serializable {
             failureCode = FailureCode.AMOUNT_NOT_NULL;
         }
 
-        EventBus.getBus().send(new CreateTransactionCommand(this));
+        CreateTransactionCommand.transactionCreated(this);
     }
 
     @BusinessMethod
@@ -261,7 +253,7 @@ public class Transaction implements AggregateBase, Serializable {
             throw new IllegalStateException("Cannot delete a transaction not yet persisted.");
         }
 
-        EventBus.getBus().send(new DeleteTransactionCommand(id));
+        DeleteTransactionCommand.transactionDeleted(id);
     }
 
     /**

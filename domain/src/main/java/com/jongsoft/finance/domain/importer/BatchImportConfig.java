@@ -4,7 +4,6 @@ import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.importer.CreateConfigurationCommand;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,8 +32,7 @@ public class BatchImportConfig implements AggregateBase, Serializable {
         this.fileCode = fileCode;
         this.type = type;
 
-        EventBus.getBus().send(
-                new CreateConfigurationCommand(type, name, fileCode));
+        CreateConfigurationCommand.configurationCreated(type, name, fileCode);
     }
 
     public BatchImport createImport(String fileCode) {

@@ -1,7 +1,5 @@
 package com.jongsoft.finance.messaging;
 
-import com.jongsoft.finance.core.ApplicationEvent;
-
 /**
  * A CommandHandler can be used to persist changes or trigger additional logic on aggregates. A command is fired by an
  * aggregate to notify the application of changes in state.

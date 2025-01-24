@@ -8,7 +8,6 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
 import com.jongsoft.finance.messaging.commands.user.ChangePasswordCommand;
@@ -48,7 +47,7 @@ public class UserAccount implements AggregateBase, Serializable {
         this.username = username;
         this.password = password;
         this.roles = Collections.List(new Role("accountant"));
-        EventBus.getBus().send(new CreateUserCommand(this.username, this.password));
+        CreateUserCommand.userCreated(username, password);
     }
 
     /**
@@ -59,7 +58,7 @@ public class UserAccount implements AggregateBase, Serializable {
     @BusinessMethod
     public void changePassword(String password) {
         this.password = password;
-        EventBus.getBus().send(new ChangePasswordCommand(username, this.password));
+        ChangePasswordCommand.passwordChanged(username, password);
     }
 
     /**
@@ -72,10 +71,7 @@ public class UserAccount implements AggregateBase, Serializable {
     public void changeCurrency(Currency currency) {
         if (!Objects.equals(this.primaryCurrency, currency)) {
             this.primaryCurrency = currency;
-            EventBus.getBus().send(new ChangeUserSettingCommand(
-                    this.username,
-                    ChangeUserSettingCommand.Type.CURRENCY,
-                    this.primaryCurrency.getCurrencyCode()));
+            ChangeUserSettingCommand.userSettingChanged(username, ChangeUserSettingCommand.Type.CURRENCY, primaryCurrency.getCurrencyCode());
         }
     }
 
@@ -88,10 +84,7 @@ public class UserAccount implements AggregateBase, Serializable {
     public void changeTheme(String theme) {
         if (!Objects.equals(this.theme, theme)) {
             this.theme = theme;
-            EventBus.getBus().send(new ChangeUserSettingCommand(
-                    this.username,
-                    ChangeUserSettingCommand.Type.THEME,
-                    this.theme));
+            ChangeUserSettingCommand.userSettingChanged(username, ChangeUserSettingCommand.Type.THEME, theme);
         }
     }
 
@@ -102,7 +95,7 @@ public class UserAccount implements AggregateBase, Serializable {
     public void enableMultiFactorAuthentication() {
         if (!twoFactorEnabled) {
             this.twoFactorEnabled = true;
-            EventBus.getBus().send(new ChangeMultiFactorCommand(username, true));
+            ChangeMultiFactorCommand.multiFactorChanged(username, true);
         }
     }
 
@@ -113,7 +106,7 @@ public class UserAccount implements AggregateBase, Serializable {
     public void disableMultiFactorAuthentication() {
         if (twoFactorEnabled) {
             this.twoFactorEnabled = false;
-            EventBus.getBus().send(new ChangeMultiFactorCommand(username, false));
+            ChangeMultiFactorCommand.multiFactorChanged(username, false);
         }
     }
 
@@ -155,7 +148,7 @@ public class UserAccount implements AggregateBase, Serializable {
             throw StatusException.notAuthorized("User cannot create tags, incorrect privileges.");
         }
 
-        EventBus.getBus().send(new CreateTagCommand(label));
+        CreateTagCommand.tagCreated(label);
         return new Tag(label);
     }
 

@@ -3,7 +3,6 @@ package com.jongsoft.finance.domain.account;
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.contract.*;
 import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleForContractCommand;
 import com.jongsoft.finance.schedule.Schedule;
@@ -46,8 +45,7 @@ public class Contract implements AggregateBase, Serializable {
         this.endDate = end;
         this.company = company;
         this.description = description;
-
-        EventBus.getBus().send(new CreateContractCommand(company.getId(), name, description, start, end));
+        CreateContractCommand.contractCreated(company.getId(), name, description, start, end);
     }
 
     /**
@@ -60,14 +58,7 @@ public class Contract implements AggregateBase, Serializable {
      */
     @BusinessMethod
     public void createSchedule(Schedule schedule, Account source, double amount) {
-        EventBus.getBus()
-                .send(
-                        new CreateScheduleForContractCommand(
-                                this.name,
-                                schedule,
-                                this,
-                                source,
-                                amount));
+        CreateScheduleForContractCommand.scheduleCreated(name, schedule, this, source, amount);
     }
 
     @BusinessMethod
@@ -81,7 +72,7 @@ public class Contract implements AggregateBase, Serializable {
         this.endDate = end;
         this.description = description;
 
-        EventBus.getBus().send(new ChangeContractCommand(id, name, description, start, end));
+        ChangeContractCommand.contractChanged(id, name, description, start, end);
     }
 
     /**
@@ -100,7 +91,7 @@ public class Contract implements AggregateBase, Serializable {
 
         if (!notifyBeforeEnd) {
             this.notifyBeforeEnd = true;
-            EventBus.getBus().send(new WarnBeforeExpiryCommand(id, endDate));
+            WarnBeforeExpiryCommand.warnBeforeExpiry(id, endDate);
         }
     }
 
@@ -111,7 +102,7 @@ public class Contract implements AggregateBase, Serializable {
         }
 
         this.uploaded = true;
-        EventBus.getBus().send(new AttachFileToContractCommand(id, storageToken));
+        AttachFileToContractCommand.attachFileToContract(id, storageToken);
     }
 
     @BusinessMethod
@@ -125,7 +116,7 @@ public class Contract implements AggregateBase, Serializable {
         }
 
         this.terminated = true;
-        EventBus.getBus().send(new TerminateContractCommand(id));
+        TerminateContractCommand.contractTerminated(id);
     }
 
     @Override

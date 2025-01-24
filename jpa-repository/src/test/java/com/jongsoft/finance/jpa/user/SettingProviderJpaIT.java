@@ -45,7 +45,6 @@ class SettingProviderJpaIT extends JpaTestSetup {
     @Test
     void handleSettingUpdated() {
         eventPublisher.publishEvent(new SettingUpdatedEvent(
-                this,
                 "RegistrationOpen",
                 "false"));
 
