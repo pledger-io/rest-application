@@ -1,6 +1,6 @@
 package com.jongsoft.finance.messaging.commands.transaction;
 
-import com.jongsoft.finance.core.ApplicationEvent;
+import com.jongsoft.finance.messaging.ApplicationEvent;
 
 public record LinkTransactionCommand(long id, LinkType type, String relation) implements ApplicationEvent {
     public enum LinkType {
@@ -8,5 +8,10 @@ public record LinkTransactionCommand(long id, LinkType type, String relation) im
         EXPENSE,
         CONTRACT,
         IMPORT
+    }
+
+    public static void linkCreated(long id, LinkType type, String relation) {
+        new LinkTransactionCommand(id, type, relation)
+                .publish();
     }
 }

@@ -1,19 +1,18 @@
 package com.jongsoft.finance.domain.core;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.format.DateTimeParseException;
-
+import com.jongsoft.finance.core.SettingType;
+import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
+import com.jongsoft.finance.messaging.EventBus;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import com.jongsoft.finance.core.SettingType;
-import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
-import com.jongsoft.finance.messaging.EventBus;
 
-import io.micronaut.context.event.ApplicationEventPublisher;
+import java.time.format.DateTimeParseException;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SettingTest {
 
@@ -34,8 +33,8 @@ class SettingTest {
 
         var captor = ArgumentCaptor.forClass(SettingUpdatedEvent.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());
-        Assertions.assertThat(captor.getValue().getSetting()).isEqualTo("sample_setting");
-        Assertions.assertThat(captor.getValue().getValue()).isEqualTo("100.2");
+        Assertions.assertThat(captor.getValue().setting()).isEqualTo("sample_setting");
+        Assertions.assertThat(captor.getValue().value()).isEqualTo("100.2");
     }
 
     @Test
@@ -54,8 +53,8 @@ class SettingTest {
 
         var captor = ArgumentCaptor.forClass(SettingUpdatedEvent.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());
-        Assertions.assertThat(captor.getValue().getSetting()).isEqualTo("sample_setting");
-        Assertions.assertThat(captor.getValue().getValue()).isEqualTo("true");
+        Assertions.assertThat(captor.getValue().setting()).isEqualTo("sample_setting");
+        Assertions.assertThat(captor.getValue().value()).isEqualTo("true");
     }
 
     @Test
@@ -73,8 +72,8 @@ class SettingTest {
 
         var captor = ArgumentCaptor.forClass(SettingUpdatedEvent.class);
         Mockito.verify(eventPublisher).publishEvent(captor.capture());
-        Assertions.assertThat(captor.getValue().getSetting()).isEqualTo("sample_setting");
-        Assertions.assertThat(captor.getValue().getValue()).isEqualTo("2020-02-10");
+        Assertions.assertThat(captor.getValue().setting()).isEqualTo("sample_setting");
+        Assertions.assertThat(captor.getValue().value()).isEqualTo("2020-02-10");
     }
 
     @Test

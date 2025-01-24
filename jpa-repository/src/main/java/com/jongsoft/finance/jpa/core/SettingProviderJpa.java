@@ -61,8 +61,8 @@ public class SettingProviderJpa implements SettingProvider {
 
         entityManager.update()
                 .hql(hql)
-                .set("name", event.getSetting())
-                .set("value", event.getValue())
+                .set("name", event.setting())
+                .set("value", event.value())
                 .execute();
     }
 

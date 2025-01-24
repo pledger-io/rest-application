@@ -3,7 +3,6 @@ package com.jongsoft.finance.domain.transaction;
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.rule.RenameRuleGroupCommand;
 import com.jongsoft.finance.messaging.commands.rule.ReorderRuleGroupCommand;
 import com.jongsoft.finance.messaging.commands.rule.RuleGroupDeleteCommand;
@@ -26,7 +25,7 @@ public class TransactionRuleGroup implements AggregateBase {
     public void changeOrder(int sort) {
         if (sort != this.sort) {
             this.sort = sort;
-            EventBus.getBus().send(new ReorderRuleGroupCommand(id, sort));
+            ReorderRuleGroupCommand.reorderRuleGroupUpdated(id, sort);
         }
     }
 
@@ -34,13 +33,13 @@ public class TransactionRuleGroup implements AggregateBase {
     public void rename(String name) {
         if (!this.name.equalsIgnoreCase(name)) {
             this.name = name;
-            EventBus.getBus().send(new RenameRuleGroupCommand(id, name));
+            RenameRuleGroupCommand.ruleGroupRenamed(id, name);
         }
     }
 
     @BusinessMethod
     public void delete() {
-        EventBus.getBus().send(new RuleGroupDeleteCommand(id));
+        RuleGroupDeleteCommand.ruleGroupDeleted(id);
     }
 
 }

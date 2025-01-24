@@ -30,7 +30,8 @@ public class IntegrationTestExtension implements ParameterResolver, BeforeAllCal
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        applicationContext = ApplicationContext.run("test", "h2");
+        System.setProperty("datasources.default.url", "jdbc:h2:mem:pledger_io;DB_CLOSE_DELAY=50;MODE=MariaDB");
+        applicationContext = ApplicationContext.run("h2");
         Control.Option(applicationContext.getBean(EmbeddedApplication.class))
                 .ifPresent(ApplicationContextLifeCycle::start);
         Control.Option(applicationContext.getBean(EmbeddedServer.class))

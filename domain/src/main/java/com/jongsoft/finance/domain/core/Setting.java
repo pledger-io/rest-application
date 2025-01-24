@@ -2,7 +2,6 @@ package com.jongsoft.finance.domain.core;
 
 import com.jongsoft.finance.core.SettingType;
 import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
-import com.jongsoft.finance.messaging.EventBus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,10 +32,7 @@ public class Setting {
             }
 
             this.value = value;
-            EventBus.getBus().send(new SettingUpdatedEvent(
-                    this,
-                    name,
-                    value));
+            SettingUpdatedEvent.settingUpdated(name, value);
         }
     }
 

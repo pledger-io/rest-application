@@ -5,7 +5,6 @@ import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleCommand;
 import com.jongsoft.finance.messaging.commands.schedule.DescribeScheduleCommand;
 import com.jongsoft.finance.messaging.commands.schedule.LimitScheduleCommand;
@@ -48,7 +47,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
         this.amount = amount;
         this.schedule = schedule;
 
-        EventBus.getBus().send(new CreateScheduleCommand(name, schedule, source, destination, amount));
+        CreateScheduleCommand.scheduleCreated(name, schedule, source, destination, amount);
     }
 
     @BusinessMethod
@@ -66,7 +65,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
         if (hasChanged) {
             this.start = start;
             this.end = end;
-            EventBus.getBus().send(new LimitScheduleCommand(id, this, start, end));
+            LimitScheduleCommand.scheduleCreated(id, this, start, end);
         }
     }
 
@@ -80,7 +79,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
         if (end == null || !end.isEqual(expectedEnd)) {
             this.start = Control.Option(this.start).getOrSupply(contract::getStartDate);
             this.end = expectedEnd;
-            EventBus.getBus().send(new LimitScheduleCommand(id, this, this.start, end));
+            LimitScheduleCommand.scheduleCreated(id, this, start, end);
         }
     }
 
@@ -91,7 +90,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
         }
 
         this.end = LocalDate.now();
-        EventBus.getBus().send(new LimitScheduleCommand(id, this, start, end));
+        LimitScheduleCommand.scheduleCreated(id, this, start, end);
     }
 
     @BusinessMethod
@@ -103,7 +102,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
 
         if (hasChanged) {
             this.schedule = new ScheduleValue(periodicity, interval);
-            EventBus.getBus().send(new RescheduleCommand(id, this, schedule));
+            RescheduleCommand.scheduleRescheduled(id, this, schedule);
         }
     }
 
@@ -116,7 +115,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
         if (hasChanged) {
             this.name = name;
             this.description = description;
-            EventBus.getBus().send(new DescribeScheduleCommand(id, description, name));
+            DescribeScheduleCommand.scheduleDescribed(id, name, description);
         }
     }
 

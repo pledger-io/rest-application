@@ -20,4 +20,8 @@ public record AdjustScheduleCommand(long id, Schedulable schedulable) implements
         return Map.of("id", id);
     }
 
+    public static void scheduleAdjusted(long id, Schedulable schedulable) {
+        new AdjustScheduleCommand(id, schedulable)
+                .publish();
+    }
 }

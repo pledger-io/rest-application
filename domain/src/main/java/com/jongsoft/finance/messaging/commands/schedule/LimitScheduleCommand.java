@@ -17,4 +17,9 @@ public record LimitScheduleCommand(long id, Schedulable schedulable, LocalDate s
     public Map<String, Object> variables() {
         return Map.of("id", id);
     }
+
+    public static void scheduleCreated(long id, Schedulable schedulable, LocalDate start, LocalDate end) {
+        new LimitScheduleCommand(id, schedulable, start, end)
+                .publish();
+    }
 }

@@ -5,7 +5,6 @@ import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.importer.CompleteImportJobCommand;
 import com.jongsoft.finance.messaging.commands.importer.CreateImportJobCommand;
 import com.jongsoft.finance.messaging.commands.importer.DeleteImportJobCommand;
@@ -44,7 +43,7 @@ public class BatchImport implements AggregateBase {
         this.config = config;
         this.fileCode = fileCode;
 
-        EventBus.getBus().send(new CreateImportJobCommand(config.getId(), slug, fileCode));
+        CreateImportJobCommand.importJobCreated(config.getId(), slug, fileCode);
     }
 
     public void archive() {
@@ -52,7 +51,7 @@ public class BatchImport implements AggregateBase {
             throw StatusException.badRequest("Cannot archive an import job that has finished running.");
         }
 
-        EventBus.getBus().send(new DeleteImportJobCommand(id));
+        DeleteImportJobCommand.importJobDeleted(id);
     }
 
     @BusinessMethod
@@ -62,7 +61,7 @@ public class BatchImport implements AggregateBase {
         }
 
         this.finished = date;
-        EventBus.getBus().send(new CompleteImportJobCommand(id));
+        CompleteImportJobCommand.importJobCompleted(id);
     }
 
 }

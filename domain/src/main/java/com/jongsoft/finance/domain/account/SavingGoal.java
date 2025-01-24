@@ -4,7 +4,6 @@ import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
-import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.savings.*;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedulable;
@@ -44,18 +43,13 @@ public class SavingGoal implements AggregateBase {
         this.targetDate = targetDate;
         this.name = name;
 
-        EventBus.getBus()
-                .send(new CreateSavingGoalCommand(
-                        account.getId(),
-                        name,
-                        goal,
-                        targetDate));
+        CreateSavingGoalCommand.savingGoalCreated(account.getId(), name, goal, targetDate);
     }
 
     /**
      * Call this operation to calculate the amount of money that should be allocated to this saving goal every
      * schedule step to reach the goal.
-     *
+     * <p>
      * Note: since this is a calculation the value can vary, based upon the already allocated amount of money in the
      * account.
      *
@@ -87,7 +81,7 @@ public class SavingGoal implements AggregateBase {
      * Change either the targeted amount of money that should be reserved or the date at which is should be
      * available.
      *
-     * @param goal the target amount of money
+     * @param goal       the target amount of money
      * @param targetDate the date at which the goal should be met
      */
     @BusinessMethod
@@ -100,15 +94,14 @@ public class SavingGoal implements AggregateBase {
 
         this.goal = goal;
         this.targetDate = targetDate;
-        EventBus.getBus()
-                .send(new AdjustSavingGoalCommand(this.id, goal, targetDate));
+        AdjustSavingGoalCommand.savingGoalAdjusted(id, goal, targetDate);
     }
 
     /**
      * Set the interval at which one wishes to add money into the saving goal.
      *
      * @param periodicity the periodicity
-     * @param interval the interval to recur on
+     * @param interval    the interval to recur on
      */
     @BusinessMethod
     public void schedule(Periodicity periodicity, int interval) {
@@ -119,13 +112,10 @@ public class SavingGoal implements AggregateBase {
         }
 
         this.schedule = new ScheduleValue(periodicity, interval);
-        EventBus.getBus()
-                .send(new AdjustScheduleCommand(
-                        id,
-                        Schedulable.basicSchedule(
-                                this.id,
-                                this.targetDate,
-                                this.schedule)));
+        AdjustScheduleCommand.scheduleAdjusted(id, Schedulable.basicSchedule(
+                this.id,
+                this.targetDate,
+                this.schedule));
     }
 
     /**
@@ -144,9 +134,7 @@ public class SavingGoal implements AggregateBase {
         var installment = computeAllocation();
         if (installment.compareTo(BigDecimal.ZERO) > 0) {
             this.allocated = this.allocated.add(installment);
-
-            EventBus.getBus()
-                    .send(new RegisterSavingInstallmentCommand(this.id, installment));
+            RegisterSavingInstallmentCommand.savingInstallmentRegistered(id, installment);
         }
     }
 
@@ -163,8 +151,7 @@ public class SavingGoal implements AggregateBase {
         }
 
         this.allocated = this.allocated.add(amount);
-        EventBus.getBus()
-                .send(new RegisterSavingInstallmentCommand(this.id, amount));
+        RegisterSavingInstallmentCommand.savingInstallmentRegistered(id, amount);
     }
 
     /**
@@ -172,8 +159,7 @@ public class SavingGoal implements AggregateBase {
      */
     @BusinessMethod
     public void completed() {
-        EventBus.getBus()
-                .send(new CompleteSavingGoalCommand(this.id));
+        CompleteSavingGoalCommand.savingGoalCompleted(id);
     }
 
 }

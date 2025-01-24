@@ -1,6 +1,6 @@
 package com.jongsoft.finance.messaging.commands.schedule;
 
-import com.jongsoft.finance.core.ApplicationEvent;
+import com.jongsoft.finance.messaging.ApplicationEvent;
 import com.jongsoft.finance.schedule.Schedulable;
 
 import java.util.Map;

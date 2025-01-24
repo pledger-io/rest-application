@@ -16,4 +16,9 @@ public record RescheduleCommand(long id, Schedulable schedulable, Schedule sched
     public Map<String, Object> variables() {
         return Map.of("id", id);
     }
+
+    public static void scheduleRescheduled(long id, Schedulable schedulable, Schedule schedule) {
+        new RescheduleCommand(id, schedulable, schedule)
+                .publish();
+    }
 }
