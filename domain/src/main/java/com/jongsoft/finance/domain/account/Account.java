@@ -76,7 +76,7 @@ public class Account implements AggregateBase, Serializable {
             this.currency = currency;
             this.type = type;
 
-            RenameAccountCommand.accountRenamed(id, name, description, currency, type);
+            RenameAccountCommand.accountRenamed(id, type, name, description, currency);
         }
     }
 
