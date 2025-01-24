@@ -4,6 +4,7 @@ import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
@@ -44,19 +45,19 @@ public class UserProviderJpa implements UserProvider {
     }
 
     @Override
-    public boolean available(String username) {
+    public boolean available(UserIdentifier username) {
         return entityManager.<Long>blocking()
                 .hql("select count(a.id) from UserAccountJpa a where a.username = :username")
-                .set("username", username)
+                .set("username", username.email())
                 .maybe()
                 .getOrSupply(() -> 0L) == 0;
     }
 
     @Override
-    public Optional<UserAccount> lookup(String username) {
+    public Optional<UserAccount> lookup(UserIdentifier username) {
         return entityManager.<UserAccountJpa>blocking()
                 .hql("from UserAccountJpa a where a.username = :username")
-                .set("username", username)
+                .set("username", username.email())
                 .maybe()
                 .map(this::convert);
     }
@@ -77,7 +78,7 @@ public class UserProviderJpa implements UserProvider {
     }
 
     @Override
-    public Sequence<SessionToken> tokens(String username) {
+    public Sequence<SessionToken> tokens(UserIdentifier username) {
         var hql = """
                 from AccountTokenJpa
                 where user.username = :username
@@ -85,7 +86,7 @@ public class UserProviderJpa implements UserProvider {
 
         return entityManager.<AccountTokenJpa>blocking()
                 .hql(hql)
-                .set("username", username)
+                .set("username", username.email())
                 .set("now", LocalDateTime.now())
                 .sequence()
                 .map(this::convert);
@@ -109,7 +110,7 @@ public class UserProviderJpa implements UserProvider {
 
         return UserAccount.builder()
                 .id(source.getId())
-                .username(source.getUsername())
+                .username(new UserIdentifier(source.getUsername()))
                 .password(source.getPassword())
                 .primaryCurrency(Control.Option(source.getCurrency()).getOrSupply(() -> Currency.getInstance("EUR")))
                 .secret(source.getTwoFactorSecret())

@@ -3,6 +3,7 @@ package com.jongsoft.finance.jpa.rule;
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.EventBus;
@@ -120,7 +121,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
                 .user(
                         UserAccount.builder()
                                 .id(source.getUser().getId())
-                                .username(source.getUser().getUsername())
+                                .username(new UserIdentifier(source.getUser().getUsername()))
                                 .build())
                 .description(source.getDescription())
                 .active(source.isActive())

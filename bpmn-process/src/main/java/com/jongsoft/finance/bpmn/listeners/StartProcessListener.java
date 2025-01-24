@@ -2,13 +2,13 @@ package com.jongsoft.finance.bpmn.listeners;
 
 import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
 import com.jongsoft.finance.core.JavaBean;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import jakarta.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
-import org.camunda.bpm.engine.variable.value.StringValue;
 
 @Slf4j
 @Singleton
@@ -27,7 +27,7 @@ public class StartProcessListener implements ExecutionListener, JavaBean {
     @Override
     public void notify(DelegateExecution execution) {
         if (execution.hasVariable("username") && authenticationFacade.authenticated() == null) {
-            var username = execution.<StringValue>getVariableTyped("username").getValue();
+            var username = (UserIdentifier) execution.getVariable("username");
 
             log.info("[{}-{}] Correcting authentication to user {}",
                     execution.getProcessDefinitionId(),
@@ -37,7 +37,7 @@ public class StartProcessListener implements ExecutionListener, JavaBean {
 
             log.trace("[{}] Setting up security credentials for {}", execution.getProcessDefinitionId(), username);
 
-            eventPublisher.publishEvent(new InternalAuthenticationEvent(this, username));
+            eventPublisher.publishEvent(new InternalAuthenticationEvent(this, username.email()));
         }
     }
 

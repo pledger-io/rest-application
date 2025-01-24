@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.*;
@@ -37,7 +38,7 @@ public class TestSetup {
 
     protected final UserAccount ACTIVE_USER = Mockito.spy(UserAccount.builder()
             .id(1L)
-            .username("test-user")
+            .username(new UserIdentifier("test-user"))
             .password("$2a$10$mgkjpf4nZqCLqAzFCjv5F.2Sj1b8k7yFJZVM0MZ4J9dJKzgBYPKDi")
             .theme("dark")
             .primaryCurrency(Currency.getInstance("EUR"))

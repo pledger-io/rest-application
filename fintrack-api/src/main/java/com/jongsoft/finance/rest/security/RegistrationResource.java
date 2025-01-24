@@ -1,10 +1,14 @@
 package com.jongsoft.finance.rest.security;
 
 import com.jongsoft.finance.domain.FinTrack;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.rest.ApiDefaults;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
-import io.micronaut.http.annotation.*;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Put;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureConfiguration;
@@ -45,7 +49,7 @@ public class RegistrationResource {
     HttpResponse<Void> createAccount(@Valid @Body AuthenticationRequest authenticationRequest) {
         processEngine.getRuntimeService()
                 .startProcessInstanceByKey("RegisterUserAccount", Map.of(
-                        "username", authenticationRequest.getIdentity(),
+                        "username", new UserIdentifier(authenticationRequest.getIdentity()),
                         "passwordHash", application.getHashingAlgorithm().encrypt(authenticationRequest.getSecret())));
 
         return HttpResponse.created((Void) null);

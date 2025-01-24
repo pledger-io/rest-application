@@ -7,6 +7,7 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.SavingGoal;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.FilterDelegate;
 import com.jongsoft.finance.jpa.projections.TripleProjection;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
@@ -213,7 +214,7 @@ public class AccountProviderJpa implements AccountProvider {
                 .savingGoals(Collections.Set(this.convertSavingGoals(source.getSavingGoals())))
                 .user(UserAccount.builder()
                         .id(source.getUser().getId())
-                        .username(source.getUser().getUsername())
+                        .username(new UserIdentifier(source.getUser().getUsername()))
                         .build())
                 .build();
     }

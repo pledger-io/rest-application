@@ -38,13 +38,13 @@ class UserAccountTest {
 
         fullAccount = UserAccount.builder()
                 .id(1L)
-                .username("demo-user")
+                .username(new UserIdentifier("demo-user"))
                 .password("1234567")
                 .roles(Collections.List(new Role("accountant")))
                 .build();
         readOnlyAccount = UserAccount.builder()
                 .id(2L)
-                .username("demo-user")
+                .username(new UserIdentifier("demo-user"))
                 .password("1234567")
                 .roles(Collections.List(new Role("reader")))
                 .build();
@@ -195,7 +195,7 @@ class UserAccountTest {
 
         Mockito.verify(applicationEventPublisher).publishEvent(changeCaptor.capture());
         assertThat(changeCaptor.getValue().enabled()).isTrue();
-        assertThat(changeCaptor.getValue().username()).isEqualTo("demo-user");
+        assertThat(changeCaptor.getValue().username()).isEqualTo(new UserIdentifier("demo-user"));
     }
 
     @Test
@@ -208,6 +208,6 @@ class UserAccountTest {
 
         Mockito.verify(applicationEventPublisher, Mockito.times(2)).publishEvent(changeCaptor.capture());
         assertThat(changeCaptor.getAllValues().get(1).enabled()).isFalse();
-        assertThat(changeCaptor.getAllValues().get(1).username()).isEqualTo("demo-user");
+        assertThat(changeCaptor.getAllValues().get(1).username()).isEqualTo(new UserIdentifier("demo-user"));
     }
 }

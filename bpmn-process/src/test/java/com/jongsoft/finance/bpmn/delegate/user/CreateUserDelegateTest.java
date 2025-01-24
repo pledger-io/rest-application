@@ -2,10 +2,12 @@ package com.jongsoft.finance.bpmn.delegate.user;
 
 import com.jongsoft.finance.bpmn.TestUtilities;
 import com.jongsoft.finance.domain.FinTrack;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.user.CreateUserCommand;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.variable.impl.value.ObjectValueImpl;
 import org.camunda.bpm.engine.variable.impl.value.PrimitiveTypeValueImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +35,7 @@ class CreateUserDelegateTest {
     @Test
     void execute() throws Exception {
         Mockito.when(execution.getVariableLocalTyped("username"))
-                .thenReturn(new PrimitiveTypeValueImpl.StringValueImpl("test-user"));
+                .thenReturn(new ObjectValueImpl(new UserIdentifier("test-user")));
         Mockito.when(execution.getVariableLocalTyped("password"))
                 .thenReturn(new PrimitiveTypeValueImpl.StringValueImpl("password"));
 

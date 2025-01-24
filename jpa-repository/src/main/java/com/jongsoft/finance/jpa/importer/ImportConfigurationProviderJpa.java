@@ -3,6 +3,7 @@ package com.jongsoft.finance.jpa.importer;
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.importer.entity.ImportConfig;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.ImportConfigurationProvider;
@@ -72,7 +73,7 @@ public class ImportConfigurationProviderJpa implements ImportConfigurationProvid
                 .fileCode(source.getFileCode())
                 .user(UserAccount.builder()
                         .id(source.getUser().getId())
-                        .username(source.getUser().getUsername())
+                        .username(new UserIdentifier(source.getUser().getUsername()))
                         .build())
                 .build();
     }

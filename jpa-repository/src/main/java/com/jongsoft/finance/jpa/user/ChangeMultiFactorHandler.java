@@ -31,7 +31,7 @@ public class ChangeMultiFactorHandler implements CommandHandler<ChangeMultiFacto
                         update UserAccountJpa
                         set twoFactorEnabled = :enabled
                         where username = :username""")
-                .set("username", command.username())
+                .set("username", command.username().email())
                 .set("enabled", command.enabled())
                 .execute();
     }

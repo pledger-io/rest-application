@@ -13,10 +13,7 @@ import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
-import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.domain.user.Category;
-import com.jongsoft.finance.domain.user.Role;
-import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.*;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
@@ -69,7 +66,7 @@ public class RuntimeContext {
         this.storageTokens = new ArrayList<>();
         this.userAccount = Mockito.spy(UserAccount.builder()
                 .id(1L)
-                .username("test-user")
+                .username(new UserIdentifier("test-user"))
                 .password("12345")
                 .roles(Collections.List(new Role("admin")))
                 .build());
@@ -97,12 +94,12 @@ public class RuntimeContext {
                     String password = invocation.getArgument(1);
                     var user = UserAccount.builder()
                             .id(idGenerator.getAndIncrement())
-                            .username(username)
+                            .username(new UserIdentifier(username))
                             .password(password)
                             .roles(Collections.List(new Role("user")))
                             .build();
 
-                    Mockito.when(getOrInstantiateBean(UserProvider.class).lookup(username))
+                    Mockito.when(getOrInstantiateBean(UserProvider.class).lookup(user.getUsername()))
                             .thenReturn(Control.Option(user));
                     return user;
                 });
@@ -415,9 +412,9 @@ public class RuntimeContext {
                 .thenReturn("test-user");
         Mockito.when(getOrInstantiateBean(CurrentUserProvider.class).currentUser())
                 .thenReturn(userAccount);
-        Mockito.when(getOrInstantiateBean(UserProvider.class).available(Mockito.anyString()))
+        Mockito.when(getOrInstantiateBean(UserProvider.class).available(Mockito.any()))
                 .thenReturn(true);
-        Mockito.when(getOrInstantiateBean(UserProvider.class).available("test-user"))
+        Mockito.when(getOrInstantiateBean(UserProvider.class).available(new UserIdentifier("test-user")))
                 .thenReturn(false);
 
         new EventBus(applicationEventPublisher);

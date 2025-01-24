@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.lang.Control;
 import dev.samstevens.totp.code.DefaultCodeGenerator;
@@ -173,7 +174,7 @@ public class TestContext {
 
     private String generateToken() {
         var optionalUser = applicationContext.getBean(UserProvider.class)
-                .lookup(authenticatedWith);
+                .lookup(new UserIdentifier(authenticatedWith));
         Assertions.assertThat(optionalUser.isPresent()).isTrue();
 
         return optionalUser.map(UserAccount::getSecret)

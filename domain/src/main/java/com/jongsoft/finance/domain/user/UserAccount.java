@@ -33,7 +33,7 @@ import java.util.Objects;
 public class UserAccount implements AggregateBase, Serializable {
 
     private Long id;
-    private String username;
+    private UserIdentifier username;
     private String password;
     private List<Role> roles;
 
@@ -44,7 +44,7 @@ public class UserAccount implements AggregateBase, Serializable {
     private boolean twoFactorEnabled;
 
     public UserAccount(String username, String password) {
-        this.username = username;
+        this.username = new UserIdentifier(username);
         this.password = password;
         this.roles = Collections.List(new Role("accountant"));
         CreateUserCommand.userCreated(username, password);

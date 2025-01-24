@@ -17,8 +17,6 @@ import io.micronaut.security.annotation.Secured;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -35,7 +33,6 @@ public class ProfileResource {
     private final FinTrack application;
     private final CurrentUserProvider currentUserProvider;
     private final UserProvider userProvider;
-    private final Logger logger = LoggerFactory.getLogger(ProfileResource.class);
 
     public ProfileResource(FinTrack application, CurrentUserProvider currentUserProvider, UserProvider userProvider) {
         this.application = application;
@@ -94,7 +91,7 @@ public class ProfileResource {
     )
     List<SessionResponse> createSession(@Body @Valid TokenCreateRequest request) {
         application.registerToken(
-                currentUserProvider.currentUser().getUsername(),
+                currentUserProvider.currentUser().getUsername().email(),
                 UUID.randomUUID().toString(),
                 (int) ChronoUnit.SECONDS.between(
                         LocalDateTime.now(),

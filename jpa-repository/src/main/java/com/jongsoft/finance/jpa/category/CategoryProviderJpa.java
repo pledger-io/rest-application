@@ -4,6 +4,7 @@ import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -96,7 +97,7 @@ public class CategoryProviderJpa implements CategoryProvider {
                 .lastActivity(source.getLastTransaction())
                 .delete(source.isArchived())
                 .user(UserAccount.builder()
-                        .username(source.getUser().getUsername())
+                        .username(new UserIdentifier(source.getUser().getUsername()))
                         .build())
                 .build();
     }

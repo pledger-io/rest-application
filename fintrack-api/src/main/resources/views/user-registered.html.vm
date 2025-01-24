@@ -36,7 +36,7 @@
         <h1>Welcome to Pledger.io</h1>
     </div>
     <div class="email-content">
-        <p>Dear <strong>$user</strong>,</p>
+        <p>Dear <strong>$user.email()</strong>,</p>
 
         <p>Thank you for registering at Pledger.io. We're excited to have you on board.</p>
 

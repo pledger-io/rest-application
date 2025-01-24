@@ -1,8 +1,8 @@
 package com.jongsoft.finance.domain.importer;
 
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.messaging.commands.importer.CreateConfigurationCommand;
 import com.jongsoft.finance.messaging.commands.importer.CreateImportJobCommand;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ class BatchImportConfigTest {
                 .id(1L)
                 .user(UserAccount.builder()
                         .id(1L)
-                        .username("demo-user")
+                        .username(new UserIdentifier("demo-user"))
                         .build())
                 .name("demo-config")
                 .build();

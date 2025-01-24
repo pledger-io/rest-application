@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.user;
 
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -28,13 +29,13 @@ class UserProviderJpaIT extends JpaTestSetup {
 
     @Test
     void available() {
-        Assertions.assertTrue(userProvider.available("user@account"));
-        Assertions.assertFalse(userProvider.available("demo-user"));
+        Assertions.assertTrue(userProvider.available(new UserIdentifier("user@account")));
+        Assertions.assertFalse(userProvider.available(new UserIdentifier("demo-user")));
     }
 
     @Test
     void lookup() {
-        var check = userProvider.lookup("demo-user");
+        var check = userProvider.lookup(new UserIdentifier("demo-user"));
 
         Assertions.assertTrue(check.isPresent());
         Assertions.assertEquals("demo-user", check.get().getUsername());
@@ -44,12 +45,12 @@ class UserProviderJpaIT extends JpaTestSetup {
 
     @Test
     void lookup_notFound() {
-        Assertions.assertFalse(userProvider.lookup("user@account").isPresent());
+        Assertions.assertFalse(userProvider.lookup(new UserIdentifier("user@account")).isPresent());
     }
 
     @Test
     void tokens() {
-        assertThat(userProvider.tokens("demo-user"))
+        assertThat(userProvider.tokens(new UserIdentifier("demo-user")))
                 .hasSize(1)
                 .first()
                 .satisfies(token -> assertThat(token.getToken()).isEqualTo("refresh-token-1"));
@@ -60,7 +61,7 @@ class UserProviderJpaIT extends JpaTestSetup {
         assertThat(userProvider.refreshToken("refresh-token-1"))
                 .hasSize(1)
                 .first()
-                .satisfies(token -> assertThat(token.getUsername()).isEqualTo("demo-user"));
+                .satisfies(token -> assertThat(token.getUsername()).isEqualTo(new UserIdentifier("demo-user")));
     }
 
     @MockBean

@@ -15,7 +15,7 @@
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${usernameAvailable}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="sf_wait_for_mail" sourceRef="st_create_account" targetRef="st_create_reconcile_account" />
-    <bpmn:sendTask id="st_send_welcome_mail" name="Send welcome mail" camunda:expression="${mailDaemon.send(username, &#39;user-registered&#39;, mailProperties)}">
+    <bpmn:sendTask id="st_send_welcome_mail" name="Send welcome mail" camunda:expression="${mailDaemon.send(username.email(), &#39;user-registered&#39;, mailProperties)}">
       <bpmn:incoming>SequenceFlow_1q5pqa4</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_102zsei</bpmn:outgoing>
     </bpmn:sendTask>
