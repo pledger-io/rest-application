@@ -38,7 +38,7 @@ class UserProviderJpaIT extends JpaTestSetup {
         var check = userProvider.lookup(new UserIdentifier("demo-user"));
 
         Assertions.assertTrue(check.isPresent());
-        Assertions.assertEquals("demo-user", check.get().getUsername());
+        Assertions.assertEquals("demo-user", check.get().getUsername().email());
         Assertions.assertEquals("1234567", check.get().getPassword());
         Assertions.assertEquals("JBSWY3DPEHPK3PXP", check.get().getSecret());
     }

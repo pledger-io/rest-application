@@ -1,6 +1,7 @@
 package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.core.SystemAccountTypes;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
@@ -87,7 +88,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
         Assertions.assertThat(account.getNumber()).isBlank();
         Assertions.assertThat(account.getBic()).isBlank();
         Assertions.assertThat(account.getType()).isEqualTo("default");
-        Assertions.assertThat(account.getUser().getUsername()).isEqualTo("demo-user");
+        Assertions.assertThat(account.getUser().getUsername()).isEqualTo(new UserIdentifier("demo-user"));
     }
 
     @Test

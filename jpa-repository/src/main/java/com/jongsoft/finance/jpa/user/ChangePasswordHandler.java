@@ -31,7 +31,7 @@ public class ChangePasswordHandler implements CommandHandler<ChangePasswordComma
                         update UserAccountJpa
                         set password = :password
                         where username = :username""")
-                .set("username", command.username())
+                .set("username", command.username().email())
                 .set("password", command.password())
                 .execute();
     }

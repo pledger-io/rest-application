@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.user;
 
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.jpa.user.entity.RoleJpa;
@@ -9,17 +10,20 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Currency;
 
 class UserEventListenerIT extends JpaTestSetup {
+
+    private static final UserIdentifier DEMO_USER = new UserIdentifier("demo-user");
+
 
     @Inject
     private ApplicationEventPublisher eventPublisher;
@@ -52,7 +56,7 @@ class UserEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleUserAccountPasswordEvent() {
-        eventPublisher.publishEvent(new ChangePasswordCommand("demo-user", "updated password"));
+        eventPublisher.publishEvent(new ChangePasswordCommand(DEMO_USER, "updated password"));
 
         var check = entityManager.find(UserAccountJpa.class, 1L);
         Assertions.assertThat(check.getPassword()).isEqualTo("updated password");
@@ -60,7 +64,7 @@ class UserEventListenerIT extends JpaTestSetup {
 
     @Test
     void handleUserAccountMultifactorEvent() {
-        eventPublisher.publishEvent(new ChangeMultiFactorCommand("demo-user", true));
+        eventPublisher.publishEvent(new ChangeMultiFactorCommand(DEMO_USER, true));
 
         var check = entityManager.find(UserAccountJpa.class, 1L);
         Assertions.assertThat(check.isTwoFactorEnabled()).isTrue();
@@ -69,7 +73,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleUserAccountSettingEvent_theme() {
         eventPublisher.publishEvent(new ChangeUserSettingCommand(
-                "demo-user",
+                DEMO_USER,
                 ChangeUserSettingCommand.Type.THEME,
                 "sample"));
 
@@ -80,7 +84,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleUserAccountSettingEvent_currency() {
         eventPublisher.publishEvent(new ChangeUserSettingCommand(
-                "demo-user",
+                DEMO_USER,
                 ChangeUserSettingCommand.Type.CURRENCY,
                 "USD"));
 
@@ -91,7 +95,7 @@ class UserEventListenerIT extends JpaTestSetup {
     @Test
     void handleTokenRegistrationEvent() {
         eventPublisher.publishEvent(new RegisterTokenCommand(
-                "demo-user",
+                DEMO_USER.email(),
                 "my-refresh-token",
                 LocalDateTime.of(2019, 1, 1, 12, 33)));
 
