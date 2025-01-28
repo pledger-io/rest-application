@@ -88,7 +88,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
         Assertions.assertThat(account.getNumber()).isBlank();
         Assertions.assertThat(account.getBic()).isBlank();
         Assertions.assertThat(account.getType()).isEqualTo("default");
-        Assertions.assertThat(account.getUser().getUsername()).isEqualTo(new UserIdentifier("demo-user"));
+        Assertions.assertThat(account.getUser()).isEqualTo(new UserIdentifier("demo-user"));
     }
 
     @Test

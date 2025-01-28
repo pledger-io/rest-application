@@ -3,7 +3,6 @@ package com.jongsoft.finance.jpa.contract;
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
 import com.jongsoft.finance.providers.ContractProvider;
@@ -104,9 +103,7 @@ public class ContractProviderJpa implements ContractProvider {
                 .endDate(source.getEndDate())
                 .company(Account.builder()
                         .id(source.getCompany().getId())
-                        .user(UserAccount.builder()
-                                .username(new UserIdentifier(source.getUser().getUsername()))
-                                .build())
+                        .user(new UserIdentifier(source.getUser().getUsername()))
                         .name(source.getCompany().getName())
                         .type(source.getCompany().getType().getLabel())
                         .imageFileToken(source.getCompany().getImageFileToken())

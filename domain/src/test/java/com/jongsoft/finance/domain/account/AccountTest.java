@@ -2,7 +2,6 @@ package com.jongsoft.finance.domain.account;
 
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.account.*;
@@ -34,9 +33,7 @@ class AccountTest {
     void setup() {
         applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         new EventBus(applicationEventPublisher);
-        var user = UserAccount.builder()
-                .username(new UserIdentifier("demo-user"))
-                .build();
+        var user = new UserIdentifier("demo-user");
 
         account = Account.builder()
                 .id(1L)

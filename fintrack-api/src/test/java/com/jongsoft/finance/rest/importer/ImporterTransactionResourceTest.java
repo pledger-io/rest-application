@@ -85,7 +85,7 @@ class ImporterTransactionResourceTest extends TestSetup {
     void delete(RequestSpecification spec) {
         Transaction transaction = Mockito.mock(Transaction.class);
 
-        Mockito.when(transaction.getUser()).thenReturn(ACTIVE_USER);
+        Mockito.when(transaction.getUser()).thenReturn(ACTIVE_USER_IDENTIFIER);
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
         // @formatter:off

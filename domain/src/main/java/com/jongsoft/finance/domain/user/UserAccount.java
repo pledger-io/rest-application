@@ -124,7 +124,7 @@ public class UserAccount implements AggregateBase, Serializable {
             throw StatusException.notAuthorized("User cannot create accounts, incorrect privileges.");
         }
 
-        return new Account(this, name, currency, type);
+        return new Account(username, name, currency, type);
     }
 
     /**

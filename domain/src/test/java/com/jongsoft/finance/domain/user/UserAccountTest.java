@@ -55,7 +55,7 @@ class UserAccountTest {
         Account account = fullAccount.createAccount("Demo account", "EUR", "checking");
 
         Mockito.verify(applicationEventPublisher).publishEvent(Mockito.any(CreateAccountCommand.class));
-        assertThat(account.getUser()).isEqualTo(fullAccount);
+        assertThat(account.getUser()).isEqualTo(fullAccount.getUsername());
         assertThat(account.getName()).isEqualTo("Demo account");
         assertThat(account.getCurrency()).isEqualTo("EUR");
         assertThat(account.getType()).isEqualTo("checking");

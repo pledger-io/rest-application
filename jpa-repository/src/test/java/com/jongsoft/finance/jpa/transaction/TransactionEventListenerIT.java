@@ -3,7 +3,6 @@ package com.jongsoft.finance.jpa.transaction;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.messaging.commands.transaction.*;
@@ -49,7 +48,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
                 Transaction.builder()
                         .date(LocalDate.of(2020, 1, 1))
                         .currency("EUR")
-                        .user(UserAccount.builder().username(new UserIdentifier("demo-user")).build())
+                        .user(new UserIdentifier("demo-user"))
                         .description("My demo transaction")
                         .transactions(Collections.List(
                                 Transaction.Part.builder()

@@ -5,13 +5,11 @@ import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.bpmn.TestUtilities;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.user.Role;
-import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.serialized.ContractJson;
-import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -24,7 +22,6 @@ import java.time.LocalDate;
 
 class ProcessContractCreateDelegateTest {
 
-    private static final UserAccount USER_ACCOUNT = UserAccount.builder().roles(Collections.List(new Role("admin"))).build();
     private AccountProvider accountProvider;
     private ContractProvider contractProvider;
     private StorageService storageService;
@@ -65,7 +62,7 @@ class ProcessContractCreateDelegateTest {
         Mockito.when(accountProvider.lookup("Telfo"))
                 .thenReturn(Control.Option(Account.builder()
                         .id(1L)
-                        .user(USER_ACCOUNT)
+                        .user(new UserIdentifier("test@user"))
                         .build()));
 
         Contract contract = Contract.builder()

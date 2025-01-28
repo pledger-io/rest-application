@@ -10,7 +10,6 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.hamcrest.Matchers;
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @DisplayName("Account transaction resource")
 class AccountTransactionResourceTest extends TestSetup {
@@ -50,7 +48,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .id(1L)
                 .name("To account")
                 .type("checking")
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .build();
 
@@ -190,14 +188,14 @@ class AccountTransactionResourceTest extends TestSetup {
                 .id(1L)
                 .name("To account")
                 .type("checking")
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .build();
         Transaction transaction = Transaction.builder()
                 .id(1L)
                 .description("Sample transaction")
                 .category("Grocery")
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
@@ -246,14 +244,14 @@ class AccountTransactionResourceTest extends TestSetup {
                 .id(1L)
                 .name("To account")
                 .type("checking")
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .build();
         Transaction transaction = Transaction.builder()
                 .id(1L)
                 .description("Sample transaction")
                 .category("Grocery")
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
@@ -316,7 +314,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
@@ -411,14 +409,14 @@ class AccountTransactionResourceTest extends TestSetup {
     void split(RequestSpecification spec) {
         Account account = Account.builder()
                 .id(1L)
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .name("To account")
                 .type("checking")
                 .currency("EUR")
                 .build();
         final Account toAccount = Account.builder()
                 .id(2L)
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .type("debtor")
                 .name("From account").build();
@@ -427,7 +425,7 @@ class AccountTransactionResourceTest extends TestSetup {
                 .id(1L)
                 .description("Sample transaction")
                 .category("Grocery")
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
@@ -489,13 +487,13 @@ class AccountTransactionResourceTest extends TestSetup {
     @DisplayName("Delete a transaction by id")
     void delete(RequestSpecification spec) {
         Transaction transaction = Mockito.mock(Transaction.class);
-        Mockito.when(transaction.getUser()).thenReturn(ACTIVE_USER);
+        Mockito.when(transaction.getUser()).thenReturn(ACTIVE_USER_IDENTIFIER);
 
         Account account = Account.builder()
                 .id(1L)
                 .name("To account")
                 .type("checking")
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .build();
 

@@ -22,7 +22,6 @@ import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 @DisplayName("Transaction resource")
@@ -140,7 +139,7 @@ class TransactionResourceTest extends TestSetup {
                 .category("Grocery")
                 .currency("EUR")
                 .budget("Household")
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER.getUsername())
                 .date(LocalDate.of(2019, 1, 15))
                 .transactions(Collections.List(
                         Transaction.Part.builder()

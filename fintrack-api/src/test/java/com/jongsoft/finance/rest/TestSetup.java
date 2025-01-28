@@ -36,9 +36,10 @@ import java.util.Currency;
 @MicronautTest(environments = {"no-camunda", "test"})
 public class TestSetup {
 
+    protected final UserIdentifier ACTIVE_USER_IDENTIFIER = new UserIdentifier("test-user");
     protected final UserAccount ACTIVE_USER = Mockito.spy(UserAccount.builder()
             .id(1L)
-            .username(new UserIdentifier("test-user"))
+            .username(ACTIVE_USER_IDENTIFIER)
             .password("$2a$10$mgkjpf4nZqCLqAzFCjv5F.2Sj1b8k7yFJZVM0MZ4J9dJKzgBYPKDi")
             .theme("dark")
             .primaryCurrency(Currency.getInstance("EUR"))
