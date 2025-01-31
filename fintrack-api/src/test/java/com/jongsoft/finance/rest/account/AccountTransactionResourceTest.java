@@ -195,7 +195,6 @@ class AccountTransactionResourceTest extends TestSetup {
                 .id(1L)
                 .description("Sample transaction")
                 .category("Grocery")
-                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
@@ -251,7 +250,6 @@ class AccountTransactionResourceTest extends TestSetup {
                 .id(1L)
                 .description("Sample transaction")
                 .category("Grocery")
-                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
@@ -314,7 +312,6 @@ class AccountTransactionResourceTest extends TestSetup {
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
-                .user(ACTIVE_USER_IDENTIFIER)
                 .transactions(Collections.List(
                         Transaction.Part.builder()
                                 .id(1L)
@@ -425,7 +422,6 @@ class AccountTransactionResourceTest extends TestSetup {
                 .id(1L)
                 .description("Sample transaction")
                 .category("Grocery")
-                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .budget("Household")
                 .date(LocalDate.of(2019, 1, 15))
@@ -487,7 +483,6 @@ class AccountTransactionResourceTest extends TestSetup {
     @DisplayName("Delete a transaction by id")
     void delete(RequestSpecification spec) {
         Transaction transaction = Mockito.mock(Transaction.class);
-        Mockito.when(transaction.getUser()).thenReturn(ACTIVE_USER_IDENTIFIER);
 
         Account account = Account.builder()
                 .id(1L)

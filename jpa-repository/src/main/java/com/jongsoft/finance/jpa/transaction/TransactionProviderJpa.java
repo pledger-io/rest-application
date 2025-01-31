@@ -5,7 +5,6 @@ import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.budget.ExpenseJpa;
 import com.jongsoft.finance.jpa.category.CategoryJpa;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
@@ -197,7 +196,6 @@ public class TransactionProviderJpa implements TransactionProvider {
 
         return Transaction.builder()
                 .id(source.getId())
-                .user(new UserIdentifier(source.getUser().getUsername()))
                 .created(source.getCreated())
                 .updated(source.getUpdated())
                 .date(source.getDate())

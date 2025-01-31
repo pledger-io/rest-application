@@ -5,7 +5,6 @@ import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.messaging.commands.transaction.*;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
@@ -62,7 +61,6 @@ public class Transaction implements AggregateBase, Serializable {
     }
 
     private Long id;
-    private transient UserIdentifier user;
 
     private LocalDate date;
     private LocalDate interestDate;
@@ -82,9 +80,7 @@ public class Transaction implements AggregateBase, Serializable {
     private Date created;
     private Date updated;
 
-    public Transaction(UserIdentifier user, Account from, Account to, double amount) {
-        this.user = user;
-
+    public Transaction(Account from, Account to, double amount) {
         var toAmount = Math.abs(amount);
         var fromAmount = 0 - Math.abs(amount);
 

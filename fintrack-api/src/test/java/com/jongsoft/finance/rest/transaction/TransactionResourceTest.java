@@ -139,7 +139,6 @@ class TransactionResourceTest extends TestSetup {
                 .category("Grocery")
                 .currency("EUR")
                 .budget("Household")
-                .user(ACTIVE_USER.getUsername())
                 .date(LocalDate.of(2019, 1, 15))
                 .transactions(Collections.List(
                         Transaction.Part.builder()

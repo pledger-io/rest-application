@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 @Named("accountTypeProvider")
 public class AccountTypeProviderJpa implements AccountTypeProvider {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(AccountTypeProvider.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(AccountTypeProviderJpa.class);
 
     private final ReactiveEntityManager entityManager;
 

@@ -166,7 +166,6 @@ public class Account implements AggregateBase, Serializable {
         }
 
         var builder = new Transaction(
-                user,
                 source,
                 destination,
                 amount)
