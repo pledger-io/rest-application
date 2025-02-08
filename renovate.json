@@ -6,7 +6,7 @@
   "packageRules": [
     {
       "groupName": "Non-major dependency updates",
-      "matchUpdateTypes": ["minor", "patch"]
+      "matchUpdateTypes": ["patch"]
     }
   ],
   "addLabels": ["dependency", "triage"],
