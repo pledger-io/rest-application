@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.schedule;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.schedule.DescribeScheduleCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,17 +28,10 @@ public class DescribeScheduleHandler implements CommandHandler<DescribeScheduleC
     public void handle(DescribeScheduleCommand command) {
         log.info("[{}] - Processing schedule describe event", command.id());
 
-        var hql = """
-                update ScheduledTransactionJpa
-                set description = :description,
-                    name = :name
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(ScheduledTransactionJpa.class)
                 .set("description", command.description())
                 .set("name", command.name())
+                .fieldEq("id", command.id())
                 .execute();
     }
 }

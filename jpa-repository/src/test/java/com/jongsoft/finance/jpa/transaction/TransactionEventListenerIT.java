@@ -3,7 +3,6 @@ package com.jongsoft.finance.jpa.transaction;
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.messaging.commands.transaction.*;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -11,12 +10,12 @@ import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -48,7 +47,6 @@ class TransactionEventListenerIT extends JpaTestSetup {
                 Transaction.builder()
                         .date(LocalDate.of(2020, 1, 1))
                         .currency("EUR")
-                        .user(UserAccount.builder().username("dem-user").build())
                         .description("My demo transaction")
                         .transactions(Collections.List(
                                 Transaction.Part.builder()

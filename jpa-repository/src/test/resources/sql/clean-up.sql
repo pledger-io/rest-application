@@ -1,6 +1,7 @@
 SET FOREIGN_KEY_CHECKS=0;  -- turn off foreign key checks
 
 TRUNCATE TABLE user_account;
+TRUNCATE TABLE user_roles;
 TRUNCATE TABLE user_account_token;
 TRUNCATE TABLE account;
 TRUNCATE TABLE transaction_journal;

@@ -1,6 +1,7 @@
 package com.jongsoft.finance.security;
 
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.lang.Control;
 import jakarta.inject.Named;
@@ -22,7 +23,7 @@ public class CurrentUserProviderImpl implements CurrentUserProvider {
     public UserAccount currentUser() {
         var username = Control.Option(authenticationFacade.authenticated());
         return username.map(s ->
-                userProvider.lookup(s)
+                userProvider.lookup(new UserIdentifier(s))
                         .getOrSupply(() -> null))
                 .getOrSupply(() -> null);
 

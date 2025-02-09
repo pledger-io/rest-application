@@ -7,7 +7,7 @@ import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.messaging.commands.account.*;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedule;
@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 public class Account implements AggregateBase, Serializable {
 
     private Long id;
-    private UserAccount user;
+    private UserIdentifier user;
 
     private String name;
     private String description;
@@ -53,7 +53,7 @@ public class Account implements AggregateBase, Serializable {
     private boolean remove;
 
     @BusinessMethod
-    public Account(UserAccount user, String name, String currency, String type) {
+    public Account(UserIdentifier user, String name, String currency, String type) {
         this.user = user;
         this.name = name;
         this.currency = currency;
@@ -166,7 +166,6 @@ public class Account implements AggregateBase, Serializable {
         }
 
         var builder = new Transaction(
-                user,
                 source,
                 destination,
                 amount)

@@ -3,7 +3,8 @@ package com.jongsoft.finance.jpa.rule;
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.domain.user.UserIdentifier;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
@@ -15,6 +16,8 @@ import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
@@ -23,6 +26,8 @@ import java.util.Optional;
 @RequiresJpa
 @Named("transactionRuleProvider")
 public class TransactionRuleProviderJpa implements TransactionRuleProvider {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
@@ -35,58 +40,52 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 
     @Override
     public Sequence<TransactionRule> lookup() {
-        var hql = """
-                select r from RuleJpa r
-                where r.user.username = :username
-                 and r.archived = false
-                 order by r.group.sort ASC, r.sort ASC""";
+        logger.trace("Listing all transaction rules.");
 
-        return entityManager.<RuleJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(RuleJpa.class)
+                .joinFetch("user")
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("archived", false)
+                .orderBy("sort", true)
+                .stream()
+                .map(this::convert)
+                .collect(ReactiveEntityManager.sequenceCollector());
     }
 
     @Override
     public com.jongsoft.lang.control.Optional<TransactionRule> lookup(long id) {
-        return entityManager.<RuleJpa>blocking()
-                .hql("from RuleJpa where id = :id and user.username = :username")
-                .set("id", id)
-                .set("username", authenticationFacade.authenticated())
-                .maybe(this::convert);
+        logger.trace("Looking up transaction rule with id {}.", id);
+
+        return entityManager.from(RuleJpa.class)
+                .fieldEq("id", id)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
+                .map(this::convert);
     }
 
     @Override
     public Sequence<TransactionRule> lookup(String group) {
-        var hql = """
-                select r from RuleJpa r
-                where r.user.username = :username
-                 and r.group.name = :name
-                 and r.archived = false
-                order by r.sort asc""";
+        logger.trace("Listing all transaction rules in group {}.", group);
 
-        return entityManager.<RuleJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", group)
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(RuleJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("group.name", group)
+                .fieldEq("archived", false)
+                .orderBy("sort", true)
+                .stream()
+                .map(this::convert)
+                .collect(ReactiveEntityManager.sequenceCollector());
     }
 
     @Override
     public void save(TransactionRule rule) {
         int sortOrder = rule.getSort();
         if (rule.getId() == null || rule.getSort() == 0) {
-            var hql = """
-                    select max(sort) + 1 from RuleJpa
-                    where user.username = :username and archived = false and group.name = :group""";
-
-            sortOrder = entityManager.<Integer>blocking()
-                    .hql(hql)
-                    .set("username", authenticationFacade.authenticated())
-                    .set("group", rule.getGroup())
-                    .maybe()
+            sortOrder = entityManager.from(RuleJpa.class)
+                    .fieldEq("user.username", authenticationFacade.authenticated())
+                    .fieldEq("group.name", rule.getGroup())
+                    .projectSingleValue(Long.class, "max(sort)")
+                    .map(Long::intValue)
                     .getOrSupply(() -> 1);
         }
 
@@ -120,7 +119,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
                 .user(
                         UserAccount.builder()
                                 .id(source.getUser().getId())
-                                .username(source.getUser().getUsername())
+                                .username(new UserIdentifier(source.getUser().getUsername()))
                                 .build())
                 .description(source.getDescription())
                 .active(source.isActive())
@@ -154,19 +153,17 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
     }
 
     private UserAccountJpa activeUser() {
-        return entityManager.<UserAccountJpa>blocking()
-                .hql("from UserAccountJpa where username = :username")
-                .set("username", authenticationFacade.authenticated())
-                .maybe()
+        return entityManager.from(UserAccountJpa.class)
+                .fieldEq("username", authenticationFacade.authenticated())
+                .singleResult()
                 .get();
     }
 
     private RuleGroupJpa group(String group) {
-        return entityManager.<RuleGroupJpa>blocking()
-                .hql("from RuleGroupJpa where user.username = :username and name = :group")
-                .set("username", authenticationFacade.authenticated())
-                .set("group", group)
-                .maybe()
+        return entityManager.from(RuleGroupJpa.class)
+                .fieldEq("username", authenticationFacade.authenticated())
+                .fieldEq("group", group)
+                .singleResult()
                 .getOrSupply(() -> {
                     EventBus.getBus().send(new CreateRuleGroupCommand(group));
                     return group(group);

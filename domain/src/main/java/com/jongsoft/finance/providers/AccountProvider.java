@@ -18,8 +18,7 @@ public interface AccountProvider extends DataProvider<Account>, Exportable<Accou
         FilterCommand number(String value, boolean fullMatch);
         FilterCommand types(Sequence<String> types);
 
-        FilterCommand page(int value);
-        FilterCommand pageSize(int value);
+        FilterCommand page(int page, int pageSize);
     }
 
     interface AccountSpending {

@@ -31,7 +31,7 @@ public class UserAccountJpa extends EntityJpa {
     private byte[] gravatar;
 
     @JoinTable(name = "user_roles")
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     private Set<RoleJpa> roles = new HashSet<>();
 
     public UserAccountJpa() {

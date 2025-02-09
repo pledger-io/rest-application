@@ -2,12 +2,9 @@ package com.jongsoft.finance.jpa.category;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
-import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.category.CreateCategoryCommand;
-import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.Collections;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -20,12 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 public class CreateCategoryHandler implements CommandHandler<CreateCategoryCommand> {
 
     private final ReactiveEntityManager entityManager;
-    private final AuthenticationFacade authenticationFacade;
 
     @Inject
-    public CreateCategoryHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+    public CreateCategoryHandler(ReactiveEntityManager entityManager) {
         this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
     }
 
     @Override
@@ -36,7 +31,7 @@ public class CreateCategoryHandler implements CommandHandler<CreateCategoryComma
         var entity = CategoryJpa.builder()
                 .label(command.name())
                 .description(command.description())
-                .user(entityManager.get(UserAccountJpa.class, Collections.Map("username", authenticationFacade.authenticated())))
+                .user(entityManager.currentUser())
                 .build();
 
         entityManager.persist(entity);

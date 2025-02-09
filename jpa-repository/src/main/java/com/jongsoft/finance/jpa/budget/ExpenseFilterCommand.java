@@ -1,50 +1,35 @@
 package com.jongsoft.finance.jpa.budget;
 
-import com.jongsoft.finance.jpa.core.FilterCommandJpa;
+import com.jongsoft.finance.jpa.query.JpaFilterBuilder;
 import com.jongsoft.finance.providers.ExpenseProvider;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class ExpenseFilterCommand extends FilterCommandJpa implements ExpenseProvider.FilterCommand {
+public class ExpenseFilterCommand extends JpaFilterBuilder<ExpenseJpa> implements ExpenseProvider.FilterCommand {
 
-    @Override
-    protected String fromHql() {
-        return " from ExpenseJpa a where a.archived = false";
+    public ExpenseFilterCommand() {
+        query().fieldEq("archived", false);
+        orderBy = "name";
+        orderAscending = true;
     }
 
-    @Override
-    public FilterCommandJpa user(String username) {
-        hql("user", " and a.user.username = :username");
-        parameter("username", username);
-        return this;
+    public void user(String username) {
+        query().fieldEq("user.username", username);
     }
 
     @Override
     public ExpenseFilterCommand name(String value, boolean exact) {
         if (exact) {
-            hql("name", " and lower(a.name) = lower(:name)");
-            parameter("name", value);
+            query().fieldEq("name", value);
         } else {
-            hql("name", " and lower(a.name) like lower(:name)");
-            parameter("name", "%" + value + "%");
+            query().fieldLike("name", value);
         }
 
         return this;
     }
 
     @Override
-    public Sort sort() {
-        return new Sort("a.name", true);
+    public Class<ExpenseJpa> entityType() {
+        return ExpenseJpa.class;
     }
-
-    @Override
-    public int page() {
-        return 0;
-    }
-
-    @Override
-    public int pageSize() {
-        return Integer.MAX_VALUE;
-    }
-
 }

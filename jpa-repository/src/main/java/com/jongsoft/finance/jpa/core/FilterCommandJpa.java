@@ -2,7 +2,6 @@ package com.jongsoft.finance.jpa.core;
 
 import com.jongsoft.finance.jpa.FilterDelegate;
 
-import jakarta.persistence.Query;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -19,7 +18,8 @@ public abstract class FilterCommandJpa implements FilterDelegate<FilterCommandJp
 
     @Override
     public String generateHql() {
-        var hqlBuilder = new StringBuilder(fromHql());
+        var hqlBuilder = new StringBuilder();
+
         filters.values().forEach(hqlFilter -> hqlBuilder
                 .append(System.lineSeparator())
                 .append(hqlFilter));
@@ -27,17 +27,11 @@ public abstract class FilterCommandJpa implements FilterDelegate<FilterCommandJp
         return hqlBuilder.toString();
     }
 
-    @Override
-    @Deprecated
-    public FilterCommandJpa prepareQuery(Query query) {
-        parameters.forEach(query::setParameter);
-        return this;
-    }
-
     public Map<String, ?> getParameters() {
         return parameters;
     }
 
+    @Deprecated
     protected abstract String fromHql();
 
     protected void hql(String key, String hql) {

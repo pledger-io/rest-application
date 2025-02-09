@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.rule;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.rule.ChangeConditionCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -26,19 +26,11 @@ public class ChangeConditionHandler implements CommandHandler<ChangeConditionCom
     public void handle(ChangeConditionCommand command) {
         log.info("[{}] - Updating rule condition", command.id());
 
-        String hql = """
-                update %s
-                set field = :field,
-                    operation = :operation,
-                    condition = :condition
-                where id = :id""".formatted(RuleConditionJpa.class.getName());
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(RuleConditionJpa.class)
                 .set("operation", command.operation())
                 .set("condition", command.condition())
                 .set("field", command.field())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

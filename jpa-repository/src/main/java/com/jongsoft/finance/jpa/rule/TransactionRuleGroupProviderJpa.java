@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.rule;
 
 import com.jongsoft.finance.domain.transaction.TransactionRuleGroup;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.TransactionRuleGroupProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
@@ -31,34 +31,23 @@ public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProv
     public Sequence<TransactionRuleGroup> lookup() {
         log.trace("TransactionRuleGroup listing");
 
-        var hql = """
-                select g from RuleGroupJpa g 
-                where g.user.username = :username
-                    and g.archived = false
-                order by g.sort asc""";
-
-        return entityManager.<RuleGroupJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(RuleGroupJpa.class)
+                .fieldEq("archived", false)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .stream()
+                .map(this::convert)
+                .collect(ReactiveEntityManager.sequenceCollector());
     }
 
     @Override
     public Optional<TransactionRuleGroup> lookup(String name) {
         log.trace("TransactionRuleGroup lookup with name: {}", name);
 
-        var hql = """
-                select g from RuleGroupJpa g 
-                where g.user.username = :username
-                    and g.name = :name
-                    and g.archived = false""";
-
-        return entityManager.<RuleGroupJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", name)
-                .maybe()
+        return entityManager.from(RuleGroupJpa.class)
+                .fieldEq("archived", false)
+                .fieldEq("name", name)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .map(this::convert);
     }
 

@@ -3,7 +3,7 @@ package com.jongsoft.finance.jpa.tag;
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Tag;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
@@ -34,32 +34,25 @@ public class TagProviderJpa implements TagProvider {
     public Sequence<Tag> lookup() {
         log.trace("Tag listing");
 
-        var hql = """
-                select t from TagJpa t
-                where t.user.username = :username and t.archived = false""";
-
-        return entityManager.<TagJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(TagJpa.class)
+                .joinFetch("user")
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("archived", false)
+                .stream()
+                .map(this::convert)
+                .collect(ReactiveEntityManager.sequenceCollector());
     }
 
     @Override
     public Optional<Tag> lookup(String name) {
         log.trace("Tag lookup by name: {}", name);
 
-        var hql = """
-                select t from TagJpa t
-                where t.name = :name
-                    and t.user.username = :username
-                    and t.archived = false""";
-
-        return entityManager.<TagJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", name)
-                .maybe()
+        return entityManager.from(TagJpa.class)
+                .joinFetch("user")
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("name", name)
+                .fieldEq("archived", false)
+                .singleResult()
                 .map(this::convert);
     }
 
@@ -68,16 +61,10 @@ public class TagProviderJpa implements TagProvider {
         log.trace("Tag lookup by filter: {}", filter);
 
         if (filter instanceof TagFilterCommand delegate) {
-            var offset = delegate.page() * delegate.pageSize();
             delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<TagJpa>blocking()
-                    .hql(delegate.generateHql())
-                    .setAll(delegate.getParameters())
-                    .limit(delegate.pageSize())
-                    .offset(offset)
-                    .sort(delegate.sort())
-                    .page()
+            return entityManager.from(delegate)
+                    .paged()
                     .map(this::convert);
         }
 

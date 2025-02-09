@@ -5,12 +5,12 @@ import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.jpa.budget.ExpenseJpa;
 import com.jongsoft.finance.jpa.category.CategoryJpa;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.expression.Expressions;
 import com.jongsoft.finance.jpa.tag.TagJpa;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Objects;
 
 @ReadOnly
@@ -51,25 +52,31 @@ public class TransactionProviderJpa implements TransactionProvider {
         log.trace("Transaction locate first with filter: {}", filter);
 
         if (filter instanceof TransactionFilterCommand delegate) {
+            delegate.page(0, 1);
             delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<TransactionJournal>blocking()
-                    .hql("select distinct a " + delegate.generateHql() + " order by a.date asc")
-                    .setAll(delegate.getParameters())
-                    .limit(1)
-                    .maybe()
+            var results = entityManager.from(delegate)
+                    .join("transactions t")
+                    .orderBy("date", true)
+                    .paged()
+                    .content()
                     .map(this::convert);
+
+            if (results.isEmpty()) {
+                return Control.Option();
+            }
+
+            return Control.Option(results.head());
         }
         throw new IllegalStateException("Cannot use non JPA filter on TransactionProviderJpa");
     }
 
     @Override
     public Optional<Transaction> lookup(long id) {
-        return entityManager.<TransactionJournal>blocking()
-                .hql("from TransactionJournal where id = :id and user.username = :username")
-                .set("username", authenticationFacade.authenticated())
-                .set("id", id)
-                .maybe()
+        return entityManager.from(TransactionJournal.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("id", id)
+                .singleResult()
                 .map(this::convert);
     }
 
@@ -78,16 +85,11 @@ public class TransactionProviderJpa implements TransactionProvider {
         log.trace("Transactions lookup with filter: {}", filter);
 
         if (filter instanceof TransactionFilterCommand delegate) {
-            var offset = delegate.page() * delegate.pageSize();
             delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<TransactionJournal>blocking()
-                    .hql(delegate.generateHql())
-                    .setAll(delegate.getParameters())
-                    .limit(delegate.pageSize())
-                    .offset(offset)
-                    .sort(delegate.sort())
-                    .page()
+            return entityManager.from(delegate)
+                    .join("transactions t")
+                    .paged()
                     .map(this::convert);
         }
 
@@ -101,18 +103,13 @@ public class TransactionProviderJpa implements TransactionProvider {
         if (filter instanceof TransactionFilterCommand delegate) {
             delegate.user(authenticationFacade.authenticated());
 
-            var hql = """
-                    select new %s(
-                       a.date,
-                       sum(t.amount))
-                       %s
-                       group by a.date
-                       order by a.date asc""".formatted(DailySummaryImpl.class.getName(), delegate.generateHql());
-
-            return entityManager.<DailySummary>blocking()
-                    .hql(hql)
-                    .setAll(delegate.getParameters())
-                    .sequence();
+            return entityManager.from(delegate)
+                    .join("transactions t")
+                    .groupBy("date")
+                    .orderBy("date", true)
+                    .project(DailySummaryImpl.class, "new DailySummaryImpl(e.date, sum(t.amount))")
+                    .map(DailySummary.class::cast)
+                    .collect(ReactiveEntityManager.sequenceCollector());
         }
 
         throw new IllegalStateException("Cannot use non JPA filter on TransactionProviderJpa");
@@ -125,18 +122,15 @@ public class TransactionProviderJpa implements TransactionProvider {
         if (filter instanceof TransactionFilterCommand delegate) {
             delegate.user(authenticationFacade.authenticated());
 
-            var hql = """
-                    select new %s(
-                       year(a.date), month(a.date), 1,
-                       sum(t.amount))
-                       %s
-                       group by year(a.date), month(a.date)
-                       order by year(a.date) asc, month(a.date) asc""".formatted(DailySummaryImpl.class.getName(), delegate.generateHql());
-
-            return entityManager.<DailySummary>blocking()
-                    .hql(hql)
-                    .setAll(delegate.getParameters())
-                    .sequence();
+            return entityManager.from(delegate)
+                    .join("transactions t")
+                    // reset the order by statement, otherwise exceptions with the group by will happen
+                    .orderBy(null, false)
+                    .groupBy(Expressions.field("year(e.date)"), Expressions.field("month(e.date)"))
+                    .project(DailySummaryImpl.class, "new DailySummaryImpl(year(e.date), month(e.date), 1, sum(t.amount))")
+                    .sorted(Comparator.comparing(DailySummaryImpl::day))
+                    .map(DailySummary.class::cast)
+                    .collect(ReactiveEntityManager.sequenceCollector());
         }
 
         throw new IllegalStateException("Cannot use non JPA filter on TransactionProviderJpa");
@@ -149,10 +143,10 @@ public class TransactionProviderJpa implements TransactionProvider {
         if (filter instanceof TransactionFilterCommand delegate) {
             delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<BigDecimal>blocking()
-                    .hql("select sum(t.amount) " + delegate.generateHql())
-                    .setAll(delegate.getParameters())
-                    .maybe();
+            return entityManager.from(delegate)
+                    .join("transactions t")
+                    .orderBy(null, false)
+                    .projectSingleValue(BigDecimal.class, "sum(t.amount)");
         }
 
         throw new IllegalStateException("Cannot use non JPA filter on TransactionProviderJpa");
@@ -160,30 +154,24 @@ public class TransactionProviderJpa implements TransactionProvider {
 
     @Override
     public Sequence<Transaction> similar(EntityRef from, EntityRef to, double amount, LocalDate date) {
-        var hql = """
-                select distinct t from TransactionJournal t
-                where t.user.username = :username
-                    and t.date = :date
-                    and exists (
-                        select 1 from t.transactions tj
-                        where abs(tj.amount) = abs(:amount)
-                            and tj.account.id = :fromAccount
-                            and tj.deleted is null)
-                    and exists (
-                        select 1 from t.transactions tj
-                        where abs(tj.amount) = abs(:amount)
-                            and tj.account.id = :toAccount
-                            and tj.deleted is null)""";
-
-        return entityManager.<TransactionJournal>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("amount", amount)
-                .set("date", date)
-                .set("fromAccount", from.getId())
-                .set("toAccount", to.getId())
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(TransactionJournal.class)
+                .joinFetch("transactions")
+                .joinFetch("currency")
+                .joinFetch("tags")
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .whereExists(fromQuery -> fromQuery
+                        .from("transactions")
+                        .fieldEq("account.id", from.getId())
+                        .fieldEqOneOf("amount", amount, -amount)
+                        .fieldNull("deleted"))
+                .whereExists(toQuery -> toQuery
+                        .from("transactions")
+                        .fieldEq("account.id", to.getId())
+                        .fieldEqOneOf("amount", amount, -amount)
+                        .fieldNull("deleted"))
+                .stream()
+                .map(this::convert)
+                .collect(com.jongsoft.lang.collection.support.Collections.collector(com.jongsoft.lang.Collections::List));
     }
 
     protected Transaction convert(TransactionJournal source) {
@@ -197,10 +185,6 @@ public class TransactionProviderJpa implements TransactionProvider {
 
         return Transaction.builder()
                 .id(source.getId())
-                .user(
-                        UserAccount.builder()
-                                .username(source.getUser().getUsername())
-                                .build())
                 .created(source.getCreated())
                 .updated(source.getUpdated())
                 .date(source.getDate())

@@ -2,6 +2,7 @@ package com.jongsoft.finance.bpmn.feature;
 
 import com.jongsoft.finance.bpmn.feature.junit.ProcessExtension;
 import com.jongsoft.finance.bpmn.feature.junit.RuntimeContext;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.assertj.core.api.Assertions;
 import org.camunda.bpm.engine.variable.Variables;
@@ -20,7 +21,7 @@ public class AccountRegistrationIT {
                 .execute(
                         "RegisterUserAccount",
                         Variables.createVariables()
-                                .putValue("username", "test-user"))
+                                .putValue("username", new UserIdentifier("test-user")))
                 .verifyCompleted()
                 .verifyErrorCompletion();
     }
@@ -33,7 +34,7 @@ public class AccountRegistrationIT {
                 .execute(
                         "RegisterUserAccount",
                         Variables.createVariables()
-                                .putValue("username", "new-user@local")
+                                .putValue("username", new UserIdentifier("new-user@local"))
                                 .putValue("passwordHash", "password-hash"))
                 .verifyCompleted()
                 .verifySuccess();
@@ -42,7 +43,7 @@ public class AccountRegistrationIT {
                 assertion.hasSize(1)
                         .anySatisfy((key, value) -> {
                             Assertions.assertThat(key).isEqualTo("user");
-                            Assertions.assertThat(value).isEqualTo("new-user@local");
+                            Assertions.assertThat(value).isEqualTo(new UserIdentifier("new-user@local"));
                         }));
     }
 }

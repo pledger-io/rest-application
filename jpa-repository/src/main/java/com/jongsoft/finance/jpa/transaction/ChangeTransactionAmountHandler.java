@@ -3,10 +3,11 @@ package com.jongsoft.finance.jpa.transaction;
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.currency.CurrencyJpa;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.expression.Expressions;
+import com.jongsoft.finance.jpa.query.expression.FieldEquation;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.ChangeTransactionAmountCommand;
-import com.jongsoft.lang.Collections;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -30,29 +31,17 @@ public class ChangeTransactionAmountHandler implements CommandHandler<ChangeTran
     public void handle(ChangeTransactionAmountCommand command) {
         log.info("[{}] - Processing transaction amount change event", command.id());
 
-        var hql = """
-                update TransactionJpa
-                set amount = case when amount >= 0
-                                then :amount 
-                                else :negAmount end
-                where journal.id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
-                .set("amount", command.amount())
-                .set("negAmount", command.amount().negate())
+        entityManager.update(TransactionJpa.class)
+                .set("amount", Expressions.caseWhen(
+                        Expressions.fieldCondition(null, "amount", FieldEquation.GTE, 0),
+                        Expressions.value(command.amount()),
+                        Expressions.value(command.amount().negate())))
+                .fieldEq("journal.id", command.id())
                 .execute();
 
-        var hqlTransaction = """
-                update TransactionJournal
-                set currency = :currency
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hqlTransaction)
-                .set("id", command.id())
-                .set("currency", entityManager.get(CurrencyJpa.class, Collections.Map("code", command.currency())))
+        entityManager.update(TransactionJournal.class)
+                .set("currency", entityManager.from(CurrencyJpa.class).fieldEq("code", command.currency()).singleResult().get())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

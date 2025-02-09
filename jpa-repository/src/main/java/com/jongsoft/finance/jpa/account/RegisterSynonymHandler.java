@@ -2,11 +2,10 @@ package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.account.RegisterSynonymCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.Collections;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -33,31 +32,22 @@ public class RegisterSynonymHandler implements CommandHandler<RegisterSynonymCom
     public void handle(RegisterSynonymCommand command) {
         log.info("[{}] - Processing register synonym event", command.accountId());
 
-        var hql = """
-                select id from AccountSynonymJpa where
-                    synonym = :synonym
-                    and account.user.username = :username""";
+        var existingId = entityManager.from(AccountSynonymJpa.class)
+                .fieldEq("synonym", command.synonym())
+                .fieldEq("account.user.username", authenticationFacade.authenticated())
+                .projectSingleValue(Long.class, "id");
 
-        var existingId = entityManager.blocking()
-                .hql(hql)
-                .set("synonym", command.synonym())
-                .set("username", authenticationFacade.authenticated())
-                .maybe();
-
-        var account = entityManager.get(
-                AccountJpa.class,
-                Collections.Map("id", command.accountId()));
+        var account = entityManager.from(AccountJpa.class)
+                .joinFetch("currency")
+                .joinFetch("user")
+                .fieldEq("id", command.accountId())
+                .singleResult()
+                .get();
 
         if (existingId.isPresent()) {
-            var updateHql = """
-                    update AccountSynonymJpa
-                    set account = :account
-                    where id = :id""";
-
-            entityManager.update()
-                    .hql(updateHql)
+            entityManager.update(AccountSynonymJpa.class)
                     .set("account", account)
-                    .set("id", existingId.get())
+                    .fieldEq("id", existingId.get())
                     .execute();
         } else {
             var entity = AccountSynonymJpa.builder()

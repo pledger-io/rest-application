@@ -60,7 +60,7 @@ class ImporterTransactionResourceTest extends TestSetup {
         var mockFilter = filterFactory.transaction();
 
         Mockito.verify(mockFilter).importSlug("ads-fasdfa-fasd");
-        Mockito.verify(mockFilter).page(0);
+        Mockito.verify(mockFilter).page(0, 0);
         Mockito.verify(transactionProvider).lookup(Mockito.any());
     }
 
@@ -85,7 +85,6 @@ class ImporterTransactionResourceTest extends TestSetup {
     void delete(RequestSpecification spec) {
         Transaction transaction = Mockito.mock(Transaction.class);
 
-        Mockito.when(transaction.getUser()).thenReturn(ACTIVE_USER);
         Mockito.when(transactionProvider.lookup(123L)).thenReturn(Control.Option(transaction));
 
         // @formatter:off

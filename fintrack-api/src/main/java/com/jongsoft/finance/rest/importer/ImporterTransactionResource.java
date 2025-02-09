@@ -54,8 +54,7 @@ public class ImporterTransactionResource {
             @Valid @Body TransactionSearchRequest request) {
         var filter = filterFactory.transaction()
                 .importSlug(batchSlug)
-                .pageSize(settingProvider.getPageSize())
-                .page(request.getPage());
+                .page(request.getPage(), settingProvider.getPageSize());
 
         var response = transactionProvider.lookup(filter)
                 .map(TransactionResponse::new);
@@ -74,8 +73,7 @@ public class ImporterTransactionResource {
     void runRuleAutomation(@PathVariable String batchSlug) {
         var searchFilter = filterFactory.transaction()
                 .importSlug(batchSlug)
-                .pageSize(Integer.MAX_VALUE)
-                .page(0);
+                .page(0, Integer.MAX_VALUE);
 
         transactionProvider.lookup(searchFilter)
                 .content()

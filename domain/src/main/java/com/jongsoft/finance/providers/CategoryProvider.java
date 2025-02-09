@@ -9,8 +9,7 @@ public interface CategoryProvider extends DataProvider<Category>, Exportable<Cat
 
     interface FilterCommand {
         FilterCommand label(String label, boolean exact);
-        FilterCommand page(int page);
-        FilterCommand pageSize(int pageSize);
+        FilterCommand page(int page, int pageSize);
     }
 
     Optional<Category> lookup(String label);

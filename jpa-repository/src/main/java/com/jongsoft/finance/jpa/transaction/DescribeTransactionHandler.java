@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.DescribeTransactionCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -27,15 +27,10 @@ public class DescribeTransactionHandler implements CommandHandler<DescribeTransa
     @BusinessEventListener
     public void handle(DescribeTransactionCommand command) {
         log.info("[{}] - Processing transaction describe event", command.id());
-        var hqlTransaction = """
-                update TransactionJournal
-                set description = :description
-                where id = :id""";
 
-        entityManager.update()
-                .hql(hqlTransaction)
-                .set("id", command.id())
+        entityManager.update(TransactionJournal.class)
                 .set("description", command.description())
+                .fieldEq("id", command.id())
                 .execute();
     }
 }

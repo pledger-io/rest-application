@@ -3,7 +3,7 @@ package com.jongsoft.finance.jpa.budget;
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.user.Budget;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
@@ -11,12 +11,17 @@ import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+
+import static org.slf4j.LoggerFactory.getLogger;
 
 @ReadOnly
 @Singleton
 @RequiresJpa
 @Named("budgetProvider")
 public class BudgetProviderJpa implements BudgetProvider {
+
+    private final Logger logger = getLogger(BudgetProviderJpa.class);
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager reactiveEntityManager;
@@ -28,49 +33,38 @@ public class BudgetProviderJpa implements BudgetProvider {
 
     @Override
     public Sequence<Budget> lookup() {
-        var hql = """
-                select b from BudgetJpa b
-                where b.user.username = :username
-                order by b.from asc""";
+        logger.trace("Fetching all budgets for user.");
 
-        return reactiveEntityManager.<BudgetJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .sequence()
-                .map(this::convert);
+        return reactiveEntityManager.from(BudgetJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .orderBy("from", true)
+                .stream()
+                .map(this::convert)
+                .collect(ReactiveEntityManager.sequenceCollector());
     }
 
     @Override
     public Optional<Budget> lookup(int year, int month) {
+        logger.trace("Fetching budget for user in {}-{}.", year, month);
         var range = DateUtils.forMonth(year, month);
 
-        var hql = """
-                select b from BudgetJpa b
-                where b.user.username = :username
-                    and b.from <= :start
-                    and (b.until is null or b.until >= :end)""";
-
-        return reactiveEntityManager.<BudgetJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("start", range.from())
-                .set("end", range.until())
-                .maybe()
+        return reactiveEntityManager.from(BudgetJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldLtOrEq("from", range.from())
+                .fieldGtOrEqNullable("until", range.until())
+                .singleResult()
                 .map(this::convert);
     }
 
     @Override
     public Optional<Budget> first() {
-        var hql = """
-                select b from BudgetJpa b
-                where b.user.username = :username
-                order by b.from asc""";
+        logger.trace("Fetching first budget for user.");
 
-        return reactiveEntityManager.<BudgetJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
+        return reactiveEntityManager.from(BudgetJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .orderBy("from", true)
                 .limit(1)
-                .maybe()
+                .singleResult()
                 .map(this::convert);
     }
 

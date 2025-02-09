@@ -1,7 +1,8 @@
 package com.jongsoft.finance.jpa.rule;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.expression.Expressions;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.rule.ReorderRuleGroupCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -32,31 +33,22 @@ public class ReorderRuleGroupHandler implements CommandHandler<ReorderRuleGroupC
 
         var jpaEntity = entityManager.getDetached(RuleGroupJpa.class, Collections.Map("id", command.id()));
 
-        var hql = """
-                update RuleGroupJpa
-                set sort = sort + :direction
-                where sort between :fromSort and :untilSort
-                 and id in (select id from RuleGroupJpa rj where rj.user.username = :username)""";
-
-        var pipeline = entityManager.update()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated());
-
+        var updateQuery = entityManager.update(RuleGroupJpa.class)
+                .fieldIn("id", RuleGroupJpa.class, subQuery -> subQuery
+                        .project("id")
+                        .fieldEq("user.username", authenticationFacade.authenticated()));
         if ((command.sort() - jpaEntity.getSort()) < 0) {
-            pipeline.set("direction", 1)
-                    .set("fromSort", command.sort())
-                    .set("untilSort", jpaEntity.getSort());
+            updateQuery.fieldBetween("sort", command.sort(), jpaEntity.getSort());
+            updateQuery.set("sort", Expressions.addition(Expressions.field("sort"), Expressions.value(1)));
         } else {
-            pipeline.set("direction", -1)
-                    .set("fromSort", jpaEntity.getSort())
-                    .set("untilSort", command.sort());
+            updateQuery.fieldBetween("sort", jpaEntity.getSort(), command.sort());
+            updateQuery.set("sort", Expressions.addition(Expressions.field("sort"), Expressions.value(-1)));
         }
-        pipeline.execute();
+        updateQuery.execute();
 
-        entityManager.update()
-                .hql("update RuleGroupJpa set sort = :sort where id = :id")
-                .set("id", command.id())
+        entityManager.update(RuleGroupJpa.class)
                 .set("sort", command.sort())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

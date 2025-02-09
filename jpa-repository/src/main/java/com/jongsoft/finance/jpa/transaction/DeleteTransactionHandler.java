@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.DeleteTransactionCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -30,21 +30,14 @@ public class DeleteTransactionHandler implements CommandHandler<DeleteTransactio
     public void handle(DeleteTransactionCommand command) {
         log.info("[{}] - Processing transaction delete event", command.id());
 
-        entityManager.update()
-                .hql("update TransactionJournal set deleted = :now where id = :id")
-                .set("id", command.id())
-                .set("now", new Date())
+        entityManager.update(TransactionJournal.class)
+                .set("deleted", new Date())
+                .fieldEq("id", command.id())
                 .execute();
 
-        var updateHql = """
-                update TransactionJpa
-                set deleted = :now
-                where journal.id = :id""";
-
-        entityManager.update()
-                .hql(updateHql)
-                .set("id", command.id())
-                .set("now", new Date())
+        entityManager.update(TransactionJpa.class)
+                .set("deleted", new Date())
+                .fieldEq("journal.id", command.id())
                 .execute();
     }
 

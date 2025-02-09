@@ -3,6 +3,7 @@ package com.jongsoft.finance.bpmn.delegate.transaction;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.finance.providers.TagProvider;
@@ -59,7 +60,7 @@ class TagLookupDelegateTest {
         var tag = new Tag("Auto");
         var userAccount = UserAccount.builder()
                 .id(1L)
-                .username("test-user")
+                .username(new UserIdentifier("test-user"))
                 .password("12345")
                 .roles(Collections.List(new Role("admin")))
                 .build();

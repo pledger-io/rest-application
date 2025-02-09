@@ -2,7 +2,7 @@ package com.jongsoft.finance.domain.account;
 
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.account.*;
 import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
@@ -33,13 +33,14 @@ class AccountTest {
     void setup() {
         applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
         new EventBus(applicationEventPublisher);
+        var user = new UserIdentifier("demo-user");
 
         account = Account.builder()
                 .id(1L)
                 .name("Test account")
                 .description("Account setup for testing")
                 .iban("NLINBS909392833")
-                .user(UserAccount.builder().username("demo-user").build())
+                .user(user)
                 .currency("EUR")
                 .type("checking")
                 .build();
@@ -48,7 +49,7 @@ class AccountTest {
                 .name("To account")
                 .description("Second account")
                 .iban("NLINBS90939284323")
-                .user(UserAccount.builder().username("demo-user").build())
+                .user(user)
                 .currency("EUR")
                 .type("debtor")
                 .build();
@@ -57,7 +58,7 @@ class AccountTest {
                 .name("Saving account")
                 .description("Second account")
                 .iban("NLINBS909232324323")
-                .user(UserAccount.builder().username("demo-user").build())
+                .user(user)
                 .currency("EUR")
                 .type("savings")
                 .build();

@@ -14,7 +14,6 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.DisplayName;
@@ -194,12 +193,12 @@ class ContractResourceTest extends TestSetup {
         final Contract contract = Mockito.mock(Contract.class);
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
-        when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
+        when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER_IDENTIFIER).build());
         when(contract.getCompany()).thenReturn(Account.builder()
                 .id(1L)
                 .balance(0D)
                 .name("Sample account")
-                .user(ACTIVE_USER)
+                .user(ACTIVE_USER_IDENTIFIER)
                 .currency("EUR")
                 .build());
 
@@ -267,7 +266,7 @@ class ContractResourceTest extends TestSetup {
                                 .id(1L)
                                 .balance(0D)
                                 .name("Sample account")
-                                .user(ACTIVE_USER)
+                                .user(ACTIVE_USER_IDENTIFIER)
                                 .currency("EUR")
                                 .build())
                         .description("Sample contract")
@@ -346,7 +345,7 @@ class ContractResourceTest extends TestSetup {
         final Contract contract = Mockito.mock(Contract.class);
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
-        when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
+        when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER_IDENTIFIER).build());
 
         // @formatter:off
         spec
@@ -365,7 +364,7 @@ class ContractResourceTest extends TestSetup {
         final Contract contract = Mockito.mock(Contract.class);
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
-        when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
+        when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER_IDENTIFIER).build());
 
         // @formatter:off
         spec
@@ -388,7 +387,7 @@ class ContractResourceTest extends TestSetup {
         final Contract contract = Mockito.mock(Contract.class);
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
-        when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER).build());
+        when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER_IDENTIFIER).build());
 
         // @formatter:off
         spec

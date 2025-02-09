@@ -6,11 +6,11 @@ import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.SavingGoal;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
-import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.jpa.FilterDelegate;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.projections.TripleProjection;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.savings.SavingGoalJpa;
+import com.jongsoft.finance.jpa.transaction.TransactionJpa;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
@@ -49,46 +49,35 @@ public class AccountProviderJpa implements AccountProvider {
 
     @Override
     public Optional<Account> synonymOf(String synonym) {
-        log.trace("Account synonym lookup with: {}", synonym);
+        log.trace("Account synonym lookup with {}.", synonym);
 
-        String hql = """
-                select a.account from AccountSynonymJpa a
-                where a.synonym = :synonym
-                and a.account.user.username = :username
-                and a.account.archived = false""";
-
-        return entityManager.<AccountJpa>blocking()
-                .hql(hql)
-                .set("synonym", synonym)
-                .set("username", authenticationFacade.authenticated())
-                .maybe()
+        return entityManager.from(AccountSynonymJpa.class)
+                .fieldEq("synonym", synonym)
+                .fieldEq("account.user.username", authenticationFacade.authenticated())
+                .fieldEq("account.archived", false)
+                .projectSingleValue(AccountJpa.class, "account")
                 .map(this::convert);
     }
 
     @Override
     public Sequence<Account> lookup() {
-        log.trace("Account listing");
+        log.trace("Listing all accounts for user.");
 
-        String hql = """
-                select a
-                from AccountJpa a
-                where a.user.username = :username
-                  and a.archived = false""";
-
-        return entityManager.<AccountJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(AccountJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("archived", false)
+                .stream()
+                .map(this::convert)
+                .collect(ReactiveEntityManager.sequenceCollector());
     }
 
     @Override
     public Optional<Account> lookup(long id) {
-        return entityManager.<AccountJpa>blocking()
-                .hql("from AccountJpa where id = :id and user.username = :username")
-                .set("username", authenticationFacade.authenticated())
-                .set("id", id)
-                .maybe()
+        log.trace("Looking up account by id {}.", id);
+        return entityManager.from(AccountJpa.class)
+                .fieldEq("id", id)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .map(this::convert);
     }
 
@@ -96,19 +85,11 @@ public class AccountProviderJpa implements AccountProvider {
     public Optional<Account> lookup(String name) {
         log.trace("Account name lookup: {} for {}", name, authenticationFacade.authenticated());
 
-        String hql = """
-                select a
-                from AccountJpa a
-                where
-                  a.name = :name
-                  and a.user.username = :username
-                  and a.archived = false""";
-
-        return entityManager.<AccountJpa>blocking()
-                .hql(hql)
-                .set("name", name)
-                .set("username", authenticationFacade.authenticated())
-                .maybe()
+        return entityManager.from(AccountJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("archived", false)
+                .fieldEq("name", name)
+                .singleResult()
                 .map(this::convert);
     }
 
@@ -116,20 +97,11 @@ public class AccountProviderJpa implements AccountProvider {
     public Optional<Account> lookup(SystemAccountTypes accountType) {
         log.trace("Account type lookup: {}", accountType);
 
-        var hql = """
-                select a
-                from AccountJpa a
-                where
-                    a.type.label = :label
-                    and a.user.username = :username
-                    and a.archived = false""";
-
-        return entityManager.<AccountJpa>blocking()
-                .hql(hql)
-                .set("label", accountType.label())
-                .set("username", authenticationFacade.authenticated())
-                .limit(1)
-                .maybe()
+        return entityManager.from(AccountJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("archived", false)
+                .fieldEq("type.label", accountType.label())
+                .singleResult()
                 .map(this::convert);
     }
 
@@ -138,16 +110,10 @@ public class AccountProviderJpa implements AccountProvider {
         log.trace("Accounts by filter: {}", filter);
 
         if (filter instanceof AccountFilterCommand delegate) {
-            var offset = delegate.page() * delegate.pageSize();
             delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<AccountJpa>blocking()
-                    .hql(delegate.generateHql())
-                    .setAll(delegate.getParameters())
-                    .limit(delegate.pageSize())
-                    .offset(offset)
-                    .sort(delegate.sort())
-                    .page()
+            return entityManager.from(delegate)
+                    .paged()
                     .map(this::convert);
         }
 
@@ -161,30 +127,25 @@ public class AccountProviderJpa implements AccountProvider {
         if (filter instanceof AccountFilterCommand delegate) {
             delegate.user(authenticationFacade.authenticated());
 
-            var hql = """
-                    select new com.jongsoft.finance.jpa.projections.TripleProjection(
-                                t.account, sum(t.amount), avg(t.amount))
-                     from TransactionJpa t
-                     where
-                        t.journal.date >= :start and t.journal.date < :until
-                        and t.deleted is null
-                        and t.journal.user.username = :username
-                        and t.account.id in (select distinct a.id %s)
-                     group by t.account
-                     having sum(t.amount) %s 0""".formatted(delegate.generateHql(), asc ? "<=" : ">=");
+            var query = entityManager.from(TransactionJpa.class)
+                    .fieldIn("account.id", AccountJpa.class, subQuery -> {
+                        delegate.applyTo(subQuery);
+                        subQuery.project("id");
+                    })
+                    .fieldBetween("journal.date", range.from(), range.until())
+                    .fieldEq("journal.user.username", authenticationFacade.authenticated())
+                    .fieldNull("deleted")
+                    .groupBy("account");
 
-            return entityManager.<TripleProjection<AccountJpa, BigDecimal, Double>>blocking()
-                    .hql(hql)
-                    .setAll(delegate.getParameters())
-                    .set("start", range.from())
-                    .set("until", range.until())
-                    .limit(delegate.pageSize())
-                    .sort(new FilterDelegate.Sort("sum(t.amount)", asc))
-                    .sequence()
-                    .map(projection -> new AccountSpendingImpl(
+            //delegate.applyPagingOnly(query);
+            return query.project(TripleProjection.class,
+                            "new com.jongsoft.finance.jpa.projections.TripleProjection(e.account, sum(e.amount), avg(e.amount))")
+                    .map(triplet -> (TripleProjection<AccountJpa, BigDecimal, Double>) triplet)
+                    .map(projection -> (AccountSpending) new AccountSpendingImpl(
                             convert(projection.getFirst()),
                             projection.getSecond(),
-                            projection.getThird()));
+                            projection.getThird()))
+                    .collect(ReactiveEntityManager.sequenceCollector());
         }
 
         throw new IllegalStateException("Cannot use non JPA filter on AccountProviderJpa");
@@ -211,10 +172,7 @@ public class AccountProviderJpa implements AccountProvider {
                 .interest(source.getInterest())
                 .interestPeriodicity(source.getInterestPeriodicity())
                 .savingGoals(Collections.Set(this.convertSavingGoals(source.getSavingGoals())))
-                .user(UserAccount.builder()
-                        .id(source.getUser().getId())
-                        .username(source.getUser().getUsername())
-                        .build())
+                .user(new UserIdentifier(source.getUser().getUsername()))
                 .build();
     }
 

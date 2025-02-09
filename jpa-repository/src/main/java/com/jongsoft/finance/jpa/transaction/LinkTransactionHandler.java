@@ -7,8 +7,7 @@ import com.jongsoft.finance.jpa.category.CategoryJpa;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
-import com.jongsoft.finance.jpa.tag.TagJpa;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -37,22 +36,16 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
     public void handle(LinkTransactionCommand command) {
         log.info("[{}] - Processing transaction relation change {}", command.id(), command.type());
 
-        var update = switch (command.type()) {
-            case CATEGORY -> " category = :relation";
-            case CONTRACT -> " contract = :relation";
-            case EXPENSE -> " budget = :relation";
-            case IMPORT -> " batchImport = :relation";
-        };
+        var updateQuery = entityManager.update(TransactionJournal.class)
+                .fieldEq("id", command.id());
 
-        var hql = "update TransactionJournal set"
-                + update
-                + " where id = :id";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
-                .set("relation", fetchRelation(command.type(), command.relation()))
-                .execute();
+        switch (command.type()) {
+            case CATEGORY -> updateQuery.set("category", fetchRelation(command.type(), command.relation()));
+            case CONTRACT -> updateQuery.set("contract", fetchRelation(command.type(), command.relation()));
+            case EXPENSE -> updateQuery.set("budget", fetchRelation(command.type(), command.relation()));
+            case IMPORT -> updateQuery.set("batchImport", fetchRelation(command.type(), command.relation()));
+        }
+        updateQuery.execute();
     }
 
     private EntityJpa fetchRelation(LinkTransactionCommand.LinkType type, String relation) {
@@ -64,68 +57,36 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
         };
     }
 
-
     private CategoryJpa category(String label) {
-        var hql = """
-                select c from CategoryJpa c
-                where c.label = :label and c.user.username = :username""";
-        return entityManager.<CategoryJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("label", label)
-                .maybe()
+        return entityManager.from(CategoryJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("label", label)
+                .singleResult()
                 .getOrThrow(() -> new IllegalArgumentException("Category not found"));
     }
 
     private ExpenseJpa expense(String name) {
-        var hql = """
-                select e from ExpenseJpa e
-                where e.name = :name and e.user.username = :username""";
-
-        return entityManager.<ExpenseJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", name)
-                .maybe()
+        return entityManager.from(ExpenseJpa.class)
+                .fieldEq("name", name)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .getOrThrow(() -> new IllegalArgumentException("Budget not found"));
     }
 
     private ContractJpa contract(String name) {
-        var hql = """
-                select e from ContractJpa e
-                where e.name = :name and e.user.username = :username and e.archived = false""";
-
-        return entityManager.<ContractJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", name)
-                .maybe()
+        return entityManager.from(ContractJpa.class)
+                .fieldEq("name", name)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .getOrThrow(() -> new IllegalArgumentException("Contract not found"));
     }
 
     private ImportJpa job(String slug) {
-        var hql = """
-                select e from ImportJpa e
-                where e.slug = :slug and e.user.username = :username""";
-
-        return entityManager.<ImportJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("slug", slug)
-                .maybe()
+        return entityManager.from(ImportJpa.class)
+                .fieldEq("slug", slug)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .getOrThrow(() -> new IllegalArgumentException("Job not found"));
     }
 
-    private TagJpa tag(String name) {
-        var hql = """
-                select t from TagJpa t
-                where t.name = :name and t.user.username = :username""";
-
-        return entityManager.<TagJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", name)
-                .maybe()
-                .getOrThrow(() -> new IllegalArgumentException("tag not found"));
-    }
 }

@@ -72,8 +72,7 @@ public class TransactionResource {
                 .range(Dates.range(
                         request.getDateRange().start(),
                         request.getDateRange().end()))
-                .pageSize(settingProvider.getPageSize())
-                .page(request.getPage());
+                .page(request.getPage(), settingProvider.getPageSize());
 
         Control.Option(request.getCategory())
                 .map(e -> new EntityRef(e.id()))
@@ -195,17 +194,17 @@ public class TransactionResource {
                                 .types(accountTypeProvider.lookup(false)))
                         .content()
                         .map(account -> new EntityRef(account.getId())))
-                .pageSize(100);
+                .page(0, 100);
 
         int currentPage = 0;
-        filterCommand.page(currentPage);
+        filterCommand.page(currentPage, 100);
         var page = transactionProvider.lookup(filterCommand);
         do {
             for (Transaction transaction : page.content()) {
                 outputStream.write(convertTransaction(transaction));
             }
 
-            filterCommand.page(++currentPage);
+            filterCommand.page(++currentPage, 100);
             page = transactionProvider.lookup(filterCommand);
         } while (page.hasNext());
 
@@ -226,7 +225,7 @@ public class TransactionResource {
                                         .types(accountTypeProvider.lookup(false)))
                                 .content()
                                 .map(account -> new EntityRef(account.getId())))
-                        .pageSize(100);
+                        .page(0, 100);
 
                 int currentPage = 0;
                 var page = transactionProvider.lookup(filterCommand);
@@ -244,7 +243,7 @@ public class TransactionResource {
                                         Map.of("transactionId", transaction));
                             }));
 
-                    filterCommand.page(++currentPage);
+                    filterCommand.page(++currentPage, 100);
                     page = transactionProvider.lookup(filterCommand);
                 } while (page.hasNext());
             });

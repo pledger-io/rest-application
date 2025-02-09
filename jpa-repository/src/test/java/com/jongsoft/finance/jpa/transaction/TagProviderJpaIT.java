@@ -1,7 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -20,7 +19,8 @@ class TagProviderJpaIT extends JpaTestSetup {
     @Inject
     private TagProvider tagProvider;
 
-    private FilterFactory filterFactory = new FilterFactoryJpa();
+    @Inject
+    private FilterFactory filterFactory;
 
     @BeforeEach
     void setup() {

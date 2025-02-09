@@ -3,6 +3,7 @@ package com.jongsoft.finance.security;
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.UserAccount;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.providers.UserProvider;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.security.authentication.AuthenticationFailureReason;
@@ -37,7 +38,7 @@ public class AuthenticationProvider implements HttpRequestAuthenticationProvider
 
     public AuthenticationResponse authenticate(String username, String password) {
         log.debug("Authentication basic request for user {}", username);
-        var authenticated = userProvider.lookup(username);
+        var authenticated = userProvider.lookup(new UserIdentifier(username));
         if (authenticated.isPresent()) {
             var userAccount = authenticated.get();
             return validateUser(userAccount, password);
@@ -58,7 +59,7 @@ public class AuthenticationProvider implements HttpRequestAuthenticationProvider
                         .forEach(roles::add);
             }
 
-            return AuthenticationResponse.success(userAccount.getUsername(), roles);
+            return AuthenticationResponse.success(userAccount.getUsername().email(), roles);
         } else {
             throw AuthenticationResponse.exception(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH);
         }

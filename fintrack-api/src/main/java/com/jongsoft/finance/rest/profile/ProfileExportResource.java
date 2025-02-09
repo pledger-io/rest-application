@@ -97,8 +97,7 @@ public class ProfileExportResource {
     private List<TransactionJson> lookupRelevantTransactions() {
         // we also want to export all opening balance transactions for liability accounts
         var filter = filterFactory.transaction()
-                .page(0)
-                .pageSize(Integer.MAX_VALUE)
+                .page(0, Integer.MAX_VALUE)
                 .description("Opening balance", true);
 
         return transactionProvider.lookup(filter)

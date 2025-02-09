@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.schedule;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.schedule.LimitScheduleCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,17 +28,10 @@ public class LimitScheduleHandler implements CommandHandler<LimitScheduleCommand
     public void handle(LimitScheduleCommand command) {
         log.info("[{}] - Processing schedule limit event", command.id());
 
-        var hql = """
-                update ScheduledTransactionJpa t
-                set t.start = :startDate,
-                    t.end = :endDate
-                where t.id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
-                .set("startDate", command.start())
-                .set("endDate", command.end())
+        entityManager.update(ScheduledTransactionJpa.class)
+                .set("start", command.start())
+                .set("end", command.end())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

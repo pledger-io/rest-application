@@ -1,6 +1,7 @@
 package com.jongsoft.finance.bpmn.delegate.user;
 
 import com.jongsoft.finance.core.JavaBean;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.providers.UserProvider;
 import jakarta.inject.Singleton;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -27,6 +28,6 @@ public class UsernameAvailableDelegate implements JavaDelegate, JavaBean {
                 execution.getVariableLocal(USERNAME));
 
         execution.setVariableLocal("usernameAvailable",
-                userProvider.available((String) execution.getVariableLocal(USERNAME)));
+                userProvider.available((UserIdentifier) execution.getVariableLocal(USERNAME)));
     }
 }

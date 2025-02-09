@@ -3,12 +3,9 @@ package com.jongsoft.finance.jpa.budget;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
-import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
-import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.transaction.annotation.Transactional;
@@ -26,12 +23,10 @@ import java.util.HashSet;
 public class CreateBudgetHandler implements CommandHandler<CreateBudgetCommand> {
 
     private final ReactiveEntityManager entityManager;
-    private final AuthenticationFacade authenticationFacade;
 
     @Inject
-    public CreateBudgetHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+    public CreateBudgetHandler(ReactiveEntityManager entityManager) {
         this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
     }
 
     @Override
@@ -43,7 +38,7 @@ public class CreateBudgetHandler implements CommandHandler<CreateBudgetCommand> 
                 .from(command.budget().getStart())
                 .expectedIncome(command.budget().getExpectedIncome())
                 .expenses(new HashSet<>())
-                .user(entityManager.get(UserAccountJpa.class, Collections.Map("username", authenticationFacade.authenticated())))
+                .user(entityManager.currentUser())
                 .build();
 
         entityManager.persist(budget);
@@ -57,7 +52,7 @@ public class CreateBudgetHandler implements CommandHandler<CreateBudgetCommand> 
         return expenses.map(expense ->
                         ExpensePeriodJpa.builder()
                                 .budget(budget)
-                                .expense(entityManager.get(ExpenseJpa.class, Collections.Map("id", expense.getId())))
+                                .expense(entityManager.getById(ExpenseJpa.class, expense.getId()))
                                 .lowerBound(BigDecimal.valueOf(expense.getLowerBound()).subtract(new BigDecimal("0.001")))
                                 .upperBound(BigDecimal.valueOf(expense.getUpperBound()))
                                 .build())

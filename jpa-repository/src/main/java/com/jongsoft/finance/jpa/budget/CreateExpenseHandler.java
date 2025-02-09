@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -31,16 +31,10 @@ public class CreateExpenseHandler implements CommandHandler<CreateExpenseCommand
     public void handle(CreateExpenseCommand command) {
         log.info("[{}] - Processing expense create event", command.name());
 
-        var hql = """
-                select b from BudgetJpa b
-                where b.user.username = :username
-                and b.from = :from""";
-
-        var activeBudget = entityManager.<BudgetJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("from", command.start())
-                .maybe()
+         var activeBudget = entityManager.from(BudgetJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("from", command.start())
+                .singleResult()
                 .get();
 
         var expenseJpa = ExpenseJpa.builder()

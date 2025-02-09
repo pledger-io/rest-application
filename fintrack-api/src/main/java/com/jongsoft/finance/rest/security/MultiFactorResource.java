@@ -50,7 +50,7 @@ public class MultiFactorResource {
         }
 
         var authentication = Authentication.build(
-                user.getUsername(),
+                user.getUsername().email(),
                 user.getRoles().stream().map(Role::getName).toList());
 
         return loginHandler.loginRefresh(authentication, UUID.randomUUID().toString(), request);

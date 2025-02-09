@@ -2,9 +2,10 @@ package com.jongsoft.finance.jpa.currency;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.core.Currency;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.CurrencyProvider;
 import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.lang.collection.support.Collections;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
@@ -25,41 +26,34 @@ public class CurrencyProviderJpa implements CurrencyProvider {
     }
 
     public Optional<Currency> lookup(long id) {
-        return entityManager.<CurrencyJpa>blocking()
-                .hql("from CurrencyJpa where id = :id")
-                .set("id", id)
-                .maybe()
+        log.trace("Currency lookup by id {}.", id);
+
+        return entityManager.from(CurrencyJpa.class)
+                .fieldEq("id", id)
+                .singleResult()
                 .map(this::convert);
     }
 
     @Override
     public Optional<Currency> lookup(String code) {
-        log.trace("Currency lookup by code: {}", code);
+        log.trace("Currency lookup by code {}.", code);
 
-        var hql = """
-                select c from CurrencyJpa c
-                where c.archived = false
-                    and c.code = :code""";
-
-        return entityManager.<CurrencyJpa>blocking()
-                .hql(hql)
-                .set("code", code)
-                .maybe()
+        return entityManager.from(CurrencyJpa.class)
+                .fieldEq("code", code)
+                .fieldEq("archived", false)
+                .singleResult()
                 .map(this::convert);
     }
 
     @Override
     public Sequence<Currency> lookup() {
-        log.trace("Currency listing");
+        log.trace("Listing all currencies in the system.");
 
-        var hql = """
-                select c from CurrencyJpa c
-                where c.archived = false""";
-
-        return entityManager.<CurrencyJpa>blocking()
-                .hql(hql)
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(CurrencyJpa.class)
+                .fieldEq("archived", false)
+                .stream()
+                .map(this::convert)
+                .collect(Collections.collector(com.jongsoft.lang.Collections::List));
     }
 
     protected Currency convert(CurrencyJpa source) {
