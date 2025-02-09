@@ -60,7 +60,7 @@ class ImporterTransactionResourceTest extends TestSetup {
         var mockFilter = filterFactory.transaction();
 
         Mockito.verify(mockFilter).importSlug("ads-fasdfa-fasd");
-        Mockito.verify(mockFilter).page(0);
+        Mockito.verify(mockFilter).page(0, 0);
         Mockito.verify(transactionProvider).lookup(Mockito.any());
     }
 

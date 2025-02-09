@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.currency;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.currency.RenameCurrencyCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,19 +28,11 @@ public class RenameCurrencyHandler implements CommandHandler<RenameCurrencyComma
     public void handle(RenameCurrencyCommand command) {
         log.info("[{}] - Processing currency rename event", command.id());
 
-        var hql = """
-                update CurrencyJpa c
-                set c.name = :name,
-                    c.code = :code,
-                    c.symbol = :symbol
-                where c.id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(CurrencyJpa.class)
                 .set("name", command.name())
                 .set("code", command.isoCode())
                 .set("symbol", command.symbol())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

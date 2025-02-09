@@ -77,7 +77,7 @@ public class TransactionTagResource {
     List<TagResponse> autoCompleteTag(@Nullable String token) {
         var filter = filterFactory.tag()
                 .name(token, false)
-                .pageSize(settingProvider.getAutocompleteLimit());
+                .page(0, settingProvider.getAutocompleteLimit());
 
         return tagProvider.lookup(filter)
                 .content()

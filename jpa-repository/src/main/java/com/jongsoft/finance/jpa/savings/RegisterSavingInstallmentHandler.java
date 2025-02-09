@@ -2,7 +2,8 @@ package com.jongsoft.finance.jpa.savings;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.expression.Expressions;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.savings.RegisterSavingInstallmentCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,16 +29,9 @@ public class RegisterSavingInstallmentHandler implements CommandHandler<Register
     public void handle(RegisterSavingInstallmentCommand command) {
         log.info("[{}] - Incrementing allocation for saving goal.", command.id());
 
-        var hql = """
-                update SavingGoalJpa
-                set
-                  allocated = allocated + :installment
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("installment", command.amount())
-                .set("id", command.id())
+        entityManager.update(SavingGoalJpa.class)
+                .set("allocated", Expressions.addition(Expressions.field("allocated"), Expressions.value(command.amount())))
+                .fieldEq("id", command.id())
                 .execute();
     }
 }

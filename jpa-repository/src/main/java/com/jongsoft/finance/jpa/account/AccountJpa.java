@@ -5,11 +5,11 @@ import com.jongsoft.finance.jpa.currency.CurrencyJpa;
 import com.jongsoft.finance.jpa.savings.SavingGoalJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.schedule.Periodicity;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.Formula;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,12 +42,15 @@ public class AccountJpa extends EntityJpa {
     @ManyToOne
     private CurrencyJpa currency;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select max(tj.t_date) from transaction_part t join transaction_journal tj on tj.id = t.journal_id where t.account_id = id and t.deleted is null)")
     private LocalDate lastTransaction;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select min(tj.t_date) from transaction_part t join transaction_journal tj on tj.id = t.journal_id where t.account_id = id and t.deleted is null)")
     private LocalDate firstTransaction;
 
+    @Basic(fetch = FetchType.LAZY)
     @Formula("(select sum(t.amount) from transaction_part t where t.account_id = id and t.deleted is null)")
     private Double balance;
 

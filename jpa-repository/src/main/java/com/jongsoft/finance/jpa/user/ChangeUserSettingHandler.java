@@ -1,7 +1,8 @@
 package com.jongsoft.finance.jpa.user;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.user.ChangeUserSettingCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,26 +29,14 @@ public class ChangeUserSettingHandler implements CommandHandler<ChangeUserSettin
     public void handle(ChangeUserSettingCommand command) {
         log.info("[{}] - Updating user setting {}", command.username(), command.type());
 
-        var query = entityManager.update()
-                .set("username", command.username().email());
+        var query = entityManager.update(UserAccountJpa.class)
+                .fieldEq("username", command.username().email());
 
-        var hql = "update UserAccountJpa set ";
         switch (command.type()) {
-            case THEME -> {
-                hql += " theme = :theme";
-                query.set("theme", command.value());
-            }
-            case CURRENCY -> {
-                hql += " currency = :currency";
-                query.set("currency", Currency.getInstance(command.value()));
-            }
-            default -> {
-
-            }
+            case THEME -> query.set("theme", command.value());
+            case CURRENCY -> query.set("currency", Currency.getInstance(command.value()));
+            default -> {}
         }
-        hql += " where username = :username";
-
-        query.hql(hql)
-                .execute();
+        query.execute();
     }
 }

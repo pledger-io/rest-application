@@ -4,9 +4,8 @@ import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.finance.domain.importer.BatchImportConfig;
-import com.jongsoft.finance.jpa.FilterDelegate;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.ImportProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.control.Optional;
@@ -34,17 +33,11 @@ public class ImportProviderJpa implements ImportProvider {
     public Optional<BatchImport> lookup(String slug) {
         log.trace("Importer lookup by slug: {}", slug);
 
-        var hql = """
-                select b from ImportJpa b
-                where b.slug = :slug
-                    and b.archived = false
-                    and b.user.username = :username""";
-
-        return entityManager.<ImportJpa>blocking()
-                .hql(hql)
-                .set("slug", slug)
-                .set("username", authenticationFacade.authenticated())
-                .maybe()
+        return entityManager.from(ImportJpa.class)
+                .fieldEq("slug", slug)
+                .fieldEq("archived", false)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .map(this::convert);
     }
 
@@ -52,13 +45,13 @@ public class ImportProviderJpa implements ImportProvider {
     public ResultPage<BatchImport> lookup(FilterCommand filter) {
         log.trace("Importer lookup by filter: {}", filter);
 
-        return entityManager.<ImportJpa>blocking()
-                .hql("from ImportJpa a where a.user.username = :username and a.archived = false")
-                .set("username", authenticationFacade.authenticated())
+        return entityManager.from(ImportJpa.class)
+                .fieldEq("archived", false)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .orderBy("created", false)
+                .skip(filter.page() * filter.pageSize())
                 .limit(filter.pageSize())
-                .offset(filter.page() * filter.pageSize())
-                .sort(new FilterDelegate.Sort("a.created", false))
-                .page()
+                .paged()
                 .map(this::convert);
     }
 

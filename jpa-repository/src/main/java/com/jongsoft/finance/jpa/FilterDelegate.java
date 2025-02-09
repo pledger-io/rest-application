@@ -1,7 +1,5 @@
 package com.jongsoft.finance.jpa;
 
-import jakarta.persistence.Query;
-
 import java.util.Map;
 
 public interface FilterDelegate<T extends FilterDelegate<T>> {
@@ -34,13 +32,5 @@ public interface FilterDelegate<T extends FilterDelegate<T>> {
      * @param username
      */
     T user(String username);
-
-    /**
-     * Prepare the query based upon the filter command supported by the delegate.
-     *
-     * @param query
-     */
-    @Deprecated
-    T prepareQuery(Query query);
 
 }

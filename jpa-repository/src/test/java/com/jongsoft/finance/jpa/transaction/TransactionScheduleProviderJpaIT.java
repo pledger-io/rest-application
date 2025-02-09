@@ -1,7 +1,6 @@
 package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -9,6 +8,7 @@ import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -20,7 +20,8 @@ class TransactionScheduleProviderJpaIT extends JpaTestSetup {
     @Inject
     private AuthenticationFacade authenticationFacade;
 
-    private FilterFactory filterFactory = new FilterFactoryJpa();
+    @Inject
+    private FilterFactory filterFactory;
 
     @BeforeEach
     void setup() {
@@ -34,9 +35,9 @@ class TransactionScheduleProviderJpaIT extends JpaTestSetup {
     }
 
     @Test
+    @DisplayName("List all scheduled transactions")
     void lookup() {
         var check = transactionScheduleProvider.lookup();
-
         Assertions.assertThat(check).hasSize(1);
     }
 

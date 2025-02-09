@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.ChangeTransactionDatesCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,19 +28,11 @@ public class ChangeTransactionDatesHandler implements CommandHandler<ChangeTrans
     public void handle(ChangeTransactionDatesCommand command) {
         log.info("[{}] - Processing transaction book event", command.id());
 
-        var hql = """
-                update TransactionJournal
-                set date = :date,
-                    bookDate = :bookDate,
-                    interestDate = :interestDate
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(TransactionJournal.class)
                 .set("bookDate", command.bookingDate())
                 .set("date", command.date())
                 .set("interestDate", command.interestDate())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

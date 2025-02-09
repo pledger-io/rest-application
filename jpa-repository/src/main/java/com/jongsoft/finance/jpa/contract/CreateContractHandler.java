@@ -3,10 +3,9 @@ package com.jongsoft.finance.jpa.contract;
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.account.AccountJpa;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.CreateContractCommand;
-import com.jongsoft.lang.Collections;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -30,7 +29,7 @@ public class CreateContractHandler implements CommandHandler<CreateContractComma
     public void handle(CreateContractCommand command) {
         log.info("[{}] - Processing contract create event", command.name());
 
-        var company = entityManager.get(AccountJpa.class, Collections.Map("id", command.companyId()));
+        var company = entityManager.getById(AccountJpa.class, command.companyId());
 
         var contract = ContractJpa.builder()
                 .name(command.name())

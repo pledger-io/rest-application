@@ -8,6 +8,7 @@ import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -28,12 +29,14 @@ class UserProviderJpaIT extends JpaTestSetup {
     }
 
     @Test
+    @DisplayName("Check username availability")
     void available() {
         Assertions.assertTrue(userProvider.available(new UserIdentifier("user@account")));
         Assertions.assertFalse(userProvider.available(new UserIdentifier("demo-user")));
     }
 
     @Test
+    @DisplayName("Lookup by the username")
     void lookup() {
         var check = userProvider.lookup(new UserIdentifier("demo-user"));
 
@@ -44,11 +47,13 @@ class UserProviderJpaIT extends JpaTestSetup {
     }
 
     @Test
+    @DisplayName("Lookup by username - Not Found")
     void lookup_notFound() {
         Assertions.assertFalse(userProvider.lookup(new UserIdentifier("user@account")).isPresent());
     }
 
     @Test
+    @DisplayName("Fetch all tokens for user")
     void tokens() {
         assertThat(userProvider.tokens(new UserIdentifier("demo-user")))
                 .hasSize(1)
@@ -57,6 +62,7 @@ class UserProviderJpaIT extends JpaTestSetup {
     }
 
     @Test
+    @DisplayName("Lookup by refresh token")
     void lookup_refreshToken() {
         assertThat(userProvider.refreshToken("refresh-token-1"))
                 .hasSize(1)

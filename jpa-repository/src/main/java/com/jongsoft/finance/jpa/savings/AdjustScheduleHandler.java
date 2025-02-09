@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.savings;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.savings.AdjustScheduleCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -26,20 +26,11 @@ public class AdjustScheduleHandler implements CommandHandler<AdjustScheduleComma
     public void handle(AdjustScheduleCommand command) {
         log.info("[{}] - Adjusting schedule for a saving goal.", command.id());
 
-        var hql = """
-                update SavingGoalJpa
-                set
-                  targetDate = :end,
-                  periodicity = :periodicity,
-                  interval = :interval
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
-                .set("end", command.schedulable().getEnd())
+        entityManager.update(SavingGoalJpa.class)
+                .set("targetDate", command.schedulable().getEnd())
                 .set("periodicity", command.schedulable().getSchedule().periodicity())
                 .set("interval", command.schedulable().getSchedule().interval())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

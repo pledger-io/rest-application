@@ -5,7 +5,7 @@ import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.domain.user.SessionToken;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserIdentifier;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.providers.UserProvider;
@@ -13,6 +13,7 @@ import com.jongsoft.lang.Control;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Collectors;
 import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.lang.collection.support.Collections;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
@@ -37,59 +38,46 @@ public class UserProviderJpa implements UserProvider {
 
     @Override
     public Optional<UserAccount> lookup(long id) {
-        return entityManager.<UserAccountJpa>blocking()
-                .hql("from UserAccountJpa a where a.id = :id")
-                .set("id", id)
-                .maybe()
+        return entityManager.from(UserAccountJpa.class)
+                .joinFetch("roles")
+                .fieldEq("id", id)
+                .singleResult()
                 .map(this::convert);
     }
 
     @Override
     public boolean available(UserIdentifier username) {
-        return entityManager.<Long>blocking()
-                .hql("select count(a.id) from UserAccountJpa a where a.username = :username")
-                .set("username", username.email())
-                .maybe()
+        return entityManager.from(UserAccountJpa.class)
+                .fieldEq("username", username.email())
+                .projectSingleValue(Long.class, "count(1)")
                 .getOrSupply(() -> 0L) == 0;
     }
 
     @Override
     public Optional<UserAccount> lookup(UserIdentifier username) {
-        return entityManager.<UserAccountJpa>blocking()
-                .hql("from UserAccountJpa a where a.username = :username")
-                .set("username", username.email())
-                .maybe()
+        return entityManager.from(UserAccountJpa.class)
+                .fieldEq("username", username.email())
+                .singleResult()
                 .map(this::convert);
     }
 
     @Override
     public Optional<UserAccount> refreshToken(String refreshToken) {
-        var hql = """
-                select u.user from AccountTokenJpa u
-                where u.refreshToken = :refreshToken
-                    and u.expires >= :now""";
-
-        return entityManager.<UserAccountJpa>blocking()
-                .hql(hql)
-                .set("refreshToken", refreshToken)
-                .set("now", LocalDateTime.now())
-                .maybe()
+        return entityManager.from(AccountTokenJpa.class)
+                .fieldEq("refreshToken", refreshToken)
+                .fieldGtOrEq("expires", LocalDateTime.now())
+                .projectSingleValue(UserAccountJpa.class, "e.user")
                 .map(this::convert);
     }
 
     @Override
     public Sequence<SessionToken> tokens(UserIdentifier username) {
-        var hql = """
-                from AccountTokenJpa
-                where user.username = :username
-                      and expires > :now""";
-
-        return entityManager.<AccountTokenJpa>blocking()
-                .hql(hql)
-                .set("username", username.email())
-                .set("now", LocalDateTime.now())
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(AccountTokenJpa.class)
+                .fieldEq("user.username", username.email())
+                .fieldGtOrEq("expires", LocalDateTime.now())
+                .stream()
+                .map(this::convert)
+                .collect(Collections.collector(com.jongsoft.lang.Collections::List));
     }
 
     protected SessionToken convert(AccountTokenJpa source) {

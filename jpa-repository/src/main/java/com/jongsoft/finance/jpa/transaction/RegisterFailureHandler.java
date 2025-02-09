@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.RegisterFailureCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,15 +28,9 @@ public class RegisterFailureHandler implements CommandHandler<RegisterFailureCom
     public void handle(RegisterFailureCommand command) {
         log.info("[{}] - Processing transaction failed register event", command.id());
 
-        var hql = """
-                update TransactionJournal
-                set failureCode = :failureCode
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(TransactionJournal.class)
                 .set("failureCode", command.code())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

@@ -1,7 +1,8 @@
 package com.jongsoft.finance.jpa.user;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -26,13 +27,9 @@ public class ChangeMultiFactorHandler implements CommandHandler<ChangeMultiFacto
     public void handle(ChangeMultiFactorCommand command) {
         log.info("[{}] - Updating multi factor setting", command.username());
 
-        entityManager.update()
-                .hql("""
-                        update UserAccountJpa
-                        set twoFactorEnabled = :enabled
-                        where username = :username""")
-                .set("username", command.username().email())
-                .set("enabled", command.enabled())
+        entityManager.update(UserAccountJpa.class)
+                .set("twoFactorEnabled", command.enabled())
+                .fieldEq("username", command.username().email())
                 .execute();
     }
 

@@ -7,10 +7,11 @@ import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.lang.collection.support.Collections;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
@@ -36,27 +37,20 @@ public class TransactionScheduleProviderJpa implements TransactionScheduleProvid
 
     @Override
     public Optional<ScheduledTransaction> lookup(long id) {
-        return entityManager.<ScheduledTransactionJpa>blocking()
-                .hql("from ScheduledTransactionJpa where id = :id and user.username = :username")
-                .set("id", id)
-                .set("username", authenticationFacade.authenticated())
-                .maybe()
+        return entityManager.from(ScheduledTransactionJpa.class)
+                .fieldEq("id", id)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .map(this::convert);
     }
 
     @Override
     public ResultPage<ScheduledTransaction> lookup(FilterCommand filterCommand) {
         if (filterCommand instanceof ScheduleFilterCommand delegate) {
-            var offset = delegate.page() * delegate.pageSize();
             delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<ScheduledTransactionJpa>blocking()
-                    .hql(delegate.generateHql())
-                    .setAll(delegate.getParameters())
-                    .limit(delegate.pageSize())
-                    .offset(offset)
-                    .sort(delegate.sort())
-                    .page()
+            return entityManager.from(delegate)
+                    .paged()
                     .map(this::convert);
         }
 
@@ -65,17 +59,12 @@ public class TransactionScheduleProviderJpa implements TransactionScheduleProvid
 
     @Override
     public Sequence<ScheduledTransaction> lookup() {
-        var hql = """
-                select s from ScheduledTransactionJpa s
-                where s.user.username = :username
-                    and (s.end > :currentDate or s.end is null)""";
-
-        return entityManager.<ScheduledTransactionJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("currentDate", LocalDate.now())
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(ScheduledTransactionJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldGtOrEqNullable("end", LocalDate.now())
+                .stream()
+                .map(this::convert)
+                .collect(Collections.collector(com.jongsoft.lang.Collections::List));
     }
 
     protected ScheduledTransaction convert(ScheduledTransactionJpa source) {

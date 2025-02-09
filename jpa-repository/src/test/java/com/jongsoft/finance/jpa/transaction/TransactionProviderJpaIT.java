@@ -2,7 +2,6 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -11,6 +10,7 @@ import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -25,7 +25,8 @@ class TransactionProviderJpaIT extends JpaTestSetup {
     @Inject
     private TransactionProvider transactionProvider;
 
-    private FilterFactory filterFactory = new FilterFactoryJpa();
+    @Inject
+    private FilterFactory filterFactory;
 
     @BeforeEach
     void setup() {
@@ -42,7 +43,8 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         var check = transactionProvider.first(filterFactory.transaction().ownAccounts())
                 .get();
 
-        Assertions.assertThat(check.getId()).isEqualTo(1L);
+        Assertions.assertThat(check.getId())
+                .isEqualTo(1L);
     }
 
     @Test
@@ -57,6 +59,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
     }
 
     @Test
+    @DisplayName("Search by currency")
     void lookup_currency() {
         var filter = filterFactory.transaction()
                 .currency("EUR");

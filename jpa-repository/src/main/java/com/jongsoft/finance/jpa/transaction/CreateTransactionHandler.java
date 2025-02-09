@@ -10,14 +10,12 @@ import com.jongsoft.finance.jpa.category.CategoryJpa;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.currency.CurrencyJpa;
 import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.tag.TagJpa;
-import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import io.micronaut.transaction.annotation.Transactional;
@@ -58,8 +56,8 @@ public class CreateTransactionHandler implements CommandHandler<CreateTransactio
                 .bookDate(command.transaction().getBookDate())
                 .interestDate(command.transaction().getInterestDate())
                 .description(command.transaction().getDescription())
-                .currency(entityManager.get(CurrencyJpa.class, Collections.Map("code", command.transaction().getCurrency())))
-                .user(entityManager.get(UserAccountJpa.class, Collections.Map("username", authenticationFacade.authenticated())))
+                .currency(entityManager.from(CurrencyJpa.class).fieldEq("code", command.transaction().getCurrency()).singleResult().get())
+                .user(entityManager.currentUser())
                 .type(TransactionType.valueOf(command.transaction().computeType().name()))
                 .failureCode(command.transaction().getFailureCode())
                 .transactions(new HashSet<>())
@@ -91,7 +89,7 @@ public class CreateTransactionHandler implements CommandHandler<CreateTransactio
             // todo change to native BigDecimal later on
             var transferJpa = TransactionJpa.builder()
                     .amount(BigDecimal.valueOf(transfer.getAmount()))
-                    .account(entityManager.get(AccountJpa.class, Collections.Map("id", transfer.getAccount().getId())))
+                    .account(entityManager.getById(AccountJpa.class, transfer.getAccount().getId()))
                     .journal(jpaEntity)
                     .build();
 
@@ -103,66 +101,42 @@ public class CreateTransactionHandler implements CommandHandler<CreateTransactio
     }
 
     private CategoryJpa category(String label) {
-        var hql = """
-                select c from CategoryJpa c
-                where c.label = :label and c.user.username = :username""";
-        return entityManager.<CategoryJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("label", label)
-                .maybe()
+        return entityManager.from(CategoryJpa.class)
+                .fieldEq("username", authenticationFacade.authenticated())
+                .fieldEq("label", label)
+                .singleResult()
                 .getOrSupply(() -> null);
     }
 
     private ExpenseJpa expense(String name) {
-        var hql = """
-                select e from ExpenseJpa e
-                where e.name = :name and e.user.username = :username""";
-
-        return entityManager.<ExpenseJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", name)
-                .maybe()
+        return entityManager.from(ExpenseJpa.class)
+                .fieldEq("name", name)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .getOrSupply(() -> null);
     }
 
     private ContractJpa contract(String name) {
-        var hql = """
-                select e from ContractJpa e
-                where e.name = :name and e.user.username = :username""";
-
-        return entityManager.<ContractJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", name)
-                .maybe()
+        return entityManager.from(ContractJpa.class)
+                .fieldEq("name", name)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .getOrSupply(() -> null);
     }
 
     private ImportJpa job(String slug) {
-        var hql = """
-                select e from ImportJpa e
-                where e.slug = :slug and e.user.username = :username""";
-
-        return entityManager.<ImportJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("slug", slug)
-                .maybe()
+        return entityManager.from(ImportJpa.class)
+                .fieldEq("slug", slug)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .getOrSupply(() -> null);
     }
 
     private TagJpa tag(String name) {
-        var hql = """
-                select t from TagJpa t
-                where t.name = :name and t.user.username = :username""";
-
-        return entityManager.<TagJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", name)
-                .maybe()
+        return entityManager.from(TagJpa.class)
+                .fieldEq("name", name)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .getOrSupply(() -> null);
     }
 

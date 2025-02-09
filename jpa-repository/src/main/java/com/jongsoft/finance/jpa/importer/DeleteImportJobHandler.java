@@ -1,7 +1,8 @@
 package com.jongsoft.finance.jpa.importer;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.importer.DeleteImportJobCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -26,14 +27,9 @@ public class DeleteImportJobHandler implements CommandHandler<DeleteImportJobCom
     public void handle(DeleteImportJobCommand command) {
         log.info("[{}] - Processing import deleted event", command.id());
 
-        var hql = """
-                update ImportJpa
-                set archived = true
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(ImportJpa.class)
+                .set("archived", true)
+                .fieldEq("id", command.id())
                 .execute();
     }
 

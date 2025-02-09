@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.core.EntityRef;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.control.Optional;
@@ -16,36 +16,31 @@ import jakarta.inject.Singleton;
 @Named("expenseProvider")
 public class ExpenseProviderJpa implements ExpenseProvider {
 
-    private final AuthenticationFacade authenticationFacadea;
+    private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
 
     @Inject
-    public ExpenseProviderJpa(AuthenticationFacade authenticationFacadea, ReactiveEntityManager entityManager) {
-        this.authenticationFacadea = authenticationFacadea;
+    public ExpenseProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+        this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }
 
     @Override
     public Optional<EntityRef.NamedEntity> lookup(long id) {
-        return entityManager.<ExpenseJpa>blocking()
-                .hql("from ExpenseJpa where id = :id and user.username = :username")
-                .set("id", id)
-                .set("username", authenticationFacadea.authenticated())
-                .maybe()
+        return entityManager.from(ExpenseJpa.class)
+                .fieldEq("id", id)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .map(this::convert);
     }
 
     @Override
     public ResultPage<EntityRef.NamedEntity> lookup(FilterCommand filter) {
         if (filter instanceof ExpenseFilterCommand delegate) {
-            delegate.user(authenticationFacadea.authenticated());
+            delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<ExpenseJpa>blocking()
-                    .hql(delegate.generateHql())
-                    .setAll(delegate.getParameters())
-                    .limit(delegate.pageSize())
-                    .offset(delegate.page() * delegate.pageSize())
-                    .page()
+            return entityManager.from(delegate)
+                    .paged()
                     .map(this::convert);
         }
 

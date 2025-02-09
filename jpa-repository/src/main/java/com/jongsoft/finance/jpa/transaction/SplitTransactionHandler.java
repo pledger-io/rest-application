@@ -4,7 +4,7 @@ import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.jpa.account.AccountJpa;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.SplitTransactionCommand;
 import com.jongsoft.lang.Collections;
@@ -47,15 +47,10 @@ public class SplitTransactionHandler implements CommandHandler<SplitTransactionC
         var deletedIds = Collections.List(transaction.getTransactions())
                 .reject(t -> survivors.contains(t.getId()))
                 .map(TransactionJpa::getId);
-        var deleteHql = """
-                update TransactionJpa
-                set deleted = :now
-                where id in (:ids)""";
 
-        entityManager.update()
-                .hql(deleteHql)
-                .set("ids", deletedIds.toJava())
-                .set("now", new Date())
+        entityManager.update(TransactionJpa.class)
+                .set("deleted", new Date())
+                .fieldEqOneOf("id", deletedIds.stream().toArray())
                 .execute();
 
         // Add new parts
@@ -65,7 +60,7 @@ public class SplitTransactionHandler implements CommandHandler<SplitTransactionC
                         // todo change to native BigDecimal later on
                         .amount(BigDecimal.valueOf(part.getAmount()))
                         .description(part.getDescription())
-                        .account(entityManager.get(AccountJpa.class, Collections.Map("id", part.getAccount().getId())))
+                        .account(entityManager.getById(AccountJpa.class, part.getAccount().getId()))
                         .journal(transaction)
                         .build())
                 .forEach(entityPart -> {
@@ -76,14 +71,9 @@ public class SplitTransactionHandler implements CommandHandler<SplitTransactionC
         // Update existing parts
         command.split()
                 .filter(part -> Objects.nonNull(part.getId()))
-                .forEach(part -> entityManager.update()
-                        .hql("""
-                                update TransactionJpa
-                                set amount = :amount
-                                where id = :id""")
-                        .set("id", part.getId())
-                        // todo change later on to BigDecimal native
-                        .set("amount", BigDecimal.valueOf(part.getAmount()))
+                .forEach(part -> entityManager.update(TransactionJpa.class)
+                        .set("amount", part.getAmount())
+                        .fieldEq("id", part.getId())
                         .execute());
     }
 

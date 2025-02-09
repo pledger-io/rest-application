@@ -5,7 +5,7 @@ import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserIdentifier;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
@@ -14,12 +14,16 @@ import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ReadOnly
 @Singleton
 @RequiresJpa
 @Named("categoryProvider")
 public class CategoryProviderJpa implements CategoryProvider {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
@@ -32,26 +36,23 @@ public class CategoryProviderJpa implements CategoryProvider {
 
     @Override
     public Optional<Category> lookup(long id) {
-        return entityManager.<CategoryJpa>blocking()
-                .hql("from CategoryJpa where id = :id and user.username = :username")
-                .set("id", id)
-                .set("username", authenticationFacade.authenticated())
-                .maybe()
+        logger.trace("Looking up category with id: {}", id);
+
+        return entityManager.from(CategoryJpa.class)
+                .fieldEq("id", id)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .map(this::convert);
     }
 
     @Override
     public Optional<Category> lookup(String label) {
-        var hql = """
-                select c from CategoryJpa c
-                where c.label = :label
-                    and c.user.username = :username""";
+        logger.trace("Looking up category with label: {}", label);
 
-        return entityManager.<CategoryJpa>blocking()
-                .hql(hql)
-                .set("label", label)
-                .set("username", authenticationFacade.authenticated())
-                .maybe()
+        return entityManager.from(CategoryJpa.class)
+                .fieldEq("label", label)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .map(this::convert);
     }
 
@@ -60,12 +61,8 @@ public class CategoryProviderJpa implements CategoryProvider {
         if (filterCommand instanceof CategoryFilterCommand delegate) {
             delegate.user(authenticationFacade.authenticated());
 
-            return entityManager.<CategoryJpa>blocking()
-                    .hql(delegate.generateHql())
-                    .setAll(delegate.getParameters())
-                    .limit(delegate.pageSize())
-                    .offset(delegate.pageSize() * delegate.page())
-                    .page()
+            return entityManager.from(delegate)
+                    .paged()
                     .map(this::convert);
         }
 
@@ -74,15 +71,14 @@ public class CategoryProviderJpa implements CategoryProvider {
 
     @Override
     public Sequence<Category> lookup() {
-        var hql = """
-                select c from CategoryJpa c
-                where c.user.username = :username and c.archived = false""";
+        logger.trace("Looking up all categories.");
 
-        return entityManager.<CategoryJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(CategoryJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("archived", false)
+                .stream()
+                .map(this::convert)
+                .collect(ReactiveEntityManager.sequenceCollector());
     }
 
     protected Category convert(CategoryJpa source) {

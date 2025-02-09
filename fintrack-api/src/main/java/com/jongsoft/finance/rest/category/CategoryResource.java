@@ -62,8 +62,7 @@ public class CategoryResource {
     ResultPageResponse<CategoryResponse> search(@Valid @Body CategorySearchRequest searchRequest) {
         var response = categoryService.lookup(
                 filterFactory.category()
-                        .page(searchRequest.getPage())
-                        .pageSize(settingProvider.getPageSize()));
+                        .page(searchRequest.getPage(), settingProvider.getPageSize()));
 
         return new ResultPageResponse<>(response.map(CategoryResponse::new));
     }
@@ -78,7 +77,7 @@ public class CategoryResource {
         return categoryService.lookup(
                         filterFactory.category()
                                 .label(token, false)
-                                .pageSize(settingProvider.getAutocompleteLimit()))
+                                .page(0, settingProvider.getAutocompleteLimit()))
                 .content()
                 .map(CategoryResponse::new)
                 .toJava();

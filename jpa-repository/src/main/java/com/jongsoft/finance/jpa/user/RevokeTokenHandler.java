@@ -1,7 +1,8 @@
 package com.jongsoft.finance.jpa.user;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.user.entity.AccountTokenJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.user.RevokeTokenCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,16 +29,10 @@ public class RevokeTokenHandler implements CommandHandler<RevokeTokenCommand> {
     public void handle(RevokeTokenCommand command) {
         log.info("[{}] - Revoking security token.", command.token());
 
-        var hql = """
-                update AccountTokenJpa
-                set expires = :now 
-                where refreshToken = :token
-                    and expires > :now""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("token", command.token())
-                .set("now", LocalDateTime.now())
+        entityManager.update(AccountTokenJpa.class)
+                .set("expires", LocalDateTime.now())
+                .fieldEq("refreshToken", command.token())
+                .fieldGtOrEq("expires", LocalDateTime.now())
                 .execute();
     }
 

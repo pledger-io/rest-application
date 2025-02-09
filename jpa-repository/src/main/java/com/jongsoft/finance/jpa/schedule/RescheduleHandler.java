@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.schedule;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.schedule.RescheduleCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,17 +28,10 @@ public class RescheduleHandler implements CommandHandler<RescheduleCommand> {
     public void handle(RescheduleCommand command) {
         log.info("[{}] - Processing schedule reschedule event", command.id());
 
-        var hql = """
-                update ScheduledTransactionJpa
-                set interval = :interval,
-                    periodicity = :periodicity
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(ScheduledTransactionJpa.class)
                 .set("interval", command.schedule().interval())
                 .set("periodicity", command.schedule().periodicity())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

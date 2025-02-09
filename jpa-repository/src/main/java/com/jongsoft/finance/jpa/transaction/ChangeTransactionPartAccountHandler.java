@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.ChangeTransactionPartAccount;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,15 +28,9 @@ public class ChangeTransactionPartAccountHandler implements CommandHandler<Chang
     public void handle(ChangeTransactionPartAccount command) {
         log.info("[{}] - Processing transaction account change", command.id());
 
-        var hql = """
-                update TransactionJpa
-                set account.id = :accountId
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
-                .set("accountId", command.accountId())
+        entityManager.update(TransactionJpa.class)
+                .set("account.id", command.accountId())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

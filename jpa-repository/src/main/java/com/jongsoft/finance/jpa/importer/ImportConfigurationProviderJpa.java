@@ -5,7 +5,7 @@ import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.importer.entity.ImportConfig;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.ImportConfigurationProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
@@ -32,17 +32,10 @@ public class ImportConfigurationProviderJpa implements ImportConfigurationProvid
     public Optional<BatchImportConfig> lookup(String name) {
         log.trace("Import configuration lookup by name {}", name);
 
-        var hql = """
-                select b from ImportConfig b
-                where b.name = :name
-                    and b.user.username = :username
-                """;
-
-        return entityManager.<ImportConfig>blocking()
-                .hql(hql)
-                .set("name", name)
-                .set("username", authenticationFacade.authenticated())
-                .maybe()
+        return entityManager.from(ImportConfig.class)
+                .fieldEq("name", name)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .map(this::convert);
     }
 
@@ -50,15 +43,11 @@ public class ImportConfigurationProviderJpa implements ImportConfigurationProvid
     public Sequence<BatchImportConfig> lookup() {
         log.trace("CSVConfiguration listing");
 
-        var hql = """
-                select b from ImportConfig b
-                where b.user.username = :username""";
-
-        return entityManager.<ImportConfig>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(ImportConfig.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .stream()
+                .map(this::convert)
+                .collect(ReactiveEntityManager.sequenceCollector());
     }
 
     private BatchImportConfig convert(ImportConfig source) {

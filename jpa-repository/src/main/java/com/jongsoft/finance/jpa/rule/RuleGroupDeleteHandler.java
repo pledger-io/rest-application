@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.rule;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.commands.rule.RuleGroupDeleteCommand;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Singleton;
@@ -24,14 +24,9 @@ class RuleGroupDeleteHandler {
     void handle(RuleGroupDeleteCommand command) {
         log.info("[{}] - Processing rule group delete event", command.id());
 
-        var hql = """
-                update RuleGroupJpa
-                set archived = true
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(RuleGroupJpa.class)
+                .set("archived", true)
+                .fieldEq("id", command.id())
                 .execute();
     }
 

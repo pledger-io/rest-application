@@ -3,7 +3,6 @@ package com.jongsoft.finance.jpa.account;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.jpa.FilterFactoryJpa;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.AccountTypeProvider;
@@ -32,7 +31,9 @@ class AccountProviderJpaIT extends JpaTestSetup {
     private AccountTypeProvider accountTypeProvider;
 
     private Sequence<String> ownTypes;
-    private FilterFactory filterFactory = new FilterFactoryJpa();
+
+    @Inject
+    private FilterFactory filterFactory;
 
     @BeforeEach
     void setup() {
@@ -117,7 +118,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
     void lookup_ibanPartial() {
         var filter = filterFactory.account()
                 .iban("NLJND20000", false)
-                .page(0);
+                .page(0, 50);
 
         var check = accountProvider.lookup(filter);
 
@@ -134,7 +135,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
     void top() {
         var filter = filterFactory.account()
                 .types(ownTypes)
-                .pageSize(2);
+                .page(0, 2);
 
         var result = accountProvider.top(
                 filter,

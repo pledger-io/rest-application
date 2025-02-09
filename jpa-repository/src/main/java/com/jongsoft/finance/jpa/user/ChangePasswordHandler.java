@@ -1,7 +1,8 @@
 package com.jongsoft.finance.jpa.user;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.user.ChangePasswordCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -26,13 +27,9 @@ public class ChangePasswordHandler implements CommandHandler<ChangePasswordComma
     public void handle(ChangePasswordCommand command) {
         log.info("[{}] - Updating password for user", command.username());
 
-        entityManager.update()
-                .hql("""
-                        update UserAccountJpa
-                        set password = :password
-                        where username = :username""")
-                .set("username", command.username().email())
+        entityManager.update(UserAccountJpa.class)
                 .set("password", command.password())
+                .fieldEq("username", command.username().email())
                 .execute();
     }
 

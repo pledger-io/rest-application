@@ -4,10 +4,11 @@ import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.user.UserIdentifier;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.lang.collection.support.Collections;
 import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
@@ -31,63 +32,49 @@ public class ContractProviderJpa implements ContractProvider {
 
     @Override
     public Sequence<Contract> lookup() {
-        log.trace("Contract listing");
+        log.trace("Listing all contracts for user.");
 
-        var hql = """
-                select c from ContractJpa c
-                where c.user.username = :username""";
-
-        return entityManager.<ContractJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(ContractJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .stream()
+                .map(this::convert)
+                .collect(Collections.collector(com.jongsoft.lang.Collections::List));
     }
 
     @Override
     public Optional<Contract> lookup(long id) {
-        return entityManager.<ContractJpa>blocking()
-                .hql("from ContractJpa where id = :id and user.username = :username")
-                .set("id", id)
-                .set("username", authenticationFacade.authenticated())
-                .maybe()
+        log.trace("Contract lookup by id {}.", id);
+
+        return entityManager.from(ContractJpa.class)
+                .fieldEq("id", id)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
                 .map(this::convert);
     }
 
     @Override
     public Optional<Contract> lookup(String name) {
-        log.trace("Contract lookup by name: {}", name);
+        log.trace("Contract lookup by name {}.", name);
 
-        var hql = """
-                select c from ContractJpa c
-                where c.name = :name
-                    and c.archived = false
-                    and c.user.username = :username""";
-
-        return entityManager.<ContractJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", name)
-                .maybe()
+        return entityManager.from(ContractJpa.class)
+                .fieldEq("name", name)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("archived", false)
+                .singleResult()
                 .map(this::convert);
     }
 
     @Override
     public Sequence<Contract> search(String partialName) {
-        log.trace("Contract lookup by partial name: {}", partialName);
+        log.trace("Contract lookup by partial name '{}'.", partialName);
 
-        var hql = """
-                select c from ContractJpa c
-                where lower(c.name) like lower(:name)
-                    and c.archived = false
-                    and c.user.username = :username""";
-
-        return entityManager.<ContractJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", "%" + partialName + "%")
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(ContractJpa.class)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("archived", false)
+                .fieldLike("name", partialName)
+                .stream()
+                .map(this::convert)
+                .collect(Collections.collector(com.jongsoft.lang.Collections::List));
     }
 
     protected Contract convert(ContractJpa source) {

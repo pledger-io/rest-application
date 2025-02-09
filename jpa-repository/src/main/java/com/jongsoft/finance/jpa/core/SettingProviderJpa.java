@@ -5,7 +5,7 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.core.Setting;
 import com.jongsoft.finance.domain.core.events.SettingUpdatedEvent;
 import com.jongsoft.finance.jpa.core.entity.SettingJpa;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
@@ -30,39 +30,28 @@ public class SettingProviderJpa implements SettingProvider {
     public Sequence<Setting> lookup() {
         log.trace("Setting listing");
 
-        return entityManager.<SettingJpa>blocking()
-                .hql("select s from SettingJpa s")
-                .sequence()
-                .map(this::convert);
+        return entityManager.from(SettingJpa.class)
+                .stream()
+                .map(this::convert)
+                .collect(ReactiveEntityManager.sequenceCollector());
     }
 
     @Override
     public Optional<Setting> lookup(String name) {
         log.trace("Setting lookup by name {}", name);
 
-        var hql = """
-                select s from SettingJpa s
-                where s.name = :name""";
-
-        return entityManager.<SettingJpa>blocking()
-                .hql(hql)
-                .set("name", name)
-                .maybe()
+        return entityManager.from(SettingJpa.class)
+                .fieldEq("name", name)
+                .singleResult()
                 .map(this::convert);
     }
 
     @Transactional
     @BusinessEventListener
     public void handleSettingUpdated(SettingUpdatedEvent event) {
-        var hql = """
-                update SettingJpa
-                set value = :value
-                where name = :name""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("name", event.setting())
+        entityManager.update(SettingJpa.class)
                 .set("value", event.value())
+                .fieldEq("name", event.setting())
                 .execute();
     }
 

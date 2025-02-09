@@ -52,5 +52,4 @@ public abstract class JpaTestSetup {
     public Encoder encoder() {
         return Mockito.mock(Encoder.class);
     }
-
 }

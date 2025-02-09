@@ -1,7 +1,7 @@
 package com.jongsoft.finance.jpa.budget;
 
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.budget.UpdateExpenseCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -28,19 +28,11 @@ public class UpdateExpenseHandler implements CommandHandler<UpdateExpenseCommand
     @Override
     @BusinessEventListener
     public void handle(UpdateExpenseCommand command) {
-
-        var hql = """
-                from ExpensePeriodJpa e
-                where
-                    e.expense.id = :id
-                    and e.budget.until is null
-                    and e.budget.user.username = :username""";
-
-        var existing = entityManager.<ExpensePeriodJpa>blocking()
-                .hql(hql)
-                .set("id", command.id())
-                .set("username", authenticationFacade.authenticated())
-                .maybe()
+        var existing = entityManager.from(ExpensePeriodJpa.class)
+                .fieldEq("expense.id", command.id())
+                .fieldEq("budget.user.username", authenticationFacade.authenticated())
+                .fieldNull("budget.until")
+                .singleResult()
                 .getOrThrow(() -> new RuntimeException("Unable to find expense"));
 
         log.info("[{}] - Processing expense update event", existing.getId());

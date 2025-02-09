@@ -48,8 +48,7 @@ public class ContractTransactionResource {
                 .ownAccounts()
                 .onlyIncome(false)
                 .contracts(Collections.List(new EntityRef(contractId)))
-                .page(Optional.ofNullable(page).orElse(0))
-                .pageSize(settingProvider.getPageSize());
+                .page(Optional.ofNullable(page).orElse(0), settingProvider.getPageSize());
 
         return new ResultPageResponse<>(transactionService.lookup(filter)
                 .map(TransactionResponse::new));

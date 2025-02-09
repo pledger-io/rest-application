@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.currency;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.currency.ChangeCurrencyPropertyCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,19 +28,12 @@ public class ChangeCurrencyPropertyHandler implements CommandHandler<ChangeCurre
     public void handle(ChangeCurrencyPropertyCommand<?> command) {
         log.trace("[{}] - Processing currency property {} event", command.code(), command.type());
 
-        var updatePart = switch (command.type()) {
-            case ENABLED -> " c.enabled = :value";
-            case DECIMAL_PLACES -> " c.decimalPlaces = :value";
+        var currency = entityManager.update(CurrencyJpa.class);
+        switch (command.type()) {
+            case ENABLED -> currency.set("enabled", command.value());
+            case DECIMAL_PLACES -> currency.set("decimalPlaces", command.value());
         };
-
-        var hql = "update CurrencyJpa c set"
-                + updatePart
-                + " where c.code = :code";
-
-        entityManager.update()
-                .hql(hql)
-                .set("code", command.code())
-                .set("value", command.value())
+        currency.fieldEq("code", command.code())
                 .execute();
     }
 

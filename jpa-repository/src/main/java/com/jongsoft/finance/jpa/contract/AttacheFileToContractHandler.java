@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.contract;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.AttachFileToContractCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,15 +28,9 @@ public class AttacheFileToContractHandler implements CommandHandler<AttachFileTo
     public void handle(AttachFileToContractCommand command) {
         log.info("[{}] - Processing contract upload event", command.id());
 
-        var hql = """
-                update ContractJpa
-                set fileToken = :token
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("token", command.fileCode())
-                .set("id", command.id())
+        entityManager.update(ContractJpa.class)
+                .set("fileToken", command.fileCode())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

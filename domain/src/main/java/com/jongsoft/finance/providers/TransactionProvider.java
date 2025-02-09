@@ -116,8 +116,7 @@ public interface TransactionProvider extends DataProvider<Transaction> {
          * @param value the page
          * @return this instance
          */
-        FilterCommand page(int value);
-        FilterCommand pageSize(int value);
+        FilterCommand page(int value, int pageSize);
     }
 
     /**

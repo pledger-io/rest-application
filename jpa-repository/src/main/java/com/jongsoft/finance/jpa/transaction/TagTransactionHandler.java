@@ -2,12 +2,11 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.tag.TagJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.TagTransactionCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.lang.Collections;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -37,7 +36,7 @@ public class TagTransactionHandler implements CommandHandler<TagTransactionComma
     public void handle(TagTransactionCommand command) {
         log.info("[{}] - Processing transaction tagging event", command.id());
 
-        var transaction = entityManager.get(TransactionJournal.class, Collections.Map("id", command.id()));
+        var transaction = entityManager.getById(TransactionJournal.class, command.id());
         transaction.getTags().clear();
 
         command.tags()
@@ -49,16 +48,11 @@ public class TagTransactionHandler implements CommandHandler<TagTransactionComma
     }
 
     private TagJpa tag(String name) {
-        var hql = """
-                select t from TagJpa t
-                where t.name = :name and t.user.username = :username""";
-
-        return entityManager.<TagJpa>blocking()
-                .hql(hql)
-                .set("username", authenticationFacade.authenticated())
-                .set("name", name)
-                .maybe()
-                .getOrSupply(() -> null);
+        return entityManager.from(TagJpa.class)
+                .fieldEq("name", name)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
+                .getOrThrow(() -> new IllegalArgumentException("tag not found"));
     }
 
 }

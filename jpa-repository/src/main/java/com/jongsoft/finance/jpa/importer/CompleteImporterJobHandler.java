@@ -2,7 +2,8 @@ package com.jongsoft.finance.jpa.importer;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.importer.CompleteImportJobCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -30,15 +31,9 @@ public class CompleteImporterJobHandler implements CommandHandler<CompleteImport
     public void handle(CompleteImportJobCommand command) {
         log.info("[{}] - Processing import finished event", command.id());
 
-        var hql = """
-                update ImportJpa
-                set finished = :finished
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(ImportJpa.class)
                 .set("finished", new Date())
+                .fieldEq("id", command.id())
                 .execute();
     }
 

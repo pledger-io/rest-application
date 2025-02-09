@@ -60,8 +60,7 @@ public class ExpenseTransactionResource {
                 .onlyIncome(false)
                 .ownAccounts()
                 .expenses(Collections.List(new EntityRef(expenseId)))
-                .page(Control.Option(page).getOrSupply(() -> 1))
-                .pageSize(settingProvider.getPageSize());
+                .page(Control.Option(page).getOrSupply(() -> 1), settingProvider.getPageSize());
 
         return new ResultPageResponse<>(
                 transactionService.lookup(filter)

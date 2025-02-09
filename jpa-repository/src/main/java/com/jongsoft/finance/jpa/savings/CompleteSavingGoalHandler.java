@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.savings;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.savings.CompleteSavingGoalCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -28,15 +28,9 @@ public class CompleteSavingGoalHandler implements CommandHandler<CompleteSavingG
     public void handle(CompleteSavingGoalCommand command) {
         log.info("[{}] - Marking saving goal for completed.", command.id());
 
-        var hql = """
-                update SavingGoalJpa
-                set
-                  archived = true
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(SavingGoalJpa.class)
+                .set("archived", true)
+                .fieldEq("id", command.id())
                 .execute();
     }
 }

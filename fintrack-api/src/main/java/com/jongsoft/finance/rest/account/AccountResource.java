@@ -99,7 +99,7 @@ public class AccountResource {
     List<AccountResponse> autocomplete(@Nullable String token, @Nullable String type) {
         var filter =  accountFilterFactory.account()
                 .name(token, false)
-                .pageSize(settingProvider.getAutocompleteLimit());
+                .page(0, settingProvider.getAutocompleteLimit());
         if (type != null) {
             filter.types(Collections.List(type));
         }
@@ -118,8 +118,7 @@ public class AccountResource {
     )
     ResultPageResponse<AccountResponse> accounts(@Valid @Body AccountSearchRequest searchRequest) {
         var filter = accountFilterFactory.account()
-                .page(Math.max(0, searchRequest.page() - 1))
-                .pageSize(settingProvider.getPageSize())
+                .page(Math.max(0, searchRequest.page() - 1), settingProvider.getPageSize())
                 .types(searchRequest.accountTypes());
         if (searchRequest.name() != null) {
             filter.name(searchRequest.name(), false);

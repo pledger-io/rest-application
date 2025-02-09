@@ -9,13 +9,16 @@ import com.jongsoft.finance.messaging.commands.savings.CompleteSavingGoalCommand
 import com.jongsoft.finance.messaging.commands.savings.CreateSavingGoalCommand;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.schedule.Schedulable;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -26,6 +29,11 @@ public class SavingGoalEventIT extends JpaTestSetup {
 
     @Inject
     private EntityManager entityManager;
+
+    @MockBean
+    AuthenticationFacade authenticationFacade() {
+        return Mockito.mock(AuthenticationFacade.class);
+    }
 
     @BeforeEach
     void setup() {

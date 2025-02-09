@@ -9,8 +9,7 @@ public interface TagProvider extends Exportable<Tag> {
 
     interface FilterCommand {
         FilterCommand name(String value, boolean exact);
-        FilterCommand page(int page);
-        FilterCommand pageSize(int pageSize);
+        FilterCommand page(int page, int pageSize);
     }
 
     Optional<Tag> lookup(String name);

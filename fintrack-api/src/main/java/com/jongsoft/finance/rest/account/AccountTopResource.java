@@ -49,7 +49,7 @@ public class AccountTopResource {
             @PathVariable @DateFormat LocalDate end) {
         var filterCommand = filterFactory.account()
                 .types(Collections.List("debtor"))
-                .pageSize(settingProvider.getAutocompleteLimit());
+                .page(0, settingProvider.getAutocompleteLimit());
 
         return accountProvider.top(filterCommand, Dates.range(start, end), true)
                 .map(AccountSpendingResponse::new)
@@ -67,7 +67,7 @@ public class AccountTopResource {
             @PathVariable @DateFormat LocalDate end) {
         var filterCommand = filterFactory.account()
                 .types(Collections.List("creditor"))
-                .pageSize(settingProvider.getAutocompleteLimit());
+                .page(0, settingProvider.getAutocompleteLimit());
 
         return accountProvider.top(filterCommand, Dates.range(start, end), false)
                 .map(AccountSpendingResponse::new)

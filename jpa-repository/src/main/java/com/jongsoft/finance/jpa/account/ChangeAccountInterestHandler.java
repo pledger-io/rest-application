@@ -2,7 +2,7 @@ package com.jongsoft.finance.jpa.account;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.reactive.ReactiveEntityManager;
+import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.account.ChangeInterestCommand;
 import io.micronaut.transaction.annotation.Transactional;
@@ -29,17 +29,10 @@ public class ChangeAccountInterestHandler implements CommandHandler<ChangeIntere
     public void handle(ChangeInterestCommand command) {
         log.info("[{}] - Processing account interest event", command.id());
 
-        var hql = """
-                update AccountJpa
-                set interest = :interest,
-                    interestPeriodicity = :periodicity
-                where id = :id""";
-
-        entityManager.update()
-                .hql(hql)
-                .set("id", command.id())
+        entityManager.update(AccountJpa.class)
                 .set("interest", command.interest())
-                .set("periodicity", command.periodicity())
+                .set("interestPeriodicity", command.periodicity())
+                .fieldEq("id", command.id())
                 .execute();
     }
 
