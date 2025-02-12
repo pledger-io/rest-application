@@ -4,7 +4,7 @@ import com.jongsoft.finance.llm.agent.TransactionSupportAgent;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.jlama.JlamaChatModel;
+import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
@@ -15,10 +15,18 @@ import io.micronaut.context.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 @Factory
 @Requires(env = "ai")
 public class LanguageModelStarter {
     private static final Logger log = LoggerFactory.getLogger(LanguageModelStarter.class);
+
+    private final List<AITool> languageTools;
+
+    public LanguageModelStarter(List<AITool> languageTools) {
+        this.languageTools = languageTools;
+    }
 
     @Bean
     public TransactionSupportAgent transactionSupportAgent(ChatLanguageModel model) {
@@ -26,23 +34,28 @@ public class LanguageModelStarter {
         return AiServices.builder(TransactionSupportAgent.class)
                 .chatLanguageModel(model)
                 .chatMemoryProvider(chatMemoryProvider())
+                .tools(languageTools.toArray())
                 .build();
     }
 
     private ChatMemoryProvider chatMemoryProvider() {
         return memoryId -> MessageWindowChatMemory.builder()
                 .id(memoryId)
-                .maxMessages(3)
+                .maxMessages(35)
                 .chatMemoryStore(new InMemoryChatMemoryStore())
                 .build();
     }
 
     @Bean
-    @Requires(property = "application.ai.engine", value = "jlama")
-    ChatLanguageModel jlamaLanguageModel(@Value("${application.ai.jlama.model}") String modelName, @Value("${application.ai.temperature}") float temperature) {
-        log.info("Creating Jlama chat model with name {}, and temperature {}.", modelName, temperature);
-        return JlamaChatModel.builder()
+    @Requires(property = "application.ai.engine", value = "ollama")
+    ChatLanguageModel jlamaLanguageModel(
+            @Value("${application.ai.ollama.model}") String modelName,
+            @Value("${application.ai.ollama.uri}") String uri,
+            @Value("${application.ai.temperature}") double temperature) {
+        log.info("Creating Ollama chat model with name {}, and temperature {}.", modelName, temperature);
+        return OllamaChatModel.builder()
                 .modelName(modelName)
+                .baseUrl(uri)
                 .temperature(temperature)
                 .build();
     }

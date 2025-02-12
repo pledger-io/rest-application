@@ -1,11 +1,11 @@
 application:
   ai:
-    engine: ${AI_ENGINE:jlama}
-    temperature: 0.0
+    engine: ${AI_ENGINE:ollama}
+    temperature: 0.2
 
-    jlama:
-      # alternative models can be found here: https://huggingface.co/tjake
-      model: nttaii/llmlingua-2-bert-base-multilingual-cased-meetingbank
+    ollama:
+      model: qwen2.5:7b
+      uri: http://localhost:11434
     openai:
       model: gpt-4o-mini
       key: ${OPENAI_TOKEN}
