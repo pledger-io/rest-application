@@ -1,6 +1,7 @@
 package com.jongsoft.finance.llm;
 
-import com.jongsoft.finance.llm.agent.TransactionSupportAgent;
+import com.jongsoft.finance.llm.agent.ClassificationAgent;
+import com.jongsoft.finance.llm.tools.AiTool;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
@@ -22,19 +23,13 @@ import java.util.List;
 public class LanguageModelStarter {
     private static final Logger log = LoggerFactory.getLogger(LanguageModelStarter.class);
 
-    private final List<AITool> languageTools;
-
-    public LanguageModelStarter(List<AITool> languageTools) {
-        this.languageTools = languageTools;
-    }
-
     @Bean
-    public TransactionSupportAgent transactionSupportAgent(ChatLanguageModel model) {
+    public ClassificationAgent transactionSupportAgent(ChatLanguageModel model, List<AiTool> aiTools) {
         log.info("Setting up transaction support chat agent.");
-        return AiServices.builder(TransactionSupportAgent.class)
+        return AiServices.builder(ClassificationAgent.class)
                 .chatLanguageModel(model)
                 .chatMemoryProvider(chatMemoryProvider())
-                .tools(languageTools.toArray())
+                .tools(aiTools.toArray())
                 .build();
     }
 
@@ -48,7 +43,7 @@ public class LanguageModelStarter {
 
     @Bean
     @Requires(property = "application.ai.engine", value = "ollama")
-    ChatLanguageModel jlamaLanguageModel(
+    ChatLanguageModel ollamaLanguageModel(
             @Value("${application.ai.ollama.model}") String modelName,
             @Value("${application.ai.ollama.uri}") String uri,
             @Value("${application.ai.temperature}") double temperature) {

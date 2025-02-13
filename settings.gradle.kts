@@ -47,12 +47,12 @@ dependencyResolutionManagement {
         create("llm") {
             val langchain4jVersion: String = "0.36.2"
             library("core", "dev.langchain4j", "langchain4j").version(langchain4jVersion)
-            library("rag", "dev.langchain4j", "langchain4j-easy-rag").version(langchain4jVersion)
+            library("retriever-sql", "dev.langchain4j", "langchain4j-experimental-sql").version(langchain4jVersion)
             library("store", "dev.langchain4j", "langchain4j-embeddings-all-minilm-l6-v2").version(langchain4jVersion)
             library("model-openai", "dev.langchain4j", "langchain4j-open-ai").version(langchain4jVersion)
             library("model-ollama", "dev.langchain4j", "langchain4j-ollama").version(langchain4jVersion)
 
-            bundle("langchain4j", listOf("core", "rag", "store", "model-openai", "model-ollama"))
+            bundle("langchain4j", listOf("core", "retriever-sql", "store", "model-openai", "model-ollama"))
         }
     }
 }
