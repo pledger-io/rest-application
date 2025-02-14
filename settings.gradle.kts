@@ -62,8 +62,9 @@ include(
     "domain",
     "transaction-importer:transaction-importer-api",
     "transaction-importer:transaction-importer-csv",
-    "learning:rule-engine",
-    "learning:language-engine",
+    "learning:learning-module",
+    "learning:learning-module-rules",
+    "learning:learning-module-llm",
     "bpmn-process",
     "jpa-repository",
     "fintrack-api")
