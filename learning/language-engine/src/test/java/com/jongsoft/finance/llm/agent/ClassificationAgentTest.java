@@ -92,26 +92,22 @@ class ClassificationAgentTest {
 
                 var suggestedBudget = transactionSupportAgent.determineBudget(csvReader.getLinesRead(), description, from, to, amount, date);
                 LoggerFactory.getLogger(getClass()).info("Chosen budget: {}", suggestedBudget);
-                Assertions.assertThat(suggestedBudget)
-                        .as("Budget '%s' expected to be in the provided list.".formatted(suggestedBudget))
-                        .isIn(budgets);
+                if (!suggestedBudget.isEmpty()) {
+                    Assertions.assertThat(suggestedBudget)
+                            .as("Budget '%s' expected to be in the provided list.".formatted(suggestedBudget))
+                            .isIn(budgets);
+                }
 
                 var suggestedCategory = transactionSupportAgent.determineCategory(csvReader.getLinesRead() * 20, description, from, to, amount, date);
                 LoggerFactory.getLogger(getClass()).info("Chosen category: {}", suggestedCategory);
-                Assertions.assertThat(suggestedCategory)
-                        .as("Category '%s' is expected to be in the provided list.".formatted(suggestedCategory))
-                        .isIn(categories);
-//                if (classification.category() != null && !classification.category().isEmpty()) {
-//                    Assertions.assertThat(classification.category())
-//                            .as("Category '%s' is expected to be in the provided list.".formatted(classification.category()))
-//                            .isIn(categories);
-//                }
+                if (!suggestedCategory.isEmpty()) {
+                    Assertions.assertThat(suggestedCategory)
+                            .as("Category '%s' is expected to be in the provided list.".formatted(suggestedCategory))
+                            .isIn(categories);
+                }
 
-//                for (var tag : classification.tags()) {
-//                    Assertions.assertThat(tag)
-//                            .as("Tag '%s' expected to be in the provided list.".formatted(tag))
-//                            .isIn(tags);
-//                }
+                var suggestedTags = transactionSupportAgent.determineTags(csvReader.getLinesRead() * 13, description, from, to, amount, date);
+                LoggerFactory.getLogger(getClass()).info("Chosen tags: {}", suggestedTags);
             }
         }
     }

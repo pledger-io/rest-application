@@ -4,7 +4,7 @@ application:
     temperature: 0.6
 
     ollama:
-      model: llama3.2:3b #qwen2.5:3b
+      model: llama3.2:3b
       uri: http://localhost:11434
     openai:
       model: gpt-4o

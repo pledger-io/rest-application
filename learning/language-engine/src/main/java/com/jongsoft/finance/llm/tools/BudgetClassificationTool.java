@@ -3,6 +3,7 @@ package com.jongsoft.finance.llm.tools;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.providers.BudgetProvider;
 import dev.langchain4j.agent.tool.Tool;
+import io.micronaut.context.annotation.Requires;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Singleton
+@Requires(env = "ai")
 public class BudgetClassificationTool implements AiTool {
 
     private final Logger logger = org.slf4j.LoggerFactory.getLogger(BudgetClassificationTool.class);
