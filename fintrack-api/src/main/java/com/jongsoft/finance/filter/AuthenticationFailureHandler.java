@@ -25,7 +25,7 @@ public class AuthenticationFailureHandler implements ExceptionHandler<Authorizat
     @Override
     public HttpResponse<JsonError> handle(HttpRequest request, AuthorizationException exception) {
         if (exception.isForbidden()) {
-            log.info("{}: {} - User {} does not have access based upon the roles {}.",
+            log.warn("{}: {} - User {} does not have access based upon the roles {}.",
                     request.getMethod(),
                     request.getPath(),
                     exception.getAuthentication().getName(),
@@ -35,7 +35,7 @@ public class AuthenticationFailureHandler implements ExceptionHandler<Authorizat
                     .body(new JsonError("User does not have access based upon the roles"));
         }
 
-        log.info("{}: {} - User {} is not authenticated.",
+        log.warn("{}: {} - User {} is not authenticated.",
                 request.getMethod(),
                 request.getPath(),
                 Control.Option(exception.getAuthentication())

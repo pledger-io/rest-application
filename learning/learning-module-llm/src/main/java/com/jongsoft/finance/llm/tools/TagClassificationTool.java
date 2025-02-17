@@ -23,7 +23,7 @@ public class TagClassificationTool implements AiTool {
 
     @Tool("Returns a list of known tags")
     public List<String> listKnownTags() {
-        logger.debug("Ai tool fetching available tags.");
+        logger.trace("Ai tool fetching available tags.");
         return tagProvider.lookup()
                 .map(Tag::name)
                 .toJava();

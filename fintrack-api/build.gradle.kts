@@ -73,6 +73,7 @@ dependencies {
     implementation(project(":jpa-repository"))
     implementation(project(":learning:learning-module"))
     implementation(project(":learning:learning-module-rules"))
+    implementation(project(":learning:learning-module-llm"))
     implementation(project(":bpmn-process"))
     implementation(project(":transaction-importer:transaction-importer-api"))
     implementation(project(":transaction-importer:transaction-importer-csv"))

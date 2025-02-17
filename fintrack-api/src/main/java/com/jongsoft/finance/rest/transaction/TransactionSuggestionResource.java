@@ -3,6 +3,7 @@ package com.jongsoft.finance.rest.transaction;
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.learning.SuggestionEngine;
 import com.jongsoft.finance.learning.SuggestionInput;
+import com.jongsoft.finance.rest.model.TagResponse;
 import com.jongsoft.finance.security.AuthenticationRoles;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
@@ -48,7 +49,10 @@ class TransactionSuggestionResource {
             output.put(RuleColumn.BUDGET.toString(), suggestions.budget());
         }
         if (suggestions.tags() != null) {
-            output.put(RuleColumn.TAGS.toString(), suggestions.tags().stream().map(TagCreateRequest::new).toList());
+            output.put(RuleColumn.TAGS.toString(), suggestions.tags()
+                    .stream()
+                    .map(tag -> new TagResponse(new com.jongsoft.finance.domain.transaction.Tag(tag)))
+                    .toList());
         }
         if (suggestions.category() != null) {
             output.put(RuleColumn.CATEGORY.toString(), suggestions.category());

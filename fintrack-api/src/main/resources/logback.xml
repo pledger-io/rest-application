@@ -11,7 +11,7 @@
 
     <logger name="com.jongsoft.finance" level="debug" />
     <logger name="com.jongsoft.finance.bpmn.delegate" level="debug" />
-    <logger name="com.jongsoft.finance.filter" level="warn" />
+    <logger name="com.jongsoft.finance.filter" level="info" />
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>

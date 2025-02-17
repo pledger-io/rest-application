@@ -22,7 +22,7 @@ public class CategoryClassificationTool implements AiTool {
 
     @Tool("Returns a list of known categories, when classifying pick from this list only")
     public List<String> listKnownCategories() {
-        logger.debug("Ai tool fetching available categories.");
+        logger.trace("Ai tool fetching available categories.");
         return categoryProvider.lookup()
                 .map(Category::getLabel)
                 .toJava();
