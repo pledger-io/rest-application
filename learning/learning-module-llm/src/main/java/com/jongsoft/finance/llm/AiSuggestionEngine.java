@@ -39,8 +39,8 @@ class AiSuggestionEngine implements SuggestionEngine {
                 transactionInput.amount());
 
         var suggestions = new SuggestionResult(
-                removeThinkPart(suggestBudget(nullSafeInput)),
-                removeThinkPart(suggestCategory(nullSafeInput)),
+                suggestBudget(nullSafeInput),
+                suggestCategory(nullSafeInput),
                 suggestTags(nullSafeInput));
 
         log.trace("Finished classification with suggestions {}.", suggestions);
@@ -88,8 +88,4 @@ class AiSuggestionEngine implements SuggestionEngine {
         return "";
     }
 
-    private String removeThinkPart(String response) {
-        // this is a correction for deepseek related models
-        return response.replaceAll("(?i)<think>(.*\\n)*</think>", "").trim();
-    }
 }

@@ -29,7 +29,7 @@ public interface ClassificationAgent {
             @V("date") String date);
 
     @UserMessage({
-            "Pick the correct subcategory a transaction on {{date}} from account {{from}} to account {{to}} of {{amount}} and with description {{description}}.",
+            "Pick the correct subcategory for a transaction on {{date}} from account {{from}} to account {{to}} of {{amount}} and with description {{description}}.",
             "You must pick a subcategory from the response of the list of known subcategories, everything else is wrong.",
             "If you cannot find a match do not answer at all.",
             "Your response must **only** contain the chosen subcategory name in plain text and nothing else. Do not add any explanation, formatting, or extra words."

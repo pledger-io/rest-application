@@ -63,7 +63,7 @@ public class ClassificationAugmenter implements RetrievalAugmentor {
                     .collect(Collectors.joining(","));
         }
 
-        if (currentMessage.contains("Pick the correct subcategory a transaction")) {
+        if (currentMessage.contains("Pick the correct subcategory for a transaction")) {
             logger.trace("User message augmentation with available categories.");
             allowedList = categoryProvider.lookup()
                     .map(Category::getLabel)
