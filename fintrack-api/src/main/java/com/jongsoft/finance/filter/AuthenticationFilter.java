@@ -14,10 +14,12 @@ import io.micronaut.serde.ObjectMapper;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 
 @Filter("/**")
 public class AuthenticationFilter implements HttpServerFilter {
@@ -43,6 +45,7 @@ public class AuthenticationFilter implements HttpServerFilter {
                 .ifPresent(this::handleAuthentication);
 
         var startTime = Instant.now();
+        MDC.put("correlationId", UUID.randomUUID().toString());
         return Publishers.then(chain.proceed(request), response -> {
             if (request.getPath().contains("/api/localization/")) {
                 log.trace("{}: {}", request.getMethod(), request.getPath());
@@ -64,6 +67,7 @@ public class AuthenticationFilter implements HttpServerFilter {
                             response.status());
                 }
             }
+            MDC.remove("correlationId");
         });
     }
 

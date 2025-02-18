@@ -102,7 +102,7 @@ public class CreateTransactionHandler implements CommandHandler<CreateTransactio
 
     private CategoryJpa category(String label) {
         return entityManager.from(CategoryJpa.class)
-                .fieldEq("username", authenticationFacade.authenticated())
+                .fieldEq("user.username", authenticationFacade.authenticated())
                 .fieldEq("label", label)
                 .singleResult()
                 .getOrSupply(() -> null);
