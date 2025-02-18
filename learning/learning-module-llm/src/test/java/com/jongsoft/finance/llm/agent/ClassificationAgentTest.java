@@ -3,6 +3,8 @@ package com.jongsoft.finance.llm.agent;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.user.Budget;
 import com.jongsoft.finance.domain.user.Category;
+import com.jongsoft.finance.learning.SuggestionEngine;
+import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.providers.TagProvider;
@@ -13,15 +15,18 @@ import com.opencsv.exceptions.CsvValidationException;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Disabled("Only ran locally to test this new module. Not production ready yet.")
@@ -29,7 +34,7 @@ import java.util.stream.Stream;
 class ClassificationAgentTest {
 
     @Inject
-    private ClassificationAgent transactionSupportAgent;
+    private SuggestionEngine suggestionEngine;
 
     @Inject
     private CategoryProvider categoryProvider;
@@ -84,27 +89,32 @@ class ClassificationAgentTest {
                 var to = line[3];
                 var amount = Double.parseDouble(line[4]);
 
-                LoggerFactory.getLogger(getClass())
-                        .info("Input data: {}", (Object) line);
+                MDC.put("correlationId", UUID.randomUUID().toString());
 
-                var suggestedBudget = transactionSupportAgent.determineBudget(UUID.randomUUID(), description, from, to, amount, date);
-                LoggerFactory.getLogger(getClass()).info("Chosen budget: {}", suggestedBudget);
-                if (!suggestedBudget.isEmpty()) {
-                    Assertions.assertThat(suggestedBudget)
-                            .as("Budget '%s' expected to be in the provided list.".formatted(suggestedBudget))
-                            .isIn(budgets);
+                var suggestionInput = new SuggestionInput(LocalDate.parse(date), description, from, to, amount);
+                var suggestions = suggestionEngine.makeSuggestions(suggestionInput);
+
+                if (!suggestions.budget().isEmpty() && !budgets.contains(suggestions.budget())) {
+                    LoggerFactory.getLogger(getClass()).error("Chosen budget not allowed: {}", suggestions.budget());
+                } else {
+                    LoggerFactory.getLogger(getClass()).info("Chosen budget: {}", suggestions.budget());
                 }
 
-                var suggestedCategory = transactionSupportAgent.determineCategory(UUID.randomUUID(), description, from, to, amount, date);
-                LoggerFactory.getLogger(getClass()).info("Chosen category: {}", suggestedCategory);
-                if (!suggestedCategory.isEmpty()) {
-                    Assertions.assertThat(suggestedCategory)
-                            .as("Category '%s' is expected to be in the provided list.".formatted(suggestedCategory))
-                            .isIn(categories);
+                if (!suggestions.category().isEmpty() && !categories.contains(suggestions.category())) {
+                    LoggerFactory.getLogger(getClass()).error("Chosen category not allowed: {}", suggestions.category());
+                } else {
+                    LoggerFactory.getLogger(getClass()).info("Chosen category: {}", suggestions.category());
                 }
 
-                var suggestedTags = transactionSupportAgent.determineTags(UUID.randomUUID(), description, from, to, amount, date);
-                LoggerFactory.getLogger(getClass()).info("Chosen tags: {}", suggestedTags);
+                var tagSplit = suggestions.tags()
+                    .stream()
+                    .collect(Collectors.teeing(
+                            Collectors.filtering(tags::contains, Collectors.joining(",")),
+                            Collectors.filtering(Predicate.not(tags::contains), Collectors.joining(",")),
+                            List::of));
+
+                LoggerFactory.getLogger(getClass()).info("Allowed tags: {}", tagSplit.getFirst());
+                LoggerFactory.getLogger(getClass()).warn("Chosen not allowed tags: {}", tagSplit.getLast());
             }
         }
     }

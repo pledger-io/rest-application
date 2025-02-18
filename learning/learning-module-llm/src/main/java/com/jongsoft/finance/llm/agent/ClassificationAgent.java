@@ -15,12 +15,12 @@ import java.util.UUID;
 public interface ClassificationAgent {
 
     @UserMessage({
-            "Pick the correct budget for a transaction on {{date}} from account {{from}} to account {{to}} of {{amount}} and with description {{description}}.",
-            "You must pick a budget from the response of the list of known budgets, everything else is wrong.",
+            "Pick the correct category for a transaction on {{date}} from account {{from}} to account {{to}} of {{amount}} and with description {{description}}.",
+            "You must pick a category from the response of the list of known categories, everything else is wrong.",
             "If you cannot find a match do not answer at all.",
-            "Your response must **only** contain the chosen budget name in plain text and nothing else. Do not add any explanation, formatting, or extra words."
+            "Your response must **only** contain the chosen category name in plain text and nothing else. Do not add any explanation, formatting, or extra words."
     })
-    String determineBudget(
+    String determineCategory(
             @MemoryId UUID chat,
             @V("description") String description,
             @V("from") String from,
@@ -29,12 +29,12 @@ public interface ClassificationAgent {
             @V("date") String date);
 
     @UserMessage({
-            "Pick the correct category a transaction on {{date}} from account {{from}} to account {{to}} of {{amount}} and with description {{description}}.",
-            "You must pick a category from the response of the list of known categories, everything else is wrong.",
+            "Pick the correct subcategory a transaction on {{date}} from account {{from}} to account {{to}} of {{amount}} and with description {{description}}.",
+            "You must pick a subcategory from the response of the list of known subcategories, everything else is wrong.",
             "If you cannot find a match do not answer at all.",
-            "Your response must **only** contain the chosen category name in plain text and nothing else. Do not add any explanation, formatting, or extra words."
+            "Your response must **only** contain the chosen subcategory name in plain text and nothing else. Do not add any explanation, formatting, or extra words."
     })
-    String determineCategory(
+    String determineSubCategory(
             @MemoryId UUID chat,
             @V("description") String description,
             @V("from") String from,

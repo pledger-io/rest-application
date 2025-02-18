@@ -22,8 +22,8 @@ public class BudgetClassificationTool implements AiTool {
         this.budgetProvider = budgetProvider;
     }
 
-    @Tool("Returns a list of known budgets")
-    public List<String> listKnownBudgets() {
+    @Tool("Returns a list of known categories")
+    public List<String> listKnownCategories() {
         logger.trace("Ai tool fetching available budgets.");
         int year = LocalDate.now().getYear();
         int month = LocalDate.now().getMonthValue();

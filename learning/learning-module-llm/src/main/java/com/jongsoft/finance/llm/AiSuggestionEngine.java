@@ -38,16 +38,17 @@ class AiSuggestionEngine implements SuggestionEngine {
                 Optional.ofNullable(transactionInput.toAccount()).orElse(""),
                 transactionInput.amount());
 
-        return new SuggestionResult(
-                suggestBudget(nullSafeInput),
-                suggestCategory(nullSafeInput),
-                suggestTags(nullSafeInput)
-        );
+        var suggestions = new SuggestionResult(
+                removeThinkPart(suggestBudget(nullSafeInput)),
+                removeThinkPart(suggestCategory(nullSafeInput)),
+                suggestTags(nullSafeInput));
+
+        log.trace("Finished classification with suggestions {}.", suggestions);
+        return suggestions;
     }
 
     private List<String> suggestTags(SuggestionInput transactionInput) {
-        log.debug("Classifying the tags.");
-//        return List.of();
+        log.trace("Classifying the tags.");
         return classificationAgent.determineTags(
                 UUID.randomUUID(),
                 transactionInput.description(),
@@ -58,8 +59,8 @@ class AiSuggestionEngine implements SuggestionEngine {
     }
 
     private String suggestCategory(SuggestionInput transactionInput) {
-        log.debug("Classifying the category.");
-        return classificationAgent.determineCategory(
+        log.trace("Classifying the category.");
+        return classificationAgent.determineSubCategory(
                 UUID.randomUUID(),
                 transactionInput.description(),
                 transactionInput.fromAccount(),
@@ -69,8 +70,8 @@ class AiSuggestionEngine implements SuggestionEngine {
     }
 
     private String suggestBudget(SuggestionInput transactionInput) {
-        log.debug("Classifying the budget.");
-        return classificationAgent.determineBudget(
+        log.trace("Classifying the budget.");
+        return classificationAgent.determineCategory(
                 UUID.randomUUID(),
                 transactionInput.description(),
                 transactionInput.fromAccount(),
@@ -85,5 +86,10 @@ class AiSuggestionEngine implements SuggestionEngine {
         }
 
         return "";
+    }
+
+    private String removeThinkPart(String response) {
+        // this is a correction for deepseek related models
+        return response.replaceAll("(?i)<think>(.*\\n)*</think>", "").trim();
     }
 }

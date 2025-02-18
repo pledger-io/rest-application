@@ -20,8 +20,8 @@ public class CategoryClassificationTool implements AiTool {
         this.categoryProvider = categoryProvider;
     }
 
-    @Tool("Returns a list of known categories, when classifying pick from this list only")
-    public List<String> listKnownCategories() {
+    @Tool("Returns a list of known subcategories, when classifying pick from this list only")
+    public List<String> listKnownSubCategories() {
         logger.trace("Ai tool fetching available categories.");
         return categoryProvider.lookup()
                 .map(Category::getLabel)
