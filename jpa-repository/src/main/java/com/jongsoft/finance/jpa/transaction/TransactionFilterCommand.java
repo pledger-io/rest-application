@@ -35,9 +35,7 @@ public class TransactionFilterCommand extends JpaFilterBuilder<TransactionJourna
 
     @Override
     public TransactionProvider.FilterCommand accounts(Sequence<EntityRef> value) {
-        query().whereExists(subQuery -> subQuery
-                .from("transactions")
-                .fieldEqOneOf("account.id", ID_REDUCER.apply(value).toArray()));
+        query().condition(Expressions.fieldCondition("t", "account.id", FieldEquation.IN, ID_REDUCER.apply(value)));
         return this;
     }
 
