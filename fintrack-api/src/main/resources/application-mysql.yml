@@ -6,6 +6,11 @@ datasources:
     password: ${DATABASE_PASSWORD:fintrack}
     dialect: mysql
 
+jpa:
+  default:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
 flyway:
   datasources:
     default:

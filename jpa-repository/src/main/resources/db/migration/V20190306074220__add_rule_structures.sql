@@ -26,7 +26,7 @@ create table rule_change
 (
   id      bigint       not null auto_increment,
   field   int          not null,
-  "value" varchar(255) not null,
+  `value` varchar(255) not null,
   rule_id bigint       not null,
 
   constraint pk_rule_change primary key (id),
