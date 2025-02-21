@@ -15,3 +15,4 @@ flyway:
   datasources:
     default:
       locations: ["classpath:db/camunda/mysql", "classpath:db/migration"]
+      validate-on-migrate: false
