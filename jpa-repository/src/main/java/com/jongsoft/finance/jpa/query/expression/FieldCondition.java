@@ -3,6 +3,8 @@ package com.jongsoft.finance.jpa.query.expression;
 import com.jongsoft.finance.jpa.query.BooleanExpression;
 import jakarta.persistence.Query;
 
+import java.util.function.Supplier;
+
 record FieldCondition(String tableAlias, String fieldId, String field, FieldEquation equation, Object value) implements BooleanExpression {
     @Override
     public String hqlExpression() {
@@ -16,14 +18,19 @@ record FieldCondition(String tableAlias, String fieldId, String field, FieldEqua
             case LIKE -> "LIKE";
         };
 
+        Supplier<String> fieldFunc = () -> "%s%s".formatted(actualAlias, field);
+        if (value instanceof String && equation == FieldEquation.LIKE) {
+            fieldFunc = () -> "lower(%s%s)".formatted(actualAlias, field);
+        }
+
         if (equation == FieldEquation.IN) {
-            return " %s%s IN(:%s) ".formatted(actualAlias, field, fieldId);
+            return " %s IN(:%s) ".formatted(fieldFunc.get(), fieldId);
         } else if (equation == FieldEquation.NIN) {
-            return " %s%s NOT IN(:%s) ".formatted(actualAlias, field, fieldId);
+            return " %s NOT IN(:%s) ".formatted(fieldFunc.get(), fieldId);
 
         }
 
-        return " %s%s %s :%s ".formatted(actualAlias, field, comparator, fieldId);
+        return " %s %s :%s ".formatted(fieldFunc.get(), comparator, fieldId);
     }
 
     @Override

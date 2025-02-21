@@ -1,9 +1,7 @@
 package com.jongsoft.finance.jpa.core.entity;
 
-import jakarta.persistence.*;
-
 import com.jongsoft.finance.core.SettingType;
-
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -17,7 +15,7 @@ public class SettingJpa extends EntityJpa {
     @Enumerated(EnumType.STRING)
     private SettingType type;
 
-    @Column(name = "`value`")
+    @Column(name = "setting_val")
     private String value;
 
     public SettingJpa() {

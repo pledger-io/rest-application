@@ -49,7 +49,7 @@ public class TransactionFilterCommand extends JpaFilterBuilder<TransactionJourna
 
     @Override
     public TransactionProvider.FilterCommand contracts(Sequence<EntityRef> value) {
-        query().fieldEqOneOf("contracts.id", ID_REDUCER.apply(value).toArray());
+        query().fieldEqOneOf("contract.id", ID_REDUCER.apply(value).toArray());
         return this;
     }
 
@@ -65,9 +65,9 @@ public class TransactionFilterCommand extends JpaFilterBuilder<TransactionJourna
             subQuery.fieldNull("deleted")
                     .from("transactions");
             if (exact) {
-                subQuery.fieldEq("name", value);
+                subQuery.fieldEq("account.name", value);
             } else {
-                subQuery.fieldLike("name", value);
+                subQuery.fieldLike("account.name", value.toLowerCase());
             }
         });
         return this;
@@ -77,8 +77,8 @@ public class TransactionFilterCommand extends JpaFilterBuilder<TransactionJourna
     public TransactionProvider.FilterCommand description(String value, boolean exact) {
         query().condition(
                 Expressions.or(
-                        Expressions.fieldLike("e", "description", value),
-                        Expressions.fieldLike("t", "description", value))
+                        Expressions.fieldLike("e", "description", value.toLowerCase()),
+                        Expressions.fieldLike("t", "description", value.toLowerCase()))
         );
 
         return this;

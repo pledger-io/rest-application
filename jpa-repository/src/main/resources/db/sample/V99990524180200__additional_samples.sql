@@ -150,7 +150,7 @@ values ('grocery', 1, 'DESCRIPTION', 'CONTAINS'),
        ('groceries', 1, 'DESCRIPTION', 'CONTAINS'),
        ('car', 2, 'DESCRIPTION', 'CONTAINS');
 
-insert into rule_change("value", rule_id, field)
+insert into rule_change(change_val, rule_id, field)
 values ('1', 1, 'CATEGORY'),
        ('1', 1, 'BUDGET'),
        ('12', 2, 'CATEGORY');
