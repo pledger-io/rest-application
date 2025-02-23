@@ -68,7 +68,6 @@ public class TransactionResource {
     )
     ResultPageResponse<TransactionResponse> search(@Valid @Body TransactionSearchRequest request) {
         var command = filterFactory.transaction()
-                .ownAccounts()
                 .range(Dates.range(
                         request.getDateRange().start(),
                         request.getDateRange().end()))
@@ -91,6 +90,8 @@ public class TransactionResource {
 
         if (request.isTransfers()) {
             command.transfers();
+        } else {
+            command.ownAccounts();
         }
 
         if (request.isOnlyIncome()) {
