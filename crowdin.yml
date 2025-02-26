@@ -3,6 +3,6 @@ api_token_env: CROWDIN_PERSONAL_TOKEN
 
 files:
   - source: "fintrack-api/src/main/resources/i18n/messages.properties"
-    translation: "fintrack-api/src/main/resources/i18n/messages%two_letters_code%.properties"
+    translation: "fintrack-api/src/main/resources/i18n/messages_%two_letters_code%.properties"
   - source: "fintrack-api/src/main/resources/i18n/ValidationMessages.properties"
-    translation: "fintrack-api/src/main/resources/i18n/ValidationMessages%two_letters_code%.properties"
+    translation: "fintrack-api/src/main/resources/i18n/ValidationMessages_%two_letters_code%.properties"
