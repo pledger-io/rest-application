@@ -3,7 +3,7 @@ rootProject.name="Pledger"
 pluginManagement {
     plugins {
         id("java")
-        id("io.micronaut.library").version("4.4.5")
+        id("io.micronaut.library").version("4.5.0")
         id("io.micronaut.application").version("4.4.5")
         id("io.freefair.lombok").version("8.12.2.1")
         id("org.sonarqube").version("6.0.1.5171")
