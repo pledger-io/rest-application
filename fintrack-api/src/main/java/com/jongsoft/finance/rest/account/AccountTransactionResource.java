@@ -80,7 +80,7 @@ public class AccountTransactionResource {
                 .range(Dates.range(
                         request.dateRange().start(),
                         request.dateRange().end()))
-                .page(request.getPage(), settingProvider.getPageSize());
+                .page(request.getPage(), Integer.MAX_VALUE);
 
         if (request.text() != null) {
             command.description(request.text(), false);
