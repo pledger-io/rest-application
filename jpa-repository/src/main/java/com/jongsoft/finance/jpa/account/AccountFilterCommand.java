@@ -13,6 +13,7 @@ public class AccountFilterCommand extends JpaFilterBuilder<AccountJpa> implement
     public AccountFilterCommand() {
         orderAscending = true;
         orderBy = FIELD_NAME;
+        query().fieldEq("archived", false);
     }
 
     @Override
