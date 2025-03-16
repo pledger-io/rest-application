@@ -93,6 +93,31 @@ class AccountProviderJpaIT extends JpaTestSetup {
     }
 
     @Test
+    void lookup_page1() {
+        var filter = filterFactory.account()
+                .page(0, 1);
+
+        var check = accountProvider.lookup(filter);
+
+        Assertions.assertThat(check.total()).isEqualTo(1);
+        Assertions.assertThat(check.content())
+                .hasSize(1)
+                .extracting("name")
+                .contains("Account One");
+    }
+
+    @Test
+    void lookup_page2() {
+        var filter = filterFactory.account()
+                .page(1, 1);
+
+        var check = accountProvider.lookup(filter);
+
+        Assertions.assertThat(check.total()).isEqualTo(1);
+        Assertions.assertThat(check.content()).isEmpty();
+    }
+
+    @Test
     void lookup_partialName() {
         var filter = filterFactory.account()
                 .name("one", false);

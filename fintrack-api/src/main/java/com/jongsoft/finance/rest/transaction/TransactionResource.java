@@ -8,7 +8,6 @@ import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.AccountTypeProvider;
-import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
@@ -42,7 +41,6 @@ import java.util.concurrent.Executors;
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class TransactionResource {
 
-    private final SettingProvider settingProvider;
     private final TransactionProvider transactionProvider;
     private final AccountProvider accountProvider;
     private final FilterFactory filterFactory;
@@ -50,8 +48,7 @@ public class TransactionResource {
     private final RuntimeResource runtimeResource;
     private final AuthenticationFacade authenticationFacade;
 
-    public TransactionResource(SettingProvider settingProvider, TransactionProvider transactionProvider, AccountProvider accountProvider, FilterFactory filterFactory, AccountTypeProvider accountTypeProvider, RuntimeResource runtimeResource, AuthenticationFacade authenticationFacade) {
-        this.settingProvider = settingProvider;
+    public TransactionResource(TransactionProvider transactionProvider, AccountProvider accountProvider, FilterFactory filterFactory, AccountTypeProvider accountTypeProvider, RuntimeResource runtimeResource, AuthenticationFacade authenticationFacade) {
         this.transactionProvider = transactionProvider;
         this.accountProvider = accountProvider;
         this.filterFactory = filterFactory;
@@ -71,7 +68,7 @@ public class TransactionResource {
                 .range(Dates.range(
                         request.getDateRange().start(),
                         request.getDateRange().end()))
-                .page(request.getPage(), settingProvider.getPageSize());
+                .page(request.getPage(), Integer.MAX_VALUE);
 
         Control.Option(request.getCategory())
                 .map(e -> new EntityRef(e.id()))

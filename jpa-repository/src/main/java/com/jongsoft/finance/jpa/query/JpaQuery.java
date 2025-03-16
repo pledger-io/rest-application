@@ -194,7 +194,12 @@ public class JpaQuery<E> extends BaseQuery<JpaQuery<E>> {
      */
     public ResultPage<E> paged() {
         var countHql = "SELECT count(DISTINCT e.id) %s".formatted(generateHql(false));
-        var numberOfRecords = createQuery(Long.class, countHql).getSingleResult();
+        var query = entityManager.createQuery(countHql, Long.class);
+        for (var condition : conditions()) {
+            condition.addParameters(query);
+        }
+
+        var numberOfRecords = query.getSingleResult();
         var limit = limitRows == null ? Integer.MAX_VALUE : limitRows;
         if (numberOfRecords > 0) {
             // only run the actual query if we had hits in the count query.
