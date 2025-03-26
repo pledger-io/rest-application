@@ -6,7 +6,7 @@ pluginManagement {
         id("io.micronaut.library").version("4.5.0")
         id("io.micronaut.application").version("4.5.0")
         id("io.freefair.lombok").version("8.13")
-        id("org.sonarqube").version("6.0.1.5171")
+        id("org.sonarqube").version("6.1.0.5360")
         id("org.openapi.generator").version("7.12.0")
 
         id("signing")
