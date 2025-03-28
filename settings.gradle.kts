@@ -3,9 +3,9 @@ rootProject.name="Pledger"
 pluginManagement {
     plugins {
         id("java")
-        id("io.micronaut.library").version("4.5.0")
-        id("io.micronaut.application").version("4.5.0")
-        id("io.freefair.lombok").version("8.13")
+        id("io.micronaut.library").version("4.5.1")
+        id("io.micronaut.application").version("4.5.1")
+        id("io.freefair.lombok").version("8.13.1")
         id("org.sonarqube").version("6.1.0.5360")
         id("org.openapi.generator").version("7.12.0")
 
@@ -32,10 +32,10 @@ dependencyResolutionManagement {
             library("csv", "com.opencsv", "opencsv").version("5.10")
 
             // testing dependencies
-            version("junit.version", "5.12.0")
+            version("junit.version", "5.12.1")
             library("junit.jupiter", "org.junit.jupiter", "junit-jupiter-api").versionRef("junit.version")
             library("assertj","org.assertj", "assertj-core").version("3.27.3")
-            library("mockito","org.mockito", "mockito-core").version("5.16.0")
+            library("mockito","org.mockito", "mockito-core").version("5.16.1")
             bundle("junit", listOf("junit.jupiter", "assertj", "mockito"))
         }
 
