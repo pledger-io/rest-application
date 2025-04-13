@@ -1,0 +1,1 @@
+alter table import_config drop column contents;

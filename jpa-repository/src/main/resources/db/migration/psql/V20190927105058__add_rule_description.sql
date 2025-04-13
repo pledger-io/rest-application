@@ -1,0 +1,1 @@
+alter table rule add column description varchar(5000);

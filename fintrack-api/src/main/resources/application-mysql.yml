@@ -14,5 +14,5 @@ jpa:
 flyway:
   datasources:
     default:
-      locations: ["classpath:db/camunda/mysql", "classpath:db/migration"]
+      locations: ["classpath:db/camunda/mysql", "classpath:db/migration/mysql"]
       validate-on-migrate: false
