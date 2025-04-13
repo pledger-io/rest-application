@@ -2,6 +2,7 @@ package com.jongsoft.finance.llm;
 
 import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.llm.agent.ClassificationAgent;
+import com.jongsoft.finance.llm.dto.ClassificationDTO;
 import com.jongsoft.finance.llm.stores.ClassificationEmbeddingStore;
 import org.junit.jupiter.api.Test;
 
@@ -27,12 +28,8 @@ class AiSuggestionEngineTest {
                 "Grocery shop",
                 22.44);
 
-        when(mockAiAgent.determineCategory(any(), any(), any(), anyString(), anyDouble(), anyString()))
-                .thenReturn("Food");
-        when(mockAiAgent.determineSubCategory(any(), any(), any(), anyString(), anyDouble(), anyString()))
-                .thenReturn("Groceries");
-        when(mockAiAgent.determineTags(any(), any(), any(), anyString(), anyDouble(), anyString()))
-                .thenReturn(List.of("shopping", "groceries"));
+        when(mockAiAgent.classifyTransaction(any(), any(), any(), anyString(), anyDouble(), anyString()))
+                .thenReturn(new ClassificationDTO("Food", "Groceries", List.of("shopping", "groceries")));
 
         var answer = subject.makeSuggestions(suggestion);
 

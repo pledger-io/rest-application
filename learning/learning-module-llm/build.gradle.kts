@@ -17,6 +17,7 @@ dependencies {
     runtimeOnly(mn.snakeyaml)
 
     testImplementation(libs.csv)
-    testRuntimeOnly(mn.logback.classic)
+    testImplementation(mn.jackson.datatype.jsr310)
     testImplementation(libs.bundles.junit)
+    testRuntimeOnly(mn.logback.classic)
 }

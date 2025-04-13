@@ -12,12 +12,10 @@ import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 
-@MicronautTest(environments = "ai")
-@EnabledIfEnvironmentVariable(named = "AI_ENABLED", matches = "true")
+@MicronautTest(environments = {"ai", "test"})
 class AiBase {
 
     @Inject
@@ -53,6 +51,11 @@ class AiBase {
         var mock = Mockito.mock(CurrentUserProvider.class);
         Mockito.when(mock.currentUser()).thenReturn(UserAccount.builder().username(new UserIdentifier("test@user")).build());
         return mock;
+    }
+
+    @MockBean
+    AccountProvider accountProvider() {
+        return Mockito.mock(AccountProvider.class);
     }
 
     @MockBean

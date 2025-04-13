@@ -14,6 +14,7 @@ import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -26,6 +27,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@EnabledIfEnvironmentVariable(named = "AI_ENABLED", matches = "true")
 class ClassificationAgentIT extends AiBase {
 
     @Inject

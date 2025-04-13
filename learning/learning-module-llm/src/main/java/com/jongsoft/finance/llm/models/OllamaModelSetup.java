@@ -55,7 +55,7 @@ class OllamaModelSetup {
             return new ClassificationAugmenter(budgetProvider, categoryProvider, tagProvider);
         }
 
-        return null;
+        return (userMessage, metadata) -> userMessage;
     }
 
     @Bean

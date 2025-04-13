@@ -9,13 +9,14 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mockito.Mockito;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
+@EnabledIfEnvironmentVariable(named = "AI_ENABLED", matches = "true")
 class ClassificationEmbeddingStoreIT extends AiBase {
 
     @Inject

@@ -1,6 +1,7 @@
 package com.jongsoft.finance.llm;
 
 import com.jongsoft.finance.llm.agent.ClassificationAgent;
+import com.jongsoft.finance.llm.agent.TransactionExtractorAgent;
 import com.jongsoft.finance.llm.tools.AiTool;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -39,6 +40,16 @@ class LanguageModelStarter {
         Optional.ofNullable(retrievalAugmentor).ifPresent(aiBuilder::retrievalAugmentor);
 
         return aiBuilder.build();
+    }
+
+    @Bean
+    public TransactionExtractorAgent transactionExtractorAgent(ChatLanguageModel model, ToolSupplier aiTools) {
+        log.info("Setting up transaction extractor chat agent.");
+        return AiServices.builder(TransactionExtractorAgent.class)
+                .chatLanguageModel(model)
+                .chatMemoryProvider(chatMemoryProvider())
+                .tools(aiTools.getTools())
+                .build();
     }
 
     @Bean

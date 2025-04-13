@@ -10,7 +10,6 @@ import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,40 +49,13 @@ class AiSuggestionEngine implements SuggestionEngine {
 
     private SuggestionResult fallbackToLLM(SuggestionInput transactionInput) {
         log.debug("No embedding found for the input, falling back to LLM.");
-        return new SuggestionResult(suggestBudget(transactionInput), suggestCategory(transactionInput), suggestTags(transactionInput));
-    }
-
-    private List<String> suggestTags(SuggestionInput transactionInput) {
-        log.trace("Classifying the tags.");
-        return classificationAgent.determineTags(
-                UUID.randomUUID(),
+        var suggestion = classificationAgent.classifyTransaction(UUID.randomUUID(),
                 transactionInput.description(),
                 transactionInput.fromAccount(),
                 transactionInput.toAccount(),
                 transactionInput.amount(),
                 translateDate(transactionInput));
-    }
-
-    private String suggestCategory(SuggestionInput transactionInput) {
-        log.trace("Classifying the category.");
-        return classificationAgent.determineSubCategory(
-                UUID.randomUUID(),
-                transactionInput.description(),
-                transactionInput.fromAccount(),
-                transactionInput.toAccount(),
-                transactionInput.amount(),
-                translateDate(transactionInput));
-    }
-
-    private String suggestBudget(SuggestionInput transactionInput) {
-        log.trace("Classifying the budget.");
-        return classificationAgent.determineCategory(
-                UUID.randomUUID(),
-                transactionInput.description(),
-                transactionInput.fromAccount(),
-                transactionInput.toAccount(),
-                transactionInput.amount(),
-                translateDate(transactionInput));
+        return new SuggestionResult(suggestion.category(), suggestion.subCategory(), suggestion.tags());
     }
 
     private String translateDate(SuggestionInput transactionInput) {
