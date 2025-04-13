@@ -1,0 +1,18 @@
+datasources:
+  default:
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_SCHEMA:pledger}
+    driverClassName: org.postgresql.Driver
+    username: ${DATABASE_USER:pledger}
+    password: ${DATABASE_PASSWORD:pledger}
+    dialect: postgres
+
+jpa:
+  default:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+flyway:
+  datasources:
+    default:
+      locations: ["classpath:db/camunda/psql", "classpath:db/migration/psql"]
+      validate-on-migrate: false

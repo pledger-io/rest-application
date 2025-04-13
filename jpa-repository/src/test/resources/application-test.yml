@@ -5,7 +5,6 @@ datasources:
     username: sa
     password: ''
     dialect: mysql
-    migration-locations: ["classpath:db/camunda/h2", "classpath:db/migration"]
 
 flyway:
   datasources:
@@ -14,6 +13,7 @@ flyway:
       driver: ${datasources.default.driverClassName}
       username: ${datasources.default.username}
       password: ${datasources.default.password}
+      locations: [ "classpath:db/migration/mysql" ]
 
 jpa:
   default:

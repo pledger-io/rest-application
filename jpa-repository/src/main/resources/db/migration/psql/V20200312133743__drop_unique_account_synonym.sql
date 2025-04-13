@@ -1,0 +1,1 @@
+alter table account_synonym drop constraint uq_synonym;

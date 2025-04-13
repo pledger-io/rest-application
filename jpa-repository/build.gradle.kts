@@ -25,8 +25,10 @@ dependencies {
     implementation(project(":domain"))
 
     runtimeOnly(mn.h2)
+    runtimeOnly(mn.postgresql)
     runtimeOnly(mn.mysql.connector.java)
     runtimeOnly(mn.flyway.mysql)
+    runtimeOnly(mn.flyway.postgresql)
 
     runtimeOnly(mn.snakeyaml)
     testRuntimeOnly(mn.logback.classic)
