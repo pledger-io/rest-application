@@ -2,6 +2,7 @@ package com.jongsoft.finance.llm;
 
 import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.llm.agent.ClassificationAgent;
+import com.jongsoft.finance.llm.stores.ClassificationEmbeddingStore;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ class AiSuggestionEngineTest {
     void makeSuggestions() {
         // given
         var mockAiAgent = mock(ClassificationAgent.class);
-        var subject = new AiSuggestionEngine(mockAiAgent);
+        var subject = new AiSuggestionEngine(mock(ClassificationEmbeddingStore.class), mockAiAgent);
         var suggestion = new SuggestionInput(
                 LocalDate.of(2022, 1, 1),
                 "My transaction",

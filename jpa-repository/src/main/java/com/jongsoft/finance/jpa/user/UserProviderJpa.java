@@ -37,6 +37,15 @@ public class UserProviderJpa implements UserProvider {
     }
 
     @Override
+    public Sequence<UserAccount> lookup() {
+        return entityManager.from(UserAccountJpa.class)
+                .joinFetch("roles")
+                .stream()
+                .map(this::convert)
+                .collect(Collections.collector(com.jongsoft.lang.Collections::List));
+    }
+
+    @Override
     public Optional<UserAccount> lookup(long id) {
         return entityManager.from(UserAccountJpa.class)
                 .joinFetch("roles")

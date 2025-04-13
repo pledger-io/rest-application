@@ -8,6 +8,8 @@ import com.jongsoft.lang.control.Optional;
 
 public interface UserProvider extends DataProvider<UserAccount> {
 
+    Sequence<UserAccount> lookup();
+
     boolean available(UserIdentifier username);
 
     Optional<UserAccount> lookup(UserIdentifier username);

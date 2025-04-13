@@ -1,6 +1,6 @@
 package com.jongsoft.finance.filter;
 
-import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
+import com.jongsoft.finance.messaging.InternalAuthenticationEvent;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.core.async.publisher.Publishers;

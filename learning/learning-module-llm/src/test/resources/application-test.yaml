@@ -1,0 +1,1 @@
+micronaut.application.storage.location: ./build/

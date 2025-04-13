@@ -1,4 +1,4 @@
-package com.jongsoft.finance.bpmn;
+package com.jongsoft.finance.messaging;
 
 import io.micronaut.context.event.ApplicationEvent;
 

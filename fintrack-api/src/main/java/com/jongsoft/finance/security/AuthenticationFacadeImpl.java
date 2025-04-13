@@ -1,6 +1,6 @@
 package com.jongsoft.finance.security;
 
-import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
+import com.jongsoft.finance.messaging.InternalAuthenticationEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.event.LoginSuccessfulEvent;

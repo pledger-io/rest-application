@@ -17,4 +17,11 @@ public @interface AiEnabled {
     @interface ClassificationAgent {
 
     }
+
+    @Qualifier
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.PARAMETER})
+    @interface AiExecutor {
+
+    }
 }

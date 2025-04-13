@@ -1,8 +1,8 @@
 package com.jongsoft.finance.bpmn.listeners;
 
-import com.jongsoft.finance.bpmn.InternalAuthenticationEvent;
 import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.domain.user.UserIdentifier;
+import com.jongsoft.finance.messaging.InternalAuthenticationEvent;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import jakarta.inject.Singleton;

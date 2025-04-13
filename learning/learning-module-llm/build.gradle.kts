@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":learning:learning-module"))
 
+    implementation(mn.micronaut.context)
     implementation(libs.lang)
     implementation(llm.bundles.langchain4j)
     runtimeOnly(mn.snakeyaml)
