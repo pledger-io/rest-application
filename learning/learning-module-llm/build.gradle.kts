@@ -7,11 +7,14 @@ java {
 }
 
 dependencies {
+    annotationProcessor(mn.micronaut.data.processor)
+
     implementation(project(":core"))
     implementation(project(":domain"))
     implementation(project(":learning:learning-module"))
 
     implementation(mn.micronaut.context)
+    implementation(mn.micronaut.data.tx)
     implementation(libs.lang)
     implementation(llm.bundles.langchain4j)
     runtimeOnly(mn.snakeyaml)

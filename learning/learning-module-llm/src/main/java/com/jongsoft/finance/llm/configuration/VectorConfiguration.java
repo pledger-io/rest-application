@@ -6,7 +6,7 @@ import io.micronaut.context.annotation.ConfigurationProperties;
 public class VectorConfiguration {
 
     private String passKey;
-    private String classificationStore;
+    private String storage;
 
     public String getPassKey() {
         return passKey;
@@ -16,11 +16,11 @@ public class VectorConfiguration {
         this.passKey = passKey;
     }
 
-    public String getClassificationStore() {
-        return classificationStore;
+    public String getStorage() {
+        return storage;
     }
 
-    public void setClassificationStore(String classificationStore) {
-        this.classificationStore = classificationStore;
+    public void setStorage(String storage) {
+        this.storage = storage;
     }
 }

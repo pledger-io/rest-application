@@ -24,7 +24,6 @@ public class OpenAISetup {
     }
 
     @Bean
-    @Requires(property = "application.ai.engine", value = "open-ai")
     ChatLanguageModel openaiLanguageModel() {
         log.info("Creating OpenAI chat model with name config: {}.", configuration.getOpenAI().getModel());
         return OpenAiChatModel.builder()
@@ -35,7 +34,6 @@ public class OpenAISetup {
     }
 
     @Bean
-    @Requires(property = "application.ai.engine", value = "open-ai")
     EmbeddingModel embeddingModel() {
         return OpenAiEmbeddingModel.builder()
                 .modelName(configuration.getOpenAI().getModel())

@@ -13,4 +13,4 @@ application:
 
     vectors:
       pass-key: E5MC00ZWUxLWJiMm
-      classification-store: ${micronaut.application.storage.location}/vector_stores/classifications.store
+      storage: ${micronaut.application.storage.location}/vector_stores
