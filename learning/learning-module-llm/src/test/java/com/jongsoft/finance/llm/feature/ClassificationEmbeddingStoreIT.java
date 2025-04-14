@@ -16,7 +16,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@EnabledIfEnvironmentVariable(named = "AI_ENABLED", matches = "true")
 class ClassificationEmbeddingStoreIT extends AiBase {
 
     @Inject
@@ -25,7 +24,7 @@ class ClassificationEmbeddingStoreIT extends AiBase {
     @Inject private TransactionProvider transactionProvider;
 
     @Test
-    void classifyTransaction() {
+    void classifyTransaction() throws InterruptedException {
         var transaction = Transaction.builder()
                 .id(1L)
                 .description("Buy a new laptop")
@@ -43,6 +42,8 @@ class ClassificationEmbeddingStoreIT extends AiBase {
         Mockito.when(transactionProvider.lookup(2L)).thenReturn(Control.Option(transaction2));
         transaction.linkToBudget("Shopping");
         transaction2.linkToBudget("Shopping");
+
+        Thread.sleep(50);
 
         var suggestion = classificationEmbeddingStore.classify(new SuggestionInput(null, "Shopping for a laptop", null, null, 0));
         assertThat(suggestion)
