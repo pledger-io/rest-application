@@ -5,8 +5,22 @@ import io.micronaut.context.annotation.ConfigurationProperties;
 @ConfigurationProperties("application.ai.vectors")
 public class VectorConfiguration {
 
+    public enum StorageType {
+        MEMORY,
+        PGSQL
+    }
+
+    private StorageType storageType;
     private String passKey;
     private String storage;
+
+    public void setStorageType(StorageType storageType) {
+        this.storageType = storageType;
+    }
+
+    public StorageType getStorageType() {
+        return storageType;
+    }
 
     public String getPassKey() {
         return passKey;

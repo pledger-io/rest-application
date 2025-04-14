@@ -23,4 +23,5 @@ dependencies {
     testImplementation(mn.jackson.datatype.jsr310)
     testImplementation(libs.bundles.junit)
     testRuntimeOnly(mn.logback.classic)
+    testRuntimeOnly(mn.micronaut.data.tx.hibernate)
 }

@@ -132,7 +132,7 @@ class EmbeddingStoreFactory {
 
     @Bean
     @AiEnabled.ClassificationAgent
-    @Requires(env = "psql")
+    @Requires(env = "psql", property = "application.ai.vectors.storageType", value = "pgsql")
     public MicronautEmbeddingStore classificationPgsql() {
         return new ContextAwarePgSQLStore("classification");
     }

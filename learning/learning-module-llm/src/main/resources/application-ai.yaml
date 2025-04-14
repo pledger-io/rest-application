@@ -12,5 +12,6 @@ application:
       key: ${OPENAI_TOKEN:}
 
     vectors:
+      storageType: memory
       pass-key: E5MC00ZWUxLWJiMm
       storage: ${micronaut.application.storage.location}/vector_stores

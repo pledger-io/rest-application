@@ -5,6 +5,7 @@ import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.learning.SuggestionResult;
 import com.jongsoft.finance.llm.AiEnabled;
 import com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand;
+import com.jongsoft.finance.messaging.notifications.TransactionCreated;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Control;
@@ -17,7 +18,6 @@ import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import io.micronaut.context.event.ShutdownEvent;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
-import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +25,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 
 @Singleton
 @AiEnabled
-@Transactional
 public class ClassificationEmbeddingStore {
 
     private final Logger logger = LoggerFactory.getLogger(ClassificationEmbeddingStore.class);
@@ -39,16 +37,13 @@ public class ClassificationEmbeddingStore {
 
     private final CurrentUserProvider currentUserProvider;
     private final TransactionProvider transactionProvider;
-    private final ExecutorService executorService;
 
     ClassificationEmbeddingStore(@AiEnabled.ClassificationAgent MicronautEmbeddingStore embeddingStore,
                                  TransactionProvider transactionProvider,
-                                 CurrentUserProvider currentUserProvider,
-                                 @AiEnabled.AiExecutor ExecutorService executorService) {
+                                 CurrentUserProvider currentUserProvider) {
         this.embeddingStore = embeddingStore;
         this.transactionProvider = transactionProvider;
         this.currentUserProvider = currentUserProvider;
-        this.executorService = executorService;
         this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
     }
 
@@ -93,6 +88,11 @@ public class ClassificationEmbeddingStore {
     @EventListener
     void handleClassificationChanged(LinkTransactionCommand command) {
         updateClassifications(transactionProvider.lookup(command.id()).get());
+    }
+
+    @EventListener
+    void handleTransactionAdded(TransactionCreated transactionCreated) {
+        updateClassifications(transactionProvider.lookup(transactionCreated.transactionId()).get());
     }
 
     private SuggestionResult convert(Metadata metadata) {
