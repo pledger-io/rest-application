@@ -9,4 +9,9 @@ application:
       force-augmentation: ${AI_AUGMENTER_ENABLED:true}
     openai:
       model: gpt-4o
-      key: ${OPENAI_TOKEN}
+      key: ${OPENAI_TOKEN:}
+
+    vectors:
+      storageType: memory
+      pass-key: E5MC00ZWUxLWJiMm
+      storage: ${micronaut.application.storage.location}/vector_stores

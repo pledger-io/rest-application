@@ -20,7 +20,13 @@ public class CategoryClassificationTool implements AiTool {
         this.categoryProvider = categoryProvider;
     }
 
-    @Tool("Returns a list of known subcategories, when classifying pick from this list only")
+    @Tool("""
+            This tool returns the full list of known subcategories that can be used when classifying financial transactions.
+            
+            Use this tool to retrieve or confirm the set of valid subcategories.
+            Do not use any subcategory that is not included in the output of this tool.
+            
+            This list contains all subcategories and is independent of any specific category.""")
     public List<String> listKnownSubCategories() {
         logger.trace("Ai tool fetching available categories.");
         return categoryProvider.lookup()

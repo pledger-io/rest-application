@@ -1,4 +1,4 @@
-package com.jongsoft.finance.llm.agent;
+package com.jongsoft.finance.llm.feature;
 
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.user.Budget;
@@ -12,11 +12,9 @@ import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvValidationException;
-import io.micronaut.test.annotation.MockBean;
-import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -29,9 +27,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Disabled("Only ran locally to test this new module. Not production ready yet.")
-@MicronautTest(environments = "ai")
-class ClassificationAgentTest {
+@EnabledIfEnvironmentVariable(named = "AI_ENABLED", matches = "true")
+class ClassificationAgentIT extends AiBase {
 
     @Inject
     private SuggestionEngine suggestionEngine;
@@ -44,21 +41,6 @@ class ClassificationAgentTest {
 
     @Inject
     private TagProvider tagProvider;
-
-    @MockBean
-    BudgetProvider budgetProvider() {
-        return Mockito.mock(BudgetProvider.class);
-    }
-
-    @MockBean
-    CategoryProvider categoryProvider() {
-        return Mockito.mock(CategoryProvider.class);
-    }
-
-    @MockBean
-    TagProvider tagProvider() {
-        return Mockito.mock(TagProvider.class);
-    }
 
     private List<String> categories = new ArrayList<>();
     private List<String> budgets = new ArrayList<>();

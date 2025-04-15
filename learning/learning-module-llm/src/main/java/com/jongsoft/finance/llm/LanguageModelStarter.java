@@ -1,24 +1,25 @@
 package com.jongsoft.finance.llm;
 
 import com.jongsoft.finance.llm.agent.ClassificationAgent;
+import com.jongsoft.finance.llm.agent.TransactionExtractorAgent;
 import com.jongsoft.finance.llm.tools.AiTool;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.rag.RetrievalAugmentor;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
-import io.micronaut.context.annotation.Value;
 import io.micronaut.core.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Factory
 @AiEnabled
@@ -41,25 +42,27 @@ class LanguageModelStarter {
         return aiBuilder.build();
     }
 
+    @Bean
+    public TransactionExtractorAgent transactionExtractorAgent(ChatLanguageModel model, ToolSupplier aiTools) {
+        log.info("Setting up transaction extractor chat agent.");
+        return AiServices.builder(TransactionExtractorAgent.class)
+                .chatLanguageModel(model)
+                .chatMemoryProvider(chatMemoryProvider())
+                .tools(aiTools.getTools())
+                .build();
+    }
+
+    @Bean
+    @AiEnabled.AiExecutor
+    public ExecutorService executorService() {
+        return Executors.newScheduledThreadPool(5);
+    }
+
     private ChatMemoryProvider chatMemoryProvider() {
         return memoryId -> MessageWindowChatMemory.builder()
                 .id(memoryId)
                 .maxMessages(10)
                 .chatMemoryStore(new InMemoryChatMemoryStore())
-                .build();
-    }
-
-    @Bean
-    @Requires(property = "application.ai.engine", value = "open-ai")
-    ChatLanguageModel openaiLanguageModel(
-            @Value("${application.ai.openai.model}") String modelName,
-            @Value("${application.ai.openai.key}") String key,
-            @Value("${application.ai.temperature}") double temperature) {
-        log.info("Creating OpenAI chat model with name {}, and temperature {}.", modelName, temperature);
-        return OpenAiChatModel.builder()
-                .modelName(modelName)
-                .apiKey(key)
-                .temperature(temperature)
                 .build();
     }
 

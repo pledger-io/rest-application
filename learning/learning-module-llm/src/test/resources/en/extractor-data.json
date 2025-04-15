@@ -1,0 +1,176 @@
+[
+  {
+    "name": "Simple transaction with positive amount",
+    "input": "I paid $50 to Jane for dinner on Friday, February 10, 2023",
+    "expected": {
+      "amount": 50.00,
+      "fromAccount": {
+        "name": "",
+        "type": ""
+      },
+      "toAccount": {
+        "name": "Jane",
+        "type": ""
+      },
+      "description": "Dinner payment",
+      "date": "2023-02-10",
+      "type": "CREDIT"
+    }
+  },
+  {
+    "name": "Transaction with negative amount (should swap accounts)",
+    "input": "Received a refund of $25.99 from Amazon on 2023-03-15 for returned headphones",
+    "expected": {
+      "amount": 25.99,
+      "fromAccount": {
+        "name": "Amazon",
+        "type": ""
+      },
+      "toAccount": {
+        "name": "",
+        "type": ""
+      },
+      "description": "Refund for returned headphones",
+      "date": "2023-03-15",
+      "type": "DEBIT"
+    }
+  },
+  {
+    "name": "Bank transfer with account details",
+    "input": "On 2023-04-20, transferred $500 from my checking account to my savings account",
+    "expected": {
+      "amount": 500.00,
+      "fromAccount": {
+        "name": "Checking Account",
+        "type": ""
+      },
+      "toAccount": {
+        "name": "Savings Account",
+        "type": ""
+      },
+      "description": "Bank transfer",
+      "date": "2023-04-20",
+      "type": "TRANSFER"
+    }
+  },
+  {
+    "name": "Transaction with date information",
+    "input": "On 2023-03-15, I spent $120.45 at Walmart for groceries",
+    "expected": {
+      "amount": 120.45,
+      "fromAccount": {
+        "name": "",
+        "type": ""
+      },
+      "toAccount": {
+        "name": "Walmart",
+        "type": ""
+      },
+      "description": "Grocery shopping",
+      "date": "2023-03-15",
+      "type": "CREDIT"
+    }
+  },
+  {
+    "name": "Multiple transactions in one message",
+    "input": "On 2023-05-10 I paid $12 for lunch and later received $40 from Bob who owed me money",
+    "expected": {
+      "amount": 12.00,
+      "fromAccount": {
+        "name": "",
+        "type": ""
+      },
+      "toAccount": {
+        "name": "Restaurant",
+        "type": ""
+      },
+      "description": "Lunch payment",
+      "date": "2023-05-10",
+      "type": "CREDIT"
+    }
+  },
+  {
+    "name": "Transaction with currency symbol",
+    "input": "Paid €75 for movie tickets at the cinema on 2023-06-18",
+    "expected": {
+      "amount": 75.00,
+      "fromAccount": {
+        "name": "",
+        "type": ""
+      },
+      "toAccount": {
+        "name": "Cinema",
+        "type": ""
+      },
+      "description": "Movie tickets",
+      "date": "2023-06-18",
+      "type": "CREDIT"
+    }
+  },
+  {
+    "name": "Salary/income transaction",
+    "input": "Received my monthly salary of $3500 from ABC Corp on 2023-07-01",
+    "expected": {
+      "amount": 3500.00,
+      "fromAccount": {
+        "name": "ABC Corp",
+        "type": ""
+      },
+      "toAccount": {
+        "name": "",
+        "type": ""
+      },
+      "description": "Monthly salary",
+      "date": "2023-07-01",
+      "type": "DEBIT"
+    }
+  },
+  {
+    "name": "Unclear transaction with date",
+    "input": "Money was moved between accounts on 2023-08-15",
+    "expected": {
+      "amount": null,
+      "fromAccount": null,
+      "toAccount": null,
+      "description": "Account transfer",
+      "date": "2023-08-15",
+      "type": "TRANSFER"
+    }
+  },
+  {
+    "name": "Transaction with detailed description",
+    "input": "On 2023-09-25, paid $89.99 for annual subscription to Netflix using my Visa credit card",
+    "expected": {
+      "amount": 89.99,
+      "fromAccount": {
+        "name": "Visa Credit Card",
+        "type": ""
+      },
+      "toAccount": {
+        "name": "Netflix",
+        "type": ""
+      },
+      "description": "Annual subscription",
+      "date": "2023-09-25",
+      "type": "CREDIT"
+    }
+  },
+  {
+    "name": "Transaction with cents",
+    "input": "2023-10-05: Bought coffee for $3.75 at Starbucks this morning",
+    "expected": {
+      "amount": 3.75,
+      "fromAccount": {
+        "name": "",
+        "type": ""
+      },
+      "toAccount": {
+        "name": "Starbucks",
+        "type": ""
+      },
+      "description": "Coffee purchase",
+      "date": "2023-10-05",
+      "type": "CREDIT"
+    }
+  }
+]

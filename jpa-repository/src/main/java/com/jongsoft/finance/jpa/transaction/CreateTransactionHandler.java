@@ -15,6 +15,7 @@ import com.jongsoft.finance.jpa.tag.TagJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
+import com.jongsoft.finance.messaging.notifications.TransactionCreated;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
@@ -97,6 +98,7 @@ public class CreateTransactionHandler implements CommandHandler<CreateTransactio
             entityManager.persist(transferJpa);
         }
 
+        TransactionCreated.transactionCreated(jpaEntity.getId());
         return jpaEntity.getId();
     }
 

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Singleton
 @AiEnabled
@@ -22,16 +23,21 @@ public class BudgetClassificationTool implements AiTool {
         this.budgetProvider = budgetProvider;
     }
 
-    @Tool("Returns a list of known categories")
+    @Tool("""
+            This tool returns the full list of known categories that can be used when classifying financial transactions.
+            
+            Use this tool to retrieve or confirm the set of valid categories.
+            Do not use any category that is not included in the output of this tool.
+            
+            To view subcategories or tags, use the appropriate tools designed for those purposes.""")
     public List<String> listKnownCategories() {
         logger.trace("Ai tool fetching available budgets.");
         int year = LocalDate.now().getYear();
         int month = LocalDate.now().getMonthValue();
 
         return budgetProvider.lookup(year, month)
-                .stream()
-                .flatMap(b -> b.getExpenses().stream())
-                .map(Budget.Expense::getName)
+                .map(b -> b.getExpenses().stream().map(Budget.Expense::getName))
+                .getOrSupply(Stream::of)
                 .toList();
     }
 }

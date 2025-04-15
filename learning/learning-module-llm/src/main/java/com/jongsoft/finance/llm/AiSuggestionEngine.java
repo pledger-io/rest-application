@@ -4,12 +4,12 @@ import com.jongsoft.finance.learning.SuggestionEngine;
 import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.learning.SuggestionResult;
 import com.jongsoft.finance.llm.agent.ClassificationAgent;
+import com.jongsoft.finance.llm.stores.ClassificationEmbeddingStore;
 import io.micronaut.context.annotation.Primary;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,9 +22,11 @@ class AiSuggestionEngine implements SuggestionEngine {
 
     private final Logger log = getLogger(AiSuggestionEngine.class);
 
+    private final ClassificationEmbeddingStore embeddingStore;
     private final ClassificationAgent classificationAgent;
 
-    public AiSuggestionEngine(ClassificationAgent classificationAgent) {
+    public AiSuggestionEngine(ClassificationEmbeddingStore embeddingStore, ClassificationAgent classificationAgent) {
+        this.embeddingStore = embeddingStore;
         this.classificationAgent = classificationAgent;
     }
 
@@ -38,46 +40,22 @@ class AiSuggestionEngine implements SuggestionEngine {
                 Optional.ofNullable(transactionInput.toAccount()).orElse(""),
                 transactionInput.amount());
 
-        var suggestions = new SuggestionResult(
-                suggestBudget(nullSafeInput),
-                suggestCategory(nullSafeInput),
-                suggestTags(nullSafeInput));
+        var suggestions = embeddingStore.classify(nullSafeInput)
+                .orElseGet(() -> fallbackToLLM(nullSafeInput));
 
         log.trace("Finished classification with suggestions {}.", suggestions);
         return suggestions;
     }
 
-    private List<String> suggestTags(SuggestionInput transactionInput) {
-        log.trace("Classifying the tags.");
-        return classificationAgent.determineTags(
-                UUID.randomUUID(),
+    private SuggestionResult fallbackToLLM(SuggestionInput transactionInput) {
+        log.debug("No embedding found for the input, falling back to LLM.");
+        var suggestion = classificationAgent.classifyTransaction(UUID.randomUUID(),
                 transactionInput.description(),
                 transactionInput.fromAccount(),
                 transactionInput.toAccount(),
                 transactionInput.amount(),
                 translateDate(transactionInput));
-    }
-
-    private String suggestCategory(SuggestionInput transactionInput) {
-        log.trace("Classifying the category.");
-        return classificationAgent.determineSubCategory(
-                UUID.randomUUID(),
-                transactionInput.description(),
-                transactionInput.fromAccount(),
-                transactionInput.toAccount(),
-                transactionInput.amount(),
-                translateDate(transactionInput));
-    }
-
-    private String suggestBudget(SuggestionInput transactionInput) {
-        log.trace("Classifying the budget.");
-        return classificationAgent.determineCategory(
-                UUID.randomUUID(),
-                transactionInput.description(),
-                transactionInput.fromAccount(),
-                transactionInput.toAccount(),
-                transactionInput.amount(),
-                translateDate(transactionInput));
+        return new SuggestionResult(suggestion.category(), suggestion.subCategory(), suggestion.tags());
     }
 
     private String translateDate(SuggestionInput transactionInput) {

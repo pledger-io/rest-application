@@ -4,6 +4,7 @@ import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.jpa.JpaTestSetup;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.transaction.*;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -39,6 +41,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
                 "sql/base-setup.sql",
                 "sql/transaction/transaction-provider.sql"
         );
+        new EventBus(eventPublisher);
     }
 
     @Test
