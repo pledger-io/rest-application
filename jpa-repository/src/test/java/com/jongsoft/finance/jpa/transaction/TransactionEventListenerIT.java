@@ -28,7 +28,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
     private AuthenticationFacade authenticationFacade;
 
     @Inject
-    private ApplicationEventPublisher<Serializable> eventPublisher;
+    private ApplicationEventPublisher eventPublisher;
 
     @Inject
     private EntityManager entityManager;
