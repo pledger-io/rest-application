@@ -1,13 +1,13 @@
 package com.jongsoft.finance.rest.transaction;
 
 import com.jongsoft.finance.core.RuleColumn;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.learning.SuggestionEngine;
 import com.jongsoft.finance.learning.SuggestionInput;
+import com.jongsoft.finance.learning.TransactionResult;
 import com.jongsoft.finance.rest.model.TagResponse;
 import com.jongsoft.finance.security.AuthenticationRoles;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Tag(name = "Transactions")
-@Controller("/api/transactions/suggestions")
+@Controller("/api/transactions")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 class TransactionSuggestionResource {
 
@@ -28,13 +28,12 @@ class TransactionSuggestionResource {
         this.suggestionEngine = suggestionEngine;
     }
 
-    @Post
+    @Post("suggestions")
     @Operation(
             operationId = "suggestTransaction",
             summary = "Suggest changes",
             description = "Suggest changes to a transaction based upon the rules in the system.")
     Map<String, ?> suggest(@Body TransactionForSuggestionRequest request) {
-
         var transactionInput = new SuggestionInput(
                 LocalDate.now(),
                 request.description(),
@@ -59,5 +58,15 @@ class TransactionSuggestionResource {
         }
 
         return output;
+    }
+
+    @Post("/generate-transaction")
+    @Operation(
+            operationId = "extractTransaction",
+            summary = "Extract transaction info",
+            description = "Extract transaction information from the presented text.")
+    public TransactionResult extractTransaction(TransactionExtractRequest request) {
+        return suggestionEngine.extractTransaction(request.fromText())
+                .orElseThrow(() -> StatusException.badRequest("No extractor configured.", "llm.not.configured"));
     }
 }

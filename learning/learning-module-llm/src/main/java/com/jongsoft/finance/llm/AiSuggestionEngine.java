@@ -3,7 +3,9 @@ package com.jongsoft.finance.llm;
 import com.jongsoft.finance.learning.SuggestionEngine;
 import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.learning.SuggestionResult;
+import com.jongsoft.finance.learning.TransactionResult;
 import com.jongsoft.finance.llm.agent.ClassificationAgent;
+import com.jongsoft.finance.llm.agent.TransactionExtractorAgent;
 import com.jongsoft.finance.llm.stores.ClassificationEmbeddingStore;
 import io.micronaut.context.annotation.Primary;
 import jakarta.inject.Singleton;
@@ -24,10 +26,15 @@ class AiSuggestionEngine implements SuggestionEngine {
 
     private final ClassificationEmbeddingStore embeddingStore;
     private final ClassificationAgent classificationAgent;
+    private final TransactionExtractorAgent transactionExtractorAgent;
 
-    public AiSuggestionEngine(ClassificationEmbeddingStore embeddingStore, ClassificationAgent classificationAgent) {
+    public AiSuggestionEngine(
+            ClassificationEmbeddingStore embeddingStore,
+            ClassificationAgent classificationAgent,
+            TransactionExtractorAgent transactionExtractorAgent) {
         this.embeddingStore = embeddingStore;
         this.classificationAgent = classificationAgent;
+        this.transactionExtractorAgent = transactionExtractorAgent;
     }
 
     @Override
@@ -45,6 +52,19 @@ class AiSuggestionEngine implements SuggestionEngine {
 
         log.trace("Finished classification with suggestions {}.", suggestions);
         return suggestions;
+    }
+
+    @Override
+    public Optional<TransactionResult> extractTransaction(String transactionInput) {
+        var extracted = transactionExtractorAgent.extractTransaction(transactionInput);
+        return Optional.of(new TransactionResult(
+                extracted.type(),
+                extracted.date(),
+                extracted.fromAccount().name().isBlank() ? null : extracted.fromAccount().name(),
+                extracted.toAccount().name().isBlank() ? null : extracted.toAccount().name(),
+                extracted.description(),
+                extracted.amount()
+        ));
     }
 
     private SuggestionResult fallbackToLLM(SuggestionInput transactionInput) {

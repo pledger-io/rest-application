@@ -1,8 +1,13 @@
 package com.jongsoft.finance.llm;
 
+import com.jongsoft.finance.core.TransactionType;
 import com.jongsoft.finance.learning.SuggestionInput;
+import com.jongsoft.finance.learning.TransactionResult;
 import com.jongsoft.finance.llm.agent.ClassificationAgent;
+import com.jongsoft.finance.llm.agent.TransactionExtractorAgent;
+import com.jongsoft.finance.llm.dto.AccountDTO;
 import com.jongsoft.finance.llm.dto.ClassificationDTO;
+import com.jongsoft.finance.llm.dto.TransactionDTO;
 import com.jongsoft.finance.llm.stores.ClassificationEmbeddingStore;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +25,7 @@ class AiSuggestionEngineTest {
     void makeSuggestions() {
         // given
         var mockAiAgent = mock(ClassificationAgent.class);
-        var subject = new AiSuggestionEngine(mock(ClassificationEmbeddingStore.class), mockAiAgent);
+        var subject = new AiSuggestionEngine(mock(ClassificationEmbeddingStore.class), mockAiAgent, mock(TransactionExtractorAgent.class));
         var suggestion = new SuggestionInput(
                 LocalDate.of(2022, 1, 1),
                 "My transaction",
@@ -37,5 +42,32 @@ class AiSuggestionEngineTest {
                 .isNotNull()
                 .extracting("budget", "category", "tags")
                 .containsExactly("Food", "Groceries", List.of("shopping", "groceries"));
+    }
+
+    @Test
+    void extractTransaction() {
+        var mockExtractionAgent = mock(TransactionExtractorAgent.class);
+        var subject = new AiSuggestionEngine(mock(ClassificationEmbeddingStore.class), mock(ClassificationAgent.class), mockExtractionAgent);
+
+        when(mockExtractionAgent.extractTransaction(anyString()))
+                .thenReturn(new TransactionDTO(
+                        new AccountDTO("Checking account", "checking"),
+                        new AccountDTO("Savings account", "savings"),
+                        "My transaction",
+                        LocalDate.of(2010, 1, 1),
+                        20.2D,
+                        TransactionType.DEBIT));
+
+        var answer = subject.extractTransaction("My transaction");
+
+        assertThat(answer)
+                .isPresent()
+                .contains(new TransactionResult(
+                        TransactionType.DEBIT,
+                        LocalDate.of(2010, 1, 1),
+                        "Checking account",
+                        "Savings account",
+                        "My transaction",
+                        20.2D));
     }
 }
