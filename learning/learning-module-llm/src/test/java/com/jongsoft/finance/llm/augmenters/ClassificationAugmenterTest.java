@@ -9,8 +9,12 @@ import com.jongsoft.finance.providers.TagProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.rag.AugmentationRequest;
+import dev.langchain4j.rag.query.Metadata;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -45,11 +49,16 @@ class ClassificationAugmenterTest {
         when(budgetProvider.lookup(LocalDate.now().getYear(), LocalDate.now().getMonthValue()))
                 .thenReturn(Control.Option(budget));
 
-        var response = augmenter.augment(UserMessage.userMessage(messageBase.formatted("category")), null);
+        var response = augmenter.augment(augmentationRequest(messageBase.formatted("category")));
 
-        assertThat(response.singleText())
-                .isNotBlank()
-                .contains("You must choose from the following options: [Food,Transportation,Shopping,Entertainment]");
+        assertThat(response.chatMessage())
+                .isNotNull()
+                .asInstanceOf(InstanceOfAssertFactories.type(UserMessage.class))
+                .satisfies(e -> {
+                    assertThat(e.singleText())
+                            .contains("You must choose from the following options: [Food,Transportation,Shopping,Entertainment]");
+
+                });
     }
 
     @Test
@@ -60,11 +69,16 @@ class ClassificationAugmenterTest {
                         Category.builder().label("Food").build(),
                         Category.builder().label("Car").build()));
 
-        var response = augmenter.augment(UserMessage.userMessage(messageBase.formatted("subcategory")), null);
+        var response = augmenter.augment(augmentationRequest(messageBase.formatted("subcategory")));
 
-        assertThat(response.singleText())
-                .isNotBlank()
-                .contains("You must choose from the following options: [Groceries,Food,Car]");
+        assertThat(response.chatMessage())
+                .isNotNull()
+                .asInstanceOf(InstanceOfAssertFactories.type(UserMessage.class))
+                .satisfies(e -> {
+                    assertThat(e.singleText())
+                            .contains("You must choose from the following options: [Groceries,Food,Car]");
+
+                });
     }
 
     @Test
@@ -73,10 +87,19 @@ class ClassificationAugmenterTest {
                 new com.jongsoft.finance.domain.transaction.Tag("food"),
                 new Tag("beverage")));
 
-        var response = augmenter.augment(UserMessage.userMessage(messageBase.formatted("tags")), null);
+        var response = augmenter.augment(augmentationRequest(messageBase.formatted("tags")));
 
-        assertThat(response.singleText())
-                .isNotBlank()
-                .contains("You must choose from the following options: [food,beverage]");
+        assertThat(response.chatMessage())
+                .isNotNull()
+                .asInstanceOf(InstanceOfAssertFactories.type(UserMessage.class))
+                .satisfies(e -> {
+                    assertThat(e.singleText())
+                            .contains(
+                                    "You must choose from the following options: [food,beverage]");
+                });
+    }
+
+    private AugmentationRequest augmentationRequest(String message) {
+        return new AugmentationRequest(UserMessage.userMessage(message), Mockito.mock(Metadata.class));
     }
 }

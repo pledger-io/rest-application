@@ -4,10 +4,11 @@ import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.learning.SuggestionEngine;
 import com.jongsoft.finance.learning.SuggestionInput;
-import com.jongsoft.finance.learning.TransactionResult;
 import com.jongsoft.finance.rest.model.TagResponse;
 import com.jongsoft.finance.security.AuthenticationRoles;
-import io.micronaut.http.annotation.*;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -65,8 +66,9 @@ class TransactionSuggestionResource {
             operationId = "extractTransaction",
             summary = "Extract transaction info",
             description = "Extract transaction information from the presented text.")
-    public TransactionResult extractTransaction(TransactionExtractRequest request) {
+    public TransactionExtractResponse extractTransaction(@Body TransactionExtractRequest request) {
         return suggestionEngine.extractTransaction(request.fromText())
+                .map(TransactionExtractResponse::from)
                 .orElseThrow(() -> StatusException.badRequest("No extractor configured.", "llm.not.configured"));
     }
 }

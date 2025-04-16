@@ -14,6 +14,7 @@ import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaModelCard;
 import dev.langchain4j.model.ollama.OllamaModels;
+import dev.langchain4j.rag.AugmentationResult;
 import dev.langchain4j.rag.RetrievalAugmentor;
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
@@ -55,7 +56,9 @@ class OllamaModelSetup {
             return new ClassificationAugmenter(budgetProvider, categoryProvider, tagProvider);
         }
 
-        return (userMessage, metadata) -> userMessage;
+        return (userMessage) -> AugmentationResult.builder()
+                .chatMessage(userMessage.chatMessage())
+                .build();
     }
 
     @Bean

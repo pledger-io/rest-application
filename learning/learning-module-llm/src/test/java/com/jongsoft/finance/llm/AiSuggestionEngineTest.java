@@ -49,10 +49,10 @@ class AiSuggestionEngineTest {
         var mockExtractionAgent = mock(TransactionExtractorAgent.class);
         var subject = new AiSuggestionEngine(mock(ClassificationEmbeddingStore.class), mock(ClassificationAgent.class), mockExtractionAgent);
 
-        when(mockExtractionAgent.extractTransaction(anyString()))
+        when(mockExtractionAgent.extractTransaction(any(), anyString()))
                 .thenReturn(new TransactionDTO(
-                        new AccountDTO("Checking account", "checking"),
-                        new AccountDTO("Savings account", "savings"),
+                        new AccountDTO(1L,"Checking account", "checking"),
+                        new AccountDTO(2L,"Savings account", "savings"),
                         "My transaction",
                         LocalDate.of(2010, 1, 1),
                         20.2D,
@@ -65,8 +65,8 @@ class AiSuggestionEngineTest {
                 .contains(new TransactionResult(
                         TransactionType.DEBIT,
                         LocalDate.of(2010, 1, 1),
-                        "Checking account",
-                        "Savings account",
+                        new TransactionResult.AccountResult(1L ,"Checking account"),
+                        new TransactionResult.AccountResult(2L ,"Savings account"),
                         "My transaction",
                         20.2D));
     }

@@ -13,7 +13,7 @@ public record TransactionDTO(
         AccountDTO toAccount,
         @Description("Write a short description for the transaction, excludes dates and amounts. Be creative.")
         String description,
-        @Description("The date of the transaction.")
+        @Description("The date of the transaction, in YYYY-MM-DD format.")
         LocalDate date,
         @Description("The amount of the transaction, cannot be a negative number.")
         double amount,

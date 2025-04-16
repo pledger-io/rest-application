@@ -34,9 +34,11 @@ class LanguageModelStarter {
         log.info("Setting up transaction support chat agent.");
         var aiBuilder =  AiServices.builder(ClassificationAgent.class)
                 .chatLanguageModel(model)
-                .chatMemoryProvider(chatMemoryProvider())
-                .tools(aiTools.getTools());
+                .chatMemoryProvider(chatMemoryProvider());
 
+        if (aiTools.getTools().length > 0) {
+            aiBuilder.tools(aiTools.getTools());
+        }
         Optional.ofNullable(retrievalAugmentor).ifPresent(aiBuilder::retrievalAugmentor);
 
         return aiBuilder.build();
@@ -45,11 +47,15 @@ class LanguageModelStarter {
     @Bean
     public TransactionExtractorAgent transactionExtractorAgent(ChatLanguageModel model, ToolSupplier aiTools) {
         log.info("Setting up transaction extractor chat agent.");
-        return AiServices.builder(TransactionExtractorAgent.class)
+        var aiBuilder = AiServices.builder(TransactionExtractorAgent.class)
                 .chatLanguageModel(model)
-                .chatMemoryProvider(chatMemoryProvider())
-                .tools(aiTools.getTools())
-                .build();
+                .chatMemoryProvider(chatMemoryProvider());
+
+        if (aiTools.getTools().length > 0) {
+            aiBuilder.tools(aiTools.getTools());
+        }
+
+        return aiBuilder.build();
     }
 
     @Bean

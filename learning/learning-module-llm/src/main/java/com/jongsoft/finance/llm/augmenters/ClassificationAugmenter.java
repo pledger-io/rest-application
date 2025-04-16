@@ -46,8 +46,7 @@ public class ClassificationAugmenter implements RetrievalAugmentor {
         throw new IllegalStateException("Could not augment a message of type " + augmentationRequest.chatMessage().getClass().getName());
     }
 
-    @Override
-    public UserMessage augment(UserMessage userMessage, Metadata metadata) {
+    private UserMessage augment(UserMessage userMessage, Metadata metadata) {
         var currentMessage = userMessage.singleText();
 
         String allowedList = "";

@@ -56,12 +56,16 @@ class AiSuggestionEngine implements SuggestionEngine {
 
     @Override
     public Optional<TransactionResult> extractTransaction(String transactionInput) {
-        var extracted = transactionExtractorAgent.extractTransaction(transactionInput);
+        var extracted = transactionExtractorAgent.extractTransaction(UUID.randomUUID(), transactionInput);
         return Optional.of(new TransactionResult(
                 extracted.type(),
                 extracted.date(),
-                extracted.fromAccount().name().isBlank() ? null : extracted.fromAccount().name(),
-                extracted.toAccount().name().isBlank() ? null : extracted.toAccount().name(),
+                Optional.ofNullable(extracted.fromAccount())
+                        .map(e -> new TransactionResult.AccountResult(Optional.ofNullable(e.id()).orElse(-1L), e.name()))
+                        .orElse(null),
+                Optional.ofNullable(extracted.toAccount())
+                        .map(e -> new TransactionResult.AccountResult(Optional.ofNullable(e.id()).orElse(-1L), e.name()))
+                        .orElse(null),
                 extracted.description(),
                 extracted.amount()
         ));
