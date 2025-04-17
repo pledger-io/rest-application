@@ -11,6 +11,7 @@ import io.micronaut.context.annotation.Primary;
 import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,7 +57,7 @@ class AiSuggestionEngine implements SuggestionEngine {
 
     @Override
     public Optional<TransactionResult> extractTransaction(String transactionInput) {
-        var extracted = transactionExtractorAgent.extractTransaction(UUID.randomUUID(), transactionInput);
+        var extracted = transactionExtractorAgent.extractTransaction(UUID.randomUUID(), LocalDate.now(), transactionInput);
         return Optional.of(new TransactionResult(
                 extracted.type(),
                 extracted.date(),

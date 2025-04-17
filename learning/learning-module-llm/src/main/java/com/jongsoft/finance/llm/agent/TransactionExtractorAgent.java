@@ -6,6 +6,7 @@ import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @SystemMessage({
@@ -43,10 +44,12 @@ public interface TransactionExtractorAgent {
             """
                     Please extract the transaction details from the following text and return them in the format of a TransactionDTO as described.
                     Only include fields that can be confidently identified.
+                    The date of today is {{date}}.
                     Here's the text: {{input}}"""
     })
     TransactionDTO extractTransaction(
             @MemoryId UUID chat,
+            @V("date") LocalDate date,
             @V("input") String input);
 
 }
