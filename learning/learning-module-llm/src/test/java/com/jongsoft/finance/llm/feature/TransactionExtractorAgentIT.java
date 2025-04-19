@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +48,7 @@ class TransactionExtractorAgentIT extends AiBase {
             prepareAccountMock(testCase.expected().fromAccount());
             prepareAccountMock(testCase.expected().toAccount());
             try {
-                var extractedTransaction = transactionExtractorAgent.extractTransaction(UUID.randomUUID(), testCase.input());
+                var extractedTransaction = transactionExtractorAgent.extractTransaction(UUID.randomUUID(), LocalDate.now(), testCase.input());
                 var expectedTransaction = testCase.expected();
 
                 try {

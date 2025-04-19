@@ -49,7 +49,7 @@ class AiSuggestionEngineTest {
         var mockExtractionAgent = mock(TransactionExtractorAgent.class);
         var subject = new AiSuggestionEngine(mock(ClassificationEmbeddingStore.class), mock(ClassificationAgent.class), mockExtractionAgent);
 
-        when(mockExtractionAgent.extractTransaction(any(), anyString()))
+        when(mockExtractionAgent.extractTransaction(any(), any(), anyString()))
                 .thenReturn(new TransactionDTO(
                         new AccountDTO(1L,"Checking account", "checking"),
                         new AccountDTO(2L,"Savings account", "savings"),
