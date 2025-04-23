@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -129,6 +128,16 @@ class TransactionEventListenerIT extends JpaTestSetup {
 
         var check = entityManager.find(TransactionJournal.class, 1L);
         Assertions.assertThat(check.getCategory().getLabel()).isEqualTo("Test");
+    }
+
+    @Test
+    void handleRelationEvent_unset() {
+        eventPublisher.publishEvent(new LinkTransactionCommand(
+                3L,
+                LinkTransactionCommand.LinkType.CATEGORY,
+                null));
+        var check = entityManager.find(TransactionJournal.class, 3L);
+        Assertions.assertThat(check.getCategory()).isNull();
     }
 
     @Test

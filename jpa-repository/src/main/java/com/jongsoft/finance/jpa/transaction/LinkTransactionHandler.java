@@ -58,6 +58,9 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
     }
 
     private CategoryJpa category(String label) {
+        if (label == null) {
+            return null;
+        }
         return entityManager.from(CategoryJpa.class)
                 .fieldEq("user.username", authenticationFacade.authenticated())
                 .fieldEq("label", label)
@@ -66,6 +69,9 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
     }
 
     private ExpenseJpa expense(String name) {
+        if (name == null) {
+            return null;
+        }
         return entityManager.from(ExpenseJpa.class)
                 .fieldEq("name", name)
                 .fieldEq("user.username", authenticationFacade.authenticated())
@@ -74,6 +80,9 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
     }
 
     private ContractJpa contract(String name) {
+        if (name == null) {
+            return null;
+        }
         return entityManager.from(ContractJpa.class)
                 .fieldEq("name", name)
                 .fieldEq("user.username", authenticationFacade.authenticated())
