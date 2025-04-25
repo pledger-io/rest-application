@@ -1,6 +1,6 @@
 
 insert into currency (id, name, symbol, code, decimal_places, enabled, archived)
-values (1, 'Euro', '?', 'EUR', default, default, default),
+values (1, 'Euro', '?', 'EUR', default, true, false),
        (2, 'US Dollar', '$', 'USD', default, default, default),
        (3, 'British Pound', '�', 'GBP', default, default, default);
 

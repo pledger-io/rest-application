@@ -84,8 +84,7 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
             sortOrder = entityManager.from(RuleJpa.class)
                     .fieldEq("user.username", authenticationFacade.authenticated())
                     .fieldEq("group.name", rule.getGroup())
-                    .projectSingleValue(Long.class, "max(sort)")
-                    .map(Long::intValue)
+                    .projectSingleValue(Integer.class, "max(sort)")
                     .getOrSupply(() -> 1);
         }
 
@@ -161,8 +160,8 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 
     private RuleGroupJpa group(String group) {
         return entityManager.from(RuleGroupJpa.class)
-                .fieldEq("username", authenticationFacade.authenticated())
-                .fieldEq("group", group)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .fieldEq("name", group)
                 .singleResult()
                 .getOrSupply(() -> {
                     EventBus.getBus().send(new CreateRuleGroupCommand(group));

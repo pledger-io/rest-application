@@ -32,12 +32,12 @@ public class CreateRuleGroupHandler implements CommandHandler<CreateRuleGroupCom
         var currentMax = entityManager.from(RuleGroupJpa.class)
                 .fieldEq("user.username", authenticationFacade.authenticated())
                 .fieldEq("archived", false)
-                .projectSingleValue(Long.class, "max(sort)");
+                .projectSingleValue(Integer.class, "max(sort)");
 
         var jpaEntity = RuleGroupJpa.builder()
                 .name(command.name())
                 .user(entityManager.currentUser())
-                .sort(currentMax.map(Integer.class::cast).getOrSupply(() -> 1))
+                .sort(currentMax.getOrSupply(() -> 1))
                 .build();
 
         entityManager.persist(jpaEntity);

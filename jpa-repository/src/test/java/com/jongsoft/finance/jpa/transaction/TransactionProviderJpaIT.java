@@ -65,7 +65,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
                 .currency("EUR");
 
         var check = transactionProvider.lookup(filter);
-        Assertions.assertThat(check.content()).hasSize(2);
+        Assertions.assertThat(check.content()).hasSize(3);
     }
 
     @Test
@@ -73,7 +73,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         var check = transactionProvider.daily(filterFactory.transaction().ownAccounts());
         Assertions.assertThat(check).hasSize(2);
         Assertions.assertThat(check).containsOnly(
-                new DailySummaryImpl(LocalDate.of(2019, 1, 1), BigDecimal.valueOf(20.2D)),
+                new DailySummaryImpl(LocalDate.of(2019, 1, 1), BigDecimal.valueOf(30.2D)),
                 new DailySummaryImpl(LocalDate.of(2019, 1, 2), BigDecimal.valueOf(20.2D)));
     }
 
@@ -82,7 +82,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         var check = transactionProvider.monthly(filterFactory.transaction().ownAccounts());
         Assertions.assertThat(check).hasSize(1);
         Assertions.assertThat(check).containsOnly(
-                new DailySummaryImpl(LocalDate.of(2019, 1, 1), BigDecimal.valueOf(40.4D)));
+                new DailySummaryImpl(LocalDate.of(2019, 1, 1), BigDecimal.valueOf(50.4D)));
     }
 
     @Test
@@ -90,7 +90,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         var check = transactionProvider.balance(filterFactory.transaction().ownAccounts());
 
         Assertions.assertThat(check.isPresent()).isTrue();
-        Assertions.assertThat(check.get()).isEqualByComparingTo(BigDecimal.valueOf(40.4));
+        Assertions.assertThat(check.get()).isEqualByComparingTo(BigDecimal.valueOf(50.4));
     }
 
     @Test
