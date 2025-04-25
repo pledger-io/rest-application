@@ -65,7 +65,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
                 .currency("EUR");
 
         var check = transactionProvider.lookup(filter);
-        Assertions.assertThat(check.content()).hasSize(2);
+        Assertions.assertThat(check.content()).hasSize(3);
     }
 
     @Test

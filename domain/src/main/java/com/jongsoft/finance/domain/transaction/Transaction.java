@@ -269,14 +269,14 @@ public class Transaction implements AggregateBase, Serializable {
         return transactions
                 .first(FROM_PREDICATE)
                 .map(Part::getAccount)
-                .get();
+                .getOrThrow(() -> new IllegalStateException("Transaction has no from account."));
     }
 
     public Account computeTo() {
         return transactions
                 .first(TO_PREDICATE)
                 .map(Part::getAccount)
-                .get();
+                .getOrThrow(() -> new IllegalStateException("Transaction has no to account."));
     }
 
     public Account computeCounter(Account account) {
