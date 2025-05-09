@@ -26,9 +26,6 @@ micronaut:
         get-allowed: true
   router:
     static-resources:
-      favicon:
-        paths: classpath:/assets/favicon.ico
-        mapping: /favicon.ico
       docs:
         paths: classpath:/docs
         mapping: /openapi/**

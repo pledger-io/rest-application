@@ -7,7 +7,7 @@ tasks.compileJava {
 }
 
 dependencies {
-    annotationProcessor(mn.micronaut.json.schema.processor)
+    //annotationProcessor(mn.micronaut.json.schema.processor)
     annotationProcessor(mn.lombok)
 
     implementation(libs.lang)

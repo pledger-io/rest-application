@@ -345,7 +345,7 @@ class ContractResourceTest extends TestSetup {
         final Contract contract = Mockito.mock(Contract.class);
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
-        when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER_IDENTIFIER).build());
+        when(contract.getCompany()).thenReturn(Account.builder().id(1L).user(ACTIVE_USER_IDENTIFIER).build());
 
         // @formatter:off
         spec
@@ -364,7 +364,7 @@ class ContractResourceTest extends TestSetup {
         final Contract contract = Mockito.mock(Contract.class);
 
         when(contractProvider.lookup(1L)).thenReturn(Control.Option(contract));
-        when(contract.getCompany()).thenReturn(Account.builder().user(ACTIVE_USER_IDENTIFIER).build());
+        when(contract.getCompany()).thenReturn(Account.builder().id(1L).user(ACTIVE_USER_IDENTIFIER).build());
 
         // @formatter:off
         spec
