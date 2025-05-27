@@ -32,9 +32,7 @@ micronaut:
       swagger:
         paths: classpath:META-INF/swagger
         mapping: /spec/**
-      webapp:
-        paths: classpath:/public
-        mapping: /ui/**
+
   server:
     cors:
       enabled: true
