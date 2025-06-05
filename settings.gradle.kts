@@ -27,7 +27,7 @@ dependencyResolutionManagement {
             library("otp", "dev.samstevens.totp", "totp").version("1.7.1")
             library("camunda", "org.camunda.bpm", "camunda-engine").version("7.23.0")
             library("bouncy", "org.bouncycastle", "bcprov-jdk18on").version("1.80")
-            library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.80")
+            library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.81")
             library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
             library("csv", "com.opencsv", "opencsv").version("5.11.1")
 
