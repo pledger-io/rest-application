@@ -3,8 +3,8 @@ rootProject.name="Pledger"
 pluginManagement {
     plugins {
         id("java")
-        id("io.micronaut.library").version("4.5.1")
-        id("io.micronaut.application").version("4.5.1")
+        id("io.micronaut.library").version("4.5.3")
+        id("io.micronaut.application").version("4.5.3")
         id("io.freefair.lombok").version("8.13.1")
         id("org.sonarqube").version("6.2.0.5505")
         id("org.openapi.generator").version("7.13.0")
@@ -29,7 +29,7 @@ dependencyResolutionManagement {
             library("bouncy", "org.bouncycastle", "bcprov-jdk18on").version("1.80")
             library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.80")
             library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
-            library("csv", "com.opencsv", "opencsv").version("5.11")
+            library("csv", "com.opencsv", "opencsv").version("5.11.1")
 
             // testing dependencies
             version("junit.version", "5.13.0")
