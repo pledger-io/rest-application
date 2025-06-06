@@ -5,13 +5,13 @@ import com.jongsoft.finance.domain.core.EntityRef;
 
 public interface ExpenseProvider extends DataProvider<EntityRef.NamedEntity> {
 
-    interface FilterCommand {
-        FilterCommand name(String value, boolean exact);
-    }
+  interface FilterCommand {
+    FilterCommand name(String value, boolean exact);
+  }
 
-    ResultPage<EntityRef.NamedEntity> lookup(FilterCommand filter);
+  ResultPage<EntityRef.NamedEntity> lookup(FilterCommand filter);
 
-    default boolean supports(Class<?> supportingClass) {
-        return EntityRef.NamedEntity.class.equals(supportingClass);
-    }
+  default boolean supports(Class<?> supportingClass) {
+    return EntityRef.NamedEntity.class.equals(supportingClass);
+  }
 }

@@ -12,20 +12,22 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 @Singleton
 public class PersistTransactionRuleDelegate implements JavaDelegate, JavaBean {
 
-    private final TransactionRuleProvider ruleProvider;
+  private final TransactionRuleProvider ruleProvider;
 
-    PersistTransactionRuleDelegate(TransactionRuleProvider ruleProvider) {
-        this.ruleProvider = ruleProvider;
-    }
+  PersistTransactionRuleDelegate(TransactionRuleProvider ruleProvider) {
+    this.ruleProvider = ruleProvider;
+  }
 
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        TransactionRule transactionRule = (TransactionRule) execution.getVariableLocal("transactionRule");
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    TransactionRule transactionRule =
+        (TransactionRule) execution.getVariableLocal("transactionRule");
 
-        log.debug("{}: Processing transaction rule save {}", execution.getCurrentActivityName(),
-                transactionRule.getName());
+    log.debug(
+        "{}: Processing transaction rule save {}",
+        execution.getCurrentActivityName(),
+        transactionRule.getName());
 
-        ruleProvider.save(transactionRule);
-    }
-
+    ruleProvider.save(transactionRule);
+  }
 }

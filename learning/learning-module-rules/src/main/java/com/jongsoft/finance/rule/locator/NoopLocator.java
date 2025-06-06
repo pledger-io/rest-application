@@ -9,14 +9,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class NoopLocator implements ChangeLocator {
 
-    @Override
-    public Object locate(RuleColumn column, String change) {
-        return change;
-    }
+  @Override
+  public Object locate(RuleColumn column, String change) {
+    return change;
+  }
 
-    @Override
-    public boolean supports(RuleColumn column) {
-        return RuleColumn.TAGS.equals(column);
-    }
-
+  @Override
+  public boolean supports(RuleColumn column) {
+    return RuleColumn.TAGS.equals(column);
+  }
 }

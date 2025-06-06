@@ -23,79 +23,81 @@ import org.slf4j.LoggerFactory;
 @Named("categoryProvider")
 public class CategoryProviderJpa implements CategoryProvider {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final AuthenticationFacade authenticationFacade;
-    private final ReactiveEntityManager entityManager;
+  private final AuthenticationFacade authenticationFacade;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public CategoryProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
+  @Inject
+  public CategoryProviderJpa(
+      AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+    this.authenticationFacade = authenticationFacade;
+    this.entityManager = entityManager;
+  }
+
+  @Override
+  public Optional<Category> lookup(long id) {
+    logger.trace("Looking up category with id: {}", id);
+
+    return entityManager
+        .from(CategoryJpa.class)
+        .fieldEq("id", id)
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .singleResult()
+        .map(this::convert);
+  }
+
+  @Override
+  public Optional<Category> lookup(String label) {
+    logger.trace("Looking up category with label: {}", label);
+
+    return entityManager
+        .from(CategoryJpa.class)
+        .fieldEq("label", label)
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .singleResult()
+        .map(this::convert);
+  }
+
+  @Override
+  public ResultPage<Category> lookup(FilterCommand filterCommand) {
+    if (filterCommand instanceof CategoryFilterCommand delegate) {
+      delegate.user(authenticationFacade.authenticated());
+
+      return entityManager.from(delegate).paged().map(this::convert);
     }
 
-    @Override
-    public Optional<Category> lookup(long id) {
-        logger.trace("Looking up category with id: {}", id);
+    throw new IllegalStateException("Cannot execute non JPA filter command on CategoryProviderJpa");
+  }
 
-        return entityManager.from(CategoryJpa.class)
-                .fieldEq("id", id)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .map(this::convert);
+  @Override
+  public Sequence<Category> lookup() {
+    logger.trace("Looking up all categories.");
+
+    return entityManager
+        .from(CategoryJpa.class)
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .fieldEq("archived", false)
+        .stream()
+        .map(this::convert)
+        .collect(ReactiveEntityManager.sequenceCollector());
+  }
+
+  protected Category convert(CategoryJpa source) {
+    if (source == null) {
+      return null;
     }
 
-    @Override
-    public Optional<Category> lookup(String label) {
-        logger.trace("Looking up category with label: {}", label);
-
-        return entityManager.from(CategoryJpa.class)
-                .fieldEq("label", label)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .map(this::convert);
-    }
-
-    @Override
-    public ResultPage<Category> lookup(FilterCommand filterCommand) {
-        if (filterCommand instanceof CategoryFilterCommand delegate) {
-            delegate.user(authenticationFacade.authenticated());
-
-            return entityManager.from(delegate)
-                    .paged()
-                    .map(this::convert);
-        }
-
-        throw new IllegalStateException("Cannot execute non JPA filter command on CategoryProviderJpa");
-    }
-
-    @Override
-    public Sequence<Category> lookup() {
-        logger.trace("Looking up all categories.");
-
-        return entityManager.from(CategoryJpa.class)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .fieldEq("archived", false)
-                .stream()
-                .map(this::convert)
-                .collect(ReactiveEntityManager.sequenceCollector());
-    }
-
-    protected Category convert(CategoryJpa source) {
-        if (source == null) {
-            return null;
-        }
-
-        return Category.builder()
-                .id(source.getId())
-                .description(source.getDescription())
-                .label(source.getLabel())
-                .lastActivity(source.getLastTransaction())
-                .delete(source.isArchived())
-                .user(UserAccount.builder()
-                        .username(new UserIdentifier(source.getUser().getUsername()))
-                        .build())
-                .build();
-    }
-
+    return Category.builder()
+        .id(source.getId())
+        .description(source.getDescription())
+        .label(source.getLabel())
+        .lastActivity(source.getLastTransaction())
+        .delete(source.isArchived())
+        .user(
+            UserAccount.builder()
+                .username(new UserIdentifier(source.getUser().getUsername()))
+                .build())
+        .build();
+  }
 }

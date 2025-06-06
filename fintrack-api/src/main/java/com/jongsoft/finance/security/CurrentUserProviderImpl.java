@@ -11,22 +11,20 @@ import jakarta.inject.Singleton;
 @Named("currentUserProvider")
 public class CurrentUserProviderImpl implements CurrentUserProvider {
 
-    private final AuthenticationFacade authenticationFacade;
-    private final UserProvider userProvider;
+  private final AuthenticationFacade authenticationFacade;
+  private final UserProvider userProvider;
 
-    public CurrentUserProviderImpl(AuthenticationFacade authenticationFacade, UserProvider userProvider) {
-        this.authenticationFacade = authenticationFacade;
-        this.userProvider = userProvider;
-    }
+  public CurrentUserProviderImpl(
+      AuthenticationFacade authenticationFacade, UserProvider userProvider) {
+    this.authenticationFacade = authenticationFacade;
+    this.userProvider = userProvider;
+  }
 
-    @Override
-    public UserAccount currentUser() {
-        var username = Control.Option(authenticationFacade.authenticated());
-        return username.map(s ->
-                userProvider.lookup(new UserIdentifier(s))
-                        .getOrSupply(() -> null))
-                .getOrSupply(() -> null);
-
-    }
-
+  @Override
+  public UserAccount currentUser() {
+    var username = Control.Option(authenticationFacade.authenticated());
+    return username
+        .map(s -> userProvider.lookup(new UserIdentifier(s)).getOrSupply(() -> null))
+        .getOrSupply(() -> null);
+  }
 }

@@ -12,22 +12,22 @@ import org.slf4j.LoggerFactory;
 @Transactional
 class RuleGroupDeleteHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(RuleGroupDeleteHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(RuleGroupDeleteHandler.class);
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    RuleGroupDeleteHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  RuleGroupDeleteHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @BusinessEventListener
-    void handle(RuleGroupDeleteCommand command) {
-        log.info("[{}] - Processing rule group delete event", command.id());
+  @BusinessEventListener
+  void handle(RuleGroupDeleteCommand command) {
+    log.info("[{}] - Processing rule group delete event", command.id());
 
-        entityManager.update(RuleGroupJpa.class)
-                .set("archived", true)
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(RuleGroupJpa.class)
+        .set("archived", true)
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

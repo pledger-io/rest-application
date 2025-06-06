@@ -14,23 +14,23 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class ChangeRuleHandler implements CommandHandler<ChangeRuleCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public ChangeRuleHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public ChangeRuleHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(ChangeRuleCommand command) {
-        log.info("[{}] - Updating rule change", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(ChangeRuleCommand command) {
+    log.info("[{}] - Updating rule change", command.id());
 
-        entityManager.update(RuleChangeJpa.class)
-                .set("field", command.column())
-                .set("`value`", command.change())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(RuleChangeJpa.class)
+        .set("field", command.column())
+        .set("`value`", command.change())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

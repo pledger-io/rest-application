@@ -19,7 +19,6 @@ import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-
 import java.time.LocalDateTime;
 import java.util.Currency;
 
@@ -29,95 +28,97 @@ import java.util.Currency;
 @Named("userProvider")
 public class UserProviderJpa implements UserProvider {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public UserProviderJpa(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
+  @Inject
+  public UserProviderJpa(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
+
+  @Override
+  public Sequence<UserAccount> lookup() {
+    return entityManager.from(UserAccountJpa.class).joinFetch("roles").stream()
+        .map(this::convert)
+        .collect(Collections.collector(com.jongsoft.lang.Collections::List));
+  }
+
+  @Override
+  public Optional<UserAccount> lookup(long id) {
+    return entityManager
+        .from(UserAccountJpa.class)
+        .joinFetch("roles")
+        .fieldEq("id", id)
+        .singleResult()
+        .map(this::convert);
+  }
+
+  @Override
+  public boolean available(UserIdentifier username) {
+    return entityManager
+            .from(UserAccountJpa.class)
+            .fieldEq("username", username.email())
+            .projectSingleValue(Long.class, "count(1)")
+            .getOrSupply(() -> 0L)
+        == 0;
+  }
+
+  @Override
+  public Optional<UserAccount> lookup(UserIdentifier username) {
+    return entityManager
+        .from(UserAccountJpa.class)
+        .fieldEq("username", username.email())
+        .singleResult()
+        .map(this::convert);
+  }
+
+  @Override
+  public Optional<UserAccount> refreshToken(String refreshToken) {
+    return entityManager
+        .from(AccountTokenJpa.class)
+        .fieldEq("refreshToken", refreshToken)
+        .fieldGtOrEq("expires", LocalDateTime.now())
+        .projectSingleValue(UserAccountJpa.class, "e.user")
+        .map(this::convert);
+  }
+
+  @Override
+  public Sequence<SessionToken> tokens(UserIdentifier username) {
+    return entityManager
+        .from(AccountTokenJpa.class)
+        .fieldEq("user.username", username.email())
+        .fieldGtOrEq("expires", LocalDateTime.now())
+        .stream()
+        .map(this::convert)
+        .collect(Collections.collector(com.jongsoft.lang.Collections::List));
+  }
+
+  protected SessionToken convert(AccountTokenJpa source) {
+    return SessionToken.builder()
+        .id(source.getId())
+        .description(source.getDescription())
+        .token(source.getRefreshToken())
+        .validity(Dates.range(source.getCreated(), source.getExpires()))
+        .build();
+  }
+
+  protected UserAccount convert(UserAccountJpa source) {
+    if (source == null) {
+      return null;
     }
 
-    @Override
-    public Sequence<UserAccount> lookup() {
-        return entityManager.from(UserAccountJpa.class)
-                .joinFetch("roles")
-                .stream()
-                .map(this::convert)
-                .collect(Collections.collector(com.jongsoft.lang.Collections::List));
-    }
-
-    @Override
-    public Optional<UserAccount> lookup(long id) {
-        return entityManager.from(UserAccountJpa.class)
-                .joinFetch("roles")
-                .fieldEq("id", id)
-                .singleResult()
-                .map(this::convert);
-    }
-
-    @Override
-    public boolean available(UserIdentifier username) {
-        return entityManager.from(UserAccountJpa.class)
-                .fieldEq("username", username.email())
-                .projectSingleValue(Long.class, "count(1)")
-                .getOrSupply(() -> 0L) == 0;
-    }
-
-    @Override
-    public Optional<UserAccount> lookup(UserIdentifier username) {
-        return entityManager.from(UserAccountJpa.class)
-                .fieldEq("username", username.email())
-                .singleResult()
-                .map(this::convert);
-    }
-
-    @Override
-    public Optional<UserAccount> refreshToken(String refreshToken) {
-        return entityManager.from(AccountTokenJpa.class)
-                .fieldEq("refreshToken", refreshToken)
-                .fieldGtOrEq("expires", LocalDateTime.now())
-                .projectSingleValue(UserAccountJpa.class, "e.user")
-                .map(this::convert);
-    }
-
-    @Override
-    public Sequence<SessionToken> tokens(UserIdentifier username) {
-        return entityManager.from(AccountTokenJpa.class)
-                .fieldEq("user.username", username.email())
-                .fieldGtOrEq("expires", LocalDateTime.now())
-                .stream()
-                .map(this::convert)
-                .collect(Collections.collector(com.jongsoft.lang.Collections::List));
-    }
-
-    protected SessionToken convert(AccountTokenJpa source) {
-        return SessionToken.builder()
-                .id(source.getId())
-                .description(source.getDescription())
-                .token(source.getRefreshToken())
-                .validity(Dates.range(
-                        source.getCreated(),
-                        source.getExpires()))
-                .build();
-    }
-
-    protected UserAccount convert(UserAccountJpa source) {
-        if (source == null) {
-            return null;
-        }
-
-        return UserAccount.builder()
-                .id(source.getId())
-                .username(new UserIdentifier(source.getUsername()))
-                .password(source.getPassword())
-                .primaryCurrency(Control.Option(source.getCurrency()).getOrSupply(() -> Currency.getInstance("EUR")))
-                .secret(source.getTwoFactorSecret())
-                .theme(source.getTheme())
-                .twoFactorEnabled(source.isTwoFactorEnabled())
-                .roles(
-                        source.getRoles().stream()
-                                .map(role -> new Role(role.getName()))
-                                .collect(Collectors.toList()))
-                .build();
-    }
-
+    return UserAccount.builder()
+        .id(source.getId())
+        .username(new UserIdentifier(source.getUsername()))
+        .password(source.getPassword())
+        .primaryCurrency(
+            Control.Option(source.getCurrency()).getOrSupply(() -> Currency.getInstance("EUR")))
+        .secret(source.getTwoFactorSecret())
+        .theme(source.getTheme())
+        .twoFactorEnabled(source.isTwoFactorEnabled())
+        .roles(
+            source.getRoles().stream()
+                .map(role -> new Role(role.getName()))
+                .collect(Collectors.toList()))
+        .build();
+  }
 }

@@ -14,22 +14,22 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class RenameRuleGroupHandler implements CommandHandler<RenameRuleGroupCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public RenameRuleGroupHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public RenameRuleGroupHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(RenameRuleGroupCommand command) {
-        log.info("[{}] - Processing rule group rename event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(RenameRuleGroupCommand command) {
+    log.info("[{}] - Processing rule group rename event", command.id());
 
-        entityManager.update(RuleGroupJpa.class)
-                .set("name", command.name())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(RuleGroupJpa.class)
+        .set("name", command.name())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

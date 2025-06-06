@@ -7,8 +7,7 @@ import jakarta.validation.constraints.NotNull;
 @ConfigurationProperties("micronaut.application.storage")
 public interface StorageSettings {
 
-    @NotNull
-    @Bindable
-    String getLocation();
-
+  @NotNull
+  @Bindable
+  String getLocation();
 }

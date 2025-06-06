@@ -7,10 +7,4 @@ import jakarta.validation.constraints.Size;
 
 @Serdeable.Deserializable
 record CategoryCreateRequest(
-        @NotNull
-        @NotBlank
-        @Size(max = 255)
-        String name,
-        @Size(max = 1024)
-        String description) {
-}
+    @NotNull @NotBlank @Size(max = 255) String name, @Size(max = 1024) String description) {}

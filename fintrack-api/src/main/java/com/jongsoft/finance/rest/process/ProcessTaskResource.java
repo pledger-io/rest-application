@@ -8,78 +8,74 @@ import io.micronaut.http.annotation.*;
 import io.micronaut.security.annotation.Secured;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.variable.Variables;
-
 import java.util.HashMap;
 import java.util.List;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.variable.Variables;
 
 @Tag(name = "Process Engine")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/runtime-process/{processDefinitionKey}/{businessKey}/{instanceId}/tasks")
 public class ProcessTaskResource {
 
-    private final TaskService taskService;
+  private final TaskService taskService;
 
-    public ProcessTaskResource(TaskService taskService) {
-        this.taskService = taskService;
-    }
+  public ProcessTaskResource(TaskService taskService) {
+    this.taskService = taskService;
+  }
 
-    @Get
-    @Operation(
-            summary = "List Tasks",
-            description = "List all available tasks for the provided process",
-            operationId = "getTasks"
-    )
-    public List<ProcessTaskResponse> tasks(@PathVariable String processDefinitionKey, @PathVariable String instanceId) {
-        return Collections.List(taskService.createTaskQuery()
+  @Get
+  @Operation(
+      summary = "List Tasks",
+      description = "List all available tasks for the provided process",
+      operationId = "getTasks")
+  public List<ProcessTaskResponse> tasks(
+      @PathVariable String processDefinitionKey, @PathVariable String instanceId) {
+    return Collections.List(
+            taskService
+                .createTaskQuery()
                 .processDefinitionKey(processDefinitionKey)
                 .processInstanceId(instanceId)
                 .initializeFormKeys()
                 .list())
-                .map(ProcessTaskResponse::new)
-                .toJava();
+        .map(ProcessTaskResponse::new)
+        .toJava();
+  }
+
+  @Get("/{taskId}/variables")
+  @Operation(
+      summary = "Get Task",
+      description = "Get the details of the given task.",
+      operationId = "getTask")
+  public synchronized VariableMap variables(
+      @PathVariable String taskId, @Nullable @QueryValue String variable) {
+    var variableMap = new VariableMap();
+    if (variable != null) {
+      variableMap.put(variable, taskService.getVariable(taskId, variable));
+    } else {
+      taskService.getVariables(taskId).forEach(variableMap::put);
     }
 
-    @Get("/{taskId}/variables")
-    @Operation(
-            summary = "Get Task",
-            description = "Get the details of the given task.",
-            operationId = "getTask"
-    )
-    public synchronized VariableMap variables(@PathVariable String taskId, @Nullable @QueryValue String variable) {
-        var variableMap = new VariableMap();
-        if (variable != null) {
-            variableMap.put(variable, taskService.getVariable(taskId, variable));
-        } else {
-            taskService.getVariables(taskId)
-                    .forEach(variableMap::put);
-        }
+    return variableMap;
+  }
 
-        return variableMap;
-    }
+  @Post("/{taskId}/complete")
+  @Operation(
+      summary = "Complete Task",
+      description = "Completes the given task with the provided data.",
+      operationId = "completeTask")
+  public void complete(@PathVariable String taskId, @Body VariableMap variables) {
+    var javaMap = new HashMap<String, Object>();
+    variables.keySet().forEach(key -> javaMap.put(key, variables.get(key)));
+    taskService.complete(taskId, Variables.fromMap(javaMap));
+  }
 
-    @Post("/{taskId}/complete")
-    @Operation(
-            summary = "Complete Task",
-            description = "Completes the given task with the provided data.",
-            operationId = "completeTask"
-    )
-    public void complete(@PathVariable String taskId, @Body VariableMap variables) {
-        var javaMap = new HashMap<String, Object>();
-        variables.keySet()
-                .forEach(key -> javaMap.put(key, variables.get(key)));
-        taskService.complete(taskId, Variables.fromMap(javaMap));
-    }
-
-    @Delete("/{taskId}")
-    @Operation(
-            summary = "Complete Task",
-            description = "Completes the given task without any additional data.",
-            operationId = "deleteTask"
-    )
-    public void complete(@PathVariable String taskId) {
-        taskService.complete(taskId);
-    }
-
+  @Delete("/{taskId}")
+  @Operation(
+      summary = "Complete Task",
+      description = "Completes the given task without any additional data.",
+      operationId = "deleteTask")
+  public void complete(@PathVariable String taskId) {
+    taskService.complete(taskId);
+  }
 }

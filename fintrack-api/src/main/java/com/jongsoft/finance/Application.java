@@ -10,29 +10,27 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 
 @OpenAPIDefinition(
-        info = @Info(
-                title = "Pledger",
-                version = "2.0.0",
-                description = "Pledger.io is a self-hosted personal finance application that helps you track your income and expenses.",
-                license = @License(name = "MIT", url = "https://opensource.org/licenses/MIT"),
-                contact = @Contact(
-                        name = "Jong Soft Development",
-                        url = "https://github.com/pledger-io/rest-application"
-                )
-        ),
-        security = @SecurityRequirement(name = "bearer")
-)
+    info =
+        @Info(
+            title = "Pledger",
+            version = "2.0.0",
+            description =
+                "Pledger.io is a self-hosted personal finance application that helps you track your income and expenses.",
+            license = @License(name = "MIT", url = "https://opensource.org/licenses/MIT"),
+            contact =
+                @Contact(
+                    name = "Jong Soft Development",
+                    url = "https://github.com/pledger-io/rest-application")),
+    security = @SecurityRequirement(name = "bearer"))
 @SecurityScheme(
-        name = "bearer",
-        type = SecuritySchemeType.HTTP,
-        bearerFormat = "JWT",
-        scheme = "bearer"
-)
+    name = "bearer",
+    type = SecuritySchemeType.HTTP,
+    bearerFormat = "JWT",
+    scheme = "bearer")
 public class Application {
 
-    public static void main(String[] args) {
-        Micronaut.run(Application.class, args);
-        System.exit(0);
-    }
-
+  public static void main(String[] args) {
+    Micronaut.run(Application.class, args);
+    System.exit(0);
+  }
 }

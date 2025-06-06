@@ -16,21 +16,22 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class DescribeTransactionHandler implements CommandHandler<DescribeTransactionCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public DescribeTransactionHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public DescribeTransactionHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(DescribeTransactionCommand command) {
-        log.info("[{}] - Processing transaction describe event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(DescribeTransactionCommand command) {
+    log.info("[{}] - Processing transaction describe event", command.id());
 
-        entityManager.update(TransactionJournal.class)
-                .set("description", command.description())
-                .fieldEq("id", command.id())
-                .execute();
-    }
+    entityManager
+        .update(TransactionJournal.class)
+        .set("description", command.description())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

@@ -7,12 +7,11 @@ import jakarta.validation.constraints.NotNull;
 @ConfigurationProperties("micronaut.application.security")
 public interface SecuritySettings {
 
-    @NotNull
-    @Bindable(defaultValue = "sample-secret")
-    String getSecret();
+  @NotNull
+  @Bindable(defaultValue = "sample-secret")
+  String getSecret();
 
-    @NotNull
-    @Bindable(defaultValue = "true")
-    boolean isEncrypt();
-
+  @NotNull
+  @Bindable(defaultValue = "true")
+  boolean isEncrypt();
 }

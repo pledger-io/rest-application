@@ -7,11 +7,11 @@ import com.jongsoft.lang.control.Optional;
 
 public interface ContractProvider extends DataProvider<Contract>, Exportable<Contract> {
 
-    Optional<Contract> lookup(String name);
+  Optional<Contract> lookup(String name);
 
-    Sequence<Contract> search(String partialName);
+  Sequence<Contract> search(String partialName);
 
-    default boolean supports(Class<?> supportingClass) {
-        return Contract.class.equals(supportingClass);
-    }
+  default boolean supports(Class<?> supportingClass) {
+    return Contract.class.equals(supportingClass);
+  }
 }

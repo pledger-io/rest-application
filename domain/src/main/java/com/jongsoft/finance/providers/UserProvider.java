@@ -8,17 +8,17 @@ import com.jongsoft.lang.control.Optional;
 
 public interface UserProvider extends DataProvider<UserAccount> {
 
-    Sequence<UserAccount> lookup();
+  Sequence<UserAccount> lookup();
 
-    boolean available(UserIdentifier username);
+  boolean available(UserIdentifier username);
 
-    Optional<UserAccount> lookup(UserIdentifier username);
+  Optional<UserAccount> lookup(UserIdentifier username);
 
-    Optional<UserAccount> refreshToken(String refreshToken);
+  Optional<UserAccount> refreshToken(String refreshToken);
 
-    Sequence<SessionToken> tokens(UserIdentifier username);
+  Sequence<SessionToken> tokens(UserIdentifier username);
 
-    default boolean supports(Class<?> supportingClass) {
-        return UserAccount.class.equals(supportingClass);
-    }
+  default boolean supports(Class<?> supportingClass) {
+    return UserAccount.class.equals(supportingClass);
+  }
 }

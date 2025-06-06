@@ -20,47 +20,47 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton
 public class SettingProviderJpa implements SettingProvider {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    public SettingProviderJpa(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  public SettingProviderJpa(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    public Sequence<Setting> lookup() {
-        log.trace("Setting listing");
+  @Override
+  public Sequence<Setting> lookup() {
+    log.trace("Setting listing");
 
-        return entityManager.from(SettingJpa.class)
-                .stream()
-                .map(this::convert)
-                .collect(ReactiveEntityManager.sequenceCollector());
-    }
+    return entityManager.from(SettingJpa.class).stream()
+        .map(this::convert)
+        .collect(ReactiveEntityManager.sequenceCollector());
+  }
 
-    @Override
-    public Optional<Setting> lookup(String name) {
-        log.trace("Setting lookup by name {}", name);
+  @Override
+  public Optional<Setting> lookup(String name) {
+    log.trace("Setting lookup by name {}", name);
 
-        return entityManager.from(SettingJpa.class)
-                .fieldEq("name", name)
-                .singleResult()
-                .map(this::convert);
-    }
+    return entityManager
+        .from(SettingJpa.class)
+        .fieldEq("name", name)
+        .singleResult()
+        .map(this::convert);
+  }
 
-    @Transactional
-    @BusinessEventListener
-    public void handleSettingUpdated(SettingUpdatedEvent event) {
-        entityManager.update(SettingJpa.class)
-                .set("value", event.value())
-                .fieldEq("name", event.setting())
-                .execute();
-    }
+  @Transactional
+  @BusinessEventListener
+  public void handleSettingUpdated(SettingUpdatedEvent event) {
+    entityManager
+        .update(SettingJpa.class)
+        .set("value", event.value())
+        .fieldEq("name", event.setting())
+        .execute();
+  }
 
-    private Setting convert(SettingJpa source) {
-        return Setting.builder()
-                .name(source.getName())
-                .type(source.getType())
-                .value(source.getValue())
-                .build();
-    }
-
+  private Setting convert(SettingJpa source) {
+    return Setting.builder()
+        .name(source.getName())
+        .type(source.getType())
+        .value(source.getValue())
+        .build();
+  }
 }

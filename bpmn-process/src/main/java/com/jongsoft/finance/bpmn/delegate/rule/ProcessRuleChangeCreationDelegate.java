@@ -12,16 +12,19 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 @Singleton
 public class ProcessRuleChangeCreationDelegate implements JavaDelegate, JavaBean {
 
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        TransactionRule transactionRule = (TransactionRule) execution.getVariableLocal("entity");
-        String id  = (String) execution.getVariableLocal("value");
-        RuleColumn field = (RuleColumn) execution.getVariableLocal("field");
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    TransactionRule transactionRule = (TransactionRule) execution.getVariableLocal("entity");
+    String id = (String) execution.getVariableLocal("value");
+    RuleColumn field = (RuleColumn) execution.getVariableLocal("field");
 
-        log.debug("{}: Processing transaction rule {} change addition {}|{}", execution.getCurrentActivityName(),
-                transactionRule.getName(), field, id);
+    log.debug(
+        "{}: Processing transaction rule {} change addition {}|{}",
+        execution.getCurrentActivityName(),
+        transactionRule.getName(),
+        field,
+        id);
 
-        transactionRule.registerChange(field, id);
-    }
-
+    transactionRule.registerChange(field, id);
+  }
 }

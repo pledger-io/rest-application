@@ -5,18 +5,17 @@ import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
-
 import java.time.LocalDate;
 import java.util.UUID;
 
 @SystemMessage({
-        """
+  """
                 You are a highly accurate and detail-oriented AI assistant specialized in extracting financial transaction information from natural language text.
                 Your job is to identify and extract structured data about transactions mentioned in the input.
-                
+
                 When a user provides you with a block of text, you must analyze it and return a structured JSON object for each transaction found.
                 If multiple transactions are mentioned, return an array of such objects.
-                
+
                 Parse and extract transaction data from user-provided text.
                 Construct and return a JSON object (or array of objects, if multiple transactions) that exactly matches the TransactionDTO and AccountDTO schema.
                 Field requirements:
@@ -40,16 +39,13 @@ import java.util.UUID;
 })
 public interface TransactionExtractorAgent {
 
-    @UserMessage({
-            """
+  @UserMessage({
+    """
                     Please extract the transaction details from the following text and return them in the format of a TransactionDTO as described.
                     Only include fields that can be confidently identified.
                     The date of today is {{date}}.
                     Here's the text: {{input}}"""
-    })
-    TransactionDTO extractTransaction(
-            @MemoryId UUID chat,
-            @V("date") LocalDate date,
-            @V("input") String input);
-
+  })
+  TransactionDTO extractTransaction(
+      @MemoryId UUID chat, @V("date") LocalDate date, @V("input") String input);
 }

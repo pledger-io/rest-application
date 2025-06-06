@@ -5,12 +5,12 @@ import dev.langchain4j.store.embedding.EmbeddingStore;
 
 interface MicronautEmbeddingStore extends AutoCloseable {
 
-    EmbeddingStore<TextSegment> embeddingStore();
+  EmbeddingStore<TextSegment> embeddingStore();
 
-    EmbeddingStoreFiller embeddingStoreFiller();
+  EmbeddingStoreFiller embeddingStoreFiller();
 
-    boolean shouldInitialize();
+  boolean shouldInitialize();
 
-    @Override
-    void close();
+  @Override
+  void close();
 }

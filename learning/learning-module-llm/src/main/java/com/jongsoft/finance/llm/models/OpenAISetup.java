@@ -16,28 +16,29 @@ import org.slf4j.Logger;
 @Requires(property = "application.ai.engine", value = "open-ai")
 public class OpenAISetup {
 
-    private final Logger log = org.slf4j.LoggerFactory.getLogger(OpenAISetup.class);
-    private final AiConfiguration configuration;
+  private final Logger log = org.slf4j.LoggerFactory.getLogger(OpenAISetup.class);
+  private final AiConfiguration configuration;
 
-    public OpenAISetup(AiConfiguration configuration) {
-        this.configuration = configuration;
-    }
+  public OpenAISetup(AiConfiguration configuration) {
+    this.configuration = configuration;
+  }
 
-    @Bean
-    ChatLanguageModel openaiLanguageModel() {
-        log.info("Creating OpenAI chat model with name config: {}.", configuration.getOpenAI().getModel());
-        return OpenAiChatModel.builder()
-                .modelName(configuration.getOpenAI().getModel())
-                .apiKey(configuration.getOpenAI().getKey())
-                .temperature(configuration.getTemperature())
-                .build();
-    }
+  @Bean
+  ChatLanguageModel openaiLanguageModel() {
+    log.info(
+        "Creating OpenAI chat model with name config: {}.", configuration.getOpenAI().getModel());
+    return OpenAiChatModel.builder()
+        .modelName(configuration.getOpenAI().getModel())
+        .apiKey(configuration.getOpenAI().getKey())
+        .temperature(configuration.getTemperature())
+        .build();
+  }
 
-    @Bean
-    EmbeddingModel embeddingModel() {
-        return OpenAiEmbeddingModel.builder()
-                .modelName(configuration.getOpenAI().getModel())
-                .apiKey(configuration.getOpenAI().getKey())
-                .build();
-    }
+  @Bean
+  EmbeddingModel embeddingModel() {
+    return OpenAiEmbeddingModel.builder()
+        .modelName(configuration.getOpenAI().getModel())
+        .apiKey(configuration.getOpenAI().getKey())
+        .build();
+  }
 }

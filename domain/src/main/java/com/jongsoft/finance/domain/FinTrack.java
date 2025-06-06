@@ -3,25 +3,23 @@ package com.jongsoft.finance.domain;
 import com.jongsoft.finance.core.Encoder;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.commands.user.RegisterTokenCommand;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
+import lombok.Getter;
 
 public class FinTrack {
 
-    @Getter
-    private final Encoder hashingAlgorithm;
+  @Getter private final Encoder hashingAlgorithm;
 
-    public FinTrack(Encoder hashingAlgorithm) {
-        this.hashingAlgorithm = hashingAlgorithm;
-    }
+  public FinTrack(Encoder hashingAlgorithm) {
+    this.hashingAlgorithm = hashingAlgorithm;
+  }
 
-    public UserAccount createUser(String username, String password) {
-        return new UserAccount(username, password);
-    }
+  public UserAccount createUser(String username, String password) {
+    return new UserAccount(username, password);
+  }
 
-    public void registerToken(String username, String token, Integer expiresIn) {
-        RegisterTokenCommand.tokenRegistered(username, token, LocalDateTime.now().plusSeconds(expiresIn));
-    }
-
+  public void registerToken(String username, String token, Integer expiresIn) {
+    RegisterTokenCommand.tokenRegistered(
+        username, token, LocalDateTime.now().plusSeconds(expiresIn));
+  }
 }

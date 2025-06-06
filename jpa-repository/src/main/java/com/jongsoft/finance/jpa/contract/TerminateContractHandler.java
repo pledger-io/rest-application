@@ -16,22 +16,22 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class TerminateContractHandler implements CommandHandler<TerminateContractCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public TerminateContractHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public TerminateContractHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(TerminateContractCommand command) {
-        log.info("[{}] - Processing contract terminate event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(TerminateContractCommand command) {
+    log.info("[{}] - Processing contract terminate event", command.id());
 
-        entityManager.update(ContractJpa.class)
-                .set("archived", true)
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(ContractJpa.class)
+        .set("archived", true)
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

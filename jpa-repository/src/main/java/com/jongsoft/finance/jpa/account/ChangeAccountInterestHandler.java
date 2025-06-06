@@ -15,25 +15,25 @@ import org.slf4j.LoggerFactory;
 @RequiresJpa
 @Transactional
 public class ChangeAccountInterestHandler implements CommandHandler<ChangeInterestCommand> {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    ChangeAccountInterestHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  ChangeAccountInterestHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(ChangeInterestCommand command) {
-        log.info("[{}] - Processing account interest event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(ChangeInterestCommand command) {
+    log.info("[{}] - Processing account interest event", command.id());
 
-        entityManager.update(AccountJpa.class)
-                .set("interest", command.interest())
-                .set("interestPeriodicity", command.periodicity())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(AccountJpa.class)
+        .set("interest", command.interest())
+        .set("interestPeriodicity", command.periodicity())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

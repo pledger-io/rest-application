@@ -14,22 +14,22 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class CloseBudgetHandler implements CommandHandler<CloseBudgetCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    CloseBudgetHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  CloseBudgetHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(CloseBudgetCommand command) {
-        log.info("[{}] - Processing budget closing event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(CloseBudgetCommand command) {
+    log.info("[{}] - Processing budget closing event", command.id());
 
-        entityManager.update(BudgetJpa.class)
-                .set("until", command.end())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(BudgetJpa.class)
+        .set("until", command.end())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

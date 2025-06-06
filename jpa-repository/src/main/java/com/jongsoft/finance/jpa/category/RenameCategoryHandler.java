@@ -16,23 +16,23 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class RenameCategoryHandler implements CommandHandler<RenameCategoryCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public RenameCategoryHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public RenameCategoryHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(RenameCategoryCommand command) {
-        log.info("[{}] - Processing rename event for category", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(RenameCategoryCommand command) {
+    log.info("[{}] - Processing rename event for category", command.id());
 
-        entityManager.update(CategoryJpa.class)
-                .set("label", command.name())
-                .set("description", command.description())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(CategoryJpa.class)
+        .set("label", command.name())
+        .set("description", command.description())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

@@ -10,12 +10,11 @@ import org.slf4j.LoggerFactory;
 @Factory
 public class EventBusFactory {
 
-    private final Logger log = LoggerFactory.getLogger(EventBusFactory.class);
+  private final Logger log = LoggerFactory.getLogger(EventBusFactory.class);
 
-    @Context
-    public EventBus eventBus(ApplicationEventPublisher eventPublisher) {
-        log.info("Staring the event bus");
-        return new EventBus(eventPublisher);
-    }
-
+  @Context
+  public EventBus eventBus(ApplicationEventPublisher eventPublisher) {
+    log.info("Staring the event bus");
+    return new EventBus(eventPublisher);
+  }
 }

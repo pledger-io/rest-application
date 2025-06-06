@@ -21,62 +21,62 @@ import lombok.extern.slf4j.Slf4j;
 @Named("tagProvider")
 public class TagProviderJpa implements TagProvider {
 
-    private final AuthenticationFacade authenticationFacade;
-    private final ReactiveEntityManager entityManager;
+  private final AuthenticationFacade authenticationFacade;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public TagProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
+  @Inject
+  public TagProviderJpa(
+      AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+    this.authenticationFacade = authenticationFacade;
+    this.entityManager = entityManager;
+  }
+
+  @Override
+  public Sequence<Tag> lookup() {
+    log.trace("Tag listing");
+
+    return entityManager
+        .from(TagJpa.class)
+        .joinFetch("user")
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .fieldEq("archived", false)
+        .stream()
+        .map(this::convert)
+        .collect(ReactiveEntityManager.sequenceCollector());
+  }
+
+  @Override
+  public Optional<Tag> lookup(String name) {
+    log.trace("Tag lookup by name: {}", name);
+
+    return entityManager
+        .from(TagJpa.class)
+        .joinFetch("user")
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .fieldEq("name", name)
+        .fieldEq("archived", false)
+        .singleResult()
+        .map(this::convert);
+  }
+
+  @Override
+  public ResultPage<Tag> lookup(FilterCommand filter) {
+    log.trace("Tag lookup by filter: {}", filter);
+
+    if (filter instanceof TagFilterCommand delegate) {
+      delegate.user(authenticationFacade.authenticated());
+
+      return entityManager.from(delegate).paged().map(this::convert);
     }
 
-    @Override
-    public Sequence<Tag> lookup() {
-        log.trace("Tag listing");
+    throw new IllegalStateException("Cannot use non JPA filter on TagProviderJpa");
+  }
 
-        return entityManager.from(TagJpa.class)
-                .joinFetch("user")
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .fieldEq("archived", false)
-                .stream()
-                .map(this::convert)
-                .collect(ReactiveEntityManager.sequenceCollector());
+  protected Tag convert(TagJpa source) {
+    if (source == null) {
+      return null;
     }
 
-    @Override
-    public Optional<Tag> lookup(String name) {
-        log.trace("Tag lookup by name: {}", name);
-
-        return entityManager.from(TagJpa.class)
-                .joinFetch("user")
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .fieldEq("name", name)
-                .fieldEq("archived", false)
-                .singleResult()
-                .map(this::convert);
-    }
-
-    @Override
-    public ResultPage<Tag> lookup(FilterCommand filter) {
-        log.trace("Tag lookup by filter: {}", filter);
-
-        if (filter instanceof TagFilterCommand delegate) {
-            delegate.user(authenticationFacade.authenticated());
-
-            return entityManager.from(delegate)
-                    .paged()
-                    .map(this::convert);
-        }
-
-        throw new IllegalStateException("Cannot use non JPA filter on TagProviderJpa");
-    }
-
-    protected Tag convert(TagJpa source) {
-        if (source == null) {
-            return null;
-        }
-
-        return new Tag(source.getName());
-    }
-
+    return new Tag(source.getName());
+  }
 }

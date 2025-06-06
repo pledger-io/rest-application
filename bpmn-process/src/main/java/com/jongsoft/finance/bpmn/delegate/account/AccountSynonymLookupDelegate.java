@@ -10,43 +10,43 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
 
 /**
- * This delegate accesses the {@link Account} synonym list in the system. The synonym list
- * contains a relation between potential account names encountered during import and previously selected actual
- * {@link Account}'s.
- * <p>
- * This delegate expects the following variables to be present:
- * </p>
+ * This delegate accesses the {@link Account} synonym list in the system. The synonym list contains
+ * a relation between potential account names encountered during import and previously selected
+ * actual {@link Account}'s.
+ *
+ * <p>This delegate expects the following variables to be present:
+ *
  * <ul>
- *     <li>name, the name to use to look in the synonym list</li>
+ *   <li>name, the name to use to look in the synonym list
  * </ul>
- * <p>
- * The delegate will produce the following output:
+ *
+ * <p>The delegate will produce the following output:
+ *
  * <ul>
- *     <li>id, the account id</li>
+ *   <li>id, the account id
  * </ul>
  */
 @Slf4j
 @Singleton
 public class AccountSynonymLookupDelegate implements JavaDelegate, JavaBean {
 
-    private final AccountProvider accountProvider;
+  private final AccountProvider accountProvider;
 
-    AccountSynonymLookupDelegate(AccountProvider accountProvider) {
-        this.accountProvider = accountProvider;
-    }
+  AccountSynonymLookupDelegate(AccountProvider accountProvider) {
+    this.accountProvider = accountProvider;
+  }
 
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        log.debug("{}: Processing account lookup using synonym '{}'", execution.getCurrentActivityName(),
-                execution.getVariable("name"));
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    log.debug(
+        "{}: Processing account lookup using synonym '{}'",
+        execution.getCurrentActivityName(),
+        execution.getVariable("name"));
 
-        var synonym = execution.<StringValue>getVariableLocalTyped("name").getValue();
+    var synonym = execution.<StringValue>getVariableLocalTyped("name").getValue();
 
-        var accountId = accountProvider.synonymOf(synonym)
-                .map(Account::getId)
-                .getOrSupply(() -> null);
+    var accountId = accountProvider.synonymOf(synonym).map(Account::getId).getOrSupply(() -> null);
 
-        execution.setVariableLocal("id", accountId);
-    }
-
+    execution.setVariableLocal("id", accountId);
+  }
 }

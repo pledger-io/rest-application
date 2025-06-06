@@ -7,15 +7,15 @@ import com.jongsoft.lang.control.Optional;
 
 public interface BudgetProvider extends Exportable<Budget> {
 
-    @Override
-    Sequence<Budget> lookup();
+  @Override
+  Sequence<Budget> lookup();
 
-    Optional<Budget> lookup(int year, int month);
+  Optional<Budget> lookup(int year, int month);
 
-    Optional<Budget> first();
+  Optional<Budget> first();
 
-    @Override
-    default boolean supports(Class<?> supportingClass) {
-        return Budget.class.equals(supportingClass);
-    }
+  @Override
+  default boolean supports(Class<?> supportingClass) {
+    return Budget.class.equals(supportingClass);
+  }
 }

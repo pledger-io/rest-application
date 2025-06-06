@@ -7,11 +7,8 @@ import io.micronaut.serde.annotation.Serdeable;
 
 @Serdeable
 public record ImportJobSettings(
-        @JsonProperty
-        ImporterConfiguration importConfiguration,
-        @JsonProperty
-        boolean applyRules,
-        @JsonProperty
-        boolean generateAccounts,
-        @JsonProperty
-        Long accountId) implements ProcessVariable {}
+    @JsonProperty ImporterConfiguration importConfiguration,
+    @JsonProperty boolean applyRules,
+    @JsonProperty boolean generateAccounts,
+    @JsonProperty Long accountId)
+    implements ProcessVariable {}

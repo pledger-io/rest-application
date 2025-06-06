@@ -14,26 +14,27 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton
 @RequiresJpa
 @Transactional
-public class ChangeTransactionDatesHandler implements CommandHandler<ChangeTransactionDatesCommand> {
+public class ChangeTransactionDatesHandler
+    implements CommandHandler<ChangeTransactionDatesCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public ChangeTransactionDatesHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public ChangeTransactionDatesHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(ChangeTransactionDatesCommand command) {
-        log.info("[{}] - Processing transaction book event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(ChangeTransactionDatesCommand command) {
+    log.info("[{}] - Processing transaction book event", command.id());
 
-        entityManager.update(TransactionJournal.class)
-                .set("bookDate", command.bookingDate())
-                .set("date", command.date())
-                .set("interestDate", command.interestDate())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(TransactionJournal.class)
+        .set("bookDate", command.bookingDate())
+        .set("date", command.date())
+        .set("interestDate", command.interestDate())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

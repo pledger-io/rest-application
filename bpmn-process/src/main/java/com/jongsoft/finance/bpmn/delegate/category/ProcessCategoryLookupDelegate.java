@@ -11,48 +11,45 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 /**
  * This delegate will lookup a {@link Category} in the system.
  *
- * <p>
- * This delegate expects one of the following variables to be present:
- * </p>
+ * <p>This delegate expects one of the following variables to be present:
+ *
  * <ol>
- *     <li>name, the label of the category</li>
- *     <li>id, the unique system generated id of the category</li>
+ *   <li>name, the label of the category
+ *   <li>id, the unique system generated id of the category
  * </ol>
  *
- * <p>
- *     This delegate will result in the following variables
- * </p>
+ * <p>This delegate will result in the following variables
+ *
  * <ul>
- *     <li>category, the {@link Category#getId()} that was found</li>
+ *   <li>category, the {@link Category#getId()} that was found
  * </ul>
  */
 @Slf4j
 @Singleton
 public class ProcessCategoryLookupDelegate implements JavaDelegate, JavaBean {
 
-    private final CategoryProvider categoryProvider;
+  private final CategoryProvider categoryProvider;
 
-    ProcessCategoryLookupDelegate(CategoryProvider categoryProvider) {
-        this.categoryProvider = categoryProvider;
+  ProcessCategoryLookupDelegate(CategoryProvider categoryProvider) {
+    this.categoryProvider = categoryProvider;
+  }
+
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    log.debug(
+        "{}: Processing category lookup '{}'",
+        execution.getCurrentActivityName(),
+        execution.getVariableLocal("name"));
+
+    final Category category;
+    if (execution.hasVariableLocal("name")) {
+      var label = (String) execution.getVariableLocal("name");
+
+      category = categoryProvider.lookup(label).get();
+    } else {
+      category = categoryProvider.lookup((Long) execution.getVariableLocal("id")).get();
     }
 
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        log.debug("{}: Processing category lookup '{}'",
-                execution.getCurrentActivityName(),
-                execution.getVariableLocal("name"));
-
-        final Category category;
-        if (execution.hasVariableLocal("name")) {
-            var label = (String) execution.getVariableLocal("name");
-
-            category = categoryProvider.lookup(label).get();
-        } else {
-            category = categoryProvider.lookup((Long) execution.getVariableLocal("id"))
-                    .get();
-        }
-
-        execution.setVariable("category", category);
-    }
-
+    execution.setVariable("category", category);
+  }
 }

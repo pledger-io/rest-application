@@ -16,25 +16,25 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class CreateCategoryHandler implements CommandHandler<CreateCategoryCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public CreateCategoryHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public CreateCategoryHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(CreateCategoryCommand command) {
-        log.info("[{}] - Processing create event for category", command.name());
+  @Override
+  @BusinessEventListener
+  public void handle(CreateCategoryCommand command) {
+    log.info("[{}] - Processing create event for category", command.name());
 
-        var entity = CategoryJpa.builder()
-                .label(command.name())
-                .description(command.description())
-                .user(entityManager.currentUser())
-                .build();
+    var entity =
+        CategoryJpa.builder()
+            .label(command.name())
+            .description(command.description())
+            .user(entityManager.currentUser())
+            .build();
 
-        entityManager.persist(entity);
-    }
-
+    entityManager.persist(entity);
+  }
 }

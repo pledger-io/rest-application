@@ -7,16 +7,18 @@ import com.jongsoft.lang.control.Optional;
 
 public interface TagProvider extends Exportable<Tag> {
 
-    interface FilterCommand {
-        FilterCommand name(String value, boolean exact);
-        FilterCommand page(int page, int pageSize);
-    }
+  interface FilterCommand {
+    FilterCommand name(String value, boolean exact);
 
-    Optional<Tag> lookup(String name);
-    ResultPage<Tag> lookup(FilterCommand filter);
+    FilterCommand page(int page, int pageSize);
+  }
 
-    @Override
-    default boolean supports(Class<?> supportingClass) {
-        return Tag.class.equals(supportingClass);
-    }
+  Optional<Tag> lookup(String name);
+
+  ResultPage<Tag> lookup(FilterCommand filter);
+
+  @Override
+  default boolean supports(Class<?> supportingClass) {
+    return Tag.class.equals(supportingClass);
+  }
 }

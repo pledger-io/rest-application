@@ -1,5 +1,8 @@
 package com.jongsoft.finance.jpa.rule;
 
+import com.jongsoft.finance.core.RuleColumn;
+import com.jongsoft.finance.core.RuleOperation;
+import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,11 +10,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-
-import com.jongsoft.finance.core.RuleColumn;
-import com.jongsoft.finance.core.RuleOperation;
-import com.jongsoft.finance.jpa.core.entity.EntityJpa;
-
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,27 +18,26 @@ import lombok.Getter;
 @Table(name = "rule_condition")
 public class RuleConditionJpa extends EntityJpa {
 
-    @Enumerated(value = EnumType.STRING)
-    private RuleColumn field;
-    @Enumerated(value = EnumType.STRING)
-    private RuleOperation operation;
+  @Enumerated(value = EnumType.STRING)
+  private RuleColumn field;
 
-    @Column(name = "cond_value")
-    private String condition;
+  @Enumerated(value = EnumType.STRING)
+  private RuleOperation operation;
 
-    @ManyToOne
-    @JoinColumn
-    private RuleJpa rule;
+  @Column(name = "cond_value")
+  private String condition;
 
-    @Builder
-    private RuleConditionJpa(Long id, RuleColumn field, RuleOperation operation, String condition, RuleJpa rule) {
-        super(id);
-        this.field = field;
-        this.operation = operation;
-        this.condition = condition;
-        this.rule = rule;
-    }
+  @ManyToOne @JoinColumn private RuleJpa rule;
 
-    public RuleConditionJpa() {
-    }
+  @Builder
+  private RuleConditionJpa(
+      Long id, RuleColumn field, RuleOperation operation, String condition, RuleJpa rule) {
+    super(id);
+    this.field = field;
+    this.operation = operation;
+    this.condition = condition;
+    this.rule = rule;
+  }
+
+  public RuleConditionJpa() {}
 }

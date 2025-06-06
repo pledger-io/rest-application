@@ -10,11 +10,10 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 @Singleton
 public class StopProcessListener implements ExecutionListener, JavaBean {
 
-    @Override
-    public void notify(DelegateExecution execution) {
-        log.info("[{}] Finish business process", execution.getProcessDefinitionId());
-        execution.removeVariablesLocal();
-        execution.removeVariables();
-    }
-
+  @Override
+  public void notify(DelegateExecution execution) {
+    log.info("[{}] Finish business process", execution.getProcessDefinitionId());
+    execution.removeVariablesLocal();
+    execution.removeVariables();
+  }
 }

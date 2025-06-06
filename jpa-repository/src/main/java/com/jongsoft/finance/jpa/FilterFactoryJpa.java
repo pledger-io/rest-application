@@ -15,33 +15,33 @@ import jakarta.inject.Singleton;
 @RequiresJpa
 public class FilterFactoryJpa implements FilterFactory {
 
-    @Override
-    public AccountFilterCommand account() {
-        return new AccountFilterCommand();
-    }
+  @Override
+  public AccountFilterCommand account() {
+    return new AccountFilterCommand();
+  }
 
-    @Override
-    public TagProvider.FilterCommand tag() {
-        return new TagFilterCommand();
-    }
+  @Override
+  public TagProvider.FilterCommand tag() {
+    return new TagFilterCommand();
+  }
 
-    @Override
-    public TransactionProvider.FilterCommand transaction() {
-        return new TransactionFilterCommand();
-    }
+  @Override
+  public TransactionProvider.FilterCommand transaction() {
+    return new TransactionFilterCommand();
+  }
 
-    @Override
-    public ExpenseProvider.FilterCommand expense() {
-        return new ExpenseFilterCommand();
-    }
+  @Override
+  public ExpenseProvider.FilterCommand expense() {
+    return new ExpenseFilterCommand();
+  }
 
-    @Override
-    public CategoryProvider.FilterCommand category() {
-        return new CategoryFilterCommand();
-    }
+  @Override
+  public CategoryProvider.FilterCommand category() {
+    return new CategoryFilterCommand();
+  }
 
-    @Override
-    public TransactionScheduleProvider.FilterCommand schedule() {
-        return new ScheduleFilterCommand();
-    }
+  @Override
+  public TransactionScheduleProvider.FilterCommand schedule() {
+    return new ScheduleFilterCommand();
+  }
 }

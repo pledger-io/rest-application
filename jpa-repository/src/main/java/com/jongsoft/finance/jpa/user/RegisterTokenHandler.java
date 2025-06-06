@@ -16,26 +16,32 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class RegisterTokenHandler implements CommandHandler<RegisterTokenCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public RegisterTokenHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public RegisterTokenHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(RegisterTokenCommand command) {
-        log.info("[{}] - Registering new security token.", command.username());
+  @Override
+  @BusinessEventListener
+  public void handle(RegisterTokenCommand command) {
+    log.info("[{}] - Registering new security token.", command.username());
 
-        var userAccountJpa = entityManager.from(UserAccountJpa.class).fieldEq("username", command.username()).singleResult().get();
+    var userAccountJpa =
+        entityManager
+            .from(UserAccountJpa.class)
+            .fieldEq("username", command.username())
+            .singleResult()
+            .get();
 
-        var refreshJpa = AccountTokenJpa.builder()
-                .user(userAccountJpa)
-                .refreshToken(command.refreshToken())
-                .expires(command.expireDate())
-                .build();
+    var refreshJpa =
+        AccountTokenJpa.builder()
+            .user(userAccountJpa)
+            .refreshToken(command.refreshToken())
+            .expires(command.expireDate())
+            .build();
 
-        entityManager.persist(refreshJpa);
-    }
+    entityManager.persist(refreshJpa);
+  }
 }

@@ -16,23 +16,23 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class WarnBeforeExpiryHandler implements CommandHandler<WarnBeforeExpiryCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public WarnBeforeExpiryHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public WarnBeforeExpiryHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(WarnBeforeExpiryCommand command) {
-        log.info("[{}] - Processing contract warning event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(WarnBeforeExpiryCommand command) {
+    log.info("[{}] - Processing contract warning event", command.id());
 
-        entityManager.update(ContractJpa.class)
-                .set("warningActive", true)
-                .set("endDate", command.endDate())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(ContractJpa.class)
+        .set("warningActive", true)
+        .set("endDate", command.endDate())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

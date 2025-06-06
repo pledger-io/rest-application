@@ -11,37 +11,36 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 /**
- * This is a delegate that prepares the account generation.
- * It reads the transaction token from the execution and reads the transaction from the storage.
- * It then writes the account JSON to the execution in the property {@code accountJson}.
+ * This is a delegate that prepares the account generation. It reads the transaction token from the
+ * execution and reads the transaction from the storage. It then writes the account JSON to the
+ * execution in the property {@code accountJson}.
  */
 @Slf4j
 @Singleton
 public class PrepareAccountGenerationDelegate implements JavaDelegate, JavaBean {
-    private final ProcessMapper mapper;
+  private final ProcessMapper mapper;
 
-    PrepareAccountGenerationDelegate(ProcessMapper mapper) {
-        this.mapper = mapper;
-    }
+  PrepareAccountGenerationDelegate(ProcessMapper mapper) {
+    this.mapper = mapper;
+  }
 
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        var transaction = (TransactionDTO) execution.getVariableLocal("transaction");
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    var transaction = (TransactionDTO) execution.getVariableLocal("transaction");
 
-        log.debug("{}: Extracting the account to be created from the transaction {}.",
-                execution.getCurrentActivityName(),
-                transaction.opposingName());
+    log.debug(
+        "{}: Extracting the account to be created from the transaction {}.",
+        execution.getCurrentActivityName(),
+        transaction.opposingName());
 
-        var accountJson = AccountJson.builder()
-                .name(transaction.opposingName())
-                .iban(transaction.opposingIBAN())
-                .type(transaction.type() == TransactionType.CREDIT ? "creditor" : "debtor")
-                .currency("EUR")// todo this needs to be fixed later on
-                .build();
+    var accountJson =
+        AccountJson.builder()
+            .name(transaction.opposingName())
+            .iban(transaction.opposingIBAN())
+            .type(transaction.type() == TransactionType.CREDIT ? "creditor" : "debtor")
+            .currency("EUR") // todo this needs to be fixed later on
+            .build();
 
-        execution.setVariableLocal(
-                "accountJson",
-                mapper.writeSafe(accountJson));
-    }
-
+    execution.setVariableLocal("accountJson", mapper.writeSafe(accountJson));
+  }
 }

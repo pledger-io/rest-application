@@ -15,22 +15,22 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class DeleteImportJobHandler implements CommandHandler<DeleteImportJobCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public DeleteImportJobHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public DeleteImportJobHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(DeleteImportJobCommand command) {
-        log.info("[{}] - Processing import deleted event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(DeleteImportJobCommand command) {
+    log.info("[{}] - Processing import deleted event", command.id());
 
-        entityManager.update(ImportJpa.class)
-                .set("archived", true)
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(ImportJpa.class)
+        .set("archived", true)
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

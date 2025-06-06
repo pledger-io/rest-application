@@ -13,26 +13,27 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 @Singleton
 public class ExtractorRuleRunDelegate implements JavaDelegate {
 
-    private final RuleEngine ruleEngine;
+  private final RuleEngine ruleEngine;
 
-    ExtractorRuleRunDelegate(RuleEngine ruleEngine) {
-        this.ruleEngine = ruleEngine;
+  ExtractorRuleRunDelegate(RuleEngine ruleEngine) {
+    this.ruleEngine = ruleEngine;
+  }
+
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    var nameIbanPair =
+        (Triplet<String, String, String>) execution.getVariableLocal("accountLookup");
+
+    var inputSet = new RuleDataSet();
+    inputSet.put(RuleColumn.TO_ACCOUNT, nameIbanPair.getFirst());
+    inputSet.put(RuleColumn.DESCRIPTION, nameIbanPair.getThird());
+
+    var outputSet = ruleEngine.run(inputSet);
+    if (outputSet.containsKey(RuleColumn.TO_ACCOUNT)) {
+      var account = outputSet.<Account>getCasted(RuleColumn.TO_ACCOUNT);
+      execution.setVariableLocal("id", account.getId());
+    } else {
+      execution.setVariableLocal("id", null);
     }
-
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        var nameIbanPair = (Triplet<String, String, String>) execution.getVariableLocal("accountLookup");
-
-        var inputSet = new RuleDataSet();
-        inputSet.put(RuleColumn.TO_ACCOUNT, nameIbanPair.getFirst());
-        inputSet.put(RuleColumn.DESCRIPTION, nameIbanPair.getThird());
-
-        var outputSet = ruleEngine.run(inputSet);
-        if (outputSet.containsKey(RuleColumn.TO_ACCOUNT)) {
-            var account = outputSet.<Account>getCasted(RuleColumn.TO_ACCOUNT);
-            execution.setVariableLocal("id", account.getId());
-        } else {
-            execution.setVariableLocal("id", null);
-        }
-    }
+  }
 }

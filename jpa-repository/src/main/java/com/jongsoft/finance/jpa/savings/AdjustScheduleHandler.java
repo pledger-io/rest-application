@@ -15,23 +15,23 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class AdjustScheduleHandler implements CommandHandler<AdjustScheduleCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    public AdjustScheduleHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  public AdjustScheduleHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(AdjustScheduleCommand command) {
-        log.info("[{}] - Adjusting schedule for a saving goal.", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(AdjustScheduleCommand command) {
+    log.info("[{}] - Adjusting schedule for a saving goal.", command.id());
 
-        entityManager.update(SavingGoalJpa.class)
-                .set("targetDate", command.schedulable().getEnd())
-                .set("periodicity", command.schedulable().getSchedule().periodicity())
-                .set("interval", command.schedulable().getSchedule().interval())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(SavingGoalJpa.class)
+        .set("targetDate", command.schedulable().getEnd())
+        .set("periodicity", command.schedulable().getSchedule().periodicity())
+        .set("interval", command.schedulable().getSchedule().interval())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

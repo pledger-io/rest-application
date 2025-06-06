@@ -6,10 +6,4 @@ import jakarta.validation.constraints.NotNull;
 
 @Serdeable.Deserializable
 record ImporterCreateRequest(
-        @NotNull
-        @NotBlank
-        String configuration,
-        @NotNull
-        @NotBlank
-        String uploadToken) {
-}
+    @NotNull @NotBlank String configuration, @NotNull @NotBlank String uploadToken) {}

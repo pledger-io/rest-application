@@ -15,22 +15,22 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class ChangeMultiFactorHandler implements CommandHandler<ChangeMultiFactorCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public ChangeMultiFactorHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public ChangeMultiFactorHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(ChangeMultiFactorCommand command) {
-        log.info("[{}] - Updating multi factor setting", command.username());
+  @Override
+  @BusinessEventListener
+  public void handle(ChangeMultiFactorCommand command) {
+    log.info("[{}] - Updating multi factor setting", command.username());
 
-        entityManager.update(UserAccountJpa.class)
-                .set("twoFactorEnabled", command.enabled())
-                .fieldEq("username", command.username().email())
-                .execute();
-    }
-
+    entityManager
+        .update(UserAccountJpa.class)
+        .set("twoFactorEnabled", command.enabled())
+        .fieldEq("username", command.username().email())
+        .execute();
+  }
 }

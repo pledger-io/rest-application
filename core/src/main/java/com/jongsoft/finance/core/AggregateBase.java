@@ -4,9 +4,6 @@ import java.io.Serializable;
 
 public interface AggregateBase extends Serializable {
 
-    /**
-     * Returns the unique identifier of the aggregate.
-     */
-    Long getId();
-
+  /** Returns the unique identifier of the aggregate. */
+  Long getId();
 }

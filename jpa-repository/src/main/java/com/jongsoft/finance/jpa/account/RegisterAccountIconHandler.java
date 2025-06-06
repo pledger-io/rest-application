@@ -15,24 +15,24 @@ import org.slf4j.LoggerFactory;
 @RequiresJpa
 @Transactional
 public class RegisterAccountIconHandler implements CommandHandler<RegisterAccountIconCommand> {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    RegisterAccountIconHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  RegisterAccountIconHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(RegisterAccountIconCommand command) {
-        log.info("[{}] - Processing icon registration event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(RegisterAccountIconCommand command) {
+    log.info("[{}] - Processing icon registration event", command.id());
 
-        entityManager.update(AccountJpa.class)
-                .set("imageFileToken", command.fileCode())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(AccountJpa.class)
+        .set("imageFileToken", command.fileCode())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

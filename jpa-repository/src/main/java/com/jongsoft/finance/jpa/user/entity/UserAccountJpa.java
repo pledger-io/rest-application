@@ -2,60 +2,57 @@ package com.jongsoft.finance.jpa.user.entity;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.util.Currency;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Entity
 @Table(name = "user_account")
 public class UserAccountJpa extends EntityJpa {
 
-    @Column(name = "username", unique = true, nullable = false)
-    private String username;
-    @Column(name = "password", nullable = false)
-    private String password;
+  @Column(name = "username", unique = true, nullable = false)
+  private String username;
 
-    private boolean twoFactorEnabled;
-    private String twoFactorSecret;
+  @Column(name = "password", nullable = false)
+  private String password;
 
-    private String theme;
+  private boolean twoFactorEnabled;
+  private String twoFactorSecret;
 
-    private Currency currency;
+  private String theme;
 
-    @Lob
-    @Column
-    private byte[] gravatar;
+  private Currency currency;
 
-    @JoinTable(name = "user_roles")
-    @ManyToMany(fetch = FetchType.LAZY)
-    private Set<RoleJpa> roles = new HashSet<>();
+  @Lob @Column private byte[] gravatar;
 
-    public UserAccountJpa() {
-        super();
-    }
+  @JoinTable(name = "user_roles")
+  @ManyToMany(fetch = FetchType.LAZY)
+  private Set<RoleJpa> roles = new HashSet<>();
 
-    @Builder
-    private UserAccountJpa(
-            String username,
-            String password,
-            boolean twoFactorEnabled,
-            String twoFactorSecret,
-            String theme,
-            Currency currency,
-            byte[] gravatar,
-            Set<RoleJpa> roles) {
-        this.username = username;
-        this.password = password;
-        this.twoFactorEnabled = twoFactorEnabled;
-        this.twoFactorSecret = twoFactorSecret;
-        this.theme = theme;
-        this.currency = currency;
-        this.gravatar = gravatar;
-        this.roles = roles;
-    }
+  public UserAccountJpa() {
+    super();
+  }
 
+  @Builder
+  private UserAccountJpa(
+      String username,
+      String password,
+      boolean twoFactorEnabled,
+      String twoFactorSecret,
+      String theme,
+      Currency currency,
+      byte[] gravatar,
+      Set<RoleJpa> roles) {
+    this.username = username;
+    this.password = password;
+    this.twoFactorEnabled = twoFactorEnabled;
+    this.twoFactorSecret = twoFactorSecret;
+    this.theme = theme;
+    this.currency = currency;
+    this.gravatar = gravatar;
+    this.roles = roles;
+  }
 }

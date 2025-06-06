@@ -12,29 +12,29 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 @Singleton
 public class ProcessContractLookupDelegate implements JavaDelegate, JavaBean {
 
-    private final ContractProvider contractProvider;
+  private final ContractProvider contractProvider;
 
-    ProcessContractLookupDelegate(ContractProvider contractProvider) {
-        this.contractProvider = contractProvider;
+  ProcessContractLookupDelegate(ContractProvider contractProvider) {
+    this.contractProvider = contractProvider;
+  }
+
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    log.debug(
+        "{}: Processing contract lookup '{}'",
+        execution.getCurrentActivityName(),
+        execution.getVariableLocal("name"));
+
+    final Contract contract;
+    if (execution.hasVariableLocal("name")) {
+      var name = (String) execution.getVariableLocal("name");
+      contract =
+          contractProvider.lookup(name).getOrSupply(() -> Contract.builder().name(name).build());
+    } else {
+      contract =
+          contractProvider.lookup((Long) execution.getVariableLocal("id")).getOrSupply(() -> null);
     }
 
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        log.debug("{}: Processing contract lookup '{}'",
-                execution.getCurrentActivityName(),
-                execution.getVariableLocal("name"));
-
-        final Contract contract;
-        if (execution.hasVariableLocal("name")) {
-            var name = (String) execution.getVariableLocal("name");
-            contract = contractProvider.lookup(name)
-                    .getOrSupply(() -> Contract.builder().name(name).build());
-        } else {
-            contract = contractProvider.lookup((Long) execution.getVariableLocal("id"))
-                    .getOrSupply(() -> null);
-        }
-
-        execution.setVariable("contract", contract);
-    }
-
+    execution.setVariable("contract", contract);
+  }
 }

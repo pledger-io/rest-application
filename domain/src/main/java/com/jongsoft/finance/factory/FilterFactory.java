@@ -4,16 +4,15 @@ import com.jongsoft.finance.providers.*;
 
 public interface FilterFactory {
 
-    AccountProvider.FilterCommand account();
+  AccountProvider.FilterCommand account();
 
-    TagProvider.FilterCommand tag();
+  TagProvider.FilterCommand tag();
 
-    TransactionProvider.FilterCommand transaction();
+  TransactionProvider.FilterCommand transaction();
 
-    ExpenseProvider.FilterCommand expense();
+  ExpenseProvider.FilterCommand expense();
 
-    CategoryProvider.FilterCommand category();
+  CategoryProvider.FilterCommand category();
 
-    TransactionScheduleProvider.FilterCommand schedule();
-
+  TransactionScheduleProvider.FilterCommand schedule();
 }

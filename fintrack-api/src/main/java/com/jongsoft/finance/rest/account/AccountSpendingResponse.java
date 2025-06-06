@@ -7,22 +7,21 @@ import io.micronaut.serde.annotation.Serdeable;
 @Serdeable.Serializable
 public class AccountSpendingResponse {
 
-    private final AccountProvider.AccountSpending wrapped;
+  private final AccountProvider.AccountSpending wrapped;
 
-    public AccountSpendingResponse(AccountProvider.AccountSpending wrapped) {
-        this.wrapped = wrapped;
-    }
+  public AccountSpendingResponse(AccountProvider.AccountSpending wrapped) {
+    this.wrapped = wrapped;
+  }
 
-    public AccountResponse getAccount() {
-        return new AccountResponse(wrapped.account());
-    }
+  public AccountResponse getAccount() {
+    return new AccountResponse(wrapped.account());
+  }
 
-    public double getTotal() {
-        return wrapped.total();
-    }
+  public double getTotal() {
+    return wrapped.total();
+  }
 
-    public double getAverage() {
-        return wrapped.average();
-    }
-
+  public double getAverage() {
+    return wrapped.average();
+  }
 }
