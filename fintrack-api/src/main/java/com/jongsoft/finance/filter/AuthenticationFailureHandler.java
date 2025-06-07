@@ -15,8 +15,6 @@ import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.Principal;
-
 @Produces
 @Singleton
 @Replaces(DefaultAuthorizationExceptionHandler.class)
@@ -32,7 +30,10 @@ public class AuthenticationFailureHandler
           "{}: {} - User {} does not have access based upon the roles {}.",
           request.getMethod(),
           request.getPath(),
-                    exception.getAuthentication().getAttributes().getOrDefault("email", exception.getAuthentication().getName()),
+          exception
+              .getAuthentication()
+              .getAttributes()
+              .getOrDefault("email", exception.getAuthentication().getName()),
           exception.getAuthentication().getRoles());
 
       return HttpResponse.status(HttpStatus.FORBIDDEN)

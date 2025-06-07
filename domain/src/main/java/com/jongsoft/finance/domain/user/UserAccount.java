@@ -31,7 +31,7 @@ public class UserAccount implements AggregateBase, Serializable {
 
   private Long id;
   private UserIdentifier username;
-    private String externalUserId;
+  private String externalUserId;
   private String password;
   private List<Role> roles;
 
@@ -48,14 +48,12 @@ public class UserAccount implements AggregateBase, Serializable {
     CreateUserCommand.userCreated(username, password);
   }
 
-    public UserAccount(String username, String externalUserId, List<String> roles) {
-        this.username = new UserIdentifier(username);
-        this.externalUserId = externalUserId;
-        this.roles = roles.stream()
-                .map(Role::new)
-                .collect(Collectors.toList());
-        CreateExternalUserCommand.externalUserCreated(username, externalUserId, roles);
-    }
+  public UserAccount(String username, String externalUserId, List<String> roles) {
+    this.username = new UserIdentifier(username);
+    this.externalUserId = externalUserId;
+    this.roles = roles.stream().map(Role::new).collect(Collectors.toList());
+    CreateExternalUserCommand.externalUserCreated(username, externalUserId, roles);
+  }
 
   /**
    * Change the password of the user to the provided new password.

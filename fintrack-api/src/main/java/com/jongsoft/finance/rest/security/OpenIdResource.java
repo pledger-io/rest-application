@@ -14,19 +14,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Authentication")
 public class OpenIdResource {
 
-    private final OpenIdConfiguration configuration;
+  private final OpenIdConfiguration configuration;
 
-    public OpenIdResource(OpenIdConfiguration openIdConfiguration) {
-        this.configuration = openIdConfiguration;
-    }
+  public OpenIdResource(OpenIdConfiguration openIdConfiguration) {
+    this.configuration = openIdConfiguration;
+  }
 
-    @Secured(SecurityRule.IS_ANONYMOUS)
-    @Get(value = "/.well-known/openid-connect")
-    @Operation(
-            summary = "Get the OpenId Connect",
-            description = "Use this operation to get the OpenId connect details."
-    )
-    public OpenIdConfiguration openIdConfiguration() {
-        return configuration;
-    }
+  @Secured(SecurityRule.IS_ANONYMOUS)
+  @Get(value = "/.well-known/openid-connect")
+  @Operation(
+      summary = "Get the OpenId Connect",
+      description = "Use this operation to get the OpenId connect details.")
+  public OpenIdConfiguration openIdConfiguration() {
+    return configuration;
+  }
 }

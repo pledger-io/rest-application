@@ -85,15 +85,16 @@ public class AuthenticationFilter implements HttpServerFilter {
   }
 
   private void handleAuthentication(Principal principal) {
-        var userName = principal.getName();
-        if (principal instanceof ServerAuthentication authentication) {
-            var hasEmail = authentication.getAttributes().containsKey("email");
-            if (hasEmail) {
-                userName = authentication.getAttributes().get("email").toString();
-                finTrack.createOathUser(userName, principal.getName(), List.copyOf(authentication.getRoles()));
-            }
-        }
-        log.trace("Authenticated user {}", userName);
-        eventPublisher.publishEvent(new InternalAuthenticationEvent(this, userName));
+    var userName = principal.getName();
+    if (principal instanceof ServerAuthentication authentication) {
+      var hasEmail = authentication.getAttributes().containsKey("email");
+      if (hasEmail) {
+        userName = authentication.getAttributes().get("email").toString();
+        finTrack.createOathUser(
+            userName, principal.getName(), List.copyOf(authentication.getRoles()));
+      }
+    }
+    log.trace("Authenticated user {}", userName);
+    eventPublisher.publishEvent(new InternalAuthenticationEvent(this, userName));
   }
 }
