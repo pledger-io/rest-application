@@ -1,0 +1,8 @@
+micronaut:
+  security:
+    token:
+      jwt:
+        jwks:
+          keycloak:
+            url: ${OPENID_URI}
+      roles-name: 'groups'

@@ -10,5 +10,5 @@ datasources:
 flyway:
   datasources:
     default:
-      locations: ["classpath:db/camunda/h2", "classpath:db/migration", "classpath:db/sample"]
+      locations: ["classpath:db/camunda/h2", "classpath:db/migration/mysql", "classpath:db/sample"]
       fail-on-missing-locations: true
