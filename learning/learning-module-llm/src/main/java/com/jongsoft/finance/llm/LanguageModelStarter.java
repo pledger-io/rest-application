@@ -13,75 +13,78 @@ import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.core.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Factory
 @AiEnabled
 class LanguageModelStarter {
-    private static final Logger log = LoggerFactory.getLogger(LanguageModelStarter.class);
+  private static final Logger log = LoggerFactory.getLogger(LanguageModelStarter.class);
 
-    @Bean
-    public ClassificationAgent transactionSupportAgent(
-            ChatLanguageModel model,
-            ToolSupplier aiTools,
-            @AiEnabled.ClassificationAgent @Nullable RetrievalAugmentor retrievalAugmentor) {
-        log.info("Setting up transaction support chat agent.");
-        var aiBuilder =  AiServices.builder(ClassificationAgent.class)
-                .chatLanguageModel(model)
-                .chatMemoryProvider(chatMemoryProvider());
+  @Bean
+  public ClassificationAgent transactionSupportAgent(
+      ChatLanguageModel model,
+      ToolSupplier aiTools,
+      @AiEnabled.ClassificationAgent @Nullable RetrievalAugmentor retrievalAugmentor) {
+    log.info("Setting up transaction support chat agent.");
+    var aiBuilder =
+        AiServices.builder(ClassificationAgent.class)
+            .chatLanguageModel(model)
+            .chatMemoryProvider(chatMemoryProvider());
 
-        if (aiTools.getTools().length > 0) {
-            aiBuilder.tools(aiTools.getTools());
-        }
-        Optional.ofNullable(retrievalAugmentor).ifPresent(aiBuilder::retrievalAugmentor);
+    if (aiTools.getTools().length > 0) {
+      aiBuilder.tools(aiTools.getTools());
+    }
+    Optional.ofNullable(retrievalAugmentor).ifPresent(aiBuilder::retrievalAugmentor);
 
-        return aiBuilder.build();
+    return aiBuilder.build();
+  }
+
+  @Bean
+  public TransactionExtractorAgent transactionExtractorAgent(
+      ChatLanguageModel model, ToolSupplier aiTools) {
+    log.info("Setting up transaction extractor chat agent.");
+    var aiBuilder =
+        AiServices.builder(TransactionExtractorAgent.class)
+            .chatLanguageModel(model)
+            .chatMemoryProvider(chatMemoryProvider());
+
+    if (aiTools.getTools().length > 0) {
+      aiBuilder.tools(aiTools.getTools());
     }
 
-    @Bean
-    public TransactionExtractorAgent transactionExtractorAgent(ChatLanguageModel model, ToolSupplier aiTools) {
-        log.info("Setting up transaction extractor chat agent.");
-        var aiBuilder = AiServices.builder(TransactionExtractorAgent.class)
-                .chatLanguageModel(model)
-                .chatMemoryProvider(chatMemoryProvider());
+    return aiBuilder.build();
+  }
 
-        if (aiTools.getTools().length > 0) {
-            aiBuilder.tools(aiTools.getTools());
-        }
+  @Bean
+  @AiEnabled.AiExecutor
+  public ExecutorService executorService() {
+    return Executors.newScheduledThreadPool(5);
+  }
 
-        return aiBuilder.build();
-    }
+  private ChatMemoryProvider chatMemoryProvider() {
+    return memoryId ->
+        MessageWindowChatMemory.builder()
+            .id(memoryId)
+            .maxMessages(10)
+            .chatMemoryStore(new InMemoryChatMemoryStore())
+            .build();
+  }
 
-    @Bean
-    @AiEnabled.AiExecutor
-    public ExecutorService executorService() {
-        return Executors.newScheduledThreadPool(5);
-    }
+  @Bean
+  @AiEnabled.ClassificationAgent
+  @Requires(property = "application.ai.engine", value = "open-ai")
+  Optional<RetrievalAugmentor> classificationAugmenter() {
+    return Optional.empty();
+  }
 
-    private ChatMemoryProvider chatMemoryProvider() {
-        return memoryId -> MessageWindowChatMemory.builder()
-                .id(memoryId)
-                .maxMessages(10)
-                .chatMemoryStore(new InMemoryChatMemoryStore())
-                .build();
-    }
-
-    @Bean
-    @AiEnabled.ClassificationAgent
-    @Requires(property = "application.ai.engine", value = "open-ai")
-    Optional<RetrievalAugmentor> classificationAugmenter() {
-        return Optional.empty();
-    }
-
-    @Bean
-    @Requires(property = "application.ai.engine", value = "open-ai")
-    ToolSupplier toolSupplier(List<AiTool> knownTools) {
-        return () -> knownTools.toArray(new AiTool[0]);
-    }
+  @Bean
+  @Requires(property = "application.ai.engine", value = "open-ai")
+  ToolSupplier toolSupplier(List<AiTool> knownTools) {
+    return () -> knownTools.toArray(new AiTool[0]);
+  }
 }

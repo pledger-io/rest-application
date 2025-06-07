@@ -6,7 +6,7 @@ import com.jongsoft.lang.control.Optional;
 
 public interface TransactionRuleGroupProvider {
 
-    Sequence<TransactionRuleGroup> lookup();
-    Optional<TransactionRuleGroup> lookup(String name);
+  Sequence<TransactionRuleGroup> lookup();
 
+  Optional<TransactionRuleGroup> lookup(String name);
 }

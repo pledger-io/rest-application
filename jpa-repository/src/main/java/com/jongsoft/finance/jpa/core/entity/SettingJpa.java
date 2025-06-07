@@ -10,24 +10,24 @@ import lombok.Getter;
 @Table(name = "setting")
 public class SettingJpa extends EntityJpa {
 
-    private String name;
+  private String name;
 
-    @Enumerated(EnumType.STRING)
-    private SettingType type;
+  @Enumerated(EnumType.STRING)
+  private SettingType type;
 
-    @Column(name = "setting_val")
-    private String value;
+  @Column(name = "setting_val")
+  private String value;
 
-    public SettingJpa() {
-        super();
-    }
+  public SettingJpa() {
+    super();
+  }
 
-    @Builder
-    protected SettingJpa(Long id, String name, SettingType type, String value) {
-        super(id);
+  @Builder
+  protected SettingJpa(Long id, String name, SettingType type, String value) {
+    super(id);
 
-        this.name = name;
-        this.type = type;
-        this.value = value;
-    }
+    this.name = name;
+    this.type = type;
+    this.value = value;
+  }
 }

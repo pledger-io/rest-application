@@ -7,17 +7,18 @@ import com.jongsoft.lang.collection.Sequence;
 
 public interface TransactionScheduleProvider extends DataProvider<ScheduledTransaction> {
 
-    interface FilterCommand {
-        FilterCommand contract(Sequence<EntityRef> contracts);
-        FilterCommand activeOnly();
-    }
+  interface FilterCommand {
+    FilterCommand contract(Sequence<EntityRef> contracts);
 
-    Sequence<ScheduledTransaction> lookup();
+    FilterCommand activeOnly();
+  }
 
-    ResultPage<ScheduledTransaction> lookup(FilterCommand filterCommand);
+  Sequence<ScheduledTransaction> lookup();
 
-    @Override
-    default boolean supports(Class<?> supportingClass) {
-        return ScheduledTransaction.class.equals(supportingClass);
-    }
+  ResultPage<ScheduledTransaction> lookup(FilterCommand filterCommand);
+
+  @Override
+  default boolean supports(Class<?> supportingClass) {
+    return ScheduledTransaction.class.equals(supportingClass);
+  }
 }

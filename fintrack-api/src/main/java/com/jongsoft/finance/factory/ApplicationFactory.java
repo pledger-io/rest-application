@@ -8,9 +8,8 @@ import io.micronaut.context.annotation.Factory;
 @Factory
 public class ApplicationFactory {
 
-    @Context
-    public FinTrack createApplicationDomain(Encoder hashingAlgorithm) {
-        return new FinTrack(hashingAlgorithm);
-    }
-
+  @Context
+  public FinTrack createApplicationDomain(Encoder hashingAlgorithm) {
+    return new FinTrack(hashingAlgorithm);
+  }
 }

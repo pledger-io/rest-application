@@ -16,23 +16,23 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class LimitScheduleHandler implements CommandHandler<LimitScheduleCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public LimitScheduleHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public LimitScheduleHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(LimitScheduleCommand command) {
-        log.info("[{}] - Processing schedule limit event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(LimitScheduleCommand command) {
+    log.info("[{}] - Processing schedule limit event", command.id());
 
-        entityManager.update(ScheduledTransactionJpa.class)
-                .set("start", command.start())
-                .set("end", command.end())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(ScheduledTransactionJpa.class)
+        .set("start", command.start())
+        .set("end", command.end())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

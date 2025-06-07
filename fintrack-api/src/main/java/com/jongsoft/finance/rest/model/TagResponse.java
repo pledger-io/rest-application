@@ -6,13 +6,13 @@ import io.micronaut.serde.annotation.Serdeable;
 @Serdeable.Serializable
 public class TagResponse {
 
-    private final Tag wrapped;
+  private final Tag wrapped;
 
-    public TagResponse(Tag wrapped) {
-        this.wrapped = wrapped;
-    }
+  public TagResponse(Tag wrapped) {
+    this.wrapped = wrapped;
+  }
 
-    public String getName() {
-        return wrapped.name();
-    }
+  public String getName() {
+    return wrapped.name();
+  }
 }

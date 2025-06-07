@@ -17,31 +17,31 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class CreateScheduleHandler implements CommandHandler<CreateScheduleCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public CreateScheduleHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public CreateScheduleHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(CreateScheduleCommand command) {
-        log.info("[{}] - Processing schedule create event", command.name());
-        var from = entityManager.getById(AccountJpa.class, command.from().getId());
-        var to = entityManager.getById(AccountJpa.class, command.destination().getId());
+  @Override
+  @BusinessEventListener
+  public void handle(CreateScheduleCommand command) {
+    log.info("[{}] - Processing schedule create event", command.name());
+    var from = entityManager.getById(AccountJpa.class, command.from().getId());
+    var to = entityManager.getById(AccountJpa.class, command.destination().getId());
 
-        var jpaEntity = ScheduledTransactionJpa.builder()
-                .user(from.getUser())
-                .source(from)
-                .destination(to)
-                .periodicity(command.schedule().periodicity())
-                .interval(command.schedule().interval())
-                .amount(command.amount())
-                .name(command.name())
-                .build();
+    var jpaEntity =
+        ScheduledTransactionJpa.builder()
+            .user(from.getUser())
+            .source(from)
+            .destination(to)
+            .periodicity(command.schedule().periodicity())
+            .interval(command.schedule().interval())
+            .amount(command.amount())
+            .name(command.name())
+            .build();
 
-        entityManager.persist(jpaEntity);
-    }
-
+    entityManager.persist(jpaEntity);
+  }
 }

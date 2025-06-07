@@ -11,39 +11,40 @@ import dev.samstevens.totp.secret.SecretGenerator;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Arrays;
 import java.util.HashSet;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
 @Transactional
 public class CreateUserHandler implements CommandHandler<CreateUserCommand> {
 
-    private final ReactiveEntityManager entityManager;
-    private final SecretGenerator secretGenerator;
+  private final ReactiveEntityManager entityManager;
+  private final SecretGenerator secretGenerator;
 
-    @Inject
-    public CreateUserHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-        secretGenerator = new DefaultSecretGenerator();
-    }
+  @Inject
+  public CreateUserHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+    secretGenerator = new DefaultSecretGenerator();
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(CreateUserCommand command) {
-        var entity = UserAccountJpa.builder()
-                .username(command.username())
-                .password(command.password())
-                .twoFactorSecret(secretGenerator.generate())
-                .theme("dark")
-                .roles(new HashSet<>(Arrays.asList(
+  @Override
+  @BusinessEventListener
+  public void handle(CreateUserCommand command) {
+    var entity =
+        UserAccountJpa.builder()
+            .username(command.username())
+            .password(command.password())
+            .twoFactorSecret(secretGenerator.generate())
+            .theme("dark")
+            .roles(
+                new HashSet<>(
+                    Arrays.asList(
                         RoleJpa.builder().id(1L).name("admin").build(),
                         RoleJpa.builder().id(2L).name("accountant").build())))
-                .build();
+            .build();
 
-        entityManager.persist(entity);
-    }
-
+    entityManager.persist(entity);
+  }
 }

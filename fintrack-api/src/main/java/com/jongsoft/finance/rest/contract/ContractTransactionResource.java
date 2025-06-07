@@ -15,7 +15,6 @@ import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.security.annotation.Secured;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import java.util.Optional;
 
 @Tag(name = "Contract")
@@ -23,35 +22,34 @@ import java.util.Optional;
 @Controller("/api/contracts/{contractId}/transactions")
 public class ContractTransactionResource {
 
-    private final FilterFactory filterFactory;
-    private final TransactionProvider transactionService;
-    private final SettingProvider settingProvider;
+  private final FilterFactory filterFactory;
+  private final TransactionProvider transactionService;
+  private final SettingProvider settingProvider;
 
-    public ContractTransactionResource(
-            FilterFactory filterFactory,
-            TransactionProvider transactionService,
-            SettingProvider settingProvider) {
-        this.filterFactory = filterFactory;
-        this.transactionService = transactionService;
-        this.settingProvider = settingProvider;
-    }
+  public ContractTransactionResource(
+      FilterFactory filterFactory,
+      TransactionProvider transactionService,
+      SettingProvider settingProvider) {
+    this.filterFactory = filterFactory;
+    this.transactionService = transactionService;
+    this.settingProvider = settingProvider;
+  }
 
-    @Get("{?page}")
-    @Operation(
-            summary = "Transaction overview",
-            description = "Paged listing of all transactions that belong to a contract"
-    )
-    ResultPageResponse<TransactionResponse> transactions(
-            @PathVariable long contractId,
-            @Nullable Integer page) {
-        var filter = filterFactory.transaction()
-                .ownAccounts()
-                .onlyIncome(false)
-                .contracts(Collections.List(new EntityRef(contractId)))
-                .page(Optional.ofNullable(page).orElse(0), settingProvider.getPageSize());
+  @Get("{?page}")
+  @Operation(
+      summary = "Transaction overview",
+      description = "Paged listing of all transactions that belong to a contract")
+  ResultPageResponse<TransactionResponse> transactions(
+      @PathVariable long contractId, @Nullable Integer page) {
+    var filter =
+        filterFactory
+            .transaction()
+            .ownAccounts()
+            .onlyIncome(false)
+            .contracts(Collections.List(new EntityRef(contractId)))
+            .page(Optional.ofNullable(page).orElse(0), settingProvider.getPageSize());
 
-        return new ResultPageResponse<>(transactionService.lookup(filter)
-                .map(TransactionResponse::new));
-    }
-
+    return new ResultPageResponse<>(
+        transactionService.lookup(filter).map(TransactionResponse::new));
+  }
 }

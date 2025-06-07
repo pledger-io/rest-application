@@ -16,28 +16,38 @@ import org.slf4j.LoggerFactory;
 @RequiresJpa
 @Transactional
 public class CreateAccountHandler implements CommandHandler<CreateAccountCommand> {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    CreateAccountHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  CreateAccountHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(CreateAccountCommand event) {
-        log.info("[{}] - Processing account create event", event.name());
+  @Override
+  @BusinessEventListener
+  public void handle(CreateAccountCommand event) {
+    log.info("[{}] - Processing account create event", event.name());
 
-        var toCreate = AccountJpa.builder()
-                .name(event.name())
-                .currency(entityManager.from(CurrencyJpa.class).fieldEq("code", event.currency()).singleResult().get())
-                .type(entityManager.from(AccountTypeJpa.class).fieldEq("label", event.type()).singleResult().get())
-                .user(entityManager.currentUser())
-                .build();
+    var toCreate =
+        AccountJpa.builder()
+            .name(event.name())
+            .currency(
+                entityManager
+                    .from(CurrencyJpa.class)
+                    .fieldEq("code", event.currency())
+                    .singleResult()
+                    .get())
+            .type(
+                entityManager
+                    .from(AccountTypeJpa.class)
+                    .fieldEq("label", event.type())
+                    .singleResult()
+                    .get())
+            .user(entityManager.currentUser())
+            .build();
 
-        entityManager.persist(toCreate);
-    }
-
+    entityManager.persist(toCreate);
+  }
 }

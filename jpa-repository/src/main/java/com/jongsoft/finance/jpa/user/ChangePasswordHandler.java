@@ -15,22 +15,22 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class ChangePasswordHandler implements CommandHandler<ChangePasswordCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public ChangePasswordHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public ChangePasswordHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(ChangePasswordCommand command) {
-        log.info("[{}] - Updating password for user", command.username());
+  @Override
+  @BusinessEventListener
+  public void handle(ChangePasswordCommand command) {
+    log.info("[{}] - Updating password for user", command.username());
 
-        entityManager.update(UserAccountJpa.class)
-                .set("password", command.password())
-                .fieldEq("username", command.username().email())
-                .execute();
-    }
-
+    entityManager
+        .update(UserAccountJpa.class)
+        .set("password", command.password())
+        .fieldEq("username", command.username().email())
+        .execute();
+  }
 }

@@ -4,6 +4,5 @@ import com.jongsoft.lang.collection.Sequence;
 
 public interface AccountTypeProvider {
 
-    Sequence<String> lookup(boolean hidden);
-
+  Sequence<String> lookup(boolean hidden);
 }

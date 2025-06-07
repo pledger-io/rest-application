@@ -17,39 +17,49 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class ReorderRuleGroupHandler implements CommandHandler<ReorderRuleGroupCommand> {
 
-    private final ReactiveEntityManager entityManager;
-    private final AuthenticationFacade authenticationFacade;
+  private final ReactiveEntityManager entityManager;
+  private final AuthenticationFacade authenticationFacade;
 
-    @Inject
-    public ReorderRuleGroupHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
-        this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
-    }
+  @Inject
+  public ReorderRuleGroupHandler(
+      ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+    this.entityManager = entityManager;
+    this.authenticationFacade = authenticationFacade;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(ReorderRuleGroupCommand command) {
-        log.info("[{}] - Processing rule group sorting event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(ReorderRuleGroupCommand command) {
+    log.info("[{}] - Processing rule group sorting event", command.id());
 
-        var jpaEntity = entityManager.getDetached(RuleGroupJpa.class, Collections.Map("id", command.id()));
+    var jpaEntity =
+        entityManager.getDetached(RuleGroupJpa.class, Collections.Map("id", command.id()));
 
-        var updateQuery = entityManager.update(RuleGroupJpa.class)
-                .fieldIn("id", RuleGroupJpa.class, subQuery -> subQuery
+    var updateQuery =
+        entityManager
+            .update(RuleGroupJpa.class)
+            .fieldIn(
+                "id",
+                RuleGroupJpa.class,
+                subQuery ->
+                    subQuery
                         .project("id")
                         .fieldEq("user.username", authenticationFacade.authenticated()));
-        if ((command.sort() - jpaEntity.getSort()) < 0) {
-            updateQuery.fieldBetween("sort", command.sort(), jpaEntity.getSort());
-            updateQuery.set("sort", Expressions.addition(Expressions.field("sort"), Expressions.value(1)));
-        } else {
-            updateQuery.fieldBetween("sort", jpaEntity.getSort(), command.sort());
-            updateQuery.set("sort", Expressions.addition(Expressions.field("sort"), Expressions.value(-1)));
-        }
-        updateQuery.execute();
-
-        entityManager.update(RuleGroupJpa.class)
-                .set("sort", command.sort())
-                .fieldEq("id", command.id())
-                .execute();
+    if ((command.sort() - jpaEntity.getSort()) < 0) {
+      updateQuery.fieldBetween("sort", command.sort(), jpaEntity.getSort());
+      updateQuery.set(
+          "sort", Expressions.addition(Expressions.field("sort"), Expressions.value(1)));
+    } else {
+      updateQuery.fieldBetween("sort", jpaEntity.getSort(), command.sort());
+      updateQuery.set(
+          "sort", Expressions.addition(Expressions.field("sort"), Expressions.value(-1)));
     }
+    updateQuery.execute();
 
+    entityManager
+        .update(RuleGroupJpa.class)
+        .set("sort", command.sort())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

@@ -14,24 +14,25 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class DeleteTagHandler implements CommandHandler<DeleteTagCommand> {
 
-    private final ReactiveEntityManager entityManager;
-    private final AuthenticationFacade authenticationFacade;
+  private final ReactiveEntityManager entityManager;
+  private final AuthenticationFacade authenticationFacade;
 
-    public DeleteTagHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
-        this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
-    }
+  public DeleteTagHandler(
+      ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+    this.entityManager = entityManager;
+    this.authenticationFacade = authenticationFacade;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(DeleteTagCommand command) {
-        log.info("[{}] - Processing tag deletion event", command.tag());
+  @Override
+  @BusinessEventListener
+  public void handle(DeleteTagCommand command) {
+    log.info("[{}] - Processing tag deletion event", command.tag());
 
-        entityManager.update(TagJpa.class)
-                .set("archived", true)
-                .fieldEq("name", command.tag())
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .execute();
-    }
-
+    entityManager
+        .update(TagJpa.class)
+        .set("archived", true)
+        .fieldEq("name", command.tag())
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .execute();
+  }
 }

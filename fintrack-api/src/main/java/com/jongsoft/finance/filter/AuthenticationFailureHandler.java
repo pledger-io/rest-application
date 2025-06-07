@@ -18,30 +18,33 @@ import org.slf4j.LoggerFactory;
 @Produces
 @Singleton
 @Replaces(DefaultAuthorizationExceptionHandler.class)
-public class AuthenticationFailureHandler implements ExceptionHandler<AuthorizationException, HttpResponse<JsonError>> {
+public class AuthenticationFailureHandler
+    implements ExceptionHandler<AuthorizationException, HttpResponse<JsonError>> {
 
-    private final Logger log = LoggerFactory.getLogger(AuthenticationFailureHandler.class);
+  private final Logger log = LoggerFactory.getLogger(AuthenticationFailureHandler.class);
 
-    @Override
-    public HttpResponse<JsonError> handle(HttpRequest request, AuthorizationException exception) {
-        if (exception.isForbidden()) {
-            log.warn("{}: {} - User {} does not have access based upon the roles {}.",
-                    request.getMethod(),
-                    request.getPath(),
-                    exception.getAuthentication().getName(),
-                    exception.getAuthentication().getRoles());
+  @Override
+  public HttpResponse<JsonError> handle(HttpRequest request, AuthorizationException exception) {
+    if (exception.isForbidden()) {
+      log.warn(
+          "{}: {} - User {} does not have access based upon the roles {}.",
+          request.getMethod(),
+          request.getPath(),
+          exception.getAuthentication().getName(),
+          exception.getAuthentication().getRoles());
 
-            return HttpResponse.status(HttpStatus.FORBIDDEN)
-                    .body(new JsonError("User does not have access based upon the roles"));
-        }
-
-        log.warn("{}: {} - User {} is not authenticated.",
-                request.getMethod(),
-                request.getPath(),
-                Control.Option(exception.getAuthentication())
-                        .map(Authentication::getName)
-                        .getOrSupply(() -> "Unknown"));
-
-        return HttpResponse.unauthorized();
+      return HttpResponse.status(HttpStatus.FORBIDDEN)
+          .body(new JsonError("User does not have access based upon the roles"));
     }
+
+    log.warn(
+        "{}: {} - User {} is not authenticated.",
+        request.getMethod(),
+        request.getPath(),
+        Control.Option(exception.getAuthentication())
+            .map(Authentication::getName)
+            .getOrSupply(() -> "Unknown"));
+
+    return HttpResponse.unauthorized();
+  }
 }

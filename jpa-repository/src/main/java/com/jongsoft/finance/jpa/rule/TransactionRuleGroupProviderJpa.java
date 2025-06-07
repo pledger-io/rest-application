@@ -18,49 +18,51 @@ import lombok.extern.slf4j.Slf4j;
 @Named("transactionRuleGroupProvider")
 public class TransactionRuleGroupProviderJpa implements TransactionRuleGroupProvider {
 
-    private final AuthenticationFacade authenticationFacade;
-    private final ReactiveEntityManager entityManager;
+  private final AuthenticationFacade authenticationFacade;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public TransactionRuleGroupProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
+  @Inject
+  public TransactionRuleGroupProviderJpa(
+      AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+    this.authenticationFacade = authenticationFacade;
+    this.entityManager = entityManager;
+  }
+
+  @Override
+  public Sequence<TransactionRuleGroup> lookup() {
+    log.trace("TransactionRuleGroup listing");
+
+    return entityManager
+        .from(RuleGroupJpa.class)
+        .fieldEq("archived", false)
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .stream()
+        .map(this::convert)
+        .collect(ReactiveEntityManager.sequenceCollector());
+  }
+
+  @Override
+  public Optional<TransactionRuleGroup> lookup(String name) {
+    log.trace("TransactionRuleGroup lookup with name: {}", name);
+
+    return entityManager
+        .from(RuleGroupJpa.class)
+        .fieldEq("archived", false)
+        .fieldEq("name", name)
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .singleResult()
+        .map(this::convert);
+  }
+
+  private TransactionRuleGroup convert(RuleGroupJpa source) {
+    if (source == null) {
+      return null;
     }
 
-    @Override
-    public Sequence<TransactionRuleGroup> lookup() {
-        log.trace("TransactionRuleGroup listing");
-
-        return entityManager.from(RuleGroupJpa.class)
-                .fieldEq("archived", false)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .stream()
-                .map(this::convert)
-                .collect(ReactiveEntityManager.sequenceCollector());
-    }
-
-    @Override
-    public Optional<TransactionRuleGroup> lookup(String name) {
-        log.trace("TransactionRuleGroup lookup with name: {}", name);
-
-        return entityManager.from(RuleGroupJpa.class)
-                .fieldEq("archived", false)
-                .fieldEq("name", name)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .map(this::convert);
-    }
-
-    private TransactionRuleGroup convert(RuleGroupJpa source) {
-        if (source == null) {
-            return null;
-        }
-
-        return TransactionRuleGroup.builder()
-                .id(source.getId())
-                .name(source.getName())
-                .sort(source.getSort())
-                .build();
-    }
-
+    return TransactionRuleGroup.builder()
+        .id(source.getId())
+        .name(source.getName())
+        .sort(source.getSort())
+        .build();
+  }
 }

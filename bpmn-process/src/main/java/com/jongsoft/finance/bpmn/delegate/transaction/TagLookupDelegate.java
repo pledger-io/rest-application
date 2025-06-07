@@ -15,33 +15,32 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 @Singleton
 public class TagLookupDelegate implements JavaDelegate, JavaBean {
 
-    private final CurrentUserProvider currentUserProvider;
-    private final TagProvider tagProvider;
+  private final CurrentUserProvider currentUserProvider;
+  private final TagProvider tagProvider;
 
-    TagLookupDelegate(CurrentUserProvider currentUserProvider, TagProvider tagProvider) {
-        this.currentUserProvider = currentUserProvider;
-        this.tagProvider = tagProvider;
-    }
+  TagLookupDelegate(CurrentUserProvider currentUserProvider, TagProvider tagProvider) {
+    this.currentUserProvider = currentUserProvider;
+    this.tagProvider = tagProvider;
+  }
 
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        log.debug("{}: Looking up tag {} for current user",
-                execution.getCurrentActivityName(),
-                execution.getVariableLocal("name"));
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    log.debug(
+        "{}: Looking up tag {} for current user",
+        execution.getCurrentActivityName(),
+        execution.getVariableLocal("name"));
 
-        var name = execution.<StringValue>getVariableLocalTyped("name").getValue();
-        var tag = tagProvider.lookup(name)
-                .getOrSupply(() -> create(name));
+    var name = execution.<StringValue>getVariableLocalTyped("name").getValue();
+    var tag = tagProvider.lookup(name).getOrSupply(() -> create(name));
 
-        execution.setVariableLocal("id", tag.name());
-    }
+    execution.setVariableLocal("id", tag.name());
+  }
 
-    private Tag create(String name) {
-        currentUserProvider.currentUser()
-                .createTag(name);
+  private Tag create(String name) {
+    currentUserProvider.currentUser().createTag(name);
 
-        return tagProvider.lookup(name)
-                .getOrThrow(() -> StatusException.internalError("Could not locate tag after creating it"));
-    }
-
+    return tagProvider
+        .lookup(name)
+        .getOrThrow(() -> StatusException.internalError("Could not locate tag after creating it"));
+  }
 }

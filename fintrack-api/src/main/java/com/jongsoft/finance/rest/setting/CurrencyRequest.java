@@ -7,16 +7,10 @@ import jakarta.validation.constraints.Size;
 
 @Serdeable.Deserializable
 public record CurrencyRequest(
-        @NotBlank
-        @Size(max = 255)
-        String name,
-        @NotBlank
-        @Size(min = 1, max = 3)
-        String code,
-        @NotNull
-        @Size(min = 1, max = 1)
-        String symbol) {
-    public char getSymbol() {
-        return symbol.charAt(0);
-    }
+    @NotBlank @Size(max = 255) String name,
+    @NotBlank @Size(min = 1, max = 3) String code,
+    @NotNull @Size(min = 1, max = 1) String symbol) {
+  public char getSymbol() {
+    return symbol.charAt(0);
+  }
 }

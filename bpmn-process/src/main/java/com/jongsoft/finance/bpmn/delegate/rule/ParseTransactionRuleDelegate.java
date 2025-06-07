@@ -13,29 +13,31 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 @Singleton
 public class ParseTransactionRuleDelegate implements JavaDelegate, JavaBean {
 
-    private final StorageService storageService;
-    private final ProcessMapper mapper;
+  private final StorageService storageService;
+  private final ProcessMapper mapper;
 
-    ParseTransactionRuleDelegate(StorageService storageService, ProcessMapper mapper) {
-        this.storageService = storageService;
-        this.mapper = mapper;
-    }
+  ParseTransactionRuleDelegate(StorageService storageService, ProcessMapper mapper) {
+    this.storageService = storageService;
+    this.mapper = mapper;
+  }
 
-    @Override
-    public void execute(DelegateExecution execution) throws Exception {
-        log.debug("{}: Processing raw json file in {}",
-                execution.getCurrentActivityName(),
-                execution.getActivityInstanceId());
+  @Override
+  public void execute(DelegateExecution execution) throws Exception {
+    log.debug(
+        "{}: Processing raw json file in {}",
+        execution.getCurrentActivityName(),
+        execution.getActivityInstanceId());
 
-        String storageToken = (String) execution.getVariableLocal("storageToken");
+    String storageToken = (String) execution.getVariableLocal("storageToken");
 
-        var rules = storageService.read(storageToken)
-                .map(String::new)
-                .map(json -> mapper.readSafe(json, RuleConfigJson.class))
-                .map(RuleConfigJson::getRules)
-                .getOrThrow(() -> new RuntimeException("Failed to read json file"));
+    var rules =
+        storageService
+            .read(storageToken)
+            .map(String::new)
+            .map(json -> mapper.readSafe(json, RuleConfigJson.class))
+            .map(RuleConfigJson::getRules)
+            .getOrThrow(() -> new RuntimeException("Failed to read json file"));
 
-        execution.setVariable("ruleLines", rules);
-    }
-
+    execution.setVariable("ruleLines", rules);
+  }
 }

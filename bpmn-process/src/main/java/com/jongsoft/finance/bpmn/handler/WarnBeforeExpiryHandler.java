@@ -14,28 +14,28 @@ import org.camunda.bpm.engine.ProcessEngine;
 @Singleton
 class WarnBeforeExpiryHandler implements CommandHandler<WarnBeforeExpiryCommand> {
 
-    private final ProcessEngine processEngine;
-    private final AuthenticationFacade authenticationFacade;
+  private final ProcessEngine processEngine;
+  private final AuthenticationFacade authenticationFacade;
 
-    WarnBeforeExpiryHandler(ProcessEngine processEngine, AuthenticationFacade authenticationFacade) {
-        this.processEngine = processEngine;
-        this.authenticationFacade = authenticationFacade;
-    }
+  WarnBeforeExpiryHandler(ProcessEngine processEngine, AuthenticationFacade authenticationFacade) {
+    this.processEngine = processEngine;
+    this.authenticationFacade = authenticationFacade;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(WarnBeforeExpiryCommand command) {
-        log.trace("[{}] - Starting the BPMN process to warn before contract expires.", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(WarnBeforeExpiryCommand command) {
+    log.trace("[{}] - Starting the BPMN process to warn before contract expires.", command.id());
 
-        var newDueDate = command.endDate().minusMonths(1);
+    var newDueDate = command.endDate().minusMonths(1);
 
-        processEngine.getRuntimeService()
-                .createProcessInstanceByKey(KnownProcesses.CONTRACT_WARN_EXPIRY)
-                .businessKey("contract_term_" + command.id())
-                .setVariable("warnAt", DateUtils.toDate(newDueDate))
-                .setVariable("username", authenticationFacade.authenticated())
-                .setVariable("contractId", command.id())
-                .execute();
-    }
-
+    processEngine
+        .getRuntimeService()
+        .createProcessInstanceByKey(KnownProcesses.CONTRACT_WARN_EXPIRY)
+        .businessKey("contract_term_" + command.id())
+        .setVariable("warnAt", DateUtils.toDate(newDueDate))
+        .setVariable("username", authenticationFacade.authenticated())
+        .setVariable("contractId", command.id())
+        .execute();
+  }
 }

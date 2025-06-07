@@ -15,23 +15,28 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton
 @RequiresJpa
 @Transactional
-public class RegisterSavingInstallmentHandler implements CommandHandler<RegisterSavingInstallmentCommand> {
+public class RegisterSavingInstallmentHandler
+    implements CommandHandler<RegisterSavingInstallmentCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public RegisterSavingInstallmentHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public RegisterSavingInstallmentHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(RegisterSavingInstallmentCommand command) {
-        log.info("[{}] - Incrementing allocation for saving goal.", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(RegisterSavingInstallmentCommand command) {
+    log.info("[{}] - Incrementing allocation for saving goal.", command.id());
 
-        entityManager.update(SavingGoalJpa.class)
-                .set("allocated", Expressions.addition(Expressions.field("allocated"), Expressions.value(command.amount())))
-                .fieldEq("id", command.id())
-                .execute();
-    }
+    entityManager
+        .update(SavingGoalJpa.class)
+        .set(
+            "allocated",
+            Expressions.addition(
+                Expressions.field("allocated"), Expressions.value(command.amount())))
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

@@ -16,30 +16,29 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TransactionRuleGroup implements AggregateBase {
 
-    private Long id;
-    private String name;
-    private int sort;
-    private boolean archived;
+  private Long id;
+  private String name;
+  private int sort;
+  private boolean archived;
 
-    @BusinessMethod
-    public void changeOrder(int sort) {
-        if (sort != this.sort) {
-            this.sort = sort;
-            ReorderRuleGroupCommand.reorderRuleGroupUpdated(id, sort);
-        }
+  @BusinessMethod
+  public void changeOrder(int sort) {
+    if (sort != this.sort) {
+      this.sort = sort;
+      ReorderRuleGroupCommand.reorderRuleGroupUpdated(id, sort);
     }
+  }
 
-    @BusinessMethod
-    public void rename(String name) {
-        if (!this.name.equalsIgnoreCase(name)) {
-            this.name = name;
-            RenameRuleGroupCommand.ruleGroupRenamed(id, name);
-        }
+  @BusinessMethod
+  public void rename(String name) {
+    if (!this.name.equalsIgnoreCase(name)) {
+      this.name = name;
+      RenameRuleGroupCommand.ruleGroupRenamed(id, name);
     }
+  }
 
-    @BusinessMethod
-    public void delete() {
-        RuleGroupDeleteCommand.ruleGroupDeleted(id);
-    }
-
+  @BusinessMethod
+  public void delete() {
+    RuleGroupDeleteCommand.ruleGroupDeleted(id);
+  }
 }

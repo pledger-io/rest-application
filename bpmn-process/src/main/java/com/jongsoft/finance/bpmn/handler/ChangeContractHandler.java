@@ -13,36 +13,39 @@ import org.camunda.bpm.engine.ProcessEngine;
 @Singleton
 class ChangeContractHandler implements CommandHandler<ChangeContractCommand> {
 
-    private final ProcessEngine processEngine;
+  private final ProcessEngine processEngine;
 
-    ChangeContractHandler(ProcessEngine processEngine) {
-        this.processEngine = processEngine;
+  ChangeContractHandler(ProcessEngine processEngine) {
+    this.processEngine = processEngine;
+  }
+
+  @Override
+  @BusinessEventListener
+  public void handle(ChangeContractCommand command) {
+    log.trace(
+        "[{}] - Updating existing BPMN flow for contract expired notification.", command.id());
+
+    var runningProcess =
+        processEngine
+            .getRuntimeService()
+            .createProcessInstanceQuery()
+            .processDefinitionKey(KnownProcesses.CONTRACT_WARN_EXPIRY)
+            .processInstanceBusinessKey("contract_term_" + command.id())
+            .singleResult();
+
+    if (runningProcess != null) {
+      var timerJob =
+          processEngine
+              .getManagementService()
+              .createJobQuery()
+              .processDefinitionKey(KnownProcesses.CONTRACT_WARN_EXPIRY)
+              .processInstanceId(runningProcess.getProcessInstanceId())
+              .singleResult();
+
+      var newDueDate = command.end().minusMonths(1);
+      processEngine
+          .getManagementService()
+          .setJobDuedate(timerJob.getId(), DateUtils.toDate(newDueDate));
     }
-
-    @Override
-    @BusinessEventListener
-    public void handle(ChangeContractCommand command) {
-        log.trace("[{}] - Updating existing BPMN flow for contract expired notification.", command.id());
-
-        var runningProcess = processEngine.getRuntimeService()
-                .createProcessInstanceQuery()
-                .processDefinitionKey(KnownProcesses.CONTRACT_WARN_EXPIRY)
-                .processInstanceBusinessKey("contract_term_" + command.id())
-                .singleResult();
-
-        if (runningProcess != null) {
-            var timerJob = processEngine.getManagementService()
-                    .createJobQuery()
-                    .processDefinitionKey(KnownProcesses.CONTRACT_WARN_EXPIRY)
-                    .processInstanceId(runningProcess.getProcessInstanceId())
-                    .singleResult();
-
-            var newDueDate = command.end().minusMonths(1);
-            processEngine.getManagementService()
-                    .setJobDuedate(
-                            timerJob.getId(),
-                            DateUtils.toDate(newDueDate));
-        }
-    }
-
+  }
 }

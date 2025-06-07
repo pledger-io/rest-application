@@ -14,25 +14,25 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class CreateTagHandler implements CommandHandler<CreateTagCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public CreateTagHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public CreateTagHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(CreateTagCommand command) {
-        log.info("[{}] - Processing tag creation event", command.tag());
+  @Override
+  @BusinessEventListener
+  public void handle(CreateTagCommand command) {
+    log.info("[{}] - Processing tag creation event", command.tag());
 
-        var toCreate = TagJpa.builder()
-                .name(command.tag())
-                .user(entityManager.currentUser())
-                .archived(false)
-                .build();
+    var toCreate =
+        TagJpa.builder()
+            .name(command.tag())
+            .user(entityManager.currentUser())
+            .archived(false)
+            .build();
 
-        entityManager.persist(toCreate);
-    }
-
+    entityManager.persist(toCreate);
+  }
 }

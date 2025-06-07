@@ -16,27 +16,39 @@ import org.slf4j.LoggerFactory;
 @RequiresJpa
 @Transactional
 public class RenameAccountHandler implements CommandHandler<RenameAccountCommand> {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    RenameAccountHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  RenameAccountHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(RenameAccountCommand command) {
-        log.info("[{}] - Processing account rename event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(RenameAccountCommand command) {
+    log.info("[{}] - Processing account rename event", command.id());
 
-        entityManager.update(AccountJpa.class)
-                .set("name", command.name())
-                .set("description", command.description())
-                .set("type", entityManager.from(AccountTypeJpa.class).fieldEq("label", command.type()).singleResult().get())
-                .set("currency", entityManager.from(CurrencyJpa.class).fieldEq("code", command.currency()).singleResult().get())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(AccountJpa.class)
+        .set("name", command.name())
+        .set("description", command.description())
+        .set(
+            "type",
+            entityManager
+                .from(AccountTypeJpa.class)
+                .fieldEq("label", command.type())
+                .singleResult()
+                .get())
+        .set(
+            "currency",
+            entityManager
+                .from(CurrencyJpa.class)
+                .fieldEq("code", command.currency())
+                .singleResult()
+                .get())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

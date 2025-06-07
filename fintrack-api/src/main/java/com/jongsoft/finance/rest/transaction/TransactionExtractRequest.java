@@ -5,6 +5,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Serdeable
 record TransactionExtractRequest(
-        @Schema(description = "The text to extract the transaction information from.")
-        String fromText) {
-}
+    @Schema(description = "The text to extract the transaction information from.")
+        String fromText) {}

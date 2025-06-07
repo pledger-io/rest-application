@@ -5,6 +5,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Serdeable.Deserializable
 public record ContractAttachmentRequest(
-        @Schema(description = "The file code of the attachment.", example = "1234567890")
-        String fileCode) {
-}
+    @Schema(description = "The file code of the attachment.", example = "1234567890")
+        String fileCode) {}

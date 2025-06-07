@@ -7,8 +7,7 @@ import jakarta.validation.constraints.NotNull;
 
 @Serdeable
 record GroupRenameRequest(
-        @NotNull
+    @NotNull
         @NotBlank
         @Schema(description = "The new name of the group", example = "My renamed group")
-        String name) {
-}
+        String name) {}

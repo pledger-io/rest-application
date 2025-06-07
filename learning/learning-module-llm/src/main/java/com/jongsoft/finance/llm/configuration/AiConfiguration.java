@@ -7,43 +7,44 @@ import io.micronaut.context.annotation.ConfigurationProperties;
 @ConfigurationProperties("application.ai")
 public class AiConfiguration {
 
-    private String engine;
-    private Double temperature;
-    private final OllamaConfiguration ollama;
-    private final OpenAiConfiguration openAI;
-    private final VectorConfiguration vectors;
+  private String engine;
+  private Double temperature;
+  private final OllamaConfiguration ollama;
+  private final OpenAiConfiguration openAI;
+  private final VectorConfiguration vectors;
 
-    AiConfiguration(OllamaConfiguration ollama, OpenAiConfiguration openAI, VectorConfiguration vectors) {
-        this.ollama = ollama;
-        this.openAI = openAI;
-        this.vectors = vectors;
-    }
+  AiConfiguration(
+      OllamaConfiguration ollama, OpenAiConfiguration openAI, VectorConfiguration vectors) {
+    this.ollama = ollama;
+    this.openAI = openAI;
+    this.vectors = vectors;
+  }
 
-    public String getEngine() {
-        return engine;
-    }
+  public String getEngine() {
+    return engine;
+  }
 
-    public void setEngine(String engine) {
-        this.engine = engine;
-    }
+  public void setEngine(String engine) {
+    this.engine = engine;
+  }
 
-    public Double getTemperature() {
-        return temperature;
-    }
+  public Double getTemperature() {
+    return temperature;
+  }
 
-    public void setTemperature(Double temperature) {
-        this.temperature = temperature;
-    }
+  public void setTemperature(Double temperature) {
+    this.temperature = temperature;
+  }
 
-    public OllamaConfiguration getOllama() {
-        return ollama;
-    }
+  public OllamaConfiguration getOllama() {
+    return ollama;
+  }
 
-    public OpenAiConfiguration getOpenAI() {
-        return openAI;
-    }
+  public OpenAiConfiguration getOpenAI() {
+    return openAI;
+  }
 
-    public VectorConfiguration getVectors() {
-        return vectors;
-    }
+  public VectorConfiguration getVectors() {
+    return vectors;
+  }
 }

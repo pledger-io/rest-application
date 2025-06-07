@@ -20,51 +20,54 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton
 public class ImportConfigurationProviderJpa implements ImportConfigurationProvider {
 
-    private final ReactiveEntityManager entityManager;
-    private final AuthenticationFacade authenticationFacade;
+  private final ReactiveEntityManager entityManager;
+  private final AuthenticationFacade authenticationFacade;
 
-    public ImportConfigurationProviderJpa(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
-        this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
+  public ImportConfigurationProviderJpa(
+      ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+    this.entityManager = entityManager;
+    this.authenticationFacade = authenticationFacade;
+  }
+
+  @Override
+  public Optional<BatchImportConfig> lookup(String name) {
+    log.trace("Import configuration lookup by name {}", name);
+
+    return entityManager
+        .from(ImportConfig.class)
+        .fieldEq("name", name)
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .singleResult()
+        .map(this::convert);
+  }
+
+  @Override
+  public Sequence<BatchImportConfig> lookup() {
+    log.trace("CSVConfiguration listing");
+
+    return entityManager
+        .from(ImportConfig.class)
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .stream()
+        .map(this::convert)
+        .collect(ReactiveEntityManager.sequenceCollector());
+  }
+
+  private BatchImportConfig convert(ImportConfig source) {
+    if (source == null) {
+      return null;
     }
 
-    @Override
-    public Optional<BatchImportConfig> lookup(String name) {
-        log.trace("Import configuration lookup by name {}", name);
-
-        return entityManager.from(ImportConfig.class)
-                .fieldEq("name", name)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .map(this::convert);
-    }
-
-    @Override
-    public Sequence<BatchImportConfig> lookup() {
-        log.trace("CSVConfiguration listing");
-
-        return entityManager.from(ImportConfig.class)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .stream()
-                .map(this::convert)
-                .collect(ReactiveEntityManager.sequenceCollector());
-    }
-
-    private BatchImportConfig convert(ImportConfig source) {
-        if (source == null) {
-            return null;
-        }
-
-        return BatchImportConfig.builder()
-                .id(source.getId())
-                .name(source.getName())
-                .type(source.getType())
-                .fileCode(source.getFileCode())
-                .user(UserAccount.builder()
-                        .id(source.getUser().getId())
-                        .username(new UserIdentifier(source.getUser().getUsername()))
-                        .build())
-                .build();
-    }
-
+    return BatchImportConfig.builder()
+        .id(source.getId())
+        .name(source.getName())
+        .type(source.getType())
+        .fileCode(source.getFileCode())
+        .user(
+            UserAccount.builder()
+                .id(source.getUser().getId())
+                .username(new UserIdentifier(source.getUser().getUsername()))
+                .build())
+        .build();
+  }
 }

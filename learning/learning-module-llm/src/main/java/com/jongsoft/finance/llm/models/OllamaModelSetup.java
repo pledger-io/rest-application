@@ -19,76 +19,79 @@ import dev.langchain4j.rag.RetrievalAugmentor;
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 @Factory
 @AiEnabled
 @Requires(property = "application.ai.engine", value = "ollama")
 class OllamaModelSetup {
-    private static final Logger log = LoggerFactory.getLogger(OllamaModelSetup.class);
+  private static final Logger log = LoggerFactory.getLogger(OllamaModelSetup.class);
 
-    private final AiConfiguration configuration;
-    private OllamaModelCard chosenModel;
+  private final AiConfiguration configuration;
+  private OllamaModelCard chosenModel;
 
-    OllamaModelSetup(AiConfiguration configuration) {
-        this.configuration = configuration;
-        retrieveModelInfo();
+  OllamaModelSetup(AiConfiguration configuration) {
+    this.configuration = configuration;
+    retrieveModelInfo();
+  }
+
+  @Bean
+  ToolSupplier toolSupplier(List<AiTool> knownTools) {
+    if (configuration.getOllama().isForceAugmentation() || noToolSupport()) {
+      return () -> new Object[0];
     }
 
-    @Bean
-    ToolSupplier toolSupplier(List<AiTool> knownTools) {
-        if (configuration.getOllama().isForceAugmentation() || noToolSupport()) {
-            return () -> new Object[0];
-        }
+    log.debug("Setting up Ai tools to be used with Ollama.");
+    return () -> knownTools.toArray(new AiTool[0]);
+  }
 
-        log.debug("Setting up Ai tools to be used with Ollama.");
-        return () -> knownTools.toArray(new AiTool[0]);
+  @Bean
+  @AiEnabled.ClassificationAgent
+  RetrievalAugmentor classificationAugmenter(
+      BudgetProvider budgetProvider, CategoryProvider categoryProvider, TagProvider tagProvider) {
+    if (configuration.getOllama().isForceAugmentation() || noToolSupport()) {
+      log.debug("Creating a classification augmenter since tools are not supported.");
+      return new ClassificationAugmenter(budgetProvider, categoryProvider, tagProvider);
     }
 
-    @Bean
-    @AiEnabled.ClassificationAgent
-    RetrievalAugmentor classificationAugmenter(BudgetProvider budgetProvider, CategoryProvider categoryProvider, TagProvider tagProvider) {
-        if (configuration.getOllama().isForceAugmentation() || noToolSupport()) {
-            log.debug("Creating a classification augmenter since tools are not supported.");
-            return new ClassificationAugmenter(budgetProvider, categoryProvider, tagProvider);
-        }
+    return (userMessage) ->
+        AugmentationResult.builder().chatMessage(userMessage.chatMessage()).build();
+  }
 
-        return (userMessage) -> AugmentationResult.builder()
-                .chatMessage(userMessage.chatMessage())
-                .build();
-    }
+  @Bean
+  ChatLanguageModel ollamaLanguageModel() {
+    log.info(
+        "Creating Ollama chat model with name {}, and temperature {}.",
+        configuration.getOllama().getModel(),
+        configuration.getTemperature());
+    return OllamaChatModel.builder()
+        .modelName(configuration.getOllama().getModel())
+        .baseUrl(configuration.getOllama().getUri())
+        .temperature(configuration.getTemperature())
+        .build();
+  }
 
-    @Bean
-    ChatLanguageModel ollamaLanguageModel() {
-        log.info("Creating Ollama chat model with name {}, and temperature {}.", configuration.getOllama().getModel(), configuration.getTemperature());
-        return OllamaChatModel.builder()
-                .modelName(configuration.getOllama().getModel())
-                .baseUrl(configuration.getOllama().getUri())
-                .temperature(configuration.getTemperature())
-                .build();
-    }
+  @Bean
+  EmbeddingModel embeddingModel() {
+    return OllamaEmbeddingModel.builder()
+        .baseUrl(configuration.getOllama().getUri())
+        .modelName(configuration.getOllama().getModel())
+        .build();
+  }
 
-    @Bean
-    EmbeddingModel embeddingModel() {
-        return OllamaEmbeddingModel.builder()
-                .baseUrl(configuration.getOllama().getUri())
-                .modelName(configuration.getOllama().getModel())
-                .build();
-    }
+  private boolean noToolSupport() {
+    return !chosenModel.getTemplate().contains(".Tools");
+  }
 
-    private boolean noToolSupport() {
-        return !chosenModel.getTemplate().contains(".Tools");
-    }
+  private void retrieveModelInfo() {
+    var modelsResponse =
+        OllamaModels.builder()
+            .baseUrl(configuration.getOllama().getUri())
+            .build()
+            .modelCard(configuration.getOllama().getModel());
 
-    private void retrieveModelInfo() {
-        var modelsResponse = OllamaModels.builder()
-                .baseUrl(configuration.getOllama().getUri())
-                .build()
-                .modelCard(configuration.getOllama().getModel());
-
-        chosenModel = modelsResponse.content();
-    }
+    chosenModel = modelsResponse.content();
+  }
 }

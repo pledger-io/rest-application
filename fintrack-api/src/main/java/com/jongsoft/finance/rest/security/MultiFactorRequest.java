@@ -7,12 +7,11 @@ import jakarta.validation.constraints.Size;
 
 @Serdeable.Deserializable
 record MultiFactorRequest(
-        @NotNull
+    @NotNull
         @Size(min = 4, max = 8)
         @Schema(
-                description = "The 2-factor verification code from a hardware device.",
-                required = true,
-                pattern = "[\\d]{6}",
-                implementation = String.class)
-        String verificationCode) {
-}
+            description = "The 2-factor verification code from a hardware device.",
+            required = true,
+            pattern = "[\\d]{6}",
+            implementation = String.class)
+        String verificationCode) {}

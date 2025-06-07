@@ -9,23 +9,22 @@ import lombok.Getter;
 @EqualsAndHashCode(of = {"id"})
 public class EntityRef implements AggregateBase {
 
-    private final Long id;
+  private final Long id;
 
-    public EntityRef(Long id) {
-        this.id = id;
+  public EntityRef(Long id) {
+    this.id = id;
+  }
+
+  @Serdeable
+  public record NamedEntity(long id, String name) implements AggregateBase {
+    @Override
+    public Long getId() {
+      return id;
     }
 
-    @Serdeable
-    public record NamedEntity(long id, String name) implements AggregateBase {
-        @Override
-        public Long getId() {
-            return id;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
+    @Override
+    public String toString() {
+      return name;
     }
-
+  }
 }

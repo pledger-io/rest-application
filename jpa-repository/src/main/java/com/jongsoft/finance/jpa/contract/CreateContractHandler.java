@@ -17,30 +17,30 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class CreateContractHandler implements CommandHandler<CreateContractCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public CreateContractHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public CreateContractHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(CreateContractCommand command) {
-        log.info("[{}] - Processing contract create event", command.name());
+  @Override
+  @BusinessEventListener
+  public void handle(CreateContractCommand command) {
+    log.info("[{}] - Processing contract create event", command.name());
 
-        var company = entityManager.getById(AccountJpa.class, command.companyId());
+    var company = entityManager.getById(AccountJpa.class, command.companyId());
 
-        var contract = ContractJpa.builder()
-                .name(command.name())
-                .startDate(command.start())
-                .endDate(command.end())
-                .description(command.description())
-                .company(company)
-                .user(company.getUser())
-                .build();
+    var contract =
+        ContractJpa.builder()
+            .name(command.name())
+            .startDate(command.start())
+            .endDate(command.end())
+            .description(command.description())
+            .company(company)
+            .user(company.getUser())
+            .build();
 
-        entityManager.persist(contract);
-    }
-
+    entityManager.persist(contract);
+  }
 }

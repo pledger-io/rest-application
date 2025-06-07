@@ -15,32 +15,35 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class CreateRuleGroupHandler implements CommandHandler<CreateRuleGroupCommand> {
 
-    private final ReactiveEntityManager entityManager;
-    private final AuthenticationFacade authenticationFacade;
+  private final ReactiveEntityManager entityManager;
+  private final AuthenticationFacade authenticationFacade;
 
-    @Inject
-    public CreateRuleGroupHandler(ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
-        this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
-    }
+  @Inject
+  public CreateRuleGroupHandler(
+      ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+    this.entityManager = entityManager;
+    this.authenticationFacade = authenticationFacade;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(CreateRuleGroupCommand command) {
-        log.info("[{}] - Processing rule group create event", command.name());
+  @Override
+  @BusinessEventListener
+  public void handle(CreateRuleGroupCommand command) {
+    log.info("[{}] - Processing rule group create event", command.name());
 
-        var currentMax = entityManager.from(RuleGroupJpa.class)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .fieldEq("archived", false)
-                .projectSingleValue(Integer.class, "max(sort)");
+    var currentMax =
+        entityManager
+            .from(RuleGroupJpa.class)
+            .fieldEq("user.username", authenticationFacade.authenticated())
+            .fieldEq("archived", false)
+            .projectSingleValue(Integer.class, "max(sort)");
 
-        var jpaEntity = RuleGroupJpa.builder()
-                .name(command.name())
-                .user(entityManager.currentUser())
-                .sort(currentMax.getOrSupply(() -> 1))
-                .build();
+    var jpaEntity =
+        RuleGroupJpa.builder()
+            .name(command.name())
+            .user(entityManager.currentUser())
+            .sort(currentMax.getOrSupply(() -> 1))
+            .build();
 
-        entityManager.persist(jpaEntity);
-    }
-
+    entityManager.persist(jpaEntity);
+  }
 }

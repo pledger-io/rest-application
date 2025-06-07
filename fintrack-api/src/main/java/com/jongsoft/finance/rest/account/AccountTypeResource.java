@@ -9,7 +9,6 @@ import io.micronaut.security.annotation.Secured;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Singleton;
-
 import java.util.List;
 
 @ApiDefaults
@@ -19,20 +18,18 @@ import java.util.List;
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class AccountTypeResource {
 
-    private final AccountTypeProvider accountTypeProvider;
+  private final AccountTypeProvider accountTypeProvider;
 
-    public AccountTypeResource(AccountTypeProvider accountTypeProvider) {
-        this.accountTypeProvider = accountTypeProvider;
-    }
+  public AccountTypeResource(AccountTypeProvider accountTypeProvider) {
+    this.accountTypeProvider = accountTypeProvider;
+  }
 
-    @Get
-    @Operation(
-            summary = "List types",
-            description = "Get a listing of all available account types in the system.",
-            operationId = "listTypes"
-    )
-    List<String> list() {
-        return accountTypeProvider.lookup(false).toJava();
-    }
-
+  @Get
+  @Operation(
+      summary = "List types",
+      description = "Get a listing of all available account types in the system.",
+      operationId = "listTypes")
+  List<String> list() {
+    return accountTypeProvider.lookup(false).toJava();
+  }
 }

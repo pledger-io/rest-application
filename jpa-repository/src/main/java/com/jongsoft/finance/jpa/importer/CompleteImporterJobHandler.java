@@ -9,9 +9,8 @@ import com.jongsoft.finance.messaging.commands.importer.CompleteImportJobCommand
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
@@ -19,22 +18,22 @@ import java.util.Date;
 @Transactional
 public class CompleteImporterJobHandler implements CommandHandler<CompleteImportJobCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public CompleteImporterJobHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public CompleteImporterJobHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(CompleteImportJobCommand command) {
-        log.info("[{}] - Processing import finished event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(CompleteImportJobCommand command) {
+    log.info("[{}] - Processing import finished event", command.id());
 
-        entityManager.update(ImportJpa.class)
-                .set("finished", new Date())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(ImportJpa.class)
+        .set("finished", new Date())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

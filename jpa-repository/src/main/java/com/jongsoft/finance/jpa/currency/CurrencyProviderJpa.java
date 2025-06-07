@@ -18,57 +18,56 @@ import lombok.extern.slf4j.Slf4j;
 @RequiresJpa
 public class CurrencyProviderJpa implements CurrencyProvider {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public CurrencyProviderJpa(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
+  @Inject
+  public CurrencyProviderJpa(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
+
+  public Optional<Currency> lookup(long id) {
+    log.trace("Currency lookup by id {}.", id);
+
+    return entityManager
+        .from(CurrencyJpa.class)
+        .fieldEq("id", id)
+        .singleResult()
+        .map(this::convert);
+  }
+
+  @Override
+  public Optional<Currency> lookup(String code) {
+    log.trace("Currency lookup by code {}.", code);
+
+    return entityManager
+        .from(CurrencyJpa.class)
+        .fieldEq("code", code)
+        .fieldEq("archived", false)
+        .singleResult()
+        .map(this::convert);
+  }
+
+  @Override
+  public Sequence<Currency> lookup() {
+    log.trace("Listing all currencies in the system.");
+
+    return entityManager.from(CurrencyJpa.class).fieldEq("archived", false).stream()
+        .map(this::convert)
+        .collect(Collections.collector(com.jongsoft.lang.Collections::List));
+  }
+
+  protected Currency convert(CurrencyJpa source) {
+    if (source == null) {
+      return null;
     }
 
-    public Optional<Currency> lookup(long id) {
-        log.trace("Currency lookup by id {}.", id);
-
-        return entityManager.from(CurrencyJpa.class)
-                .fieldEq("id", id)
-                .singleResult()
-                .map(this::convert);
-    }
-
-    @Override
-    public Optional<Currency> lookup(String code) {
-        log.trace("Currency lookup by code {}.", code);
-
-        return entityManager.from(CurrencyJpa.class)
-                .fieldEq("code", code)
-                .fieldEq("archived", false)
-                .singleResult()
-                .map(this::convert);
-    }
-
-    @Override
-    public Sequence<Currency> lookup() {
-        log.trace("Listing all currencies in the system.");
-
-        return entityManager.from(CurrencyJpa.class)
-                .fieldEq("archived", false)
-                .stream()
-                .map(this::convert)
-                .collect(Collections.collector(com.jongsoft.lang.Collections::List));
-    }
-
-    protected Currency convert(CurrencyJpa source) {
-        if (source == null) {
-            return null;
-        }
-
-        return Currency.builder()
-                .id(source.getId())
-                .name(source.getName())
-                .code(source.getCode())
-                .symbol(source.getSymbol())
-                .decimalPlaces(source.getDecimalPlaces())
-                .enabled(source.isEnabled())
-                .build();
-    }
-
+    return Currency.builder()
+        .id(source.getId())
+        .name(source.getName())
+        .code(source.getCode())
+        .symbol(source.getSymbol())
+        .decimalPlaces(source.getDecimalPlaces())
+        .enabled(source.isEnabled())
+        .build();
+  }
 }

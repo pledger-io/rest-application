@@ -13,35 +13,37 @@ import org.slf4j.LoggerFactory;
 
 @Factory
 public class MailDaemonFactory {
-    private final Logger log = LoggerFactory.getLogger(MailDaemonFactory.class);
+  private final Logger log = LoggerFactory.getLogger(MailDaemonFactory.class);
 
-    @Context
-    @Requirements({
-            @Requires(property = "application.mail", notEquals = "mock"),
-    })
-    @Replaces(MailDaemon.class)
-    public MailDaemon createMailDaemon(
-            @Value("${application.mail}") String mailImplementation,
-            EmailSender<?, ?> customMailer) {
-        log.info("Starting a real mail daemon using {}", mailImplementation);
-        return (recipient, template, mailProperties) -> {
-            log.debug("Sending email to {}", recipient);
+  @Context
+  @Requirements({
+    @Requires(property = "application.mail", notEquals = "mock"),
+  })
+  @Replaces(MailDaemon.class)
+  public MailDaemon createMailDaemon(
+      @Value("${application.mail}") String mailImplementation, EmailSender<?, ?> customMailer) {
+    log.info("Starting a real mail daemon using {}", mailImplementation);
+    return (recipient, template, mailProperties) -> {
+      log.debug("Sending email to {}", recipient);
 
-            var email = Email.builder()
-                    .to(recipient)
-                    .subject("Pleger.io: Welcome to the family!")
-                    .body(new MultipartBody(
-                            new TemplateBody<>(BodyType.HTML, new ModelAndView<>(template + ".html", mailProperties)),
-                            new TemplateBody<>(BodyType.TEXT, new ModelAndView<>(template + ".text", mailProperties)))
-                    );
+      var email =
+          Email.builder()
+              .to(recipient)
+              .subject("Pleger.io: Welcome to the family!")
+              .body(
+                  new MultipartBody(
+                      new TemplateBody<>(
+                          BodyType.HTML, new ModelAndView<>(template + ".html", mailProperties)),
+                      new TemplateBody<>(
+                          BodyType.TEXT, new ModelAndView<>(template + ".text", mailProperties))));
 
-            customMailer.send(email);
-        };
-    }
+      customMailer.send(email);
+    };
+  }
 
-    @Context
-    public MailDaemon createMailDaemon() {
-        log.info("Starting a mock mail daemon");
-        return (recipient, template, mailProperties) -> log.info("Sending email to {}", recipient);
-    }
+  @Context
+  public MailDaemon createMailDaemon() {
+    log.info("Starting a mock mail daemon");
+    return (recipient, template, mailProperties) -> log.info("Sending email to {}", recipient);
+  }
 }

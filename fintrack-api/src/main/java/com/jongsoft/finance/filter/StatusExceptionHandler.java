@@ -14,32 +14,31 @@ import org.slf4j.LoggerFactory;
 
 @Produces
 @Singleton
-public class StatusExceptionHandler implements ExceptionHandler<StatusException, HttpResponse<JsonError>> {
+public class StatusExceptionHandler
+    implements ExceptionHandler<StatusException, HttpResponse<JsonError>> {
 
-    private final Logger log = LoggerFactory.getLogger(StatusExceptionHandler.class);
+  private final Logger log = LoggerFactory.getLogger(StatusExceptionHandler.class);
 
-    @Override
-    public HttpResponse<JsonError> handle(HttpRequest request, StatusException exception) {
-        if (exception.getStatusCode() != 404) {
-            log.warn("{}: {} - Resource requested status {} with message: '{}'",
-                    request.getMethod(),
-                    request.getPath(),
-                    exception.getStatusCode(),
-                    exception.getMessage());
-        } else {
-            log.trace("{}: {} - Resource not found on server.", request.getMethod(), request.getPath());
-        }
-
-        var error = new JsonError(exception.getMessage());
-        error.link(Link.SELF, Link.of(request.getUri()));
-
-        if (exception.getLocalizationMessage() != null) {
-            error.link(Link.HELP, exception.getLocalizationMessage());
-        }
-
-        return HttpResponse
-                .status(HttpStatus.valueOf(exception.getStatusCode()))
-                .body(error);
+  @Override
+  public HttpResponse<JsonError> handle(HttpRequest request, StatusException exception) {
+    if (exception.getStatusCode() != 404) {
+      log.warn(
+          "{}: {} - Resource requested status {} with message: '{}'",
+          request.getMethod(),
+          request.getPath(),
+          exception.getStatusCode(),
+          exception.getMessage());
+    } else {
+      log.trace("{}: {} - Resource not found on server.", request.getMethod(), request.getPath());
     }
 
+    var error = new JsonError(exception.getMessage());
+    error.link(Link.SELF, Link.of(request.getUri()));
+
+    if (exception.getLocalizationMessage() != null) {
+      error.link(Link.HELP, exception.getLocalizationMessage());
+    }
+
+    return HttpResponse.status(HttpStatus.valueOf(exception.getStatusCode())).body(error);
+  }
 }

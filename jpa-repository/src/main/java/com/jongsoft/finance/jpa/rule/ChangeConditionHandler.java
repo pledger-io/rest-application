@@ -14,24 +14,24 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class ChangeConditionHandler implements CommandHandler<ChangeConditionCommand> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public ChangeConditionHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public ChangeConditionHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(ChangeConditionCommand command) {
-        log.info("[{}] - Updating rule condition", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(ChangeConditionCommand command) {
+    log.info("[{}] - Updating rule condition", command.id());
 
-        entityManager.update(RuleConditionJpa.class)
-                .set("operation", command.operation())
-                .set("condition", command.condition())
-                .set("field", command.field())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(RuleConditionJpa.class)
+        .set("operation", command.operation())
+        .set("condition", command.condition())
+        .set("field", command.field())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

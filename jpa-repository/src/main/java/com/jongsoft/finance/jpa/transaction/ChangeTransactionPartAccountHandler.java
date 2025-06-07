@@ -14,24 +14,25 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton
 @RequiresJpa
 @Transactional
-public class ChangeTransactionPartAccountHandler implements CommandHandler<ChangeTransactionPartAccount> {
+public class ChangeTransactionPartAccountHandler
+    implements CommandHandler<ChangeTransactionPartAccount> {
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public ChangeTransactionPartAccountHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  public ChangeTransactionPartAccountHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(ChangeTransactionPartAccount command) {
-        log.info("[{}] - Processing transaction account change", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(ChangeTransactionPartAccount command) {
+    log.info("[{}] - Processing transaction account change", command.id());
 
-        entityManager.update(TransactionJpa.class)
-                .set("account.id", command.accountId())
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(TransactionJpa.class)
+        .set("account.id", command.accountId())
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }

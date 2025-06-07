@@ -1,5 +1,6 @@
 plugins {
     id("io.micronaut.library") apply false
+    id("com.diffplug.spotless")
     id("maven-publish")
     id("java")
 
@@ -20,6 +21,7 @@ subprojects {
     apply(plugin = "java")
     apply(plugin = "maven-publish")
     apply(plugin = "jacoco")
+    apply(plugin = "com.diffplug.spotless")
 
     if (project.name != "fintrack-api") {
         apply(plugin = "io.micronaut.library")
@@ -32,6 +34,17 @@ subprojects {
     tasks.jacocoTestReport {
         reports {
             xml.required = true
+        }
+    }
+
+    spotless {
+        java {
+            target("src/main/java/**")
+            importOrder()
+            removeUnusedImports()
+            trimTrailingWhitespace()
+            endWithNewline()
+            googleJavaFormat()
         }
     }
 

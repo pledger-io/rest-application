@@ -16,43 +16,42 @@ import jakarta.inject.Singleton;
 @Named("expenseProvider")
 public class ExpenseProviderJpa implements ExpenseProvider {
 
-    private final AuthenticationFacade authenticationFacade;
-    private final ReactiveEntityManager entityManager;
+  private final AuthenticationFacade authenticationFacade;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    public ExpenseProviderJpa(AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
-        this.authenticationFacade = authenticationFacade;
-        this.entityManager = entityManager;
+  @Inject
+  public ExpenseProviderJpa(
+      AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+    this.authenticationFacade = authenticationFacade;
+    this.entityManager = entityManager;
+  }
+
+  @Override
+  public Optional<EntityRef.NamedEntity> lookup(long id) {
+    return entityManager
+        .from(ExpenseJpa.class)
+        .fieldEq("id", id)
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .singleResult()
+        .map(this::convert);
+  }
+
+  @Override
+  public ResultPage<EntityRef.NamedEntity> lookup(FilterCommand filter) {
+    if (filter instanceof ExpenseFilterCommand delegate) {
+      delegate.user(authenticationFacade.authenticated());
+
+      return entityManager.from(delegate).paged().map(this::convert);
     }
 
-    @Override
-    public Optional<EntityRef.NamedEntity> lookup(long id) {
-        return entityManager.from(ExpenseJpa.class)
-                .fieldEq("id", id)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .map(this::convert);
+    throw new IllegalStateException("Cannot use non JPA filter on ExpenseProviderJpa");
+  }
+
+  protected EntityRef.NamedEntity convert(ExpenseJpa source) {
+    if (source == null) {
+      return null;
     }
 
-    @Override
-    public ResultPage<EntityRef.NamedEntity> lookup(FilterCommand filter) {
-        if (filter instanceof ExpenseFilterCommand delegate) {
-            delegate.user(authenticationFacade.authenticated());
-
-            return entityManager.from(delegate)
-                    .paged()
-                    .map(this::convert);
-        }
-
-        throw new IllegalStateException("Cannot use non JPA filter on ExpenseProviderJpa");
-    }
-
-    protected EntityRef.NamedEntity convert(ExpenseJpa source) {
-        if (source == null) {
-            return null;
-        }
-
-        return new EntityRef.NamedEntity(source.getId(), source.getName());
-    }
-
+    return new EntityRef.NamedEntity(source.getId(), source.getName());
+  }
 }

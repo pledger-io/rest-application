@@ -15,24 +15,24 @@ import org.slf4j.LoggerFactory;
 @RequiresJpa
 @Transactional
 public class TerminateAccountHandler implements CommandHandler<TerminateAccountCommand> {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-    private final ReactiveEntityManager entityManager;
+  private final ReactiveEntityManager entityManager;
 
-    @Inject
-    TerminateAccountHandler(ReactiveEntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+  @Inject
+  TerminateAccountHandler(ReactiveEntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
-    @Override
-    @BusinessEventListener
-    public void handle(TerminateAccountCommand command) {
-        log.info("[{}] - Processing account terminate event", command.id());
+  @Override
+  @BusinessEventListener
+  public void handle(TerminateAccountCommand command) {
+    log.info("[{}] - Processing account terminate event", command.id());
 
-        entityManager.update(AccountJpa.class)
-                .set("archived", true)
-                .fieldEq("id", command.id())
-                .execute();
-    }
-
+    entityManager
+        .update(AccountJpa.class)
+        .set("archived", true)
+        .fieldEq("id", command.id())
+        .execute();
+  }
 }
