@@ -20,7 +20,7 @@ public class MultiFactorLoginTest {
 
         profileContext
                 .get(response -> response
-                        .body("theme", equalTo("dark"))
+                        .body("theme", equalTo("light"))
                         .body("currency", equalTo("EUR"))
                         .body("mfa", equalTo(false)))
                 .qrCode();
@@ -32,7 +32,7 @@ public class MultiFactorLoginTest {
                 .multiFactor()
                 .profile()
                 .get(response -> response
-                        .body("theme", equalTo("dark"))
+                        .body("theme", equalTo("light"))
                         .body("currency", equalTo("EUR"))
                         .body("mfa", equalTo(true)));
     }
