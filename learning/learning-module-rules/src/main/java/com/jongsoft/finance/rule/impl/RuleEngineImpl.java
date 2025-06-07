@@ -11,7 +11,6 @@ import com.jongsoft.finance.rule.matcher.NumberMatcher;
 import com.jongsoft.finance.rule.matcher.StringMatcher;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import java.util.List;
 
 @Singleton

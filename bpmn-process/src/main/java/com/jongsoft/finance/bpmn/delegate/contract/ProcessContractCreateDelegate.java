@@ -9,13 +9,12 @@ import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.serialized.ContractJson;
 import jakarta.inject.Singleton;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Hex;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
-
-import java.util.function.Function;
 
 @Slf4j
 @Singleton
