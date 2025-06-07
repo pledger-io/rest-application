@@ -79,9 +79,6 @@ public class RuleEngineImpl implements RuleEngine {
   }
 
   ChangeLocator findLocator(RuleColumn column) {
-    return locators.stream()
-            .filter(locator -> locator.supports(column))
-            .findFirst()
-            .orElseThrow();
+    return locators.stream().filter(locator -> locator.supports(column)).findFirst().orElseThrow();
   }
 }

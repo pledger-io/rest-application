@@ -60,7 +60,8 @@ public class ProcessCreateCategoryDelegate implements JavaDelegate, JavaBean {
               categoryProvider
                   .lookup(categoryJson.getLabel())
                   .ifPresent(
-                      category -> category.rename(categoryJson.getLabel(), categoryJson.getDescription()));
+                      category ->
+                          category.rename(categoryJson.getLabel(), categoryJson.getDescription()));
             });
   }
 }

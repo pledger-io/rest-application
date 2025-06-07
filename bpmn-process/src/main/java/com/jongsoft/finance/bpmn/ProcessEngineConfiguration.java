@@ -96,11 +96,7 @@ public class ProcessEngineConfiguration {
     PathMatchingResourcePatternResolver resourceLoader = new PathMatchingResourcePatternResolver();
     for (String extension : List.of("dmn", "cmmn", "bpmn")) {
       for (Resource resource :
-          resourceLoader.getResources(
-              CLASSPATH_ALL_URL_PREFIX
-                  + extension
-                  + "/*/*."
-                  + extension)) {
+          resourceLoader.getResources(CLASSPATH_ALL_URL_PREFIX + extension + "/*/*." + extension)) {
         log.info("Deploying model: {}", resource.getFilename());
         processEngine
             .getRepositoryService()
