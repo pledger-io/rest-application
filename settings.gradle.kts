@@ -8,7 +8,7 @@ pluginManagement {
         id("io.freefair.lombok").version("8.13.1")
         id("org.sonarqube").version("6.2.0.5505")
         id("org.openapi.generator").version("7.13.0")
-        id("com.diffplug.spotless").version("7.0.3")
+        id("com.diffplug.spotless").version("7.0.4")
 
         id("signing")
         id("maven-publish")
@@ -33,7 +33,7 @@ dependencyResolutionManagement {
             library("csv", "com.opencsv", "opencsv").version("5.11.1")
 
             // testing dependencies
-            version("junit.version", "5.13.0")
+            version("junit.version", "5.13.1")
             library("junit.jupiter", "org.junit.jupiter", "junit-jupiter-api").versionRef("junit.version")
             library("assertj","org.assertj", "assertj-core").version("3.27.3")
             library("mockito","org.mockito", "mockito-core").version("5.18.0")
