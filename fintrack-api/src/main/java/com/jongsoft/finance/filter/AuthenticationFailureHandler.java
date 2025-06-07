@@ -30,7 +30,10 @@ public class AuthenticationFailureHandler
           "{}: {} - User {} does not have access based upon the roles {}.",
           request.getMethod(),
           request.getPath(),
-          exception.getAuthentication().getName(),
+          exception
+              .getAuthentication()
+              .getAttributes()
+              .getOrDefault("email", exception.getAuthentication().getName()),
           exception.getAuthentication().getRoles());
 
       return HttpResponse.status(HttpStatus.FORBIDDEN)

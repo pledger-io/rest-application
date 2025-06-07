@@ -1,0 +1,16 @@
+micronaut:
+  security:
+    token:
+      jwt:
+        signatures:
+          jwks:
+            keycloak:
+              url: ${OPENID_URI}
+              key-type: RSA
+
+application:
+  openid:
+    client-id: ${OPENID_CLIENT:pledger-io}
+    client-secret: ${OPENID_SECRET:-}
+    authority: ${OPENID_AUTHORITY:-}
+

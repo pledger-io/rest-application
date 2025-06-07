@@ -9,11 +9,9 @@ import com.jongsoft.finance.domain.importer.BatchImportConfig;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
-import com.jongsoft.finance.messaging.commands.user.ChangeMultiFactorCommand;
-import com.jongsoft.finance.messaging.commands.user.ChangePasswordCommand;
-import com.jongsoft.finance.messaging.commands.user.ChangeUserSettingCommand;
-import com.jongsoft.finance.messaging.commands.user.CreateUserCommand;
+import com.jongsoft.finance.messaging.commands.user.*;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.collection.Collectors;
 import com.jongsoft.lang.collection.List;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -33,6 +31,7 @@ public class UserAccount implements AggregateBase, Serializable {
 
   private Long id;
   private UserIdentifier username;
+  private String externalUserId;
   private String password;
   private List<Role> roles;
 
@@ -47,6 +46,13 @@ public class UserAccount implements AggregateBase, Serializable {
     this.password = password;
     this.roles = Collections.List(new Role("accountant"));
     CreateUserCommand.userCreated(username, password);
+  }
+
+  public UserAccount(String username, String externalUserId, List<String> roles) {
+    this.username = new UserIdentifier(username);
+    this.externalUserId = externalUserId;
+    this.roles = roles.stream().map(Role::new).collect(Collectors.toList());
+    CreateExternalUserCommand.externalUserCreated(username, externalUserId, roles);
   }
 
   /**

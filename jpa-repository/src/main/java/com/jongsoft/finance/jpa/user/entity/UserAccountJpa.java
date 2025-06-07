@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Singular;
 
 @Getter
 @Entity
@@ -45,7 +46,7 @@ public class UserAccountJpa extends EntityJpa {
       String theme,
       Currency currency,
       byte[] gravatar,
-      Set<RoleJpa> roles) {
+      @Singular Set<RoleJpa> roles) {
     this.username = username;
     this.password = password;
     this.twoFactorEnabled = twoFactorEnabled;

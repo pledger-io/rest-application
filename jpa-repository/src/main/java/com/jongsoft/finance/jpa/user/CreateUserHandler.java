@@ -37,7 +37,7 @@ public class CreateUserHandler implements CommandHandler<CreateUserCommand> {
             .username(command.username())
             .password(command.password())
             .twoFactorSecret(secretGenerator.generate())
-            .theme("dark")
+            .theme("light")
             .roles(
                 new HashSet<>(
                     Arrays.asList(
