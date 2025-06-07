@@ -2,11 +2,14 @@ package com.jongsoft.finance.jpa.user.entity;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Singular;
+
 import java.util.Currency;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Builder;
-import lombok.Getter;
+
 
 @Getter
 @Entity
@@ -45,6 +48,7 @@ public class UserAccountJpa extends EntityJpa {
       String theme,
       Currency currency,
       byte[] gravatar,
+            @Singular
       Set<RoleJpa> roles) {
     this.username = username;
     this.password = password;

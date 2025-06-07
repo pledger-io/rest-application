@@ -48,6 +48,7 @@ dependencies {
     implementation(mn.micronaut.security.jwt)
     implementation(mn.micronaut.http.server.jetty)
     implementation(mn.micronaut.http.validation)
+    implementation(mn.micronaut.http.client)
     implementation(mn.micronaut.email.template)
     implementation(mn.micronaut.views.velocity)
 

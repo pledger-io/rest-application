@@ -1,5 +1,6 @@
 package com.jongsoft.finance.filter;
 
+import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.messaging.InternalAuthenticationEvent;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.event.ApplicationEventPublisher;
@@ -10,10 +11,12 @@ import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
 import io.micronaut.http.filter.ServerFilterPhase;
+import io.micronaut.security.authentication.ServerAuthentication;
 import io.micronaut.serde.ObjectMapper;
 import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
@@ -27,12 +30,15 @@ public class AuthenticationFilter implements HttpServerFilter {
 
   private final ApplicationEventPublisher<InternalAuthenticationEvent> eventPublisher;
   private final ObjectMapper objectMapper;
+  private final FinTrack finTrack;
 
   public AuthenticationFilter(
       ApplicationEventPublisher<InternalAuthenticationEvent> eventPublisher,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      FinTrack finTrack) {
     this.eventPublisher = eventPublisher;
     this.objectMapper = objectMapper;
+    this.finTrack = finTrack;
   }
 
   @Override
@@ -79,7 +85,15 @@ public class AuthenticationFilter implements HttpServerFilter {
   }
 
   private void handleAuthentication(Principal principal) {
-    log.trace("Authenticated user {}", principal.getName());
-    eventPublisher.publishEvent(new InternalAuthenticationEvent(this, principal.getName()));
+        var userName = principal.getName();
+        if (principal instanceof ServerAuthentication authentication) {
+            var hasEmail = authentication.getAttributes().containsKey("email");
+            if (hasEmail) {
+                userName = authentication.getAttributes().get("email").toString();
+                finTrack.createOathUser(userName, principal.getName(), List.copyOf(authentication.getRoles()));
+            }
+        }
+        log.trace("Authenticated user {}", userName);
+        eventPublisher.publishEvent(new InternalAuthenticationEvent(this, userName));
   }
 }
