@@ -11,6 +11,7 @@ import com.jongsoft.finance.rule.matcher.NumberMatcher;
 import com.jongsoft.finance.rule.matcher.StringMatcher;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
 import java.util.List;
 
 @Singleton
@@ -78,6 +79,9 @@ public class RuleEngineImpl implements RuleEngine {
   }
 
   ChangeLocator findLocator(RuleColumn column) {
-    return locators.stream().filter(locator -> locator.supports(column)).findFirst().get();
+    return locators.stream()
+            .filter(locator -> locator.supports(column))
+            .findFirst()
+            .orElseThrow();
   }
 }

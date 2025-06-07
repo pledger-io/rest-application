@@ -3,6 +3,8 @@ package com.jongsoft.finance.bpmn.delegate.contract;
 import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.core.JavaBean;
+import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.ContractProvider;
 import com.jongsoft.finance.serialized.ContractJson;
@@ -12,6 +14,8 @@ import org.bouncycastle.util.encoders.Hex;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
+
+import java.util.function.Function;
 
 @Slf4j
 @Singleton
@@ -47,34 +51,38 @@ public class ProcessContractCreateDelegate implements JavaDelegate, JavaBean {
 
     contractProvider
         .lookup(contractJson.getName())
-        .ifNotPresent(
-            () -> {
-              accountProvider
-                  .lookup(contractJson.getCompany())
-                  .map(
-                      account ->
-                          account.createContract(
-                              contractJson.getName(),
-                              contractJson.getDescription(),
-                              contractJson.getStart(),
-                              contractJson.getEnd()))
-                  .ifPresent(
-                      unsaved -> {
-                        contractProvider
-                            .lookup(contractJson.getName())
-                            .ifPresent(
-                                contract -> {
-                                  if (contractJson.getContract() != null) {
-                                    contract.registerUpload(
-                                        storageService.store(
-                                            Hex.decode(contractJson.getContract())));
-                                  }
+        .ifNotPresent(() -> createContract(contractJson));
+  }
 
-                                  if (contractJson.isTerminated()) {
-                                    contract.terminate();
-                                  }
-                                });
-                      });
+  private void createContract(ContractJson contractJson) {
+    accountProvider
+        .lookup(contractJson.getCompany())
+        .map(createContractForAccount(contractJson))
+        .ifPresent(_ -> adjustContract(contractJson));
+  }
+
+  private Function<Account, Contract> createContractForAccount(ContractJson contractJson) {
+    return account -> account.createContract(
+        contractJson.getName(),
+        contractJson.getDescription(),
+        contractJson.getStart(),
+        contractJson.getEnd());
+  }
+
+  private void adjustContract(ContractJson contractJson) {
+    contractProvider
+        .lookup(contractJson.getName())
+        .ifPresent(
+            contract -> {
+              if (contractJson.getContract() != null) {
+                contract.registerUpload(
+                    storageService.store(
+                        Hex.decode(contractJson.getContract())));
+              }
+
+              if (contractJson.isTerminated()) {
+                contract.terminate();
+              }
             });
   }
 }
