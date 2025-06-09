@@ -34,6 +34,15 @@ tasks.check {
     dependsOn("itTest")
 }
 
+tasks.processResources {
+    filesMatching("**/micronaut-banner.txt") {
+        filter { line ->
+            var updated = line.replace("\${application.version}", project.version.toString())
+            updated.replace("\${micronaut.version}", properties.get("micronautVersion").toString())
+        }
+    }
+}
+
 dependencies {
     annotationProcessor(mn.micronaut.openapi.asProvider())
     annotationProcessor(mn.micronaut.http.validation)
