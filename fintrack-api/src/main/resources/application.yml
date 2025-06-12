@@ -52,6 +52,11 @@ micronaut:
 
 application:
   mail: mock
+  ai:
+    vectors:
+      storageType: memory
+      pass-key: E5MC00ZWUxLWJiMm
+      storage: ${micronaut.application.storage.location}/vector_stores
 
 endpoints:
   health:

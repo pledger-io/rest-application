@@ -3,6 +3,7 @@ package com.jongsoft.finance.llm.stores;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.learning.SuggestionResult;
+import com.jongsoft.finance.learning.stores.PledgerEmbeddingStore;
 import com.jongsoft.finance.llm.AiEnabled;
 import com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand;
 import com.jongsoft.finance.messaging.notifications.TransactionCreated;
@@ -31,17 +32,20 @@ public class ClassificationEmbeddingStore {
 
   private final Logger logger = LoggerFactory.getLogger(ClassificationEmbeddingStore.class);
 
-  private final MicronautEmbeddingStore embeddingStore;
+  private final PledgerEmbeddingStore embeddingStore;
   private final EmbeddingModel embeddingModel;
+  private final EmbeddingStoreFiller embeddingStoreFiller;
 
   private final CurrentUserProvider currentUserProvider;
   private final TransactionProvider transactionProvider;
 
   ClassificationEmbeddingStore(
-      @AiEnabled.ClassificationAgent MicronautEmbeddingStore embeddingStore,
+      @AiEnabled.ClassificationAgent PledgerEmbeddingStore embeddingStore,
+      EmbeddingStoreFiller embeddingStoreFiller,
       TransactionProvider transactionProvider,
       CurrentUserProvider currentUserProvider) {
     this.embeddingStore = embeddingStore;
+    this.embeddingStoreFiller = embeddingStoreFiller;
     this.transactionProvider = transactionProvider;
     this.currentUserProvider = currentUserProvider;
     this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
@@ -80,7 +84,7 @@ public class ClassificationEmbeddingStore {
   void handleStartup(StartupEvent startupEvent) {
     logger.info("Initializing classification embedding store.");
     if (embeddingStore.shouldInitialize()) {
-      embeddingStore.embeddingStoreFiller().consumeTransactions(this::updateClassifications);
+      embeddingStoreFiller.consumeTransactions(this::updateClassifications);
     }
   }
 

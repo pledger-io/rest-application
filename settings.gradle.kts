@@ -53,6 +53,7 @@ dependencyResolutionManagement {
             library("model-openai", "dev.langchain4j", "langchain4j-open-ai").version(langchain4jVersion)
             library("model-ollama", "dev.langchain4j", "langchain4j-ollama").version(langchain4jVersion)
 
+            bundle("embeddings", listOf("core", "store", "retriever-sql"))
             bundle("langchain4j", listOf("core", "retriever-sql", "store", "model-openai", "model-ollama"))
         }
     }
@@ -66,6 +67,7 @@ include(
     "learning:learning-module",
     "learning:learning-module-rules",
     "learning:learning-module-llm",
+    "learning:learning-module-spending-patterns",
     "bpmn-process",
     "jpa-repository",
     "fintrack-api")

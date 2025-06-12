@@ -11,13 +11,11 @@ public class AiConfiguration {
   private Double temperature;
   private final OllamaConfiguration ollama;
   private final OpenAiConfiguration openAI;
-  private final VectorConfiguration vectors;
 
   AiConfiguration(
-      OllamaConfiguration ollama, OpenAiConfiguration openAI, VectorConfiguration vectors) {
+      OllamaConfiguration ollama, OpenAiConfiguration openAI) {
     this.ollama = ollama;
     this.openAI = openAI;
-    this.vectors = vectors;
   }
 
   public String getEngine() {
@@ -44,7 +42,4 @@ public class AiConfiguration {
     return openAI;
   }
 
-  public VectorConfiguration getVectors() {
-    return vectors;
-  }
 }

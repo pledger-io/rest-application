@@ -1,4 +1,4 @@
-package com.jongsoft.finance.llm.configuration;
+package com.jongsoft.finance.learning.config;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 
