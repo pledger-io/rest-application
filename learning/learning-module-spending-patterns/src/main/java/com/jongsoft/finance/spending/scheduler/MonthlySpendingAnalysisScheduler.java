@@ -35,8 +35,7 @@ public class MonthlySpendingAnalysisScheduler {
     this.transactionProvider = transactionProvider;
   }
 
-  //@Scheduled(cron = "0 0 2 1 * *")
-  @Scheduled(initialDelay = "2s")
+  @Scheduled(cron = "0 0 0 15 1-12 *")
   public void analyzeMonthlySpendingPatterns() {
     log.info("Starting monthly spending analysis...");
     userScopedExecutor.runForPerUser(this::analyzeForUser);

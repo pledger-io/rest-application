@@ -16,3 +16,8 @@ flyway:
     default:
       locations: ["classpath:db/camunda/psql", "classpath:db/migration/psql"]
       validate-on-migrate: false
+
+application:
+  ai:
+    vectors:
+      storage-type: ${VECTOR_TYPE:memory}

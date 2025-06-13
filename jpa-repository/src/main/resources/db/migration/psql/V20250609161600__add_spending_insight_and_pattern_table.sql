@@ -4,16 +4,16 @@
 -- Create spending_insights table
 create table spending_insights
 (
-    id            bigint      not null auto_increment,
-    type          varchar(50) not null,
-    category      varchar(255),
-    severity      varchar(50),
-    score double not null,
-    detected_date date,
-    message       varchar(1024),
-    year_month    varchar(7),
+    id             BIGSERIAL   not null,
+    type           varchar(50) not null,
+    category       varchar(255),
+    severity       varchar(50),
+    score decimal(22, 2) not null,
+    detected_date  date,
+    message        varchar(1024),
+    year_month     varchar(7),
     transaction_id bigint,
-    user_id       bigint      not null,
+    user_id        bigint      not null,
 
     constraint pk_spending_insights primary key (id),
     constraint fk_spending_insights_user foreign key (user_id) references user_account (id)
@@ -22,7 +22,7 @@ create table spending_insights
 -- Create spending_insight_metadata table
 create table spending_insight_metadata
 (
-    insight_id     bigint       not null,
+    insight_id     BIGSERIAL    not null,
     metadata_key   varchar(255) not null,
     metadata_value varchar(255),
 
@@ -33,10 +33,10 @@ create table spending_insight_metadata
 -- Create spending_patterns table
 create table spending_patterns
 (
-    id            bigint      not null auto_increment,
+    id            BIGSERIAL   not null,
     type          varchar(50) not null,
     category      varchar(255),
-    confidence double not null,
+    confidence decimal(22, 2) not null,
     detected_date date,
     year_month    varchar(7),
     user_id       bigint      not null,
@@ -48,7 +48,7 @@ create table spending_patterns
 -- Create spending_pattern_metadata table
 create table spending_pattern_metadata
 (
-    pattern_id     bigint       not null,
+    pattern_id     BIGSERIAL    not null,
     metadata_key   varchar(255) not null,
     metadata_value varchar(255),
 
