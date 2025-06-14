@@ -7,11 +7,10 @@ import com.jongsoft.finance.messaging.commands.insight.CompleteAnalyzeJob;
 import com.jongsoft.finance.messaging.commands.insight.CreateAnalyzeJob;
 import com.jongsoft.finance.providers.AnalyzeJobProvider;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-
 import java.time.YearMonth;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
@@ -25,8 +24,10 @@ class AnalyzeJobProviderJpa implements AnalyzeJobProvider {
 
   @Override
   public Optional<AnalyzeJob> first() {
-    return entityManager.from(AnalyzeJobJpa.class)
+    return entityManager
+        .from(AnalyzeJobJpa.class)
         .fieldEq("completed", false)
+        .orderBy("yearMonth", true)
         .limit(1)
         .singleResult()
         .map(this::convert)
@@ -49,7 +50,8 @@ class AnalyzeJobProviderJpa implements AnalyzeJobProvider {
   public void completeAnalyzeJob(CompleteAnalyzeJob command) {
     log.info("Completing analyze job for month {}.", command.month());
 
-    entityManager.update(AnalyzeJobJpa.class)
+    entityManager
+        .update(AnalyzeJobJpa.class)
         .fieldEq("yearMonth", command.month().toString())
         .fieldEq("completed", false)
         .set("completed", true)

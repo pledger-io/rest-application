@@ -1,12 +1,11 @@
 package com.jongsoft.finance.domain.insight;
 
 import com.jongsoft.finance.messaging.commands.insight.CreateSpendingInsight;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Objects;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 public class SpendingInsight implements Insight {
@@ -64,6 +63,7 @@ public class SpendingInsight implements Insight {
 
   @Override
   public String toString() {
-    return "[%s] %s (severity:%s, detectedDate:%s): %s".formatted(type, category, severity, detectedDate, transactionId);
+    return "[%s] %s (severity:%s, detectedDate:%s): %s"
+        .formatted(type, category, severity, detectedDate, transactionId);
   }
 }

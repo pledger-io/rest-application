@@ -14,12 +14,11 @@ import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ReadOnly
@@ -32,8 +31,7 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
   private final ReactiveEntityManager entityManager;
 
   public SpendingPatternProviderJpa(
-      AuthenticationFacade authenticationFacade,
-      ReactiveEntityManager entityManager) {
+      AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
     this.authenticationFacade = authenticationFacade;
     this.entityManager = entityManager;
   }
@@ -84,9 +82,7 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
 
     if (filter instanceof SpendingPatternFilterCommand delegate) {
       delegate.user(authenticationFacade.authenticated());
-      return entityManager.from(delegate)
-          .paged()
-          .map(this::convert);
+      return entityManager.from(delegate).paged().map(this::convert);
     }
 
     throw new IllegalStateException("Cannot use non-JPA filter on SpendingPatternProviderJpa");
@@ -106,15 +102,16 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
     }
 
     // Create the JPA entity
-    SpendingPatternJpa jpa = SpendingPatternJpa.builder()
-        .type(pattern.getType())
-        .category(pattern.getCategory())
-        .confidence(pattern.getConfidence())
-        .detectedDate(pattern.getDetectedDate())
-        .yearMonth(YearMonth.from(pattern.getDetectedDate()))
-        .metadata(metadata)
-        .user(entityManager.currentUser())
-        .build();
+    SpendingPatternJpa jpa =
+        SpendingPatternJpa.builder()
+            .type(pattern.getType())
+            .category(pattern.getCategory())
+            .confidence(pattern.getConfidence())
+            .detectedDate(pattern.getDetectedDate())
+            .yearMonth(YearMonth.from(pattern.getDetectedDate()))
+            .metadata(metadata)
+            .user(entityManager.currentUser())
+            .build();
 
     // Save the entity
     entityManager.persist(jpa);
@@ -126,8 +123,9 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
     }
 
     // Convert metadata from string values to objects
-    Map<String, Object> metadata = source.getMetadata().entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    Map<String, Object> metadata =
+        source.getMetadata().entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     return SpendingPattern.builder()
         .type(source.getType())

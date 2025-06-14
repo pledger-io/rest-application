@@ -12,8 +12,7 @@ public class AiConfiguration {
   private final OllamaConfiguration ollama;
   private final OpenAiConfiguration openAI;
 
-  AiConfiguration(
-      OllamaConfiguration ollama, OpenAiConfiguration openAI) {
+  AiConfiguration(OllamaConfiguration ollama, OpenAiConfiguration openAI) {
     this.ollama = ollama;
     this.openAI = openAI;
   }
@@ -41,5 +40,4 @@ public class AiConfiguration {
   public OpenAiConfiguration getOpenAI() {
     return openAI;
   }
-
 }

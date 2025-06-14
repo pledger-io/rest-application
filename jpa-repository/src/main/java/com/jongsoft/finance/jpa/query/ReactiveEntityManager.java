@@ -8,15 +8,13 @@ import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.collection.support.Collections;
 import jakarta.inject.Singleton;
 import jakarta.persistence.EntityManager;
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.stream.Collector;
+import lombok.Getter;
 
 @Singleton
 public class ReactiveEntityManager {
-  @Getter
-  private final EntityManager entityManager;
+  @Getter private final EntityManager entityManager;
   private final AuthenticationFacade authenticationFacade;
 
   ReactiveEntityManager(EntityManager entityManager, AuthenticationFacade authenticationFacade) {

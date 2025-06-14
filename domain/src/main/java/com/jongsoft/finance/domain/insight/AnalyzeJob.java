@@ -3,12 +3,11 @@ package com.jongsoft.finance.domain.insight;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.messaging.commands.insight.CompleteAnalyzeJob;
 import com.jongsoft.finance.messaging.commands.insight.CreateAnalyzeJob;
+import java.time.YearMonth;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.YearMonth;
-import java.util.UUID;
 
 @Getter
 @Builder
@@ -29,12 +28,10 @@ public class AnalyzeJob {
   public void complete() {
     if (completed) {
       throw StatusException.badRequest(
-          "Cannot complete an analyze job that has already completed.",
-          "AnalyzeJob.completed");
+          "Cannot complete an analyze job that has already completed.", "AnalyzeJob.completed");
     }
 
     completed = true;
     CompleteAnalyzeJob.completeAnalyzeJob(month);
   }
-
 }

@@ -5,7 +5,6 @@ import com.jongsoft.finance.domain.insight.SpendingPattern;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -17,26 +16,37 @@ import java.util.stream.Collectors;
 public class SeasonalPattern implements Pattern {
 
   @Override
-  public Optional<SpendingPattern> detect(Transaction transaction, List<EmbeddingMatch<TextSegment>> matches) {
+  public Optional<SpendingPattern> detect(
+      Transaction transaction, List<EmbeddingMatch<TextSegment>> matches) {
+    if (matches.isEmpty()) {
+      return Optional.empty();
+    }
+
     int currentMonth = transaction.getDate().getMonthValue();
-    var transactionsByMonth = matches.stream()
-        .map(match -> LocalDate.parse(Objects.requireNonNull(match.embedded().metadata().getString("date"))))
-        .map(LocalDate::getMonthValue)
-        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+    var transactionsByMonth =
+        matches.stream()
+            .map(
+                match ->
+                    LocalDate.parse(
+                        Objects.requireNonNull(match.embedded().metadata().getString("date"))))
+            .map(LocalDate::getMonthValue)
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+    if (transactionsByMonth.isEmpty()) {
+      return Optional.empty();
+    }
 
     var numberInMonth = transactionsByMonth.getOrDefault(currentMonth, 0L);
     var avgPerMonth = matches.size() / transactionsByMonth.size();
-    if (isSignificantlyMoreThanAverage(numberInMonth,avgPerMonth)) {
-      return Optional.of(SpendingPattern
-          .builder()
-          .type(PatternType.SEASONAL)
-          .category(transaction.getCategory())
-          .detectedDate(transaction.getDate().withDayOfMonth(1))
-          .confidence(.75)
-          .metadata(Map.of(
-              "season", getCurrentSeason(transaction.getDate())
-          ))
-          .build());
+    if (isSignificantlyMoreThanAverage(numberInMonth, avgPerMonth)) {
+      return Optional.of(
+          SpendingPattern.builder()
+              .type(PatternType.SEASONAL)
+              .category(transaction.getCategory())
+              .detectedDate(transaction.getDate().withDayOfMonth(1))
+              .confidence(.75)
+              .metadata(Map.of("season", getCurrentSeason(transaction.getDate())))
+              .build());
     }
 
     return Optional.empty();

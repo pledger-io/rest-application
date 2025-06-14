@@ -5,10 +5,9 @@ import com.jongsoft.finance.security.Encryption;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.core.annotation.Nullable;
-
-import javax.sql.DataSource;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import javax.sql.DataSource;
 
 @Factory
 public class EmbeddingStoreFactory {
@@ -18,8 +17,7 @@ public class EmbeddingStoreFactory {
   private final Encryption encryption;
 
   public EmbeddingStoreFactory(
-      VectorConfiguration vectorConfiguration,
-      @Nullable DataSource dataSource) {
+      VectorConfiguration vectorConfiguration, @Nullable DataSource dataSource) {
     this.vectorConfiguration = vectorConfiguration;
     this.dataSource = dataSource;
     this.encryption = new Encryption();
@@ -36,8 +34,6 @@ public class EmbeddingStoreFactory {
     }
 
     return new ContextAwareInMemoryStore(
-        storagePath.resolve(purpose + ".store"),
-        encryption,
-        vectorConfiguration.getPassKey());
+        storagePath.resolve(purpose + ".store"), encryption, vectorConfiguration.getPassKey());
   }
 }

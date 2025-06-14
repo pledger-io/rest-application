@@ -3,6 +3,7 @@ package com.jongsoft.finance.llm.stores;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.learning.SuggestionResult;
+import com.jongsoft.finance.learning.stores.EmbeddingStoreFiller;
 import com.jongsoft.finance.learning.stores.PledgerEmbeddingStore;
 import com.jongsoft.finance.llm.AiEnabled;
 import com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand;

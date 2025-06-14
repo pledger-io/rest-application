@@ -5,10 +5,9 @@ import com.jongsoft.finance.messaging.InternalAuthenticationEvent;
 import com.jongsoft.finance.providers.UserProvider;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import jakarta.inject.Singleton;
-import org.slf4j.MDC;
-
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+import org.slf4j.MDC;
 
 @Singleton
 public final class UserScopedExecutor {
@@ -38,5 +37,4 @@ public final class UserScopedExecutor {
     runnable.run();
     MDC.remove("correlationId");
   }
-
 }

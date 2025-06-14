@@ -3,7 +3,6 @@ package com.jongsoft.finance.spending.detector.anomaly;
 import com.jongsoft.finance.domain.insight.InsightType;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.domain.transaction.Transaction;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,7 +11,8 @@ public class UnusualAmount implements Anomaly {
   private static final double SENSITIVITY = 0.15;
 
   @Override
-  public Optional<SpendingInsight> detect(Transaction transaction, UserCategoryStatistics statistics) {
+  public Optional<SpendingInsight> detect(
+      Transaction transaction, UserCategoryStatistics statistics) {
     var typicalAmount = statistics.amounts().get(transaction.getBudget());
     if (typicalAmount == null) {
       return Optional.empty();
@@ -42,11 +42,12 @@ public class UnusualAmount implements Anomaly {
               .detectedDate(transaction.getDate())
               .message(generateMessage(transactionAmount, mean))
               .transactionId(transaction.getId())
-              .metadata(Map.of(
-                  "amount", transactionAmount,
-                  "z_score", zScore,
-                  "mean", mean,
-                  "std_dev", stdDev))
+              .metadata(
+                  Map.of(
+                      "amount", transactionAmount,
+                      "z_score", zScore,
+                      "mean", mean,
+                      "std_dev", stdDev))
               .build());
     }
 

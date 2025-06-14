@@ -7,10 +7,9 @@ import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.scheduling.annotation.Scheduled;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Singleton;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-
-import java.util.UUID;
 
 @Slf4j
 @Singleton
@@ -35,18 +34,25 @@ public class RunAnalyzeJobScheduler {
   @Transactional
   @Scheduled(cron = "*/5 * * * * *")
   public void analyzeMonthlySpendingPatterns() {
+    MDC.put("correlationId", UUID.randomUUID().toString());
     var jobToRun = analyzeJobProvider.first();
     if (jobToRun.isPresent()) {
+      var success = true;
       var analyzeJob = jobToRun.get();
       log.info("Scheduling analyze job {}.", analyzeJob.getMonth());
       for (var user : userProvider.lookup()) {
-        MDC.put("correlationId", UUID.randomUUID().toString());
-        eventPublisher.publishEvent(new InternalAuthenticationEvent(this, user.getUsername().email()));
-        analysisRunner.analyzeForUser(analyzeJob.getMonth());
-        MDC.remove("correlationId");
+        eventPublisher.publishEvent(
+            new InternalAuthenticationEvent(this, user.getUsername().email()));
+        success &= analysisRunner.analyzeForUser(analyzeJob.getMonth());
       }
-      analyzeJob.complete();
-    }
-  }
 
+      if (success) {
+        log.debug("Completed analysis for month {}.", analyzeJob.getMonth());
+        analyzeJob.complete();
+      } else {
+        log.warn("Failed to complete analysis for month {}.", analyzeJob.getMonth());
+      }
+    }
+    MDC.remove("correlationId");
+  }
 }

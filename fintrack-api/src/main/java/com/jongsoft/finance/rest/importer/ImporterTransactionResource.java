@@ -21,10 +21,9 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 @Tag(name = "Importer")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
@@ -89,17 +88,13 @@ public class ImporterTransactionResource {
               schema = @Schema(implementation = String.class)))
   void runRuleAutomation(@PathVariable String batchSlug) {
     var page = 0;
-    var searchFilter = filterFactory.transaction()
-        .importSlug(batchSlug)
-        .page(page, 250);
+    var searchFilter = filterFactory.transaction().importSlug(batchSlug).page(page, 250);
 
     var result = transactionProvider.lookup(searchFilter);
     while (true) {
-      log.info("Processing page {} of {} transactions for applying rules.", page + 1, result.pages());
-      result.content()
-          .stream()
-          .parallel()
-          .forEach(this::processTransaction);
+      log.info(
+          "Processing page {} of {} transactions for applying rules.", page + 1, result.pages());
+      result.content().stream().parallel().forEach(this::processTransaction);
       if (!result.hasNext()) {
         break;
       }

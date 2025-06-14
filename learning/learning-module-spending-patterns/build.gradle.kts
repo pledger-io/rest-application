@@ -31,5 +31,4 @@ dependencies {
     implementation("org.apache.commons:commons-math3:3.6.1")
 
     testRuntimeOnly(mn.logback.classic)
-    testImplementation(libs.bundles.junit)
-}
+    testImplementation(libs.bundles.junit)}

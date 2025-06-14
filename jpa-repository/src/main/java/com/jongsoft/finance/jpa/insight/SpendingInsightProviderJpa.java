@@ -13,12 +13,11 @@ import com.jongsoft.lang.control.Optional;
 import io.micronaut.transaction.annotation.ReadOnly;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import lombok.extern.slf4j.Slf4j;
-
 import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ReadOnly
@@ -31,8 +30,7 @@ public class SpendingInsightProviderJpa implements SpendingInsightProvider {
   private final ReactiveEntityManager entityManager;
 
   public SpendingInsightProviderJpa(
-      AuthenticationFacade authenticationFacade,
-      ReactiveEntityManager entityManager) {
+      AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
     this.authenticationFacade = authenticationFacade;
     this.entityManager = entityManager;
   }
@@ -101,18 +99,19 @@ public class SpendingInsightProviderJpa implements SpendingInsightProvider {
     }
 
     // Create the JPA entity
-    SpendingInsightJpa jpa = SpendingInsightJpa.builder()
-        .type(insight.getType())
-        .category(insight.getCategory())
-        .severity(insight.getSeverity())
-        .score(insight.getScore())
-        .detectedDate(insight.getDetectedDate())
-        .message(insight.getMessage())
-        .yearMonth(YearMonth.from(insight.getDetectedDate()))
-        .transactionId(insight.getTransactionId())
-        .metadata(metadata)
-        .user(entityManager.currentUser())
-        .build();
+    SpendingInsightJpa jpa =
+        SpendingInsightJpa.builder()
+            .type(insight.getType())
+            .category(insight.getCategory())
+            .severity(insight.getSeverity())
+            .score(insight.getScore())
+            .detectedDate(insight.getDetectedDate())
+            .message(insight.getMessage())
+            .yearMonth(YearMonth.from(insight.getDetectedDate()))
+            .transactionId(insight.getTransactionId())
+            .metadata(metadata)
+            .user(entityManager.currentUser())
+            .build();
 
     // Save the entity
     entityManager.persist(jpa);
@@ -124,8 +123,9 @@ public class SpendingInsightProviderJpa implements SpendingInsightProvider {
     }
 
     // Convert metadata from string values to objects
-    Map<String, Object> metadata = source.getMetadata().entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    Map<String, Object> metadata =
+        source.getMetadata().entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     return SpendingInsight.builder()
         .type(source.getType())

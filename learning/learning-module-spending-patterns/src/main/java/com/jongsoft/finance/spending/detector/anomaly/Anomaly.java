@@ -3,7 +3,6 @@ package com.jongsoft.finance.spending.detector.anomaly;
 import com.jongsoft.finance.domain.insight.Severity;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.domain.transaction.Transaction;
-
 import java.util.Optional;
 
 public interface Anomaly {

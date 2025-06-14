@@ -12,8 +12,7 @@ class LlmEmbeddingFactory {
 
   private final EmbeddingStoreFactory embeddingStoreFactory;
 
-  LlmEmbeddingFactory(
-      EmbeddingStoreFactory embeddingStoreFactory) {
+  LlmEmbeddingFactory(EmbeddingStoreFactory embeddingStoreFactory) {
     this.embeddingStoreFactory = embeddingStoreFactory;
   }
 

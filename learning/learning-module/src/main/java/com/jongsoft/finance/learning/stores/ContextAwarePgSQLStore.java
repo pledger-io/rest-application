@@ -3,7 +3,6 @@ package com.jongsoft.finance.learning.stores;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
-
 import javax.sql.DataSource;
 
 public class ContextAwarePgSQLStore implements PledgerEmbeddingStore {

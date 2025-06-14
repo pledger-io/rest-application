@@ -19,5 +19,4 @@ public interface FilterFactory {
   SpendingInsightProvider.FilterCommand insight();
 
   SpendingPatternProvider.FilterCommand pattern();
-
 }

@@ -5,7 +5,6 @@ import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
-
 import java.time.YearMonth;
 
 public interface SpendingInsightProvider extends Exportable<SpendingInsight> {
