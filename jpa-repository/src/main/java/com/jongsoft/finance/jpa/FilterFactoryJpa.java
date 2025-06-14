@@ -5,6 +5,8 @@ import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.jpa.account.AccountFilterCommand;
 import com.jongsoft.finance.jpa.budget.ExpenseFilterCommand;
 import com.jongsoft.finance.jpa.category.CategoryFilterCommand;
+import com.jongsoft.finance.jpa.insight.SpendingInsightFilterCommand;
+import com.jongsoft.finance.jpa.insight.SpendingPatternFilterCommand;
 import com.jongsoft.finance.jpa.schedule.ScheduleFilterCommand;
 import com.jongsoft.finance.jpa.tag.TagFilterCommand;
 import com.jongsoft.finance.jpa.transaction.TransactionFilterCommand;
@@ -43,5 +45,15 @@ public class FilterFactoryJpa implements FilterFactory {
   @Override
   public TransactionScheduleProvider.FilterCommand schedule() {
     return new ScheduleFilterCommand();
+  }
+
+  @Override
+  public SpendingInsightProvider.FilterCommand insight() {
+    return new SpendingInsightFilterCommand();
+  }
+
+  @Override
+  public SpendingPatternProvider.FilterCommand pattern() {
+    return new SpendingPatternFilterCommand();
   }
 }

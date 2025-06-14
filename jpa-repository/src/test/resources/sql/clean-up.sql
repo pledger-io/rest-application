@@ -23,5 +23,9 @@ TRUNCATE TABLE tags;
 TRUNCATE TABLE category;
 TRUNCATE TABLE transaction_tag;
 TRUNCATE TABLE currency;
+TRUNCATE TABLE spending_insight_metadata;
+TRUNCATE TABLE spending_insights;
+TRUNCATE TABLE spending_pattern_metadata;
+TRUNCATE TABLE spending_patterns;
 
 SET FOREIGN_KEY_CHECKS=1;  -- turn on foreign key checks
