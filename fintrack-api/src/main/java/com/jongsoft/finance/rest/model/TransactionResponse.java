@@ -118,7 +118,7 @@ public class TransactionResponse {
       return wrapped.getFailureCode();
     }
 
-    @Schema(description = "The tags that the transaction has", example = "food,dining")
+    @Schema(description = "The tags that the transaction has", example = "[\"food\",\"dining\"]")
     public List<String> getTags() {
       return wrapped.getTags() != null ? wrapped.getTags().toJava() : null;
     }
@@ -129,7 +129,8 @@ public class TransactionResponse {
 
     @Schema(
         description = "The type of transaction",
-        allowableValues = {"CREDIT", "DEBIT", "TRANSFER"})
+        allowableValues = {"\"CREDIT\"", "\"DEBIT\"", "\"TRANSFER\""},
+        requiredMode = Schema.RequiredMode.REQUIRED)
     public String getCode() {
       return wrapped.computeType().name();
     }
