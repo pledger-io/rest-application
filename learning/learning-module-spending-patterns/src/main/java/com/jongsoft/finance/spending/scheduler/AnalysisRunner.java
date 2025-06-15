@@ -5,6 +5,7 @@ import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.spending.Detector;
+import com.jongsoft.finance.spending.SpendingAnalyticsEnabled;
 import com.jongsoft.lang.Dates;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Singleton;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@SpendingAnalyticsEnabled
 class AnalysisRunner {
   private final List<Detector<?>> transactionDetectors;
   private final FilterFactory filterFactory;

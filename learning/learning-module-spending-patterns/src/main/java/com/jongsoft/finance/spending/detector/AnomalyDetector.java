@@ -7,6 +7,7 @@ import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.spending.Detector;
+import com.jongsoft.finance.spending.SpendingAnalyticsEnabled;
 import com.jongsoft.finance.spending.detector.anomaly.*;
 import com.jongsoft.lang.Dates;
 import jakarta.inject.Singleton;
@@ -19,6 +20,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 @Slf4j
 @Singleton
+@SpendingAnalyticsEnabled
 class AnomalyDetector implements Detector<SpendingInsight> {
 
   private final TransactionProvider transactionProvider;

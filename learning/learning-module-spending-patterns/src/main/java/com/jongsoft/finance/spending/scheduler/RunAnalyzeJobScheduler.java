@@ -3,6 +3,7 @@ package com.jongsoft.finance.spending.scheduler;
 import com.jongsoft.finance.messaging.InternalAuthenticationEvent;
 import com.jongsoft.finance.providers.AnalyzeJobProvider;
 import com.jongsoft.finance.providers.UserProvider;
+import com.jongsoft.finance.spending.SpendingAnalyticsEnabled;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.scheduling.annotation.Scheduled;
 import io.micronaut.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import org.slf4j.MDC;
 
 @Slf4j
 @Singleton
+@SpendingAnalyticsEnabled
 public class RunAnalyzeJobScheduler {
 
   private final AnalyzeJobProvider analyzeJobProvider;

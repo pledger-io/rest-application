@@ -10,6 +10,7 @@ import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.spending.Detector;
 import com.jongsoft.finance.spending.PatternVectorStore;
+import com.jongsoft.finance.spending.SpendingAnalyticsEnabled;
 import com.jongsoft.finance.spending.detector.pattern.AmountPattern;
 import com.jongsoft.finance.spending.detector.pattern.OccurrencePattern;
 import com.jongsoft.finance.spending.detector.pattern.Pattern;
@@ -22,6 +23,7 @@ import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import io.micronaut.context.event.ShutdownEvent;
 import io.micronaut.context.event.StartupEvent;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.runtime.event.annotation.EventListener;
 import jakarta.inject.Singleton;
 import java.time.YearMonth;
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Singleton
+@SpendingAnalyticsEnabled
 class PatternDetector implements Detector<SpendingPattern> {
   // Threshold for similarity matching
   private static final double SIMILARITY_THRESHOLD = 0.9;
@@ -48,7 +51,7 @@ class PatternDetector implements Detector<SpendingPattern> {
   private final EmbeddingStoreFiller embeddingStoreFiller;
 
   PatternDetector(
-      TransactionProvider transactionProvider,
+      @Nullable TransactionProvider transactionProvider,
       CurrentUserProvider currentUserProvider,
       @PatternVectorStore PledgerEmbeddingStore patternVectorStore,
       EmbeddingStoreFiller embeddingStoreFiller) {
