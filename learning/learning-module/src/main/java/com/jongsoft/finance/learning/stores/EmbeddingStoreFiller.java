@@ -1,21 +1,24 @@
-package com.jongsoft.finance.llm.stores;
+package com.jongsoft.finance.learning.stores;
 
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.llm.AiEnabled;
+import com.jongsoft.finance.learning.config.LearningExecutor;
 import com.jongsoft.finance.messaging.InternalAuthenticationEvent;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.providers.UserProvider;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import jakarta.inject.Singleton;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-class EmbeddingStoreFiller {
+public class EmbeddingStoreFiller {
 
   private final Logger logger = LoggerFactory.getLogger(EmbeddingStoreFiller.class);
 
@@ -25,10 +28,11 @@ class EmbeddingStoreFiller {
   private final FilterFactory filterFactory;
   private final UserProvider userProvider;
   private final TransactionProvider transactionProvider;
+  private final List<Future<?>> futures = new ArrayList<>();
 
   EmbeddingStoreFiller(
       ApplicationEventPublisher<InternalAuthenticationEvent> eventPublisher,
-      @AiEnabled.AiExecutor ExecutorService executorService,
+      @LearningExecutor ExecutorService executorService,
       FilterFactory filterFactory,
       UserProvider userProvider,
       TransactionProvider transactionProvider) {
@@ -39,10 +43,15 @@ class EmbeddingStoreFiller {
     this.transactionProvider = transactionProvider;
   }
 
-  void consumeTransactions(Consumer<Transaction> callback) {
+  public void consumeTransactions(Consumer<Transaction> callback) {
     for (var user : userProvider.lookup()) {
-      executorService.submit(() -> performInitialFill(user.getUsername().email(), callback));
+      futures.add(
+          executorService.submit(() -> performInitialFill(user.getUsername().email(), callback)));
     }
+  }
+
+  public boolean isDone() {
+    return futures.stream().allMatch(Future::isDone);
   }
 
   private void performInitialFill(String userId, Consumer<Transaction> callback) {

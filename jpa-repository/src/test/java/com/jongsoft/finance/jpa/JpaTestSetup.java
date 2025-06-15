@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 @MicronautTest(
-        environments = {"application", "h2"}
+        environments = {"application", "h2", "test"}
 )
 public abstract class JpaTestSetup {
 

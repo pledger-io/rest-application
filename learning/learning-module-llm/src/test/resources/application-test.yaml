@@ -5,3 +5,5 @@ application:
     ollama:
       model: llama3.2
       force-augmentation: false
+    vectors:
+      storage: ${micronaut.application.storage.location}/vectors
