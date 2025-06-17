@@ -8,7 +8,6 @@ import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.rest.model.ResultPageResponse;
 import com.jongsoft.finance.rest.model.TransactionResponse;
-import com.jongsoft.finance.rest.process.RuntimeResource;
 import com.jongsoft.finance.rule.RuleDataSet;
 import com.jongsoft.finance.rule.RuleEngine;
 import com.jongsoft.finance.security.AuthenticationRoles;

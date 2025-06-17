@@ -1,10 +1,10 @@
 package com.jongsoft.finance.jpa.insight;
 
+import static com.jongsoft.finance.jpa.insight.SpendingPatternJpa.*;
+
 import com.jongsoft.finance.jpa.query.JpaFilterBuilder;
 import com.jongsoft.finance.providers.SpendingPatternProvider;
 import java.time.YearMonth;
-
-import static com.jongsoft.finance.jpa.insight.SpendingPatternJpa.*;
 
 public class SpendingPatternFilterCommand extends JpaFilterBuilder<SpendingPatternJpa>
     implements SpendingPatternProvider.FilterCommand {

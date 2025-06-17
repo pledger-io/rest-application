@@ -1,5 +1,7 @@
 package com.jongsoft.finance.jpa.insight;
 
+import static com.jongsoft.finance.jpa.insight.SpendingPatternJpa.*;
+
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.annotation.BusinessEventListener;
@@ -19,8 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-
-import static com.jongsoft.finance.jpa.insight.SpendingPatternJpa.*;
 
 @Slf4j
 @ReadOnly
