@@ -37,19 +37,16 @@ public class ImporterTransactionResource {
   private final TransactionProvider transactionProvider;
 
   private final RuleEngine ruleEngine;
-  private final RuntimeResource runtimeResource;
 
   public ImporterTransactionResource(
       SettingProvider settingProvider,
       FilterFactory filterFactory,
       TransactionProvider transactionProvider,
-      RuleEngine ruleEngine,
-      RuntimeResource runtimeResource) {
+      RuleEngine ruleEngine) {
     this.settingProvider = settingProvider;
     this.filterFactory = filterFactory;
     this.transactionProvider = transactionProvider;
     this.ruleEngine = ruleEngine;
-    this.runtimeResource = runtimeResource;
   }
 
   @Post
