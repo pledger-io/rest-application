@@ -102,6 +102,12 @@ class AnomalyDetector implements Detector<SpendingInsight> {
   }
 
   @Override
+  public void analysisCompleted() {
+    userCategoryStatistics.remove();
+    log.debug("Analysis completed. Removed user category statistics.");
+  }
+
+  @Override
   public List<SpendingInsight> detect(Transaction transaction) {
     var userStatistics = userCategoryStatistics.get();
     if (userStatistics == null

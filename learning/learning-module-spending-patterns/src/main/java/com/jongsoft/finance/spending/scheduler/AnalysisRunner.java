@@ -57,6 +57,8 @@ class AnalysisRunner {
     } catch (Exception e) {
       log.error("Error occurred while processing monthly spending analysis for {}.", month, e);
       return false;
+    } finally {
+      transactionDetectors.forEach(Detector::analysisCompleted);
     }
 
     return true;

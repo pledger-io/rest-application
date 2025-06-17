@@ -98,6 +98,11 @@ class PatternDetector implements Detector<SpendingPattern> {
   }
 
   @Override
+  public void analysisCompleted() {
+    // no action needed
+  }
+
+  @Override
   public List<SpendingPattern> detect(Transaction transaction) {
     // Skip transactions without a category or budget
     if (transaction.getCategory() == null && transaction.getBudget() == null) {

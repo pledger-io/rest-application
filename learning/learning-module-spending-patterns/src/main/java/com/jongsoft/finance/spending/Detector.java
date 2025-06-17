@@ -9,6 +9,8 @@ public interface Detector<T extends Insight> {
 
   void updateBaseline(YearMonth forMonth);
 
+  void analysisCompleted();
+
   List<T> detect(Transaction transaction);
 
   boolean readyForAnalysis();
