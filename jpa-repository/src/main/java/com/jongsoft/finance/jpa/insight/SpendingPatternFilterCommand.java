@@ -4,6 +4,8 @@ import com.jongsoft.finance.jpa.query.JpaFilterBuilder;
 import com.jongsoft.finance.providers.SpendingPatternProvider;
 import java.time.YearMonth;
 
+import static com.jongsoft.finance.jpa.insight.SpendingPatternJpa.*;
+
 public class SpendingPatternFilterCommand extends JpaFilterBuilder<SpendingPatternJpa>
     implements SpendingPatternProvider.FilterCommand {
 
@@ -15,16 +17,16 @@ public class SpendingPatternFilterCommand extends JpaFilterBuilder<SpendingPatte
   @Override
   public SpendingPatternFilterCommand category(String value, boolean exact) {
     if (exact) {
-      query().fieldEq("category", value);
+      query().fieldEq(COLUMN_CATEGORY, value);
     } else {
-      query().fieldLike("category", value);
+      query().fieldLike(COLUMN_CATEGORY, value);
     }
     return this;
   }
 
   @Override
   public SpendingPatternFilterCommand yearMonth(YearMonth yearMonth) {
-    query().fieldEq("yearMonth", yearMonth.toString());
+    query().fieldEq(COLUMN_YEAR_MONTH, yearMonth.toString());
     return this;
   }
 
@@ -36,7 +38,7 @@ public class SpendingPatternFilterCommand extends JpaFilterBuilder<SpendingPatte
   }
 
   public void user(String username) {
-    query().fieldEq("user.username", username);
+    query().fieldEq(COLUMN_USERNAME, username);
   }
 
   @Override

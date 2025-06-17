@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
+import static com.jongsoft.finance.jpa.insight.SpendingPatternJpa.*;
+
 @Slf4j
 @ReadOnly
 @Singleton
@@ -43,7 +45,7 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
     return entityManager
         .from(SpendingPatternJpa.class)
         .joinFetch("user")
-        .fieldEq("user.username", authenticationFacade.authenticated())
+        .fieldEq(COLUMN_USERNAME, authenticationFacade.authenticated())
         .stream()
         .map(this::convert)
         .collect(ReactiveEntityManager.sequenceCollector());
@@ -56,8 +58,8 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
     return entityManager
         .from(SpendingPatternJpa.class)
         .joinFetch("user")
-        .fieldEq("user.username", authenticationFacade.authenticated())
-        .fieldEq("category", category)
+        .fieldEq(COLUMN_USERNAME, authenticationFacade.authenticated())
+        .fieldEq(COLUMN_CATEGORY, category)
         .singleResult()
         .map(this::convert);
   }
@@ -69,8 +71,8 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
     return entityManager
         .from(SpendingPatternJpa.class)
         .joinFetch("user")
-        .fieldEq("user.username", authenticationFacade.authenticated())
-        .fieldEq("yearMonth", yearMonth.toString())
+        .fieldEq(COLUMN_USERNAME, authenticationFacade.authenticated())
+        .fieldEq(COLUMN_YEAR_MONTH, yearMonth.toString())
         .stream()
         .map(this::convert)
         .collect(ReactiveEntityManager.sequenceCollector());

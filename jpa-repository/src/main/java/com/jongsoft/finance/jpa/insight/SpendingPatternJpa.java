@@ -16,6 +16,10 @@ import lombok.Getter;
 @Table(name = "spending_patterns")
 public class SpendingPatternJpa extends EntityJpa {
 
+  static final String COLUMN_CATEGORY = "category";
+  static final String COLUMN_USERNAME = "user.username";
+  static final String COLUMN_YEAR_MONTH = "yearMonth";
+
   @Enumerated(EnumType.STRING)
   private PatternType type;
 
