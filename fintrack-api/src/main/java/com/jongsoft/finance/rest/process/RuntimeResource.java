@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.process;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_AUTOMATION_PROCESSES;
+
 import com.jongsoft.finance.rest.model.ProcessResponse;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
@@ -15,7 +17,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.RuntimeService;
 
-@Tag(name = "Process Engine")
+@Tag(name = TAG_AUTOMATION_PROCESSES)
 @Controller("/api/runtime-process")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public class RuntimeResource {

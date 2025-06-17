@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.transaction;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_TRANSACTION;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
@@ -35,7 +37,7 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
-@Tag(name = "Transactions")
+@Tag(name = TAG_TRANSACTION)
 @Controller("/api/transactions")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class TransactionResource {

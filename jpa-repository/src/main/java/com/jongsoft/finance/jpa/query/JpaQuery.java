@@ -183,7 +183,7 @@ public class JpaQuery<E> extends BaseQuery<JpaQuery<E>> {
         .map(Control::Option)
         .recover(
             e -> {
-              logger.warn("Unable to find entity, cause: {}", e.getLocalizedMessage());
+              logger.trace("Unable to find entity, cause: {}", e.getLocalizedMessage());
               return Control.Option();
             })
         .get();

@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.importer;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_TRANSACTION_IMPORT;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.providers.ImportConfigurationProvider;
 import com.jongsoft.finance.providers.ImportProvider;
@@ -19,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 
-@Tag(name = "Importer")
+@Tag(name = TAG_TRANSACTION_IMPORT)
 @Controller("/api/import")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class BatchImportResource {

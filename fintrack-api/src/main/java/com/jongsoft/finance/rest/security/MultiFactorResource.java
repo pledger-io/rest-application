@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.security;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SECURITY;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.rest.ApiDefaults;
@@ -21,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
 
-@Tag(name = "Authentication")
+@Tag(name = TAG_SECURITY)
 @Controller(consumes = MediaType.APPLICATION_JSON, value = "/api/security/2-factor")
 public class MultiFactorResource {
 

@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.localization;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SETTINGS_LOCALIZATION;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.annotation.Controller;
@@ -16,7 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-@Tags(@Tag(name = "Localization"))
+@Tags(@Tag(name = TAG_SETTINGS_LOCALIZATION))
 @Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/api/localization/lang")
 public class LanguageResource {

@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_ACCOUNTS;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
@@ -23,8 +25,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @ApiDefaults
+@Tag(name = TAG_ACCOUNTS)
 @Controller("/api/accounts")
-@Tag(name = "Account information")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class AccountResource {
 

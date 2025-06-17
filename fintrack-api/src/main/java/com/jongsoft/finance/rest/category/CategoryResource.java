@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.category;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_CATEGORIES;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -18,7 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 
-@Tag(name = "Category")
+@Tag(name = TAG_CATEGORIES)
 @Controller("/api/categories")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class CategoryResource {

@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.contract;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_CONTRACTS;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -23,7 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 
-@Tag(name = "Contract")
+@Tag(name = TAG_CONTRACTS)
 @Controller("/api/contracts")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class ContractResource {

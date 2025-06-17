@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.statistic;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_REPORTS;
+
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -28,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-@Tag(name = "Reports")
+@Tag(name = TAG_REPORTS)
 @Controller("/api/statistics/balance")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class BalanceResource {

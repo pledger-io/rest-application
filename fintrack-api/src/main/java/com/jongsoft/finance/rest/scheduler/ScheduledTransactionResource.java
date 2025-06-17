@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Objects;
 
-@Tag(name = "Scheduling agent")
+@Tag(name = "Automation::Scheduling")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/schedule/transaction")
 public class ScheduledTransactionResource {

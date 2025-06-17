@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_ACCOUNTS;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.SavingGoal;
@@ -21,8 +23,8 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 @ApiDefaults
+@Tag(name = TAG_ACCOUNTS)
 @Controller("/api/accounts/{accountId}")
-@Tag(name = "Account information")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public class AccountEditResource {
 

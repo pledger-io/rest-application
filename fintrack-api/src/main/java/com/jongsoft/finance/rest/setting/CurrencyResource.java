@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.setting;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SETTINGS_CURRENCIES;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.Currency;
 import com.jongsoft.finance.providers.CurrencyProvider;
@@ -18,7 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 
-@Tag(name = "Application Settings")
+@Tag(name = TAG_SETTINGS_CURRENCIES)
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/settings/currencies")
 public class CurrencyResource {

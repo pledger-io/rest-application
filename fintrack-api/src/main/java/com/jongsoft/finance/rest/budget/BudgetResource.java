@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.budget;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_BUDGETS;
+
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -34,7 +36,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Tag(name = "Budget")
+@Tag(name = TAG_BUDGETS)
 @Controller("/api/budgets")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class BudgetResource {

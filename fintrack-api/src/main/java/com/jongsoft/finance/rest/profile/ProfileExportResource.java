@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.profile;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SECURITY_USERS;
+
 import com.jongsoft.finance.Exportable;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.core.RuleColumn;
@@ -29,7 +31,7 @@ import java.util.function.Supplier;
 
 @Controller("/api/profile/export")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@io.swagger.v3.oas.annotations.tags.Tag(name = "User profile")
+@io.swagger.v3.oas.annotations.tags.Tag(name = TAG_SECURITY_USERS)
 public class ProfileExportResource {
 
   private final AuthenticationFacade authenticationFacade;

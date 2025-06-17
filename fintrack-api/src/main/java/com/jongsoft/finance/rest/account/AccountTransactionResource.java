@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_ACCOUNTS_TRANSACTIONS;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -29,9 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.function.Consumer;
 
-@Tag(
-    name = "Account Transactions",
-    description = "Operations on transactions based on a given account.")
+@Tag(name = TAG_ACCOUNTS_TRANSACTIONS)
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/accounts/{accountId}/transactions")
 public class AccountTransactionResource {

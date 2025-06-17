@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.profile;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SECURITY_USERS;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.providers.UserProvider;
@@ -24,7 +26,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "User profile")
+@Tag(name = TAG_SECURITY_USERS)
 @Controller("/api/profile")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class ProfileResource {

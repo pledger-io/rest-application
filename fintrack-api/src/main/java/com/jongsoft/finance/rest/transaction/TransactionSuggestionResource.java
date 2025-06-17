@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.transaction;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_TRANSACTION_ANALYTICS;
+
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.learning.SuggestionEngine;
@@ -17,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@Tag(name = "Transactions")
+@Tag(name = TAG_TRANSACTION_ANALYTICS)
 @Controller("/api/transactions")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 class TransactionSuggestionResource {

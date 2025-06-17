@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.transaction;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_AUTOMATION_RULES;
+
 import com.jongsoft.finance.core.Removable;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
@@ -24,7 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 
-@Tag(name = "Transaction Rules")
+@Tag(name = TAG_AUTOMATION_RULES)
 @Controller("/api/transaction-rules")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public class TransactionRuleResource {

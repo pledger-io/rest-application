@@ -27,7 +27,7 @@ micronaut:
   router:
     static-resources:
       docs:
-        paths: classpath:/docs
+        paths: classpath:docs
         mapping: /openapi/**
       swagger:
         paths: classpath:META-INF/swagger

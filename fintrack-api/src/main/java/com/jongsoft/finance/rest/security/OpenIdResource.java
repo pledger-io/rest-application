@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.security;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SECURITY;
+
 import com.jongsoft.finance.security.OpenIdConfiguration;
 import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.annotation.Controller;
@@ -11,7 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Controller
 @Requires(env = "openid")
-@Tag(name = "Authentication")
+@Tag(name = TAG_SECURITY)
 public class OpenIdResource {
 
   private final OpenIdConfiguration configuration;

@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.file;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_ATTACHMENTS;
+
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.security.AuthenticationRoles;
 import io.micronaut.http.HttpStatus;
@@ -11,7 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 
-@Tag(name = "Attachments")
+@Tag(name = TAG_ATTACHMENTS)
 @Controller("/api/attachment")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class FileResource {
