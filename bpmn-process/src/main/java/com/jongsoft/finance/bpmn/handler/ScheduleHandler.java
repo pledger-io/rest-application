@@ -32,14 +32,13 @@ public class ScheduleHandler implements CommandHandler<ScheduleCommand> {
   private void startNewActivity(ScheduleCommand command) {
     Objects.requireNonNull(command.schedulable(), "Entity to be scheduled cannot be null.");
 
-    var starter =
-        processEngine
-            .getRuntimeService()
-            .createProcessInstanceByKey(KnownProcesses.PROCESS_SCHEDULE)
-            .businessKey(command.businessKey())
-            .setVariable("username", authenticationFacade.authenticated())
-            .setVariable("subProcess", command.processDefinition())
-            .setVariable(command.processDefinition(), command.variables());
+    var starter = processEngine
+        .getRuntimeService()
+        .createProcessInstanceByKey(KnownProcesses.PROCESS_SCHEDULE)
+        .businessKey(command.businessKey())
+        .setVariable("username", authenticationFacade.authenticated())
+        .setVariable("subProcess", command.processDefinition())
+        .setVariable(command.processDefinition(), command.variables());
 
     if (Objects.nonNull(command.schedulable().getStart())) {
       starter.setVariable("start", command.schedulable().getStart().toString());
@@ -59,12 +58,11 @@ public class ScheduleHandler implements CommandHandler<ScheduleCommand> {
   }
 
   private void deleteAnyActiveProcess(ScheduleCommand command) {
-    var runningProcess =
-        processEngine
-            .getRuntimeService()
-            .createProcessInstanceQuery()
-            .processInstanceBusinessKey(command.businessKey())
-            .singleResult();
+    var runningProcess = processEngine
+        .getRuntimeService()
+        .createProcessInstanceQuery()
+        .processInstanceBusinessKey(command.businessKey())
+        .singleResult();
     if (runningProcess != null) {
       processEngine
           .getRuntimeService()

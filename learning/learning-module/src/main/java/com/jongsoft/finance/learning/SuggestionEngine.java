@@ -7,7 +7,8 @@ public interface SuggestionEngine {
   SuggestionResult makeSuggestions(SuggestionInput transactionInput);
 
   /**
-   * Extracts a transaction based on the given input string and returns a {@code TransactionResult}.
+   * Extracts a transaction based on the given input string and returns a {@code
+   * TransactionResult}.
    *
    * @param transactionInput the raw transaction input string to be processed
    * @return a {@code TransactionResult} containing the extracted transaction data

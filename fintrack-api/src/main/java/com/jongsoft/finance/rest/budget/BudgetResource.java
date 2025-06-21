@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.budget;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_BUDGETS;
+
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -34,7 +36,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Tag(name = "Budget")
+@Tag(name = TAG_BUDGETS)
 @Controller("/api/budgets")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class BudgetResource {
@@ -93,7 +95,10 @@ public class BudgetResource {
               in = ParameterIn.QUERY,
               schema = @Schema(implementation = String.class)))
   List<EntityRef.NamedEntity> autocomplete(@Nullable String token) {
-    return expenseProvider.lookup(filterFactory.expense().name(token, false)).content().toJava();
+    return expenseProvider
+        .lookup(filterFactory.expense().name(token, false))
+        .content()
+        .toJava();
   }
 
   @Get
@@ -133,11 +138,10 @@ public class BudgetResource {
   BudgetResponse patchBudget(@Valid @Body BudgetCreateRequest patchRequest) {
     var startDate = patchRequest.getStart();
 
-    var budget =
-        budgetProvider
-            .lookup(startDate.getYear(), startDate.getMonthValue())
-            .getOrThrow(
-                () -> StatusException.notFound("No budget is active yet, create a budget first."));
+    var budget = budgetProvider
+        .lookup(startDate.getYear(), startDate.getMonthValue())
+        .getOrThrow(
+            () -> StatusException.notFound("No budget is active yet, create a budget first."));
 
     budget.indexBudget(startDate, patchRequest.income());
     return budgetProvider
@@ -154,33 +158,31 @@ public class BudgetResource {
   BudgetResponse patchExpenses(@Valid @Body ExpensePatchRequest patchRequest) {
     var currentDate = LocalDate.now().withDayOfMonth(1);
 
-    var budget =
-        budgetProvider
-            .lookup(currentDate.getYear(), currentDate.getMonthValue())
-            .getOrThrow(
-                () -> StatusException.notFound("Cannot update expenses, no budget available yet."));
+    var budget = budgetProvider
+        .lookup(currentDate.getYear(), currentDate.getMonthValue())
+        .getOrThrow(() ->
+            StatusException.notFound("Cannot update expenses, no budget available" + " yet."));
 
     if (patchRequest.expenseId() != null) {
       log.debug("Updating expense {} within active budget.", patchRequest.expenseId());
 
       if (budget.getStart().isBefore(currentDate)) {
         log.info(
-            "Starting new budget period as the current period {} is after the existing start of {}",
+            "Starting new budget period as the current period {} is after the existing"
+                + " start of {}",
             currentDate,
             budget.getStart());
         budget.indexBudget(currentDate, budget.getExpectedIncome());
-        budget =
-            budgetProvider
-                .lookup(currentDate.getYear(), currentDate.getMonthValue())
-                .getOrThrow(() -> StatusException.internalError("Updating of budget failed."));
+        budget = budgetProvider
+            .lookup(currentDate.getYear(), currentDate.getMonthValue())
+            .getOrThrow(() -> StatusException.internalError("Updating of budget failed."));
       }
 
-      var toUpdate =
-          budget
-              .getExpenses()
-              .first(expense -> Objects.equals(expense.getId(), patchRequest.expenseId()))
-              .getOrThrow(
-                  () -> StatusException.badRequest("Attempted to update a non existing expense."));
+      var toUpdate = budget
+          .getExpenses()
+          .first(expense -> Objects.equals(expense.getId(), patchRequest.expenseId()))
+          .getOrThrow(
+              () -> StatusException.badRequest("Attempted to update a non existing expense."));
 
       toUpdate.updateExpense(patchRequest.amount());
     } else {
@@ -205,23 +207,21 @@ public class BudgetResource {
     return budgetProvider.lookup(year, month).stream()
         .flatMap(budget -> budget.getExpenses().stream())
         .filter(expense -> expense.getId() == id)
-        .map(
-            expense -> {
-              var filter =
-                  filterFactory
-                      .transaction()
-                      .ownAccounts()
-                      .range(dateRange)
-                      .expenses(Collections.List(new EntityRef(expense.getId())));
+        .map(expense -> {
+          var filter = filterFactory
+              .transaction()
+              .ownAccounts()
+              .range(dateRange)
+              .expenses(Collections.List(new EntityRef(expense.getId())));
 
-              return new ComputedExpenseResponse(
-                  expense.computeBudget(),
-                  transactionProvider
-                      .balance(filter)
-                      .getOrSupply(() -> BigDecimal.ZERO)
-                      .doubleValue(),
-                  dateRange);
-            })
+          return new ComputedExpenseResponse(
+              expense.computeBudget(),
+              transactionProvider
+                  .balance(filter)
+                  .getOrSupply(() -> BigDecimal.ZERO)
+                  .doubleValue(),
+              dateRange);
+        })
         .toList();
   }
 }

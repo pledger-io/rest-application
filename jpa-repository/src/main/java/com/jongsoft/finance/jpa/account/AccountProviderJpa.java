@@ -128,34 +128,26 @@ public class AccountProviderJpa implements AccountProvider {
     if (filter instanceof AccountFilterCommand delegate) {
       delegate.user(authenticationFacade.authenticated());
 
-      var query =
-          entityManager
-              .from(TransactionJpa.class)
-              .fieldIn(
-                  "account.id",
-                  AccountJpa.class,
-                  subQuery -> {
-                    delegate.applyTo(subQuery);
-                    subQuery.project("id");
-                  })
-              .fieldBetween("journal.date", range.from(), range.until())
-              .fieldEq("journal.user.username", authenticationFacade.authenticated())
-              .fieldNull("deleted")
-              .groupBy("account");
+      var query = entityManager
+          .from(TransactionJpa.class)
+          .fieldIn("account.id", AccountJpa.class, subQuery -> {
+            delegate.applyTo(subQuery);
+            subQuery.project("id");
+          })
+          .fieldBetween("journal.date", range.from(), range.until())
+          .fieldEq("journal.user.username", authenticationFacade.authenticated())
+          .fieldNull("deleted")
+          .groupBy("account");
 
       // delegate.applyPagingOnly(query);
       return query
           .project(
               TripleProjection.class,
-              "new com.jongsoft.finance.jpa.projections.TripleProjection(e.account, sum(e.amount), avg(e.amount))")
+              "new com.jongsoft.finance.jpa.projections.TripleProjection(e.account,"
+                  + " sum(e.amount), avg(e.amount))")
           .map(triplet -> (TripleProjection<AccountJpa, BigDecimal, Double>) triplet)
-          .map(
-              projection ->
-                  (AccountSpending)
-                      new AccountSpendingImpl(
-                          convert(projection.getFirst()),
-                          projection.getSecond(),
-                          projection.getThird()))
+          .map(projection -> (AccountSpending) new AccountSpendingImpl(
+              convert(projection.getFirst()), projection.getSecond(), projection.getThird()))
           .collect(ReactiveEntityManager.sequenceCollector());
     }
 
@@ -164,7 +156,8 @@ public class AccountProviderJpa implements AccountProvider {
 
   protected Account convert(AccountJpa source) {
     if (source == null
-        || !Objects.equals(authenticationFacade.authenticated(), source.getUser().getUsername())) {
+        || !Objects.equals(
+            authenticationFacade.authenticated(), source.getUser().getUsername())) {
       return null;
     }
 
@@ -195,25 +188,22 @@ public class AccountProviderJpa implements AccountProvider {
 
     return savingGoals.stream()
         .filter(Predicate.not(SavingGoalJpa::isArchived))
-        .map(
-            source ->
-                SavingGoal.builder()
-                    .id(source.getId())
-                    .allocated(source.getAllocated())
-                    .goal(source.getGoal())
-                    .targetDate(source.getTargetDate())
-                    .name(source.getName())
-                    .description(source.getDescription())
-                    .schedule(
-                        source.getPeriodicity() != null
-                            ? new ScheduleValue(source.getPeriodicity(), source.getInterval())
-                            : null)
-                    .account(
-                        Account.builder()
-                            .id(source.getAccount().getId())
-                            .name(source.getAccount().getName())
-                            .build())
-                    .build())
+        .map(source -> SavingGoal.builder()
+            .id(source.getId())
+            .allocated(source.getAllocated())
+            .goal(source.getGoal())
+            .targetDate(source.getTargetDate())
+            .name(source.getName())
+            .description(source.getDescription())
+            .schedule(
+                source.getPeriodicity() != null
+                    ? new ScheduleValue(source.getPeriodicity(), source.getInterval())
+                    : null)
+            .account(Account.builder()
+                .id(source.getAccount().getId())
+                .name(source.getAccount().getName())
+                .build())
+            .build())
         .collect(Collectors.toSet());
   }
 }

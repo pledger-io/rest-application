@@ -19,9 +19,13 @@ public class RuleJpa extends EntityJpa {
   private boolean archived;
   private int sort;
 
-  @ManyToOne @JoinColumn private UserAccountJpa user;
+  @ManyToOne
+  @JoinColumn
+  private UserAccountJpa user;
 
-  @ManyToOne @JoinColumn private RuleGroupJpa group;
+  @ManyToOne
+  @JoinColumn
+  private RuleGroupJpa group;
 
   @OneToMany(
       mappedBy = "rule",

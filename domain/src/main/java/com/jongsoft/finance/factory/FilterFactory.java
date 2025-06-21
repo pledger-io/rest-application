@@ -15,4 +15,8 @@ public interface FilterFactory {
   CategoryProvider.FilterCommand category();
 
   TransactionScheduleProvider.FilterCommand schedule();
+
+  SpendingInsightProvider.FilterCommand insight();
+
+  SpendingPatternProvider.FilterCommand pattern();
 }

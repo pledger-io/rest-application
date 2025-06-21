@@ -105,7 +105,8 @@ public interface Query<Q extends Query<Q>> {
   /**
    * Executes the given subQueryBuilder only if it exists in the context of the current query.
    *
-   * @param subQueryBuilder the consumer function defining the sub-query to be checked for existence
+   * @param subQueryBuilder the consumer function defining the sub-query to be checked for
+   *     existence
    * @return the updated query instance with the existence check condition applied
    */
   Q whereExists(Consumer<SubQuery> subQueryBuilder);

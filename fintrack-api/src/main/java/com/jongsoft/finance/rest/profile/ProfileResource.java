@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.profile;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SECURITY_USERS;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.providers.UserProvider;
@@ -24,7 +26,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "User profile")
+@Tag(name = TAG_SECURITY_USERS)
 @Controller("/api/profile")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class ProfileResource {
@@ -85,15 +87,14 @@ public class ProfileResource {
   @Operation(
       operationId = "createToken",
       summary = "Create session token",
-      description =
-          "Create a new session token that has a longer validity then default authentication tokens.")
+      description = "Create a new session token that has a longer validity then default"
+          + " authentication tokens.")
   List<SessionResponse> createSession(@Body @Valid TokenCreateRequest request) {
     application.registerToken(
         currentUserProvider.currentUser().getUsername().email(),
         UUID.randomUUID().toString(),
-        (int)
-            ChronoUnit.SECONDS.between(
-                LocalDateTime.now(), request.expires().atTime(LocalTime.MIN)));
+        (int) ChronoUnit.SECONDS.between(
+            LocalDateTime.now(), request.expires().atTime(LocalTime.MIN)));
 
     return sessions();
   }
@@ -112,8 +113,8 @@ public class ProfileResource {
   @Operation(
       operationId = "getQrCode",
       summary = "QR Code",
-      description =
-          "Use this API to obtain a QR code that can be used to scan in a 2-factor application")
+      description = "Use this API to obtain a QR code that can be used to scan in a 2-factor"
+          + " application")
   byte[] qrCode() {
     var qrCode = TwoFactorHelper.build2FactorQr(currentUserProvider.currentUser());
     try {
@@ -130,8 +131,8 @@ public class ProfileResource {
   @Operation(
       operationId = "enable2Factor",
       summary = "Enable 2-factor authentication",
-      description =
-          "This will activate 2-factor authentication when the security code matches the one recorded")
+      description = "This will activate 2-factor authentication when the security code matches the"
+          + " one recorded")
   void enableMfa(@Body @Valid MultiFactorRequest multiFactorRequest) {
     var userAccount = currentUserProvider.currentUser();
     if (!TwoFactorHelper.verifySecurityCode(
@@ -147,9 +148,8 @@ public class ProfileResource {
   @Operation(
       operationId = "disable2Factor",
       summary = "Disable 2-factor authentication",
-      description =
-          "This operation will disable 2-factor authentication, but will only work if it was enabled on the authorized "
-              + "account")
+      description = "This operation will disable 2-factor authentication, but will only work if it"
+          + " was enabled on the authorized account")
   void disableMfa() {
     currentUserProvider.currentUser().disableMultiFactorAuthentication();
   }

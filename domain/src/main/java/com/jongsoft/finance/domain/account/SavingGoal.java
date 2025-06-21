@@ -105,7 +105,8 @@ public class SavingGoal implements AggregateBase {
     var firstSaving = LocalDate.now().plus(interval, periodicity.toChronoUnit());
     if (firstSaving.isAfter(targetDate)) {
       throw StatusException.badRequest(
-          "Cannot set schedule when first saving would be after the target date of this saving goal.");
+          "Cannot set schedule when first saving would be after the target date of this"
+              + " saving goal.");
     }
 
     this.schedule = new ScheduleValue(periodicity, interval);
@@ -146,7 +147,8 @@ public class SavingGoal implements AggregateBase {
   public void registerPayment(BigDecimal amount) {
     if (allocated.add(amount).compareTo(goal) > 0) {
       throw StatusException.badRequest(
-          "Cannot increase allocation, the increment would add more then the desired goal of "
+          "Cannot increase allocation, the increment would add more then the desired goal"
+              + " of "
               + goal);
     }
 

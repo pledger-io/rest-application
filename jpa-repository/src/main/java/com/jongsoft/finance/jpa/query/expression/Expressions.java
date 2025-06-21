@@ -129,7 +129,8 @@ public final class Expressions {
   }
 
   /**
-   * Creates a new computation expression representing the addition of two computation expressions.
+   * Creates a new computation expression representing the addition of two computation
+   * expressions.
    *
    * @param left the left computation expression to add
    * @param right the right computation expression to add

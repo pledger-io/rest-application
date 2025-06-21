@@ -31,13 +31,17 @@ public class ScheduledTransactionJpa extends EntityJpa {
   @Column(name = "reoccur")
   private int interval;
 
-  @ManyToOne private UserAccountJpa user;
+  @ManyToOne
+  private UserAccountJpa user;
 
-  @ManyToOne private AccountJpa source;
+  @ManyToOne
+  private AccountJpa source;
 
-  @ManyToOne private AccountJpa destination;
+  @ManyToOne
+  private AccountJpa destination;
 
-  @ManyToOne private ContractJpa contract;
+  @ManyToOne
+  private ContractJpa contract;
 
   @Builder
   public ScheduledTransactionJpa(

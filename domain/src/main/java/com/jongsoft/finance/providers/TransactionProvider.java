@@ -13,11 +13,13 @@ public interface TransactionProvider extends DataProvider<Transaction> {
 
   /**
    * This command class helps to search in the database for relevant transactions. Use the methods
-   * provided to add filters to the query. Calling a method twice will override the previous value.
+   * provided to add filters to the query. Calling a method twice will override the previous
+   * value.
    */
   interface FilterCommand {
     /**
-     * A list of {@link EntityRef} with unique identifiers of accounts that should be filtered for.
+     * A list of {@link EntityRef} with unique identifiers of accounts that should be filtered
+     * for.
      *
      * @param value the list of identifiers
      * @return this instance
@@ -34,7 +36,8 @@ public interface TransactionProvider extends DataProvider<Transaction> {
     FilterCommand categories(Sequence<EntityRef> value);
 
     /**
-     * A list of {@link EntityRef} with unique identifiers of contracts that should be filtered for.
+     * A list of {@link EntityRef} with unique identifiers of contracts that should be filtered
+     * for.
      *
      * @param value the list of identifiers
      * @return this instance
@@ -42,7 +45,8 @@ public interface TransactionProvider extends DataProvider<Transaction> {
     FilterCommand contracts(Sequence<EntityRef> value);
 
     /**
-     * A list of {@link EntityRef} with unique identifiers of expenses that should be filtered for.
+     * A list of {@link EntityRef} with unique identifiers of expenses that should be filtered
+     * for.
      *
      * @param value the list of identifiers
      * @return this instance
@@ -50,8 +54,8 @@ public interface TransactionProvider extends DataProvider<Transaction> {
     FilterCommand expenses(Sequence<EntityRef> value);
 
     /**
-     * Add a filter on the name of one of the accounts involved in the transaction. Depending on the
-     * value of the {@code exact} flag this will be an exact match or a partial match.
+     * Add a filter on the name of one of the accounts involved in the transaction. Depending on
+     * the value of the {@code exact} flag this will be an exact match or a partial match.
      *
      * @param value the name
      * @param exact should the name match exactly or partially
@@ -60,8 +64,8 @@ public interface TransactionProvider extends DataProvider<Transaction> {
     FilterCommand name(String value, boolean exact);
 
     /**
-     * Add a filter for the description in the transaction. You can choose if the match should be
-     * exact or partial using the {@code exact} parameter.
+     * Add a filter for the description in the transaction. You can choose if the match should
+     * be exact or partial using the {@code exact} parameter.
      *
      * @param value the description
      * @param exact should the name match exactly or partially
@@ -91,8 +95,8 @@ public interface TransactionProvider extends DataProvider<Transaction> {
 
     /**
      * Filter to only include transactions to all of your own accounts. This will exclude some
-     * transactions from the search. This operation is mutually exclusive with {@link #transfers()}
-     * ()} and {@link #accounts(Sequence)}.
+     * transactions from the search. This operation is mutually exclusive with {@link
+     * #transfers()} ()} and {@link #accounts(Sequence)}.
      *
      * @return this instance
      */
@@ -107,8 +111,8 @@ public interface TransactionProvider extends DataProvider<Transaction> {
     FilterCommand transfers();
 
     /**
-     * Set the page to retrieve, if a page is set greater then available the result will be a blank
-     * {@link ResultPage}.
+     * Set the page to retrieve, if a page is set greater then available the result will be a
+     * blank {@link ResultPage}.
      *
      * @param value the page
      * @return this instance

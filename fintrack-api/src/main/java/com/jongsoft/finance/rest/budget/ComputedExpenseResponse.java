@@ -48,13 +48,17 @@ class ComputedExpenseResponse {
   }
 
   public double getLeft() {
-    return BigDecimal.valueOf(allowed).subtract(BigDecimal.valueOf(Math.abs(spent))).doubleValue();
+    return BigDecimal.valueOf(allowed)
+        .subtract(BigDecimal.valueOf(Math.abs(spent)))
+        .doubleValue();
   }
 
   public double getDailyLeft() {
     var days = (int) ChronoUnit.DAYS.between(dateRange.getStart(), dateRange.getEnd());
     return calculateDaily(
-            BigDecimal.valueOf(allowed).subtract(BigDecimal.valueOf(Math.abs(spent))).doubleValue(),
+            BigDecimal.valueOf(allowed)
+                .subtract(BigDecimal.valueOf(Math.abs(spent)))
+                .doubleValue(),
             days)
         .doubleValue();
   }

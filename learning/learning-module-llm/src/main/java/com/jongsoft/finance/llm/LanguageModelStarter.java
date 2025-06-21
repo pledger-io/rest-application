@@ -31,10 +31,9 @@ class LanguageModelStarter {
       ToolSupplier aiTools,
       @AiEnabled.ClassificationAgent @Nullable RetrievalAugmentor retrievalAugmentor) {
     log.info("Setting up transaction support chat agent.");
-    var aiBuilder =
-        AiServices.builder(ClassificationAgent.class)
-            .chatLanguageModel(model)
-            .chatMemoryProvider(chatMemoryProvider());
+    var aiBuilder = AiServices.builder(ClassificationAgent.class)
+        .chatLanguageModel(model)
+        .chatMemoryProvider(chatMemoryProvider());
 
     if (aiTools.getTools().length > 0) {
       aiBuilder.tools(aiTools.getTools());
@@ -48,10 +47,9 @@ class LanguageModelStarter {
   public TransactionExtractorAgent transactionExtractorAgent(
       ChatLanguageModel model, ToolSupplier aiTools) {
     log.info("Setting up transaction extractor chat agent.");
-    var aiBuilder =
-        AiServices.builder(TransactionExtractorAgent.class)
-            .chatLanguageModel(model)
-            .chatMemoryProvider(chatMemoryProvider());
+    var aiBuilder = AiServices.builder(TransactionExtractorAgent.class)
+        .chatLanguageModel(model)
+        .chatMemoryProvider(chatMemoryProvider());
 
     if (aiTools.getTools().length > 0) {
       aiBuilder.tools(aiTools.getTools());
@@ -67,12 +65,11 @@ class LanguageModelStarter {
   }
 
   private ChatMemoryProvider chatMemoryProvider() {
-    return memoryId ->
-        MessageWindowChatMemory.builder()
-            .id(memoryId)
-            .maxMessages(10)
-            .chatMemoryStore(new InMemoryChatMemoryStore())
-            .build();
+    return memoryId -> MessageWindowChatMemory.builder()
+        .id(memoryId)
+        .maxMessages(10)
+        .chatMemoryStore(new InMemoryChatMemoryStore())
+        .build();
   }
 
   @Bean

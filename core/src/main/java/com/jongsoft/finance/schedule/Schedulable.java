@@ -16,8 +16,8 @@ public interface Schedulable extends AggregateBase {
   void limit(LocalDate start, LocalDate end);
 
   /**
-   * Adjust the scheduling starting with the first next cycle. The current cycle is still completed
-   * by the old settings.
+   * Adjust the scheduling starting with the first next cycle. The current cycle is still
+   * completed by the old settings.
    *
    * @param periodicity the new periodicity
    * @param interval the new interval of the periodicity

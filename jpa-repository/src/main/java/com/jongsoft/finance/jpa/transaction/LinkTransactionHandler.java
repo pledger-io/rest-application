@@ -41,12 +41,12 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
 
     switch (command.type()) {
       case CATEGORY ->
-          updateQuery.set("category", fetchRelation(command.type(), command.relation()));
+        updateQuery.set("category", fetchRelation(command.type(), command.relation()));
       case CONTRACT ->
-          updateQuery.set("contract", fetchRelation(command.type(), command.relation()));
+        updateQuery.set("contract", fetchRelation(command.type(), command.relation()));
       case EXPENSE -> updateQuery.set("budget", fetchRelation(command.type(), command.relation()));
       case IMPORT ->
-          updateQuery.set("batchImport", fetchRelation(command.type(), command.relation()));
+        updateQuery.set("batchImport", fetchRelation(command.type(), command.relation()));
     }
     updateQuery.execute();
   }

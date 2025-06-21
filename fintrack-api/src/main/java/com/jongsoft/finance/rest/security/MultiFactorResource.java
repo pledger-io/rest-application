@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.security;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SECURITY;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.user.Role;
 import com.jongsoft.finance.rest.ApiDefaults;
@@ -21,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
 
-@Tag(name = "Authentication")
+@Tag(name = TAG_SECURITY)
 @Controller(consumes = MediaType.APPLICATION_JSON, value = "/api/security/2-factor")
 public class MultiFactorResource {
 
@@ -40,8 +42,8 @@ public class MultiFactorResource {
   @Secured(AuthenticationRoles.TWO_FACTOR_NEEDED)
   @Operation(
       summary = "Verify MFA token",
-      description =
-          "Used to verify the user token against that what is expected. If valid the user will get a new JWT with updated authorizations.")
+      description = "Used to verify the user token against that what is expected. If valid the user"
+          + " will get a new JWT with updated authorizations.")
   HttpResponse<?> validateToken(
       @Valid @Body MultiFactorRequest verification, HttpRequest<?> request) {
     var user = currentUserProvider.currentUser();
@@ -49,9 +51,8 @@ public class MultiFactorResource {
       throw StatusException.forbidden("Invalid verification code");
     }
 
-    var authentication =
-        Authentication.build(
-            user.getUsername().email(), user.getRoles().stream().map(Role::getName).toList());
+    var authentication = Authentication.build(
+        user.getUsername().email(), user.getRoles().stream().map(Role::getName).toList());
 
     return loginHandler.loginRefresh(authentication, UUID.randomUUID().toString(), request);
   }

@@ -69,7 +69,8 @@ public class DiskStorageService implements StorageService {
       var readResult = Files.readAllBytes(uploadRootDirectory.resolve(token));
 
       if (securitySettings.isEncrypt()) {
-        readResult = encryption.decrypt(readResult, currentUserProvider.currentUser().getSecret());
+        readResult =
+            encryption.decrypt(readResult, currentUserProvider.currentUser().getSecret());
       }
 
       return Control.Option(readResult);

@@ -82,19 +82,17 @@ public class Transaction implements AggregateBase, Serializable {
     var toAmount = Math.abs(amount);
     var fromAmount = 0 - Math.abs(amount);
 
-    this.transactions =
-        Collections.List(
-            Part.builder().account(from).amount(fromAmount).build(),
-            Part.builder().account(to).amount(toAmount).build());
+    this.transactions = Collections.List(
+        Part.builder().account(from).amount(fromAmount).build(),
+        Part.builder().account(to).amount(toAmount).build());
   }
 
   @BusinessMethod
   public void book(LocalDate date, LocalDate bookDate, LocalDate interestDate) {
-    var hasChanged =
-        Control.Equal(date, this.date)
-            .append(bookDate, this.bookDate)
-            .append(interestDate, this.interestDate)
-            .isNotEqual();
+    var hasChanged = Control.Equal(date, this.date)
+        .append(bookDate, this.bookDate)
+        .append(interestDate, this.interestDate)
+        .isNotEqual();
 
     if (hasChanged) {
       this.date = date;
@@ -114,10 +112,9 @@ public class Transaction implements AggregateBase, Serializable {
 
   @BusinessMethod
   public void changeAmount(double amount, String currency) {
-    var hasChanged =
-        Control.Equal(Math.abs(this.computeAmount(this.computeTo())), amount)
-            .append(this.currency, currency)
-            .isNotEqual();
+    var hasChanged = Control.Equal(Math.abs(this.computeAmount(this.computeTo())), amount)
+        .append(this.currency, currency)
+        .isNotEqual();
 
     if (hasChanged) {
       if (transactions.size() != 2) {
@@ -145,18 +142,16 @@ public class Transaction implements AggregateBase, Serializable {
     var isCredit = computeType() == Type.CREDIT;
     if (Math.abs(totalAmount) != Math.abs(computeAmount(notOwn))) {
       var multiplier = isCredit ? -1 : 1;
-      var ownPart = this.transactions.filter(t -> !t.getAccount().equals(notOwn)).head();
+      var ownPart =
+          this.transactions.filter(t -> !t.getAccount().equals(notOwn)).head();
       ownPart.amount = multiplier * split.map(SplitRecord::amount).reduce(Double::sum);
     }
 
-    var splitParts =
-        split.map(
-            record ->
-                Part.builder()
-                    .account(notOwn)
-                    .description(record.description())
-                    .amount(isCredit ? Math.abs(record.amount()) : -Math.abs(record.amount()))
-                    .build());
+    var splitParts = split.map(record -> Part.builder()
+        .account(notOwn)
+        .description(record.description())
+        .amount(isCredit ? Math.abs(record.amount()) : -Math.abs(record.amount()))
+        .build());
 
     this.transactions =
         this.transactions.reject(t -> t.getAccount().equals(notOwn)).union(splitParts);
@@ -174,14 +169,10 @@ public class Transaction implements AggregateBase, Serializable {
         failureCode = FailureCode.FROM_TO_SAME;
       }
 
-      transactions
-          .filter(isFromAccount ? FROM_PREDICATE : TO_PREDICATE)
-          .forEach(
-              t -> {
-                t.account = account;
-                ChangeTransactionPartAccount.transactionPartAccountChanged(
-                    t.getId(), account.getId());
-              });
+      transactions.filter(isFromAccount ? FROM_PREDICATE : TO_PREDICATE).forEach(t -> {
+        t.account = account;
+        ChangeTransactionPartAccount.transactionPartAccountChanged(t.getId(), account.getId());
+      });
     }
   }
 

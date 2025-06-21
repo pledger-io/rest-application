@@ -19,7 +19,9 @@ public class ProcessResponse {
   }
 
   public String getProcess() {
-    return Optional.ofNullable(wrapped).map(ProcessInstance::getProcessDefinitionId).orElse(null);
+    return Optional.ofNullable(wrapped)
+        .map(ProcessInstance::getProcessDefinitionId)
+        .orElse(null);
   }
 
   public String getBusinessKey() {

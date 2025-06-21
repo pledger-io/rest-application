@@ -71,27 +71,26 @@ public class ReadTransactionLogDelegate implements JavaDelegate, JavaBean {
         .filter(provider -> provider.supports(importJobSettings.importConfiguration()))
         .findFirst()
         .ifPresentOrElse(
-            provider ->
-                provider.readTransactions(
-                    transactionDTO -> {
-                      // write the serialized transaction to storage and store the token
-                      var serialized =
-                          mapper.writeSafe(transactionDTO).getBytes(StandardCharsets.UTF_8);
-                      storageTokens.add(storageService.store(serialized));
+            provider -> provider.readTransactions(
+                transactionDTO -> {
+                  // write the serialized transaction to storage and store
+                  // the token
+                  var serialized =
+                      mapper.writeSafe(transactionDTO).getBytes(StandardCharsets.UTF_8);
+                  storageTokens.add(storageService.store(serialized));
 
-                      // write the extracted account lookup to the locatable set
-                      locatable.add(
-                          new ExtractedAccountLookup(
-                              transactionDTO.opposingName(),
-                              transactionDTO.opposingIBAN(),
-                              transactionDTO.description()));
-                    },
-                    importJobSettings.importConfiguration(),
-                    importJob),
-            () ->
-                log.warn(
-                    "No importer provider found for configuration: {}",
-                    importJobSettings.importConfiguration()));
+                  // write the extracted account lookup to the locatable
+                  // set
+                  locatable.add(new ExtractedAccountLookup(
+                      transactionDTO.opposingName(),
+                      transactionDTO.opposingIBAN(),
+                      transactionDTO.description()));
+                },
+                importJobSettings.importConfiguration(),
+                importJob),
+            () -> log.warn(
+                "No importer provider found for configuration: {}",
+                importJobSettings.importConfiguration()));
 
     if (locatable.isEmpty()) {
       log.warn("No accounts found for import job {}", batchImportSlug);

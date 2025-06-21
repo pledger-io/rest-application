@@ -28,10 +28,9 @@ public class ImportAccountExtractorDelegate implements JavaDelegate, JavaBean {
         execution.getVariableLocal("name"),
         execution.getVariableLocal("accountId"));
 
-    var mapping =
-        new ExtractionMapping(
-            execution.<StringValue>getVariableLocalTyped("name").getValue(),
-            (Long) execution.getVariableLocal("accountId"));
+    var mapping = new ExtractionMapping(
+        execution.<StringValue>getVariableLocalTyped("name").getValue(),
+        (Long) execution.getVariableLocal("accountId"));
 
     getAccountMappings(execution).add(mapping);
   }

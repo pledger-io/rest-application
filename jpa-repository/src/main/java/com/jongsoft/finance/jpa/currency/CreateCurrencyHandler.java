@@ -28,14 +28,13 @@ public class CreateCurrencyHandler implements CommandHandler<CreateCurrencyComma
   public void handle(CreateCurrencyCommand command) {
     log.info("[{}] - Processing currency create event", command.isoCode());
 
-    var entity =
-        CurrencyJpa.builder()
-            .name(command.name())
-            .code(command.isoCode())
-            .symbol(command.symbol())
-            .enabled(true)
-            .decimalPlaces(2)
-            .build();
+    var entity = CurrencyJpa.builder()
+        .name(command.name())
+        .code(command.isoCode())
+        .symbol(command.symbol())
+        .enabled(true)
+        .decimalPlaces(2)
+        .build();
 
     entityManager.persist(entity);
   }

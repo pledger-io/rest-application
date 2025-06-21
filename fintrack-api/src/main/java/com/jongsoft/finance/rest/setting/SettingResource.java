@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.setting;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SETTINGS;
+
 import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.model.SettingResponse;
 import com.jongsoft.finance.security.AuthenticationRoles;
@@ -13,7 +15,7 @@ import java.util.List;
 
 @Secured(AuthenticationRoles.IS_ADMIN)
 @Controller("/api/settings")
-@Tag(name = "Application Settings")
+@Tag(name = TAG_SETTINGS)
 public class SettingResource {
 
   private final SettingProvider settingProvider;
@@ -31,9 +33,8 @@ public class SettingResource {
   List<SettingResponse> list() {
     return settingProvider
         .lookup()
-        .map(
-            setting ->
-                new SettingResponse(setting.getName(), setting.getValue(), setting.getType()))
+        .map(setting ->
+            new SettingResponse(setting.getName(), setting.getValue(), setting.getType()))
         .toJava();
   }
 

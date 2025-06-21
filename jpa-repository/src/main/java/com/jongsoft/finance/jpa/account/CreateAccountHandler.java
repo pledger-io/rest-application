@@ -30,23 +30,20 @@ public class CreateAccountHandler implements CommandHandler<CreateAccountCommand
   public void handle(CreateAccountCommand event) {
     log.info("[{}] - Processing account create event", event.name());
 
-    var toCreate =
-        AccountJpa.builder()
-            .name(event.name())
-            .currency(
-                entityManager
-                    .from(CurrencyJpa.class)
-                    .fieldEq("code", event.currency())
-                    .singleResult()
-                    .get())
-            .type(
-                entityManager
-                    .from(AccountTypeJpa.class)
-                    .fieldEq("label", event.type())
-                    .singleResult()
-                    .get())
-            .user(entityManager.currentUser())
-            .build();
+    var toCreate = AccountJpa.builder()
+        .name(event.name())
+        .currency(entityManager
+            .from(CurrencyJpa.class)
+            .fieldEq("code", event.currency())
+            .singleResult()
+            .get())
+        .type(entityManager
+            .from(AccountTypeJpa.class)
+            .fieldEq("label", event.type())
+            .singleResult()
+            .get())
+        .user(entityManager.currentUser())
+        .build();
 
     entityManager.persist(toCreate);
   }

@@ -39,7 +39,8 @@ public class V20200429151821__MigrateEncryptedStorage extends BaseJavaMigration 
   // this::encrypt);
   //        jdbcTemplate.query("select id, file_code from import where user_id = " + id,
   // this::encrypt);
-  //        jdbcTemplate.query("select id, file_token as file_code from contract where user_id = " +
+  //        jdbcTemplate.query("select id, file_token as file_code from contract where user_id = "
+  // +
   // id, this::encrypt);
   //    }
   //
@@ -52,7 +53,8 @@ public class V20200429151821__MigrateEncryptedStorage extends BaseJavaMigration 
   //            var encryptor = Encryptors.standard(userSecret, securitySalt);
   //            var encrypted = encryptor.encrypt(content);
   //
-  //            try (var output = new FileOutputStream(new File(this.storageLocation + "/upload/" +
+  //            try (var output = new FileOutputStream(new File(this.storageLocation + "/upload/"
+  // +
   // rs.getString("file_code")), false)) {
   //                output.write(encrypted);
   //            }

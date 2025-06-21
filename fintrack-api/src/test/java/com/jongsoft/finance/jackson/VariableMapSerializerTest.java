@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
-@MicronautTest
 @DisplayName("Variable map serializer")
+@MicronautTest(environments = {"no-camunda", "no-analytics"} )
 class VariableMapSerializerTest {
 
     public static final String JSON = "{\"variables\":{\"number\":{\"_type\":\"com.jongsoft.finance.rest.process.VariableMap$WrappedVariable\",\"value\":123},\"boolean\":{\"_type\":\"com.jongsoft.finance.rest.process.VariableMap$WrappedVariable\",\"value\":true},\"string\":{\"_type\":\"com.jongsoft.finance.rest.process.VariableMap$WrappedVariable\",\"value\":\"value\"},\"list\":{\"_type\":\"com.jongsoft.finance.rest.process.VariableMap$VariableList\",\"content\":[{\"_type\":\"com.jongsoft.finance.rest.process.VariableMap$WrappedVariable\",\"value\":\"one\"},{\"_type\":\"com.jongsoft.finance.rest.process.VariableMap$WrappedVariable\",\"value\":\"two\"},{\"_type\":\"com.jongsoft.finance.rest.process.VariableMap$WrappedVariable\",\"value\":\"three\"}]}}}";

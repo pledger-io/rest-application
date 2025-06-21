@@ -22,7 +22,12 @@ public class RandomizedTransactions {
   static String password = "fintrack"; // replace with your database password
 
   static String loremIpsum =
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor"
+          + " incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis"
+          + " nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+          + " Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu"
+          + " fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in"
+          + " culpa qui officia deserunt mollit anim id est laborum.";
 
   static Random rand = new Random();
 
@@ -35,14 +40,15 @@ public class RandomizedTransactions {
       String description,
       String category) {
     var transactionSql =
-        "INSERT INTO transaction_journal(user_id, created, updated, t_date, description, category_id, type, currency_id) "
-            + "VALUES (1, ?, ?, ?, ?, (SELECT id FROM category WHERE label = ?), 'CREDIT', 1)";
+        "INSERT INTO transaction_journal(user_id, created, updated, t_date, description,"
+            + " category_id, type, currency_id) VALUES (1, ?, ?, ?, ?, (SELECT id FROM"
+            + " category WHERE label = ?), 'CREDIT', 1)";
     var partSql =
         """
-                INSERT INTO transaction_part(journal_id, created, updated, account_id, description, amount)
-                VALUES (
-                    (SELECT id FROM transaction_journal WHERE t_date = ? AND description = ? AND type = 'CREDIT' AND user_id = 1 limit 1),
-                    ?,?,?,?,?)""";
+INSERT INTO transaction_part(journal_id, created, updated, account_id, description, amount)
+VALUES (
+    (SELECT id FROM transaction_journal WHERE t_date = ? AND description = ? AND type = 'CREDIT' AND user_id = 1 limit 1),
+    ?,?,?,?,?)""";
 
     try (Connection conn = DriverManager.getConnection(url, user, password)) {
       try (PreparedStatement journalStatement = conn.prepareStatement(transactionSql);
@@ -51,11 +57,10 @@ public class RandomizedTransactions {
           log.info("Creating transactions for year {} and description {}", year, description);
           for (int month = 1; month <= 12; month++) {
             var lastDayOfMonth = LocalDate.of(year, month, 1).lengthOfMonth();
-            var updatedDescription =
-                description.replaceAll(
-                    "\\{month}",
-                    LocalDate.of(year, month, 1)
-                        .format(java.time.format.DateTimeFormatter.ofPattern("MMMM")));
+            var updatedDescription = description.replaceAll(
+                "\\{month}",
+                LocalDate.of(year, month, 1)
+                    .format(java.time.format.DateTimeFormatter.ofPattern("MMMM")));
 
             for (int i = 0; i < transactionsPerMonth; i++) {
               int day = rand.nextInt(lastDayOfMonth) + 1;
@@ -95,8 +100,8 @@ public class RandomizedTransactions {
   public static void createContract(
       String name, int companyId, String start, String end, double amount) {
     var contractSql =
-        "INSERT INTO contract(user_id, name, company_id, start_date, end_date, description) "
-            + "VALUES (1, ?, ?, ?, ?, ?)";
+        "INSERT INTO contract(user_id, name, company_id, start_date, end_date, description)"
+            + " VALUES (1, ?, ?, ?, ?, ?)";
 
     try (Connection conn = DriverManager.getConnection(url, user, password)) {
       log.info("Creating contract for company {} and name {}", companyId, name);

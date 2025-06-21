@@ -31,10 +31,9 @@ public class RelationLocator implements ChangeLocator {
           default -> throw new IllegalArgumentException("Unsupported type");
         };
 
-    var dataProvider =
-        applicationContext.getBeansOfType(DataProvider.class).stream()
-            .filter(bean -> bean.supports(genericType))
-            .findFirst();
+    var dataProvider = applicationContext.getBeansOfType(DataProvider.class).stream()
+        .filter(bean -> bean.supports(genericType))
+        .findFirst();
 
     if (dataProvider.isPresent()) {
       var entity = dataProvider.get().lookup(Long.parseLong(change));

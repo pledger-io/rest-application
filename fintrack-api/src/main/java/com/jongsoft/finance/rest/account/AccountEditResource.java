@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_ACCOUNTS;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.account.SavingGoal;
@@ -21,8 +23,8 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 @ApiDefaults
+@Tag(name = TAG_ACCOUNTS)
 @Controller("/api/accounts/{accountId}")
-@Tag(name = "Account information")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public class AccountEditResource {
 
@@ -35,9 +37,8 @@ public class AccountEditResource {
   @Get
   @Operation(
       summary = "Get Account",
-      description =
-          "Attempts to get the account with matching account id. If no account is found or you are not"
-              + "authorized an exception will be returned.",
+      description = "Attempts to get the account with matching account id. If no account is found"
+          + " or you are notauthorized an exception will be returned.",
       parameters =
           @Parameter(
               name = "accountId",
@@ -62,9 +63,9 @@ public class AccountEditResource {
   @Post
   @Operation(
       summary = "Update Account",
-      description =
-          "Update an existing account with the new details provided in the body. The updated account will"
-              + " be returned, or if no account is found an exception.",
+      description = "Update an existing account with the new details provided in the body. The"
+          + " updated account will be returned, or if no account is found an"
+          + " exception.",
       parameters =
           @Parameter(
               name = "accountId",
@@ -81,10 +82,9 @@ public class AccountEditResource {
       })
   AccountResponse update(
       @PathVariable long accountId, @Valid @Body AccountEditRequest accountEditRequest) {
-    var account =
-        accountProvider
-            .lookup(accountId)
-            .getOrThrow(() -> StatusException.notFound("No account found with id " + accountId));
+    var account = accountProvider
+        .lookup(accountId)
+        .getOrThrow(() -> StatusException.notFound("No account found with id " + accountId));
 
     account.rename(
         accountEditRequest.name(),
@@ -105,9 +105,8 @@ public class AccountEditResource {
   @Post(value = "/image")
   @Operation(
       summary = "Attach icon",
-      description =
-          "Attach an icon to the account. If any icon was previously registered it will be removed "
-              + "from the system.",
+      description = "Attach an icon to the account. If any icon was previously registered it will"
+          + " be removed from the system.",
       parameters =
           @Parameter(
               name = "accountId",
@@ -151,15 +150,14 @@ public class AccountEditResource {
   @Operation(
       operationId = "addSavingGoal",
       summary = "Create saving goal",
-      description =
-          "Creates a saving goal into the account, only valid for accounts of types SAVINGS and JOINED_SAVINGS")
+      description = "Creates a saving goal into the account, only valid for accounts of types"
+          + " SAVINGS and JOINED_SAVINGS")
   AccountResponse createSavingGoal(
       @PathVariable long accountId, @Body @Valid AccountSavingGoalCreateRequest request) {
     accountProvider
         .lookup(accountId)
-        .ifPresent(
-            account ->
-                account.createSavingGoal(request.name(), request.goal(), request.targetDate()))
+        .ifPresent(account ->
+            account.createSavingGoal(request.name(), request.goal(), request.targetDate()))
         .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
 
     return accountProvider.lookup(accountId).map(AccountResponse::new).get();
@@ -176,13 +174,11 @@ public class AccountEditResource {
       @Body @Valid AccountSavingGoalCreateRequest request) {
     accountProvider
         .lookup(accountId)
-        .ifPresent(
-            account ->
-                account
-                    .getSavingGoals()
-                    .filter(goal -> goal.getId() == savingId)
-                    .head()
-                    .adjustGoal(request.goal(), request.targetDate()))
+        .ifPresent(account -> account
+            .getSavingGoals()
+            .filter(goal -> goal.getId() == savingId)
+            .head()
+            .adjustGoal(request.goal(), request.targetDate()))
         .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
 
     return accountProvider.lookup(accountId).map(AccountResponse::new).get();
@@ -199,13 +195,11 @@ public class AccountEditResource {
       @Valid @QueryValue @Positive double amount) {
     accountProvider
         .lookup(accountId)
-        .ifPresent(
-            account ->
-                account
-                    .getSavingGoals()
-                    .filter(goal -> goal.getId() == savingId)
-                    .head()
-                    .registerPayment(BigDecimal.valueOf(amount)))
+        .ifPresent(account -> account
+            .getSavingGoals()
+            .filter(goal -> goal.getId() == savingId)
+            .head()
+            .registerPayment(BigDecimal.valueOf(amount)))
         .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
 
     return accountProvider.lookup(accountId).map(AccountResponse::new).get();
@@ -219,12 +213,10 @@ public class AccountEditResource {
   void deleteSavingGoal(@PathVariable long accountId, @PathVariable long savingId) {
     accountProvider
         .lookup(accountId)
-        .ifPresent(
-            account ->
-                account
-                    .getSavingGoals()
-                    .filter(goal -> goal.getId() == savingId)
-                    .forEach(SavingGoal::completed))
+        .ifPresent(account -> account
+            .getSavingGoals()
+            .filter(goal -> goal.getId() == savingId)
+            .forEach(SavingGoal::completed))
         .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
   }
 }

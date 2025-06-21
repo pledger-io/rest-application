@@ -16,13 +16,12 @@ public class NumberMatcher implements ConditionMatcher {
       return this;
     }
 
-    innerMatcher =
-        switch (operation) {
-          case LESS_THAN -> () -> castedActual < checkAmount;
-          case MORE_THAN -> () -> castedActual > checkAmount;
-          case EQUALS -> () -> castedActual == checkAmount;
-          default -> () -> false;
-        };
+    innerMatcher = switch (operation) {
+      case LESS_THAN -> () -> castedActual < checkAmount;
+      case MORE_THAN -> () -> castedActual > checkAmount;
+      case EQUALS -> () -> castedActual == checkAmount;
+      default -> () -> false;
+    };
 
     return this;
   }

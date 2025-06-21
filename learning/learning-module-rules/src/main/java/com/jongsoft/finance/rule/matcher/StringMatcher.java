@@ -16,13 +16,12 @@ public class StringMatcher implements ConditionMatcher {
       var castedActual = actual.toString().toLowerCase();
       var loweredExpectation = expectation.toLowerCase();
 
-      innerMatcher =
-          switch (operation) {
-            case EQUALS -> () -> loweredExpectation.equals(castedActual);
-            case CONTAINS -> () -> castedActual.contains(loweredExpectation);
-            case STARTS_WITH -> () -> castedActual.startsWith(loweredExpectation);
-            default -> () -> false;
-          };
+      innerMatcher = switch (operation) {
+        case EQUALS -> () -> loweredExpectation.equals(castedActual);
+        case CONTAINS -> () -> castedActual.contains(loweredExpectation);
+        case STARTS_WITH -> () -> castedActual.startsWith(loweredExpectation);
+        default -> () -> false;
+      };
     }
 
     return this;

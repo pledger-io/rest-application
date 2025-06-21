@@ -22,12 +22,12 @@ public class TagClassificationTool implements AiTool {
 
   @Tool(
       """
-            This tool returns the full list of known tags that can be used when classifying financial transactions.
+This tool returns the full list of known tags that can be used when classifying financial transactions.
 
-            Use this tool to retrieve or confirm the set of valid tags.
-            Do not use any tag that is not included in the output of this tool.
+Use this tool to retrieve or confirm the set of valid tags.
+Do not use any tag that is not included in the output of this tool.
 
-            Tags provide additional context for classification but are independent of categories and subcategories.""")
+Tags provide additional context for classification but are independent of categories and subcategories.""")
   public List<String> listKnownTags() {
     logger.trace("Ai tool fetching available tags.");
     return tagProvider.lookup().map(Tag::name).toJava();

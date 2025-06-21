@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_REACT_APP;
+
 import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -9,6 +11,7 @@ import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import java.io.InputStream;
 import java.net.URI;
@@ -18,11 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
+@Tag(name = TAG_REACT_APP)
 @Secured(SecurityRule.IS_ANONYMOUS)
 public class StaticResource {
   private final Logger log = LoggerFactory.getLogger(StaticResource.class);
 
-  @Inject ResourceResolver resourceResolver;
+  @Inject
+  ResourceResolver resourceResolver;
 
   @Get
   @Operation(hidden = true)
