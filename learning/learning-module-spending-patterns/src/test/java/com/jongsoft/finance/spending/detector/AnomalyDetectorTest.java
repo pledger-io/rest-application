@@ -1,5 +1,7 @@
 package com.jongsoft.finance.spending.detector;
 
+import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -9,6 +11,8 @@ import com.jongsoft.finance.spending.detector.anomaly.Anomaly;
 import com.jongsoft.finance.spending.detector.anomaly.UserCategoryStatistics;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +74,7 @@ class AnomalyDetectorTest {
 
     // Assert
     assertEquals(1, insights.size());
-    assertSame(mockInsight, insights.get(0));
+    assertSame(mockInsight, insights.getFirst());
     verify(mockAnomaly).detect(eq(transaction), any());
   }
 
@@ -114,6 +118,90 @@ class AnomalyDetectorTest {
 
     // Assert
     assertTrue(insights.isEmpty());
+  }
+
+  @Test
+  void shouldUpdateBaselineSuccessfully() {
+    // Arrange
+    TransactionProvider transactionProvider = mock(TransactionProvider.class);
+    FilterFactory filterFactory = mock(FilterFactory.class);
+    BudgetProvider budgetProvider = mock(BudgetProvider.class);
+
+    TestableAnomalyDetector detector = new TestableAnomalyDetector(
+        transactionProvider, filterFactory, budgetProvider);
+
+    // Mock transactions and their grouping by budget
+    Transaction transaction1 = mock(Transaction.class);
+    Transaction transaction2 = mock(Transaction.class);
+    when(transaction1.getBudget()).thenReturn("Groceries");
+    when(transaction2.getBudget()).thenReturn("Groceries");
+    when(transaction1.computeAmount(any())).thenReturn(100.0);
+    when(transaction2.computeAmount(any())).thenReturn(200.0);
+    when(filterFactory.transaction()).thenReturn(mock(TransactionProvider.FilterCommand.class));
+
+    Account merchantAccount = mock(Account.class);
+    when(transaction1.computeTo()).thenReturn(merchantAccount);
+    when(transaction2.computeTo()).thenReturn(merchantAccount);
+    when(merchantAccount.getName()).thenReturn("MerchantA");
+
+    LocalDate now = LocalDate.now();
+    when(transaction1.getDate()).thenReturn(now.minusMonths(1));
+    when(transaction2.getDate()).thenReturn(now.minusMonths(2));
+
+    when(transactionProvider.lookup(any()))
+        .thenReturn(ResultPage.of(transaction1, transaction2));
+
+    // Act
+    detector.updateBaseline(YearMonth.now());
+
+    // Assert
+    var statistics = detector.getUserCategoryStatistics().get();
+    assertNotNull(statistics);
+    assertTrue(statistics.amounts().containsKey("Groceries"));
+    assertEquals(2, statistics.frequencies().get("Groceries").getN());
+    assertEquals(300.0, statistics.amounts().get("Groceries").getSum(), 0.01);
+    assertTrue(statistics.typicalMerchants().get("Groceries").contains("MerchantA"));
+  }
+
+  @Test
+  void shouldClearStatisticsWhenUpdateBaselineCalled() {
+    // Arrange
+    TransactionProvider transactionProvider = mock(TransactionProvider.class);
+    FilterFactory filterFactory = mock(FilterFactory.class);
+    BudgetProvider budgetProvider = mock(BudgetProvider.class);
+
+    TestableAnomalyDetector detector = new TestableAnomalyDetector(
+        transactionProvider, filterFactory, budgetProvider);
+
+    // Mock transactions for the first update
+    Transaction transaction1 = mock(Transaction.class);
+    when(transaction1.getBudget()).thenReturn("Entertainment");
+    when(transaction1.computeAmount(any())).thenReturn(150.0);
+    when(transaction1.getDate()).thenReturn(LocalDate.now().minusMonths(1));
+    when(filterFactory.transaction()).thenReturn(mock(TransactionProvider.FilterCommand.class));
+
+    when(transactionProvider.lookup(any())).thenReturn(ResultPage.of(transaction1));
+
+    detector.updateBaseline(YearMonth.now());
+
+    // Mock transactions for the second update
+    Transaction transaction2 = mock(Transaction.class);
+    when(transaction2.getBudget()).thenReturn("Groceries");
+    when(transaction2.computeAmount(any())).thenReturn(250.0);
+    when(transaction2.getDate()).thenReturn(LocalDate.now().minusMonths(2));
+
+    var transactionsRound2 = List.of(transaction2);
+    when(transactionProvider.lookup(any())).thenReturn(ResultPage.of(transaction2));
+
+    // Act
+    detector.updateBaseline(YearMonth.now());
+
+    // Assert
+    var statistics = detector.getUserCategoryStatistics().get();
+    assertNotNull(statistics);
+    assertFalse(statistics.amounts().containsKey("Entertainment"));
+    assertTrue(statistics.amounts().containsKey("Groceries"));
+    assertEquals(250.0, statistics.amounts().get("Groceries").getSum(), 0.01);
   }
 
   /**

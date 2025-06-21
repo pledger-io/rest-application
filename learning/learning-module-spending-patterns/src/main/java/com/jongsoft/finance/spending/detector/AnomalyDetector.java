@@ -86,6 +86,7 @@ class AnomalyDetector implements Detector<SpendingInsight> {
 
       Set<String> merchants = budgetTransactions.getValue().stream()
           .map(Transaction::computeTo)
+          .filter(Objects::nonNull)
           .map(Account::getName)
           .collect(Collectors.toSet());
       userCategoryStatistics.get().typicalMerchants().put(budget, merchants);
