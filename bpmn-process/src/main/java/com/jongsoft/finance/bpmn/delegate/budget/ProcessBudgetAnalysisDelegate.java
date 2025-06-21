@@ -64,23 +64,20 @@ public class ProcessBudgetAnalysisDelegate implements JavaDelegate, JavaBean {
     for (int i = budgetAnalysisMonths; i > 0; i--) {
       var transactions = transactionProvider.lookup(searchCommand.range(dateRange));
 
-      var spentInMonth =
-          transactions
-              .content()
-              .map(transaction -> transaction.computeAmount(transaction.computeTo()))
-              .sum()
-              .get();
+      var spentInMonth = transactions
+          .content()
+          .map(transaction -> transaction.computeAmount(transaction.computeTo()))
+          .sum()
+          .get();
 
       deviation += forExpense.computeBudget() - spentInMonth;
       dateRange = dateRange.previous();
     }
 
-    var averageDeviation =
-        BigDecimal.valueOf(deviation)
-            .divide(
-                BigDecimal.valueOf(budgetAnalysisMonths), new MathContext(6, RoundingMode.HALF_UP))
-            .setScale(2, RoundingMode.HALF_UP)
-            .doubleValue();
+    var averageDeviation = BigDecimal.valueOf(deviation)
+        .divide(BigDecimal.valueOf(budgetAnalysisMonths), new MathContext(6, RoundingMode.HALF_UP))
+        .setScale(2, RoundingMode.HALF_UP)
+        .doubleValue();
     if (Math.abs(averageDeviation) / forExpense.computeBudget()
         > settingProvider.getMaximumBudgetDeviation()) {
       execution.setVariableLocal("deviation", averageDeviation);

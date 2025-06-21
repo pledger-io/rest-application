@@ -8,8 +8,8 @@ public record CreateContractCommand(
     implements ApplicationEvent {
 
   /**
-   * Creates a new contract with the provided details and publishes it to the event bus for further
-   * processing.
+   * Creates a new contract with the provided details and publishes it to the event bus for
+   * further processing.
    *
    * @param companyId the identifier of the company for which the contract is being created
    * @param name the name of the contract

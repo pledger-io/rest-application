@@ -131,18 +131,18 @@ public class JpaQuery<E> extends BaseQuery<JpaQuery<E>> {
    * @param <C> the type of the projection result
    * @param projectionType the class representing the type of projection result
    * @param projection the expression for the projection
-   * @return an Optional containing the projected result if successful, otherwise an empty Optional
+   * @return an Optional containing the projected result if successful, otherwise an empty
+   *     Optional
    */
   public <C> Optional<C> projectSingleValue(Class<C> projectionType, String projection) {
     var hql = "SELECT %s %s".formatted(projection, generateHql(true));
 
     return Control.Try(() -> (C) createQuery(projectionType, hql).getSingleResult())
         .map(Control::Option)
-        .recover(
-            e -> {
-              logger.warn("Unable to find projection, cause: {}", e.getLocalizedMessage());
-              return Control.Option();
-            })
+        .recover(e -> {
+          logger.warn("Unable to find projection, cause: {}", e.getLocalizedMessage());
+          return Control.Option();
+        })
         .get();
   }
 
@@ -152,7 +152,8 @@ public class JpaQuery<E> extends BaseQuery<JpaQuery<E>> {
    * @param <C> the type of the projection result
    * @param projectionType the class representing the type of projection result
    * @param projection the expression for the projection
-   * @return a Stream of the projected results based on the specified projection type and expression
+   * @return a Stream of the projected results based on the specified projection type and
+   *     expression
    */
   public <C> Stream<C> project(Class<C> projectionType, String projection) {
     var hql = "SELECT %s %s".formatted(projection, generateHql(true));
@@ -181,19 +182,18 @@ public class JpaQuery<E> extends BaseQuery<JpaQuery<E>> {
 
     return Control.Try(() -> (E) createQuery(table, hql).getSingleResult())
         .map(Control::Option)
-        .recover(
-            e -> {
-              logger.trace("Unable to find entity, cause: {}", e.getLocalizedMessage());
-              return Control.Option();
-            })
+        .recover(e -> {
+          logger.trace("Unable to find entity, cause: {}", e.getLocalizedMessage());
+          return Control.Option();
+        })
         .get();
   }
 
   /**
    * Retrieves a paginated result page based on the specified query conditions.
    *
-   * @return a ResultPage containing elements resulting from the query execution paginated based on
-   *     the provided conditions
+   * @return a ResultPage containing elements resulting from the query execution paginated based
+   *     on the provided conditions
    */
   public ResultPage<E> paged() {
     var countHql = "SELECT count(DISTINCT e.id) %s".formatted(generateHql(false));

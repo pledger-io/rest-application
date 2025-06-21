@@ -38,9 +38,8 @@ public class FileResource {
   @Get(value = "/{fileCode}", consumes = MediaType.ALL, produces = MediaType.ALL)
   @Operation(
       summary = "Download attachment",
-      description =
-          "Download an existing attachment, if file encryption is enabled this will"
-              + " throw an exception if the current user did not upload the file.")
+      description = "Download an existing attachment, if file encryption is enabled this will"
+          + " throw an exception if the current user did not upload the file.")
   byte[] download(@PathVariable String fileCode) {
     return storageService.read(fileCode).get();
   }
@@ -49,9 +48,8 @@ public class FileResource {
   @Status(HttpStatus.NO_CONTENT)
   @Operation(
       summary = "Delete attachment",
-      description =
-          "Delete an existing attachment, if file encryption is enabled this will"
-              + " throw an exception if the current user did not upload the file.")
+      description = "Delete an existing attachment, if file encryption is enabled this will"
+          + " throw an exception if the current user did not upload the file.")
   void delete(@PathVariable String fileCode) {
     storageService.remove(fileCode);
   }

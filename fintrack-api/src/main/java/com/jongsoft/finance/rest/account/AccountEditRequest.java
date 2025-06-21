@@ -12,8 +12,8 @@ record AccountEditRequest(
     @NotNull @NotBlank @Schema(description = "Account currency, must exist in the system")
         String currency,
     @Pattern(
-            regexp =
-                "^([A-Z]{2}[ \\-]?[0-9]{2})(?=(?:[ \\-]?[A-Z0-9]){9,30}$)((?:[ \\-]?[A-Z0-9]{3,5}){2,7})([ \\-]?[A-Z0-9]{1,3})?$")
+            regexp = "^([A-Z]{2}[ \\-]?[0-9]{2})(?=(?:[ \\-]?[A-Z0-9]){9,30}$)((?:["
+                + " \\-]?[A-Z0-9]{3,5}){2,7})([ \\-]?[A-Z0-9]{1,3})?$")
         @Schema(description = "IBAN number")
         String iban,
     @Pattern(regexp = "^([a-zA-Z]{4}[a-zA-Z]{2}[a-zA-Z0-9]{2}([a-zA-Z0-9]{3})?)$")

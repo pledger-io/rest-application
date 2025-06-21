@@ -56,30 +56,26 @@ public class MicronautBeanResolver implements ResolverFactory, Resolver {
 
   protected synchronized Set<String> getKeySet() {
     if (keySet == null) {
-      keySet =
-          applicationContext.getAllBeanDefinitions().stream()
-              .filter(
-                  beanDefinition ->
-                      !beanDefinition.getClass().getName().startsWith("io.micronaut."))
-              .map(this::getBeanName)
-              .collect(Collectors.toSet());
+      keySet = applicationContext.getAllBeanDefinitions().stream()
+          .filter(
+              beanDefinition -> !beanDefinition.getClass().getName().startsWith("io.micronaut."))
+          .map(this::getBeanName)
+          .collect(Collectors.toSet());
     }
     return keySet;
   }
 
   protected String getBeanName(BeanDefinition<?> beanDefinition) {
-    var beanQualifier =
-        beanDefinition
-            .getAnnotationMetadata()
-            .findDeclaredAnnotation(AnnotationUtil.NAMED)
-            .flatMap(AnnotationValue::stringValue);
-    return beanQualifier.orElseGet(
-        () -> {
-          if (beanDefinition instanceof NameResolver resolver) {
-            return resolver.resolveName().orElse(getBeanNameFromType(beanDefinition));
-          }
-          return getBeanNameFromType(beanDefinition);
-        });
+    var beanQualifier = beanDefinition
+        .getAnnotationMetadata()
+        .findDeclaredAnnotation(AnnotationUtil.NAMED)
+        .flatMap(AnnotationValue::stringValue);
+    return beanQualifier.orElseGet(() -> {
+      if (beanDefinition instanceof NameResolver resolver) {
+        return resolver.resolveName().orElse(getBeanNameFromType(beanDefinition));
+      }
+      return getBeanNameFromType(beanDefinition);
+    });
   }
 
   protected String getBeanNameFromType(BeanDefinition<?> beanDefinition) {

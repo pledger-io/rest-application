@@ -10,7 +10,9 @@ import lombok.Data;
 @Table(name = "analyze_job")
 public class AnalyzeJobJpa {
 
-  @Id private String id;
+  @Id
+  private String id;
+
   private String yearMonth;
   private boolean completed;
 }

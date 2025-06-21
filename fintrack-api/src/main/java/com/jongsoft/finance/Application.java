@@ -17,8 +17,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
         @Info(
             title = "Pledger",
             version = "2.0.0",
-            description =
-                "Pledger.io is a self-hosted personal finance application that helps you track your income and expenses.",
+            description = "Pledger.io is a self-hosted personal finance application that"
+                + " helps you track your income and expenses.",
             license = @License(name = "MIT", url = "https://opensource.org/licenses/MIT"),
             contact =
                 @Contact(
@@ -35,7 +35,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
       @Tag(
           name = TAG_ACCOUNTS_TRANSACTIONS,
           description =
-              "API access to fetch transactions for any accounts of a user in Pledger.io"),
+              "API access to fetch transactions for any accounts of a user in" + " Pledger.io"),
       @Tag(
           name = TAG_BUDGETS,
           description = "API to get access to budget information for the user."),
@@ -47,51 +47,53 @@ import io.swagger.v3.oas.annotations.tags.Tag;
           description = "API to get access to contract information for the user."),
       @Tag(
           name = TAG_ATTACHMENTS,
-          description =
-              "API for managing file attachments and documents related to transactions and accounts."),
+          description = "API for managing file attachments and documents related to"
+              + " transactions and accounts."),
       @Tag(
           name = TAG_REPORTS,
           description = "API for generating and retrieving financial reports and analytics."),
       @Tag(
           name = TAG_TRANSACTION,
           description =
-              "API for creating, updating, and managing individual financial transactions."),
+              "API for creating, updating, and managing individual financial" + " transactions."),
       @Tag(
           name = TAG_TRANSACTION_IMPORT,
-          description = "API for importing transactions from external sources and file formats."),
+          description =
+              "API for importing transactions from external sources and file" + " formats."),
       @Tag(
           name = TAG_TRANSACTION_ANALYTICS,
           description =
-              "API for retrieving analytical data and insights about transaction patterns."),
+              "API for retrieving analytical data and insights about transaction" + " patterns."),
       @Tag(
           name = TAG_TRANSACTION_TAGGING,
-          description =
-              "API for managing tags and labels associated with transactions for better organization."),
+          description = "API for managing tags and labels associated with transactions for"
+              + " better organization."),
       @Tag(
           name = TAG_AUTOMATION_RULES,
-          description =
-              "API for defining and managing rules that automate transaction processing and categorization."),
+          description = "API for defining and managing rules that automate transaction"
+              + " processing and categorization."),
       @Tag(
           name = TAG_AUTOMATION_PROCESSES,
-          description =
-              "API for managing automated business processes and workflows related to financial data."),
+          description = "API for managing automated business processes and workflows related to"
+              + " financial data."),
       @Tag(
           name = TAG_SETTINGS,
           description = "API for configuring general application settings and preferences."),
       @Tag(
           name = TAG_SETTINGS_CURRENCIES,
-          description =
-              "API for managing currency settings, exchange rates, and currency-related configurations."),
+          description = "API for managing currency settings, exchange rates, and"
+              + " currency-related configurations."),
       @Tag(
           name = TAG_SETTINGS_LOCALIZATION,
           description = "API for configuring language, region, and format preferences."),
       @Tag(
           name = TAG_SECURITY,
-          description = "API for managing security settings, permissions, and access controls."),
+          description =
+              "API for managing security settings, permissions, and access" + " controls."),
       @Tag(
           name = TAG_SECURITY_USERS,
-          description =
-              "API for user management, including creation, updates, and permission assignments."),
+          description = "API for user management, including creation, updates, and permission"
+              + " assignments."),
     })
 @SecurityScheme(
     name = "bearer",

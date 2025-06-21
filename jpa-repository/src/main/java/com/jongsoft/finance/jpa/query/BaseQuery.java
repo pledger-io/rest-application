@@ -62,14 +62,12 @@ public abstract class BaseQuery<Q extends Query<Q>> implements Query<Q> {
     if (conditions.length == 1) {
       return fieldEq(field, conditions[0]);
     } else if (conditions.length == 2) {
-      this.conditions.add(
-          Expressions.or(
-              Expressions.fieldCondition(tableAlias, field, FieldEquation.EQ, conditions[0]),
-              Expressions.fieldCondition(tableAlias, field, FieldEquation.EQ, conditions[1])));
+      this.conditions.add(Expressions.or(
+          Expressions.fieldCondition(tableAlias, field, FieldEquation.EQ, conditions[0]),
+          Expressions.fieldCondition(tableAlias, field, FieldEquation.EQ, conditions[1])));
     } else {
-      this.conditions.add(
-          Expressions.fieldCondition(
-              tableAlias, field, FieldEquation.IN, Arrays.asList(conditions)));
+      this.conditions.add(Expressions.fieldCondition(
+          tableAlias, field, FieldEquation.IN, Arrays.asList(conditions)));
     }
 
     return (Q) this;
@@ -78,9 +76,8 @@ public abstract class BaseQuery<Q extends Query<Q>> implements Query<Q> {
   @Override
   @SuppressWarnings("unchecked")
   public <C> Q fieldNotEqOneOf(String field, C... conditions) {
-    this.conditions.add(
-        Expressions.fieldCondition(
-            tableAlias, field, FieldEquation.NIN, Arrays.asList(conditions)));
+    this.conditions.add(Expressions.fieldCondition(
+        tableAlias, field, FieldEquation.NIN, Arrays.asList(conditions)));
     return (Q) this;
   }
 
@@ -94,10 +91,9 @@ public abstract class BaseQuery<Q extends Query<Q>> implements Query<Q> {
   @Override
   @SuppressWarnings("unchecked")
   public <C> Q fieldGtOrEqNullable(String field, C condition) {
-    conditions.add(
-        Expressions.or(
-            Expressions.fieldCondition(tableAlias, field, FieldEquation.GTE, condition),
-            Expressions.fieldNull(tableAlias, field)));
+    conditions.add(Expressions.or(
+        Expressions.fieldCondition(tableAlias, field, FieldEquation.GTE, condition),
+        Expressions.fieldNull(tableAlias, field)));
     return (Q) this;
   }
 

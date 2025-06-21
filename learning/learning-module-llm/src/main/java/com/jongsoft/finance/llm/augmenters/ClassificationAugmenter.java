@@ -44,9 +44,8 @@ public class ClassificationAugmenter implements RetrievalAugmentor {
           .build();
     }
 
-    throw new IllegalStateException(
-        "Could not augment a message of type "
-            + augmentationRequest.chatMessage().getClass().getName());
+    throw new IllegalStateException("Could not augment a message of type "
+        + augmentationRequest.chatMessage().getClass().getName());
   }
 
   private UserMessage augment(UserMessage userMessage, Metadata metadata) {
@@ -58,18 +57,16 @@ public class ClassificationAugmenter implements RetrievalAugmentor {
       int year = LocalDate.now().getYear();
       int month = LocalDate.now().getMonthValue();
 
-      allowedList =
-          budgetProvider.lookup(year, month).stream()
-              .flatMap(b -> b.getExpenses().stream())
-              .map(Budget.Expense::getName)
-              .collect(Collectors.joining(","));
+      allowedList = budgetProvider.lookup(year, month).stream()
+          .flatMap(b -> b.getExpenses().stream())
+          .map(Budget.Expense::getName)
+          .collect(Collectors.joining(","));
     }
 
     if (currentMessage.contains("Pick the correct subcategory for a transaction")) {
       logger.trace("User message augmentation with available categories.");
-      allowedList =
-          categoryProvider.lookup().map(Category::getLabel).stream()
-              .collect(Collectors.joining(","));
+      allowedList = categoryProvider.lookup().map(Category::getLabel).stream()
+          .collect(Collectors.joining(","));
     }
 
     if (currentMessage.contains("Pick the correct tags for a transaction on")) {
@@ -79,10 +76,10 @@ public class ClassificationAugmenter implements RetrievalAugmentor {
 
     var updatedRequest =
         """
-                %s
-                You must choose from the following options: [%s].
+%s
+You must choose from the following options: [%s].
 
-                Your response must **only** contain the chosen option in plain text and nothing else. Do not add any explanation, formatting, or extra words."""
+Your response must **only** contain the chosen option in plain text and nothing else. Do not add any explanation, formatting, or extra words."""
             .formatted(currentMessage.split("\n")[0], allowedList);
 
     return UserMessage.userMessage(updatedRequest);

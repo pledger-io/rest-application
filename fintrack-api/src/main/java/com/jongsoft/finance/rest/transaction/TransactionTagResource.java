@@ -61,8 +61,8 @@ public class TransactionTagResource {
   @Operation(
       operationId = "deleteTag",
       summary = "Delete tag",
-      description =
-          "Removes a tag from the system, this prevents it being used in updates. But will not remove old relations between tags and transactions.")
+      description = "Removes a tag from the system, this prevents it being used in updates. But"
+          + " will not remove old relations between tags and transactions.")
   void delete(@PathVariable String tag) {
     tagProvider
         .lookup(tag)

@@ -32,8 +32,10 @@ public class ProcessVariableResource {
       operationId = "getVariables")
   public List<ProcessVariableResponse> variables(
       @PathVariable String processDefinitionKey, @PathVariable String instanceId) {
-    return Collections.List(
-            runtimeService.createVariableInstanceQuery().processInstanceIdIn(instanceId).list())
+    return Collections.List(runtimeService
+            .createVariableInstanceQuery()
+            .processInstanceIdIn(instanceId)
+            .list())
         .map(ProcessVariableResponse::new)
         .toJava();
   }
@@ -47,12 +49,11 @@ public class ProcessVariableResource {
       @PathVariable String processDefinitionKey,
       @PathVariable String instanceId,
       @PathVariable String variable) {
-    return Collections.List(
-            runtimeService
-                .createVariableInstanceQuery()
-                .processInstanceIdIn(instanceId)
-                .variableName(variable)
-                .list())
+    return Collections.List(runtimeService
+            .createVariableInstanceQuery()
+            .processInstanceIdIn(instanceId)
+            .variableName(variable)
+            .list())
         .map(ProcessVariableResponse::new)
         .toJava();
   }

@@ -27,33 +27,30 @@ public class OccurrencePattern implements Pattern {
       return Optional.empty();
     }
 
-    var dates =
-        matches.stream()
-            .map(
-                match ->
-                    LocalDate.parse(
-                        Objects.requireNonNull(match.embedded().metadata().getString("date"))))
-            .sorted()
-            .toList();
+    var dates = matches.stream()
+        .map(match ->
+            LocalDate.parse(Objects.requireNonNull(match.embedded().metadata().getString("date"))))
+        .sorted()
+        .toList();
 
     var detected = detectMonthlyOrWeekly(computeIntervals(dates));
     if (detected != null) {
-      var amounts =
-          matches.stream().map(match -> match.embedded().metadata().getDouble("amount")).toList();
+      var amounts = matches.stream()
+          .map(match -> match.embedded().metadata().getDouble("amount"))
+          .filter(Objects::nonNull)
+          .toList();
 
-      return Optional.of(
-          SpendingPattern.builder()
-              .type(detected)
-              .category(transaction.getCategory())
-              .detectedDate(transaction.getDate().withDayOfMonth(1))
-              .confidence(calculateConfidence(matches))
-              .metadata(
-                  Map.of(
-                      "frequency", detected == PatternType.RECURRING_WEEKLY ? "weekly" : "monthly",
-                      "typical_amount", calculateAverage(amounts),
-                      "vector_similarity", calculateAverageSimilarity(matches),
-                      "typical_day", getMostCommonDayOfWeek(dates)))
-              .build());
+      return Optional.of(SpendingPattern.builder()
+          .type(detected)
+          .category(transaction.getCategory())
+          .detectedDate(transaction.getDate().withDayOfMonth(1))
+          .confidence(calculateConfidence(matches))
+          .metadata(Map.of(
+              "frequency", detected == PatternType.RECURRING_WEEKLY ? "weekly" : "monthly",
+              "typical_amount", calculateAverage(amounts),
+              "vector_similarity", calculateAverageSimilarity(matches),
+              "typical_day", getMostCommonDayOfWeek(dates)))
+          .build());
     }
 
     return Optional.empty();
@@ -77,9 +74,8 @@ public class OccurrencePattern implements Pattern {
   }
 
   private DayOfWeek getMostCommonDayOfWeek(List<LocalDate> dates) {
-    Map<DayOfWeek, Long> dayCount =
-        dates.stream()
-            .collect(Collectors.groupingBy(LocalDate::getDayOfWeek, Collectors.counting()));
+    Map<DayOfWeek, Long> dayCount = dates.stream()
+        .collect(Collectors.groupingBy(LocalDate::getDayOfWeek, Collectors.counting()));
 
     return dayCount.entrySet().stream()
         .max(Map.Entry.comparingByValue())
@@ -90,14 +86,18 @@ public class OccurrencePattern implements Pattern {
   private PatternType detectMonthlyOrWeekly(List<Number> intervals) {
     if (intervals.isEmpty()) return null;
 
-    var avgInterval = (int) intervals.stream().mapToLong(Number::longValue).average().orElse(0);
+    var avgInterval =
+        (int) intervals.stream().mapToLong(Number::longValue).average().orElse(0);
 
     // Check for monthly pattern first (more specific check)
     if (avgInterval >= 28 && avgInterval <= 31) {
-      // For monthly patterns, we need to be more lenient because months have different lengths
+      // For monthly patterns, we need to be more lenient because months have different
+      // lengths
       // Check if most intervals are between 28 and 31 days
-      var monthlyIntervals =
-          intervals.stream().mapToLong(Number::longValue).filter(i -> i >= 28 && i <= 31).count();
+      var monthlyIntervals = intervals.stream()
+          .mapToLong(Number::longValue)
+          .filter(i -> i >= 28 && i <= 31)
+          .count();
       boolean isMonthly = monthlyIntervals >= intervals.size() * PERCENTAGE_INSIDE_AVG_INTERVAL;
 
       log.trace(
@@ -111,11 +111,10 @@ public class OccurrencePattern implements Pattern {
     }
 
     // Check for weekly pattern
-    var numberWithinAvg =
-        intervals.stream()
-            .mapToLong(Number::longValue)
-            .filter(i -> Math.abs(i - avgInterval) <= DAYS_DEVIATION_ALLOWED)
-            .count();
+    var numberWithinAvg = intervals.stream()
+        .mapToLong(Number::longValue)
+        .filter(i -> Math.abs(i - avgInterval) <= DAYS_DEVIATION_ALLOWED)
+        .count();
     boolean isConsistent = numberWithinAvg >= intervals.size() * PERCENTAGE_INSIDE_AVG_INTERVAL;
 
     log.trace(

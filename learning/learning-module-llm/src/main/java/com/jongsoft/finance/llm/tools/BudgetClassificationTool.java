@@ -24,12 +24,12 @@ public class BudgetClassificationTool implements AiTool {
 
   @Tool(
       """
-            This tool returns the full list of known categories that can be used when classifying financial transactions.
+This tool returns the full list of known categories that can be used when classifying financial transactions.
 
-            Use this tool to retrieve or confirm the set of valid categories.
-            Do not use any category that is not included in the output of this tool.
+Use this tool to retrieve or confirm the set of valid categories.
+Do not use any category that is not included in the output of this tool.
 
-            To view subcategories or tags, use the appropriate tools designed for those purposes.""")
+To view subcategories or tags, use the appropriate tools designed for those purposes.""")
   public List<String> listKnownCategories() {
     logger.trace("Ai tool fetching available budgets.");
     int year = LocalDate.now().getYear();

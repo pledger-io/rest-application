@@ -36,13 +36,12 @@ class TransactionSuggestionResource {
       summary = "Suggest changes",
       description = "Suggest changes to a transaction based upon the rules in the system.")
   Map<String, ?> suggest(@Body TransactionForSuggestionRequest request) {
-    var transactionInput =
-        new SuggestionInput(
-            LocalDate.now(),
-            request.description(),
-            request.source(),
-            request.destination(),
-            Optional.ofNullable(request.amount()).orElse(0D));
+    var transactionInput = new SuggestionInput(
+        LocalDate.now(),
+        request.description(),
+        request.source(),
+        request.destination(),
+        Optional.ofNullable(request.amount()).orElse(0D));
     var suggestions = suggestionEngine.makeSuggestions(transactionInput);
 
     var output = new HashMap<String, Object>();

@@ -43,8 +43,8 @@ public class ReactController {
   }
 
   /**
-   * Catch-all route to serve the React app for any path under /react/. This allows the React Router
-   * to handle client-side routing properly.
+   * Catch-all route to serve the React app for any path under /react/. This allows the React
+   * Router to handle client-side routing properly.
    *
    * @return The index.html file
    */

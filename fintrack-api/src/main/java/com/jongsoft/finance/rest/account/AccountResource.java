@@ -52,13 +52,12 @@ public class AccountResource {
   @Get("/my-own")
   @Operation(
       summary = "List own accounts",
-      description =
-          "List all accounts that are creatable in the front-end using one of the selectable account types",
+      description = "List all accounts that are creatable in the front-end using one of the"
+          + " selectable account types",
       operationId = "ownAccounts")
   List<AccountResponse> ownAccounts() {
-    var accounts =
-        accountProvider.lookup(
-            accountFilterFactory.account().types(accountTypeProvider.lookup(false)));
+    var accounts = accountProvider.lookup(
+        accountFilterFactory.account().types(accountTypeProvider.lookup(false)));
 
     return accounts.content().map(AccountResponse::new).toJava();
   }
@@ -75,8 +74,8 @@ public class AccountResource {
   @Get("/auto-complete{?token,type}")
   @Operation(
       summary = "Autocomplete accounts",
-      description =
-          "Performs a search operation based on the partial name (token) of the given account type",
+      description = "Performs a search operation based on the partial name (token) of the given"
+          + " account type",
       operationId = "autocomplete",
       parameters = {
         @Parameter(
@@ -87,19 +86,19 @@ public class AccountResource {
             schema = @Schema(implementation = String.class)),
         @Parameter(
             name = "type",
-            description =
-                "An account type to limit the search to, see <a href='#get-/api/account-type'>types</a> for available types.",
+            description = "An account type to limit the search to, see <a"
+                + " href='#get-/api/account-type'>types</a> for available"
+                + " types.",
             example = "credit",
             in = ParameterIn.QUERY,
             required = true,
             schema = @Schema(implementation = String.class)),
       })
   List<AccountResponse> autocomplete(@Nullable String token, @Nullable String type) {
-    var filter =
-        accountFilterFactory
-            .account()
-            .name(token, false)
-            .page(0, settingProvider.getAutocompleteLimit());
+    var filter = accountFilterFactory
+        .account()
+        .name(token, false)
+        .page(0, settingProvider.getAutocompleteLimit());
     if (type != null) {
       filter.types(Collections.List(type));
     }
@@ -114,11 +113,10 @@ public class AccountResource {
       description = "Search through all accounts using the provided filter set",
       operationId = "listAccounts")
   ResultPageResponse<AccountResponse> accounts(@Valid @Body AccountSearchRequest searchRequest) {
-    var filter =
-        accountFilterFactory
-            .account()
-            .page(Math.max(0, searchRequest.page() - 1), settingProvider.getPageSize())
-            .types(searchRequest.accountTypes());
+    var filter = accountFilterFactory
+        .account()
+        .page(Math.max(0, searchRequest.page() - 1), settingProvider.getPageSize())
+        .types(searchRequest.accountTypes());
     if (searchRequest.name() != null) {
       filter.name(searchRequest.name(), false);
     }
@@ -144,20 +142,17 @@ public class AccountResource {
 
       return accountProvider
           .lookup(accountEditRequest.name())
-          .map(
-              inserted -> {
-                if (accountEditRequest.interestPeriodicity() != null) {
-                  inserted.interest(
-                      accountEditRequest.interest(), accountEditRequest.interestPeriodicity());
-                }
+          .map(inserted -> {
+            if (accountEditRequest.interestPeriodicity() != null) {
+              inserted.interest(
+                  accountEditRequest.interest(), accountEditRequest.interestPeriodicity());
+            }
 
-                inserted.changeAccount(
-                    accountEditRequest.iban(),
-                    accountEditRequest.bic(),
-                    accountEditRequest.number());
+            inserted.changeAccount(
+                accountEditRequest.iban(), accountEditRequest.bic(), accountEditRequest.number());
 
-                return new AccountResponse(inserted);
-              })
+            return new AccountResponse(inserted);
+          })
           .getOrThrow(() -> StatusException.internalError("Failed to create account"));
     }
 

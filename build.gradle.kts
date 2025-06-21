@@ -44,7 +44,7 @@ subprojects {
             removeUnusedImports()
             trimTrailingWhitespace()
             endWithNewline()
-            googleJavaFormat()
+            palantirJavaFormat("2.68.0").style("GOOGLE")
         }
     }
 

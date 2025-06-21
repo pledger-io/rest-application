@@ -33,12 +33,11 @@ public class ReadTransactionFromStorage implements JavaDelegate, JavaBean {
   public void execute(DelegateExecution delegateExecution) throws Exception {
     var storageToken = (String) delegateExecution.getVariableLocal("storageToken");
 
-    var transaction =
-        storageService
-            .read(storageToken)
-            .map(byteArray -> new String(byteArray, StandardCharsets.UTF_8))
-            .map(json -> processMapper.readSafe(json, TransactionDTO.class))
-            .getOrThrow(() -> new RuntimeException("Failed to read transaction from storage"));
+    var transaction = storageService
+        .read(storageToken)
+        .map(byteArray -> new String(byteArray, StandardCharsets.UTF_8))
+        .map(json -> processMapper.readSafe(json, TransactionDTO.class))
+        .getOrThrow(() -> new RuntimeException("Failed to read transaction from storage"));
 
     delegateExecution.setVariableLocal("transaction", transaction);
   }

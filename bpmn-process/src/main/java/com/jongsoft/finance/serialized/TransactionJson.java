@@ -16,16 +16,24 @@ import lombok.Data;
 public class TransactionJson implements Serializable {
 
   /** The account from which the transaction was made. */
-  @NonNull private final String fromAccount;
+  @NonNull
+  private final String fromAccount;
 
   /** The account to which the transaction was made. */
-  @NonNull private final String toAccount;
+  @NonNull
+  private final String toAccount;
 
-  @NonNull private final String description;
-  @NonNull private final String currency;
+  @NonNull
+  private final String description;
+
+  @NonNull
+  private final String currency;
+
   private final double amount;
 
-  @NonNull private final LocalDate date;
+  @NonNull
+  private final LocalDate date;
+
   private final LocalDate interestDate;
   private final LocalDate bookDate;
 

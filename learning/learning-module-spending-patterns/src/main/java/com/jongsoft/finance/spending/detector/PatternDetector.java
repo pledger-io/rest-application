@@ -84,7 +84,8 @@ class PatternDetector implements Detector<SpendingPattern> {
 
   @EventListener
   void handleTransactionAdded(TransactionCreated transactionCreated) {
-    indexTransaction(transactionProvider.lookup(transactionCreated.transactionId()).get());
+    indexTransaction(
+        transactionProvider.lookup(transactionCreated.transactionId()).get());
   }
 
   @Override
@@ -112,20 +113,17 @@ class PatternDetector implements Detector<SpendingPattern> {
     var segment = createTextSegment(transaction);
 
     // Search for similar transactions
-    var searchRequest =
-        EmbeddingSearchRequest.builder()
-            .queryEmbedding(embeddingModel.embed(segment).content())
-            .filter(
-                MetadataFilterBuilder.metadataKey("user")
-                    .isEqualTo(currentUserProvider.currentUser().getUsername().email())
-                    .and(
-                        MetadataFilterBuilder.metadataKey("date")
-                            .isBetween(
-                                transaction.getDate().minusMonths(3).toString(),
-                                transaction.getDate().toString())))
-            .maxResults(150)
-            .minScore(SIMILARITY_THRESHOLD)
-            .build();
+    var searchRequest = EmbeddingSearchRequest.builder()
+        .queryEmbedding(embeddingModel.embed(segment).content())
+        .filter(MetadataFilterBuilder.metadataKey("user")
+            .isEqualTo(currentUserProvider.currentUser().getUsername().email())
+            .and(MetadataFilterBuilder.metadataKey("date")
+                .isBetween(
+                    transaction.getDate().minusMonths(3).toString(),
+                    transaction.getDate().toString())))
+        .maxResults(150)
+        .minScore(SIMILARITY_THRESHOLD)
+        .build();
 
     var matches = patternVectorStore.embeddingStore().search(searchRequest).matches();
 
@@ -146,12 +144,10 @@ class PatternDetector implements Detector<SpendingPattern> {
     // Remove any existing entries for this transaction
     patternVectorStore
         .embeddingStore()
-        .removeAll(
-            MetadataFilterBuilder.metadataKey("id")
-                .isEqualTo(transaction.getId().toString())
-                .and(
-                    MetadataFilterBuilder.metadataKey("user")
-                        .isEqualTo(currentUserProvider.currentUser().getUsername().email())));
+        .removeAll(MetadataFilterBuilder.metadataKey("id")
+            .isEqualTo(transaction.getId().toString())
+            .and(MetadataFilterBuilder.metadataKey("user")
+                .isEqualTo(currentUserProvider.currentUser().getUsername().email())));
 
     // Add the transaction to the vector store
     patternVectorStore.embeddingStore().add(embeddingModel.embed(segment).content(), segment);

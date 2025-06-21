@@ -40,10 +40,9 @@ public class SplitTransactionHandler implements CommandHandler<SplitTransactionC
     var survivors = command.split().map(Transaction.Part::getId).reject(Objects::isNull);
 
     // Mark all old parts as deleted
-    var deletedIds =
-        Collections.List(transaction.getTransactions())
-            .reject(t -> survivors.contains(t.getId()))
-            .map(TransactionJpa::getId);
+    var deletedIds = Collections.List(transaction.getTransactions())
+        .reject(t -> survivors.contains(t.getId()))
+        .map(TransactionJpa::getId);
 
     entityManager
         .update(TransactionJpa.class)
@@ -55,31 +54,23 @@ public class SplitTransactionHandler implements CommandHandler<SplitTransactionC
     command
         .split()
         .filter(part -> part.getId() == null)
-        .map(
-            part ->
-                TransactionJpa.builder()
-                    // todo change to native BigDecimal later on
-                    .amount(BigDecimal.valueOf(part.getAmount()))
-                    .description(part.getDescription())
-                    .account(entityManager.getById(AccountJpa.class, part.getAccount().getId()))
-                    .journal(transaction)
-                    .build())
-        .forEach(
-            entityPart -> {
-              transaction.getTransactions().add(entityPart);
-              entityManager.persist(entityPart);
-            });
+        .map(part -> TransactionJpa.builder()
+            // todo change to native BigDecimal later on
+            .amount(BigDecimal.valueOf(part.getAmount()))
+            .description(part.getDescription())
+            .account(entityManager.getById(AccountJpa.class, part.getAccount().getId()))
+            .journal(transaction)
+            .build())
+        .forEach(entityPart -> {
+          transaction.getTransactions().add(entityPart);
+          entityManager.persist(entityPart);
+        });
 
     // Update existing parts
-    command
-        .split()
-        .filter(part -> Objects.nonNull(part.getId()))
-        .forEach(
-            part ->
-                entityManager
-                    .update(TransactionJpa.class)
-                    .set("amount", part.getAmount())
-                    .fieldEq("id", part.getId())
-                    .execute());
+    command.split().filter(part -> Objects.nonNull(part.getId())).forEach(part -> entityManager
+        .update(TransactionJpa.class)
+        .set("amount", part.getAmount())
+        .fieldEq("id", part.getId())
+        .execute());
   }
 }

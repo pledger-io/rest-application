@@ -39,8 +39,8 @@ public class RuntimeResource {
   @Put("/{processDefinitionKey}/start")
   @Operation(
       summary = "Create Process",
-      description =
-          "Creates and executes a new process for the selected definition, with the provided map as parameters",
+      description = "Creates and executes a new process for the selected definition, with the"
+          + " provided map as parameters",
       operationId = "startProcess")
   public ProcessResponse startProcess(
       @PathVariable String processDefinitionKey, @Body Map<String, Object> parameters) {
@@ -55,11 +55,10 @@ public class RuntimeResource {
     instanceBuilder.setVariable(KEY_USERNAME, authenticationFacade.authenticated());
 
     var process = instanceBuilder.execute();
-    return new ProcessResponse(
-        runtimeService
-            .createProcessInstanceQuery()
-            .processInstanceId(process.getProcessInstanceId())
-            .singleResult());
+    return new ProcessResponse(runtimeService
+        .createProcessInstanceQuery()
+        .processInstanceId(process.getProcessInstanceId())
+        .singleResult());
   }
 
   @Get("/{processDefinitionKey}")
@@ -68,14 +67,13 @@ public class RuntimeResource {
       description = "Lists the historic executions for the provided process definition key",
       operationId = "getProcessHistory")
   public List<ProcessResponse> history(@PathVariable String processDefinitionKey) {
-    return Collections.List(
-            runtimeService
-                .createProcessInstanceQuery()
-                .processDefinitionKey(processDefinitionKey)
-                .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
-                .orderByProcessInstanceId()
-                .desc()
-                .list())
+    return Collections.List(runtimeService
+            .createProcessInstanceQuery()
+            .processDefinitionKey(processDefinitionKey)
+            .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
+            .orderByProcessInstanceId()
+            .desc()
+            .list())
         .map(ProcessResponse::new)
         .toJava();
   }
@@ -83,20 +81,19 @@ public class RuntimeResource {
   @Get("/{processDefinitionKey}/{businessKey}")
   @Operation(
       summary = "Process History for key",
-      description =
-          "List the history executions for the provided definition key, but only once with matching business key",
+      description = "List the history executions for the provided definition key, but only once"
+          + " with matching business key",
       operationId = "getProcessHistoryByBusinessKey")
   public List<ProcessResponse> history(
       @PathVariable String processDefinitionKey, @PathVariable String businessKey) {
-    return Collections.List(
-            runtimeService
-                .createProcessInstanceQuery()
-                .processDefinitionKey(processDefinitionKey)
-                .processInstanceBusinessKey(businessKey)
-                .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
-                .orderByProcessInstanceId()
-                .desc()
-                .list())
+    return Collections.List(runtimeService
+            .createProcessInstanceQuery()
+            .processDefinitionKey(processDefinitionKey)
+            .processInstanceBusinessKey(businessKey)
+            .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
+            .orderByProcessInstanceId()
+            .desc()
+            .list())
         .map(ProcessResponse::new)
         .toJava();
   }

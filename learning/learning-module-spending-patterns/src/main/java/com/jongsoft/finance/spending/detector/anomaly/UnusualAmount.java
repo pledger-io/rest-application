@@ -33,22 +33,20 @@ public class UnusualAmount implements Anomaly {
     if (zScore > adjustedThreshold) {
       var score = Math.min(1.0, zScore / (adjustedThreshold * 2));
 
-      return Optional.of(
-          SpendingInsight.builder()
-              .type(InsightType.UNUSUAL_AMOUNT)
-              .category(transaction.getBudget())
-              .severity(getSeverityFromScore(score))
-              .score(score)
-              .detectedDate(transaction.getDate())
-              .message(generateMessage(transactionAmount, mean))
-              .transactionId(transaction.getId())
-              .metadata(
-                  Map.of(
-                      "amount", transactionAmount,
-                      "z_score", zScore,
-                      "mean", mean,
-                      "std_dev", stdDev))
-              .build());
+      return Optional.of(SpendingInsight.builder()
+          .type(InsightType.UNUSUAL_AMOUNT)
+          .category(transaction.getBudget())
+          .severity(getSeverityFromScore(score))
+          .score(score)
+          .detectedDate(transaction.getDate())
+          .message(generateMessage(transactionAmount, mean))
+          .transactionId(transaction.getId())
+          .metadata(Map.of(
+              "amount", transactionAmount,
+              "z_score", zScore,
+              "mean", mean,
+              "std_dev", stdDev))
+          .build());
     }
 
     return Optional.empty();

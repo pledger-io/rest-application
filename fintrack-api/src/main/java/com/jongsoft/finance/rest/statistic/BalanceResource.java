@@ -51,8 +51,8 @@ public class BalanceResource {
   @Post
   @Operation(
       summary = "Calculate balance",
-      description =
-          "This operation will calculate the balance for the current user based upon the given filters",
+      description = "This operation will calculate the balance for the current user based upon the"
+          + " given filters",
       operationId = "getBalance")
   BalanceResponse calculate(@Valid @Body BalanceRequest request) {
     TransactionProvider.FilterCommand filter = buildFilterCommand(request);
@@ -65,8 +65,8 @@ public class BalanceResource {
   @Post("/partitioned/{partitionKey}")
   @Operation(
       summary = "Partitioned balance",
-      description =
-          "Partition all transaction matching the balance request using the partitionKey provided.",
+      description = "Partition all transaction matching the balance request using the partitionKey"
+          + " provided.",
       operationId = "partitionedBalance",
       parameters = {
         @Parameter(
@@ -81,13 +81,13 @@ public class BalanceResource {
         switch (partitionKey) {
           case "account" -> applicationContext.getBean(AccountProvider.class).lookup();
           case "budget" ->
-              applicationContext
-                  .getBean(ExpenseProvider.class)
-                  .lookup(filterFactory.expense())
-                  .content();
+            applicationContext
+                .getBean(ExpenseProvider.class)
+                .lookup(filterFactory.expense())
+                .content();
           case "category" -> applicationContext.getBean(CategoryProvider.class).lookup();
           default ->
-              throw new IllegalArgumentException("Unsupported partition used " + partitionKey);
+            throw new IllegalArgumentException("Unsupported partition used " + partitionKey);
         };
 
     Function<Sequence<EntityRef>, TransactionProvider.FilterCommand> filterBuilder =
@@ -96,7 +96,7 @@ public class BalanceResource {
           case "budget" -> (e) -> buildFilterCommand(request).expenses(e);
           case "category" -> (e) -> buildFilterCommand(request).categories(e);
           default ->
-              throw new IllegalArgumentException("Unsupported partition used " + partitionKey);
+            throw new IllegalArgumentException("Unsupported partition used " + partitionKey);
         };
 
     var result = new ArrayList<BalancePartitionResponse>();
@@ -121,7 +121,10 @@ public class BalanceResource {
       description = "Compute the daily balance based upon the provided request",
       operationId = "dailyBalance")
   List<DailyResponse> daily(@Valid @Body BalanceRequest request) {
-    return transactionProvider.daily(buildFilterCommand(request)).map(DailyResponse::new).toJava();
+    return transactionProvider
+        .daily(buildFilterCommand(request))
+        .map(DailyResponse::new)
+        .toJava();
   }
 
   @Post("/monthly")
@@ -155,7 +158,8 @@ public class BalanceResource {
     }
 
     if (request.getDateRange() != null) {
-      filter.range(Dates.range(request.getDateRange().start(), request.getDateRange().end()));
+      filter.range(
+          Dates.range(request.getDateRange().start(), request.getDateRange().end()));
     }
 
     if (!request.allMoney()) {

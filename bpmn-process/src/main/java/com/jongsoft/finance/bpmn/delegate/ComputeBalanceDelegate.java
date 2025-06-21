@@ -45,7 +45,8 @@ public class ComputeBalanceDelegate implements JavaDelegate, JavaBean {
     }
 
     if (execution.hasVariableLocal("onlyIncome")) {
-      boolean onlyIncome = execution.<BooleanValue>getVariableLocalTyped("onlyIncome").getValue();
+      boolean onlyIncome =
+          execution.<BooleanValue>getVariableLocalTyped("onlyIncome").getValue();
       requestBuilder.onlyIncome(onlyIncome);
     }
 

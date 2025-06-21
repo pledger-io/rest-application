@@ -42,8 +42,8 @@ public class MultiFactorResource {
   @Secured(AuthenticationRoles.TWO_FACTOR_NEEDED)
   @Operation(
       summary = "Verify MFA token",
-      description =
-          "Used to verify the user token against that what is expected. If valid the user will get a new JWT with updated authorizations.")
+      description = "Used to verify the user token against that what is expected. If valid the user"
+          + " will get a new JWT with updated authorizations.")
   HttpResponse<?> validateToken(
       @Valid @Body MultiFactorRequest verification, HttpRequest<?> request) {
     var user = currentUserProvider.currentUser();
@@ -51,9 +51,8 @@ public class MultiFactorResource {
       throw StatusException.forbidden("Invalid verification code");
     }
 
-    var authentication =
-        Authentication.build(
-            user.getUsername().email(), user.getRoles().stream().map(Role::getName).toList());
+    var authentication = Authentication.build(
+        user.getUsername().email(), user.getRoles().stream().map(Role::getName).toList());
 
     return loginHandler.loginRefresh(authentication, UUID.randomUUID().toString(), request);
   }

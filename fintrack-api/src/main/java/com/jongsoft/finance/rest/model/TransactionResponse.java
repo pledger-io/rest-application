@@ -75,7 +75,7 @@ public class TransactionResponse {
           case DEBIT -> wrapped.computeFrom();
           case CREDIT -> wrapped.computeTo();
           case TRANSFER ->
-              throw new IllegalStateException("Split transaction cannot be a transfer");
+            throw new IllegalStateException("Split transaction cannot be a transfer");
         };
 
     return wrapped

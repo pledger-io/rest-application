@@ -41,27 +41,21 @@ public class ProcessCreateCategoryDelegate implements JavaDelegate, JavaBean {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    var categoryJson =
-        mapper.readSafe(
-            execution.<StringValue>getVariableLocalTyped("category").getValue(),
-            CategoryJson.class);
+    var categoryJson = mapper.readSafe(
+        execution.<StringValue>getVariableLocalTyped("category").getValue(), CategoryJson.class);
 
     log.debug(
         "{}: Processing category creation from json '{}'",
         execution.getCurrentActivityName(),
         categoryJson.getLabel());
 
-    categoryProvider
-        .lookup(categoryJson.getLabel())
-        .ifNotPresent(
-            () -> {
-              currentUserProvider.currentUser().createCategory(categoryJson.getLabel());
+    categoryProvider.lookup(categoryJson.getLabel()).ifNotPresent(() -> {
+      currentUserProvider.currentUser().createCategory(categoryJson.getLabel());
 
-              categoryProvider
-                  .lookup(categoryJson.getLabel())
-                  .ifPresent(
-                      category ->
-                          category.rename(categoryJson.getLabel(), categoryJson.getDescription()));
-            });
+      categoryProvider
+          .lookup(categoryJson.getLabel())
+          .ifPresent(
+              category -> category.rename(categoryJson.getLabel(), categoryJson.getDescription()));
+    });
   }
 }

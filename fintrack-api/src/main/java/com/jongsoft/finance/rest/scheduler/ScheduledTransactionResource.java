@@ -75,11 +75,10 @@ public class ScheduledTransactionResource {
   @Post
   @Operation(operationId = "searchTransactionSchedule", summary = "Search schedule")
   public List<ScheduledTransactionResponse> search(@Valid @Body ScheduleSearchRequest request) {
-    var filter =
-        filterFactory
-            .schedule()
-            .contract(Collections.List(request.getContracts()).map(c -> new EntityRef(c.id())))
-            .activeOnly();
+    var filter = filterFactory
+        .schedule()
+        .contract(Collections.List(request.getContracts()).map(c -> new EntityRef(c.id())))
+        .activeOnly();
 
     return scheduleProvider
         .lookup(filter)
@@ -100,11 +99,10 @@ public class ScheduledTransactionResource {
               schema = @Schema(implementation = Long.class),
               in = ParameterIn.PATH))
   public ScheduledTransactionResponse get(@PathVariable long scheduleId) {
-    var scheduleOption =
-        scheduleProvider
-            .lookup()
-            .filter(s -> s.getId() == scheduleId)
-            .map(ScheduledTransactionResponse::new);
+    var scheduleOption = scheduleProvider
+        .lookup()
+        .filter(s -> s.getId() == scheduleId)
+        .map(ScheduledTransactionResponse::new);
 
     if (scheduleOption.isEmpty()) {
       throw StatusException.notFound("No scheduled transaction found with id " + scheduleId);

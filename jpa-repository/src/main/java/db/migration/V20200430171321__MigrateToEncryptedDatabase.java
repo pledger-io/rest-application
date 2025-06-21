@@ -30,7 +30,8 @@ public class V20200430171321__MigrateToEncryptedDatabase extends BaseJavaMigrati
   //
   //        log.info("Start encryption of database tables for {}", username);
   //
-  //        jdbcTemplate.query("select id, name, iban, bic, number from account where user_id = " +
+  //        jdbcTemplate.query("select id, name, iban, bic, number from account where user_id = "
+  // +
   // id, this::encryptAccount);
   //    }
   //

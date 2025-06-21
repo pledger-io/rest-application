@@ -57,9 +57,8 @@ public class CategoryResource {
       description = "Search through the categories with the provided filter set",
       operationId = "searchCategories")
   ResultPageResponse<CategoryResponse> search(@Valid @Body CategorySearchRequest searchRequest) {
-    var response =
-        categoryService.lookup(
-            filterFactory.category().page(searchRequest.getPage(), settingProvider.getPageSize()));
+    var response = categoryService.lookup(
+        filterFactory.category().page(searchRequest.getPage(), settingProvider.getPageSize()));
 
     return new ResultPageResponse<>(response.map(CategoryResponse::new));
   }
@@ -71,11 +70,10 @@ public class CategoryResource {
       operationId = "getCategoriesByToken")
   List<CategoryResponse> autocomplete(@Nullable String token) {
     return categoryService
-        .lookup(
-            filterFactory
-                .category()
-                .label(token, false)
-                .page(0, settingProvider.getAutocompleteLimit()))
+        .lookup(filterFactory
+            .category()
+            .label(token, false)
+            .page(0, settingProvider.getAutocompleteLimit()))
         .content()
         .map(CategoryResponse::new)
         .toJava();
@@ -92,11 +90,10 @@ public class CategoryResource {
 
     return categoryService
         .lookup(createRequest.name())
-        .map(
-            category -> {
-              category.rename(createRequest.name(), createRequest.description());
-              return category;
-            })
+        .map(category -> {
+          category.rename(createRequest.name(), createRequest.description());
+          return category;
+        })
         .map(CategoryResponse::new)
         .getOrThrow(() -> StatusException.internalError("Could not create category"));
   }
@@ -121,11 +118,10 @@ public class CategoryResource {
   CategoryResponse update(@PathVariable long id, @Valid @Body CategoryCreateRequest updateRequest) {
     return categoryService
         .lookup(id)
-        .map(
-            category -> {
-              category.rename(updateRequest.name(), updateRequest.description());
-              return new CategoryResponse(category);
-            })
+        .map(category -> {
+          category.rename(updateRequest.name(), updateRequest.description());
+          return new CategoryResponse(category);
+        })
         .getOrThrow(() -> StatusException.notFound("No category found with id " + id));
   }
 

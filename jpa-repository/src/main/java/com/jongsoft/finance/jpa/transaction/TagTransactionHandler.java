@@ -39,11 +39,9 @@ public class TagTransactionHandler implements CommandHandler<TagTransactionComma
     var transaction = entityManager.getById(TransactionJournal.class, command.id());
     transaction.getTags().clear();
 
-    command
-        .tags()
-        .map(this::tag)
-        .filter(Objects::nonNull)
-        .forEach(tag -> transaction.getTags().add(tag));
+    command.tags().map(this::tag).filter(Objects::nonNull).forEach(tag -> transaction
+        .getTags()
+        .add(tag));
 
     entityManager.persist(transaction);
   }

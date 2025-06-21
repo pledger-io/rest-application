@@ -33,9 +33,8 @@ public class SettingResource {
   List<SettingResponse> list() {
     return settingProvider
         .lookup()
-        .map(
-            setting ->
-                new SettingResponse(setting.getName(), setting.getValue(), setting.getType()))
+        .map(setting ->
+            new SettingResponse(setting.getName(), setting.getValue(), setting.getType()))
         .toJava();
   }
 

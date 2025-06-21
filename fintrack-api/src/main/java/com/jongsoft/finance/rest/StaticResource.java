@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
 public class StaticResource {
   private final Logger log = LoggerFactory.getLogger(StaticResource.class);
 
-  @Inject ResourceResolver resourceResolver;
+  @Inject
+  ResourceResolver resourceResolver;
 
   @Get
   @Operation(hidden = true)

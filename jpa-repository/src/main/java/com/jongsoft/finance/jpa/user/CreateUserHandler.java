@@ -32,18 +32,15 @@ public class CreateUserHandler implements CommandHandler<CreateUserCommand> {
   @Override
   @BusinessEventListener
   public void handle(CreateUserCommand command) {
-    var entity =
-        UserAccountJpa.builder()
-            .username(command.username())
-            .password(command.password())
-            .twoFactorSecret(secretGenerator.generate())
-            .theme("light")
-            .roles(
-                new HashSet<>(
-                    Arrays.asList(
-                        RoleJpa.builder().id(1L).name("admin").build(),
-                        RoleJpa.builder().id(2L).name("accountant").build())))
-            .build();
+    var entity = UserAccountJpa.builder()
+        .username(command.username())
+        .password(command.password())
+        .twoFactorSecret(secretGenerator.generate())
+        .theme("light")
+        .roles(new HashSet<>(Arrays.asList(
+            RoleJpa.builder().id(1L).name("admin").build(),
+            RoleJpa.builder().id(2L).name("accountant").build())))
+        .build();
 
     entityManager.persist(entity);
   }

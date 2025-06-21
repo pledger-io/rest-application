@@ -11,7 +11,8 @@ import java.util.List;
 @Serdeable
 public class AccountSearchRequest {
 
-  @NotEmpty private List<String> accountTypes;
+  @NotEmpty
+  private List<String> accountTypes;
 
   @Min(0)
   private int page;

@@ -60,11 +60,10 @@ public class ImporterTransactionResource {
               schema = @Schema(implementation = String.class)))
   ResultPageResponse<TransactionResponse> search(
       @PathVariable String batchSlug, @Valid @Body TransactionSearchRequest request) {
-    var filter =
-        filterFactory
-            .transaction()
-            .importSlug(batchSlug)
-            .page(request.getPage(), settingProvider.getPageSize());
+    var filter = filterFactory
+        .transaction()
+        .importSlug(batchSlug)
+        .page(request.getPage(), settingProvider.getPageSize());
 
     var response = transactionProvider.lookup(filter).map(TransactionResponse::new);
 
@@ -111,14 +110,13 @@ public class ImporterTransactionResource {
       switch (entry.getKey()) {
         case CATEGORY -> transaction.linkToCategory((String) entry.getValue());
         case TO_ACCOUNT, CHANGE_TRANSFER_TO ->
-            transaction.changeAccount(false, (Account) entry.getValue());
+          transaction.changeAccount(false, (Account) entry.getValue());
         case SOURCE_ACCOUNT, CHANGE_TRANSFER_FROM ->
-            transaction.changeAccount(true, (Account) entry.getValue());
+          transaction.changeAccount(true, (Account) entry.getValue());
         case CONTRACT -> transaction.linkToContract((String) entry.getValue());
         case BUDGET -> transaction.linkToBudget((String) entry.getValue());
         default ->
-            throw new IllegalArgumentException(
-                "Unsupported rule column provided " + entry.getKey());
+          throw new IllegalArgumentException("Unsupported rule column provided " + entry.getKey());
       }
     }
   }

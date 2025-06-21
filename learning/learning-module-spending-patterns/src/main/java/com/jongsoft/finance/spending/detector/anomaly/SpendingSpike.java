@@ -43,20 +43,18 @@ public class SpendingSpike implements Anomaly {
       double percentIncrease = (currentMonthTotal - avgMonthlySpending) / avgMonthlySpending;
       double score = Math.min(1.0, percentIncrease);
 
-      return Optional.of(
-          SpendingInsight.builder()
-              .type(InsightType.SPENDING_SPIKE)
-              .category(transaction.getBudget())
-              .severity(getSeverityFromScore(score))
-              .score(score)
-              .detectedDate(transaction.getDate().withDayOfMonth(1))
-              .message("computed.insight.spending.spike")
-              .metadata(
-                  Map.of(
-                      "current_month_total", currentMonthTotal,
-                      "avg_monthly_spending", avgMonthlySpending,
-                      "percent_increase", percentIncrease))
-              .build());
+      return Optional.of(SpendingInsight.builder()
+          .type(InsightType.SPENDING_SPIKE)
+          .category(transaction.getBudget())
+          .severity(getSeverityFromScore(score))
+          .score(score)
+          .detectedDate(transaction.getDate().withDayOfMonth(1))
+          .message("computed.insight.spending.spike")
+          .metadata(Map.of(
+              "current_month_total", currentMonthTotal,
+              "avg_monthly_spending", avgMonthlySpending,
+              "percent_increase", percentIncrease))
+          .build());
     }
 
     return Optional.empty();
@@ -72,11 +70,10 @@ public class SpendingSpike implements Anomaly {
             .filter(e -> e.getName().equalsIgnoreCase(transaction.getBudget()))
             .findFirst()
             .orElseThrow();
-    var filter =
-        filterFactory
-            .transaction()
-            .ownAccounts()
-            .expenses(Collections.List(new EntityRef(expense.getId())));
+    var filter = filterFactory
+        .transaction()
+        .ownAccounts()
+        .expenses(Collections.List(new EntityRef(expense.getId())));
 
     var currentMonth = transaction.getDate().withDayOfMonth(1);
     var monthlyMap = new HashMap<String, Double>();
@@ -85,11 +82,8 @@ public class SpendingSpike implements Anomaly {
       var dateRange = Dates.range(currentMonth, ChronoUnit.MONTHS);
 
       var computedBalance = transactionProvider.balance(filter.range(dateRange));
-      computedBalance.ifPresent(
-          amount ->
-              monthlyMap.put(
-                  startDate.getYear() + "-" + startDate.getMonthValue(),
-                  Math.abs(amount.doubleValue())));
+      computedBalance.ifPresent(amount -> monthlyMap.put(
+          startDate.getYear() + "-" + startDate.getMonthValue(), Math.abs(amount.doubleValue())));
       currentMonth = currentMonth.minusMonths(1);
     }
 

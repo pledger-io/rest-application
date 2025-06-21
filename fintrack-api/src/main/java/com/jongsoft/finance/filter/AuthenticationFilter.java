@@ -53,35 +53,31 @@ public class AuthenticationFilter implements HttpServerFilter {
 
     var startTime = Instant.now();
     MDC.put("correlationId", UUID.randomUUID().toString());
-    return Publishers.then(
-        chain.proceed(request),
-        response -> {
-          if (request.getPath().contains("/api/localization/")) {
-            log.trace("{}: {}", request.getMethod(), request.getPath());
-          } else {
-            if (log.isTraceEnabled() && request.getBody().isPresent()) {
-              Object body = request.getBody().get();
-              log.atTrace()
-                  .addArgument(request::getMethod)
-                  .addArgument(request::getPath)
-                  .addArgument(() -> Duration.between(startTime, Instant.now()).toMillis())
-                  .addArgument(
-                      () ->
-                          Control.Try(() -> objectMapper.writeValueAsString(body))
-                              .recover(Throwable::getMessage)
-                              .get())
-                  .log("{}: {} in {} ms, with request body {}.");
-            } else {
-              log.info(
-                  "{}: {} in {} ms - Status Code {}.",
-                  request.getMethod(),
-                  request.getPath(),
-                  Duration.between(startTime, Instant.now()).toMillis(),
-                  response.status());
-            }
-          }
-          MDC.remove("correlationId");
-        });
+    return Publishers.then(chain.proceed(request), response -> {
+      if (request.getPath().contains("/api/localization/")) {
+        log.trace("{}: {}", request.getMethod(), request.getPath());
+      } else {
+        if (log.isTraceEnabled() && request.getBody().isPresent()) {
+          Object body = request.getBody().get();
+          log.atTrace()
+              .addArgument(request::getMethod)
+              .addArgument(request::getPath)
+              .addArgument(() -> Duration.between(startTime, Instant.now()).toMillis())
+              .addArgument(() -> Control.Try(() -> objectMapper.writeValueAsString(body))
+                  .recover(Throwable::getMessage)
+                  .get())
+              .log("{}: {} in {} ms, with request body {}.");
+        } else {
+          log.info(
+              "{}: {} in {} ms - Status Code {}.",
+              request.getMethod(),
+              request.getPath(),
+              Duration.between(startTime, Instant.now()).toMillis(),
+              response.status());
+        }
+      }
+      MDC.remove("correlationId");
+    });
   }
 
   private void handleAuthentication(Principal principal) {
