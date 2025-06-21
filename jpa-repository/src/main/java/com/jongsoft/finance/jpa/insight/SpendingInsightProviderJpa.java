@@ -89,25 +89,24 @@ public class SpendingInsightProviderJpa implements SpendingInsightProvider {
 
   @BusinessEventListener
   public void save(CreateSpendingInsight command) {
-    log.trace("Saving spending insight: {}", command.spendingInsight());
+    log.trace("Saving spending insight: {}", command);
 
     // Convert metadata to string values
-    var insight = command.spendingInsight();
     Map<String, String> metadata = new HashMap<>();
-    for (Map.Entry<String, Object> entry : insight.getMetadata().entrySet()) {
+    for (Map.Entry<String, Object> entry : command.metadata().entrySet()) {
       metadata.put(entry.getKey(), entry.getValue() != null ? entry.getValue().toString() : null);
     }
 
     // Create the JPA entity
     SpendingInsightJpa jpa = SpendingInsightJpa.builder()
-        .type(insight.getType())
-        .category(insight.getCategory())
-        .severity(insight.getSeverity())
-        .score(insight.getScore())
-        .detectedDate(insight.getDetectedDate())
-        .message(insight.getMessage())
-        .yearMonth(YearMonth.from(insight.getDetectedDate()))
-        .transactionId(insight.getTransactionId())
+        .type(command.type())
+        .category(command.category())
+        .severity(command.severity())
+        .score(command.score())
+        .detectedDate(command.detectedDate())
+        .message(command.message())
+        .yearMonth(YearMonth.from(command.detectedDate()))
+        .transactionId(command.transactionId())
         .metadata(metadata)
         .user(entityManager.currentUser())
         .build();

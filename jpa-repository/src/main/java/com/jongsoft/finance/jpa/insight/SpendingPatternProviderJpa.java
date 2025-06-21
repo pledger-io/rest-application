@@ -92,12 +92,11 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
 
   @BusinessEventListener
   public void save(CreateSpendingPattern command) {
-    log.trace("Saving spending pattern: {}", command.spendingPattern());
+    log.trace("Saving spending pattern: {}", command);
 
     // Convert metadata to string values
-    var pattern = command.spendingPattern();
     Map<String, String> metadata = new HashMap<>();
-    for (Map.Entry<String, ?> entry : pattern.getMetadata().entrySet()) {
+    for (Map.Entry<String, ?> entry : command.metadata().entrySet()) {
       metadata.put(
           entry.getKey(),
           Control.Option(entry.getValue()).map(Object::toString).getOrSupply(() -> null));
@@ -105,11 +104,11 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
 
     // Create the JPA entity
     SpendingPatternJpa jpa = SpendingPatternJpa.builder()
-        .type(pattern.getType())
-        .category(pattern.getCategory())
-        .confidence(pattern.getConfidence())
-        .detectedDate(pattern.getDetectedDate())
-        .yearMonth(YearMonth.from(pattern.getDetectedDate()))
+        .type(command.type())
+        .category(command.category())
+        .confidence(command.confidence())
+        .detectedDate(command.detectedDate())
+        .yearMonth(YearMonth.from(command.detectedDate()))
         .metadata(metadata)
         .user(entityManager.currentUser())
         .build();

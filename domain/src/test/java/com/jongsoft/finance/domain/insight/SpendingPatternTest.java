@@ -82,7 +82,12 @@ class SpendingPatternTest {
 
     var captor = ArgumentCaptor.forClass(CreateSpendingPattern.class);
     Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-    assertThat(captor.getValue().spendingPattern())
-        .isEqualTo(pattern);
+
+    var command = captor.getValue();
+    assertThat(command.type()).isEqualTo(pattern.getType());
+    assertThat(command.category()).isEqualTo(pattern.getCategory());
+    assertThat(command.confidence()).isEqualTo(pattern.getConfidence());
+    assertThat(command.detectedDate()).isEqualTo(pattern.getDetectedDate());
+    assertThat(command.metadata()).isEqualTo(pattern.getMetadata());
   }
 }

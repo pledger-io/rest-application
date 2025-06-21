@@ -26,4 +26,6 @@ public class ApiConstants {
 
   public static final String TAG_SECURITY = "Security";
   public static final String TAG_SECURITY_USERS = TAG_SECURITY + "::Users";
+
+  private ApiConstants() {}
 }

@@ -110,7 +110,16 @@ class SpendingInsightProviderJpaIT extends JpaTestSetup {
                 .build();
 
         // Save the insight
-        eventPublisher.publishEvent(new CreateSpendingInsight(newInsight));
+        eventPublisher.publishEvent(new CreateSpendingInsight(
+                newInsight.getType(),
+                newInsight.getCategory(),
+                newInsight.getSeverity(),
+                newInsight.getScore(),
+                newInsight.getDetectedDate(),
+                newInsight.getMessage(),
+                newInsight.getTransactionId(),
+                newInsight.getMetadata()
+        ));
 
         // Verify it was saved by looking it up
         var savedInsight = spendingInsightProvider.lookup("Shopping");

@@ -44,6 +44,14 @@ class SpendingInsightTest {
     var captor = ArgumentCaptor.forClass(CreateSpendingInsight.class);
     Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
 
-    assertThat(captor.getValue().spendingInsight()).isEqualTo(insight);
+    var command = captor.getValue();
+    assertThat(command.type()).isEqualTo(insight.getType());
+    assertThat(command.category()).isEqualTo(insight.getCategory());
+    assertThat(command.severity()).isEqualTo(insight.getSeverity());
+    assertThat(command.score()).isEqualTo(insight.getScore());
+    assertThat(command.transactionId()).isEqualTo(insight.getTransactionId());
+    assertThat(command.detectedDate()).isEqualTo(insight.getDetectedDate());
+    assertThat(command.message()).isEqualTo(insight.getMessage());
+    assertThat(command.metadata()).isEqualTo(insight.getMetadata());
   }
 }
