@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.security;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SECURITY;
+
 import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.rest.ApiDefaults;
@@ -22,7 +24,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 
-@Tag(name = "Authentication")
+@Tag(name = TAG_SECURITY)
 @Controller(consumes = MediaType.APPLICATION_JSON)
 public class RegistrationResource {
 

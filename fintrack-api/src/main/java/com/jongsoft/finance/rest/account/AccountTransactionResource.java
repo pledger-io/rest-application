@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_ACCOUNTS_TRANSACTIONS;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -29,9 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.function.Consumer;
 
-@Tag(
-    name = "Account Transactions",
-    description = "Operations on transactions based on a given account.")
+@Tag(name = TAG_ACCOUNTS_TRANSACTIONS)
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/accounts/{accountId}/transactions")
 public class AccountTransactionResource {
@@ -73,12 +73,11 @@ public class AccountTransactionResource {
     if (!accountOption.isPresent()) {
       throw StatusException.notFound("Account not found with id " + accountId);
     }
-    var command =
-        filterFactory
-            .transaction()
-            .accounts(Collections.List(new EntityRef(accountId)))
-            .range(Dates.range(request.dateRange().start(), request.dateRange().end()))
-            .page(request.getPage(), Integer.MAX_VALUE);
+    var command = filterFactory
+        .transaction()
+        .accounts(Collections.List(new EntityRef(accountId)))
+        .range(Dates.range(request.dateRange().start(), request.dateRange().end()))
+        .page(request.getPage(), Integer.MAX_VALUE);
 
     if (request.text() != null) {
       command.description(request.text(), false);
@@ -110,33 +109,27 @@ public class AccountTransactionResource {
     Account toAccount = accountProvider.lookup(request.destination().id()).get();
 
     final Consumer<Transaction.TransactionBuilder> builderConsumer =
-        transactionBuilder ->
-            transactionBuilder
-                .currency(request.currency())
-                .description(request.description())
-                .budget(
-                    Control.Option(request.budget())
-                        .map(AccountTransactionCreateRequest.EntityRef::name)
-                        .getOrSupply(() -> null))
-                .category(
-                    Control.Option(request.category())
-                        .map(AccountTransactionCreateRequest.EntityRef::name)
-                        .getOrSupply(() -> null))
-                .contract(
-                    Control.Option(request.contract())
-                        .map(AccountTransactionCreateRequest.EntityRef::name)
-                        .getOrSupply(() -> null))
-                .date(request.date())
-                .bookDate(request.bookDate())
-                .interestDate(request.interestDate())
-                .tags(
-                    Control.Option(request.tags())
-                        .map(Collections::List)
-                        .getOrSupply(Collections::List));
+        transactionBuilder -> transactionBuilder
+            .currency(request.currency())
+            .description(request.description())
+            .budget(Control.Option(request.budget())
+                .map(AccountTransactionCreateRequest.EntityRef::name)
+                .getOrSupply(() -> null))
+            .category(Control.Option(request.category())
+                .map(AccountTransactionCreateRequest.EntityRef::name)
+                .getOrSupply(() -> null))
+            .contract(Control.Option(request.contract())
+                .map(AccountTransactionCreateRequest.EntityRef::name)
+                .getOrSupply(() -> null))
+            .date(request.date())
+            .bookDate(request.bookDate())
+            .interestDate(request.interestDate())
+            .tags(Control.Option(request.tags())
+                .map(Collections::List)
+                .getOrSupply(Collections::List));
 
-    final Transaction transaction =
-        fromAccount.createTransaction(
-            toAccount, request.amount(), determineType(fromAccount, toAccount), builderConsumer);
+    final Transaction transaction = fromAccount.createTransaction(
+        toAccount, request.amount(), determineType(fromAccount, toAccount), builderConsumer);
 
     transaction.register();
   }
@@ -241,18 +234,15 @@ public class AccountTransactionResource {
     }
 
     // update meta-data
-    transaction.linkToBudget(
-        Control.Option(request.budget())
-            .map(AccountTransactionCreateRequest.EntityRef::name)
-            .getOrSupply(() -> null));
-    transaction.linkToCategory(
-        Control.Option(request.category())
-            .map(AccountTransactionCreateRequest.EntityRef::name)
-            .getOrSupply(() -> null));
-    transaction.linkToContract(
-        Control.Option(request.contract())
-            .map(AccountTransactionCreateRequest.EntityRef::name)
-            .getOrSupply(() -> null));
+    transaction.linkToBudget(Control.Option(request.budget())
+        .map(AccountTransactionCreateRequest.EntityRef::name)
+        .getOrSupply(() -> null));
+    transaction.linkToCategory(Control.Option(request.category())
+        .map(AccountTransactionCreateRequest.EntityRef::name)
+        .getOrSupply(() -> null));
+    transaction.linkToContract(Control.Option(request.contract())
+        .map(AccountTransactionCreateRequest.EntityRef::name)
+        .getOrSupply(() -> null));
 
     Control.Option(request.tags()).map(Collections::List).ifPresent(transaction::tag);
 
@@ -262,8 +252,8 @@ public class AccountTransactionResource {
   @Patch("/{transactionId}")
   @Operation(
       summary = "Split transactions",
-      description =
-          "Split the transaction into smaller pieces, all belonging to the same actual transaction.",
+      description = "Split the transaction into smaller pieces, all belonging to the same actual"
+          + " transaction.",
       parameters =
           @Parameter(
               name = "transactionId",
@@ -273,15 +263,13 @@ public class AccountTransactionResource {
       @PathVariable long transactionId, @Valid @Body AccountTransactionSplitRequest request) {
     return transactionProvider
         .lookup(transactionId)
-        .map(
-            transaction -> {
-              var splits =
-                  Collections.List(request.getSplits())
-                      .map(split -> new SplitRecord(split.description(), split.amount()));
-              transaction.split(splits);
+        .map(transaction -> {
+          var splits = Collections.List(request.getSplits())
+              .map(split -> new SplitRecord(split.description(), split.amount()));
+          transaction.split(splits);
 
-              return new TransactionResponse(transaction);
-            })
+          return new TransactionResponse(transaction);
+        })
         .getOrThrow(() -> StatusException.notFound("No transaction found for id " + transactionId));
   }
 

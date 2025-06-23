@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.process;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_AUTOMATION_PROCESSES;
+
 import com.jongsoft.finance.rest.model.ProcessTaskResponse;
 import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.lang.Collections;
@@ -13,7 +15,7 @@ import java.util.List;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.variable.Variables;
 
-@Tag(name = "Process Engine")
+@Tag(name = TAG_AUTOMATION_PROCESSES)
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/runtime-process/{processDefinitionKey}/{businessKey}/{instanceId}/tasks")
 public class ProcessTaskResource {
@@ -31,13 +33,12 @@ public class ProcessTaskResource {
       operationId = "getTasks")
   public List<ProcessTaskResponse> tasks(
       @PathVariable String processDefinitionKey, @PathVariable String instanceId) {
-    return Collections.List(
-            taskService
-                .createTaskQuery()
-                .processDefinitionKey(processDefinitionKey)
-                .processInstanceId(instanceId)
-                .initializeFormKeys()
-                .list())
+    return Collections.List(taskService
+            .createTaskQuery()
+            .processDefinitionKey(processDefinitionKey)
+            .processInstanceId(instanceId)
+            .initializeFormKeys()
+            .list())
         .map(ProcessTaskResponse::new)
         .toJava();
   }

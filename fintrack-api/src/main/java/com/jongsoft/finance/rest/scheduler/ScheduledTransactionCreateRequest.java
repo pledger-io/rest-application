@@ -15,15 +15,19 @@ public class ScheduledTransactionCreateRequest {
   @Serdeable.Deserializable
   public record ScheduleValue(@NotNull Periodicity periodicity, @Min(1) int interval) {}
 
-  @NotBlank private final String name;
+  @NotBlank
+  private final String name;
 
   private final double amount;
 
-  @NotNull private final EntityRef source;
+  @NotNull
+  private final EntityRef source;
 
-  @NotNull private final EntityRef destination;
+  @NotNull
+  private final EntityRef destination;
 
-  @NotNull private final ScheduleValue schedule;
+  @NotNull
+  private final ScheduleValue schedule;
 
   public ScheduledTransactionCreateRequest(
       String name, double amount, EntityRef source, EntityRef destination, ScheduleValue schedule) {

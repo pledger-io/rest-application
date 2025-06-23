@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.importer;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_TRANSACTION_IMPORT;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.providers.ImportConfigurationProvider;
 import com.jongsoft.finance.providers.ImportProvider;
@@ -19,7 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 
-@Tag(name = "Importer")
+@Tag(name = TAG_TRANSACTION_IMPORT)
 @Controller("/api/import")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class BatchImportResource {
@@ -45,19 +47,17 @@ public class BatchImportResource {
       summary = "List jobs",
       description = "This operation will list all the run importer jobs for the current user")
   ResultPageResponse<ImporterResponse> list(@Valid @Body ImportSearchRequest request) {
-    var result =
-        importProvider.lookup(
-            new ImportProvider.FilterCommand() {
-              @Override
-              public int page() {
-                return request.getPage();
-              }
+    var result = importProvider.lookup(new ImportProvider.FilterCommand() {
+      @Override
+      public int page() {
+        return request.getPage();
+      }
 
-              @Override
-              public int pageSize() {
-                return settingProvider.getPageSize();
-              }
-            });
+      @Override
+      public int pageSize() {
+        return settingProvider.getPageSize();
+      }
+    });
 
     return new ResultPageResponse<>(result.map(ImporterResponse::new));
   }
@@ -65,8 +65,8 @@ public class BatchImportResource {
   @Put
   @Operation(
       summary = "Create importer",
-      description =
-          "Creates a new importer job in FinTrack, which can be used to import a CSV of transactions")
+      description = "Creates a new importer job in FinTrack, which can be used to import a CSV of"
+          + " transactions")
   ImporterResponse create(@Valid @Body ImporterCreateRequest request) {
     return csvConfigProvider
         .lookup(request.configuration())
@@ -94,8 +94,8 @@ public class BatchImportResource {
   @Delete("/{batchSlug}")
   @Operation(
       summary = "Delete importer job",
-      description =
-          "Removes an unfinished job from the system. Note that already completed jobs cannot be removed.",
+      description = "Removes an unfinished job from the system. Note that already completed jobs"
+          + " cannot be removed.",
       parameters =
           @Parameter(
               name = "batchSlug",
@@ -105,11 +105,10 @@ public class BatchImportResource {
   String delete(@PathVariable String batchSlug) {
     return importProvider
         .lookup(batchSlug)
-        .map(
-            job -> {
-              job.archive();
-              return job.getSlug();
-            })
+        .map(job -> {
+          job.archive();
+          return job.getSlug();
+        })
         .getOrThrow(() -> StatusException.notFound("Cannot delete import with slug " + batchSlug));
   }
 
@@ -125,7 +124,7 @@ public class BatchImportResource {
   @Operation(
       summary = "Create configuration",
       description =
-          "Creates a new importer configuration in FinTrack, using the provided file token")
+          "Creates a new importer configuration in FinTrack, using the provided file" + " token")
   CSVImporterConfigResponse createConfig(@Valid @Body CSVImporterConfigCreateRequest request) {
     var existing = csvConfigProvider.lookup(request.name());
     if (existing.isPresent()) {
@@ -133,9 +132,8 @@ public class BatchImportResource {
           "Configuration with name " + request.name() + " already exists.");
     }
 
-    return new CSVImporterConfigResponse(
-        currentUserProvider
-            .currentUser()
-            .createImportConfiguration(request.type(), request.name(), request.fileCode()));
+    return new CSVImporterConfigResponse(currentUserProvider
+        .currentUser()
+        .createImportConfiguration(request.type(), request.name(), request.fileCode()));
   }
 }

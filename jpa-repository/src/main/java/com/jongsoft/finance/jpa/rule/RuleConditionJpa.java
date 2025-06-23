@@ -27,7 +27,9 @@ public class RuleConditionJpa extends EntityJpa {
   @Column(name = "cond_value")
   private String condition;
 
-  @ManyToOne @JoinColumn private RuleJpa rule;
+  @ManyToOne
+  @JoinColumn
+  private RuleJpa rule;
 
   @Builder
   private RuleConditionJpa(

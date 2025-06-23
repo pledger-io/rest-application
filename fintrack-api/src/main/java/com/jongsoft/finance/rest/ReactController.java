@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_REACT_APP;
+
 import io.micronaut.core.io.ResourceResolver;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
@@ -8,11 +10,13 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.server.types.files.StreamedFile;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Controller("/ui")
+@Tag(name = TAG_REACT_APP)
 @Secured(SecurityRule.IS_ANONYMOUS)
 public class ReactController {
 
@@ -39,8 +43,8 @@ public class ReactController {
   }
 
   /**
-   * Catch-all route to serve the React app for any path under /react/. This allows the React Router
-   * to handle client-side routing properly.
+   * Catch-all route to serve the React app for any path under /react/. This allows the React
+   * Router to handle client-side routing properly.
    *
    * @return The index.html file
    */

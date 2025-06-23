@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.transaction;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_TRANSACTION_TAGGING;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.Tag;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -17,7 +19,7 @@ import java.util.List;
 
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/transactions/tags")
-@io.swagger.v3.oas.annotations.tags.Tag(name = "Transactions")
+@io.swagger.v3.oas.annotations.tags.Tag(name = TAG_TRANSACTION_TAGGING)
 public class TransactionTagResource {
 
   private final SettingProvider settingProvider;
@@ -59,8 +61,8 @@ public class TransactionTagResource {
   @Operation(
       operationId = "deleteTag",
       summary = "Delete tag",
-      description =
-          "Removes a tag from the system, this prevents it being used in updates. But will not remove old relations between tags and transactions.")
+      description = "Removes a tag from the system, this prevents it being used in updates. But"
+          + " will not remove old relations between tags and transactions.")
   void delete(@PathVariable String tag) {
     tagProvider
         .lookup(tag)

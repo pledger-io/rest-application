@@ -77,13 +77,12 @@ public class BudgetProviderJpa implements BudgetProvider {
       return null;
     }
 
-    var budget =
-        Budget.builder()
-            .id(source.getId())
-            .start(source.getFrom())
-            .end(source.getUntil())
-            .expectedIncome(source.getExpectedIncome())
-            .build();
+    var budget = Budget.builder()
+        .id(source.getId())
+        .start(source.getFrom())
+        .end(source.getUntil())
+        .expectedIncome(source.getExpectedIncome())
+        .build();
 
     for (var expense : source.getExpenses()) {
       budget

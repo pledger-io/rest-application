@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_ACCOUNTS;
+
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.SettingProvider;
@@ -18,8 +20,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @ApiDefaults
+@Tag(name = TAG_ACCOUNTS)
 @Controller("/api/accounts/top")
-@Tag(name = "Account information")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class AccountTopResource {
 
@@ -44,11 +46,10 @@ public class AccountTopResource {
       operationId = "listTopDebtors")
   List<AccountSpendingResponse> topDebtors(
       @PathVariable @DateFormat LocalDate start, @PathVariable @DateFormat LocalDate end) {
-    var filterCommand =
-        filterFactory
-            .account()
-            .types(Collections.List("debtor"))
-            .page(0, settingProvider.getAutocompleteLimit());
+    var filterCommand = filterFactory
+        .account()
+        .types(Collections.List("debtor"))
+        .page(0, settingProvider.getAutocompleteLimit());
 
     return accountProvider
         .top(filterCommand, Dates.range(start, end), true)
@@ -64,11 +65,10 @@ public class AccountTopResource {
       operationId = "listTopCreditors")
   List<AccountSpendingResponse> topCreditor(
       @PathVariable @DateFormat LocalDate start, @PathVariable @DateFormat LocalDate end) {
-    var filterCommand =
-        filterFactory
-            .account()
-            .types(Collections.List("creditor"))
-            .page(0, settingProvider.getAutocompleteLimit());
+    var filterCommand = filterFactory
+        .account()
+        .types(Collections.List("creditor"))
+        .page(0, settingProvider.getAutocompleteLimit());
 
     return accountProvider
         .top(filterCommand, Dates.range(start, end), false)

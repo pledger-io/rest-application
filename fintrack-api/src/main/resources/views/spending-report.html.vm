@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Monthly Spending Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .email-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .email-header h1 {
+            color: #4CAF50;
+        }
+        .email-content {
+            line-height: 1.5;
+        }
+        .email-footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .insight-section, .pattern-section {
+            margin-bottom: 30px;
+        }
+        .month-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="email-header">
+        <h1>Monthly Spending Report</h1>
+    </div>
+    <div class="email-content">
+        <p>Dear <strong>$user.email()</strong>,</p>
+
+        <p>Here is your spending report for <strong>$reportMonth</strong>.</p>
+
+        <div class="insight-section">
+            <h2>Spending Insights</h2>
+            <p>These insights show your spending patterns for the month:</p>
+
+            #if($insights && !$insights.isEmpty())
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Transactions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #foreach($insight in $insights)
+                    <tr>
+                        <td>$insight.getCategory()</td>
+                        <td>$insight.getAmount()</td>
+                        <td>$insight.getTransactionCount()</td>
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+            #else
+            <p>No spending insights were found for this month.</p>
+            #end
+        </div>
+
+        <div class="pattern-section">
+            <h2>Spending Patterns</h2>
+            <p>These patterns show recurring expenses and trends:</p>
+
+            #if($patterns && !$patterns.isEmpty())
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Average Amount</th>
+                        <th>Frequency</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    #foreach($pattern in $patterns)
+                    <tr>
+                        <td>$pattern.getCategory()</td>
+                        <td>$pattern.getAverageAmount()</td>
+                        <td>$pattern.getFrequency()</td>
+                    </tr>
+                    #end
+                </tbody>
+            </table>
+            #else
+            <p>No spending patterns were found for this month.</p>
+            #end
+        </div>
+
+        <p>Use this information to help you track your spending habits and make informed financial decisions.</p>
+
+        <p>You can view more detailed reports by logging into your Pledger.io account.</p>
+    </div>
+    <div class="email-footer">
+        <p>Thank you,</p>
+        <p>The Pledger.io Team</p>
+    </div>
+</div>
+</body>
+</html>

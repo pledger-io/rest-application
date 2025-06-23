@@ -59,7 +59,7 @@ public class AccountResponse {
 
   @Schema(
       description =
-          "The interest information for the account, only used for loans, debts and mortgage")
+          "The interest information for the account, only used for loans, debts and" + " mortgage")
   public InterestInformation getInterest() {
     return new InterestInformation();
   }
@@ -71,7 +71,7 @@ public class AccountResponse {
 
   @Schema(
       description =
-          "The saving goals for the account, only valid for type savings and joined_savings")
+          "The saving goals for the account, only valid for type savings and" + " joined_savings")
   public Set<SavingGoalResponse> getSavingGoals() {
     if (wrapped.getSavingGoals() != null) {
       return wrapped.getSavingGoals().map(SavingGoalResponse::new).toJava();

@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.process;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_AUTOMATION_PROCESSES;
+
 import com.jongsoft.finance.rest.model.ProcessVariableResponse;
 import com.jongsoft.finance.security.AuthenticationRoles;
 import com.jongsoft.lang.Collections;
@@ -12,7 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.camunda.bpm.engine.RuntimeService;
 
-@Tag(name = "Process Engine")
+@Tag(name = TAG_AUTOMATION_PROCESSES)
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/runtime-process/{processDefinitionKey}/{businessKey}/{instanceId}/variables")
 public class ProcessVariableResource {
@@ -30,8 +32,10 @@ public class ProcessVariableResource {
       operationId = "getVariables")
   public List<ProcessVariableResponse> variables(
       @PathVariable String processDefinitionKey, @PathVariable String instanceId) {
-    return Collections.List(
-            runtimeService.createVariableInstanceQuery().processInstanceIdIn(instanceId).list())
+    return Collections.List(runtimeService
+            .createVariableInstanceQuery()
+            .processInstanceIdIn(instanceId)
+            .list())
         .map(ProcessVariableResponse::new)
         .toJava();
   }
@@ -45,12 +49,11 @@ public class ProcessVariableResource {
       @PathVariable String processDefinitionKey,
       @PathVariable String instanceId,
       @PathVariable String variable) {
-    return Collections.List(
-            runtimeService
-                .createVariableInstanceQuery()
-                .processInstanceIdIn(instanceId)
-                .variableName(variable)
-                .list())
+    return Collections.List(runtimeService
+            .createVariableInstanceQuery()
+            .processInstanceIdIn(instanceId)
+            .variableName(variable)
+            .list())
         .map(ProcessVariableResponse::new)
         .toJava();
   }

@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.account;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_ACCOUNTS;
+
 import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.finance.rest.ApiDefaults;
 import com.jongsoft.finance.security.AuthenticationRoles;
@@ -13,7 +15,7 @@ import java.util.List;
 
 @ApiDefaults
 @Singleton
-@Tag(name = "Account information")
+@Tag(name = TAG_ACCOUNTS)
 @Controller("/api/account-types")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 public class AccountTypeResource {

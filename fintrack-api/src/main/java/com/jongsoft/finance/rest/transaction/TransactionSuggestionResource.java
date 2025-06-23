@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.transaction;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_TRANSACTION_ANALYTICS;
+
 import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.learning.SuggestionEngine;
@@ -17,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@Tag(name = "Transactions")
+@Tag(name = TAG_TRANSACTION_ANALYTICS)
 @Controller("/api/transactions")
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 class TransactionSuggestionResource {
@@ -34,13 +36,12 @@ class TransactionSuggestionResource {
       summary = "Suggest changes",
       description = "Suggest changes to a transaction based upon the rules in the system.")
   Map<String, ?> suggest(@Body TransactionForSuggestionRequest request) {
-    var transactionInput =
-        new SuggestionInput(
-            LocalDate.now(),
-            request.description(),
-            request.source(),
-            request.destination(),
-            Optional.ofNullable(request.amount()).orElse(0D));
+    var transactionInput = new SuggestionInput(
+        LocalDate.now(),
+        request.description(),
+        request.source(),
+        request.destination(),
+        Optional.ofNullable(request.amount()).orElse(0D));
     var suggestions = suggestionEngine.makeSuggestions(transactionInput);
 
     var output = new HashMap<String, Object>();

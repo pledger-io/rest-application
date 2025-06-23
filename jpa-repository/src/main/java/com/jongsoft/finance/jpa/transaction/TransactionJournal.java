@@ -44,15 +44,25 @@ public class TransactionJournal extends AuditedJpa {
   @JoinColumn(nullable = false, updatable = false)
   private UserAccountJpa user;
 
-  @ManyToOne @JoinColumn private CategoryJpa category;
+  @ManyToOne
+  @JoinColumn
+  private CategoryJpa category;
 
-  @ManyToOne @JoinColumn private ExpenseJpa budget;
+  @ManyToOne
+  @JoinColumn
+  private ExpenseJpa budget;
 
-  @ManyToOne @JoinColumn private ContractJpa contract;
+  @ManyToOne
+  @JoinColumn
+  private ContractJpa contract;
 
-  @ManyToOne @JoinColumn private ImportJpa batchImport;
+  @ManyToOne
+  @JoinColumn
+  private ImportJpa batchImport;
 
-  @ManyToOne @JoinColumn private CurrencyJpa currency;
+  @ManyToOne
+  @JoinColumn
+  private CurrencyJpa currency;
 
   @JoinTable(
       name = "transaction_tag",

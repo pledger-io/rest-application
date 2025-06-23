@@ -28,9 +28,8 @@ public class SchedulerVariableMappingDelegate implements DelegateVariableMapping
       variableMap.forEach(subVariables::putValue);
     }
 
-    var scheduledDate =
-        LocalDate.ofInstant(
-            ((Date) superExecution.getVariable("nextRun")).toInstant(), ZoneId.systemDefault());
+    var scheduledDate = LocalDate.ofInstant(
+        ((Date) superExecution.getVariable("nextRun")).toInstant(), ZoneId.systemDefault());
     subVariables.putValue("scheduled", scheduledDate.toString());
     subVariables.putValue("username", superExecution.getVariable("username"));
   }

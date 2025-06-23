@@ -1,0 +1,38 @@
+Monthly Spending Report
+
+Dear $user.email(),
+
+Here is your spending report for $reportMonth.
+
+SPENDING INSIGHTS
+----------------
+These insights show your spending patterns for the month:
+
+#if($insights && !$insights.isEmpty())
+Category | Amount | Transactions
+#foreach($insight in $insights)
+$insight.getCategory() | $insight.getAmount() | $insight.getTransactionCount()
+#end
+#else
+No spending insights were found for this month.
+#end
+
+SPENDING PATTERNS
+----------------
+These patterns show recurring expenses and trends:
+
+#if($patterns && !$patterns.isEmpty())
+Category | Average Amount | Frequency
+#foreach($pattern in $patterns)
+$pattern.getCategory() | $pattern.getAverageAmount() | $pattern.getFrequency()
+#end
+#else
+No spending patterns were found for this month.
+#end
+
+Use this information to help you track your spending habits and make informed financial decisions.
+
+You can view more detailed reports by logging into your Pledger.io account.
+
+Thank you,
+The Pledger.io Team

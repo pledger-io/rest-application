@@ -30,19 +30,17 @@ public class CreateRuleGroupHandler implements CommandHandler<CreateRuleGroupCom
   public void handle(CreateRuleGroupCommand command) {
     log.info("[{}] - Processing rule group create event", command.name());
 
-    var currentMax =
-        entityManager
-            .from(RuleGroupJpa.class)
-            .fieldEq("user.username", authenticationFacade.authenticated())
-            .fieldEq("archived", false)
-            .projectSingleValue(Integer.class, "max(sort)");
+    var currentMax = entityManager
+        .from(RuleGroupJpa.class)
+        .fieldEq("user.username", authenticationFacade.authenticated())
+        .fieldEq("archived", false)
+        .projectSingleValue(Integer.class, "max(sort)");
 
-    var jpaEntity =
-        RuleGroupJpa.builder()
-            .name(command.name())
-            .user(entityManager.currentUser())
-            .sort(currentMax.getOrSupply(() -> 1))
-            .build();
+    var jpaEntity = RuleGroupJpa.builder()
+        .name(command.name())
+        .user(entityManager.currentUser())
+        .sort(currentMax.getOrSupply(() -> 1))
+        .build();
 
     entityManager.persist(jpaEntity);
   }

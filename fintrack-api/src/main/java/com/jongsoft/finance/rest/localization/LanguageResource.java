@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.localization;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_SETTINGS_LOCALIZATION;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import io.micronaut.context.MessageSource;
 import io.micronaut.http.annotation.Controller;
@@ -16,7 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-@Tags(@Tag(name = "Localization"))
+@Tags(@Tag(name = TAG_SETTINGS_LOCALIZATION))
 @Secured(SecurityRule.IS_ANONYMOUS)
 @Controller("/api/localization/lang")
 public class LanguageResource {
@@ -47,10 +49,9 @@ public class LanguageResource {
   @Get("/{language}/{textKey}")
   @Operation(summary = "Get single translation", operationId = "getTranslation")
   LanguageResponse getText(@PathVariable String language, @PathVariable String textKey) {
-    var message =
-        messageSource
-            .getMessage(textKey, MessageSource.MessageContext.of(Locale.forLanguageTag(language)))
-            .orElseThrow(() -> StatusException.notFound("No message found for " + textKey));
+    var message = messageSource
+        .getMessage(textKey, MessageSource.MessageContext.of(Locale.forLanguageTag(language)))
+        .orElseThrow(() -> StatusException.notFound("No message found for " + textKey));
 
     return new LanguageResponse(message);
   }

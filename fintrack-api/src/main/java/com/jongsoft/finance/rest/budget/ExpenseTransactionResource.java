@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.budget;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_BUDGETS;
+
 import com.jongsoft.finance.core.DateUtils;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -21,7 +23,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Budget")
+@Tag(name = TAG_BUDGETS)
 @Secured(AuthenticationRoles.IS_AUTHENTICATED)
 @Controller("/api/budgets/expenses/{expenseId}/{year}/{month}/transactions")
 public class ExpenseTransactionResource {
@@ -69,14 +71,13 @@ public class ExpenseTransactionResource {
       @PathVariable int year,
       @PathVariable int month,
       @Nullable Integer page) {
-    var filter =
-        filterFactory
-            .transaction()
-            .range(DateUtils.forMonth(year, month))
-            .onlyIncome(false)
-            .ownAccounts()
-            .expenses(Collections.List(new EntityRef(expenseId)))
-            .page(Control.Option(page).getOrSupply(() -> 1), settingProvider.getPageSize());
+    var filter = filterFactory
+        .transaction()
+        .range(DateUtils.forMonth(year, month))
+        .onlyIncome(false)
+        .ownAccounts()
+        .expenses(Collections.List(new EntityRef(expenseId)))
+        .page(Control.Option(page).getOrSupply(() -> 1), settingProvider.getPageSize());
 
     return new ResultPageResponse<>(
         transactionService.lookup(filter).map(TransactionResponse::new));

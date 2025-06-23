@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Currency;
 
-@MicronautTest(environments = {"no-camunda", "test"})
+@MicronautTest(environments = {"no-camunda", "test", "no-analytics"})
 public class TestSetup {
 
     protected final UserIdentifier ACTIVE_USER_IDENTIFIER = new UserIdentifier("test-user");

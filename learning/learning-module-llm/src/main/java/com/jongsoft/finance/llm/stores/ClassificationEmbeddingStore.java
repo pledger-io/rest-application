@@ -3,6 +3,8 @@ package com.jongsoft.finance.llm.stores;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.learning.SuggestionResult;
+import com.jongsoft.finance.learning.stores.EmbeddingStoreFiller;
+import com.jongsoft.finance.learning.stores.PledgerEmbeddingStore;
 import com.jongsoft.finance.llm.AiEnabled;
 import com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand;
 import com.jongsoft.finance.messaging.notifications.TransactionCreated;
@@ -31,17 +33,20 @@ public class ClassificationEmbeddingStore {
 
   private final Logger logger = LoggerFactory.getLogger(ClassificationEmbeddingStore.class);
 
-  private final MicronautEmbeddingStore embeddingStore;
+  private final PledgerEmbeddingStore embeddingStore;
   private final EmbeddingModel embeddingModel;
+  private final EmbeddingStoreFiller embeddingStoreFiller;
 
   private final CurrentUserProvider currentUserProvider;
   private final TransactionProvider transactionProvider;
 
   ClassificationEmbeddingStore(
-      @AiEnabled.ClassificationAgent MicronautEmbeddingStore embeddingStore,
+      @AiEnabled.ClassificationAgent PledgerEmbeddingStore embeddingStore,
+      EmbeddingStoreFiller embeddingStoreFiller,
       TransactionProvider transactionProvider,
       CurrentUserProvider currentUserProvider) {
     this.embeddingStore = embeddingStore;
+    this.embeddingStoreFiller = embeddingStoreFiller;
     this.transactionProvider = transactionProvider;
     this.currentUserProvider = currentUserProvider;
     this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
@@ -50,22 +55,21 @@ public class ClassificationEmbeddingStore {
   public Optional<SuggestionResult> classify(SuggestionInput input) {
     var textSegment = TextSegment.from(input.description());
 
-    var searchRequest =
-        EmbeddingSearchRequest.builder()
-            .filter(
-                MetadataFilterBuilder.metadataKey("user")
-                    .isEqualTo(currentUserProvider.currentUser().getUsername().email())
-                    .and(
-                        // Filter applied to only match something with filled category, budget or
-                        // tags
-                        MetadataFilterBuilder.metadataKey("category")
-                            .isNotEqualTo("")
-                            .or(MetadataFilterBuilder.metadataKey("budget").isNotEqualTo(""))
-                            .or(MetadataFilterBuilder.metadataKey("tags").isNotEqualTo(""))))
-            .queryEmbedding(embeddingModel.embed(textSegment).content())
-            .maxResults(1)
-            .minScore(.8)
-            .build();
+    var searchRequest = EmbeddingSearchRequest.builder()
+        .filter(MetadataFilterBuilder.metadataKey("user")
+            .isEqualTo(currentUserProvider.currentUser().getUsername().email())
+            .and(
+                // Filter applied to only match something with
+                // filled category, budget or
+                // tags
+                MetadataFilterBuilder.metadataKey("category")
+                    .isNotEqualTo("")
+                    .or(MetadataFilterBuilder.metadataKey("budget").isNotEqualTo(""))
+                    .or(MetadataFilterBuilder.metadataKey("tags").isNotEqualTo(""))))
+        .queryEmbedding(embeddingModel.embed(textSegment).content())
+        .maxResults(1)
+        .minScore(.8)
+        .build();
 
     var hits = embeddingStore.embeddingStore().search(searchRequest).matches();
     if (hits.isEmpty()) {
@@ -80,7 +84,7 @@ public class ClassificationEmbeddingStore {
   void handleStartup(StartupEvent startupEvent) {
     logger.info("Initializing classification embedding store.");
     if (embeddingStore.shouldInitialize()) {
-      embeddingStore.embeddingStoreFiller().consumeTransactions(this::updateClassifications);
+      embeddingStoreFiller.consumeTransactions(this::updateClassifications);
     }
   }
 
@@ -97,7 +101,8 @@ public class ClassificationEmbeddingStore {
 
   @EventListener
   void handleTransactionAdded(TransactionCreated transactionCreated) {
-    updateClassifications(transactionProvider.lookup(transactionCreated.transactionId()).get());
+    updateClassifications(
+        transactionProvider.lookup(transactionCreated.transactionId()).get());
   }
 
   private SuggestionResult convert(Metadata metadata) {
@@ -110,28 +115,24 @@ public class ClassificationEmbeddingStore {
   private void updateClassifications(Transaction transaction) {
     logger.trace("Updating categorisation for transaction {}", transaction.getId());
 
-    var tags =
-        transaction.getTags().isEmpty()
-            ? ""
-            : transaction.getTags().reduce((left, right) -> left + ";" + right);
-    var metadata =
-        Map.of(
-            "id", transaction.getId().toString(),
-            "user", currentUserProvider.currentUser().getUsername().email(),
-            "category", Control.Option(transaction.getCategory()).getOrSupply(() -> ""),
-            "budget", Control.Option(transaction.getBudget()).getOrSupply(() -> ""),
-            "tags", tags);
+    var tags = transaction.getTags().isEmpty()
+        ? ""
+        : transaction.getTags().reduce((left, right) -> left + ";" + right);
+    var metadata = Map.of(
+        "id", transaction.getId().toString(),
+        "user", currentUserProvider.currentUser().getUsername().email(),
+        "category", Control.Option(transaction.getCategory()).getOrSupply(() -> ""),
+        "budget", Control.Option(transaction.getBudget()).getOrSupply(() -> ""),
+        "tags", tags);
     var textSegment =
         TextSegment.textSegment(transaction.getDescription(), Metadata.from(metadata));
 
     embeddingStore
         .embeddingStore()
-        .removeAll(
-            MetadataFilterBuilder.metadataKey("id")
-                .isEqualTo(transaction.getId().toString())
-                .and(
-                    MetadataFilterBuilder.metadataKey("user")
-                        .isEqualTo(currentUserProvider.currentUser().getUsername().email())));
+        .removeAll(MetadataFilterBuilder.metadataKey("id")
+            .isEqualTo(transaction.getId().toString())
+            .and(MetadataFilterBuilder.metadataKey("user")
+                .isEqualTo(currentUserProvider.currentUser().getUsername().email())));
 
     embeddingStore.embeddingStore().add(embeddingModel.embed(textSegment).content(), textSegment);
   }

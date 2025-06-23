@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.transaction;
 
+import static com.jongsoft.finance.rest.ApiConstants.TAG_AUTOMATION_RULES;
+
 import com.jongsoft.finance.core.Removable;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
@@ -24,7 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 
-@Tag(name = "Transaction Rules")
+@Tag(name = TAG_AUTOMATION_RULES)
 @Controller("/api/transaction-rules")
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public class TransactionRuleResource {
@@ -141,10 +143,8 @@ public class TransactionRuleResource {
 
     request
         .getConditions()
-        .forEach(
-            condition ->
-                rule.registerCondition(
-                    condition.column(), condition.operation(), condition.value()));
+        .forEach(condition ->
+            rule.registerCondition(condition.column(), condition.operation(), condition.value()));
 
     ruleProvider.save(rule);
   }
@@ -200,32 +200,29 @@ public class TransactionRuleResource {
       @PathVariable String group, @PathVariable long id, @Valid @Body CreateRuleRequest request) {
     return ruleProvider
         .lookup(id)
-        .map(
-            rule -> {
-              rule.change(
-                  request.getName(),
-                  request.getDescription(),
-                  request.isRestrictive(),
-                  request.isActive());
+        .map(rule -> {
+          rule.change(
+              request.getName(),
+              request.getDescription(),
+              request.isRestrictive(),
+              request.isActive());
 
-              rule.getChanges().forEach(Removable::delete);
+          rule.getChanges().forEach(Removable::delete);
 
-              request
-                  .getChanges()
-                  .forEach(change -> rule.registerChange(change.column(), change.value()));
+          request
+              .getChanges()
+              .forEach(change -> rule.registerChange(change.column(), change.value()));
 
-              rule.getConditions().forEach(Removable::delete);
+          rule.getConditions().forEach(Removable::delete);
 
-              request
-                  .getConditions()
-                  .forEach(
-                      condition ->
-                          rule.registerCondition(
-                              condition.column(), condition.operation(), condition.value()));
+          request
+              .getConditions()
+              .forEach(condition -> rule.registerCondition(
+                  condition.column(), condition.operation(), condition.value()));
 
-              ruleProvider.save(rule);
-              return ruleProvider.lookup(id).get();
-            })
+          ruleProvider.save(rule);
+          return ruleProvider.lookup(id).get();
+        })
         .map(TransactionRuleResponse::new)
         .getOrThrow(() -> StatusException.notFound("Rule not found with id " + id));
   }

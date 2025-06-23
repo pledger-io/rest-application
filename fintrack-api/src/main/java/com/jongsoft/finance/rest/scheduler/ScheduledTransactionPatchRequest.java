@@ -22,9 +22,11 @@ public class ScheduledTransactionPatchRequest {
   @Serdeable.Deserializable
   public record ScheduleValue(Periodicity periodicity, int interval) {}
 
-  @Valid private final DateRange range;
+  @Valid
+  private final DateRange range;
 
-  @Valid private final ScheduleValue schedule;
+  @Valid
+  private final ScheduleValue schedule;
 
   private final String name;
   private final String description;

@@ -28,12 +28,11 @@ public class CreateCategoryHandler implements CommandHandler<CreateCategoryComma
   public void handle(CreateCategoryCommand command) {
     log.info("[{}] - Processing create event for category", command.name());
 
-    var entity =
-        CategoryJpa.builder()
-            .label(command.name())
-            .description(command.description())
-            .user(entityManager.currentUser())
-            .build();
+    var entity = CategoryJpa.builder()
+        .label(command.name())
+        .description(command.description())
+        .user(entityManager.currentUser())
+        .build();
 
     entityManager.persist(entity);
   }

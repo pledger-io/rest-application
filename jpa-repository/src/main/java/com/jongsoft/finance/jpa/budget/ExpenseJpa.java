@@ -17,7 +17,9 @@ public class ExpenseJpa extends EntityJpa {
   private String name;
   private boolean archived;
 
-  @ManyToOne @JoinColumn private UserAccountJpa user;
+  @ManyToOne
+  @JoinColumn
+  private UserAccountJpa user;
 
   @Builder
   private ExpenseJpa(String name, boolean archived, UserAccountJpa user) {

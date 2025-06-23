@@ -32,25 +32,28 @@ public class AccountJpa extends EntityJpa {
   @Enumerated(value = EnumType.STRING)
   private Periodicity interestPeriodicity;
 
-  @ManyToOne private AccountTypeJpa type;
+  @ManyToOne
+  private AccountTypeJpa type;
 
-  @ManyToOne private UserAccountJpa user;
+  @ManyToOne
+  private UserAccountJpa user;
 
-  @ManyToOne private CurrencyJpa currency;
+  @ManyToOne
+  private CurrencyJpa currency;
 
   @Basic(fetch = FetchType.LAZY)
-  @Formula(
-      "(select max(tj.t_date) from transaction_part t join transaction_journal tj on tj.id = t.journal_id where t.account_id = id and t.deleted is null)")
+  @Formula("(select max(tj.t_date) from transaction_part t join transaction_journal tj on tj.id ="
+      + " t.journal_id where t.account_id = id and t.deleted is null)")
   private LocalDate lastTransaction;
 
   @Basic(fetch = FetchType.LAZY)
-  @Formula(
-      "(select min(tj.t_date) from transaction_part t join transaction_journal tj on tj.id = t.journal_id where t.account_id = id and t.deleted is null)")
+  @Formula("(select min(tj.t_date) from transaction_part t join transaction_journal tj on tj.id ="
+      + " t.journal_id where t.account_id = id and t.deleted is null)")
   private LocalDate firstTransaction;
 
   @Basic(fetch = FetchType.LAZY)
-  @Formula(
-      "(select sum(t.amount) from transaction_part t where t.account_id = id and t.deleted is null)")
+  @Formula("(select sum(t.amount) from transaction_part t where t.account_id = id and t.deleted is"
+      + " null)")
   private Double balance;
 
   private boolean archived;

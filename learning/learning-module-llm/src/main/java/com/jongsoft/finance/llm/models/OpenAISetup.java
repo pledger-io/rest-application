@@ -26,7 +26,8 @@ public class OpenAISetup {
   @Bean
   ChatLanguageModel openaiLanguageModel() {
     log.info(
-        "Creating OpenAI chat model with name config: {}.", configuration.getOpenAI().getModel());
+        "Creating OpenAI chat model with name config: {}.",
+        configuration.getOpenAI().getModel());
     return OpenAiChatModel.builder()
         .modelName(configuration.getOpenAI().getModel())
         .apiKey(configuration.getOpenAI().getKey())

@@ -7,7 +7,9 @@ package com.jongsoft.finance.jpa.query.expression;
  */
 public enum FieldEquation {
 
-  /** Enumeration representing the field equation option for equality comparison in expressions. */
+  /**
+   * Enumeration representing the field equation option for equality comparison in expressions.
+   */
   EQ,
   /**
    * Represents the field equation option for greater than or equal to comparison in expressions.

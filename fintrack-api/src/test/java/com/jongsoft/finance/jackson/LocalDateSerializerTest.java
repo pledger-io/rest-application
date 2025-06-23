@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.time.LocalDate;
 
-@MicronautTest
 @DisplayName("LocalDate serializer")
+@MicronautTest(environments = {"no-camunda", "no-analytics"} )
 class LocalDateSerializerTest {
 
     @Test
