@@ -8,10 +8,10 @@ create table spending_insights
     type           varchar(50) not null,
     category       varchar(255),
     severity       varchar(50),
-    score double not null,
+    score          double not null,
     detected_date  date,
     message        varchar(1024),
-    year_month     varchar(7),
+    `year_month`     varchar(7),
     transaction_id bigint,
     user_id        bigint      not null,
 
@@ -38,7 +38,7 @@ create table spending_patterns
     category      varchar(255),
     confidence double not null,
     detected_date date,
-    year_month    varchar(7),
+    `year_month`    varchar(7),
     user_id       bigint      not null,
 
     constraint pk_spending_patterns primary key (id),
