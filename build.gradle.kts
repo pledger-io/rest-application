@@ -37,6 +37,10 @@ subprojects {
         }
     }
 
+    tasks.classes {
+        dependsOn("spotlessApply")
+    }
+
     spotless {
         java {
             target("src/main/java/**")

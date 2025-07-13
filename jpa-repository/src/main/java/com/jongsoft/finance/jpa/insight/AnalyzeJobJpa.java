@@ -16,5 +16,6 @@ public class AnalyzeJobJpa {
 
   @Column(name = "year_month_found")
   private String yearMonth;
+
   private boolean completed;
 }
