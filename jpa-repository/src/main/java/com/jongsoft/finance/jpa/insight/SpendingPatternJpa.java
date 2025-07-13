@@ -27,7 +27,7 @@ public class SpendingPatternJpa extends EntityJpa {
   private double confidence;
   private LocalDate detectedDate;
 
-  @Column(name = "year_month")
+  @Column(name = "year_month_found")
   private String yearMonth;
 
   @ElementCollection

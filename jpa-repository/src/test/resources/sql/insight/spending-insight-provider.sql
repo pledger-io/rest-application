@@ -1,7 +1,7 @@
 -- Test data for SpendingInsightProviderJpaIT
 
 -- Add spending insights for demo-user
-INSERT INTO spending_insights (id, type, category, severity, score, detected_date, message, year_month, user_id)
+INSERT INTO spending_insights (id, type, category, severity, score, detected_date, message, year_month_found, user_id)
 VALUES
     (1, 'UNUSUAL_AMOUNT', 'Groceries', 'WARNING', 0.85, '2023-01-15', 'Unusual spending amount in Groceries', '2023-01', 1),
     (2, 'BUDGET_EXCEEDED', 'Entertainment', 'ALERT', 0.95, '2023-01-20', 'Budget exceeded in Entertainment', '2023-01', 1),
@@ -21,6 +21,6 @@ VALUES
     (4, 'actual_count', '8');
 
 -- Add spending insight for demo-user-not (to test user filtering)
-INSERT INTO spending_insights (id, type, category, severity, score, detected_date, message, year_month, user_id)
+INSERT INTO spending_insights (id, type, category, severity, score, detected_date, message, year_month_found, user_id)
 VALUES
     (5, 'UNUSUAL_AMOUNT', 'Groceries', 'WARNING', 0.85, '2023-01-15', 'Unusual spending amount in Groceries', '2023-01', 2);

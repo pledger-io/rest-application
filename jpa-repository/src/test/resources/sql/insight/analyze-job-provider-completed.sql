@@ -1,7 +1,7 @@
 -- Test data for AnalyzeJobProviderJpaIT (all jobs completed)
 
 -- Add only completed analyze jobs for testing
-INSERT INTO analyze_job (id, year_month, completed)
+INSERT INTO analyze_job (id, year_month_found, completed)
 VALUES
     ('job-1', '2023-01', true),
     ('job-2', '2023-02', true),
