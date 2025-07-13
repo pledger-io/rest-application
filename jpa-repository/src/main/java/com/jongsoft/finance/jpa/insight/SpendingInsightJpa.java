@@ -30,7 +30,7 @@ public class SpendingInsightJpa extends EntityJpa {
   private String message;
   private Long transactionId;
 
-  @Column(name = "year_month")
+  @Column(name = "year_month_found")
   private String yearMonth;
 
   @ElementCollection
