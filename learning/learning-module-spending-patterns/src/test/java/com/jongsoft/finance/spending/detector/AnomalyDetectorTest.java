@@ -9,7 +9,9 @@ import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.spending.detector.anomaly.Anomaly;
 import com.jongsoft.finance.spending.detector.anomaly.UserCategoryStatistics;
+import net.bytebuddy.matcher.ElementMatchers;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -137,7 +139,7 @@ class AnomalyDetectorTest {
     when(transaction2.getBudget()).thenReturn("Groceries");
     when(transaction1.computeAmount(any())).thenReturn(100.0);
     when(transaction2.computeAmount(any())).thenReturn(200.0);
-    when(filterFactory.transaction()).thenReturn(mock(TransactionProvider.FilterCommand.class));
+    when(filterFactory.transaction()).thenReturn(mock(TransactionProvider.FilterCommand.class, InvocationOnMock::getMock));
 
     Account merchantAccount = mock(Account.class);
     when(transaction1.computeTo()).thenReturn(merchantAccount);
@@ -178,7 +180,7 @@ class AnomalyDetectorTest {
     when(transaction1.getBudget()).thenReturn("Entertainment");
     when(transaction1.computeAmount(any())).thenReturn(150.0);
     when(transaction1.getDate()).thenReturn(LocalDate.now().minusMonths(1));
-    when(filterFactory.transaction()).thenReturn(mock(TransactionProvider.FilterCommand.class));
+    when(filterFactory.transaction()).thenReturn(mock(TransactionProvider.FilterCommand.class, InvocationOnMock::getMock));
 
     when(transactionProvider.lookup(any())).thenReturn(ResultPage.of(transaction1));
 

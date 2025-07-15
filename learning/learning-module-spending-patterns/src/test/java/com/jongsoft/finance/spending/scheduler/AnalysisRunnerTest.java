@@ -4,8 +4,11 @@ import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.insight.Insight;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.messaging.ApplicationEvent;
+import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.spending.Detector;
+import io.micronaut.context.event.ApplicationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +41,8 @@ class AnalysisRunnerTest {
         // Create filter factory chain mocks
         when(filterFactory.transaction()).thenReturn(filterCommand);
         when(filterCommand.range(any())).thenReturn(filterCommand);
+
+        new EventBus(mock(ApplicationEventPublisher.class));
 
         // Create the analysis runner
         analysisRunner = new AnalysisRunner(transactionDetectors, filterFactory, transactionProvider);
