@@ -39,20 +39,24 @@ public class RunAnalyzeJobScheduler {
     MDC.put("correlationId", UUID.randomUUID().toString());
     var jobToRun = analyzeJobProvider.first();
     if (jobToRun.isPresent()) {
-      var success = true;
       var analyzeJob = jobToRun.get();
       log.info("Scheduling analyze job {}.", analyzeJob.getMonth());
-      for (var user : userProvider.lookup()) {
-        eventPublisher.publishEvent(
-            new InternalAuthenticationEvent(this, user.getUsername().email()));
-        success &= analysisRunner.analyzeForUser(analyzeJob.getMonth());
-      }
+      eventPublisher.publishEvent(
+          new InternalAuthenticationEvent(this, analyzeJob.getUser().email()));
+      var success = analysisRunner.analyzeForUser(analyzeJob.getMonth());
 
       if (success) {
-        log.debug("Completed analysis for month {}.", analyzeJob.getMonth());
+        log.debug(
+            "Completed analysis for month {} for user {}.",
+            analyzeJob.getMonth(),
+            analyzeJob.getUser().email());
         analyzeJob.complete();
       } else {
-        log.warn("Failed to complete analysis for month {}.", analyzeJob.getMonth());
+        log.warn(
+            "Failed to complete analysis for month {} for user {}.",
+            analyzeJob.getMonth(),
+            analyzeJob.getUser().email());
+        analyzeJob.fail();
       }
     }
     MDC.remove("correlationId");

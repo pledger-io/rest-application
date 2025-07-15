@@ -1,8 +1,10 @@
 package com.jongsoft.finance.domain.insight;
 
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.messaging.commands.insight.CompleteAnalyzeJob;
 import com.jongsoft.finance.messaging.commands.insight.CreateAnalyzeJob;
+import com.jongsoft.finance.messaging.commands.insight.FailAnalyzeJob;
 import java.time.YearMonth;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -16,13 +18,15 @@ public class AnalyzeJob {
 
   private final String jobId;
   private final YearMonth month;
+  private final UserIdentifier user;
   private boolean completed;
 
-  public AnalyzeJob(YearMonth month) {
+  public AnalyzeJob(UserIdentifier user, YearMonth month) {
     this.jobId = UUID.randomUUID().toString();
     this.month = month;
+    this.user = user;
 
-    CreateAnalyzeJob.createAnalyzeJob(month);
+    CreateAnalyzeJob.createAnalyzeJob(user, month);
   }
 
   public void complete() {
@@ -32,6 +36,15 @@ public class AnalyzeJob {
     }
 
     completed = true;
-    CompleteAnalyzeJob.completeAnalyzeJob(month);
+    CompleteAnalyzeJob.completeAnalyzeJob(user, month);
+  }
+
+  public void fail() {
+    if (completed) {
+      throw StatusException.badRequest(
+          "Cannot fail an analyze job that has already completed.", "AnalyzeJob.completed");
+    }
+
+    FailAnalyzeJob.failAnalyzeJob(user, month);
   }
 }

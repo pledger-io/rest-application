@@ -1,5 +1,6 @@
 package com.jongsoft.finance.jpa.insight;
 
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.insight.CompleteAnalyzeJob;
@@ -73,7 +74,7 @@ class AnalyzeJobProviderJpaIT extends JpaTestSetup {
   @Test
   @DisplayName("Test createJob() - Should create a new analyze job")
   void createJob() {
-    CreateAnalyzeJob.createAnalyzeJob(YearMonth.now());
+    CreateAnalyzeJob.createAnalyzeJob(new UserIdentifier("demo-user"), YearMonth.now());
 
     var entity = entityManager.createQuery("select j from AnalyzeJobJpa j where j.yearMonth = :month", AnalyzeJobJpa.class)
         .setParameter("month", YearMonth.now().toString())
@@ -81,6 +82,7 @@ class AnalyzeJobProviderJpaIT extends JpaTestSetup {
 
     Assertions.assertThat(entity).isNotNull();
     Assertions.assertThat(entity.getYearMonth()).isEqualTo(YearMonth.now().toString());
+    Assertions.assertThat(entity.getUser().getUsername()).isEqualTo("demo-user");
     Assertions.assertThat(entity.isCompleted()).isFalse();
   }
 
@@ -91,7 +93,7 @@ class AnalyzeJobProviderJpaIT extends JpaTestSetup {
         "sql/insight/analyze-job-provider.sql"
     );
 
-    CompleteAnalyzeJob.completeAnalyzeJob(YearMonth.of(2023, 1));
+    CompleteAnalyzeJob.completeAnalyzeJob(new UserIdentifier("demo-user"), YearMonth.of(2023, 1));
 
     var entity = entityManager.createQuery("select j from AnalyzeJobJpa j where j.yearMonth = :month", AnalyzeJobJpa.class)
         .setParameter("month", "2023-01")

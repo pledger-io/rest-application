@@ -3,6 +3,7 @@ package com.jongsoft.finance.spending.scheduler;
 import com.jongsoft.finance.domain.insight.Insight;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
+import com.jongsoft.finance.messaging.commands.insight.CleanInsightsForMonth;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.spending.Detector;
 import com.jongsoft.finance.spending.SpendingAnalyticsEnabled;
@@ -33,13 +34,17 @@ class AnalysisRunner {
   @Transactional
   public boolean analyzeForUser(YearMonth month) {
     if (!transactionDetectors.stream().allMatch(Detector::readyForAnalysis)) {
+      log.debug("Not all transaction detectors are ready for analysis. Skipping analysis.");
       return false;
     }
 
     log.info("Starting monthly spending analysis for {}.", month);
     try {
-      var transactionFilter =
-          filterFactory.transaction().range(Dates.range(month.atDay(1), month.atEndOfMonth()));
+      CleanInsightsForMonth.cleanInsightsForMonth(month);
+      var transactionFilter = filterFactory
+          .transaction()
+          .range(Dates.range(month.atDay(1), month.atEndOfMonth()))
+          .ownAccounts();
 
       var transactionInMonth = transactionProvider.lookup(transactionFilter).content();
       if (transactionInMonth.isEmpty()) {
