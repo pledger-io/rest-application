@@ -41,10 +41,10 @@ class AnalysisRunner {
     log.info("Starting monthly spending analysis for {}.", month);
     try {
       CleanInsightsForMonth.cleanInsightsForMonth(month);
-      var transactionFilter =
-          filterFactory.transaction()
-              .range(Dates.range(month.atDay(1), month.atEndOfMonth()))
-              .ownAccounts();
+      var transactionFilter = filterFactory
+          .transaction()
+          .range(Dates.range(month.atDay(1), month.atEndOfMonth()))
+          .ownAccounts();
 
       var transactionInMonth = transactionProvider.lookup(transactionFilter).content();
       if (transactionInMonth.isEmpty()) {
