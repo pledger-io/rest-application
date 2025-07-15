@@ -57,7 +57,10 @@ class AnomalyDetector implements Detector<SpendingInsight> {
 
     log.debug("Updating baseline for anomaly detection");
     var transactionsPerBudget = transactionProvider
-        .lookup(filterFactory.transaction().range(Dates.range(startDate, LocalDate.now())))
+        .lookup(filterFactory
+            .transaction()
+            .ownAccounts()
+            .range(Dates.range(startDate, LocalDate.now())))
         .content()
         .stream()
         .filter(t -> t.getBudget() != null)

@@ -5,6 +5,7 @@ import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
+import com.jongsoft.finance.messaging.commands.insight.CleanInsightsForMonth;
 import com.jongsoft.finance.messaging.commands.insight.CreateSpendingInsight;
 import com.jongsoft.finance.providers.SpendingInsightProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -113,6 +114,18 @@ public class SpendingInsightProviderJpa implements SpendingInsightProvider {
 
     // Save the entity
     entityManager.persist(jpa);
+  }
+
+  @BusinessEventListener
+  public void cleanForMonth(CleanInsightsForMonth command) {
+    log.trace("Cleaning spending insights for month: {}", command.month());
+    entityManager
+        .getEntityManager()
+        .createQuery(
+            "DELETE FROM SpendingInsightJpa WHERE yearMonth = :yearMonth and user.id in (select id from UserAccountJpa a where a.username = :username)")
+        .setParameter("yearMonth", command.month().toString())
+        .setParameter("username", authenticationFacade.authenticated())
+        .executeUpdate();
   }
 
   private SpendingInsight convert(SpendingInsightJpa source) {

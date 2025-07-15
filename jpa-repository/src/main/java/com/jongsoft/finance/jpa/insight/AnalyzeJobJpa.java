@@ -1,9 +1,7 @@
 package com.jongsoft.finance.jpa.insight;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -17,5 +15,9 @@ public class AnalyzeJobJpa {
   @Column(name = "year_month_found")
   private String yearMonth;
 
+  @ManyToOne
+  private UserAccountJpa user;
+
   private boolean completed;
+  private boolean failed;
 }

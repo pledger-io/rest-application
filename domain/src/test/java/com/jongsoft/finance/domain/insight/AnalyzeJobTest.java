@@ -1,6 +1,7 @@
 package com.jongsoft.finance.domain.insight;
 
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.insight.CompleteAnalyzeJob;
 import com.jongsoft.finance.messaging.commands.insight.CreateAnalyzeJob;
@@ -28,7 +29,7 @@ class AnalyzeJobTest {
   void shouldCompleteAnalyzeJobSuccessfully() {
     // Arrange
     YearMonth month = YearMonth.of(2023, 9);
-    AnalyzeJob analyzeJob = new AnalyzeJob(month);
+    AnalyzeJob analyzeJob = new AnalyzeJob(new UserIdentifier("test@local"), month);
     var mockedCompleteAnalyzeJob = mockStatic(CompleteAnalyzeJob.class);
 
     // Act
@@ -36,7 +37,7 @@ class AnalyzeJobTest {
 
     // Assert
     assertTrue(analyzeJob.isCompleted(), "Expected analyze job to be marked as completed.");
-    mockedCompleteAnalyzeJob.verify(() -> CompleteAnalyzeJob.completeAnalyzeJob(month));
+    mockedCompleteAnalyzeJob.verify(() -> CompleteAnalyzeJob.completeAnalyzeJob(new UserIdentifier("test@local"), month));
     mockedCompleteAnalyzeJob.close();
   }
 
@@ -44,7 +45,7 @@ class AnalyzeJobTest {
   void shouldThrowExceptionWhenCompletingAlreadyCompletedJob() {
     // Arrange
     YearMonth month = YearMonth.of(2023, 9);
-    AnalyzeJob analyzeJob = new AnalyzeJob(month);
+    AnalyzeJob analyzeJob = new AnalyzeJob(new UserIdentifier("test@local"), month);
     analyzeJob.complete();
 
     // Act & Assert
@@ -67,10 +68,10 @@ class AnalyzeJobTest {
     var mockedCreateAnalyzeJob = mockStatic(CreateAnalyzeJob.class);
 
     // Act
-    new AnalyzeJob(month);
+    new AnalyzeJob(new UserIdentifier("test@local"), month);
 
     // Assert
-    mockedCreateAnalyzeJob.verify(() -> CreateAnalyzeJob.createAnalyzeJob(month));
+    mockedCreateAnalyzeJob.verify(() -> CreateAnalyzeJob.createAnalyzeJob(new UserIdentifier("test@local"), month));
     mockedCreateAnalyzeJob.close();
   }
 }
