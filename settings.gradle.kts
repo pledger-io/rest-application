@@ -30,7 +30,7 @@ dependencyResolutionManagement {
             library("bouncy", "org.bouncycastle", "bcprov-jdk18on").version("1.81")
             library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.81")
             library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
-            library("csv", "com.opencsv", "opencsv").version("5.11.2")
+            library("csv", "com.opencsv", "opencsv").version("5.12.0")
 
             // testing dependencies
             version("junit.version", "5.13.4")
