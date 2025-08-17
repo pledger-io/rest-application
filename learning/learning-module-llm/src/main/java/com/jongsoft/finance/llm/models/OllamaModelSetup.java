@@ -8,7 +8,7 @@ import com.jongsoft.finance.llm.tools.AiTool;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.providers.TagProvider;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
@@ -61,7 +61,7 @@ class OllamaModelSetup {
   }
 
   @Bean
-  ChatLanguageModel ollamaLanguageModel() {
+  ChatModel ollamaLanguageModel() {
     log.info(
         "Creating Ollama chat model with name {}, and temperature {}.",
         configuration.getOllama().getModel(),

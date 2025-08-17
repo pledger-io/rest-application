@@ -5,7 +5,7 @@ import com.jongsoft.finance.llm.agent.TransactionExtractorAgent;
 import com.jongsoft.finance.llm.tools.AiTool;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.rag.RetrievalAugmentor;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
@@ -27,12 +27,12 @@ class LanguageModelStarter {
 
   @Bean
   public ClassificationAgent transactionSupportAgent(
-      ChatLanguageModel model,
+      ChatModel model,
       ToolSupplier aiTools,
       @AiEnabled.ClassificationAgent @Nullable RetrievalAugmentor retrievalAugmentor) {
     log.info("Setting up transaction support chat agent.");
     var aiBuilder = AiServices.builder(ClassificationAgent.class)
-        .chatLanguageModel(model)
+        .chatModel(model)
         .chatMemoryProvider(chatMemoryProvider());
 
     if (aiTools.getTools().length > 0) {
@@ -45,10 +45,10 @@ class LanguageModelStarter {
 
   @Bean
   public TransactionExtractorAgent transactionExtractorAgent(
-      ChatLanguageModel model, ToolSupplier aiTools) {
+      ChatModel model, ToolSupplier aiTools) {
     log.info("Setting up transaction extractor chat agent.");
     var aiBuilder = AiServices.builder(TransactionExtractorAgent.class)
-        .chatLanguageModel(model)
+        .chatModel(model)
         .chatMemoryProvider(chatMemoryProvider());
 
     if (aiTools.getTools().length > 0) {

@@ -2,7 +2,7 @@ package com.jongsoft.finance.llm.models;
 
 import com.jongsoft.finance.llm.AiEnabled;
 import com.jongsoft.finance.llm.configuration.AiConfiguration;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
@@ -24,7 +24,7 @@ public class OpenAISetup {
   }
 
   @Bean
-  ChatLanguageModel openaiLanguageModel() {
+  ChatModel openaiLanguageModel() {
     log.info(
         "Creating OpenAI chat model with name config: {}.",
         configuration.getOpenAI().getModel());
