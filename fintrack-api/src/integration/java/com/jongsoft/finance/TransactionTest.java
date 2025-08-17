@@ -3,14 +3,16 @@ package com.jongsoft.finance;
 import com.jongsoft.finance.extension.AccountContext;
 import com.jongsoft.finance.extension.IntegrationTest;
 import com.jongsoft.finance.extension.TestContext;
+import com.jongsoft.finance.extension.TransactionContext;
+import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.*;
 
 @IntegrationTest(phase = 2)
 @DisplayName("User creates the initial transactions:")
@@ -77,5 +79,35 @@ public class TransactionTest {
                 .list(LocalDate.parse("2020-01-03"), response -> response
                         .body("info.records", equalTo(1))
                         .body("content.amount", hasItem(15f)));
+    }
+
+    @Test
+    void splitTransaction(TestContext context) {
+      context.authenticate("sample@e", "Zomer2020");
+
+      var checkingAccount = new MutableObject<AccountContext.Account>();
+      var shop = new MutableObject<AccountContext.Account>();
+      var transactionId = new MutableLong();
+
+      context.accounts()
+          .locate("My checking account", checkingAccount::setValue)
+          .locate("Guarda", shop::setValue);
+
+      context.transactions()
+          .create(
+              checkingAccount.getValue(),
+              shop.getValue(),
+              25,
+              "Total spending habit",
+              LocalDate.parse("2023-01-01"))
+          .list(LocalDate.parse("2023-01-01"), response ->
+              transactionId.setValue(response.extract().jsonPath().getLong("content[0].id")))
+          .split(shop.getValue().getId(), transactionId.getValue(), List.of(
+              new TransactionContext.TransactionSplit("First part spending", 10),
+              new TransactionContext.TransactionSplit("Second part spending", 15)))
+          .list(LocalDate.parse("2023-01-01"), response -> response
+              .body("info.records", equalTo(1))
+              .body("content.amount", hasItem(25f))
+              .body("content[0].split.amount", hasItems(15f, 10f)));
     }
 }

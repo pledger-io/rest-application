@@ -47,7 +47,7 @@ public class AccountContext {
             return this;
         }
 
-        long getId() {
+        public long getId() {
             return id;
         }
     }
