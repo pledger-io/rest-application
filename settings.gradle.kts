@@ -5,7 +5,7 @@ pluginManagement {
         id("java")
         id("io.micronaut.library").version("4.5.4")
         id("io.micronaut.application").version("4.5.4")
-        id("io.freefair.lombok").version("8.14")
+        id("io.freefair.lombok").version("8.14.2")
         id("org.sonarqube").version("6.2.0.5505")
         id("org.openapi.generator").version("7.14.0")
         id("com.diffplug.spotless").version("7.2.1")
@@ -35,7 +35,7 @@ dependencyResolutionManagement {
             // testing dependencies
             version("junit.version", "5.13.4")
             library("junit.jupiter", "org.junit.jupiter", "junit-jupiter-api").versionRef("junit.version")
-            library("assertj","org.assertj", "assertj-core").version("3.27.3")
+            library("assertj","org.assertj", "assertj-core").version("3.27.4")
             library("mockito","org.mockito", "mockito-core").version("5.18.0")
             bundle("junit", listOf("junit.jupiter", "assertj", "mockito"))
         }
