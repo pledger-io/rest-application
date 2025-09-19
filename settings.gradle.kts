@@ -35,7 +35,7 @@ dependencyResolutionManagement {
             // testing dependencies
             version("junit.version", "5.13.4")
             library("junit.jupiter", "org.junit.jupiter", "junit-jupiter-api").versionRef("junit.version")
-            library("assertj","org.assertj", "assertj-core").version("3.27.4")
+            library("assertj","org.assertj", "assertj-core").version("3.27.5")
             library("mockito","org.mockito", "mockito-core").version("5.19.0")
             bundle("junit", listOf("junit.jupiter", "assertj", "mockito"))
         }
