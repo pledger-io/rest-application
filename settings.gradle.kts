@@ -8,7 +8,7 @@ pluginManagement {
         id("io.freefair.lombok").version("8.14.2")
         id("org.sonarqube").version("6.3.1.5724")
         id("org.openapi.generator").version("7.15.0")
-        id("com.diffplug.spotless").version("7.2.1")
+        id("com.diffplug.spotless").version("8.0.0")
 
         id("signing")
         id("maven-publish")
