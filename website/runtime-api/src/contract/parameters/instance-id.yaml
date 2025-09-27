@@ -1,0 +1,4 @@
+name: instanceId
+in: path
+schema:
+  type: string

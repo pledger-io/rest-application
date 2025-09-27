@@ -9,6 +9,7 @@ pluginManagement {
         id("org.sonarqube").version("7.1.0.6387")
         id("org.openapi.generator").version("7.17.0")
         id("com.diffplug.spotless").version("8.1.0")
+        id("io.micronaut.openapi").version("4.5.4")
 
         id("signing")
         id("maven-publish")
@@ -41,8 +42,7 @@ dependencyResolutionManagement {
         }
 
         create("mn") {
-            val micronautVersion: String by settings
-            from("io.micronaut.platform:micronaut-platform:${micronautVersion}")
+            from("io.micronaut.platform:micronaut-platform:4.9.3")
         }
 
         create("llm") {
@@ -70,4 +70,10 @@ include(
     "learning:learning-module-spending-patterns",
     "bpmn-process",
     "jpa-repository",
+    "website:rest-api",
+    "website:runtime-api",
+    "website:importer-api",
+    "website:system-api",
+    "website:budget-api",
+    "website:application",
     "fintrack-api")

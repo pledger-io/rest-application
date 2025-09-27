@@ -1,0 +1,6 @@
+name: offset
+description: The number of rows to skip in the result set
+in: query
+required: true
+schema:
+  type: integer

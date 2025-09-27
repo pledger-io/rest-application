@@ -69,20 +69,6 @@ endpoints:
 jackson:
   serialization-inclusion: non_absent
 
-jpa:
-  default:
-    compile-time-hibernate-proxies: true
-    packages-to-scan:
-      - 'com.jongsoft.finance.jpa'
-    properties:
-      jdbc:
-        time_zone: UTC
-      hibernate:
-        hbm2ddl:
-          auto: none
-        physical_naming_strategy: 'com.jongsoft.finance.jpa.DefaultNamingStrategy'
-        show_sql: false
-
 otel:
   trace:
     exporter: otlp

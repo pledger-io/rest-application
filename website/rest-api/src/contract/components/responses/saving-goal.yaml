@@ -1,0 +1,45 @@
+type: object
+required:
+  - goal
+  - id
+  - reserved
+  - targetDate
+properties:
+  id:
+    type: integer
+    description: The identifier of the saving goal
+    format: int64
+    example: 132
+  name:
+    type: string
+    description: The name of the saving goal
+    example: Car replacement
+  description:
+    type: string
+    description: The description of the saving goal
+  schedule:
+    description: The schedule that allocations are created automatically
+    $ref: "#/components/schemas/schedule-response"
+  goal:
+    type: number
+    description: The goal one wishes to achieve by the end date
+    example: 1500.4
+  reserved:
+    type: number
+    description: The amount of money reserved for this saving goal
+    example: 200
+  installments:
+    type: number
+    description: >
+      The amount of money allocated each interval, only when schedule is set
+    example: 25.5
+  targetDate:
+    type: string
+    description: The date before which the goal must be met
+    format: date
+    example: 2021-01-12
+  monthsLeft:
+    type: integer
+    description: The amount of months left until the target date
+    format: int64
+    example: 23

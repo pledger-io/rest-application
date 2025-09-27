@@ -2,6 +2,9 @@
   "resources": {
     "includes": [
       {
+        "pattern": "application-.*\\.yml"
+      },
+      {
         "pattern": "db/camunda/h2/.*"
       },
       {

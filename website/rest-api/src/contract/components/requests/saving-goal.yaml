@@ -1,0 +1,16 @@
+type: object
+required:
+  - goal
+  - name
+  - targetDate
+properties:
+  name:
+    minLength: 1
+    type: string
+  goal:
+    minimum: 0
+    exclusiveMinimum: true
+    type: number
+  targetDate:
+    type: string
+    format: date

@@ -1,0 +1,1004 @@
+openapi: 3.1.0
+info:
+  title: Pledger.io REST API
+  version: 3.0.0
+  contact:
+    name: Jong Soft Development
+    url: https://github.com/pledger-io/rest-application
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+tags:
+  - name: i18n
+    description: i18n
+  - name: account-fetcher
+    description: Operations to fetch account information
+  - name: account-commands
+    description: Operations to manipulate account information
+  - name: transaction-fetcher
+    description: Operations to fetch transaction information
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/account-types:
+    get:
+      operationId: getAccountTypes
+      tags: [ system-information ]
+      description: >
+        Get a listing of all available account types in the system.
+      responses:
+        "200":
+          description: A list of all available account types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  /api/export:
+    get:
+      operationId: exportUserAccount
+      tags: [ export ]
+      description: >
+        Create an export of all information that belongs to the authenticated
+        user.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/export-profile-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  #-------------------------------------------------------------------
+  #                  Account creation / search
+  #-------------------------------------------------------------------
+
+  /api/accounts:
+    get:
+      operationId: getAccounts
+      tags: [ account-fetcher ]
+      description: >
+        List available accounts that the current user has access to
+      parameters:
+        - name: type
+          description: The account type to filter on
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/number-of-results'
+        - name: accountName
+          in: query
+          description: A partial name of an account to look for
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The list of accounts
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/paged-account-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createAccount
+      tags: [ account-command ]
+      description: >
+        Create a new account for the current user
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/account-request' }
+      responses:
+        "201":
+          description: The created account
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/account-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  /api/accounts/top-by-spending:
+    get:
+      operationId: getTopAccountsBySpending
+      tags: [ account-fetcher ]
+      parameters:
+        - $ref: '#/components/parameters/start-date'
+        - $ref: '#/components/parameters/end-date'
+        - name: type
+          description: Filter on the type of account. Must not be set when useOwnAccounts is provided.
+          in: query
+          schema: { $ref: '#/components/schemas/account-type' }
+        - name: useOwnAccounts
+          description: Filter on all of the users own accounts. If set the type filter will be ignored.
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: The list of top spending accounts
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/account-spending-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  #-------------------------------------------------------------------
+  #                     Account manipulations
+  #-------------------------------------------------------------------
+
+  /api/accounts/{id}:
+    parameters:
+      - name: id
+        description: The identifier of the account
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 1234567890
+    get:
+      operationId: getAccountById
+      tags: [ account-fetcher ]
+      description: >
+        Get account details by id for the current user
+      responses:
+        "200":
+          description: The created account
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/account-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404":
+          description: Saving goal not found
+    put:
+      operationId: updateAccountById
+      tags: [ account-command ]
+      description: >
+        Update account details by id for the current user
+      responses:
+        "200":
+          description: The created account
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/account-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404":
+          description: Saving goal not found
+    delete:
+      operationId: deleteAccountById
+      tags: [ account-command ]
+      description: >
+        Delete account details by id for the current user
+      responses:
+        "204":
+          description: Confirmation that the account was deleted
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+  #-------------------------------------------------------------------
+  #                     Account saving goals
+  #-------------------------------------------------------------------
+
+  /api/accounts/{id}/saving-goals:
+    parameters:
+      - name: id
+        description: The identifier of the account
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 1234567890
+    get:
+      operationId: getSavingGoalsForAccount
+      tags: [ account-fetcher ]
+      description: >
+        Get the saving goals for the account, note this can only be called if the account type is SAVINGS.
+      responses:
+        "200":
+          description: The list of saving goals
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/saving-goal-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    post:
+      operationId: createSavingGoalForAccount
+      tags: [ account-command ]
+      description: >
+        Create a new saving goal for the account, note this can only be called if the account type is SAVINGS.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/saving-goal-request' }
+      responses:
+        "201":
+          description: The created saving goal
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/saving-goal-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /api/accounts/{id}/saving-goals/{goalId}:
+    parameters:
+      - name: id
+        description: The identifier of the account
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 1234567890
+      - name: goalId
+        description: The identifier of the saving goal
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 1234567890
+    put:
+      operationId: updateSavingGoalForAccount
+      tags: [ account-command ]
+      description: >
+        Update a saving goal for the account, note this can only be called if the account type is SAVINGS.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/saving-goal-request' }
+      responses:
+        "200":
+          description: The updated saving goal
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/saving-goal-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    delete:
+      operationId: deleteSavingGoalForAccount
+      tags: [ account-command ]
+      description: >
+        Remove a saving goal for the account, note this can only be called if the account type is SAVINGS.
+      responses:
+        "204":
+          description: Confirmation that the saving goal was deleted
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+  /api/accounts/{id}/saving-goals/{goalId}/make-reservation:
+    parameters:
+      - name: id
+        description: The identifier of the account
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 1234567890
+      - name: goalId
+        description: The identifier of the saving goal
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 1234567890
+    post:
+      operationId: makeReservationForSavingGoal
+      tags: [ account-command ]
+      description: >
+        Make a reservation for the saving goal, note this can only be called if the account type is SAVINGS.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/saving-reservation-request' }
+      responses:
+        "204":
+          description: Confirmation that a reservation was added to the saving goal
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+  #-------------------------------------------------------------------
+  #                     Transaction searching
+  #-------------------------------------------------------------------
+
+  /api/transactions:
+    get:
+      operationId: findTransactionBy
+      tags: [ transaction-fetcher ]
+      parameters:
+        - $ref: '#/components/parameters/start-date'
+        - $ref: '#/components/parameters/end-date'
+        - $ref: '#/components/parameters/number-of-results'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/account-filter'
+        - $ref: '#/components/parameters/expense-filter'
+        - $ref: '#/components/parameters/category-filter'
+        - $ref: '#/components/parameters/tag-filter'
+        - $ref: '#/components/parameters/import-id-filter'
+        - name: description
+          in: query
+          description: Filter on a part of the transaction description
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Filter on the transaction type
+          schema:
+            type: string
+            enum: [ 'INCOME', 'EXPENSE', 'TRANSFER' ]
+        - name: currency
+          in: query
+          description: Filter based on the currency code
+          schema:
+            type: string
+            example: 'EUR'
+      responses:
+        "200": { $ref: '#/components/responses/paged-transaction' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createTransaction
+      tags: [ transaction-command ]
+      description: Create a new transaction in the system
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/transaction-request' }
+      responses:
+        "201":
+          description: The created transaction
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/transaction-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  #-------------------------------------------------------------------
+  #                     Transaction control
+  #-------------------------------------------------------------------
+
+  /api/transactions/{id}:
+    parameters:
+      - name: id
+        description: The identifier of the transaction
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 1234567890
+    get:
+      operationId: getTransactionById
+      tags: [ transaction-fetcher ]
+      description: Fetch a single transaction from the system
+      responses:
+        "200":
+          description: The matching transaction
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/transaction-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    put:
+      operationId: updateTransaction
+      tags: [ transaction-command ]
+      description: Update a transaction in the system
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/transaction-request' }
+      responses:
+        "200":
+          description: The updated transaction
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/transaction-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    patch:
+      operationId: splitTransaction
+      tags: [ transaction-command ]
+      description: Provide the new split for the transaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  description:
+                    type: string
+                  amount:
+                    type: number
+      responses:
+        "200":
+          description: The updated transaction
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/transaction-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    delete:
+      operationId: deleteTransaction
+      tags: [ transaction-command ]
+      description: Remove a transaction from the system
+      responses:
+        "204":
+          description: Confirmation that a transaction was removed
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+  /api/balance:
+    post:
+      operationId: computeBalanceWithFilter
+      tags: [ statistics-balance ]
+      description: >
+        Computes a balance for the user based on the filters applied.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/balance-request' }
+      responses:
+        "200":
+          description: The balance for the given filters
+          content:
+            application/json:
+             schema: { $ref: '#/components/schemas/balance-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /api/balance/{partition}:
+    parameters:
+      - name: partition
+        in: path
+        required: true
+        schema:
+          type: string
+          enum: [ account, budget, category ]
+    post:
+      operationId: computePartitionedBalanceWithFilter
+      tags: [ statistics-balance ]
+      description: >
+        Computes a balance for the user based on the filters applied.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/balance-request' }
+      responses:
+        "200":
+          description: The balance for the given filters
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/partitioned-balance-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /api/balance/by-date/{type}:
+    parameters:
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+          enum: [ daily, monthly ]
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/balance-request' }
+      responses:
+        "200":
+          description: The balance for the given filters
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/dated-balance-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  /api/detected/insight:
+    get:
+      operationId: getInsightsByFilters
+      tags: [ insight ]
+      parameters:
+        - name: year
+          in: query
+          schema:
+            type: integer
+            min: 1990
+            max: 9999
+        - name: month
+          in: query
+          schema:
+            type: integer
+            min: 1
+            max: 12
+      responses:
+        "200":
+          description: The list of detected insights
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/insight-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /api/detected/pattern:
+    get:
+      operationId: getPatternsByFilters
+      tags: [ insight ]
+      parameters:
+        - name: year
+          in: query
+          schema:
+            type: integer
+            min: 1990
+            max: 9999
+        - name: month
+          in: query
+          schema:
+            type: integer
+            min: 1
+            max: 12
+      responses:
+        "200":
+          description: The list of detected patterns
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/pattern-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  #-------------------------------------------------------------------
+  #                   Category creation / search
+  #-------------------------------------------------------------------
+
+  /api/categories:
+    get:
+      operationId: findCategoriesBy
+      tags: [ category-fetcher ]
+      parameters:
+        - $ref: '#/components/parameters/name-filter'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/number-of-results'
+      responses:
+        "200":
+          description: The categories matching the filters
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/paged-category-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createCategory
+      tags: [ category-command ]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/category-request' }
+      responses:
+        "201":
+          description: The created category
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/category-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  #-------------------------------------------------------------------
+  #                   Category command
+  #-------------------------------------------------------------------
+
+  /api/categories/{id}:
+    parameters:
+      - name: id
+        description: The identifier of the category
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 1234567890
+    get:
+      operationId: getCategoryById
+      tags: [ category-fetcher ]
+      responses:
+        "200":
+          description: The category
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/category-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    put:
+      operationId: updateCategory
+      tags: [ category-command ]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/category-request' }
+      responses:
+        "200":
+          description: The updated category
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/category-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    delete:
+      operationId: deleteCategoryById
+      tags: [ category-command ]
+      responses:
+        "204":
+          description: Confirmation that a transaction was removed
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+  #-------------------------------------------------------------------
+  #                   Contract creation / search
+  #-------------------------------------------------------------------
+
+  /api/contracts:
+    get:
+      operationId: findContractBy
+      tags: [ contract-fetcher ]
+      parameters:
+        - $ref: '#/components/parameters/name-filter'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/number-of-results'
+      responses:
+        "200":
+          description: The contracts matching the filters
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/paged-contract-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createContract
+      tags: [ contract-command ]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/contract-request' }
+      responses:
+        "201":
+          description: The created contract
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/contract-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  #-------------------------------------------------------------------
+  #                   Category command
+  #-------------------------------------------------------------------
+
+  /api/contracts/{id}:
+    parameters:
+      - name: id
+        description: The identifier of the contract
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 1234567890
+    get:
+      operationId: getContractById
+      tags: [ contract-fetcher ]
+      responses:
+        "200":
+          description: The contract
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/contract-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    put:
+      operationId: updateContract
+      tags: [ contract-command ]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/contract-request' }
+      responses:
+        "200":
+          description: The updated category
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/contract-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    delete:
+      operationId: deleteContractById
+      tags: [ contract-command ]
+      responses:
+        "204":
+          description: Confirmation that a contract was removed
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+  /api/contracts/{id}/warn-before-expiration:
+    parameters:
+      - name: id
+        description: The identifier of the contract
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 123
+    post:
+      operationId: warnBeforeContractExpiry
+      tags: [ contract-command ]
+      description: Send out a warning e-mail before the contract expiry date
+      responses:
+        "204":
+          description: Confirmation that a contract was removed
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+  #-------------------------------------------------------------------
+  #                   Tag creation / search
+  #-------------------------------------------------------------------
+
+  /api/tags:
+    get:
+      operationId: findTagsBy
+      tags: [ tag-fetcher ]
+      parameters:
+        - $ref: '#/components/parameters/name-filter'
+      responses:
+        "200":
+          description: The tags matching the filters
+          content:
+            application/json:
+              schema:
+                type: string
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createTag
+      tags: [ tag-command ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "204":
+          description: Confirmation the tag was created
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  #-------------------------------------------------------------------
+  #                   Scheduling creation / search
+  #-------------------------------------------------------------------
+
+  /api/schedules:
+    get:
+      operationId: findScheduleByFilter
+      tags: [ schedule-fetcher ]
+      parameters:
+        - name: account
+          description: >
+            Identifiers of accounts to filter for. Can be either a source or destination
+            for the schedule.
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+        - name: contract
+          in: query
+          description: >
+            Identifiers of contracts to filter on.
+          schema:
+            type: array
+            items:
+              type: integer
+      responses:
+        "200":
+          description: The list of schedules based upon the filters
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/transaction-schedule-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    put:
+      operationId: createSchedule
+      tags: [ schedule-command ]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/schedule-request' }
+      responses:
+        "201":
+          description: Confirmation the schedule was created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/transaction-schedule-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  /api/schedules/{id}:
+    parameters:
+      - name: id
+        description: The identifier of the schedule
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+          example: 123
+    get:
+      operationId: findScheduleById
+      tags: [ schedule-fetcher ]
+      responses:
+        "200":
+          description: The schedule
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/transaction-schedule-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    patch:
+      operationId: updateSchedule
+      tags: [ schedule-command ]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/schedule-patch-request' }
+      responses:
+        "200":
+          description: The updated schedule
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/transaction-schedule-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    delete:
+      operationId: deleteSchedule
+      tags: [ schedule-command ]
+      responses:
+        "204":
+          description: Confirmation the schedule was deleted
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+components:
+  responses:
+    400: { $ref: './responses/400-response.yaml' }
+    401: { $ref: './responses/401-response.yaml' }
+    403: { $ref: './responses/403-response.yaml' }
+    404: { $ref: './responses/404-response.yaml' }
+
+    paged-transaction: { $ref: './responses/paged-transactions.yaml' }
+
+  parameters:
+    # pagination related parameters
+    number-of-results: { $ref: 'parameters/number-of-results.yaml' }
+    offset: { $ref: 'parameters/offset.yaml' }
+
+    # date range related parameters
+    start-date: { $ref: 'parameters/startDate.yaml' }
+    end-date: { $ref: 'parameters/endDate.yaml' }
+
+    # filter based parameters
+    account-filter: { $ref: 'parameters/accounts.yaml' }
+    expense-filter: { $ref: 'parameters/budgets.yaml' }
+    category-filter: { $ref: 'parameters/categories.yaml' }
+    tag-filter: { $ref: 'parameters/tags.yaml' }
+    import-id-filter: { $ref: 'parameters/import-id.yaml' }
+    name-filter: { $ref: 'parameters/name.yaml' }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+# For both request and response
+    periodicity: { $ref: 'components/periodicity.yaml' }
+    account-type: { $ref: 'components/account-type.yaml' }
+    account-link: { $ref: 'components/account-link.yaml' }
+    date-range: { $ref: 'components/date-range.yaml' }
+
+# All the request objects
+    account-request: { $ref: 'components/requests/account.yaml' }
+    saving-goal-request: { $ref: 'components/requests/saving-goal.yaml' }
+    saving-reservation-request: { $ref: 'components/requests/saving-reservation.yaml' }
+    transaction-request: { $ref: 'components/requests/transaction.yaml' }
+    category-request: { $ref: 'components/requests/category.yaml' }
+    contract-request: { $ref: 'components/requests/contract.yaml' }
+    schedule-request: { $ref: 'components/requests/create-schedule.yaml' }
+    schedule-patch-request: { $ref: 'components/requests/patch-schedule.yaml' }
+    balance-request: { $ref: 'components/requests/balance.yaml' }
+
+# All the response objects
+    account-response: { $ref: 'components/responses/account.yaml' }
+    account-spending-response: { $ref: 'components/responses/account-spending.yaml' }
+    schedule-response: { $ref: 'components/responses/schedule.yaml' }
+    paged-response: { $ref: 'components/paged-response.yaml' }
+    paged-account-response: { $ref: 'components/responses/paged-account.yaml' }
+    saving-goal-response: { $ref: 'components/responses/saving-goal.yaml' }
+    json-error-response: { $ref: 'components/responses/json-error.yaml' }
+
+    transaction-response: { $ref: 'components/responses/transaction.yaml' }
+    paged-transaction-response: { $ref: 'components/responses/paged-transaction.yaml' }
+
+    category-response: { $ref: 'components/responses/category.yaml' }
+    paged-category-response: { $ref: 'components/responses/paged-category.yaml' }
+
+    contract-response: { $ref: 'components/responses/contract.yaml' }
+    paged-contract-response: { $ref: 'components/responses/paged-contract.yaml' }
+
+    transaction-schedule-response: { $ref: 'components/responses/transaction-schedule.yaml' }
+
+    export-profile-response: { $ref: 'components/responses/export-profile.yaml' }
+    balance-response: { $ref: 'components/responses/balance.yaml' }
+    partitioned-balance-response: { $ref: 'components/responses/partitioned-balance.yaml' }
+    dated-balance-response: { $ref: 'components/responses/dated-balance.yaml' }
+    insight-response: { $ref: 'components/responses/insight.yaml' }
+    pattern-response: { $ref: 'components/responses/pattern.yaml' }

@@ -1,0 +1,8 @@
+type: object
+properties:
+  period:
+    $ref: '#/components/schemas/date-range'
+  expenses:
+    type: array
+    items:
+      $ref: '#/components/schemas/expense-response'

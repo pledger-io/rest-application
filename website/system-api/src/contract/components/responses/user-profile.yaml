@@ -1,0 +1,22 @@
+type: object
+required:
+  - theme
+  - currency
+  - mfa
+properties:
+  theme:
+    type: string
+    description: The theme to use for the user interface.
+    example: "light"
+  currency:
+    type: string
+    description: The default currency to use for the user interface.
+    example: "EUR"
+    min: 3
+    max: 3
+  profilePicture:
+    type: string
+  mfa:
+    type: boolean
+    description: Whether the user has enabled 2-factor authentication.
+    example: true

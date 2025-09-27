@@ -1,0 +1,8 @@
+type: object
+properties:
+  decimalPlaces:
+    type: integer
+    minimum: 0
+    maximum: 10
+  enabled:
+    type: boolean

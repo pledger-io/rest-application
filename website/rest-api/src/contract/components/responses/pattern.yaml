@@ -1,0 +1,25 @@
+type: object
+properties:
+  type:
+    type: string
+    enum:
+      - RECURRING_MONTHLY
+      - RECURRING_WEEKLY
+      - SEASONAL
+      - INCREASING_TREND
+      - DECREASING_TREND
+  category:
+    type: string
+  confidence:
+    type: number
+    format: double
+    min: 0.0
+    max: 1.0
+  detected-date:
+    type: string
+    format: date
+  metadata:
+    description: Additional metadata for the insight
+    type: object
+    additionalProperties:
+      type: object

@@ -1,0 +1,15 @@
+type: object
+oneOf:
+  - type: object
+    properties:
+      verificationCode:
+        type: string
+        min: 4
+        max: 8
+      action:
+        type: string
+        value: "ENABLE"
+  - type: object
+    action:
+      type: string
+      value: "DISABLE"

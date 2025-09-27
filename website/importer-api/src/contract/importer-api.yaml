@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: Pledger.io Importer API
+  version: 3.0.0
+  contact:
+    name: Jong Soft Development
+    url: https://github.com/pledger-io/rest-application
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+security:
+  - bearerAuth: [ ]
+
+paths:
+  /api/batch-importer:
+    get:
+      operationId: getJobsByFilters
+      tags: [ batch-importer ]
+      parameters:
+        - $ref: '#/components/parameters/number-of-results'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        "200":
+          description: The batch jobs that were executed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/paged-batch-job-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createJob
+      tags: [ batch-importer ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                configuration:
+                  type: string
+                fileToken:
+                  type: string
+      responses:
+        "201":
+          description: The created batch job
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/batch-job-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /api/batch-importer/{slug}:
+    parameters:
+      - name: slug
+        required: true
+        in: path
+        description: The unique identifier
+        schema:
+          type: string
+    get:
+      operationId: getJobBySlug
+      tags: [ batch-importer ]
+      responses:
+        "200":
+          description: The batch job
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/batch-job-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    delete:
+      operationId: deleteJobBySlug
+      tags: [ batch-importer ]
+      responses:
+        "204":
+          description: Confirmation that the batch job was deleted
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+  /api/batch-importer-config:
+    get:
+      operationId: getConfigurations
+      tags: [ batch-importer ]
+      responses:
+        "200":
+          description: A list of all available configurations
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/configuration-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createConfiguration
+      tags: [ batch-importer ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ name, type, fileCode ]
+              properties:
+                name:
+                  type: string
+                  description: The name of the configuration
+                type:
+                  type: string
+                  description: The type of importer that will be used
+                fileCode:
+                  type: string
+                  description: The file code to get the contents of the configuration
+      responses:
+        "201":
+          description: THe created configuration
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/configuration-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    # pagination related parameters
+    number-of-results: { $ref: 'parameters/number-of-results.yaml' }
+    offset: { $ref: 'parameters/offset.yaml' }
+
+  responses:
+    400: { $ref: './responses/400-response.yaml' }
+    401: { $ref: './responses/401-response.yaml' }
+    403: { $ref: './responses/403-response.yaml' }
+    404: { $ref: './responses/404-response.yaml' }
+
+  schemas:
+    paged-response: { $ref: 'components/paged-response.yaml' }
+    batch-job-response: { $ref: 'components/batch-job.yaml' }
+    paged-batch-job-response: { $ref: 'components/paged-batch-job.yaml' }
+    configuration-response: { $ref: 'components/configuration.yaml' }
+    json-error-response: { $ref: 'components/json-error.yaml' }

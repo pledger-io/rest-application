@@ -1,0 +1,7 @@
+type: string
+description: The interval the interest is calculated on
+example: MONTHS
+enum:
+  - MONTHS
+  - WEEKS
+  - YEARS

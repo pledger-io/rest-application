@@ -1,0 +1,35 @@
+type: object
+properties:
+  accounts:
+    type: array
+    items:
+      allOf:
+        - '#/components/schemas/account-response'
+        - type: object
+          properties:
+            icon:
+              type: string
+              description: The icon of the account, in a base64 encoded string
+  categories:
+    type: array
+    items: '#/components/schemas/category-response'
+  budget:
+    type: array
+    items: '#/components/schemas/budget-response'
+  contract:
+    type: array
+    items:
+      allOf:
+        - '#/components/schemas/contract-response'
+        - type: object
+          properties:
+            contract:
+              type: string
+              description: The HEX encoded attached contract file
+  tags:
+    type: array
+    items: '#/components/schemas/tag-response'
+  transaction:
+    type: array
+    items: '#/components/schemas/transaction-response'
+# todo add transaction rules
