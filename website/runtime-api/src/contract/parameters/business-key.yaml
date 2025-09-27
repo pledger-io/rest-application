@@ -1,0 +1,4 @@
+name: businessKey
+in: path
+schema:
+  type: string

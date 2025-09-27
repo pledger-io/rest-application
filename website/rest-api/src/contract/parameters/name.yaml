@@ -1,0 +1,5 @@
+name: name
+description: Filter based on a partial name
+in: query
+schema:
+  type: string

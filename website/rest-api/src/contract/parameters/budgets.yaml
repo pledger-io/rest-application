@@ -1,0 +1,9 @@
+name: category
+required: true
+in: query
+schema:
+  type: array
+  items:
+    type: integer
+    format: int64
+    example: 12

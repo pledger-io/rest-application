@@ -1,0 +1,7 @@
+allOf:
+  - $ref: '#/components/schemas/paged-response'
+  - type: object
+    properties:
+      content:
+        type: array
+        items: { $ref: '#/components/schemas/category-response' }

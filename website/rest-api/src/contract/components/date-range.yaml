@@ -1,0 +1,11 @@
+type: object
+required:
+  - startDate
+  - endDate
+properties:
+  startDate:
+    type: string
+    format: date
+  endDate:
+    type: string
+    format: date

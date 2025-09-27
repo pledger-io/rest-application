@@ -5,6 +5,7 @@ pluginManagement {
         id("java")
         id("io.micronaut.library").version("4.5.4")
         id("io.micronaut.application").version("4.5.4")
+        id("io.micronaut.openapi").version("4.5.4")
         id("io.freefair.lombok").version("8.14.2")
         id("org.sonarqube").version("6.3.1.5724")
         id("org.openapi.generator").version("7.15.0")
@@ -41,8 +42,7 @@ dependencyResolutionManagement {
         }
 
         create("mn") {
-            val micronautVersion: String by settings
-            from("io.micronaut.platform:micronaut-platform:${micronautVersion}")
+            from("io.micronaut.platform:micronaut-platform:4.9.3")
         }
 
         create("llm") {
@@ -70,4 +70,10 @@ include(
     "learning:learning-module-spending-patterns",
     "bpmn-process",
     "jpa-repository",
+    "website:rest-api",
+    "website:runtime-api",
+    "website:importer-api",
+    "website:system-api",
+    "website:budget-api",
+    "website:application",
     "fintrack-api")

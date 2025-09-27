@@ -1,0 +1,54 @@
+type: object
+description: Transaction request
+required:
+  - date
+  - currency
+  - description
+  - amount
+  - source
+  - target
+properties:
+  date:
+    type: string
+    format: date
+  interestDate:
+    type: string
+    format: date
+  bookDate:
+    type: string
+    format: date
+
+  currency:
+    minLength: 1
+    maxLength: 3
+    type: string
+  description:
+    maxLength: 1024
+    minLength: 1
+    type: string
+  amount:
+    type: number
+    format: double
+
+  source:
+    type: integer
+    description: The account paying the money
+  target:
+    type: integer
+    description: The account receiving the money
+
+  # classification fields
+  category:
+    type: integer
+    description: The category this transaction falls into
+  expense:
+    type: integer
+    description: The expense grouping this transaction falls into
+  contract:
+    type: integer
+    description: The contract this payment was for
+
+  tags:
+    type: array
+    items:
+      type: string

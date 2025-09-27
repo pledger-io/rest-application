@@ -1,0 +1,15 @@
+type: object
+required:
+  - message
+properties:
+  _links:
+    type: object
+    additionalProperties: true
+  message:
+    type: string
+  logref:
+    type: string
+    nullable: true
+  path:
+    type: string
+    nullable: true

@@ -1,0 +1,10 @@
+type: object
+required:
+  - verificationCode
+properties:
+  verificationCode:
+    maxLength: 8
+    minLength: 4
+    pattern: "[\\d]{6}"
+    type: string
+    description: The 2-factor verification code from a hardware device.

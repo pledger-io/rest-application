@@ -1,0 +1,7 @@
+allOf:
+  - $ref: '#/components/schemas/balance-response'
+  - type: object
+    properties:
+      date:
+        type: string
+        format: date

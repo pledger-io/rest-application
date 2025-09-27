@@ -1,0 +1,6 @@
+name: numberOfResults
+description: The number of accounts to be returned
+in: query
+required: true
+schema:
+  type: integer

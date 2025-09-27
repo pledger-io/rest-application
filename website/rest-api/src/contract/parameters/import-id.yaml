@@ -1,0 +1,5 @@
+name: tag
+required: true
+in: query
+schema:
+  type: string
