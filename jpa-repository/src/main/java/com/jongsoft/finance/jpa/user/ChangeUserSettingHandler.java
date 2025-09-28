@@ -28,9 +28,8 @@ public class ChangeUserSettingHandler implements CommandHandler<ChangeUserSettin
   public void handle(ChangeUserSettingCommand command) {
     log.info("[{}] - Updating user setting {}", command.username(), command.type());
 
-    var query = entityManager
-        .update(UserAccountJpa.class)
-        .fieldEq("username", command.username().email());
+    var query =
+        entityManager.update(UserAccountJpa.class).fieldEq("username", command.username().email());
 
     switch (command.type()) {
       case THEME -> query.set("theme", command.value());

@@ -57,10 +57,11 @@ VALUES (
           log.info("Creating transactions for year {} and description {}", year, description);
           for (int month = 1; month <= 12; month++) {
             var lastDayOfMonth = LocalDate.of(year, month, 1).lengthOfMonth();
-            var updatedDescription = description.replaceAll(
-                "\\{month}",
-                LocalDate.of(year, month, 1)
-                    .format(java.time.format.DateTimeFormatter.ofPattern("MMMM")));
+            var updatedDescription =
+                description.replaceAll(
+                    "\\{month}",
+                    LocalDate.of(year, month, 1)
+                        .format(java.time.format.DateTimeFormatter.ofPattern("MMMM")));
 
             for (int i = 0; i < transactionsPerMonth; i++) {
               int day = rand.nextInt(lastDayOfMonth) + 1;

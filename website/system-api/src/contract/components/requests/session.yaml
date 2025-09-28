@@ -1,0 +1,13 @@
+type: object
+required:
+  - description
+  - expires
+properties:
+  description:
+    type: string
+    minLength: 8
+    description: The description for the session that is created
+  expires:
+    type: string
+    format: date
+    description: The date on which the long lived token should expire

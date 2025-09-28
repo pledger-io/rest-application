@@ -27,9 +27,7 @@ public class UserAccountJpa extends EntityJpa {
 
   private Currency currency;
 
-  @Lob
-  @Column
-  private byte[] gravatar;
+  @Lob @Column private byte[] gravatar;
 
   @JoinTable(name = "user_roles")
   @ManyToMany(fetch = FetchType.LAZY)

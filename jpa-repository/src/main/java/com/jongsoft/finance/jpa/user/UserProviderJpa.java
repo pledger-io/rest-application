@@ -115,9 +115,10 @@ public class UserProviderJpa implements UserProvider {
         .secret(source.getTwoFactorSecret())
         .theme(source.getTheme())
         .twoFactorEnabled(source.isTwoFactorEnabled())
-        .roles(source.getRoles().stream()
-            .map(role -> new Role(role.getName()))
-            .collect(Collectors.toList()))
+        .roles(
+            source.getRoles().stream()
+                .map(role -> new Role(role.getName()))
+                .collect(Collectors.toList()))
         .build();
   }
 }

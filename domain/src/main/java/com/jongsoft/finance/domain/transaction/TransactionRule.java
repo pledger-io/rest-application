@@ -43,10 +43,11 @@ public class TransactionRule implements AggregateBase {
     }
 
     public void update(RuleColumn field, RuleOperation operation, String condition) {
-      var hasChanged = Control.Equal(this.field, field)
-          .append(this.operation, operation)
-          .append(this.condition, condition)
-          .isNotEqual();
+      var hasChanged =
+          Control.Equal(this.field, field)
+              .append(this.operation, operation)
+              .append(this.condition, condition)
+              .isNotEqual();
 
       if (hasChanged) {
         this.field = field;

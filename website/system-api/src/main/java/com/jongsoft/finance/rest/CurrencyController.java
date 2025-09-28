@@ -8,7 +8,6 @@ import com.jongsoft.finance.rest.model.CurrencyResponse;
 import com.jongsoft.finance.rest.model.PatchCurrencyRequest;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.server.exceptions.NotFoundException;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.slf4j.Logger;
@@ -22,7 +21,7 @@ public class CurrencyController implements CurrencyApi {
 
   public CurrencyController(CurrencyProvider currencyProvider) {
     this.currencyProvider = currencyProvider;
-    this.logger = LoggerFactory.getLogger(CurrencyController.class);
+    this.logger = LoggerFactory.getLogger(CurrencyApi.class);
   }
 
   @Override
@@ -33,10 +32,11 @@ public class CurrencyController implements CurrencyApi {
           "Currency with code " + currencyRequest.getCode() + " already exists");
     }
 
-    var currency = new Currency(
-        currencyRequest.getName(),
-        currencyRequest.getCode(),
-        currencyRequest.getSymbol().charAt(0));
+    var currency =
+        new Currency(
+            currencyRequest.getName(),
+            currencyRequest.getCode(),
+            currencyRequest.getSymbol().charAt(0));
     return HttpResponse.created(convert(currency));
   }
 
@@ -54,16 +54,18 @@ public class CurrencyController implements CurrencyApi {
     return currencyProvider
         .lookup(currencyCode)
         .map(this::convert)
-        .getOrThrow(NotFoundException::new);
+        .getOrThrow(() -> StatusException.notFound("No currency found with code " + currencyCode));
   }
 
   @Override
   public CurrencyResponse patchCurrencyByCode(
       String currencyCode, PatchCurrencyRequest patchCurrencyRequest) {
     logger.info("Patching currency by code {}.", currencyCode);
-    var currency = currencyProvider
-        .lookup(currencyCode)
-        .getOrThrow(() -> StatusException.notFound("No currency found with code " + currencyCode));
+    var currency =
+        currencyProvider
+            .lookup(currencyCode)
+            .getOrThrow(
+                () -> StatusException.notFound("No currency found with code " + currencyCode));
 
     if (patchCurrencyRequest.getEnabled() != null) {
       if (patchCurrencyRequest.getEnabled().equals(true)) {
@@ -86,13 +88,14 @@ public class CurrencyController implements CurrencyApi {
     logger.info("Updating currency by code {}.", currencyCode);
     return currencyProvider
         .lookup(currencyCode)
-        .map(currency -> {
-          currency.rename(
-              currencyRequest.getName(),
-              currency.getCode(),
-              currencyRequest.getSymbol().charAt(0));
-          return currency;
-        })
+        .map(
+            currency -> {
+              currency.rename(
+                  currencyRequest.getName(),
+                  currency.getCode(),
+                  currencyRequest.getSymbol().charAt(0));
+              return currency;
+            })
         .map(this::convert)
         .getOrThrow(() -> StatusException.notFound("No currency found with code " + currencyCode));
   }

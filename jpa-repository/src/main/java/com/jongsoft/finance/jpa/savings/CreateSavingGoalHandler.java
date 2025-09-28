@@ -27,12 +27,13 @@ public class CreateSavingGoalHandler implements CommandHandler<CreateSavingGoalC
   public void handle(CreateSavingGoalCommand command) {
     log.info("[{}] - Creating new saving goal.", command.name());
 
-    var entity = SavingGoalJpa.builder()
-        .goal(command.goal())
-        .targetDate(command.targetDate())
-        .name(command.name())
-        .account(entityManager.getById(AccountJpa.class, command.accountId()))
-        .build();
+    var entity =
+        SavingGoalJpa.builder()
+            .goal(command.goal())
+            .targetDate(command.targetDate())
+            .name(command.name())
+            .account(entityManager.getById(AccountJpa.class, command.accountId()))
+            .build();
 
     entityManager.persist(entity);
   }

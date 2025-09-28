@@ -57,10 +57,11 @@ public class ProcessAccountLookupDelegate implements JavaDelegate, JavaBean {
     if (!matchedAccount.isPresent() && execution.hasVariableLocal("iban")) {
       final String iban = (String) execution.getVariableLocal("iban");
       if (iban != null && !iban.trim().isEmpty()) {
-        matchedAccount = accountProvider
-            .lookup(accountFilterFactory.account().iban(iban, true))
-            .content()
-            .first(ignored -> true);
+        matchedAccount =
+            accountProvider
+                .lookup(accountFilterFactory.account().iban(iban, true))
+                .content()
+                .first(ignored -> true);
       }
     }
 

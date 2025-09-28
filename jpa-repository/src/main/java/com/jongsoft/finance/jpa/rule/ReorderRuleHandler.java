@@ -34,12 +34,17 @@ public class ReorderRuleHandler implements CommandHandler<ReorderRuleCommand> {
 
     var jpaEntity = entityManager.getDetached(RuleJpa.class, Collections.Map("id", command.id()));
 
-    var updateQuery = entityManager
-        .update(RuleJpa.class)
-        .fieldIn("id", RuleJpa.class, subQuery -> subQuery
-            .project("id")
-            .fieldEq("user.username", authenticationFacade.authenticated())
-            .fieldEq("group.name", jpaEntity.getGroup().getName()));
+    var updateQuery =
+        entityManager
+            .update(RuleJpa.class)
+            .fieldIn(
+                "id",
+                RuleJpa.class,
+                subQuery ->
+                    subQuery
+                        .project("id")
+                        .fieldEq("user.username", authenticationFacade.authenticated())
+                        .fieldEq("group.name", jpaEntity.getGroup().getName()));
 
     if ((command.sort() - jpaEntity.getSort()) < 0) {
       updateQuery

@@ -28,13 +28,14 @@ public class UpdateExpenseHandler implements CommandHandler<UpdateExpenseCommand
   @Override
   @BusinessEventListener
   public void handle(UpdateExpenseCommand command) {
-    var existing = entityManager
-        .from(ExpensePeriodJpa.class)
-        .fieldEq("expense.id", command.id())
-        .fieldEq("budget.user.username", authenticationFacade.authenticated())
-        .fieldNull("budget.until")
-        .singleResult()
-        .getOrThrow(() -> new RuntimeException("Unable to find expense"));
+    var existing =
+        entityManager
+            .from(ExpensePeriodJpa.class)
+            .fieldEq("expense.id", command.id())
+            .fieldEq("budget.user.username", authenticationFacade.authenticated())
+            .fieldNull("budget.until")
+            .singleResult()
+            .getOrThrow(() -> new RuntimeException("Unable to find expense"));
 
     log.info("[{}] - Processing expense update event", existing.getId());
 

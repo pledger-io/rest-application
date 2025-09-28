@@ -17,15 +17,11 @@ public class ImportConfig extends EntityJpa {
 
   private String name;
 
-  @Column
-  private String fileCode;
+  @Column private String fileCode;
 
-  @Column
-  private String type;
+  @Column private String type;
 
-  @ManyToOne
-  @JoinColumn
-  private UserAccountJpa user;
+  @ManyToOne @JoinColumn private UserAccountJpa user;
 
   @Builder
   private ImportConfig(String name, String fileCode, String type, UserAccountJpa user) {

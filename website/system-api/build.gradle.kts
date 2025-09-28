@@ -21,16 +21,26 @@ micronaut {
 dependencies {
     implementation(mn.micronaut.http.validation)
     implementation(mn.micronaut.security.annotations)
+
+    // JWT security dependencies
     implementation(mn.micronaut.security)
+    implementation(mn.micronaut.security.jwt)
+    implementation(libs.bouncy)
+    implementation(libs.bcpkix)
+    implementation(libs.bcrypt)
 
     implementation(mn.micronaut.serde.api)
     implementation(mn.validation)
+
+    implementation(mn.micronaut.email.javamail)
+
     implementation(libs.lang)
+    implementation(libs.otp)
 
     implementation(project(":core"))
     implementation(project(":domain"))
 
-
+    // Needed for running the tests
     testRuntimeOnly(mn.micronaut.serde.jackson)
     testRuntimeOnly(mn.micronaut.jackson.databind)
     testRuntimeOnly(mn.logback.classic)

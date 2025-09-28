@@ -14,8 +14,7 @@ import lombok.Data;
 @JsonSchema(title = "Category", description = "Category of a transaction", uri = "/category")
 public class CategoryJson implements Serializable {
 
-  @NonNull
-  private String label;
+  @NonNull private String label;
 
   private String description;
 

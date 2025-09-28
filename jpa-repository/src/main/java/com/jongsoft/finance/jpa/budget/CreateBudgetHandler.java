@@ -33,12 +33,13 @@ public class CreateBudgetHandler implements CommandHandler<CreateBudgetCommand> 
   public void handle(CreateBudgetCommand command) {
     log.info("[{}] - Processing budget create event", command.budget().getStart());
 
-    var budget = BudgetJpa.builder()
-        .from(command.budget().getStart())
-        .expectedIncome(command.budget().getExpectedIncome())
-        .expenses(new HashSet<>())
-        .user(entityManager.currentUser())
-        .build();
+    var budget =
+        BudgetJpa.builder()
+            .from(command.budget().getStart())
+            .expectedIncome(command.budget().getExpectedIncome())
+            .expenses(new HashSet<>())
+            .user(entityManager.currentUser())
+            .build();
 
     entityManager.persist(budget);
 
@@ -50,13 +51,16 @@ public class CreateBudgetHandler implements CommandHandler<CreateBudgetCommand> 
       BudgetJpa budget, Sequence<Budget.Expense> expenses) {
     log.debug("Creating {} expenses for budget period {}", expenses.size(), budget.getFrom());
     return expenses
-        .map(expense -> ExpensePeriodJpa.builder()
-            .budget(budget)
-            .expense(entityManager.getById(ExpenseJpa.class, expense.getId()))
-            .lowerBound(
-                BigDecimal.valueOf(expense.getLowerBound()).subtract(new BigDecimal("0.001")))
-            .upperBound(BigDecimal.valueOf(expense.getUpperBound()))
-            .build())
+        .map(
+            expense ->
+                ExpensePeriodJpa.builder()
+                    .budget(budget)
+                    .expense(entityManager.getById(ExpenseJpa.class, expense.getId()))
+                    .lowerBound(
+                        BigDecimal.valueOf(expense.getLowerBound())
+                            .subtract(new BigDecimal("0.001")))
+                    .upperBound(BigDecimal.valueOf(expense.getUpperBound()))
+                    .build())
         .map(this::persist)
         .toJava();
   }

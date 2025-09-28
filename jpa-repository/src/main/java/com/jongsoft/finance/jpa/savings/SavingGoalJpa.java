@@ -35,8 +35,7 @@ public class SavingGoalJpa extends EntityJpa {
   @Column(name = "reoccurrence")
   private int interval;
 
-  @ManyToOne
-  private AccountJpa account;
+  @ManyToOne private AccountJpa account;
 
   private boolean archived;
 

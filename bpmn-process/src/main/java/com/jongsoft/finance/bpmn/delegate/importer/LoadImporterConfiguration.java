@@ -37,20 +37,25 @@ public class LoadImporterConfiguration implements JavaDelegate, JavaBean {
         delegateExecution.getCurrentActivityName(),
         batchImportSlug);
 
-    var importJob = importProvider
-        .lookup(batchImportSlug)
-        .getOrThrow(() ->
-            new IllegalStateException("Cannot find batch import with slug " + batchImportSlug));
+    var importJob =
+        importProvider
+            .lookup(batchImportSlug)
+            .getOrThrow(
+                () ->
+                    new IllegalStateException(
+                        "Cannot find batch import with slug " + batchImportSlug));
 
     importerProvider.stream()
-        .filter(importer ->
-            importer.getImporterType().equalsIgnoreCase(importJob.getConfig().getType()))
+        .filter(
+            importer ->
+                importer.getImporterType().equalsIgnoreCase(importJob.getConfig().getType()))
         .findFirst()
         .ifPresentOrElse(
-            importer -> delegateExecution.setVariableLocal(
-                "importConfig",
-                new ImportJobSettings(
-                    importer.loadConfiguration(importJob.getConfig()), false, false, null)),
+            importer ->
+                delegateExecution.setVariableLocal(
+                    "importConfig",
+                    new ImportJobSettings(
+                        importer.loadConfiguration(importJob.getConfig()), false, false, null)),
             () -> {
               throw new IllegalStateException(
                   "Cannot find importer for type " + importJob.getConfig().getType());

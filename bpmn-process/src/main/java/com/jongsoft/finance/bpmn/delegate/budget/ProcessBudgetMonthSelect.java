@@ -28,9 +28,10 @@ public class ProcessBudgetMonthSelect implements JavaDelegate, JavaBean {
 
     budgetProvider
         .lookup(year, month)
-        .ifPresent(
-            budget -> execution.setVariable("expenses", budget.getExpenses().toJava()))
-        .elseThrow(() -> new IllegalStateException(
-            "Budget cannot be found for year " + year + " and month " + month));
+        .ifPresent(budget -> execution.setVariable("expenses", budget.getExpenses().toJava()))
+        .elseThrow(
+            () ->
+                new IllegalStateException(
+                    "Budget cannot be found for year " + year + " and month " + month));
   }
 }

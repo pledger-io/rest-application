@@ -9,7 +9,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.jongsoft.finance" level="debug" />
+    <logger name="com.jongsoft.finance" level="trace" />
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>

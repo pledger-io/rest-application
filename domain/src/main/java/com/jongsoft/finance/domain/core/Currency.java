@@ -36,10 +36,11 @@ public class Currency implements AggregateBase {
 
   @BusinessMethod
   public void rename(String name, String code, char symbol) {
-    var changed = Control.Equal(this.name, name)
-        .append(this.code, code)
-        .append(this.symbol, symbol)
-        .isNotEqual();
+    var changed =
+        Control.Equal(this.name, name)
+            .append(this.code, code)
+            .append(this.symbol, symbol)
+            .isNotEqual();
 
     if (changed) {
       this.name = name;

@@ -29,12 +29,13 @@ public class CreateConfigurationHandler implements CommandHandler<CreateConfigur
   public void handle(CreateConfigurationCommand command) {
     log.info("[{}] - Processing CSV configuration create event", command.name());
 
-    var entity = ImportConfig.builder()
-        .fileCode(command.fileCode())
-        .name(command.name())
-        .type(command.type())
-        .user(entityManager.currentUser())
-        .build();
+    var entity =
+        ImportConfig.builder()
+            .fileCode(command.fileCode())
+            .name(command.name())
+            .type(command.type())
+            .user(entityManager.currentUser())
+            .build();
 
     entityManager.persist(entity);
   }

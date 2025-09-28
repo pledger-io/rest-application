@@ -11,9 +11,7 @@ import lombok.Getter;
 @Table(name = "user_account_token")
 public class AccountTokenJpa extends EntityJpa {
 
-  @ManyToOne
-  @JoinColumn
-  private UserAccountJpa user;
+  @ManyToOne @JoinColumn private UserAccountJpa user;
 
   @Column(name = "description")
   private String description;

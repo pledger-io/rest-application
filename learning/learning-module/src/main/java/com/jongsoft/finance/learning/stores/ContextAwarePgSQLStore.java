@@ -18,13 +18,14 @@ public class ContextAwarePgSQLStore implements PledgerEmbeddingStore {
   @Override
   public EmbeddingStore<TextSegment> embeddingStore() {
     if (internalStore == null) {
-      internalStore = PgVectorEmbeddingStore.datasourceBuilder()
-          .datasource(dataSource)
-          .table("embedding_" + tableName)
-          .dimension(384) // copied from the
-          // AllMiniLmL6V2EmbeddingModel.knownDimension
-          .createTable(true)
-          .build();
+      internalStore =
+          PgVectorEmbeddingStore.datasourceBuilder()
+              .datasource(dataSource)
+              .table("embedding_" + tableName)
+              .dimension(384) // copied from the
+              // AllMiniLmL6V2EmbeddingModel.knownDimension
+              .createTable(true)
+              .build();
     }
     return internalStore;
   }

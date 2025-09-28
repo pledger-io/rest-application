@@ -18,9 +18,7 @@ public class RuleGroupJpa extends EntityJpa {
   private int sort;
   private boolean archived;
 
-  @ManyToOne
-  @JoinColumn
-  private UserAccountJpa user;
+  @ManyToOne @JoinColumn private UserAccountJpa user;
 
   @Builder
   private RuleGroupJpa(String name, int sort, boolean archived, UserAccountJpa user) {

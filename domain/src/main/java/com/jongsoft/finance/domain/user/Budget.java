@@ -82,8 +82,7 @@ public class Budget implements AggregateBase {
   private LocalDate start;
   private LocalDate end;
 
-  @Builder.Default
-  private Sequence<Expense> expenses = Collections.List();
+  @Builder.Default private Sequence<Expense> expenses = Collections.List();
 
   private double expectedIncome;
 
@@ -105,9 +104,11 @@ public class Budget implements AggregateBase {
     if (!Objects.equals(this.start, perDate)) {
       this.close(perDate);
 
-      var deviation = BigDecimal.ONE.add(BigDecimal.valueOf(expectedIncome)
-          .subtract(BigDecimal.valueOf(this.expectedIncome))
-          .divide(BigDecimal.valueOf(this.expectedIncome), 20, RoundingMode.HALF_UP));
+      var deviation =
+          BigDecimal.ONE.add(
+              BigDecimal.valueOf(expectedIncome)
+                  .subtract(BigDecimal.valueOf(this.expectedIncome))
+                  .divide(BigDecimal.valueOf(this.expectedIncome), 20, RoundingMode.HALF_UP));
 
       var newBudget = new Budget(perDate, expectedIncome);
       for (var expense : expenses) {

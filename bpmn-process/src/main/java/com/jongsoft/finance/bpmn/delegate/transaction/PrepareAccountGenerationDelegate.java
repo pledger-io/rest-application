@@ -33,12 +33,13 @@ public class PrepareAccountGenerationDelegate implements JavaDelegate, JavaBean 
         execution.getCurrentActivityName(),
         transaction.opposingName());
 
-    var accountJson = AccountJson.builder()
-        .name(transaction.opposingName())
-        .iban(transaction.opposingIBAN())
-        .type(transaction.type() == TransactionType.CREDIT ? "creditor" : "debtor")
-        .currency("EUR") // todo this needs to be fixed later on
-        .build();
+    var accountJson =
+        AccountJson.builder()
+            .name(transaction.opposingName())
+            .iban(transaction.opposingIBAN())
+            .type(transaction.type() == TransactionType.CREDIT ? "creditor" : "debtor")
+            .currency("EUR") // todo this needs to be fixed later on
+            .build();
 
     execution.setVariableLocal("accountJson", mapper.writeSafe(accountJson));
   }

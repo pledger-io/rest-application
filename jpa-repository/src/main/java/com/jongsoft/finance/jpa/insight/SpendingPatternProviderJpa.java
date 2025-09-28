@@ -104,15 +104,16 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
     }
 
     // Create the JPA entity
-    SpendingPatternJpa jpa = SpendingPatternJpa.builder()
-        .type(command.type())
-        .category(command.category())
-        .confidence(command.confidence())
-        .detectedDate(command.detectedDate())
-        .yearMonth(YearMonth.from(command.detectedDate()))
-        .metadata(metadata)
-        .user(entityManager.currentUser())
-        .build();
+    SpendingPatternJpa jpa =
+        SpendingPatternJpa.builder()
+            .type(command.type())
+            .category(command.category())
+            .confidence(command.confidence())
+            .detectedDate(command.detectedDate())
+            .yearMonth(YearMonth.from(command.detectedDate()))
+            .metadata(metadata)
+            .user(entityManager.currentUser())
+            .build();
 
     // Save the entity
     entityManager.persist(jpa);
@@ -136,8 +137,9 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
     }
 
     // Convert metadata from string values to objects
-    Map<String, Object> metadata = source.getMetadata().entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    Map<String, Object> metadata =
+        source.getMetadata().entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     return SpendingPattern.builder()
         .type(source.getType())

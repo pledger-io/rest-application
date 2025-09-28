@@ -53,47 +53,55 @@ public class CreateTransactionHandler
   public long handleCreatedEvent(CreateTransactionCommand command) {
     log.info("[{}] - Processing transaction create event", command.transaction().getDescription());
 
-    var jpaEntity = TransactionJournal.builder()
-        .date(command.transaction().getDate())
-        .bookDate(command.transaction().getBookDate())
-        .interestDate(command.transaction().getInterestDate())
-        .description(command.transaction().getDescription())
-        .currency(entityManager
-            .from(CurrencyJpa.class)
-            .fieldEq("code", command.transaction().getCurrency())
-            .singleResult()
-            .get())
-        .user(entityManager.currentUser())
-        .type(TransactionType.valueOf(command.transaction().computeType().name()))
-        .failureCode(command.transaction().getFailureCode())
-        .transactions(new HashSet<>())
-        .category(Control.Option(command.transaction().getCategory())
-            .map(this::category)
-            .getOrSupply(() -> null))
-        .budget(Control.Option(command.transaction().getBudget())
-            .map(this::expense)
-            .getOrSupply(() -> null))
-        .contract(Control.Option(command.transaction().getContract())
-            .map(this::contract)
-            .getOrSupply(() -> null))
-        .tags(Control.Option(command.transaction().getTags())
-            .map(Sequence::distinct)
-            .map(set -> set.map(this::tag).toJava())
-            .getOrSupply(() -> null))
-        .batchImport(Control.Option(command.transaction().getImportSlug())
-            .map(this::job)
-            .getOrSupply(() -> null))
-        .build();
+    var jpaEntity =
+        TransactionJournal.builder()
+            .date(command.transaction().getDate())
+            .bookDate(command.transaction().getBookDate())
+            .interestDate(command.transaction().getInterestDate())
+            .description(command.transaction().getDescription())
+            .currency(
+                entityManager
+                    .from(CurrencyJpa.class)
+                    .fieldEq("code", command.transaction().getCurrency())
+                    .singleResult()
+                    .get())
+            .user(entityManager.currentUser())
+            .type(TransactionType.valueOf(command.transaction().computeType().name()))
+            .failureCode(command.transaction().getFailureCode())
+            .transactions(new HashSet<>())
+            .category(
+                Control.Option(command.transaction().getCategory())
+                    .map(this::category)
+                    .getOrSupply(() -> null))
+            .budget(
+                Control.Option(command.transaction().getBudget())
+                    .map(this::expense)
+                    .getOrSupply(() -> null))
+            .contract(
+                Control.Option(command.transaction().getContract())
+                    .map(this::contract)
+                    .getOrSupply(() -> null))
+            .tags(
+                Control.Option(command.transaction().getTags())
+                    .map(Sequence::distinct)
+                    .map(set -> set.map(this::tag).toJava())
+                    .getOrSupply(() -> null))
+            .batchImport(
+                Control.Option(command.transaction().getImportSlug())
+                    .map(this::job)
+                    .getOrSupply(() -> null))
+            .build();
 
     entityManager.persist(jpaEntity);
 
     for (Transaction.Part transfer : command.transaction().getTransactions()) {
       // todo change to native BigDecimal later on
-      var transferJpa = TransactionJpa.builder()
-          .amount(BigDecimal.valueOf(transfer.getAmount()))
-          .account(entityManager.getById(AccountJpa.class, transfer.getAccount().getId()))
-          .journal(jpaEntity)
-          .build();
+      var transferJpa =
+          TransactionJpa.builder()
+              .amount(BigDecimal.valueOf(transfer.getAmount()))
+              .account(entityManager.getById(AccountJpa.class, transfer.getAccount().getId()))
+              .journal(jpaEntity)
+              .build();
 
       jpaEntity.getTransactions().add(transferJpa);
       entityManager.persist(transferJpa);

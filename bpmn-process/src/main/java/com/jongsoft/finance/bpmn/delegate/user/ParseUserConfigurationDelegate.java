@@ -38,28 +38,33 @@ public class ParseUserConfigurationDelegate implements JavaDelegate, JavaBean {
 
     String storageToken = (String) execution.getVariable("storageToken");
 
-    var profileJson = storageService
-        .read(storageToken)
-        .map(String::new)
-        .map(json -> mapper.readSafe(json, ExportJson.class))
-        .getOrThrow(() -> new RuntimeException("Unable to parse json file"));
+    var profileJson =
+        storageService
+            .read(storageToken)
+            .map(String::new)
+            .map(json -> mapper.readSafe(json, ExportJson.class))
+            .getOrThrow(() -> new RuntimeException("Unable to parse json file"));
 
     if (profileJson.getRules() != null && !profileJson.getRules().isEmpty()) {
-      String ruleStorageToken = storageService.store(mapper
-          .writeSafe(RuleConfigJson.builder()
-              .slug("profile-import")
-              .rules(profileJson.getRules())
-              .build())
-          .getBytes(StandardCharsets.UTF_8));
+      String ruleStorageToken =
+          storageService.store(
+              mapper
+                  .writeSafe(
+                      RuleConfigJson.builder()
+                          .slug("profile-import")
+                          .rules(profileJson.getRules())
+                          .build())
+                  .getBytes(StandardCharsets.UTF_8));
       execution.setVariableLocal("ruleStorageToken", ruleStorageToken);
     } else {
       execution.setVariableLocal("ruleStorageToken", null);
     }
 
     if (profileJson.getBudgetPeriods() != null) {
-      var sortedBudgets = profileJson.getBudgetPeriods().stream()
-          .sorted(Comparator.comparing(BudgetJson::getStart))
-          .toList();
+      var sortedBudgets =
+          profileJson.getBudgetPeriods().stream()
+              .sorted(Comparator.comparing(BudgetJson::getStart))
+              .toList();
       execution.setVariableLocal("budgetPeriods", serialize(sortedBudgets));
     } else {
       execution.setVariableLocal("budgetPeriods", List.of());

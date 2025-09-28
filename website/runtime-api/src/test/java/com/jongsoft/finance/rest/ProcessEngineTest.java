@@ -1,12 +1,12 @@
 package com.jongsoft.finance.rest;
 
 import com.jongsoft.finance.security.AuthenticationFacade;
-import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,19 +19,18 @@ import static org.mockito.Mockito.when;
 @MicronautTest(environments = {"h2", "test"})
 public class ProcessEngineTest {
 
-  @Replaces
-  @MockBean
-  public AuthenticationFacade authenticationFacade() {
+  @MockBean(AuthenticationFacade.class)
+  AuthenticationFacade authenticationFacade() {
     var mockedFacade = mock(AuthenticationFacade.class);
     when(mockedFacade.authenticated()).thenReturn("test@account.local");
-    return mock(AuthenticationFacade.class);
+    return mockedFacade;
   }
 
   @Test
   @DisplayName("Start an account reconcile, fetch it and cancel the process")
   void performAccountReconcileProcess(RequestSpecification spec) {
     // Create the account reconcile process
-    var id = RestAssured.given(spec)
+    int id = RestAssured.given(spec)
           .contentType(ContentType.JSON)
           .body(Map.of(
               "accountId", 1L,
@@ -48,7 +47,7 @@ public class ProcessEngineTest {
           .body("state", equalTo("ACTIVE"))
           .body("process", startsWith("AccountReconcile:1"))
         .extract()
-          .jsonPath().getLong("id");
+          .jsonPath().getInt("id");
 
     // verify the process exists in the system
     RestAssured.given(spec)
@@ -70,8 +69,7 @@ public class ProcessEngineTest {
         .then()
           .log().ifValidationFails()
           .statusCode(200)
-          .body("$", hasSize(1))
-          .body("$.id", equalTo(id));
+          .body("id", hasItem(String.valueOf(id)));
 
     // cancel the process
     RestAssured.given(spec)

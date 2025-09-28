@@ -39,11 +39,12 @@ public class LocateAccountInMapping implements JavaDelegate, JavaBean {
         delegateExecution.getCurrentActivityName(),
         accountName);
 
-    var accountId = mappings.stream()
-        .filter(mapping -> mapping.getName().equals(accountName))
-        .findFirst()
-        .map(ExtractionMapping::getAccountId)
-        .orElse(null);
+    var accountId =
+        mappings.stream()
+            .filter(mapping -> mapping.getName().equals(accountName))
+            .findFirst()
+            .map(ExtractionMapping::getAccountId)
+            .orElse(null);
 
     determineSynonym(accountName, accountId);
 
@@ -55,9 +56,10 @@ public class LocateAccountInMapping implements JavaDelegate, JavaBean {
       return;
     }
 
-    var account = accountProvider
-        .lookup(accountId)
-        .getOrThrow(() -> new IllegalStateException("Account not found: " + accountId));
+    var account =
+        accountProvider
+            .lookup(accountId)
+            .getOrThrow(() -> new IllegalStateException("Account not found: " + accountId));
     if (!account.getName().equals(accountName)) {
       log.info(
           "Account name '{}' does not match the account name in the mapping '{}'.",

@@ -44,11 +44,12 @@ subprojects {
     spotless {
         java {
             target("src/main/java/**")
-            importOrder()
             removeUnusedImports()
             trimTrailingWhitespace()
             endWithNewline()
-            palantirJavaFormat("2.68.0").style("GOOGLE")
+            googleJavaFormat()
+                .reorderImports(true)
+                .skipJavadocFormatting()
         }
     }
 

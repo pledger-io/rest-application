@@ -19,7 +19,6 @@ import org.camunda.bpm.engine.impl.scripting.engine.ResolverFactory;
 public class MicronautBeanResolver implements ResolverFactory, Resolver {
 
   private final ApplicationContext applicationContext;
-  protected Set<String> keySet;
 
   public MicronautBeanResolver(ApplicationContext applicationContext) {
     this.applicationContext = applicationContext;
@@ -55,27 +54,25 @@ public class MicronautBeanResolver implements ResolverFactory, Resolver {
   }
 
   protected synchronized Set<String> getKeySet() {
-    if (keySet == null) {
-      keySet = applicationContext.getAllBeanDefinitions().stream()
-          .filter(
-              beanDefinition -> !beanDefinition.getClass().getName().startsWith("io.micronaut."))
-          .map(this::getBeanName)
-          .collect(Collectors.toSet());
-    }
-    return keySet;
+    return applicationContext.getAllBeanDefinitions().stream()
+        .filter(beanDefinition -> !beanDefinition.getClass().getName().startsWith("io.micronaut."))
+        .map(this::getBeanName)
+        .collect(Collectors.toSet());
   }
 
   protected String getBeanName(BeanDefinition<?> beanDefinition) {
-    var beanQualifier = beanDefinition
-        .getAnnotationMetadata()
-        .findDeclaredAnnotation(AnnotationUtil.NAMED)
-        .flatMap(AnnotationValue::stringValue);
-    return beanQualifier.orElseGet(() -> {
-      if (beanDefinition instanceof NameResolver resolver) {
-        return resolver.resolveName().orElse(getBeanNameFromType(beanDefinition));
-      }
-      return getBeanNameFromType(beanDefinition);
-    });
+    var beanQualifier =
+        beanDefinition
+            .getAnnotationMetadata()
+            .findDeclaredAnnotation(AnnotationUtil.NAMED)
+            .flatMap(AnnotationValue::stringValue);
+    return beanQualifier.orElseGet(
+        () -> {
+          if (beanDefinition instanceof NameResolver resolver) {
+            return resolver.resolveName().orElse(getBeanNameFromType(beanDefinition));
+          }
+          return getBeanNameFromType(beanDefinition);
+        });
   }
 
   protected String getBeanNameFromType(BeanDefinition<?> beanDefinition) {
