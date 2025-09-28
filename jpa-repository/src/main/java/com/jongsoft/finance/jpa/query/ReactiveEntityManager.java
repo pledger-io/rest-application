@@ -14,8 +14,7 @@ import lombok.Getter;
 
 @Singleton
 public class ReactiveEntityManager {
-  @Getter
-  private final EntityManager entityManager;
+  @Getter private final EntityManager entityManager;
 
   private final AuthenticationFacade authenticationFacade;
 

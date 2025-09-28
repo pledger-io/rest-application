@@ -7,6 +7,7 @@ import com.jongsoft.finance.domain.FinTrack;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.messaging.commands.account.CreateAccountCommand;
 import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.ApplicationContext;
 import io.micronaut.inject.qualifiers.Qualifiers;
@@ -43,6 +44,7 @@ public class ProcessTestExtension implements BeforeAllCallback, AfterAllCallback
         applicationContext.registerSingleton(FinTrack.class, applicationBean);
         applicationContext.registerSingleton(StorageService.class, Mockito.spy(StorageService.class), Qualifiers.byName("storageService"));
         applicationContext.registerSingleton(MailDaemon.class, Mockito.spy(MailDaemon.class), Qualifiers.byName("mailDaemon"));
+        applicationContext.registerSingleton(AuthenticationFacade.class, Mockito.spy(AuthenticationFacade.class));
         applicationContext.registerSingleton(new Consumer<CreateAccountCommand>() {
             @EventListener
             public void accept(CreateAccountCommand accountCreatedEvent) {

@@ -28,6 +28,7 @@ dependencies {
 
     implementation(libs.camunda)
 
+    implementation(project(":core"))
     implementation(project(":domain"))
 
     testRuntimeOnly(mn.micronaut.serde.jackson)

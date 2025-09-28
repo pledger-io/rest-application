@@ -99,18 +99,19 @@ public class SpendingInsightProviderJpa implements SpendingInsightProvider {
     }
 
     // Create the JPA entity
-    SpendingInsightJpa jpa = SpendingInsightJpa.builder()
-        .type(command.type())
-        .category(command.category())
-        .severity(command.severity())
-        .score(command.score())
-        .detectedDate(command.detectedDate())
-        .message(command.message())
-        .yearMonth(YearMonth.from(command.detectedDate()))
-        .transactionId(command.transactionId())
-        .metadata(metadata)
-        .user(entityManager.currentUser())
-        .build();
+    SpendingInsightJpa jpa =
+        SpendingInsightJpa.builder()
+            .type(command.type())
+            .category(command.category())
+            .severity(command.severity())
+            .score(command.score())
+            .detectedDate(command.detectedDate())
+            .message(command.message())
+            .yearMonth(YearMonth.from(command.detectedDate()))
+            .transactionId(command.transactionId())
+            .metadata(metadata)
+            .user(entityManager.currentUser())
+            .build();
 
     // Save the entity
     entityManager.persist(jpa);
@@ -134,8 +135,9 @@ public class SpendingInsightProviderJpa implements SpendingInsightProvider {
     }
 
     // Convert metadata from string values to objects
-    Map<String, Object> metadata = source.getMetadata().entrySet().stream()
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    Map<String, Object> metadata =
+        source.getMetadata().entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
     return SpendingInsight.builder()
         .type(source.getType())

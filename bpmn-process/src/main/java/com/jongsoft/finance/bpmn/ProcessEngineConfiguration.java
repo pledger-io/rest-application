@@ -60,11 +60,12 @@ public class ProcessEngineConfiguration {
     configuration.setHistoryCleanupBatchWindowEndTime("03:00");
     configuration.setHistoryTimeToLive("P1D");
     configuration.setResolverFactories(List.of(new MicronautBeanResolver(applicationContext)));
-    configuration.setCustomPreVariableSerializers(List.of(
-        new JsonRecordSerializer<>(
-            applicationContext.getBean(ObjectMapper.class), ProcessVariable.class),
-        new JsonRecordSerializer<>(
-            applicationContext.getBean(ObjectMapper.class), TransactionDTO.class)));
+    configuration.setCustomPreVariableSerializers(
+        List.of(
+            new JsonRecordSerializer<>(
+                applicationContext.getBean(ObjectMapper.class), ProcessVariable.class),
+            new JsonRecordSerializer<>(
+                applicationContext.getBean(ObjectMapper.class), TransactionDTO.class)));
 
     var processEngine = configuration.buildProcessEngine();
     log.info("Created camunda process engine");

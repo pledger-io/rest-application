@@ -49,12 +49,13 @@ paths:
     post:
       operationId: createUser
       tags: [ security ]
+      security: []
       requestBody:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/user-request' }
       responses:
-        "201":
+        "204":
           description: Confirmation the account was created
         "400": { $ref: '#/components/responses/400' }
   /api/user-account/verify-2-factor:
@@ -152,6 +153,10 @@ paths:
       description: >
         Start a new durable long term session. This can for
         example be used in a mobile app.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/session-request' }
       responses:
         "201":
           description: The created session
@@ -445,9 +450,31 @@ components:
     setting-request: { $ref: 'components/requests/setting.yaml' }
     patch-currency-request: { $ref: 'components/requests/patch-currency.yaml' }
     patch-multi-factor-request: { $ref: 'components/requests/patch-multi-factor.yaml' }
+    session-request: { $ref: 'components/requests/session.yaml' }
     currency-response: { $ref: 'components/responses/currency.yaml' }
     setting-response: { $ref: 'components/responses/setting.yaml' }
     json-error-response: { $ref: 'components/json-error.yaml' }
     file-response: { $ref: 'components/responses/file.yaml' }
     user-profile-response: { $ref: 'components/responses/user-profile.yaml' }
     session-response: { $ref: 'components/responses/session.yaml' }
+
+    enable-mfa-request:
+      type: object
+      required:
+        - action
+        - verificationCode
+      properties:
+        verificationCode:
+          type: string
+          min: 4
+          max: 8
+        action:
+          type: string
+    disable-mfa-request:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+

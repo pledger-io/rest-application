@@ -8,11 +8,12 @@ import java.util.List;
 @Singleton
 public class AccountLocator implements ChangeLocator {
 
-  private static final List<RuleColumn> SUPPORTED = List.of(
-      RuleColumn.SOURCE_ACCOUNT,
-      RuleColumn.TO_ACCOUNT,
-      RuleColumn.CHANGE_TRANSFER_FROM,
-      RuleColumn.CHANGE_TRANSFER_TO);
+  private static final List<RuleColumn> SUPPORTED =
+      List.of(
+          RuleColumn.SOURCE_ACCOUNT,
+          RuleColumn.TO_ACCOUNT,
+          RuleColumn.CHANGE_TRANSFER_FROM,
+          RuleColumn.CHANGE_TRANSFER_TO);
 
   private final AccountProvider accountProvider;
 

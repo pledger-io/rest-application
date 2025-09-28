@@ -66,18 +66,24 @@ public class CreateTransactionDelegate implements JavaDelegate, JavaBean {
           case TRANSFER -> Transaction.Type.TRANSFER;
         };
 
-    Transaction transaction = targetAccount.createTransaction(
-        toAccount, parsedTransaction.amount(), type, t -> t.currency(targetAccount.getCurrency())
-            .date(parsedTransaction.transactionDate())
-            .bookDate(parsedTransaction.bookDate())
-            .interestDate(parsedTransaction.interestDate())
-            .description(parsedTransaction.description())
-            .category(parsedTransaction.category())
-            .budget(parsedTransaction.budget())
-            .tags(Control.Option(parsedTransaction.tags())
-                .map(Collections::List)
-                .getOrSupply(() -> null))
-            .importSlug(batchImportSlug));
+    Transaction transaction =
+        targetAccount.createTransaction(
+            toAccount,
+            parsedTransaction.amount(),
+            type,
+            t ->
+                t.currency(targetAccount.getCurrency())
+                    .date(parsedTransaction.transactionDate())
+                    .bookDate(parsedTransaction.bookDate())
+                    .interestDate(parsedTransaction.interestDate())
+                    .description(parsedTransaction.description())
+                    .category(parsedTransaction.category())
+                    .budget(parsedTransaction.budget())
+                    .tags(
+                        Control.Option(parsedTransaction.tags())
+                            .map(Collections::List)
+                            .getOrSupply(() -> null))
+                    .importSlug(batchImportSlug));
 
     long transactionId =
         creationHandler.handleCreatedEvent(new CreateTransactionCommand(transaction));

@@ -17,9 +17,7 @@ public class RuleChangeJpa extends EntityJpa {
   @Column(name = "change_val")
   private String value;
 
-  @ManyToOne
-  @JoinColumn
-  private RuleJpa rule;
+  @ManyToOne @JoinColumn private RuleJpa rule;
 
   public RuleChangeJpa() {
     super();

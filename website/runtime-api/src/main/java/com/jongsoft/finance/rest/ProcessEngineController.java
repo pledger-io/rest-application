@@ -1,6 +1,6 @@
 package com.jongsoft.finance.rest;
 
-import com.jongsoft.finance.domain.user.UserIdentifier;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.rest.model.runtime.ProcessInstanceResponse;
 import com.jongsoft.finance.rest.model.runtime.ProcessInstanceResponseState;
 import com.jongsoft.finance.security.AuthenticationFacade;
@@ -47,6 +47,7 @@ class ProcessEngineController implements ProcessEngineApi {
         .createProcessInstanceQuery()
         .processDefinitionKey(processDefinition)
         .processInstanceId(instanceId)
+        .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
         .singleResult();
     return convert(processInstance);
   }
@@ -99,13 +100,15 @@ class ProcessEngineController implements ProcessEngineApi {
     if (parameters.containsKey("businessKey")) {
       instanceBuilder.businessKey(parameters.get("businessKey").toString());
     }
-    instanceBuilder.setVariable(
-        KEY_USERNAME, new UserIdentifier(authenticationFacade.authenticated()));
+    instanceBuilder.setVariable(KEY_USERNAME, authenticationFacade.authenticated());
 
     return HttpResponse.created(convert(instanceBuilder.execute()));
   }
 
   private ProcessInstanceResponse convert(ProcessInstance processInstance) {
+    if (processInstance == null) {
+      throw StatusException.notFound("No process instance found.");
+    }
     return new ProcessInstanceResponse(
         processInstance.getProcessInstanceId(),
         processInstance.getProcessDefinitionId(),

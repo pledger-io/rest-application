@@ -31,17 +31,18 @@ public class CreateScheduleFromContractHandler
   public void handle(CreateScheduleForContractCommand command) {
     log.info("[{}] - Creating a schedule from an existing contract", command.name());
 
-    var jpaEntity = ScheduledTransactionJpa.builder()
-        .name(command.name())
-        .amount(command.amount())
-        .contract(entityManager.getById(ContractJpa.class, command.contract().getId()))
-        .source(entityManager.getById(AccountJpa.class, command.source().getId()))
-        .destination(entityManager.getById(
-            AccountJpa.class, command.contract().getCompany().getId()))
-        .periodicity(command.schedule().periodicity())
-        .interval(command.schedule().interval())
-        .user(entityManager.currentUser())
-        .build();
+    var jpaEntity =
+        ScheduledTransactionJpa.builder()
+            .name(command.name())
+            .amount(command.amount())
+            .contract(entityManager.getById(ContractJpa.class, command.contract().getId()))
+            .source(entityManager.getById(AccountJpa.class, command.source().getId()))
+            .destination(
+                entityManager.getById(AccountJpa.class, command.contract().getCompany().getId()))
+            .periodicity(command.schedule().periodicity())
+            .interval(command.schedule().interval())
+            .user(entityManager.currentUser())
+            .build();
 
     entityManager.persist(jpaEntity);
   }

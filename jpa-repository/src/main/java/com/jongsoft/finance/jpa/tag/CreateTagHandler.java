@@ -26,11 +26,12 @@ public class CreateTagHandler implements CommandHandler<CreateTagCommand> {
   public void handle(CreateTagCommand command) {
     log.info("[{}] - Processing tag creation event", command.tag());
 
-    var toCreate = TagJpa.builder()
-        .name(command.tag())
-        .user(entityManager.currentUser())
-        .archived(false)
-        .build();
+    var toCreate =
+        TagJpa.builder()
+            .name(command.tag())
+            .user(entityManager.currentUser())
+            .archived(false)
+            .build();
 
     entityManager.persist(toCreate);
   }

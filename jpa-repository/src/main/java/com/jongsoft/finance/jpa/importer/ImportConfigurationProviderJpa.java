@@ -63,10 +63,11 @@ public class ImportConfigurationProviderJpa implements ImportConfigurationProvid
         .name(source.getName())
         .type(source.getType())
         .fileCode(source.getFileCode())
-        .user(UserAccount.builder()
-            .id(source.getUser().getId())
-            .username(new UserIdentifier(source.getUser().getUsername()))
-            .build())
+        .user(
+            UserAccount.builder()
+                .id(source.getUser().getId())
+                .username(new UserIdentifier(source.getUser().getUsername()))
+                .build())
         .build();
   }
 }

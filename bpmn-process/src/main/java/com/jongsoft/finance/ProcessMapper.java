@@ -18,19 +18,21 @@ public class ProcessMapper {
 
   public <T> String writeSafe(T entity) {
     return Control.Try(() -> objectMapper.writeValueAsString(entity))
-        .recover(x -> {
-          log.warn("Could not serialize entity {}", entity, x);
-          return null;
-        })
+        .recover(
+            x -> {
+              log.warn("Could not serialize entity {}", entity, x);
+              return null;
+            })
         .get();
   }
 
   public <T> T readSafe(String json, Class<T> clazz) {
     return Control.Try(() -> objectMapper.readValue(json, clazz))
-        .recover(x -> {
-          log.warn("Could not deserialize json {}", json, x);
-          return null;
-        })
+        .recover(
+            x -> {
+              log.warn("Could not deserialize json {}", json, x);
+              return null;
+            })
         .get();
   }
 

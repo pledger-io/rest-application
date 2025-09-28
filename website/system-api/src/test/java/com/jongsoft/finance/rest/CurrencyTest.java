@@ -28,7 +28,7 @@ public class CurrencyTest {
   public AuthenticationFacade authenticationFacade() {
     var mockedFacade = mock(AuthenticationFacade.class);
     when(mockedFacade.authenticated()).thenReturn("test@account.local");
-    return mock(AuthenticationFacade.class);
+    return mockedFacade;
   }
 
   @BeforeEach

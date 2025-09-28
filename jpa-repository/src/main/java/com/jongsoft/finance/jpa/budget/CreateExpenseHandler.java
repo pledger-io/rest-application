@@ -31,23 +31,24 @@ public class CreateExpenseHandler implements CommandHandler<CreateExpenseCommand
   public void handle(CreateExpenseCommand command) {
     log.info("[{}] - Processing expense create event", command.name());
 
-    var activeBudget = entityManager
-        .from(BudgetJpa.class)
-        .fieldEq("user.username", authenticationFacade.authenticated())
-        .fieldEq("from", command.start())
-        .singleResult()
-        .get();
+    var activeBudget =
+        entityManager
+            .from(BudgetJpa.class)
+            .fieldEq("user.username", authenticationFacade.authenticated())
+            .fieldEq("from", command.start())
+            .singleResult()
+            .get();
 
-    var expenseJpa =
-        ExpenseJpa.builder().name(command.name()).user(activeBudget.getUser()).build();
+    var expenseJpa = ExpenseJpa.builder().name(command.name()).user(activeBudget.getUser()).build();
     entityManager.persist(expenseJpa);
 
-    var expensePeriodJpa = ExpensePeriodJpa.builder()
-        .lowerBound(command.budget().subtract(new BigDecimal("0.01")))
-        .upperBound(command.budget())
-        .expense(expenseJpa)
-        .budget(activeBudget)
-        .build();
+    var expensePeriodJpa =
+        ExpensePeriodJpa.builder()
+            .lowerBound(command.budget().subtract(new BigDecimal("0.01")))
+            .upperBound(command.budget())
+            .expense(expenseJpa)
+            .budget(activeBudget)
+            .build();
     entityManager.persist(expensePeriodJpa);
 
     // fix for when budget is created in same transaction (otherwise the list remains empty in

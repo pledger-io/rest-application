@@ -34,22 +34,32 @@ public class ImportTransactionJsonDelegate implements JavaDelegate, JavaBean {
         transaction.getFromAccount(),
         transaction.getToAccount());
 
-    var fromAccount = accountProvider
-        .lookup(transaction.getFromAccount())
-        .getOrThrow(() -> new IllegalStateException(
-            "Unable to find account with name " + transaction.getFromAccount()));
-    var toAccount = accountProvider
-        .lookup(transaction.getToAccount())
-        .getOrThrow(() -> new IllegalStateException(
-            "Unable to find account with name " + transaction.getToAccount()));
+    var fromAccount =
+        accountProvider
+            .lookup(transaction.getFromAccount())
+            .getOrThrow(
+                () ->
+                    new IllegalStateException(
+                        "Unable to find account with name " + transaction.getFromAccount()));
+    var toAccount =
+        accountProvider
+            .lookup(transaction.getToAccount())
+            .getOrThrow(
+                () ->
+                    new IllegalStateException(
+                        "Unable to find account with name " + transaction.getToAccount()));
 
-    var created = fromAccount.createTransaction(
-        toAccount, transaction.getAmount(), Transaction.Type.CREDIT, t -> t.currency(
-                transaction.getCurrency())
-            .date(transaction.getDate())
-            .bookDate(transaction.getBookDate())
-            .interestDate(transaction.getInterestDate())
-            .description(transaction.getDescription()));
+    var created =
+        fromAccount.createTransaction(
+            toAccount,
+            transaction.getAmount(),
+            Transaction.Type.CREDIT,
+            t ->
+                t.currency(transaction.getCurrency())
+                    .date(transaction.getDate())
+                    .bookDate(transaction.getBookDate())
+                    .interestDate(transaction.getInterestDate())
+                    .description(transaction.getDescription()));
 
     long transactionId = creationHandler.handleCreatedEvent(new CreateTransactionCommand(created));
     execution.setVariable("transactionId", transactionId);

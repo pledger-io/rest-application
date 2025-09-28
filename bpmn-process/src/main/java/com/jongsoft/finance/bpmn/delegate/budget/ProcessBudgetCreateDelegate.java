@@ -39,8 +39,9 @@ public class ProcessBudgetCreateDelegate implements JavaDelegate, JavaBean {
 
   @Override
   public void execute(DelegateExecution execution) {
-    var budgetJson = mapper.readSafe(
-        execution.<StringValue>getVariableLocalTyped("budget").getValue(), BudgetJson.class);
+    var budgetJson =
+        mapper.readSafe(
+            execution.<StringValue>getVariableLocalTyped("budget").getValue(), BudgetJson.class);
 
     log.debug(
         "{}: Processing budget creation from json for period '{}'",
@@ -63,21 +64,25 @@ public class ProcessBudgetCreateDelegate implements JavaDelegate, JavaBean {
       EventBus.getBus().send(new CloseBudgetCommand(oldBudget.get().getId(), start));
       // create new budget
       EventBus.getBus()
-          .send(new CreateBudgetCommand(Budget.builder()
-              .start(start)
-              .expectedIncome(budgetJson.getExpectedIncome())
-              .expenses(oldBudget.get().getExpenses())
-              .build()));
+          .send(
+              new CreateBudgetCommand(
+                  Budget.builder()
+                      .start(start)
+                      .expectedIncome(budgetJson.getExpectedIncome())
+                      .expenses(oldBudget.get().getExpenses())
+                      .build()));
     } else {
       log.debug(
           "{}: Creating new budget period for period '{}'",
           execution.getCurrentActivityName(),
           start);
       EventBus.getBus()
-          .send(new CreateBudgetCommand(Budget.builder()
-              .start(start)
-              .expectedIncome(budgetJson.getExpectedIncome())
-              .build()));
+          .send(
+              new CreateBudgetCommand(
+                  Budget.builder()
+                      .start(start)
+                      .expectedIncome(budgetJson.getExpectedIncome())
+                      .build()));
     }
 
     log.trace(
@@ -85,16 +90,22 @@ public class ProcessBudgetCreateDelegate implements JavaDelegate, JavaBean {
         execution.getCurrentActivityName(),
         budgetJson.getStart());
 
-    var budget = budgetProvider
-        .lookup(year, month)
-        .getOrThrow(() -> new IllegalStateException("Budget period not found for period " + start));
+    var budget =
+        budgetProvider
+            .lookup(year, month)
+            .getOrThrow(
+                () -> new IllegalStateException("Budget period not found for period " + start));
 
     budgetJson
         .getExpenses()
         // update or create the expenses
-        .forEach(e -> Control.Option(budget.determineExpense(e.getName()))
-            .ifPresent(currentExpense -> currentExpense.updateExpense(e.getUpperBound()))
-            .elseRun(
-                () -> budget.createExpense(e.getName(), e.getLowerBound(), e.getUpperBound())));
+        .forEach(
+            e ->
+                Control.Option(budget.determineExpense(e.getName()))
+                    .ifPresent(currentExpense -> currentExpense.updateExpense(e.getUpperBound()))
+                    .elseRun(
+                        () ->
+                            budget.createExpense(
+                                e.getName(), e.getLowerBound(), e.getUpperBound())));
   }
 }

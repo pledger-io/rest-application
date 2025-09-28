@@ -31,15 +31,16 @@ public class CreateScheduleHandler implements CommandHandler<CreateScheduleComma
     var from = entityManager.getById(AccountJpa.class, command.from().getId());
     var to = entityManager.getById(AccountJpa.class, command.destination().getId());
 
-    var jpaEntity = ScheduledTransactionJpa.builder()
-        .user(from.getUser())
-        .source(from)
-        .destination(to)
-        .periodicity(command.schedule().periodicity())
-        .interval(command.schedule().interval())
-        .amount(command.amount())
-        .name(command.name())
-        .build();
+    var jpaEntity =
+        ScheduledTransactionJpa.builder()
+            .user(from.getUser())
+            .source(from)
+            .destination(to)
+            .periodicity(command.schedule().periodicity())
+            .interval(command.schedule().interval())
+            .amount(command.amount())
+            .name(command.name())
+            .build();
 
     entityManager.persist(jpaEntity);
   }

@@ -9,14 +9,12 @@ import lombok.Data;
 @Table(name = "analyze_job")
 public class AnalyzeJobJpa {
 
-  @Id
-  private String id;
+  @Id private String id;
 
   @Column(name = "year_month_found")
   private String yearMonth;
 
-  @ManyToOne
-  private UserAccountJpa user;
+  @ManyToOne private UserAccountJpa user;
 
   private boolean completed;
   private boolean failed;

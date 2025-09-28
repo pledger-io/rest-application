@@ -30,12 +30,13 @@ public class ParseTransactionRuleDelegate implements JavaDelegate, JavaBean {
 
     String storageToken = (String) execution.getVariableLocal("storageToken");
 
-    var rules = storageService
-        .read(storageToken)
-        .map(String::new)
-        .map(json -> mapper.readSafe(json, RuleConfigJson.class))
-        .map(RuleConfigJson::getRules)
-        .getOrThrow(() -> new RuntimeException("Failed to read json file"));
+    var rules =
+        storageService
+            .read(storageToken)
+            .map(String::new)
+            .map(json -> mapper.readSafe(json, RuleConfigJson.class))
+            .map(RuleConfigJson::getRules)
+            .getOrThrow(() -> new RuntimeException("Failed to read json file"));
 
     execution.setVariable("ruleLines", rules);
   }
