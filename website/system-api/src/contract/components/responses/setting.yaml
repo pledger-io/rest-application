@@ -1,4 +1,8 @@
 type: object
+required:
+  - name
+  - value
+  - type
 properties:
   name:
     type: string

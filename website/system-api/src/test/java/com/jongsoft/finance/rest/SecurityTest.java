@@ -1,14 +1,14 @@
 package com.jongsoft.finance.rest;
 
-import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.core.MailDaemon;
 import com.jongsoft.finance.messaging.EventBus;
-
 import io.micronaut.context.event.ApplicationEventPublisher;
+import io.micronaut.http.HttpHeaders;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.token.generator.AccessRefreshTokenGenerator;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
@@ -26,11 +26,6 @@ public class SecurityTest {
 
   @Inject
   private AccessRefreshTokenGenerator accessRefreshTokenGenerator;
-
-  @MockBean
-  StorageService storageService() {
-    return mock(StorageService.class);
-  }
 
   @MockBean(MailDaemon.class)
   MailDaemon mailDaemon() {
@@ -69,7 +64,7 @@ public class SecurityTest {
 
     // fetch profile
     given(spec)
-        .auth().preemptive().oauth2(getToken())
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + getToken())
         .pathParam("user-account", "test@account.local")
         .get("/api/user-account/{user-account}")
         .then()
@@ -81,14 +76,14 @@ public class SecurityTest {
 
     // change currency to GBP
     given(spec)
-        .auth().preemptive().oauth2(getToken())
+        .header(HttpHeaders.AUTHORIZATION, "Bearer " + getToken())
         .pathParam("user-account", "test@account.local")
         .body(Map.of(
             "theme", "dark",
             "currency", "GBP"))
         .patch("/api/user-account/{user-account}")
         .then()
-          .log().ifValidationFails()
+          .log().ifValidationFails(LogDetail.ALL)
           .statusCode(200)
           .body("theme", equalTo("dark"))
           .body("currency", equalTo("GBP"))
@@ -97,6 +92,7 @@ public class SecurityTest {
 
   private String getToken() {
     return accessRefreshTokenGenerator.generate(Authentication.build("test@account.local"))
-        .get().getAccessToken();
+        .get()
+        .getAccessToken();
   }
 }

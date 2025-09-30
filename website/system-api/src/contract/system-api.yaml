@@ -383,10 +383,13 @@ paths:
       tags: [ files ]
       requestBody:
         content:
-          multipart/form-data:
+          'multipart/form-data':
             schema:
-              type: string
-              format: binary
+              type: object
+              properties:
+                upload:
+                  type: string
+                  format: binary
         required: true
       responses:
         "201":
