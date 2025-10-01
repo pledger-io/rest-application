@@ -5,9 +5,12 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.ChangeContractCommand;
+
 import io.micronaut.transaction.annotation.Transactional;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -16,25 +19,25 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class ChangeContractHandler implements CommandHandler<ChangeContractCommand> {
 
-  private final ReactiveEntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
-  @Inject
-  public ChangeContractHandler(ReactiveEntityManager entityManager) {
-    this.entityManager = entityManager;
-  }
+    @Inject
+    public ChangeContractHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
-  @Override
-  @BusinessEventListener
-  public void handle(ChangeContractCommand command) {
-    log.info("[{}] - Processing contract changed event", command.id());
+    @Override
+    @BusinessEventListener
+    public void handle(ChangeContractCommand command) {
+        log.info("[{}] - Processing contract changed event", command.id());
 
-    entityManager
-        .update(ContractJpa.class)
-        .set("name", command.name())
-        .set("startDate", command.start())
-        .set("endDate", command.end())
-        .set("description", command.description())
-        .fieldEq("id", command.id())
-        .execute();
-  }
+        entityManager
+                .update(ContractJpa.class)
+                .set("name", command.name())
+                .set("startDate", command.start())
+                .set("endDate", command.end())
+                .set("description", command.description())
+                .fieldEq("id", command.id())
+                .execute();
+    }
 }

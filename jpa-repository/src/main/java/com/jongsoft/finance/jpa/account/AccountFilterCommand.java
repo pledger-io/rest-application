@@ -5,72 +5,72 @@ import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.lang.collection.Sequence;
 
 public class AccountFilterCommand extends JpaFilterBuilder<AccountJpa>
-    implements AccountProvider.FilterCommand {
+        implements AccountProvider.FilterCommand {
 
-  private static final String FIELD_NUMBER = "number";
-  private static final String FIELD_NAME = "name";
-  private static final String FIELD_IBAN = "iban";
+    private static final String FIELD_NUMBER = "number";
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_IBAN = "iban";
 
-  public AccountFilterCommand() {
-    orderAscending = true;
-    orderBy = FIELD_NAME;
-    query().fieldEq("archived", false);
-  }
-
-  @Override
-  public AccountFilterCommand name(String value, boolean exact) {
-    if (exact) {
-      query().fieldEq(FIELD_NAME, value.toLowerCase());
-    } else {
-      query().fieldLike(FIELD_NAME, value.toLowerCase());
+    public AccountFilterCommand() {
+        orderAscending = true;
+        orderBy = FIELD_NAME;
+        query().fieldEq("archived", false);
     }
 
-    return this;
-  }
+    @Override
+    public AccountFilterCommand name(String value, boolean exact) {
+        if (exact) {
+            query().fieldEq(FIELD_NAME, value.toLowerCase());
+        } else {
+            query().fieldLike(FIELD_NAME, value.toLowerCase());
+        }
 
-  @Override
-  public AccountFilterCommand iban(String value, boolean exact) {
-    if (exact) {
-      query().fieldEq(FIELD_IBAN, value.toLowerCase());
-    } else {
-      query().fieldLike(FIELD_IBAN, value.toLowerCase());
+        return this;
     }
 
-    return this;
-  }
+    @Override
+    public AccountFilterCommand iban(String value, boolean exact) {
+        if (exact) {
+            query().fieldEq(FIELD_IBAN, value.toLowerCase());
+        } else {
+            query().fieldLike(FIELD_IBAN, value.toLowerCase());
+        }
 
-  @Override
-  public AccountFilterCommand number(String value, boolean exact) {
-    if (exact) {
-      query().fieldEq(FIELD_NUMBER, value.toLowerCase());
-    } else {
-      query().fieldLike(FIELD_NUMBER, value.toLowerCase());
+        return this;
     }
 
-    return this;
-  }
+    @Override
+    public AccountFilterCommand number(String value, boolean exact) {
+        if (exact) {
+            query().fieldEq(FIELD_NUMBER, value.toLowerCase());
+        } else {
+            query().fieldLike(FIELD_NUMBER, value.toLowerCase());
+        }
 
-  @Override
-  public AccountFilterCommand types(Sequence<String> types) {
-    if (!types.isEmpty()) {
-      query().fieldEqOneOf("type.label", types.stream().toArray());
+        return this;
     }
-    return this;
-  }
 
-  @Override
-  public AccountFilterCommand page(int page, int pageSize) {
-    skipRows = page * pageSize;
-    limitRows = pageSize;
-    return this;
-  }
+    @Override
+    public AccountFilterCommand types(Sequence<String> types) {
+        if (!types.isEmpty()) {
+            query().fieldEqOneOf("type.label", types.stream().toArray());
+        }
+        return this;
+    }
 
-  public void user(String username) {
-    query().fieldEq("user.username", username);
-  }
+    @Override
+    public AccountFilterCommand page(int page, int pageSize) {
+        skipRows = page * pageSize;
+        limitRows = pageSize;
+        return this;
+    }
 
-  @Override
-  public Class<AccountJpa> entityType() {
-    return AccountJpa.class;
-  }
+    public void user(String username) {
+        query().fieldEq("user.username", username);
+    }
+
+    @Override
+    public Class<AccountJpa> entityType() {
+        return AccountJpa.class;
+    }
 }

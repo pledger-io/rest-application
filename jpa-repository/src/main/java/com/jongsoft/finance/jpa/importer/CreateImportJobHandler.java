@@ -7,9 +7,12 @@ import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.importer.CreateImportJobCommand;
+
 import io.micronaut.transaction.annotation.Transactional;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -17,36 +20,37 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class CreateImportJobHandler implements CommandHandler<CreateImportJobCommand> {
 
-  private final ReactiveEntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
-  @Inject
-  public CreateImportJobHandler(ReactiveEntityManager entityManager) {
-    this.entityManager = entityManager;
-  }
+    @Inject
+    public CreateImportJobHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
-  @Override
-  @BusinessEventListener
-  public void handle(CreateImportJobCommand command) {
-    log.info("[{}] - Processing import create event", command.slug());
+    @Override
+    @BusinessEventListener
+    public void handle(CreateImportJobCommand command) {
+        log.info("[{}] - Processing import create event", command.slug());
 
-    var configJpa =
-        entityManager
-            .from(ImportConfig.class)
-            .fieldEq("id", command.configId())
-            .singleResult()
-            .getOrThrow(
-                () ->
-                    StatusException.notFound(
-                        "Could not find the configuration for id " + command.configId()));
+        var configJpa =
+                entityManager
+                        .from(ImportConfig.class)
+                        .fieldEq("id", command.configId())
+                        .singleResult()
+                        .getOrThrow(
+                                () ->
+                                        StatusException.notFound(
+                                                "Could not find the configuration for id "
+                                                        + command.configId()));
 
-    var importJpa =
-        ImportJpa.builder()
-            .slug(command.slug())
-            .config(configJpa)
-            .user(configJpa.getUser())
-            .fileCode(command.fileCode())
-            .build();
+        var importJpa =
+                ImportJpa.builder()
+                        .slug(command.slug())
+                        .config(configJpa)
+                        .user(configJpa.getUser())
+                        .fileCode(command.fileCode())
+                        .build();
 
-    entityManager.persist(importJpa);
-  }
+        entityManager.persist(importJpa);
+    }
 }

@@ -1,14 +1,16 @@
 package com.jongsoft.finance.llm.agent;
 
 import com.jongsoft.finance.llm.dto.ClassificationDTO;
+
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
 import dev.langchain4j.service.V;
+
 import java.util.UUID;
 
 @SystemMessage({
-  """
+    """
                 You are a financial transaction classification assistant. Your task is to analyze and classify transactions based on the following input fields:
                  - description: Free-text transaction description
                  - from: Sender or originating entity
@@ -42,8 +44,8 @@ import java.util.UUID;
 })
 public interface ClassificationAgent {
 
-  @UserMessage({
-    """
+    @UserMessage({
+        """
                     Please classify the following financial transaction using ONLY the predefined categories, subcategories, and tags.
 
                     IMPORTANT: You must first retrieve the valid categories, subcategories, and tags using the available tools before attempting classification.
@@ -57,12 +59,12 @@ public interface ClassificationAgent {
                     - Date: {{date}}
 
                     Remember to use ONLY terms explicitly retrieved from the system's predefined classifications."""
-  })
-  ClassificationDTO classifyTransaction(
-      @MemoryId UUID chat,
-      @V("description") String description,
-      @V("from") String from,
-      @V("to") String to,
-      @V("amount") double amount,
-      @V("date") String date);
+    })
+    ClassificationDTO classifyTransaction(
+            @MemoryId UUID chat,
+            @V("description") String description,
+            @V("from") String from,
+            @V("to") String to,
+            @V("amount") double amount,
+            @V("date") String date);
 }

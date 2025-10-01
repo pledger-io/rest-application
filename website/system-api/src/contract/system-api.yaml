@@ -30,7 +30,7 @@ paths:
           description: The configuration
           content:
             application/json:
-              schema: { $ref: 'components/open-id-configuration.yaml' }
+              schema: { $ref: './components/open-id-configuration.yaml' }
   /.well-known/public-key:
     get:
       operationId: getJwtSignature
@@ -252,7 +252,7 @@ paths:
           description: getTranslations 200 response
           content:
             application/json:
-              schema: { $ref: 'components/i18n-response.yaml' }
+              schema: { $ref: './components/i18n-response.yaml' }
 
   /api/currencies:
     get:
@@ -446,20 +446,20 @@ components:
     403: { $ref: './responses/403-response.yaml' }
     404: { $ref: './responses/404-response.yaml' }
   schemas:
-    date-range: { $ref: 'components/date-range.yaml' }
-    token-request: { $ref: 'components/requests/token.yaml' }
-    user-request: { $ref: 'components/requests/user.yaml' }
-    currency-request: { $ref: 'components/requests/currency.yaml' }
-    setting-request: { $ref: 'components/requests/setting.yaml' }
-    patch-currency-request: { $ref: 'components/requests/patch-currency.yaml' }
-    patch-multi-factor-request: { $ref: 'components/requests/patch-multi-factor.yaml' }
-    session-request: { $ref: 'components/requests/session.yaml' }
-    currency-response: { $ref: 'components/responses/currency.yaml' }
-    setting-response: { $ref: 'components/responses/setting.yaml' }
-    json-error-response: { $ref: 'components/json-error.yaml' }
-    file-response: { $ref: 'components/responses/file.yaml' }
-    user-profile-response: { $ref: 'components/responses/user-profile.yaml' }
-    session-response: { $ref: 'components/responses/session.yaml' }
+    date-range: { $ref: './components/date-range.yaml' }
+    token-request: { $ref: './components/requests/token.yaml' }
+    user-request: { $ref: './components/requests/user.yaml' }
+    currency-request: { $ref: './components/requests/currency.yaml' }
+    setting-request: { $ref: './components/requests/setting.yaml' }
+    patch-currency-request: { $ref: './components/requests/patch-currency.yaml' }
+    patch-multi-factor-request: { $ref: './components/requests/patch-multi-factor.yaml' }
+    session-request: { $ref: './components/requests/session.yaml' }
+    currency-response: { $ref: './components/responses/currency.yaml' }
+    setting-response: { $ref: './components/responses/setting.yaml' }
+    json-error-response: { $ref: './components/json-error.yaml' }
+    file-response: { $ref: './components/responses/file.yaml' }
+    user-profile-response: { $ref: './components/responses/user-profile.yaml' }
+    session-response: { $ref: './components/responses/session.yaml' }
 
     enable-mfa-request:
       type: object

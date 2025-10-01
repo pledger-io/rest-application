@@ -48,6 +48,7 @@ subprojects {
             trimTrailingWhitespace()
             endWithNewline()
             googleJavaFormat()
+                .aosp()
                 .reorderImports(true)
                 .skipJavadocFormatting()
         }

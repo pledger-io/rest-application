@@ -5,9 +5,9 @@ import com.jongsoft.finance.messaging.ApplicationEvent;
 import com.jongsoft.lang.collection.Sequence;
 
 public record SplitTransactionCommand(long id, Sequence<Transaction.Part> split)
-    implements ApplicationEvent {
+        implements ApplicationEvent {
 
-  public static void transactionSplit(long id, Sequence<Transaction.Part> split) {
-    new SplitTransactionCommand(id, split).publish();
-  }
+    public static void transactionSplit(long id, Sequence<Transaction.Part> split) {
+        new SplitTransactionCommand(id, split).publish();
+    }
 }

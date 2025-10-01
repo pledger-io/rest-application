@@ -4,11 +4,14 @@ import com.jongsoft.finance.ProcessMapper;
 import com.jongsoft.finance.StorageService;
 import com.jongsoft.finance.core.JavaBean;
 import com.jongsoft.finance.importer.api.TransactionDTO;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.nio.charset.StandardCharsets;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * Reads a transaction from storage.
@@ -20,26 +23,29 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 @Singleton
 public class ReadTransactionFromStorage implements JavaDelegate, JavaBean {
 
-  private final StorageService storageService;
-  private final ProcessMapper processMapper;
+    private final StorageService storageService;
+    private final ProcessMapper processMapper;
 
-  @Inject
-  public ReadTransactionFromStorage(StorageService storageService, ProcessMapper processMapper) {
-    this.storageService = storageService;
-    this.processMapper = processMapper;
-  }
+    @Inject
+    public ReadTransactionFromStorage(StorageService storageService, ProcessMapper processMapper) {
+        this.storageService = storageService;
+        this.processMapper = processMapper;
+    }
 
-  @Override
-  public void execute(DelegateExecution delegateExecution) throws Exception {
-    var storageToken = (String) delegateExecution.getVariableLocal("storageToken");
+    @Override
+    public void execute(DelegateExecution delegateExecution) throws Exception {
+        var storageToken = (String) delegateExecution.getVariableLocal("storageToken");
 
-    var transaction =
-        storageService
-            .read(storageToken)
-            .map(byteArray -> new String(byteArray, StandardCharsets.UTF_8))
-            .map(json -> processMapper.readSafe(json, TransactionDTO.class))
-            .getOrThrow(() -> new RuntimeException("Failed to read transaction from storage"));
+        var transaction =
+                storageService
+                        .read(storageToken)
+                        .map(byteArray -> new String(byteArray, StandardCharsets.UTF_8))
+                        .map(json -> processMapper.readSafe(json, TransactionDTO.class))
+                        .getOrThrow(
+                                () ->
+                                        new RuntimeException(
+                                                "Failed to read transaction from storage"));
 
-    delegateExecution.setVariableLocal("transaction", transaction);
-  }
+        delegateExecution.setVariableLocal("transaction", transaction);
+    }
 }

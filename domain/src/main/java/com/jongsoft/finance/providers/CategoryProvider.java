@@ -7,18 +7,18 @@ import com.jongsoft.lang.control.Optional;
 
 public interface CategoryProvider extends DataProvider<Category>, Exportable<Category> {
 
-  interface FilterCommand {
-    FilterCommand label(String label, boolean exact);
+    interface FilterCommand {
+        FilterCommand label(String label, boolean exact);
 
-    FilterCommand page(int page, int pageSize);
-  }
+        FilterCommand page(int page, int pageSize);
+    }
 
-  Optional<Category> lookup(String label);
+    Optional<Category> lookup(String label);
 
-  ResultPage<Category> lookup(FilterCommand filterCommand);
+    ResultPage<Category> lookup(FilterCommand filterCommand);
 
-  @Override
-  default boolean supports(Class<?> supportingClass) {
-    return Category.class.equals(supportingClass);
-  }
+    @Override
+    default boolean supports(Class<?> supportingClass) {
+        return Category.class.equals(supportingClass);
+    }
 }

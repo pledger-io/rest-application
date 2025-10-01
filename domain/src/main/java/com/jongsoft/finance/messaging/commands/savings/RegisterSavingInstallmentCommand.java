@@ -1,6 +1,7 @@
 package com.jongsoft.finance.messaging.commands.savings;
 
 import com.jongsoft.finance.messaging.ApplicationEvent;
+
 import java.math.BigDecimal;
 
 /**
@@ -8,9 +9,9 @@ import java.math.BigDecimal;
  * would increase the allocated amount of money for the saving goal.
  */
 public record RegisterSavingInstallmentCommand(long id, BigDecimal amount)
-    implements ApplicationEvent {
+        implements ApplicationEvent {
 
-  public static void savingInstallmentRegistered(long id, BigDecimal amount) {
-    new RegisterSavingInstallmentCommand(id, amount).publish();
-  }
+    public static void savingInstallmentRegistered(long id, BigDecimal amount) {
+        new RegisterSavingInstallmentCommand(id, amount).publish();
+    }
 }

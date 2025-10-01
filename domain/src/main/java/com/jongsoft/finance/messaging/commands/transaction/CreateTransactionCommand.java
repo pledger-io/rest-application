@@ -5,7 +5,7 @@ import com.jongsoft.finance.messaging.ApplicationEvent;
 
 public record CreateTransactionCommand(Transaction transaction) implements ApplicationEvent {
 
-  public static void transactionCreated(Transaction transaction) {
-    new CreateTransactionCommand(transaction).publish();
-  }
+    public static void transactionCreated(Transaction transaction) {
+        new CreateTransactionCommand(transaction).publish();
+    }
 }
