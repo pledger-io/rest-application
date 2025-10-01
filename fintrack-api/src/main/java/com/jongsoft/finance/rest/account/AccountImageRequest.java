@@ -5,4 +5,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Serdeable.Deserializable
 record AccountImageRequest(
-    @Schema(description = "The file code that was returned after the upload") String fileCode) {}
+        @Schema(description = "The file code that was returned after the upload")
+                String fileCode) {}

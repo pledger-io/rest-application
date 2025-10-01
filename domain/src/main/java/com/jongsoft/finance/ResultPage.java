@@ -2,55 +2,57 @@ package com.jongsoft.finance;
 
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Sequence;
+
 import java.util.function.Function;
 
 public interface ResultPage<T> {
 
-  default int pageSize() {
-    return 20;
-  }
+    default int pageSize() {
+        return 20;
+    }
 
-  default int pages() {
-    return 0;
-  }
+    default int pages() {
+        return 0;
+    }
 
-  default long total() {
-    return content().size();
-  }
+    default long total() {
+        return content().size();
+    }
 
-  default Sequence<T> content() {
-    return Collections.List();
-  }
+    default Sequence<T> content() {
+        return Collections.List();
+    }
 
-  default boolean hasPages() {
-    return pages() > 0;
-  }
+    default boolean hasPages() {
+        return pages() > 0;
+    }
 
-  default boolean hasNext() {
-    return false;
-  }
+    default boolean hasNext() {
+        return false;
+    }
 
-  <R> ResultPage<R> map(Function<T, R> mapper);
+    <R> ResultPage<R> map(Function<T, R> mapper);
 
-  @SuppressWarnings("unchecked")
-  static <T> ResultPage<T> empty() {
-    return ResultPage.of();
-  }
+    @SuppressWarnings("unchecked")
+    static <T> ResultPage<T> empty() {
+        return ResultPage.of();
+    }
 
-  @SafeVarargs
-  static <T> ResultPage<T> of(T... elements) {
-    return new ResultPage<T>() {
-      @Override
-      public Sequence<T> content() {
-        return Collections.List(elements);
-      }
+    @SafeVarargs
+    static <T> ResultPage<T> of(T... elements) {
+        return new ResultPage<T>() {
+            @Override
+            public Sequence<T> content() {
+                return Collections.List(elements);
+            }
 
-      @Override
-      @SuppressWarnings("unchecked")
-      public <R> ResultPage<R> map(Function<T, R> mapper) {
-        return (ResultPage<R>)
-            ResultPage.of(Collections.List(elements).map(mapper).iterator().toNativeArray());
-      }
-    };
-  }
+            @Override
+            @SuppressWarnings("unchecked")
+            public <R> ResultPage<R> map(Function<T, R> mapper) {
+                return (ResultPage<R>)
+                        ResultPage.of(
+                                Collections.List(elements).map(mapper).iterator().toNativeArray());
+            }
+        };
+    }
 }

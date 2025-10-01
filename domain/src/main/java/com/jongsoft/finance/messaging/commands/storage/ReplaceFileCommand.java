@@ -4,7 +4,7 @@ import com.jongsoft.finance.messaging.ApplicationEvent;
 
 public interface ReplaceFileCommand extends ApplicationEvent {
 
-  String fileCode();
+    String fileCode();
 
-  String oldFileCode();
+    String oldFileCode();
 }

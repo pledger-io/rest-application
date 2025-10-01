@@ -5,9 +5,12 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.savings.CompleteSavingGoalCommand;
+
 import io.micronaut.transaction.annotation.Transactional;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -16,22 +19,22 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class CompleteSavingGoalHandler implements CommandHandler<CompleteSavingGoalCommand> {
 
-  private final ReactiveEntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
-  @Inject
-  public CompleteSavingGoalHandler(ReactiveEntityManager entityManager) {
-    this.entityManager = entityManager;
-  }
+    @Inject
+    public CompleteSavingGoalHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
-  @Override
-  @BusinessEventListener
-  public void handle(CompleteSavingGoalCommand command) {
-    log.info("[{}] - Marking saving goal for completed.", command.id());
+    @Override
+    @BusinessEventListener
+    public void handle(CompleteSavingGoalCommand command) {
+        log.info("[{}] - Marking saving goal for completed.", command.id());
 
-    entityManager
-        .update(SavingGoalJpa.class)
-        .set("archived", true)
-        .fieldEq("id", command.id())
-        .execute();
-  }
+        entityManager
+                .update(SavingGoalJpa.class)
+                .set("archived", true)
+                .fieldEq("id", command.id())
+                .execute();
+    }
 }

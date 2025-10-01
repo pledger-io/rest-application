@@ -8,8 +8,10 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.contract.TerminateContractCommand;
 import com.jongsoft.finance.providers.TransactionScheduleProvider;
 import com.jongsoft.lang.Collections;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,20 +25,23 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class ScheduleTerminateContractHandler implements CommandHandler<TerminateContractCommand> {
 
-  private final TransactionScheduleProvider transactionScheduleProvider;
-  private final FilterFactory filterFactory;
+    private final TransactionScheduleProvider transactionScheduleProvider;
+    private final FilterFactory filterFactory;
 
-  @Override
-  @BusinessEventListener
-  public void handle(TerminateContractCommand command) {
-    log.info("[{}] - Terminating any transaction schedule for contract.", command.id());
+    @Override
+    @BusinessEventListener
+    public void handle(TerminateContractCommand command) {
+        log.info("[{}] - Terminating any transaction schedule for contract.", command.id());
 
-    var filter =
-        filterFactory
-            .schedule()
-            .contract(Collections.List(new EntityRef(command.id())))
-            .activeOnly();
+        var filter =
+                filterFactory
+                        .schedule()
+                        .contract(Collections.List(new EntityRef(command.id())))
+                        .activeOnly();
 
-    transactionScheduleProvider.lookup(filter).content().forEach(ScheduledTransaction::terminate);
-  }
+        transactionScheduleProvider
+                .lookup(filter)
+                .content()
+                .forEach(ScheduledTransaction::terminate);
+    }
 }

@@ -4,7 +4,7 @@ import com.jongsoft.finance.messaging.ApplicationEvent;
 
 public record CompleteImportJobCommand(long id) implements ApplicationEvent {
 
-  public static void importJobCompleted(long id) {
-    new CompleteImportJobCommand(id).publish();
-  }
+    public static void importJobCompleted(long id) {
+        new CompleteImportJobCommand(id).publish();
+    }
 }

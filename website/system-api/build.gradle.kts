@@ -46,6 +46,7 @@ dependencies {
     testRuntimeOnly(mn.logback.classic)
     testRuntimeOnly(project(":bpmn-process"))
     testRuntimeOnly(project(":jpa-repository"))
+
     testImplementation(mn.micronaut.test.rest.assured)
     testImplementation(mn.micronaut.test.junit5)
     testImplementation(libs.bundles.junit)

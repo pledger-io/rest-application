@@ -11,49 +11,50 @@ import com.jongsoft.finance.jpa.schedule.ScheduleFilterCommand;
 import com.jongsoft.finance.jpa.tag.TagFilterCommand;
 import com.jongsoft.finance.jpa.transaction.TransactionFilterCommand;
 import com.jongsoft.finance.providers.*;
+
 import jakarta.inject.Singleton;
 
 @Singleton
 @RequiresJpa
 public class FilterFactoryJpa implements FilterFactory {
 
-  @Override
-  public AccountFilterCommand account() {
-    return new AccountFilterCommand();
-  }
+    @Override
+    public AccountFilterCommand account() {
+        return new AccountFilterCommand();
+    }
 
-  @Override
-  public TagProvider.FilterCommand tag() {
-    return new TagFilterCommand();
-  }
+    @Override
+    public TagProvider.FilterCommand tag() {
+        return new TagFilterCommand();
+    }
 
-  @Override
-  public TransactionProvider.FilterCommand transaction() {
-    return new TransactionFilterCommand();
-  }
+    @Override
+    public TransactionProvider.FilterCommand transaction() {
+        return new TransactionFilterCommand();
+    }
 
-  @Override
-  public ExpenseProvider.FilterCommand expense() {
-    return new ExpenseFilterCommand();
-  }
+    @Override
+    public ExpenseProvider.FilterCommand expense() {
+        return new ExpenseFilterCommand();
+    }
 
-  @Override
-  public CategoryProvider.FilterCommand category() {
-    return new CategoryFilterCommand();
-  }
+    @Override
+    public CategoryProvider.FilterCommand category() {
+        return new CategoryFilterCommand();
+    }
 
-  @Override
-  public TransactionScheduleProvider.FilterCommand schedule() {
-    return new ScheduleFilterCommand();
-  }
+    @Override
+    public TransactionScheduleProvider.FilterCommand schedule() {
+        return new ScheduleFilterCommand();
+    }
 
-  @Override
-  public SpendingInsightProvider.FilterCommand insight() {
-    return new SpendingInsightFilterCommand();
-  }
+    @Override
+    public SpendingInsightProvider.FilterCommand insight() {
+        return new SpendingInsightFilterCommand();
+    }
 
-  @Override
-  public SpendingPatternProvider.FilterCommand pattern() {
-    return new SpendingPatternFilterCommand();
-  }
+    @Override
+    public SpendingPatternProvider.FilterCommand pattern() {
+        return new SpendingPatternFilterCommand();
+    }
 }

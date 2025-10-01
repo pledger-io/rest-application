@@ -5,9 +5,12 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.schedule.DescribeScheduleCommand;
+
 import io.micronaut.transaction.annotation.Transactional;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -16,23 +19,23 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class DescribeScheduleHandler implements CommandHandler<DescribeScheduleCommand> {
 
-  private final ReactiveEntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
-  @Inject
-  public DescribeScheduleHandler(ReactiveEntityManager entityManager) {
-    this.entityManager = entityManager;
-  }
+    @Inject
+    public DescribeScheduleHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
-  @Override
-  @BusinessEventListener
-  public void handle(DescribeScheduleCommand command) {
-    log.info("[{}] - Processing schedule describe event", command.id());
+    @Override
+    @BusinessEventListener
+    public void handle(DescribeScheduleCommand command) {
+        log.info("[{}] - Processing schedule describe event", command.id());
 
-    entityManager
-        .update(ScheduledTransactionJpa.class)
-        .set("description", command.description())
-        .set("name", command.name())
-        .fieldEq("id", command.id())
-        .execute();
-  }
+        entityManager
+                .update(ScheduledTransactionJpa.class)
+                .set("description", command.description())
+                .set("name", command.name())
+                .fieldEq("id", command.id())
+                .execute();
+    }
 }
