@@ -3,8 +3,8 @@ rootProject.name="Pledger"
 pluginManagement {
     plugins {
         id("java")
-        id("io.micronaut.library").version("4.5.4")
-        id("io.micronaut.application").version("4.5.4")
+        id("io.micronaut.library").version("4.5.5")
+        id("io.micronaut.application").version("4.5.5")
         id("io.freefair.lombok").version("8.14.2")
         id("org.sonarqube").version("6.3.1.5724")
         id("org.openapi.generator").version("7.15.0")
@@ -35,7 +35,7 @@ dependencyResolutionManagement {
             // testing dependencies
             version("junit.version", "5.13.4")
             library("junit.jupiter", "org.junit.jupiter", "junit-jupiter-api").versionRef("junit.version")
-            library("assertj","org.assertj", "assertj-core").version("3.27.5")
+            library("assertj","org.assertj", "assertj-core").version("3.27.6")
             library("mockito","org.mockito", "mockito-core").version("5.20.0")
             bundle("junit", listOf("junit.jupiter", "assertj", "mockito"))
         }
