@@ -1,7 +1,11 @@
 package com.jongsoft.finance.rest.api;
 
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.account.SavingGoal;
 import com.jongsoft.finance.rest.model.*;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 interface AccountMapper {
 
@@ -28,6 +32,30 @@ interface AccountMapper {
         accountNumbers.setIban(account.getIban());
         accountNumbers.setNumber(account.getNumber());
         accountNumbers.setCurrency(account.getCurrency());
+
+        return response;
+    }
+
+    static SavingGoalResponse toSavingGoalResponse(SavingGoal savingGoal) {
+        var response =
+                new SavingGoalResponse(
+                        savingGoal.getId(),
+                        savingGoal.getGoal(),
+                        savingGoal.getAllocated(),
+                        savingGoal.getTargetDate());
+
+        response.setName(savingGoal.getName());
+        response.setDescription(savingGoal.getDescription());
+        if (savingGoal.getSchedule() != null) {
+            response.setSchedule(
+                    new ScheduleResponse(
+                            Periodicity.fromValue(savingGoal.getSchedule().periodicity().name()),
+                            savingGoal.getSchedule().interval()));
+            response.setInstallments(savingGoal.computeAllocation());
+        }
+        response.setMonthsLeft(
+                Math.max(
+                        ChronoUnit.MONTHS.between(LocalDate.now(), savingGoal.getTargetDate()), 0));
 
         return response;
     }

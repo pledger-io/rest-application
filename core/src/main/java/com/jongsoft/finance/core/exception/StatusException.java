@@ -19,6 +19,10 @@ public class StatusException extends RuntimeException {
         return localizationMessage;
     }
 
+    public static StatusException gone(String message) {
+        return new StatusException(410, message, null);
+    }
+
     public static StatusException notFound(String message) {
         return new StatusException(404, message, null);
     }

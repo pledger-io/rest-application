@@ -169,6 +169,10 @@ paths:
       tags: [ account-command ]
       description: >
         Update account details by id for the current user
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/account-request' }
       responses:
         "200":
           description: The created account

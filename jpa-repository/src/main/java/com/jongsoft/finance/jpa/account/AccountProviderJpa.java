@@ -191,6 +191,7 @@ public class AccountProviderJpa implements AccountProvider {
                 .interestPeriodicity(source.getInterestPeriodicity())
                 .savingGoals(Collections.Set(this.convertSavingGoals(source.getSavingGoals())))
                 .user(new UserIdentifier(source.getUser().getUsername()))
+                .remove(source.isArchived())
                 .build();
     }
 
