@@ -128,4 +128,60 @@ public class PledgerRequests {
           .then()
               .log().ifValidationFails();
     }
+
+    public ValidatableResponse createCategory(String name, String description) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .body(Map.of("name", name, "description", description))
+          .when()
+              .post("/api/categories")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse fetchCategory(long id) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .pathParam("id", id)
+          .when()
+              .get("/api/categories/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse updateCategory(long id, String name, String description) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .pathParam("id", id)
+              .body(Map.of("name", name, "description", description))
+          .when()
+              .put("/api/categories/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse deleteCategory(long id) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .pathParam("id", id)
+          .when()
+              .delete("/api/categories/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse searchCategories(int offset, int limit, String name) {
+        var request = given(requestSpecification)
+              .queryParam("offset", offset)
+              .queryParam("numberOfResults", limit);
+        if (name != null) {
+            request.queryParam("name", name);
+        }
+
+        return request.when()
+              .get("/api/categories")
+          .then()
+              .log().ifValidationFails();
+    }
+
 }
