@@ -50,7 +50,9 @@ public class ProcessCategoryLookupDelegate implements JavaDelegate, JavaBean {
 
             category = categoryProvider.lookup(label).get();
         } else {
-            category = categoryProvider.lookup((Long) execution.getVariableLocal("id")).get();
+            category = categoryProvider
+                    .lookup((Long) execution.getVariableLocal("id"))
+                    .get();
         }
 
         execution.setVariable("category", category);

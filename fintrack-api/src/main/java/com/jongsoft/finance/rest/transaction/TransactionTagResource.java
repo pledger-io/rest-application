@@ -81,11 +81,10 @@ public class TransactionTagResource {
             description = "Look for tags with the partial token in the name",
             operationId = "lookupTags")
     List<TagResponse> autoCompleteTag(@Nullable String token) {
-        var filter =
-                filterFactory
-                        .tag()
-                        .name(token, false)
-                        .page(0, settingProvider.getAutocompleteLimit());
+        var filter = filterFactory
+                .tag()
+                .name(token, false)
+                .page(0, settingProvider.getAutocompleteLimit());
 
         return tagProvider.lookup(filter).content().map(TagResponse::new).toJava();
     }

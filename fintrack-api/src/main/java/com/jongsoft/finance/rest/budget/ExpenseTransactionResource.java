@@ -72,16 +72,13 @@ public class ExpenseTransactionResource {
             @PathVariable int year,
             @PathVariable int month,
             @Nullable Integer page) {
-        var filter =
-                filterFactory
-                        .transaction()
-                        .range(DateUtils.forMonth(year, month))
-                        .onlyIncome(false)
-                        .ownAccounts()
-                        .expenses(Collections.List(new EntityRef(expenseId)))
-                        .page(
-                                Control.Option(page).getOrSupply(() -> 1),
-                                settingProvider.getPageSize());
+        var filter = filterFactory
+                .transaction()
+                .range(DateUtils.forMonth(year, month))
+                .onlyIncome(false)
+                .ownAccounts()
+                .expenses(Collections.List(new EntityRef(expenseId)))
+                .page(Control.Option(page).getOrSupply(() -> 1), settingProvider.getPageSize());
 
         return new ResultPageResponse<>(
                 transactionService.lookup(filter).map(TransactionResponse::new));

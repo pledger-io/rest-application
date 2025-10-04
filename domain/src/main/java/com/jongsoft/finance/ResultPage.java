@@ -49,9 +49,8 @@ public interface ResultPage<T> {
             @Override
             @SuppressWarnings("unchecked")
             public <R> ResultPage<R> map(Function<T, R> mapper) {
-                return (ResultPage<R>)
-                        ResultPage.of(
-                                Collections.List(elements).map(mapper).iterator().toNativeArray());
+                return (ResultPage<R>) ResultPage.of(
+                        Collections.List(elements).map(mapper).iterator().toNativeArray());
             }
         };
     }

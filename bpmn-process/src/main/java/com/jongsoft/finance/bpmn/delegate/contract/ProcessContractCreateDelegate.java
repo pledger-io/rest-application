@@ -42,10 +42,9 @@ public class ProcessContractCreateDelegate implements JavaDelegate, JavaBean {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        var contractJson =
-                mapper.readSafe(
-                        execution.<StringValue>getVariableLocalTyped("contract").getValue(),
-                        ContractJson.class);
+        var contractJson = mapper.readSafe(
+                execution.<StringValue>getVariableLocalTyped("contract").getValue(),
+                ContractJson.class);
 
         log.debug(
                 "{}: Processing contract creation from json '{}'",
@@ -65,28 +64,23 @@ public class ProcessContractCreateDelegate implements JavaDelegate, JavaBean {
     }
 
     private Function<Account, Contract> createContractForAccount(ContractJson contractJson) {
-        return account ->
-                account.createContract(
-                        contractJson.getName(),
-                        contractJson.getDescription(),
-                        contractJson.getStart(),
-                        contractJson.getEnd());
+        return account -> account.createContract(
+                contractJson.getName(),
+                contractJson.getDescription(),
+                contractJson.getStart(),
+                contractJson.getEnd());
     }
 
     private void adjustContract(ContractJson contractJson) {
-        contractProvider
-                .lookup(contractJson.getName())
-                .ifPresent(
-                        contract -> {
-                            if (contractJson.getContract() != null) {
-                                contract.registerUpload(
-                                        storageService.store(
-                                                Hex.decode(contractJson.getContract())));
-                            }
+        contractProvider.lookup(contractJson.getName()).ifPresent(contract -> {
+            if (contractJson.getContract() != null) {
+                contract.registerUpload(
+                        storageService.store(Hex.decode(contractJson.getContract())));
+            }
 
-                            if (contractJson.isTerminated()) {
-                                contract.terminate();
-                            }
-                        });
+            if (contractJson.isTerminated()) {
+                contract.terminate();
+            }
+        });
     }
 }

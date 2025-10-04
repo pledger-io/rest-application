@@ -52,7 +52,8 @@ public class ReconcileAccountDelegate implements JavaDelegate, JavaBean {
         var accountId = ((Number) execution.getVariableLocal("accountId")).longValue();
         var amount =
                 execution.<ObjectValue>getVariableLocalTyped("amount").getValue(BigDecimal.class);
-        var isoBookDate = execution.<StringValue>getVariableLocalTyped("bookDate").getValue();
+        var isoBookDate =
+                execution.<StringValue>getVariableLocalTyped("bookDate").getValue();
 
         var transactionDate = LocalDate.parse(isoBookDate).minusDays(1);
         log.debug(
@@ -63,25 +64,18 @@ public class ReconcileAccountDelegate implements JavaDelegate, JavaBean {
                 amount);
 
         Account toReconcile = accountProvider.lookup(accountId).get();
-        Account reconcileAccount =
-                accountProvider
-                        .lookup(SystemAccountTypes.RECONCILE)
-                        .getOrThrow(
-                                () -> StatusException.badRequest("Reconcile account not found"));
+        Account reconcileAccount = accountProvider
+                .lookup(SystemAccountTypes.RECONCILE)
+                .getOrThrow(() -> StatusException.badRequest("Reconcile account not found"));
 
-        Transaction.Type type =
-                amount.compareTo(BigDecimal.ZERO) >= 0
-                        ? Transaction.Type.CREDIT
-                        : Transaction.Type.DEBIT;
-        Transaction transaction =
-                toReconcile.createTransaction(
-                        reconcileAccount,
-                        amount.abs().doubleValue(),
-                        type,
-                        t ->
-                                t.description("Reconcile transaction")
-                                        .currency(toReconcile.getCurrency())
-                                        .date(transactionDate));
+        Transaction.Type type = amount.compareTo(BigDecimal.ZERO) >= 0
+                ? Transaction.Type.CREDIT
+                : Transaction.Type.DEBIT;
+        Transaction transaction = toReconcile.createTransaction(
+                reconcileAccount, amount.abs().doubleValue(), type, t -> t.description(
+                                "Reconcile transaction")
+                        .currency(toReconcile.getCurrency())
+                        .date(transactionDate));
 
         creationHandler.handleCreatedEvent(new CreateTransactionCommand(transaction));
     }

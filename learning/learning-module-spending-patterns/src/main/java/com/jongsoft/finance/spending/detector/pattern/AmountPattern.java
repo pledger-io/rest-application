@@ -14,39 +14,28 @@ public class AmountPattern implements Pattern {
     @Override
     public Optional<SpendingPattern> detect(
             Transaction transaction, List<EmbeddingMatch<TextSegment>> matches) {
-        var amountPerDate =
-                matches.stream()
-                        .map(
-                                match ->
-                                        new AbstractMap.SimpleEntry<>(
-                                                LocalDate.parse(
-                                                        Objects.requireNonNull(
-                                                                match.embedded()
-                                                                        .metadata()
-                                                                        .getString("date"))),
-                                                match.embedded().metadata().getDouble("amount")))
-                        .sorted(Map.Entry.comparingByKey())
-                        .toList();
+        var amountPerDate = matches.stream()
+                .map(match -> new AbstractMap.SimpleEntry<>(
+                        LocalDate.parse(Objects.requireNonNull(
+                                match.embedded().metadata().getString("date"))),
+                        match.embedded().metadata().getDouble("amount")))
+                .sorted(Map.Entry.comparingByKey())
+                .toList();
 
         var amountPatternType = detectPatternType(amountPerDate);
         if (amountPatternType != null) {
             var averageAmount = calculateAverage(amountPerDate);
-            return Optional.of(
-                    SpendingPattern.builder()
-                            .type(amountPatternType)
-                            .category(transaction.getCategory())
-                            .detectedDate(transaction.getDate().withDayOfMonth(1))
-                            .confidence(0.85)
-                            .metadata(
-                                    Map.of(
-                                            "typical_amount", averageAmount,
-                                            "current_amount",
-                                                    transaction.computeAmount(
-                                                            transaction.computeFrom()),
-                                            "deviation_percent",
-                                                    calculateDeviationPercent(
-                                                            transaction, averageAmount)))
-                            .build());
+            return Optional.of(SpendingPattern.builder()
+                    .type(amountPatternType)
+                    .category(transaction.getCategory())
+                    .detectedDate(transaction.getDate().withDayOfMonth(1))
+                    .confidence(0.85)
+                    .metadata(Map.of(
+                            "typical_amount", averageAmount,
+                            "current_amount", transaction.computeAmount(transaction.computeFrom()),
+                            "deviation_percent",
+                                    calculateDeviationPercent(transaction, averageAmount)))
+                    .build());
         }
 
         return Optional.empty();
@@ -55,17 +44,15 @@ public class AmountPattern implements Pattern {
     private PatternType detectPatternType(
             List<AbstractMap.SimpleEntry<LocalDate, Double>> amountPerDate) {
         var midPoint = amountPerDate.size() / 2;
-        double firstHalfAvg =
-                amountPerDate.subList(0, midPoint).stream()
-                        .mapToDouble(Map.Entry::getValue)
-                        .average()
-                        .orElse(0);
+        double firstHalfAvg = amountPerDate.subList(0, midPoint).stream()
+                .mapToDouble(Map.Entry::getValue)
+                .average()
+                .orElse(0);
 
-        double secondHalfAvg =
-                amountPerDate.subList(midPoint, amountPerDate.size()).stream()
-                        .mapToDouble(Map.Entry::getValue)
-                        .average()
-                        .orElse(0);
+        double secondHalfAvg = amountPerDate.subList(midPoint, amountPerDate.size()).stream()
+                .mapToDouble(Map.Entry::getValue)
+                .average()
+                .orElse(0);
 
         double percentChange = (secondHalfAvg - firstHalfAvg) / firstHalfAvg;
 
@@ -79,7 +66,10 @@ public class AmountPattern implements Pattern {
     }
 
     private double calculateAverage(List<AbstractMap.SimpleEntry<LocalDate, Double>> values) {
-        return values.stream().mapToDouble(AbstractMap.SimpleEntry::getValue).average().orElse(0);
+        return values.stream()
+                .mapToDouble(AbstractMap.SimpleEntry::getValue)
+                .average()
+                .orElse(0);
     }
 
     private double calculateDeviationPercent(Transaction transaction, double average) {

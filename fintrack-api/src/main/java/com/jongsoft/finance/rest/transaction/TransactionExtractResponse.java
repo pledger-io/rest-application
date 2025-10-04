@@ -23,8 +23,10 @@ public record TransactionExtractResponse(
         return new TransactionExtractResponse(
                 transactionResult.type(),
                 transactionResult.date(),
-                new AccountRef(transactionResult.from().id(), transactionResult.from().name()),
-                new AccountRef(transactionResult.to().id(), transactionResult.to().name()),
+                new AccountRef(
+                        transactionResult.from().id(), transactionResult.from().name()),
+                new AccountRef(
+                        transactionResult.to().id(), transactionResult.to().name()),
                 transactionResult.description(),
                 transactionResult.amount());
     }

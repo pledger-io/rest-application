@@ -16,7 +16,8 @@ public class AccountSynonymJpa extends EntityJpa {
 
     private String synonym;
 
-    @ManyToOne private AccountJpa account;
+    @ManyToOne
+    private AccountJpa account;
 
     @Builder
     public AccountSynonymJpa(String synonym, AccountJpa account) {

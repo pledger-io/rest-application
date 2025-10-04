@@ -68,12 +68,11 @@ public class Account implements AggregateBase, Serializable {
 
     @BusinessMethod
     public void rename(String name, String description, String currency, String type) {
-        var noChanges =
-                Control.Equal(this.name, name)
-                        .append(this.description, description)
-                        .append(this.currency, currency)
-                        .append(this.type, type)
-                        .isEqual();
+        var noChanges = Control.Equal(this.name, name)
+                .append(this.description, description)
+                .append(this.currency, currency)
+                .append(this.type, type)
+                .isEqual();
 
         if (!noChanges) {
             this.name = name;
@@ -103,10 +102,9 @@ public class Account implements AggregateBase, Serializable {
             throw new IllegalArgumentException("Highly improbable interest of more than 200%.");
         }
 
-        var changes =
-                Control.Equal(this.interest, interest)
-                        .append(this.interestPeriodicity, periodicity)
-                        .isNotEqual();
+        var changes = Control.Equal(this.interest, interest)
+                .append(this.interestPeriodicity, periodicity)
+                .isNotEqual();
 
         if (changes) {
             this.interest = interest;
@@ -129,11 +127,10 @@ public class Account implements AggregateBase, Serializable {
      */
     @BusinessMethod
     public void changeAccount(String iban, String bic, String number) {
-        var noChanges =
-                Control.Equal(this.iban, iban)
-                        .append(this.bic, bic)
-                        .append(this.number, number)
-                        .isEqual();
+        var noChanges = Control.Equal(this.iban, iban)
+                .append(this.bic, bic)
+                .append(this.number, number)
+                .isEqual();
 
         if (!noChanges) {
             this.iban = iban;
@@ -213,11 +210,8 @@ public class Account implements AggregateBase, Serializable {
     @BusinessMethod
     public SavingGoal createSavingGoal(String name, BigDecimal goal, LocalDate targetDate) {
         if (!Collections.List("savings", "joined_savings").contains(type.toLowerCase())) {
-            throw StatusException.badRequest(
-                    "Cannot add a savings goal to account "
-                            + id
-                            + " it is of unsupported type "
-                            + type);
+            throw StatusException.badRequest("Cannot add a savings goal to account " + id
+                    + " it is of unsupported type " + type);
         }
 
         return new SavingGoal(this, name, goal, targetDate);

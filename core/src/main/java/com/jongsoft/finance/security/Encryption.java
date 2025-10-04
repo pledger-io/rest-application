@@ -32,12 +32,8 @@ public class Encryption {
     public synchronized byte[] encrypt(byte[] data, String password) {
         try {
             // Create an instance of PBKDF2 and derive a key.
-            var pwSpec =
-                    new PBEKeySpec(
-                            password.toCharArray(),
-                            securitySalt,
-                            PBKDF2_ITERATIONS,
-                            ALGORITHM_KEY_SIZE);
+            var pwSpec = new PBEKeySpec(
+                    password.toCharArray(), securitySalt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
             var keyFactory = SecretKeyFactory.getInstance(PBKDF2_NAME);
             var key = keyFactory.generateSecret(pwSpec).getEncoded();
 
@@ -78,9 +74,8 @@ public class Encryption {
                     cipherTextAndNonce.length);
 
             // Create an instance of PBKDF2 and derive the key.
-            var pwSpec =
-                    new PBEKeySpec(
-                            password.toCharArray(), salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
+            var pwSpec = new PBEKeySpec(
+                    password.toCharArray(), salt, PBKDF2_ITERATIONS, ALGORITHM_KEY_SIZE);
             var keyFactory = SecretKeyFactory.getInstance(PBKDF2_NAME);
             byte[] key = keyFactory.generateSecret(pwSpec).getEncoded();
 

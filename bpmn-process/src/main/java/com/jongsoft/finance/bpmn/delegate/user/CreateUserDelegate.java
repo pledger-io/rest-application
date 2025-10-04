@@ -27,21 +27,20 @@ public class CreateUserDelegate implements JavaDelegate, JavaBean {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        var toCreateUsername =
-                execution
-                        .<ObjectValue>getVariableLocalTyped("username")
-                        .getValue(UserIdentifier.class);
-        var toCreatePassword = execution.<StringValue>getVariableLocalTyped("password").getValue();
+        var toCreateUsername = execution
+                .<ObjectValue>getVariableLocalTyped("username")
+                .getValue(UserIdentifier.class);
+        var toCreatePassword =
+                execution.<StringValue>getVariableLocalTyped("password").getValue();
 
         application.createUser(toCreateUsername.email(), toCreatePassword);
 
-        var reconcileAccount =
-                AccountJson.builder()
-                        .currency("EUR")
-                        .description("Reconcile Account")
-                        .name("Reconcile Account")
-                        .type(SystemAccountTypes.RECONCILE.label())
-                        .build();
+        var reconcileAccount = AccountJson.builder()
+                .currency("EUR")
+                .description("Reconcile Account")
+                .name("Reconcile Account")
+                .type(SystemAccountTypes.RECONCILE.label())
+                .build();
 
         execution.setVariableLocal("account", mapper.writeSafe(reconcileAccount));
     }

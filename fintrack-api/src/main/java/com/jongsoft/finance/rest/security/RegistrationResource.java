@@ -76,6 +76,7 @@ public class RegistrationResource {
             description =
                     "Use this operation to obtain the public signing key used to sign the JWT.")
     public String publicKey() {
-        return Base64.encodeBase64String(rsaSignatureConfiguration.getPublicKey().getEncoded());
+        return Base64.encodeBase64String(
+                rsaSignatureConfiguration.getPublicKey().getEncoded());
     }
 }

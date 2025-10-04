@@ -94,16 +94,14 @@ public class ProfileResource {
     @Operation(
             operationId = "createToken",
             summary = "Create session token",
-            description =
-                    "Create a new session token that has a longer validity then default"
-                            + " authentication tokens.")
+            description = "Create a new session token that has a longer validity then default"
+                    + " authentication tokens.")
     List<SessionResponse> createSession(@Body @Valid TokenCreateRequest request) {
         application.registerToken(
                 currentUserProvider.currentUser().getUsername().email(),
                 UUID.randomUUID().toString(),
-                (int)
-                        ChronoUnit.SECONDS.between(
-                                LocalDateTime.now(), request.expires().atTime(LocalTime.MIN)));
+                (int) ChronoUnit.SECONDS.between(
+                        LocalDateTime.now(), request.expires().atTime(LocalTime.MIN)));
 
         return sessions();
     }
@@ -122,9 +120,8 @@ public class ProfileResource {
     @Operation(
             operationId = "getQrCode",
             summary = "QR Code",
-            description =
-                    "Use this API to obtain a QR code that can be used to scan in a 2-factor"
-                            + " application")
+            description = "Use this API to obtain a QR code that can be used to scan in a 2-factor"
+                    + " application")
     byte[] qrCode() {
         var qrCode = TwoFactorHelper.build2FactorQr(currentUserProvider.currentUser());
         try {

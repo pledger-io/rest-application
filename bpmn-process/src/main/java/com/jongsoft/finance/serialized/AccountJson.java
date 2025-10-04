@@ -25,13 +25,15 @@ import java.util.function.Supplier;
 public class AccountJson implements Serializable {
 
     /** The name of the account. */
-    @NonNull private String name;
+    @NonNull
+    private String name;
 
     /** The description of the account. */
     private String description;
 
     /** The currency of the account, in a 3-letter ISO currency code. */
-    @NonNull private String currency;
+    @NonNull
+    private String currency;
 
     /** The icon of the account, in a base64 encoded string. */
     private String icon;
@@ -44,20 +46,20 @@ public class AccountJson implements Serializable {
     private String number;
 
     /** The type of the account. */
-    @NonNull private String type;
+    @NonNull
+    private String type;
 
     public static AccountJson fromDomain(Account account, Supplier<byte[]> iconSupplier) {
-        var builder =
-                AccountJson.builder()
-                        .bic(account.getBic())
-                        .currency(account.getCurrency())
-                        .description(account.getDescription())
-                        .iban(account.getIban())
-                        .number(account.getNumber())
-                        .type(account.getType())
-                        .name(account.getName())
-                        .periodicity(account.getInterestPeriodicity())
-                        .interest(account.getInterest());
+        var builder = AccountJson.builder()
+                .bic(account.getBic())
+                .currency(account.getCurrency())
+                .description(account.getDescription())
+                .iban(account.getIban())
+                .number(account.getNumber())
+                .type(account.getType())
+                .name(account.getName())
+                .periodicity(account.getInterestPeriodicity())
+                .interest(account.getInterest());
 
         if (account.getImageFileToken() != null) {
             builder.icon(Hex.toHexString(iconSupplier.get()));

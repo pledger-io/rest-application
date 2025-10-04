@@ -17,11 +17,10 @@ public class PasswordEncoder implements Encoder {
     private final BCrypt.Hasher hashApplier;
 
     public PasswordEncoder() {
-        this.hashApplier =
-                BCrypt.with(
-                        BCrypt.Version.VERSION_2A,
-                        new SecureRandom(),
-                        LongPasswordStrategies.hashSha512(BCrypt.Version.VERSION_2A));
+        this.hashApplier = BCrypt.with(
+                BCrypt.Version.VERSION_2A,
+                new SecureRandom(),
+                LongPasswordStrategies.hashSha512(BCrypt.Version.VERSION_2A));
     }
 
     public String encrypt(String password) {

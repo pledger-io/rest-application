@@ -45,6 +45,7 @@ public class StatusExceptionHandler
             error.link(Link.HELP, exception.getLocalizationMessage());
         }
 
-        return HttpResponse.status(HttpStatus.valueOf(exception.getStatusCode())).body(error);
+        return HttpResponse.status(HttpStatus.valueOf(exception.getStatusCode()))
+                .body(error);
     }
 }

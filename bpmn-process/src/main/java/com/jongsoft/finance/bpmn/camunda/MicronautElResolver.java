@@ -54,11 +54,10 @@ public class MicronautElResolver extends ELResolver {
     public void setValue(ELContext context, Object base, Object property, Object value) {
         if (base == null
                 && !applicationContext.containsBean(TYPE, Qualifiers.byName(property.toString()))) {
-            throw new ProcessEngineException(
-                    "Cannot set value of '"
-                            + property
-                            + "', it resolves to a bean defined in the Micronaut"
-                            + " application-context.");
+            throw new ProcessEngineException("Cannot set value of '"
+                    + property
+                    + "', it resolves to a bean defined in the Micronaut"
+                    + " application-context.");
         }
     }
 

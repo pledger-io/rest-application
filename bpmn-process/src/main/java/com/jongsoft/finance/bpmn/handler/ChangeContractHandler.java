@@ -29,22 +29,20 @@ class ChangeContractHandler implements CommandHandler<ChangeContractCommand> {
                 "[{}] - Updating existing BPMN flow for contract expired notification.",
                 command.id());
 
-        var runningProcess =
-                processEngine
-                        .getRuntimeService()
-                        .createProcessInstanceQuery()
-                        .processDefinitionKey(KnownProcesses.CONTRACT_WARN_EXPIRY)
-                        .processInstanceBusinessKey("contract_term_" + command.id())
-                        .singleResult();
+        var runningProcess = processEngine
+                .getRuntimeService()
+                .createProcessInstanceQuery()
+                .processDefinitionKey(KnownProcesses.CONTRACT_WARN_EXPIRY)
+                .processInstanceBusinessKey("contract_term_" + command.id())
+                .singleResult();
 
         if (runningProcess != null) {
-            var timerJob =
-                    processEngine
-                            .getManagementService()
-                            .createJobQuery()
-                            .processDefinitionKey(KnownProcesses.CONTRACT_WARN_EXPIRY)
-                            .processInstanceId(runningProcess.getProcessInstanceId())
-                            .singleResult();
+            var timerJob = processEngine
+                    .getManagementService()
+                    .createJobQuery()
+                    .processDefinitionKey(KnownProcesses.CONTRACT_WARN_EXPIRY)
+                    .processInstanceId(runningProcess.getProcessInstanceId())
+                    .singleResult();
 
             var newDueDate = command.end().minusMonths(1);
             processEngine

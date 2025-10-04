@@ -50,19 +50,17 @@ public class BatchImportResource {
             summary = "List jobs",
             description = "This operation will list all the run importer jobs for the current user")
     ResultPageResponse<ImporterResponse> list(@Valid @Body ImportSearchRequest request) {
-        var result =
-                importProvider.lookup(
-                        new ImportProvider.FilterCommand() {
-                            @Override
-                            public int page() {
-                                return request.getPage();
-                            }
+        var result = importProvider.lookup(new ImportProvider.FilterCommand() {
+            @Override
+            public int page() {
+                return request.getPage();
+            }
 
-                            @Override
-                            public int pageSize() {
-                                return settingProvider.getPageSize();
-                            }
-                        });
+            @Override
+            public int pageSize() {
+                return settingProvider.getPageSize();
+            }
+        });
 
         return new ResultPageResponse<>(result.map(ImporterResponse::new));
     }
@@ -112,15 +110,12 @@ public class BatchImportResource {
     String delete(@PathVariable String batchSlug) {
         return importProvider
                 .lookup(batchSlug)
-                .map(
-                        job -> {
-                            job.archive();
-                            return job.getSlug();
-                        })
-                .getOrThrow(
-                        () ->
-                                StatusException.notFound(
-                                        "Cannot delete import with slug " + batchSlug));
+                .map(job -> {
+                    job.archive();
+                    return job.getSlug();
+                })
+                .getOrThrow(() ->
+                        StatusException.notFound("Cannot delete import with slug " + batchSlug));
     }
 
     @Get("/config")
@@ -144,10 +139,8 @@ public class BatchImportResource {
                     "Configuration with name " + request.name() + " already exists.");
         }
 
-        return new CSVImporterConfigResponse(
-                currentUserProvider
-                        .currentUser()
-                        .createImportConfiguration(
-                                request.type(), request.name(), request.fileCode()));
+        return new CSVImporterConfigResponse(currentUserProvider
+                .currentUser()
+                .createImportConfiguration(request.type(), request.name(), request.fileCode()));
     }
 }

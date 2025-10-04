@@ -22,11 +22,16 @@ public class ImportJpa extends EntityJpa {
     private String slug;
     private boolean archived;
 
-    @Column private String fileCode;
+    @Column
+    private String fileCode;
 
-    @ManyToOne @JoinColumn private ImportConfig config;
+    @ManyToOne
+    @JoinColumn
+    private ImportConfig config;
 
-    @ManyToOne @JoinColumn private UserAccountJpa user;
+    @ManyToOne
+    @JoinColumn
+    private UserAccountJpa user;
 
     @OneToMany(mappedBy = "batchImport")
     private List<TransactionJournal> transactions;

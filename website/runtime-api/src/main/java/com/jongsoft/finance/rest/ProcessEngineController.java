@@ -47,13 +47,12 @@ class ProcessEngineController implements ProcessEngineApi {
             String processDefinition, String businessKey, String instanceId) {
         logger.info("Getting processes for instance {}.", instanceId);
 
-        var processInstance =
-                runtimeService
-                        .createProcessInstanceQuery()
-                        .processDefinitionKey(processDefinition)
-                        .processInstanceId(instanceId)
-                        .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
-                        .singleResult();
+        var processInstance = runtimeService
+                .createProcessInstanceQuery()
+                .processDefinitionKey(processDefinition)
+                .processInstanceId(instanceId)
+                .variableValueEquals(KEY_USERNAME, authenticationFacade.authenticated())
+                .singleResult();
         return convert(processInstance);
     }
 

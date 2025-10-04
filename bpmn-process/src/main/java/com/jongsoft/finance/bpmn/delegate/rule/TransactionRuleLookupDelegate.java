@@ -31,10 +31,9 @@ public class TransactionRuleLookupDelegate implements JavaDelegate, JavaBean {
 
         var ruleName = (String) execution.getVariableLocal("name");
 
-        var existing =
-                transactionRuleProvider
-                        .lookup()
-                        .count(rule -> Objects.equals(rule.getName(), ruleName));
+        var existing = transactionRuleProvider
+                .lookup()
+                .count(rule -> Objects.equals(rule.getName(), ruleName));
 
         execution.setVariableLocal("exists", existing != 0);
     }

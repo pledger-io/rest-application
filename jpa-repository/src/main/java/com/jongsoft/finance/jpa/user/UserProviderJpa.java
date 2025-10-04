@@ -119,16 +119,14 @@ public class UserProviderJpa implements UserProvider {
                 .id(source.getId())
                 .username(new UserIdentifier(source.getUsername()))
                 .password(source.getPassword())
-                .primaryCurrency(
-                        Control.Option(source.getCurrency())
-                                .getOrSupply(() -> Currency.getInstance("EUR")))
+                .primaryCurrency(Control.Option(source.getCurrency())
+                        .getOrSupply(() -> Currency.getInstance("EUR")))
                 .secret(source.getTwoFactorSecret())
                 .theme(source.getTheme())
                 .twoFactorEnabled(source.isTwoFactorEnabled())
-                .roles(
-                        source.getRoles().stream()
-                                .map(role -> new Role(role.getName()))
-                                .collect(Collectors.toList()))
+                .roles(source.getRoles().stream()
+                        .map(role -> new Role(role.getName()))
+                        .collect(Collectors.toList()))
                 .build();
     }
 }

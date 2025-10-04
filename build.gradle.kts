@@ -47,10 +47,7 @@ subprojects {
             removeUnusedImports()
             trimTrailingWhitespace()
             endWithNewline()
-            googleJavaFormat()
-                .aosp()
-                .reorderImports(true)
-                .skipJavadocFormatting()
+            palantirJavaFormat("2.75.0").style("AOSP")
         }
     }
 

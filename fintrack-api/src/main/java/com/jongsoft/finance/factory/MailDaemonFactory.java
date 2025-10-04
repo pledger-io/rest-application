@@ -29,20 +29,16 @@ public class MailDaemonFactory {
         return (recipient, template, mailProperties) -> {
             log.debug("Sending email to {}", recipient);
 
-            var email =
-                    Email.builder()
-                            .to(recipient)
-                            .subject("Pleger.io: Welcome to the family!")
-                            .body(
-                                    new MultipartBody(
-                                            new TemplateBody<>(
-                                                    BodyType.HTML,
-                                                    new ModelAndView<>(
-                                                            template + ".html", mailProperties)),
-                                            new TemplateBody<>(
-                                                    BodyType.TEXT,
-                                                    new ModelAndView<>(
-                                                            template + ".text", mailProperties))));
+            var email = Email.builder()
+                    .to(recipient)
+                    .subject("Pleger.io: Welcome to the family!")
+                    .body(new MultipartBody(
+                            new TemplateBody<>(
+                                    BodyType.HTML,
+                                    new ModelAndView<>(template + ".html", mailProperties)),
+                            new TemplateBody<>(
+                                    BodyType.TEXT,
+                                    new ModelAndView<>(template + ".text", mailProperties))));
 
             customMailer.send(email);
         };

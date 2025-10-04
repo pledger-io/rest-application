@@ -21,30 +21,33 @@ import java.util.function.Supplier;
 @JsonSchema(title = "Contract", description = "Contract details", uri = "/contract")
 public class ContractJson implements Serializable {
 
-    @NonNull private String name;
+    @NonNull
+    private String name;
 
     private String description;
 
-    @NonNull private String company;
+    @NonNull
+    private String company;
 
     /** The contract attachment as a hex string. */
     private String contract;
 
     private boolean terminated;
 
-    @NonNull private LocalDate start;
+    @NonNull
+    private LocalDate start;
 
-    @NonNull private LocalDate end;
+    @NonNull
+    private LocalDate end;
 
     public static ContractJson fromDomain(Contract contract, Supplier<byte[]> attachmentSupplier) {
-        ContractJsonBuilder builder =
-                ContractJson.builder()
-                        .name(contract.getName())
-                        .description(contract.getDescription())
-                        .company(contract.getCompany().getName())
-                        .start(contract.getStartDate())
-                        .end(contract.getEndDate())
-                        .terminated(contract.isTerminated());
+        ContractJsonBuilder builder = ContractJson.builder()
+                .name(contract.getName())
+                .description(contract.getDescription())
+                .company(contract.getCompany().getName())
+                .start(contract.getStartDate())
+                .end(contract.getEndDate())
+                .terminated(contract.isTerminated());
 
         if (contract.isUploaded()) {
             builder.contract(Hex.toHexString(attachmentSupplier.get()));

@@ -54,22 +54,20 @@ public class UnusualFrequency implements Anomaly {
         if (zScore > ADJUSTED_THRESHOLD) {
             double score = Math.min(1.0, zScore / (ADJUSTED_THRESHOLD * 2));
 
-            return Optional.of(
-                    SpendingInsight.builder()
-                            .type(InsightType.UNUSUAL_FREQUENCY)
-                            .category(transaction.getBudget())
-                            .severity(getSeverityFromScore(score))
-                            .score(score)
-                            .detectedDate(transaction.getDate())
-                            .message(generateMessage(currentMonthCount, mean))
-                            .transactionId(transaction.getId())
-                            .metadata(
-                                    Map.of(
-                                            "frequency", currentMonthCount,
-                                            "z_score", zScore,
-                                            "mean", mean,
-                                            "std_dev", stdDev))
-                            .build());
+            return Optional.of(SpendingInsight.builder()
+                    .type(InsightType.UNUSUAL_FREQUENCY)
+                    .category(transaction.getBudget())
+                    .severity(getSeverityFromScore(score))
+                    .score(score)
+                    .detectedDate(transaction.getDate())
+                    .message(generateMessage(currentMonthCount, mean))
+                    .transactionId(transaction.getId())
+                    .metadata(Map.of(
+                            "frequency", currentMonthCount,
+                            "z_score", zScore,
+                            "mean", mean,
+                            "std_dev", stdDev))
+                    .build());
         }
 
         return Optional.empty();
@@ -83,25 +81,19 @@ public class UnusualFrequency implements Anomaly {
     }
 
     protected long computeTransactionsInMonth(Transaction transaction) {
-        var expense =
-                budgetProvider
-                        .lookup(
-                                transaction.getDate().getYear(),
-                                transaction.getDate().getMonthValue())
-                        .stream()
-                        .flatMap(b -> b.getExpenses().stream())
-                        .filter(e -> e.getName().equalsIgnoreCase(transaction.getBudget()))
-                        .findFirst()
-                        .orElseThrow();
+        var expense = budgetProvider
+                .lookup(transaction.getDate().getYear(), transaction.getDate().getMonthValue())
+                .stream()
+                .flatMap(b -> b.getExpenses().stream())
+                .filter(e -> e.getName().equalsIgnoreCase(transaction.getBudget()))
+                .findFirst()
+                .orElseThrow();
 
-        var filter =
-                filterFactory
-                        .transaction()
-                        .expenses(Collections.List(new EntityRef(expense.getId())))
-                        .range(
-                                Dates.range(
-                                        transaction.getDate().withDayOfMonth(1), ChronoUnit.MONTHS))
-                        .page(1, 1);
+        var filter = filterFactory
+                .transaction()
+                .expenses(Collections.List(new EntityRef(expense.getId())))
+                .range(Dates.range(transaction.getDate().withDayOfMonth(1), ChronoUnit.MONTHS))
+                .page(1, 1);
 
         return transactionProvider.lookup(filter).total();
     }

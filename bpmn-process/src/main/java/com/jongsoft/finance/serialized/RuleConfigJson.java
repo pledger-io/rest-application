@@ -48,28 +48,19 @@ public class RuleConfigJson implements Serializable {
                     .restrictive(rule.isRestrictive())
                     .name(rule.getName())
                     .group(rule.getGroup())
-                    .changes(
-                            rule.getChanges().stream()
-                                    .map(
-                                            c ->
-                                                    ChangeJson.builder()
-                                                            .field(c.getField())
-                                                            .value(
-                                                                    lookup.apply(
-                                                                            c.getField(),
-                                                                            c.getChange()))
-                                                            .build())
-                                    .collect(Collectors.toList()))
-                    .conditions(
-                            rule.getConditions().stream()
-                                    .map(
-                                            c ->
-                                                    ConditionJson.builder()
-                                                            .field(c.getField())
-                                                            .operation(c.getOperation())
-                                                            .value(c.getCondition())
-                                                            .build())
-                                    .collect(Collectors.toList()))
+                    .changes(rule.getChanges().stream()
+                            .map(c -> ChangeJson.builder()
+                                    .field(c.getField())
+                                    .value(lookup.apply(c.getField(), c.getChange()))
+                                    .build())
+                            .collect(Collectors.toList()))
+                    .conditions(rule.getConditions().stream()
+                            .map(c -> ConditionJson.builder()
+                                    .field(c.getField())
+                                    .operation(c.getOperation())
+                                    .value(c.getCondition())
+                                    .build())
+                            .collect(Collectors.toList()))
                     .build();
         }
     }

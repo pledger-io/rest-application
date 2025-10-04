@@ -65,40 +65,25 @@ public class ProfileExportResource {
             operationId = "exportProfile")
     public HttpResponse<ExportJson> export() {
         var exportFileName = authenticationFacade.authenticated() + "-profile.json";
-        var exportJson =
-                ExportJson.builder()
-                        .accounts(
-                                lookupAllOf(Account.class)
-                                        .map(
-                                                account ->
-                                                        AccountJson.fromDomain(
-                                                                account,
-                                                                loadFromStorage(
-                                                                        account
-                                                                                .getImageFileToken())))
-                                        .toJava())
-                        .budgetPeriods(
-                                lookupAllOf(Budget.class).map(BudgetJson::fromDomain).toJava())
-                        .categories(
-                                lookupAllOf(Category.class).map(CategoryJson::fromDomain).toJava())
-                        .tags(lookupAllOf(Tag.class).map(Tag::name).toJava())
-                        .contracts(
-                                lookupAllOf(Contract.class)
-                                        .map(
-                                                c ->
-                                                        ContractJson.fromDomain(
-                                                                c,
-                                                                loadFromStorage(c.getFileToken())))
-                                        .toJava())
-                        .rules(
-                                lookupAllOf(TransactionRule.class)
-                                        .map(
-                                                rule ->
-                                                        RuleConfigJson.RuleJson.fromDomain(
-                                                                rule, this::loadRelation))
-                                        .toJava())
-                        .transactions(lookupRelevantTransactions())
-                        .build();
+        var exportJson = ExportJson.builder()
+                .accounts(lookupAllOf(Account.class)
+                        .map(account -> AccountJson.fromDomain(
+                                account, loadFromStorage(account.getImageFileToken())))
+                        .toJava())
+                .budgetPeriods(
+                        lookupAllOf(Budget.class).map(BudgetJson::fromDomain).toJava())
+                .categories(lookupAllOf(Category.class)
+                        .map(CategoryJson::fromDomain)
+                        .toJava())
+                .tags(lookupAllOf(Tag.class).map(Tag::name).toJava())
+                .contracts(lookupAllOf(Contract.class)
+                        .map(c -> ContractJson.fromDomain(c, loadFromStorage(c.getFileToken())))
+                        .toJava())
+                .rules(lookupAllOf(TransactionRule.class)
+                        .map(rule -> RuleConfigJson.RuleJson.fromDomain(rule, this::loadRelation))
+                        .toJava())
+                .transactions(lookupRelevantTransactions())
+                .build();
 
         return HttpResponse.ok(exportJson)
                 .header(
@@ -124,11 +109,10 @@ public class ProfileExportResource {
 
     private List<TransactionJson> lookupRelevantTransactions() {
         // we also want to export all opening balance transactions for liability accounts
-        var filter =
-                filterFactory
-                        .transaction()
-                        .page(0, Integer.MAX_VALUE)
-                        .description("Opening balance", true);
+        var filter = filterFactory
+                .transaction()
+                .page(0, Integer.MAX_VALUE)
+                .description("Opening balance", true);
 
         return transactionProvider
                 .lookup(filter)
@@ -146,7 +130,7 @@ public class ProfileExportResource {
         Class<?> genericType =
                 switch (column) {
                     case TO_ACCOUNT, SOURCE_ACCOUNT, CHANGE_TRANSFER_FROM, CHANGE_TRANSFER_TO ->
-                            Account.class;
+                        Account.class;
                     case CATEGORY -> Category.class;
                     case BUDGET -> Budget.Expense.class;
                     case CONTRACT -> Contract.class;

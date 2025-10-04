@@ -37,12 +37,11 @@ class CreateExternalUserHandler implements CommandHandler<CreateExternalUserComm
         }
 
         log.info("[{}] - Creating external user", command.username());
-        var builder =
-                UserAccountJpa.builder()
-                        .username(command.username())
-                        .password("")
-                        .theme("light")
-                        .twoFactorSecret(secretGenerator.generate());
+        var builder = UserAccountJpa.builder()
+                .username(command.username())
+                .password("")
+                .theme("light")
+                .twoFactorSecret(secretGenerator.generate());
 
         for (var role : command.roles()) {
             entityManager

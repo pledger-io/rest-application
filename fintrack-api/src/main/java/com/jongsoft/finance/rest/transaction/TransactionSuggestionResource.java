@@ -38,13 +38,12 @@ class TransactionSuggestionResource {
             summary = "Suggest changes",
             description = "Suggest changes to a transaction based upon the rules in the system.")
     Map<String, ?> suggest(@Body TransactionForSuggestionRequest request) {
-        var transactionInput =
-                new SuggestionInput(
-                        LocalDate.now(),
-                        request.description(),
-                        request.source(),
-                        request.destination(),
-                        Optional.ofNullable(request.amount()).orElse(0D));
+        var transactionInput = new SuggestionInput(
+                LocalDate.now(),
+                request.description(),
+                request.source(),
+                request.destination(),
+                Optional.ofNullable(request.amount()).orElse(0D));
         var suggestions = suggestionEngine.makeSuggestions(transactionInput);
 
         var output = new HashMap<String, Object>();
@@ -56,11 +55,8 @@ class TransactionSuggestionResource {
             output.put(
                     RuleColumn.TAGS.toString(),
                     suggestions.tags().stream()
-                            .map(
-                                    tag ->
-                                            new TagResponse(
-                                                    new com.jongsoft.finance.domain.transaction.Tag(
-                                                            tag)))
+                            .map(tag -> new TagResponse(
+                                    new com.jongsoft.finance.domain.transaction.Tag(tag)))
                             .toList());
         }
         if (suggestions.category() != null) {
@@ -79,9 +75,7 @@ class TransactionSuggestionResource {
         return suggestionEngine
                 .extractTransaction(request.fromText())
                 .map(TransactionExtractResponse::from)
-                .orElseThrow(
-                        () ->
-                                StatusException.badRequest(
-                                        "No extractor configured.", "llm.not.configured"));
+                .orElseThrow(() -> StatusException.badRequest(
+                        "No extractor configured.", "llm.not.configured"));
     }
 }

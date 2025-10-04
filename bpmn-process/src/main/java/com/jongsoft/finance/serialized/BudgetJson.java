@@ -25,14 +25,16 @@ public class BudgetJson implements Serializable {
     @Serdeable
     @JsonSchema(title = "Expense", description = "Expense for a budget", uri = "/budget-expense")
     public static class ExpenseJson implements Serializable {
-        @NonNull private String name;
+        @NonNull
+        private String name;
 
         private double lowerBound;
         private double upperBound;
     }
 
     /** Start date of the budget, in ISO 8601 format. */
-    @NonNull private LocalDate start;
+    @NonNull
+    private LocalDate start;
 
     private LocalDate end;
 
@@ -40,23 +42,21 @@ public class BudgetJson implements Serializable {
     private double expectedIncome;
 
     /** List of expenses for the budget. */
-    @NonNull private List<ExpenseJson> expenses;
+    @NonNull
+    private List<ExpenseJson> expenses;
 
     public static BudgetJson fromDomain(Budget budget) {
         return BudgetJson.builder()
                 .start(budget.getStart())
                 .end(budget.getEnd())
                 .expectedIncome(budget.getExpectedIncome())
-                .expenses(
-                        budget.getExpenses().stream()
-                                .map(
-                                        e ->
-                                                ExpenseJson.builder()
-                                                        .name(e.getName())
-                                                        .lowerBound(e.getLowerBound())
-                                                        .upperBound(e.getUpperBound())
-                                                        .build())
-                                .collect(Collectors.toList()))
+                .expenses(budget.getExpenses().stream()
+                        .map(e -> ExpenseJson.builder()
+                                .name(e.getName())
+                                .lowerBound(e.getLowerBound())
+                                .upperBound(e.getUpperBound())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
     }
 }

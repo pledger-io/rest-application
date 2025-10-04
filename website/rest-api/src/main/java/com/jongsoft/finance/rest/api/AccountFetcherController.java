@@ -80,10 +80,9 @@ class AccountFetcherController implements AccountFetcherApi {
     }
 
     private Account lookupAccountOrThrow(Long id) {
-        var bankAccount =
-                accountProvider
-                        .lookup(id)
-                        .getOrThrow(() -> StatusException.notFound("Bank account is not found"));
+        var bankAccount = accountProvider
+                .lookup(id)
+                .getOrThrow(() -> StatusException.notFound("Bank account is not found"));
 
         if (bankAccount.isRemove()) {
             throw StatusException.gone("Bank account has been removed from the system");

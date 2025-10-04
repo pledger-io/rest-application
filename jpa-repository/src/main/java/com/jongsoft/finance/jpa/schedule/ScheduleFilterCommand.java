@@ -18,7 +18,9 @@ public class ScheduleFilterCommand extends JpaFilterBuilder<ScheduledTransaction
     @Override
     public TransactionScheduleProvider.FilterCommand contract(Sequence<EntityRef> contracts) {
         if (!contracts.isEmpty()) {
-            query().fieldEqOneOf("contract.id", contracts.map(EntityRef::getId).toJava().toArray());
+            query().fieldEqOneOf(
+                            "contract.id",
+                            contracts.map(EntityRef::getId).toJava().toArray());
         }
         return this;
     }

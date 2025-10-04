@@ -30,13 +30,10 @@ public class SettingController implements SettingsApi {
 
     @Override
     public HttpResponse<Void> patchSetting(String setting, SettingRequest settingRequest) {
-        var existing =
-                settingProvider
-                        .lookup(setting)
-                        .getOrThrow(
-                                () ->
-                                        StatusException.notFound(
-                                                "No setting found with name " + setting));
+        var existing = settingProvider
+                .lookup(setting)
+                .getOrThrow(
+                        () -> StatusException.notFound("No setting found with name " + setting));
 
         existing.update(settingRequest.getValue().toString());
         return HttpResponse.noContent();

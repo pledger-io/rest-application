@@ -88,31 +88,30 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
     public void save(TransactionRule rule) {
         int sortOrder = rule.getSort();
         if (rule.getId() == null || rule.getSort() == 0) {
-            sortOrder =
-                    entityManager
-                            .from(RuleJpa.class)
-                            .fieldEq("user.username", authenticationFacade.authenticated())
-                            .fieldEq("group.name", rule.getGroup())
-                            .projectSingleValue(Integer.class, "max(sort)")
-                            .getOrSupply(() -> 1);
+            sortOrder = entityManager
+                    .from(RuleJpa.class)
+                    .fieldEq("user.username", authenticationFacade.authenticated())
+                    .fieldEq("group.name", rule.getGroup())
+                    .projectSingleValue(Integer.class, "max(sort)")
+                    .getOrSupply(() -> 1);
         }
 
-        var ruleJpa =
-                RuleJpa.builder()
-                        .id(rule.getId())
-                        .name(rule.getName())
-                        .description(rule.getDescription())
-                        .restrictive(rule.isRestrictive())
-                        .active(rule.isActive())
-                        .user(activeUser())
-                        .archived(rule.isDeleted())
-                        .group(group(rule.getGroup()))
-                        .sort(sortOrder)
-                        .build();
+        var ruleJpa = RuleJpa.builder()
+                .id(rule.getId())
+                .name(rule.getName())
+                .description(rule.getDescription())
+                .restrictive(rule.isRestrictive())
+                .active(rule.isActive())
+                .user(activeUser())
+                .archived(rule.isDeleted())
+                .group(group(rule.getGroup()))
+                .sort(sortOrder)
+                .build();
 
-        ruleJpa.setConditions(
-                convertConditions(ruleJpa, Collections.List(rule.getConditions())).toJava());
-        ruleJpa.setChanges(convertChanges(ruleJpa, Collections.List(rule.getChanges())).toJava());
+        ruleJpa.setConditions(convertConditions(ruleJpa, Collections.List(rule.getConditions()))
+                .toJava());
+        ruleJpa.setChanges(
+                convertChanges(ruleJpa, Collections.List(rule.getChanges())).toJava());
 
         entityManager.persist(ruleJpa);
     }
@@ -122,35 +121,25 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
             return null;
         }
 
-        var rule =
-                TransactionRule.builder()
-                        .id(source.getId())
-                        .name(source.getName())
-                        .restrictive(source.isRestrictive())
-                        .user(
-                                UserAccount.builder()
-                                        .id(source.getUser().getId())
-                                        .username(
-                                                new UserIdentifier(source.getUser().getUsername()))
-                                        .build())
-                        .description(source.getDescription())
-                        .active(source.isActive())
-                        .group(
-                                Optional.ofNullable(source.getGroup())
-                                        .map(RuleGroupJpa::getName)
-                                        .orElse(null))
-                        .sort(source.getSort())
-                        .build();
+        var rule = TransactionRule.builder()
+                .id(source.getId())
+                .name(source.getName())
+                .restrictive(source.isRestrictive())
+                .user(UserAccount.builder()
+                        .id(source.getUser().getId())
+                        .username(new UserIdentifier(source.getUser().getUsername()))
+                        .build())
+                .description(source.getDescription())
+                .active(source.isActive())
+                .group(Optional.ofNullable(source.getGroup())
+                        .map(RuleGroupJpa::getName)
+                        .orElse(null))
+                .sort(source.getSort())
+                .build();
 
         source.getConditions()
-                .forEach(
-                        c ->
-                                rule
-                                .new Condition(
-                                        c.getId(),
-                                        c.getField(),
-                                        c.getOperation(),
-                                        c.getCondition()));
+                .forEach(c -> rule
+                .new Condition(c.getId(), c.getField(), c.getOperation(), c.getCondition()));
         source.getChanges().forEach(c -> rule.new Change(c.getId(), c.getField(), c.getValue()));
 
         return rule;
@@ -158,27 +147,23 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
 
     private Sequence<RuleChangeJpa> convertChanges(
             RuleJpa rule, Sequence<TransactionRule.Change> changes) {
-        return changes.map(
-                c ->
-                        RuleChangeJpa.builder()
-                                .id(c.getId())
-                                .rule(rule)
-                                .field(c.getField())
-                                .value(c.getChange())
-                                .build());
+        return changes.map(c -> RuleChangeJpa.builder()
+                .id(c.getId())
+                .rule(rule)
+                .field(c.getField())
+                .value(c.getChange())
+                .build());
     }
 
     private Sequence<RuleConditionJpa> convertConditions(
             RuleJpa rule, Sequence<TransactionRule.Condition> conditions) {
-        return conditions.map(
-                c ->
-                        RuleConditionJpa.builder()
-                                .id(c.getId())
-                                .field(c.getField())
-                                .rule(rule)
-                                .operation(c.getOperation())
-                                .condition(c.getCondition())
-                                .build());
+        return conditions.map(c -> RuleConditionJpa.builder()
+                .id(c.getId())
+                .field(c.getField())
+                .rule(rule)
+                .operation(c.getOperation())
+                .condition(c.getCondition())
+                .build());
     }
 
     private UserAccountJpa activeUser() {
@@ -195,10 +180,9 @@ public class TransactionRuleProviderJpa implements TransactionRuleProvider {
                 .fieldEq("user.username", authenticationFacade.authenticated())
                 .fieldEq("name", group)
                 .singleResult()
-                .getOrSupply(
-                        () -> {
-                            EventBus.getBus().send(new CreateRuleGroupCommand(group));
-                            return group(group);
-                        });
+                .getOrSupply(() -> {
+                    EventBus.getBus().send(new CreateRuleGroupCommand(group));
+                    return group(group);
+                });
     }
 }

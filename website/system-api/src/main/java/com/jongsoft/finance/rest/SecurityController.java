@@ -68,18 +68,16 @@ public class SecurityController implements SecurityApi {
     @Override
     public Object verifyTwoFactor(TokenRequest tokenRequest) {
         var currentUser = currentUserProvider.currentUser();
-        var validToken =
-                TwoFactorHelper.verifySecurityCode(
-                        currentUser.getSecret(), tokenRequest.getVerificationCode());
+        var validToken = TwoFactorHelper.verifySecurityCode(
+                currentUser.getSecret(), tokenRequest.getVerificationCode());
 
         if (!validToken) {
             throw StatusException.forbidden("Invalid verification token provided.");
         }
 
-        var authentication =
-                Authentication.build(
-                        currentUser.getUsername().email(),
-                        currentUser.getRoles().stream().map(Role::getName).toList());
+        var authentication = Authentication.build(
+                currentUser.getUsername().email(),
+                currentUser.getRoles().stream().map(Role::getName).toList());
 
         return accessRefreshTokenGenerator
                 .generate(UUID.randomUUID().toString(), authentication)

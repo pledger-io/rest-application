@@ -40,8 +40,9 @@ public class Category implements AggregateBase {
 
     @BusinessMethod
     public void rename(String label, String description) {
-        var hasChanged =
-                Control.Equal(this.label, label).append(this.description, description).isNotEqual();
+        var hasChanged = Control.Equal(this.label, label)
+                .append(this.description, description)
+                .isNotEqual();
 
         if (hasChanged) {
             this.label = label;

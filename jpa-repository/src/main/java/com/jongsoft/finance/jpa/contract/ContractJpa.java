@@ -26,9 +26,11 @@ public class ContractJpa extends EntityJpa {
 
     private String fileToken;
 
-    @ManyToOne private AccountJpa company;
+    @ManyToOne
+    private AccountJpa company;
 
-    @ManyToOne private UserAccountJpa user;
+    @ManyToOne
+    private UserAccountJpa user;
 
     private boolean warningActive;
     private boolean archived;

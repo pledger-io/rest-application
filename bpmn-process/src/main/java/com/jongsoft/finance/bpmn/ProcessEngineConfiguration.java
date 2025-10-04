@@ -56,23 +56,19 @@ public class ProcessEngineConfiguration {
                 .setProcessEngineName("fintrack")
                 .setHistoryCleanupEnabled(true)
                 .setSkipIsolationLevelCheck(true)
-                .setExpressionManager(
-                        new MicronautExpressionManager(
-                                new MicronautElResolver(applicationContext)));
+                .setExpressionManager(new MicronautExpressionManager(
+                        new MicronautElResolver(applicationContext)));
 
         configuration.setHistoryCleanupBatchSize(250);
         configuration.setHistoryCleanupBatchWindowStartTime("01:00");
         configuration.setHistoryCleanupBatchWindowEndTime("03:00");
         configuration.setHistoryTimeToLive("P1D");
         configuration.setResolverFactories(List.of(new MicronautBeanResolver(applicationContext)));
-        configuration.setCustomPreVariableSerializers(
-                List.of(
-                        new JsonRecordSerializer<>(
-                                applicationContext.getBean(ObjectMapper.class),
-                                ProcessVariable.class),
-                        new JsonRecordSerializer<>(
-                                applicationContext.getBean(ObjectMapper.class),
-                                TransactionDTO.class)));
+        configuration.setCustomPreVariableSerializers(List.of(
+                new JsonRecordSerializer<>(
+                        applicationContext.getBean(ObjectMapper.class), ProcessVariable.class),
+                new JsonRecordSerializer<>(
+                        applicationContext.getBean(ObjectMapper.class), TransactionDTO.class)));
 
         var processEngine = configuration.buildProcessEngine();
         log.info("Created camunda process engine");
@@ -102,9 +98,8 @@ public class ProcessEngineConfiguration {
         PathMatchingResourcePatternResolver resourceLoader =
                 new PathMatchingResourcePatternResolver();
         for (String extension : List.of("dmn", "cmmn", "bpmn")) {
-            for (Resource resource :
-                    resourceLoader.getResources(
-                            CLASSPATH_ALL_URL_PREFIX + extension + "/*/*." + extension)) {
+            for (Resource resource : resourceLoader.getResources(
+                    CLASSPATH_ALL_URL_PREFIX + extension + "/*/*." + extension)) {
                 log.info("Deploying model: {}", resource.getFilename());
                 processEngine
                         .getRepositoryService()

@@ -12,7 +12,8 @@ import java.util.List;
 
 public class FinTrack {
 
-    @Getter private final Encoder hashingAlgorithm;
+    @Getter
+    private final Encoder hashingAlgorithm;
 
     public FinTrack(Encoder hashingAlgorithm) {
         this.hashingAlgorithm = hashingAlgorithm;

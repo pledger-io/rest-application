@@ -24,16 +24,13 @@ public abstract class JpaFilterBuilder<E> {
      * @param applyTo the query to apply the conditions to
      */
     public void applyTo(Query<?> applyTo) {
-        query.conditions()
-                .forEach(
-                        condition -> {
-                            if (condition.tableAlias() == null
-                                    && applyTo instanceof JpaQuery<?> jpaQuery) {
-                                applyTo.condition(condition.cloneWithAlias("e"));
-                            } else {
-                                applyTo.condition(condition);
-                            }
-                        });
+        query.conditions().forEach(condition -> {
+            if (condition.tableAlias() == null && applyTo instanceof JpaQuery<?> jpaQuery) {
+                applyTo.condition(condition.cloneWithAlias("e"));
+            } else {
+                applyTo.condition(condition);
+            }
+        });
         if (applyTo instanceof JpaQuery<?> jpaQuery) {
             applyPagingOnly(jpaQuery);
         }

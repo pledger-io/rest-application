@@ -24,7 +24,9 @@ public class BudgetJpa extends EntityJpa {
     @Column(name = "b_until")
     private LocalDate until;
 
-    @ManyToOne @JoinColumn private UserAccountJpa user;
+    @ManyToOne
+    @JoinColumn
+    private UserAccountJpa user;
 
     @OneToMany(mappedBy = "budget", fetch = FetchType.EAGER)
     private Set<ExpensePeriodJpa> expenses;

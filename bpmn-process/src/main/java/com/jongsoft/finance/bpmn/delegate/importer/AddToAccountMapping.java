@@ -27,9 +27,8 @@ public class AddToAccountMapping implements JavaDelegate, JavaBean {
                 accountId);
 
         @SuppressWarnings("unchecked")
-        var mappings =
-                new HashSet<>(
-                        (Collection<ExtractionMapping>) execution.getVariable("accountMappings"));
+        var mappings = new HashSet<>(
+                (Collection<ExtractionMapping>) execution.getVariable("accountMappings"));
         mappings.removeIf(mapping -> mapping.getName().equals(accountName));
         mappings.add(new ExtractionMapping(accountName, accountId.longValue()));
 

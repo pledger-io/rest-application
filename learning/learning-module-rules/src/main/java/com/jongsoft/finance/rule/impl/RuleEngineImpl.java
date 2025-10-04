@@ -44,15 +44,11 @@ public class RuleEngineImpl implements RuleEngine {
     }
 
     public RuleDataSet run(RuleDataSet input, TransactionRule rule) {
-        var matchers =
-                rule.getConditions()
-                        .map(
-                                condition ->
-                                        locateMatcher(condition.getField())
-                                                .prepare(
-                                                        condition.getOperation(),
-                                                        condition.getCondition(),
-                                                        input.get(condition.getField())));
+        var matchers = rule.getConditions().map(condition -> locateMatcher(condition.getField())
+                .prepare(
+                        condition.getOperation(),
+                        condition.getCondition(),
+                        input.get(condition.getField())));
 
         boolean matches;
         if (rule.isRestrictive()) {
@@ -64,9 +60,8 @@ public class RuleEngineImpl implements RuleEngine {
         RuleDataSet output = new RuleDataSet();
         if (matches) {
             for (TransactionRule.Change change : rule.getChanges()) {
-                var located =
-                        findLocator(change.getField())
-                                .locate(change.getField(), change.getChange());
+                var located = findLocator(change.getField())
+                        .locate(change.getField(), change.getChange());
                 output.put(change.getField(), located);
             }
         }

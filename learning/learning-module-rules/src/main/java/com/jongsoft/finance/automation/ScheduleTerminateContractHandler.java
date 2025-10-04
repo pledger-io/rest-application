@@ -33,11 +33,10 @@ public class ScheduleTerminateContractHandler implements CommandHandler<Terminat
     public void handle(TerminateContractCommand command) {
         log.info("[{}] - Terminating any transaction schedule for contract.", command.id());
 
-        var filter =
-                filterFactory
-                        .schedule()
-                        .contract(Collections.List(new EntityRef(command.id())))
-                        .activeOnly();
+        var filter = filterFactory
+                .schedule()
+                .contract(Collections.List(new EntityRef(command.id())))
+                .activeOnly();
 
         transactionScheduleProvider
                 .lookup(filter)
