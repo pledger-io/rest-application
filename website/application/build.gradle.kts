@@ -1,6 +1,5 @@
 plugins {
     id("io.micronaut.application")
-    id("io.micronaut.openapi")
 }
 
 micronaut {
@@ -24,6 +23,7 @@ dependencies {
     // Http Server
     implementation(mn.micronaut.http.server.jetty)
     implementation(mn.micronaut.http.validation)
+    implementation(mn.micronaut.openapi.adoc)
 
     implementation(project(":core"))
     implementation(project(":domain"))

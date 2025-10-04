@@ -21,3 +21,6 @@ properties:
     type: string
     description: The end date of the contract.
     format: date
+  attachmentCode:
+    type: string
+    description: The file code to get the digital copy of the contract.

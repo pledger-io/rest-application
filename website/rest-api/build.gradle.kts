@@ -1,5 +1,5 @@
 plugins {
-    id("io.micronaut.application")
+    id("io.micronaut.library")
     id("io.micronaut.openapi")
 }
 
@@ -40,4 +40,5 @@ dependencies {
 
     testImplementation(mn.micronaut.test.rest.assured)
     testImplementation(libs.bundles.junit)
+    testImplementation(mn.micronaut.http.server.jetty)
 }

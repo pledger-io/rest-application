@@ -42,9 +42,7 @@ properties:
       tags:
         type: array
         description: The tags that the transaction has
-        example:
-          - food
-          - dining
+        example: ["food", "dining"]
         items:
           type: string
   type:

@@ -1,5 +1,5 @@
 plugins {
-    id("io.micronaut.application")
+    id("io.micronaut.library")
     id("io.micronaut.openapi")
 }
 

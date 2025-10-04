@@ -519,6 +519,10 @@ paths:
           type: string
           enum: [ daily, monthly ]
     post:
+      operationId: computeBalanceGroupedByDate
+      tags: [ statistics-balance ]
+      description: >
+        Computes the balance grouping it by date as indicated in the `type`.
       requestBody:
         content:
           application/json:
@@ -689,14 +693,19 @@ paths:
       tags: [ contract-fetcher ]
       parameters:
         - $ref: '#/components/parameters/name-filter'
-        - $ref: '#/components/parameters/offset'
-        - $ref: '#/components/parameters/number-of-results'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ ACTIVE, INACTIVE ]
       responses:
         "200":
           description: The contracts matching the filters
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/paged-contract-response' }
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/contract-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
     post:
