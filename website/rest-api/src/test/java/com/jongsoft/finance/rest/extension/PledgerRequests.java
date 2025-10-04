@@ -184,4 +184,64 @@ public class PledgerRequests {
               .log().ifValidationFails();
     }
 
+    public ValidatableResponse createContract(long accountId, String name, String description, LocalDate startDate, LocalDate endDate) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .body(Map.of(
+                    "company", Map.of("id", accountId),
+                    "name", name,
+                    "description", description,
+                    "start", startDate.toString(),
+                    "end", endDate.toString()
+              ))
+          .when()
+              .post("/api/contracts")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse fetchContract(long contractId) {
+        return given(requestSpecification)
+              .pathParam("id", contractId)
+          .when()
+              .get("/api/contracts/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse updateContract(long contractId, String name, String description, LocalDate startDate, LocalDate endDate) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .pathParam("id", contractId)
+              .body(Map.of(
+                    "name", name,
+                    "description", description,
+                    "start", startDate.toString(),
+                    "end", endDate.toString()
+              ))
+          .when()
+              .put("/api/contracts/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse warnBeforeContractExpires(long contractId) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .pathParam("id", contractId)
+          .when()
+              .post("/api/contracts/{id}/warn-before-expiration")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse deleteContract(long contractId) {
+        return given(requestSpecification)
+              .pathParam("id", contractId)
+          .when()
+              .delete("/api/contracts/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
 }

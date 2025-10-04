@@ -1,5 +1,5 @@
 plugins {
-    id("io.micronaut.application")
+    id("io.micronaut.library")
     id("io.micronaut.openapi")
 }
 
@@ -8,7 +8,7 @@ micronaut {
     testRuntime("junit5")
 
     openapi {
-        server(file("src/contract/importer-api.yaml")) {
+        server("importer", file("src/contract/importer-api.yaml")) {
             apiPackageName = "com.jongsoft.finance.rest"
             modelPackageName = "com.jongsoft.finance.rest.model"
             useAuth = true

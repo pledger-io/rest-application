@@ -3,6 +3,7 @@ package com.jongsoft.finance.domain.account;
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.messaging.commands.contract.*;
 import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleForContractCommand;
 import com.jongsoft.finance.schedule.Schedule;
@@ -88,8 +89,9 @@ public class Contract implements AggregateBase, Serializable {
         }
 
         if (endDate.isBefore(LocalDate.now())) {
-            throw new IllegalStateException(
-                    "Cannot activate contract warning if contract has expired.");
+            throw StatusException.badRequest(
+                    "Cannot activate contract warning if contract has expired.",
+                    "contract.warn.not.possible.expired");
         }
 
         if (!notifyBeforeEnd) {
@@ -111,11 +113,13 @@ public class Contract implements AggregateBase, Serializable {
     @BusinessMethod
     public void terminate() {
         if (terminated) {
-            throw new IllegalStateException("Contract is already terminated.");
+            throw StatusException.badRequest(
+                    "Contract is already terminated.", "contract.already.terminated");
         }
 
         if (endDate.isAfter(LocalDate.now())) {
-            throw new IllegalStateException("Contract has not yet expired.");
+            throw StatusException.badRequest(
+                    "Contract has not yet expired.", "contract.not.expired");
         }
 
         this.terminated = true;
