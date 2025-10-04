@@ -67,6 +67,18 @@ public class PledgerRequests {
               .log().ifValidationFails();
     }
 
+    public ValidatableResponse updateSavingGoal(long accountId, long savingGoalId, double goal, LocalDate targetDate) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .pathParam("id", accountId)
+              .pathParam("savingGoalId", savingGoalId)
+              .body(Map.of("goal", goal, "targetDate", targetDate.toString()))
+          .when()
+              .put("/api/accounts/{id}/saving-goals/{savingGoalId}")
+          .then()
+              .log().ifValidationFails();
+    }
+
     public ValidatableResponse fetchSavingGoals(long accountId) {
         return given(requestSpecification)
               .pathParam("id", accountId)
@@ -84,6 +96,17 @@ public class PledgerRequests {
               .body(Map.of("amount", amount))
           .when()
               .post("/api/accounts/{id}/saving-goals/{goal-id}/make-reservation")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse deleteSavingGoal(long accountId, long savingGoalId) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .pathParam("id", accountId)
+              .pathParam("savingGoalId", savingGoalId)
+          .when()
+              .delete("/api/accounts/{id}/saving-goals/{savingGoalId}")
           .then()
               .log().ifValidationFails();
     }

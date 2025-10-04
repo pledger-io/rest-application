@@ -96,6 +96,22 @@ public class BankAccountTest {
               .body("[0].id", equalTo(savingGoalId))
               .body("[0].installments", equalTo(31.82F))
               .body("[0].reserved", equalTo(150F));
+
+        requests.updateSavingGoal(accountId, savingGoalId, 500D, LocalDate.now().plusMonths(6))
+              .statusCode(200)
+              .body("id", equalTo(savingGoalId))
+              .body("name", equalTo("Washer"))
+              .body("goal", equalTo(500F))
+              .body("targetDate", equalTo(LocalDate.now().plusMonths(6).toString()))
+              .body("installments", equalTo(70F))
+              .body("monthsLeft", equalTo(6));
+
+        requests.deleteSavingGoal(accountId, savingGoalId)
+              .statusCode(204);
+
+        requests.fetchSavingGoals(accountId)
+              .statusCode(200)
+              .body("$", hasSize(0));
     }
 
     @Test
