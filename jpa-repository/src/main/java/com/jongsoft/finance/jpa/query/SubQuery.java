@@ -32,10 +32,9 @@ public class SubQuery extends BaseQuery<SubQuery> implements BooleanExpression {
 
     public SubQuery fieldEqParentField(String field, String parentField) {
         var actualParent = parentAlias == null ? "e." : parentAlias + ".";
-        condition(
-                Expressions.equals(
-                        Expressions.field(tableAlias() + "." + field),
-                        Expressions.field(actualParent + parentField)));
+        condition(Expressions.equals(
+                Expressions.field(tableAlias() + "." + field),
+                Expressions.field(actualParent + parentField)));
         return this;
     }
 
@@ -50,14 +49,13 @@ public class SubQuery extends BaseQuery<SubQuery> implements BooleanExpression {
             throw new IllegalStateException("Cannot create a sub selection without filters.");
         }
 
-        StringBuilder hql =
-                new StringBuilder("(SELECT ")
-                        .append(projection)
-                        .append(" FROM ")
-                        .append(from)
-                        .append(" ")
-                        .append(tableAlias())
-                        .append(" WHERE ");
+        StringBuilder hql = new StringBuilder("(SELECT ")
+                .append(projection)
+                .append(" FROM ")
+                .append(from)
+                .append(" ")
+                .append(tableAlias())
+                .append(" WHERE ");
         hql.append(" 1=1 ");
         for (var condition : conditions()) {
             hql.append(" AND ").append(condition.hqlExpression());

@@ -34,10 +34,8 @@ public class ProcessTransactionRuleDelegate implements JavaDelegate, JavaBean {
         var transactionRule = userAccount.createRule(ruleJson.getName(), ruleJson.isRestrictive());
 
         ruleJson.getConditions()
-                .forEach(
-                        c ->
-                                transactionRule.registerCondition(
-                                        c.getField(), c.getOperation(), c.getValue()));
+                .forEach(c -> transactionRule.registerCondition(
+                        c.getField(), c.getOperation(), c.getValue()));
 
         transactionRule.change(
                 ruleJson.getName(),

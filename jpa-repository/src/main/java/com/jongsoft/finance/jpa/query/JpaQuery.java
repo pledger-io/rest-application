@@ -142,13 +142,10 @@ public class JpaQuery<E> extends BaseQuery<JpaQuery<E>> {
 
         return Control.Try(() -> (C) createQuery(projectionType, hql).getSingleResult())
                 .map(Control::Option)
-                .recover(
-                        e -> {
-                            logger.warn(
-                                    "Unable to find projection, cause: {}",
-                                    e.getLocalizedMessage());
-                            return Control.Option();
-                        })
+                .recover(e -> {
+                    logger.warn("Unable to find projection, cause: {}", e.getLocalizedMessage());
+                    return Control.Option();
+                })
                 .get();
     }
 
@@ -188,12 +185,10 @@ public class JpaQuery<E> extends BaseQuery<JpaQuery<E>> {
 
         return Control.Try(() -> (E) createQuery(table, hql).getSingleResult())
                 .map(Control::Option)
-                .recover(
-                        e -> {
-                            logger.trace(
-                                    "Unable to find entity, cause: {}", e.getLocalizedMessage());
-                            return Control.Option();
-                        })
+                .recover(e -> {
+                    logger.trace("Unable to find entity, cause: {}", e.getLocalizedMessage());
+                    return Control.Option();
+                })
                 .get();
     }
 

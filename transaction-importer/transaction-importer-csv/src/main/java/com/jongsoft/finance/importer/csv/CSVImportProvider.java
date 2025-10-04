@@ -51,24 +51,18 @@ public class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
         var csvConfiguration = (CSVConfiguration) configuration;
 
         try {
-            var inputStream =
-                    storageService
-                            .read(importJob.getFileCode())
-                            .map(ByteArrayInputStream::new)
-                            .map(InputStreamReader::new)
-                            .getOrThrow(
-                                    () ->
-                                            new IllegalStateException(
-                                                    "Failed to read CSV file: "
-                                                            + importJob.getFileCode()));
+            var inputStream = storageService
+                    .read(importJob.getFileCode())
+                    .map(ByteArrayInputStream::new)
+                    .map(InputStreamReader::new)
+                    .getOrThrow(() -> new IllegalStateException(
+                            "Failed to read CSV file: " + importJob.getFileCode()));
 
-            try (var reader =
-                    new CSVReaderBuilder(inputStream)
-                            .withCSVParser(
-                                    new CSVParserBuilder()
-                                            .withSeparator(csvConfiguration.delimiter())
-                                            .build())
-                            .build()) {
+            try (var reader = new CSVReaderBuilder(inputStream)
+                    .withCSVParser(new CSVParserBuilder()
+                            .withSeparator(csvConfiguration.delimiter())
+                            .build())
+                    .build()) {
 
                 if (csvConfiguration.headers()) {
                     logger.debug("CSV file has headers, skipping first line");
@@ -112,9 +106,8 @@ public class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
                     "Could not load CSV configuration from disk: {}",
                     batchImportConfig.getFileCode(),
                     e);
-            throw new IllegalStateException(
-                    "Failed to load CSV configuration from disk: "
-                            + batchImportConfig.getFileCode());
+            throw new IllegalStateException("Failed to load CSV configuration from disk: "
+                    + batchImportConfig.getFileCode());
         }
     }
 
@@ -125,37 +118,29 @@ public class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
 
     private TransactionDTO readLine(String[] line, CSVConfiguration configuration) {
         Function<ColumnRole, String> columnLocator =
-                (role) ->
-                        Control.Try(() -> line[configuration.columnRoles().indexOf(role)])
-                                .recover(x -> null)
-                                .get();
-        Function<String, LocalDate> parseDate =
-                (date) ->
-                        date != null
-                                ? LocalDate.parse(
-                                        date,
-                                        DateTimeFormatter.ofPattern(configuration.dateFormat()))
-                                : null;
+                (role) -> Control.Try(() -> line[configuration.columnRoles().indexOf(role)])
+                        .recover(x -> null)
+                        .get();
+        Function<String, LocalDate> parseDate = (date) -> date != null
+                ? LocalDate.parse(date, DateTimeFormatter.ofPattern(configuration.dateFormat()))
+                : null;
         Function<String, Double> parseAmount =
                 (amount) -> Double.parseDouble(amount.replace(',', '.'));
 
         var amount = parseAmount.apply(columnLocator.apply(ColumnRole.AMOUNT));
-        var type =
-                Control.Option(columnLocator.apply(ColumnRole.CUSTOM_INDICATOR))
-                        .map(
-                                indicator -> {
-                                    if (indicator.equalsIgnoreCase(
-                                            configuration.transactionTypeIndicator().credit())) {
-                                        return TransactionType.CREDIT;
-                                    } else if (indicator.equalsIgnoreCase(
-                                            configuration.transactionTypeIndicator().deposit())) {
-                                        return TransactionType.DEBIT;
-                                    }
+        var type = Control.Option(columnLocator.apply(ColumnRole.CUSTOM_INDICATOR))
+                .map(indicator -> {
+                    if (indicator.equalsIgnoreCase(
+                            configuration.transactionTypeIndicator().credit())) {
+                        return TransactionType.CREDIT;
+                    } else if (indicator.equalsIgnoreCase(
+                            configuration.transactionTypeIndicator().deposit())) {
+                        return TransactionType.DEBIT;
+                    }
 
-                                    return null;
-                                })
-                        .getOrSupply(
-                                () -> amount >= 0 ? TransactionType.DEBIT : TransactionType.CREDIT);
+                    return null;
+                })
+                .getOrSupply(() -> amount >= 0 ? TransactionType.DEBIT : TransactionType.CREDIT);
 
         logger.trace(
                 "Reading single transaction on {}: amount={}, type={}",

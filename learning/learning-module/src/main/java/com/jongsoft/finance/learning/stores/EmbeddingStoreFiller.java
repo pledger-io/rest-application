@@ -49,9 +49,8 @@ public class EmbeddingStoreFiller {
 
     public void consumeTransactions(Consumer<Transaction> callback) {
         for (var user : userProvider.lookup()) {
-            futures.add(
-                    executorService.submit(
-                            () -> performInitialFill(user.getUsername().email(), callback)));
+            futures.add(executorService.submit(
+                    () -> performInitialFill(user.getUsername().email(), callback)));
         }
     }
 

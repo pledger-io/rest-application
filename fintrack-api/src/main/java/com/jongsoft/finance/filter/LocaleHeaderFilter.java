@@ -24,10 +24,8 @@ public class LocaleHeaderFilter implements HttpServerFilter {
 
         request.getHeaders()
                 .get("Accept-Language", String.class)
-                .ifPresent(
-                        s ->
-                                request.setAttribute(
-                                        RequestAttributes.LOCALIZATION, Locale.forLanguageTag(s)));
+                .ifPresent(s -> request.setAttribute(
+                        RequestAttributes.LOCALIZATION, Locale.forLanguageTag(s)));
 
         return chain.proceed(request);
     }

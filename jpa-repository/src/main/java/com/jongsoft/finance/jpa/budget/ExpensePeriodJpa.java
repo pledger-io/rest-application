@@ -26,9 +26,13 @@ public class ExpensePeriodJpa extends EntityJpa {
     @Column(name = "bp_upper_bound")
     private BigDecimal upperBound;
 
-    @ManyToOne @JoinColumn private ExpenseJpa expense;
+    @ManyToOne
+    @JoinColumn
+    private ExpenseJpa expense;
 
-    @ManyToOne @JoinColumn private BudgetJpa budget;
+    @ManyToOne
+    @JoinColumn
+    private BudgetJpa budget;
 
     @Builder
     private ExpensePeriodJpa(

@@ -56,10 +56,9 @@ public class MultiFactorResource {
             throw StatusException.forbidden("Invalid verification code");
         }
 
-        var authentication =
-                Authentication.build(
-                        user.getUsername().email(),
-                        user.getRoles().stream().map(Role::getName).toList());
+        var authentication = Authentication.build(
+                user.getUsername().email(),
+                user.getRoles().stream().map(Role::getName).toList());
 
         return loginHandler.loginRefresh(authentication, UUID.randomUUID().toString(), request);
     }

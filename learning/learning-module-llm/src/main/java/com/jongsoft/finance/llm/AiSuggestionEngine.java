@@ -44,18 +44,16 @@ class AiSuggestionEngine implements SuggestionEngine {
     @Override
     public SuggestionResult makeSuggestions(SuggestionInput transactionInput) {
         log.debug("Starting classification on {}.", transactionInput);
-        var nullSafeInput =
-                new SuggestionInput(
-                        transactionInput.date(),
-                        Optional.ofNullable(transactionInput.description()).orElse(""),
-                        Optional.ofNullable(transactionInput.fromAccount()).orElse(""),
-                        Optional.ofNullable(transactionInput.toAccount()).orElse(""),
-                        transactionInput.amount());
+        var nullSafeInput = new SuggestionInput(
+                transactionInput.date(),
+                Optional.ofNullable(transactionInput.description()).orElse(""),
+                Optional.ofNullable(transactionInput.fromAccount()).orElse(""),
+                Optional.ofNullable(transactionInput.toAccount()).orElse(""),
+                transactionInput.amount());
 
-        var suggestions =
-                embeddingStore
-                        .classify(nullSafeInput)
-                        .orElseGet(() -> fallbackToLLM(nullSafeInput));
+        var suggestions = embeddingStore
+                .classify(nullSafeInput)
+                .orElseGet(() -> fallbackToLLM(nullSafeInput));
 
         log.trace("Finished classification with suggestions {}.", suggestions);
         return suggestions;
@@ -63,41 +61,32 @@ class AiSuggestionEngine implements SuggestionEngine {
 
     @Override
     public Optional<TransactionResult> extractTransaction(String transactionInput) {
-        var extracted =
-                transactionExtractorAgent.extractTransaction(
-                        UUID.randomUUID(), LocalDate.now(), transactionInput);
-        return Optional.of(
-                new TransactionResult(
-                        extracted.type(),
-                        extracted.date(),
-                        Optional.ofNullable(extracted.fromAccount())
-                                .map(
-                                        e ->
-                                                new TransactionResult.AccountResult(
-                                                        Optional.ofNullable(e.id()).orElse(-1L),
-                                                        e.name()))
-                                .orElse(null),
-                        Optional.ofNullable(extracted.toAccount())
-                                .map(
-                                        e ->
-                                                new TransactionResult.AccountResult(
-                                                        Optional.ofNullable(e.id()).orElse(-1L),
-                                                        e.name()))
-                                .orElse(null),
-                        extracted.description(),
-                        extracted.amount()));
+        var extracted = transactionExtractorAgent.extractTransaction(
+                UUID.randomUUID(), LocalDate.now(), transactionInput);
+        return Optional.of(new TransactionResult(
+                extracted.type(),
+                extracted.date(),
+                Optional.ofNullable(extracted.fromAccount())
+                        .map(e -> new TransactionResult.AccountResult(
+                                Optional.ofNullable(e.id()).orElse(-1L), e.name()))
+                        .orElse(null),
+                Optional.ofNullable(extracted.toAccount())
+                        .map(e -> new TransactionResult.AccountResult(
+                                Optional.ofNullable(e.id()).orElse(-1L), e.name()))
+                        .orElse(null),
+                extracted.description(),
+                extracted.amount()));
     }
 
     private SuggestionResult fallbackToLLM(SuggestionInput transactionInput) {
         log.debug("No embedding found for the input, falling back to LLM.");
-        var suggestion =
-                classificationAgent.classifyTransaction(
-                        UUID.randomUUID(),
-                        transactionInput.description(),
-                        transactionInput.fromAccount(),
-                        transactionInput.toAccount(),
-                        transactionInput.amount(),
-                        translateDate(transactionInput));
+        var suggestion = classificationAgent.classifyTransaction(
+                UUID.randomUUID(),
+                transactionInput.description(),
+                transactionInput.fromAccount(),
+                transactionInput.toAccount(),
+                transactionInput.amount(),
+                translateDate(transactionInput));
         return new SuggestionResult(
                 suggestion.category(), suggestion.subCategory(), suggestion.tags());
     }

@@ -45,11 +45,10 @@ public class TransactionRule implements AggregateBase {
         }
 
         public void update(RuleColumn field, RuleOperation operation, String condition) {
-            var hasChanged =
-                    Control.Equal(this.field, field)
-                            .append(this.operation, operation)
-                            .append(this.condition, condition)
-                            .isNotEqual();
+            var hasChanged = Control.Equal(this.field, field)
+                    .append(this.operation, operation)
+                    .append(this.condition, condition)
+                    .isNotEqual();
 
             if (hasChanged) {
                 this.field = field;
@@ -81,8 +80,9 @@ public class TransactionRule implements AggregateBase {
         }
 
         public void update(RuleColumn ruleColumn, String change) {
-            var hasChanged =
-                    Control.Equal(ruleColumn, this.field).append(change, this.change).isNotEqual();
+            var hasChanged = Control.Equal(ruleColumn, this.field)
+                    .append(change, this.change)
+                    .isNotEqual();
 
             if (hasChanged) {
                 this.field = ruleColumn;
@@ -188,7 +188,9 @@ public class TransactionRule implements AggregateBase {
     }
 
     public Condition findCondition(long conditionId) {
-        return this.conditions.first(c -> Objects.equals(c.getId(), conditionId)).get();
+        return this.conditions
+                .first(c -> Objects.equals(c.getId(), conditionId))
+                .get();
     }
 
     public Change findChange(long changeId) {

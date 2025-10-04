@@ -36,11 +36,10 @@ public class CurrencyController implements CurrencyApi {
                     "Currency with code " + currencyRequest.getCode() + " already exists");
         }
 
-        var currency =
-                new Currency(
-                        currencyRequest.getName(),
-                        currencyRequest.getCode(),
-                        currencyRequest.getSymbol().charAt(0));
+        var currency = new Currency(
+                currencyRequest.getName(),
+                currencyRequest.getCode(),
+                currencyRequest.getSymbol().charAt(0));
         return HttpResponse.created(convert(currency));
     }
 
@@ -58,23 +57,18 @@ public class CurrencyController implements CurrencyApi {
         return currencyProvider
                 .lookup(currencyCode)
                 .map(this::convert)
-                .getOrThrow(
-                        () ->
-                                StatusException.notFound(
-                                        "No currency found with code " + currencyCode));
+                .getOrThrow(() ->
+                        StatusException.notFound("No currency found with code " + currencyCode));
     }
 
     @Override
     public CurrencyResponse patchCurrencyByCode(
             String currencyCode, PatchCurrencyRequest patchCurrencyRequest) {
         logger.info("Patching currency by code {}.", currencyCode);
-        var currency =
-                currencyProvider
-                        .lookup(currencyCode)
-                        .getOrThrow(
-                                () ->
-                                        StatusException.notFound(
-                                                "No currency found with code " + currencyCode));
+        var currency = currencyProvider
+                .lookup(currencyCode)
+                .getOrThrow(() ->
+                        StatusException.notFound("No currency found with code " + currencyCode));
 
         if (patchCurrencyRequest.getEnabled() != null) {
             if (patchCurrencyRequest.getEnabled().equals(true)) {
@@ -97,19 +91,16 @@ public class CurrencyController implements CurrencyApi {
         logger.info("Updating currency by code {}.", currencyCode);
         return currencyProvider
                 .lookup(currencyCode)
-                .map(
-                        currency -> {
-                            currency.rename(
-                                    currencyRequest.getName(),
-                                    currency.getCode(),
-                                    currencyRequest.getSymbol().charAt(0));
-                            return currency;
-                        })
+                .map(currency -> {
+                    currency.rename(
+                            currencyRequest.getName(),
+                            currency.getCode(),
+                            currencyRequest.getSymbol().charAt(0));
+                    return currency;
+                })
                 .map(this::convert)
-                .getOrThrow(
-                        () ->
-                                StatusException.notFound(
-                                        "No currency found with code " + currencyCode));
+                .getOrThrow(() ->
+                        StatusException.notFound("No currency found with code " + currencyCode));
     }
 
     private CurrencyResponse convert(Currency currency) {

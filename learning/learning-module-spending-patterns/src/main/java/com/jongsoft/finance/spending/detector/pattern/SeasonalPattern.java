@@ -25,17 +25,11 @@ public class SeasonalPattern implements Pattern {
         }
 
         int currentMonth = transaction.getDate().getMonthValue();
-        var transactionsByMonth =
-                matches.stream()
-                        .map(
-                                match ->
-                                        LocalDate.parse(
-                                                Objects.requireNonNull(
-                                                        match.embedded()
-                                                                .metadata()
-                                                                .getString("date"))))
-                        .map(LocalDate::getMonthValue)
-                        .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        var transactionsByMonth = matches.stream()
+                .map(match -> LocalDate.parse(
+                        Objects.requireNonNull(match.embedded().metadata().getString("date"))))
+                .map(LocalDate::getMonthValue)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
         if (transactionsByMonth.isEmpty()) {
             return Optional.empty();
@@ -44,14 +38,13 @@ public class SeasonalPattern implements Pattern {
         var numberInMonth = transactionsByMonth.getOrDefault(currentMonth, 0L);
         var avgPerMonth = matches.size() / transactionsByMonth.size();
         if (isSignificantlyMoreThanAverage(numberInMonth, avgPerMonth)) {
-            return Optional.of(
-                    SpendingPattern.builder()
-                            .type(PatternType.SEASONAL)
-                            .category(transaction.getCategory())
-                            .detectedDate(transaction.getDate().withDayOfMonth(1))
-                            .confidence(.75)
-                            .metadata(Map.of("season", getCurrentSeason(transaction.getDate())))
-                            .build());
+            return Optional.of(SpendingPattern.builder()
+                    .type(PatternType.SEASONAL)
+                    .category(transaction.getCategory())
+                    .detectedDate(transaction.getDate().withDayOfMonth(1))
+                    .confidence(.75)
+                    .metadata(Map.of("season", getCurrentSeason(transaction.getDate())))
+                    .build());
         }
 
         return Optional.empty();

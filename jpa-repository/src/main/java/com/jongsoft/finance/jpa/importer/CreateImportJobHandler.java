@@ -32,24 +32,19 @@ public class CreateImportJobHandler implements CommandHandler<CreateImportJobCom
     public void handle(CreateImportJobCommand command) {
         log.info("[{}] - Processing import create event", command.slug());
 
-        var configJpa =
-                entityManager
-                        .from(ImportConfig.class)
-                        .fieldEq("id", command.configId())
-                        .singleResult()
-                        .getOrThrow(
-                                () ->
-                                        StatusException.notFound(
-                                                "Could not find the configuration for id "
-                                                        + command.configId()));
+        var configJpa = entityManager
+                .from(ImportConfig.class)
+                .fieldEq("id", command.configId())
+                .singleResult()
+                .getOrThrow(() -> StatusException.notFound(
+                        "Could not find the configuration for id " + command.configId()));
 
-        var importJpa =
-                ImportJpa.builder()
-                        .slug(command.slug())
-                        .config(configJpa)
-                        .user(configJpa.getUser())
-                        .fileCode(command.fileCode())
-                        .build();
+        var importJpa = ImportJpa.builder()
+                .slug(command.slug())
+                .config(configJpa)
+                .user(configJpa.getUser())
+                .fileCode(command.fileCode())
+                .build();
 
         entityManager.persist(importJpa);
     }

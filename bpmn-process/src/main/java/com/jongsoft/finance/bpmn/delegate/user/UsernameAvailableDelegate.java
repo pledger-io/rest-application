@@ -30,8 +30,7 @@ public class UsernameAvailableDelegate implements JavaDelegate, JavaBean {
                 execution.getCurrentActivityName(),
                 execution.getVariableLocal(USERNAME));
 
-        execution.setVariableLocal(
-                "usernameAvailable",
-                userProvider.available((UserIdentifier) execution.getVariableLocal(USERNAME)));
+        execution.setVariableLocal("usernameAvailable", userProvider.available((UserIdentifier)
+                execution.getVariableLocal(USERNAME)));
     }
 }

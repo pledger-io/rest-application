@@ -25,15 +25,14 @@ public class TwoFactorHelper {
     private TwoFactorHelper() {}
 
     public static byte[] build2FactorQr(UserAccount userAccount) {
-        var qrData =
-                new QrData.Builder()
-                        .label("Pledger.io: " + userAccount.getUsername())
-                        .secret(userAccount.getSecret())
-                        .issuer("Pledger.io")
-                        .algorithm(HashingAlgorithm.SHA1)
-                        .digits(6)
-                        .period(30)
-                        .build();
+        var qrData = new QrData.Builder()
+                .label("Pledger.io: " + userAccount.getUsername())
+                .secret(userAccount.getSecret())
+                .issuer("Pledger.io")
+                .algorithm(HashingAlgorithm.SHA1)
+                .digits(6)
+                .period(30)
+                .build();
         try {
             var generator = new ZxingPngQrGenerator();
             generator.setImageSize(150);

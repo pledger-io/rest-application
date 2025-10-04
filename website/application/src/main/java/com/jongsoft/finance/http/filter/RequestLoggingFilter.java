@@ -29,18 +29,16 @@ public class RequestLoggingFilter implements HttpServerFilter {
             HttpRequest<?> request, ServerFilterChain chain) {
         var startTime = Instant.now();
 
-        return Publishers.then(
-                chain.proceed(request),
-                response -> {
-                    var endTime = Instant.now();
-                    var duration = endTime.toEpochMilli() - startTime.toEpochMilli();
+        return Publishers.then(chain.proceed(request), response -> {
+            var endTime = Instant.now();
+            var duration = endTime.toEpochMilli() - startTime.toEpochMilli();
 
-                    logger.info(
-                            "{}: {} - {} ms - Status Code {}.",
-                            request.getMethod(),
-                            request.getPath(),
-                            duration,
-                            response.status());
-                });
+            logger.info(
+                    "{}: {} - {} ms - Status Code {}.",
+                    request.getMethod(),
+                    request.getPath(),
+                    duration,
+                    response.status());
+        });
     }
 }

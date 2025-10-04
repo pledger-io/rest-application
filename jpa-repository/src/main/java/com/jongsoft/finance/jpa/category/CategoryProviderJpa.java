@@ -98,10 +98,9 @@ public class CategoryProviderJpa implements CategoryProvider {
                 .label(source.getLabel())
                 .lastActivity(source.getLastTransaction())
                 .delete(source.isArchived())
-                .user(
-                        UserAccount.builder()
-                                .username(new UserIdentifier(source.getUser().getUsername()))
-                                .build())
+                .user(UserAccount.builder()
+                        .username(new UserIdentifier(source.getUser().getUsername()))
+                        .build())
                 .build();
     }
 }

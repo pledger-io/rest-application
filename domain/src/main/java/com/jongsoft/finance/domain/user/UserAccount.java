@@ -214,9 +214,7 @@ public class UserAccount implements AggregateBase, Serializable {
 
     public boolean notFullUser() {
         return roles.stream()
-                .noneMatch(
-                        r ->
-                                Objects.equals(r.getName(), "accountant")
-                                        || Objects.equals(r.getName(), "admin"));
+                .noneMatch(r -> Objects.equals(r.getName(), "accountant")
+                        || Objects.equals(r.getName(), "admin"));
     }
 }

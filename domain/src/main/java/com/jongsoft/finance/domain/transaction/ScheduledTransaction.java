@@ -96,11 +96,10 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
 
     @BusinessMethod
     public void adjustSchedule(Periodicity periodicity, int interval) {
-        var hasChanged =
-                this.schedule == null
-                        || Control.Equal(this.schedule.interval(), interval)
-                                .append(this.schedule.periodicity(), periodicity)
-                                .isNotEqual();
+        var hasChanged = this.schedule == null
+                || Control.Equal(this.schedule.interval(), interval)
+                        .append(this.schedule.periodicity(), periodicity)
+                        .isNotEqual();
 
         if (hasChanged) {
             this.schedule = new ScheduleValue(periodicity, interval);
@@ -110,8 +109,9 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
 
     @BusinessMethod
     public void describe(String name, String description) {
-        var hasChanged =
-                Control.Equal(this.name, name).append(this.description, description).isNotEqual();
+        var hasChanged = Control.Equal(this.name, name)
+                .append(this.description, description)
+                .isNotEqual();
 
         if (hasChanged) {
             this.name = name;

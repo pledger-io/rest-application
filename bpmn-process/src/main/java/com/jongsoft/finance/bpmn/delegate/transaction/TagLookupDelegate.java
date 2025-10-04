@@ -44,9 +44,7 @@ public class TagLookupDelegate implements JavaDelegate, JavaBean {
 
         return tagProvider
                 .lookup(name)
-                .getOrThrow(
-                        () ->
-                                StatusException.internalError(
-                                        "Could not locate tag after creating it"));
+                .getOrThrow(() ->
+                        StatusException.internalError("Could not locate tag after creating it"));
     }
 }

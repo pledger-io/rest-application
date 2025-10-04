@@ -48,12 +48,11 @@ class AnalyzeJobProviderJpa implements AnalyzeJobProvider {
 
         var entity = new AnalyzeJobJpa();
         entity.setId(UUID.randomUUID().toString());
-        entity.setUser(
-                entityManager
-                        .from(UserAccountJpa.class)
-                        .fieldEq("username", command.user().email())
-                        .singleResult()
-                        .get());
+        entity.setUser(entityManager
+                .from(UserAccountJpa.class)
+                .fieldEq("username", command.user().email())
+                .singleResult()
+                .get());
         entity.setYearMonth(command.month().toString());
 
         entityManager.getEntityManager().persist(entity);

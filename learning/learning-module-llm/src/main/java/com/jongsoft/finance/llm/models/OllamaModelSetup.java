@@ -62,8 +62,9 @@ class OllamaModelSetup {
             return new ClassificationAugmenter(budgetProvider, categoryProvider, tagProvider);
         }
 
-        return (userMessage) ->
-                AugmentationResult.builder().chatMessage(userMessage.chatMessage()).build();
+        return (userMessage) -> AugmentationResult.builder()
+                .chatMessage(userMessage.chatMessage())
+                .build();
     }
 
     @Bean
@@ -92,11 +93,10 @@ class OllamaModelSetup {
     }
 
     private void retrieveModelInfo() {
-        var modelsResponse =
-                OllamaModels.builder()
-                        .baseUrl(configuration.getOllama().getUri())
-                        .build()
-                        .modelCard(configuration.getOllama().getModel());
+        var modelsResponse = OllamaModels.builder()
+                .baseUrl(configuration.getOllama().getUri())
+                .build()
+                .modelCard(configuration.getOllama().getModel());
 
         chosenModel = modelsResponse.content();
     }

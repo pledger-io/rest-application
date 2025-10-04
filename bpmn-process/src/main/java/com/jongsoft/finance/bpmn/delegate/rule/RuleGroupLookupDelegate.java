@@ -42,9 +42,7 @@ public class RuleGroupLookupDelegate implements JavaDelegate, JavaBean {
 
         return ruleGroupProvider
                 .lookup(name)
-                .getOrThrow(
-                        () ->
-                                new IllegalStateException(
-                                        "Failed to create rule group with name " + name));
+                .getOrThrow(() ->
+                        new IllegalStateException("Failed to create rule group with name " + name));
     }
 }

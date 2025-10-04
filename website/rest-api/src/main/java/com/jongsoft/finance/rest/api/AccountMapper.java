@@ -11,21 +11,18 @@ interface AccountMapper {
 
     static AccountResponse toAccountResponse(Account account) {
         var accountNumbers = new AccountResponseAllOfAccount();
-        var response =
-                new AccountResponse(
-                        account.getId(), account.getName(), account.getType(), accountNumbers);
+        var response = new AccountResponse(
+                account.getId(), account.getName(), account.getType(), accountNumbers);
 
         response.setDescription(account.getDescription());
         if (account.getInterestPeriodicity() != null) {
-            response.setInterest(
-                    new AccountResponseAllOfInterest(
-                            Periodicity.fromValue(account.getInterestPeriodicity().name()),
-                            account.getInterest()));
+            response.setInterest(new AccountResponseAllOfInterest(
+                    Periodicity.fromValue(account.getInterestPeriodicity().name()),
+                    account.getInterest()));
         }
         if (account.getFirstTransaction() != null) {
-            response.setHistory(
-                    new AccountResponseAllOfHistory(
-                            account.getFirstTransaction(), account.getLastTransaction()));
+            response.setHistory(new AccountResponseAllOfHistory(
+                    account.getFirstTransaction(), account.getLastTransaction()));
         }
 
         accountNumbers.setBic(account.getBic());
@@ -37,25 +34,22 @@ interface AccountMapper {
     }
 
     static SavingGoalResponse toSavingGoalResponse(SavingGoal savingGoal) {
-        var response =
-                new SavingGoalResponse(
-                        savingGoal.getId(),
-                        savingGoal.getGoal(),
-                        savingGoal.getAllocated(),
-                        savingGoal.getTargetDate());
+        var response = new SavingGoalResponse(
+                savingGoal.getId(),
+                savingGoal.getGoal(),
+                savingGoal.getAllocated(),
+                savingGoal.getTargetDate());
 
         response.setName(savingGoal.getName());
         response.setDescription(savingGoal.getDescription());
         if (savingGoal.getSchedule() != null) {
-            response.setSchedule(
-                    new ScheduleResponse(
-                            Periodicity.fromValue(savingGoal.getSchedule().periodicity().name()),
-                            savingGoal.getSchedule().interval()));
+            response.setSchedule(new ScheduleResponse(
+                    Periodicity.fromValue(savingGoal.getSchedule().periodicity().name()),
+                    savingGoal.getSchedule().interval()));
             response.setInstallments(savingGoal.computeAllocation());
         }
-        response.setMonthsLeft(
-                Math.max(
-                        ChronoUnit.MONTHS.between(LocalDate.now(), savingGoal.getTargetDate()), 0));
+        response.setMonthsLeft(Math.max(
+                ChronoUnit.MONTHS.between(LocalDate.now(), savingGoal.getTargetDate()), 0));
 
         return response;
     }

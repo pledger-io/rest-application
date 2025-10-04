@@ -20,7 +20,8 @@ import java.util.Optional;
 @Secured(SecurityRule.IS_ANONYMOUS)
 public class StaticController {
 
-    @Inject ResourceResolver resourceResolver;
+    @Inject
+    ResourceResolver resourceResolver;
 
     @Get
     public HttpResponse<?> index() throws URISyntaxException {

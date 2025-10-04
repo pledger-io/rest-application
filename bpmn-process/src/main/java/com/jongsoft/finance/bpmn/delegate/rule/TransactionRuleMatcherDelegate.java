@@ -41,13 +41,10 @@ public class TransactionRuleMatcherDelegate implements JavaDelegate, JavaBean {
     public void execute(DelegateExecution execution) throws Exception {
         var id = execution.<LongValue>getVariableLocalTyped("transactionId").getValue();
 
-        var transaction =
-                transactionProvider
-                        .lookup(id)
-                        .getOrThrow(
-                                () ->
-                                        new IllegalStateException(
-                                                "Cannot locate transaction with id " + id));
+        var transaction = transactionProvider
+                .lookup(id)
+                .getOrThrow(
+                        () -> new IllegalStateException("Cannot locate transaction with id " + id));
 
         log.debug(
                 "{}: Processing transaction rules on transaction {}",
@@ -66,14 +63,14 @@ public class TransactionRuleMatcherDelegate implements JavaDelegate, JavaBean {
             switch (entry.getKey()) {
                 case CATEGORY -> transaction.linkToCategory((String) entry.getValue());
                 case TO_ACCOUNT, CHANGE_TRANSFER_TO ->
-                        transaction.changeAccount(false, (Account) entry.getValue());
+                    transaction.changeAccount(false, (Account) entry.getValue());
                 case SOURCE_ACCOUNT, CHANGE_TRANSFER_FROM ->
-                        transaction.changeAccount(true, (Account) entry.getValue());
+                    transaction.changeAccount(true, (Account) entry.getValue());
                 case CONTRACT -> transaction.linkToContract((String) entry.getValue());
                 case BUDGET -> transaction.linkToBudget((String) entry.getValue());
                 default ->
-                        throw new IllegalArgumentException(
-                                "Unsupported rule column provided " + entry.getKey());
+                    throw new IllegalArgumentException(
+                            "Unsupported rule column provided " + entry.getKey());
             }
         }
     }

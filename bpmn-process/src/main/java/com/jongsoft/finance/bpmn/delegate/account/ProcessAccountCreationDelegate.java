@@ -49,56 +49,43 @@ public class ProcessAccountCreationDelegate implements JavaDelegate, JavaBean {
 
     @Override
     public void execute(DelegateExecution execution) {
-        var accountJson =
-                mapper.readSafe(
-                        execution.<StringValue>getVariableLocalTyped("account").getValue(),
-                        AccountJson.class);
+        var accountJson = mapper.readSafe(
+                execution.<StringValue>getVariableLocalTyped("account").getValue(),
+                AccountJson.class);
 
         log.debug(
                 "{}: Processing account creation from json '{}'",
                 execution.getCurrentActivityName(),
                 accountJson.getName());
 
-        accountProvider
-                .lookup(accountJson.getName())
-                .ifNotPresent(
-                        () -> {
-                            userProvider
-                                    .currentUser()
-                                    .createAccount(
-                                            accountJson.getName(),
-                                            accountJson.getCurrency(),
-                                            accountJson.getType());
+        accountProvider.lookup(accountJson.getName()).ifNotPresent(() -> {
+            userProvider
+                    .currentUser()
+                    .createAccount(
+                            accountJson.getName(),
+                            accountJson.getCurrency(),
+                            accountJson.getType());
 
-                            accountProvider
-                                    .lookup(accountJson.getName())
-                                    .ifPresent(
-                                            account -> {
-                                                account.changeAccount(
-                                                        handleEmptyAsNull(accountJson.getIban()),
-                                                        handleEmptyAsNull(accountJson.getBic()),
-                                                        handleEmptyAsNull(accountJson.getNumber()));
-                                                account.rename(
-                                                        accountJson.getName(),
-                                                        accountJson.getDescription(),
-                                                        accountJson.getCurrency(),
-                                                        accountJson.getType());
+            accountProvider.lookup(accountJson.getName()).ifPresent(account -> {
+                account.changeAccount(
+                        handleEmptyAsNull(accountJson.getIban()),
+                        handleEmptyAsNull(accountJson.getBic()),
+                        handleEmptyAsNull(accountJson.getNumber()));
+                account.rename(
+                        accountJson.getName(),
+                        accountJson.getDescription(),
+                        accountJson.getCurrency(),
+                        accountJson.getType());
 
-                                                if (accountJson.getPeriodicity() != null) {
-                                                    account.interest(
-                                                            accountJson.getInterest(),
-                                                            accountJson.getPeriodicity());
-                                                }
+                if (accountJson.getPeriodicity() != null) {
+                    account.interest(accountJson.getInterest(), accountJson.getPeriodicity());
+                }
 
-                                                if (accountJson.getIcon() != null) {
-                                                    account.registerIcon(
-                                                            storageService.store(
-                                                                    Hex.decode(
-                                                                            accountJson
-                                                                                    .getIcon())));
-                                                }
-                                            });
-                        });
+                if (accountJson.getIcon() != null) {
+                    account.registerIcon(storageService.store(Hex.decode(accountJson.getIcon())));
+                }
+            });
+        });
     }
 
     private String handleEmptyAsNull(String value) {

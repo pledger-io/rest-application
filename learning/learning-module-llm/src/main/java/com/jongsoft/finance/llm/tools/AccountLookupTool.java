@@ -34,16 +34,10 @@ public class AccountLookupTool implements AiTool {
 
         var result = accountProvider.lookup(filter).content().map(this::convert);
         if (result.isEmpty()) {
-            return accountProvider
-                    .synonymOf(accountName)
-                    .map(this::convert)
-                    .getOrSupply(
-                            () -> {
-                                LOGGER.trace(
-                                        "Ai tool could not find account information for {}.",
-                                        accountName);
-                                return UNKNOWN_ACCOUNT;
-                            });
+            return accountProvider.synonymOf(accountName).map(this::convert).getOrSupply(() -> {
+                LOGGER.trace("Ai tool could not find account information for {}.", accountName);
+                return UNKNOWN_ACCOUNT;
+            });
         }
 
         return result.head();

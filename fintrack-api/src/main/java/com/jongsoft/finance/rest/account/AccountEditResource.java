@@ -89,13 +89,10 @@ public class AccountEditResource {
             })
     AccountResponse update(
             @PathVariable long accountId, @Valid @Body AccountEditRequest accountEditRequest) {
-        var account =
-                accountProvider
-                        .lookup(accountId)
-                        .getOrThrow(
-                                () ->
-                                        StatusException.notFound(
-                                                "No account found with id " + accountId));
+        var account = accountProvider
+                .lookup(accountId)
+                .getOrThrow(
+                        () -> StatusException.notFound("No account found with id " + accountId));
 
         account.rename(
                 accountEditRequest.name(),
@@ -163,17 +160,14 @@ public class AccountEditResource {
     @Operation(
             operationId = "addSavingGoal",
             summary = "Create saving goal",
-            description =
-                    "Creates a saving goal into the account, only valid for accounts of types"
-                            + " SAVINGS and JOINED_SAVINGS")
+            description = "Creates a saving goal into the account, only valid for accounts of types"
+                    + " SAVINGS and JOINED_SAVINGS")
     AccountResponse createSavingGoal(
             @PathVariable long accountId, @Body @Valid AccountSavingGoalCreateRequest request) {
         accountProvider
                 .lookup(accountId)
-                .ifPresent(
-                        account ->
-                                account.createSavingGoal(
-                                        request.name(), request.goal(), request.targetDate()))
+                .ifPresent(account -> account.createSavingGoal(
+                        request.name(), request.goal(), request.targetDate()))
                 .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
 
         return accountProvider.lookup(accountId).map(AccountResponse::new).get();
@@ -190,12 +184,10 @@ public class AccountEditResource {
             @Body @Valid AccountSavingGoalCreateRequest request) {
         accountProvider
                 .lookup(accountId)
-                .ifPresent(
-                        account ->
-                                account.getSavingGoals()
-                                        .filter(goal -> goal.getId() == savingId)
-                                        .head()
-                                        .adjustGoal(request.goal(), request.targetDate()))
+                .ifPresent(account -> account.getSavingGoals()
+                        .filter(goal -> goal.getId() == savingId)
+                        .head()
+                        .adjustGoal(request.goal(), request.targetDate()))
                 .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
 
         return accountProvider.lookup(accountId).map(AccountResponse::new).get();
@@ -212,12 +204,10 @@ public class AccountEditResource {
             @Valid @QueryValue @Positive double amount) {
         accountProvider
                 .lookup(accountId)
-                .ifPresent(
-                        account ->
-                                account.getSavingGoals()
-                                        .filter(goal -> goal.getId() == savingId)
-                                        .head()
-                                        .registerPayment(BigDecimal.valueOf(amount)))
+                .ifPresent(account -> account.getSavingGoals()
+                        .filter(goal -> goal.getId() == savingId)
+                        .head()
+                        .registerPayment(BigDecimal.valueOf(amount)))
                 .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
 
         return accountProvider.lookup(accountId).map(AccountResponse::new).get();
@@ -231,11 +221,9 @@ public class AccountEditResource {
     void deleteSavingGoal(@PathVariable long accountId, @PathVariable long savingId) {
         accountProvider
                 .lookup(accountId)
-                .ifPresent(
-                        account ->
-                                account.getSavingGoals()
-                                        .filter(goal -> goal.getId() == savingId)
-                                        .forEach(SavingGoal::completed))
+                .ifPresent(account -> account.getSavingGoals()
+                        .filter(goal -> goal.getId() == savingId)
+                        .forEach(SavingGoal::completed))
                 .elseThrow(() -> StatusException.notFound("No account found for id " + accountId));
     }
 }

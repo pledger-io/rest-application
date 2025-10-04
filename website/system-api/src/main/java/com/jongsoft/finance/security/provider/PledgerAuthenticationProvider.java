@@ -41,17 +41,13 @@ public class PledgerAuthenticationProvider
             @NonNull AuthenticationRequest<String, String> authRequest) {
         logger.info("Authentication Http request for user {}.", authRequest.getIdentity());
 
-        var userAccount =
-                userProvider
-                        .lookup(new UserIdentifier(authRequest.getIdentity()))
-                        .getOrThrow(
-                                () ->
-                                        AuthenticationResponse.exception(
-                                                AuthenticationFailureReason.USER_NOT_FOUND));
-        boolean matches =
-                application
-                        .getHashingAlgorithm()
-                        .matches(userAccount.getPassword(), authRequest.getSecret());
+        var userAccount = userProvider
+                .lookup(new UserIdentifier(authRequest.getIdentity()))
+                .getOrThrow(() -> AuthenticationResponse.exception(
+                        AuthenticationFailureReason.USER_NOT_FOUND));
+        boolean matches = application
+                .getHashingAlgorithm()
+                .matches(userAccount.getPassword(), authRequest.getSecret());
         if (!matches) {
             throw AuthenticationResponse.exception(
                     AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH);

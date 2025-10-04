@@ -73,14 +73,11 @@ public class TransactionResource {
             summary = "Search transactions",
             description = "Search in all transactions using the given search request.")
     ResultPageResponse<TransactionResponse> search(@Valid @Body TransactionSearchRequest request) {
-        var command =
-                filterFactory
-                        .transaction()
-                        .range(
-                                Dates.range(
-                                        request.getDateRange().start(),
-                                        request.getDateRange().end()))
-                        .page(request.getPage(), Integer.MAX_VALUE);
+        var command = filterFactory
+                .transaction()
+                .range(Dates.range(
+                        request.getDateRange().start(), request.getDateRange().end()))
+                .page(request.getPage(), Integer.MAX_VALUE);
 
         Control.Option(request.getCategory())
                 .map(e -> new EntityRef(e.id()))
@@ -145,16 +142,13 @@ public class TransactionResource {
                     .map(TransactionBulkEditRequest.EntityRef::name)
                     .ifPresent(transaction::linkToContract);
 
-            Control.Option(request.getTags())
-                    .ifPresent(
-                            adding -> {
-                                var tags =
-                                        Control.Option(transaction.getTags())
-                                                .getOrSupply(Collections::List)
-                                                .union(adding);
+            Control.Option(request.getTags()).ifPresent(adding -> {
+                var tags = Control.Option(transaction.getTags())
+                        .getOrSupply(Collections::List)
+                        .union(adding);
 
-                                transaction.tag(tags);
-                            });
+                transaction.tag(tags);
+            });
         }
     }
 
@@ -177,8 +171,8 @@ public class TransactionResource {
         }
 
         if (request.getDateRange() != null) {
-            command.range(
-                    Dates.range(request.getDateRange().start(), request.getDateRange().end()));
+            command.range(Dates.range(
+                    request.getDateRange().start(), request.getDateRange().end()));
         }
 
         if (request.isTransfers()) {
@@ -198,23 +192,17 @@ public class TransactionResource {
             description = "Creates a CSV export of all transactions in the system.")
     String export() throws IOException {
         var outputStream = new ByteArrayOutputStream();
-        outputStream.write(
-                ("Date,Booking Date,Interest Date,From name,From IBAN,"
-                                + "To name,To IBAN,Description,Category,Budget,Contract,Amount\n")
-                        .getBytes(StandardCharsets.UTF_8));
+        outputStream.write(("Date,Booking Date,Interest Date,From name,From IBAN,"
+                        + "To name,To IBAN,Description,Category,Budget,Contract,Amount\n")
+                .getBytes(StandardCharsets.UTF_8));
 
-        var filterCommand =
-                filterFactory
-                        .transaction()
-                        .accounts(
-                                accountProvider
-                                        .lookup(
-                                                filterFactory
-                                                        .account()
-                                                        .types(accountTypeProvider.lookup(false)))
-                                        .content()
-                                        .map(account -> new EntityRef(account.getId())))
-                        .page(0, 100);
+        var filterCommand = filterFactory
+                .transaction()
+                .accounts(accountProvider
+                        .lookup(filterFactory.account().types(accountTypeProvider.lookup(false)))
+                        .content()
+                        .map(account -> new EntityRef(account.getId())))
+                .page(0, 100);
 
         int currentPage = 0;
         filterCommand.page(currentPage, 100);
@@ -235,59 +223,39 @@ public class TransactionResource {
     @Operation(hidden = true)
     void applyRules() {
         try (var executors = Executors.newFixedThreadPool(25)) {
-            executors.execute(
-                    () -> {
-                        EventBus.getBus()
-                                .sendSystemEvent(
-                                        new InternalAuthenticationEvent(
+            executors.execute(() -> {
+                EventBus.getBus()
+                        .sendSystemEvent(new InternalAuthenticationEvent(
+                                this, authenticationFacade.authenticated()));
+
+                var filterCommand = filterFactory
+                        .transaction()
+                        .accounts(accountProvider
+                                .lookup(filterFactory
+                                        .account()
+                                        .types(accountTypeProvider.lookup(false)))
+                                .content()
+                                .map(account -> new EntityRef(account.getId())))
+                        .page(0, 100);
+
+                int currentPage = 0;
+                var page = transactionProvider.lookup(filterCommand);
+                do {
+                    page.content()
+                            .map(Transaction::getId)
+                            .forEach(transaction -> executors.execute(() -> {
+                                EventBus.getBus()
+                                        .sendSystemEvent(new InternalAuthenticationEvent(
                                                 this, authenticationFacade.authenticated()));
 
-                        var filterCommand =
-                                filterFactory
-                                        .transaction()
-                                        .accounts(
-                                                accountProvider
-                                                        .lookup(
-                                                                filterFactory
-                                                                        .account()
-                                                                        .types(
-                                                                                accountTypeProvider
-                                                                                        .lookup(
-                                                                                                false)))
-                                                        .content()
-                                                        .map(
-                                                                account ->
-                                                                        new EntityRef(
-                                                                                account.getId())))
-                                        .page(0, 100);
+                                runtimeResource.startProcess(
+                                        "analyzeRule", Map.of("transactionId", transaction));
+                            }));
 
-                        int currentPage = 0;
-                        var page = transactionProvider.lookup(filterCommand);
-                        do {
-                            page.content()
-                                    .map(Transaction::getId)
-                                    .forEach(
-                                            transaction ->
-                                                    executors.execute(
-                                                            () -> {
-                                                                EventBus.getBus()
-                                                                        .sendSystemEvent(
-                                                                                new InternalAuthenticationEvent(
-                                                                                        this,
-                                                                                        authenticationFacade
-                                                                                                .authenticated()));
-
-                                                                runtimeResource.startProcess(
-                                                                        "analyzeRule",
-                                                                        Map.of(
-                                                                                "transactionId",
-                                                                                transaction));
-                                                            }));
-
-                            filterCommand.page(++currentPage, 100);
-                            page = transactionProvider.lookup(filterCommand);
-                        } while (page.hasNext());
-                    });
+                    filterCommand.page(++currentPage, 100);
+                    page = transactionProvider.lookup(filterCommand);
+                } while (page.hasNext());
+            });
         }
     }
 

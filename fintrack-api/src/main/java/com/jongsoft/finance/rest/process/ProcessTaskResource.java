@@ -36,13 +36,12 @@ public class ProcessTaskResource {
             operationId = "getTasks")
     public List<ProcessTaskResponse> tasks(
             @PathVariable String processDefinitionKey, @PathVariable String instanceId) {
-        return Collections.List(
-                        taskService
-                                .createTaskQuery()
-                                .processDefinitionKey(processDefinitionKey)
-                                .processInstanceId(instanceId)
-                                .initializeFormKeys()
-                                .list())
+        return Collections.List(taskService
+                        .createTaskQuery()
+                        .processDefinitionKey(processDefinitionKey)
+                        .processInstanceId(instanceId)
+                        .initializeFormKeys()
+                        .list())
                 .map(ProcessTaskResponse::new)
                 .toJava();
     }

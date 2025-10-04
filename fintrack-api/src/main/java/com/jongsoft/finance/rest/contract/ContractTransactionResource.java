@@ -43,13 +43,12 @@ public class ContractTransactionResource {
             description = "Paged listing of all transactions that belong to a contract")
     ResultPageResponse<TransactionResponse> transactions(
             @PathVariable long contractId, @Nullable Integer page) {
-        var filter =
-                filterFactory
-                        .transaction()
-                        .ownAccounts()
-                        .onlyIncome(false)
-                        .contracts(Collections.List(new EntityRef(contractId)))
-                        .page(Optional.ofNullable(page).orElse(0), settingProvider.getPageSize());
+        var filter = filterFactory
+                .transaction()
+                .ownAccounts()
+                .onlyIncome(false)
+                .contracts(Collections.List(new EntityRef(contractId)))
+                .page(Optional.ofNullable(page).orElse(0), settingProvider.getPageSize());
 
         return new ResultPageResponse<>(
                 transactionService.lookup(filter).map(TransactionResponse::new));

@@ -63,9 +63,8 @@ public class JsonRecordSerializer<T> extends AbstractTypedValueSerializer<TypedV
     public TypedValue readValue(ValueFields valueFields, boolean b, boolean b1) {
         logger.trace("Reading value from value fields: {}", valueFields.getName());
         try {
-            return Variables.objectValue(
-                            objectMapper.readValue(
-                                    new String(valueFields.getByteArrayValue()), supportedClass))
+            return Variables.objectValue(objectMapper.readValue(
+                            new String(valueFields.getByteArrayValue()), supportedClass))
                     .serializationDataFormat("application/json")
                     .create();
         } catch (IOException e) {

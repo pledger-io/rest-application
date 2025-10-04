@@ -59,14 +59,13 @@ public class TransactionProviderJpa implements TransactionProvider {
             delegate.page(0, 1);
             delegate.user(authenticationFacade.authenticated());
 
-            var results =
-                    entityManager
-                            .from(delegate)
-                            .join("transactions t")
-                            .orderBy("date", true)
-                            .paged()
-                            .content()
-                            .map(this::convert);
+            var results = entityManager
+                    .from(delegate)
+                    .join("transactions t")
+                    .orderBy("date", true)
+                    .paged()
+                    .content()
+                    .map(this::convert);
 
             if (results.isEmpty()) {
                 return Control.Option();
@@ -171,24 +170,19 @@ public class TransactionProviderJpa implements TransactionProvider {
                 .joinFetch("currency")
                 .joinFetch("tags")
                 .fieldEq("user.username", authenticationFacade.authenticated())
-                .whereExists(
-                        fromQuery ->
-                                fromQuery
-                                        .from("transactions")
-                                        .fieldEq("account.id", from.getId())
-                                        .fieldEqOneOf("amount", amount, -amount)
-                                        .fieldNull("deleted"))
-                .whereExists(
-                        toQuery ->
-                                toQuery.from("transactions")
-                                        .fieldEq("account.id", to.getId())
-                                        .fieldEqOneOf("amount", amount, -amount)
-                                        .fieldNull("deleted"))
+                .whereExists(fromQuery -> fromQuery
+                        .from("transactions")
+                        .fieldEq("account.id", from.getId())
+                        .fieldEqOneOf("amount", amount, -amount)
+                        .fieldNull("deleted"))
+                .whereExists(toQuery -> toQuery.from("transactions")
+                        .fieldEq("account.id", to.getId())
+                        .fieldEqOneOf("amount", amount, -amount)
+                        .fieldNull("deleted"))
                 .stream()
                 .map(this::convert)
-                .collect(
-                        com.jongsoft.lang.collection.support.Collections.collector(
-                                com.jongsoft.lang.Collections::List));
+                .collect(com.jongsoft.lang.collection.support.Collections.collector(
+                        com.jongsoft.lang.Collections::List));
     }
 
     protected Transaction convert(TransactionJournal source) {
@@ -196,10 +190,9 @@ public class TransactionProviderJpa implements TransactionProvider {
             return null;
         }
 
-        var parts =
-                Collections.List(source.getTransactions())
-                        .filter(entity -> Objects.isNull(entity.getDeleted()))
-                        .map(this::convertPart);
+        var parts = Collections.List(source.getTransactions())
+                .filter(entity -> Objects.isNull(entity.getDeleted()))
+                .map(this::convertPart);
 
         return Transaction.builder()
                 .id(source.getId())
@@ -209,28 +202,23 @@ public class TransactionProviderJpa implements TransactionProvider {
                 .bookDate(source.getBookDate())
                 .interestDate(source.getInterestDate())
                 .failureCode(source.getFailureCode())
-                .budget(
-                        Control.Option(source.getBudget())
-                                .map(ExpenseJpa::getName)
-                                .getOrSupply(() -> null))
-                .category(
-                        Control.Option(source.getCategory())
-                                .map(CategoryJpa::getLabel)
-                                .getOrSupply(() -> null))
+                .budget(Control.Option(source.getBudget())
+                        .map(ExpenseJpa::getName)
+                        .getOrSupply(() -> null))
+                .category(Control.Option(source.getCategory())
+                        .map(CategoryJpa::getLabel)
+                        .getOrSupply(() -> null))
                 .currency(source.getCurrency().getCode())
-                .importSlug(
-                        Control.Option(source.getBatchImport())
-                                .map(ImportJpa::getSlug)
-                                .getOrSupply(() -> null))
+                .importSlug(Control.Option(source.getBatchImport())
+                        .map(ImportJpa::getSlug)
+                        .getOrSupply(() -> null))
                 .description(source.getDescription())
-                .contract(
-                        Control.Option(source.getContract())
-                                .map(ContractJpa::getName)
-                                .getOrSupply(() -> null))
-                .tags(
-                        Control.Option(source.getTags())
-                                .map(tags -> Collections.List(tags).map(TagJpa::getName))
-                                .getOrSupply(Collections::List))
+                .contract(Control.Option(source.getContract())
+                        .map(ContractJpa::getName)
+                        .getOrSupply(() -> null))
+                .tags(Control.Option(source.getTags())
+                        .map(tags -> Collections.List(tags).map(TagJpa::getName))
+                        .getOrSupply(Collections::List))
                 .transactions(parts)
                 .build();
     }
@@ -238,13 +226,12 @@ public class TransactionProviderJpa implements TransactionProvider {
     private Transaction.Part convertPart(TransactionJpa transaction) {
         return Transaction.Part.builder()
                 .id(transaction.getId())
-                .account(
-                        Account.builder()
-                                .id(transaction.getAccount().getId())
-                                .name(transaction.getAccount().getName())
-                                .type(transaction.getAccount().getType().getLabel())
-                                .imageFileToken(transaction.getAccount().getImageFileToken())
-                                .build())
+                .account(Account.builder()
+                        .id(transaction.getAccount().getId())
+                        .name(transaction.getAccount().getName())
+                        .type(transaction.getAccount().getType().getLabel())
+                        .imageFileToken(transaction.getAccount().getImageFileToken())
+                        .build())
                 .amount(transaction.getAmount().doubleValue())
                 .description(transaction.getDescription())
                 .build();

@@ -58,26 +58,23 @@ public class MicronautBeanResolver implements ResolverFactory, Resolver {
 
     protected synchronized Set<String> getKeySet() {
         return applicationContext.getAllBeanDefinitions().stream()
-                .filter(
-                        beanDefinition ->
-                                !beanDefinition.getClass().getName().startsWith("io.micronaut."))
+                .filter(beanDefinition ->
+                        !beanDefinition.getClass().getName().startsWith("io.micronaut."))
                 .map(this::getBeanName)
                 .collect(Collectors.toSet());
     }
 
     protected String getBeanName(BeanDefinition<?> beanDefinition) {
-        var beanQualifier =
-                beanDefinition
-                        .getAnnotationMetadata()
-                        .findDeclaredAnnotation(AnnotationUtil.NAMED)
-                        .flatMap(AnnotationValue::stringValue);
-        return beanQualifier.orElseGet(
-                () -> {
-                    if (beanDefinition instanceof NameResolver resolver) {
-                        return resolver.resolveName().orElse(getBeanNameFromType(beanDefinition));
-                    }
-                    return getBeanNameFromType(beanDefinition);
-                });
+        var beanQualifier = beanDefinition
+                .getAnnotationMetadata()
+                .findDeclaredAnnotation(AnnotationUtil.NAMED)
+                .flatMap(AnnotationValue::stringValue);
+        return beanQualifier.orElseGet(() -> {
+            if (beanDefinition instanceof NameResolver resolver) {
+                return resolver.resolveName().orElse(getBeanNameFromType(beanDefinition));
+            }
+            return getBeanNameFromType(beanDefinition);
+        });
     }
 
     protected String getBeanNameFromType(BeanDefinition<?> beanDefinition) {

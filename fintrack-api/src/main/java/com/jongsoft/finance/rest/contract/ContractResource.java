@@ -60,8 +60,14 @@ public class ContractResource {
         var contracts = contractProvider.lookup();
 
         return new ContractOverviewResponse(
-                contracts.reject(Contract::isTerminated).map(ContractResponse::new).toJava(),
-                contracts.filter(Contract::isTerminated).map(ContractResponse::new).toJava());
+                contracts
+                        .reject(Contract::isTerminated)
+                        .map(ContractResponse::new)
+                        .toJava(),
+                contracts
+                        .filter(Contract::isTerminated)
+                        .map(ContractResponse::new)
+                        .toJava());
     }
 
     @Get("/auto-complete")
@@ -83,27 +89,17 @@ public class ContractResource {
     ContractResponse create(@Body ContractCreateRequest createRequest) {
         return accountProvider
                 .lookup(createRequest.company().id())
-                .map(
-                        account ->
-                                account.createContract(
-                                        createRequest.name(),
-                                        createRequest.description(),
-                                        createRequest.start(),
-                                        createRequest.end()))
-                .map(
-                        account ->
-                                contractProvider
-                                        .lookup(createRequest.name())
-                                        .getOrThrow(
-                                                () ->
-                                                        StatusException.internalError(
-                                                                "Error creating contract")))
+                .map(account -> account.createContract(
+                        createRequest.name(),
+                        createRequest.description(),
+                        createRequest.start(),
+                        createRequest.end()))
+                .map(account -> contractProvider
+                        .lookup(createRequest.name())
+                        .getOrThrow(() -> StatusException.internalError("Error creating contract")))
                 .map(ContractResponse::new)
-                .getOrThrow(
-                        () ->
-                                StatusException.notFound(
-                                        "No account can be found for "
-                                                + createRequest.company().id()));
+                .getOrThrow(() -> StatusException.notFound(
+                        "No account can be found for " + createRequest.company().id()));
     }
 
     @Post("/{contractId}")
@@ -119,15 +115,14 @@ public class ContractResource {
             @PathVariable long contractId, @Body @Valid ContractCreateRequest updateRequest) {
         return contractProvider
                 .lookup(contractId)
-                .map(
-                        contract -> {
-                            contract.change(
-                                    updateRequest.name(),
-                                    updateRequest.description(),
-                                    updateRequest.start(),
-                                    updateRequest.end());
-                            return contract;
-                        })
+                .map(contract -> {
+                    contract.change(
+                            updateRequest.name(),
+                            updateRequest.description(),
+                            updateRequest.start(),
+                            updateRequest.end());
+                    return contract;
+                })
                 .map(ContractResponse::new)
                 .getOrThrow(() -> StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
     }
@@ -158,31 +153,24 @@ public class ContractResource {
                             in = ParameterIn.PATH,
                             schema = @Schema(implementation = Long.class)))
     void schedule(@PathVariable long contractId, @Body @Valid CreateScheduleRequest request) {
-        var account =
-                accountProvider
-                        .lookup(request.source().id())
-                        .getOrThrow(
-                                () ->
-                                        StatusException.badRequest(
-                                                "No source account found with provided id."));
+        var account = accountProvider
+                .lookup(request.source().id())
+                .getOrThrow(() ->
+                        StatusException.badRequest("No source account found with provided id."));
 
-        var contract =
-                contractProvider
-                        .lookup(contractId)
-                        .getOrThrow(
-                                () ->
-                                        StatusException.badRequest(
-                                                "No contract found with provided id."));
+        var contract = contractProvider
+                .lookup(contractId)
+                .getOrThrow(
+                        () -> StatusException.badRequest("No contract found with provided id."));
 
         contract.createSchedule(request.getSchedule(), account, request.amount());
 
         // update the schedule start / end date
         scheduleProvider
-                .lookup(
-                        filterFactory
-                                .schedule()
-                                .activeOnly()
-                                .contract(Collections.List(new EntityRef(contractId))))
+                .lookup(filterFactory
+                        .schedule()
+                        .activeOnly()
+                        .contract(Collections.List(new EntityRef(contractId))))
                 .content()
                 .forEach(ScheduledTransaction::limitForContract);
     }
@@ -200,11 +188,10 @@ public class ContractResource {
     ContractResponse warnExpiry(@PathVariable long contractId) {
         return contractProvider
                 .lookup(contractId)
-                .map(
-                        contract -> {
-                            contract.warnBeforeExpires();
-                            return contract;
-                        })
+                .map(contract -> {
+                    contract.warnBeforeExpires();
+                    return contract;
+                })
                 .map(ContractResponse::new)
                 .getOrThrow(() -> StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
     }
@@ -224,11 +211,10 @@ public class ContractResource {
             @Body @Valid ContractAttachmentRequest attachmentRequest) {
         return contractProvider
                 .lookup(contractId)
-                .map(
-                        contract -> {
-                            contract.registerUpload(attachmentRequest.fileCode());
-                            return contract;
-                        })
+                .map(contract -> {
+                    contract.registerUpload(attachmentRequest.fileCode());
+                    return contract;
+                })
                 .map(ContractResponse::new)
                 .getOrThrow(() -> StatusException.notFound(NO_CONTRACT_FOUND_MESSAGE + contractId));
     }

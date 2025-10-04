@@ -145,22 +145,17 @@ public class BudgetResource {
     BudgetResponse patchBudget(@Valid @Body BudgetCreateRequest patchRequest) {
         var startDate = patchRequest.getStart();
 
-        var budget =
-                budgetProvider
-                        .lookup(startDate.getYear(), startDate.getMonthValue())
-                        .getOrThrow(
-                                () ->
-                                        StatusException.notFound(
-                                                "No budget is active yet, create a budget first."));
+        var budget = budgetProvider
+                .lookup(startDate.getYear(), startDate.getMonthValue())
+                .getOrThrow(() -> StatusException.notFound(
+                        "No budget is active yet, create a budget first."));
 
         budget.indexBudget(startDate, patchRequest.income());
         return budgetProvider
                 .lookup(startDate.getYear(), startDate.getMonthValue())
                 .map(BudgetResponse::new)
-                .getOrThrow(
-                        () ->
-                                StatusException.internalError(
-                                        "Could not get budget after updating the period."));
+                .getOrThrow(() -> StatusException.internalError(
+                        "Could not get budget after updating the period."));
     }
 
     @Patch("/expenses")
@@ -170,14 +165,10 @@ public class BudgetResource {
     BudgetResponse patchExpenses(@Valid @Body ExpensePatchRequest patchRequest) {
         var currentDate = LocalDate.now().withDayOfMonth(1);
 
-        var budget =
-                budgetProvider
-                        .lookup(currentDate.getYear(), currentDate.getMonthValue())
-                        .getOrThrow(
-                                () ->
-                                        StatusException.notFound(
-                                                "Cannot update expenses, no budget available"
-                                                        + " yet."));
+        var budget = budgetProvider
+                .lookup(currentDate.getYear(), currentDate.getMonthValue())
+                .getOrThrow(() -> StatusException.notFound(
+                        "Cannot update expenses, no budget available" + " yet."));
 
         if (patchRequest.expenseId() != null) {
             log.debug("Updating expense {} within active budget.", patchRequest.expenseId());
@@ -189,25 +180,16 @@ public class BudgetResource {
                         currentDate,
                         budget.getStart());
                 budget.indexBudget(currentDate, budget.getExpectedIncome());
-                budget =
-                        budgetProvider
-                                .lookup(currentDate.getYear(), currentDate.getMonthValue())
-                                .getOrThrow(
-                                        () ->
-                                                StatusException.internalError(
-                                                        "Updating of budget failed."));
+                budget = budgetProvider
+                        .lookup(currentDate.getYear(), currentDate.getMonthValue())
+                        .getOrThrow(
+                                () -> StatusException.internalError("Updating of budget failed."));
             }
 
-            var toUpdate =
-                    budget.getExpenses()
-                            .first(
-                                    expense ->
-                                            Objects.equals(
-                                                    expense.getId(), patchRequest.expenseId()))
-                            .getOrThrow(
-                                    () ->
-                                            StatusException.badRequest(
-                                                    "Attempted to update a non existing expense."));
+            var toUpdate = budget.getExpenses()
+                    .first(expense -> Objects.equals(expense.getId(), patchRequest.expenseId()))
+                    .getOrThrow(() -> StatusException.badRequest(
+                            "Attempted to update a non existing expense."));
 
             toUpdate.updateExpense(patchRequest.amount());
         } else {
@@ -218,10 +200,8 @@ public class BudgetResource {
         return budgetProvider
                 .lookup(currentDate.getYear(), currentDate.getMonthValue())
                 .map(BudgetResponse::new)
-                .getOrThrow(
-                        () ->
-                                StatusException.internalError(
-                                        "Error whilst fetching updated budget."));
+                .getOrThrow(() ->
+                        StatusException.internalError("Error whilst fetching updated budget."));
     }
 
     @Get("/expenses/{id}/{year}/{month}")
@@ -235,25 +215,21 @@ public class BudgetResource {
         return budgetProvider.lookup(year, month).stream()
                 .flatMap(budget -> budget.getExpenses().stream())
                 .filter(expense -> expense.getId() == id)
-                .map(
-                        expense -> {
-                            var filter =
-                                    filterFactory
-                                            .transaction()
-                                            .ownAccounts()
-                                            .range(dateRange)
-                                            .expenses(
-                                                    Collections.List(
-                                                            new EntityRef(expense.getId())));
+                .map(expense -> {
+                    var filter = filterFactory
+                            .transaction()
+                            .ownAccounts()
+                            .range(dateRange)
+                            .expenses(Collections.List(new EntityRef(expense.getId())));
 
-                            return new ComputedExpenseResponse(
-                                    expense.computeBudget(),
-                                    transactionProvider
-                                            .balance(filter)
-                                            .getOrSupply(() -> BigDecimal.ZERO)
-                                            .doubleValue(),
-                                    dateRange);
-                        })
+                    return new ComputedExpenseResponse(
+                            expense.computeBudget(),
+                            transactionProvider
+                                    .balance(filter)
+                                    .getOrSupply(() -> BigDecimal.ZERO)
+                                    .doubleValue(),
+                            dateRange);
+                })
                 .toList();
     }
 }

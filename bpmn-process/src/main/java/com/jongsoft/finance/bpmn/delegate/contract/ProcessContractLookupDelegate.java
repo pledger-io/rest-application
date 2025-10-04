@@ -31,15 +31,13 @@ public class ProcessContractLookupDelegate implements JavaDelegate, JavaBean {
         final Contract contract;
         if (execution.hasVariableLocal("name")) {
             var name = (String) execution.getVariableLocal("name");
-            contract =
-                    contractProvider
-                            .lookup(name)
-                            .getOrSupply(() -> Contract.builder().name(name).build());
+            contract = contractProvider
+                    .lookup(name)
+                    .getOrSupply(() -> Contract.builder().name(name).build());
         } else {
-            contract =
-                    contractProvider
-                            .lookup((Long) execution.getVariableLocal("id"))
-                            .getOrSupply(() -> null);
+            contract = contractProvider
+                    .lookup((Long) execution.getVariableLocal("id"))
+                    .getOrSupply(() -> null);
         }
 
         execution.setVariable("contract", contract);

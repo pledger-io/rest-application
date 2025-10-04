@@ -135,10 +135,9 @@ public class TransactionRuleResource {
             description = "Rule successfully created",
             content = @Content(schema = @Schema(implementation = TransactionRuleResponse.class)))
     void create(@PathVariable String group, @Valid @Body CreateRuleRequest request) {
-        var rule =
-                currentUserProvider
-                        .currentUser()
-                        .createRule(request.getName(), request.isRestrictive());
+        var rule = currentUserProvider
+                .currentUser()
+                .createRule(request.getName(), request.isRestrictive());
 
         rule.assign(group);
         rule.change(
@@ -151,12 +150,8 @@ public class TransactionRuleResource {
                 .forEach(change -> rule.registerChange(change.column(), change.value()));
 
         request.getConditions()
-                .forEach(
-                        condition ->
-                                rule.registerCondition(
-                                        condition.column(),
-                                        condition.operation(),
-                                        condition.value()));
+                .forEach(condition -> rule.registerCondition(
+                        condition.column(), condition.operation(), condition.value()));
 
         ruleProvider.save(rule);
     }
@@ -214,35 +209,28 @@ public class TransactionRuleResource {
             @Valid @Body CreateRuleRequest request) {
         return ruleProvider
                 .lookup(id)
-                .map(
-                        rule -> {
-                            rule.change(
-                                    request.getName(),
-                                    request.getDescription(),
-                                    request.isRestrictive(),
-                                    request.isActive());
+                .map(rule -> {
+                    rule.change(
+                            request.getName(),
+                            request.getDescription(),
+                            request.isRestrictive(),
+                            request.isActive());
 
-                            rule.getChanges().forEach(Removable::delete);
+                    rule.getChanges().forEach(Removable::delete);
 
-                            request.getChanges()
-                                    .forEach(
-                                            change ->
-                                                    rule.registerChange(
-                                                            change.column(), change.value()));
+                    request.getChanges()
+                            .forEach(
+                                    change -> rule.registerChange(change.column(), change.value()));
 
-                            rule.getConditions().forEach(Removable::delete);
+                    rule.getConditions().forEach(Removable::delete);
 
-                            request.getConditions()
-                                    .forEach(
-                                            condition ->
-                                                    rule.registerCondition(
-                                                            condition.column(),
-                                                            condition.operation(),
-                                                            condition.value()));
+                    request.getConditions()
+                            .forEach(condition -> rule.registerCondition(
+                                    condition.column(), condition.operation(), condition.value()));
 
-                            ruleProvider.save(rule);
-                            return ruleProvider.lookup(id).get();
-                        })
+                    ruleProvider.save(rule);
+                    return ruleProvider.lookup(id).get();
+                })
                 .map(TransactionRuleResponse::new)
                 .getOrThrow(() -> StatusException.notFound("Rule not found with id " + id));
     }

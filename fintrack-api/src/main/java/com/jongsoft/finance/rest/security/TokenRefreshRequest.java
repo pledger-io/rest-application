@@ -10,9 +10,8 @@ public class TokenRefreshRequest {
 
     @NotBlank
     @Schema(
-            description =
-                    "The refresh token that, this can be obtained from the JWT provided after"
-                            + " login.",
+            description = "The refresh token that, this can be obtained from the JWT provided after"
+                    + " login.",
             required = true,
             implementation = String.class)
     private String token;

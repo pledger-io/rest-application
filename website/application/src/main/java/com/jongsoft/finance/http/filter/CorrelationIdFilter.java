@@ -23,10 +23,8 @@ public class CorrelationIdFilter implements HttpServerFilter {
             MDC.put("correlationId", UUID.randomUUID().toString());
         }
 
-        return Publishers.then(
-                chain.proceed(request),
-                response -> {
-                    MDC.remove("correlationId");
-                });
+        return Publishers.then(chain.proceed(request), response -> {
+            MDC.remove("correlationId");
+        });
     }
 }

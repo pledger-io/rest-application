@@ -37,9 +37,8 @@ public class LanguageResource {
         var pathPart = "en".equals(language) ? "" : "_" + language;
 
         var messages = getClass().getResourceAsStream("/i18n/messages" + pathPart + ".properties");
-        var validation =
-                getClass()
-                        .getResourceAsStream("/i18n/ValidationMessages" + pathPart + ".properties");
+        var validation = getClass()
+                .getResourceAsStream("/i18n/ValidationMessages" + pathPart + ".properties");
 
         var response = new HashMap<String, String>();
         var textKeys = new Properties();
@@ -52,13 +51,10 @@ public class LanguageResource {
     @Get("/{language}/{textKey}")
     @Operation(summary = "Get single translation", operationId = "getTranslation")
     LanguageResponse getText(@PathVariable String language, @PathVariable String textKey) {
-        var message =
-                messageSource
-                        .getMessage(
-                                textKey,
-                                MessageSource.MessageContext.of(Locale.forLanguageTag(language)))
-                        .orElseThrow(
-                                () -> StatusException.notFound("No message found for " + textKey));
+        var message = messageSource
+                .getMessage(
+                        textKey, MessageSource.MessageContext.of(Locale.forLanguageTag(language)))
+                .orElseThrow(() -> StatusException.notFound("No message found for " + textKey));
 
         return new LanguageResponse(message);
     }

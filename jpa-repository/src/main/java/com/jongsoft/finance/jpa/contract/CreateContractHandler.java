@@ -34,15 +34,14 @@ public class CreateContractHandler implements CommandHandler<CreateContractComma
 
         var company = entityManager.getById(AccountJpa.class, command.companyId());
 
-        var contract =
-                ContractJpa.builder()
-                        .name(command.name())
-                        .startDate(command.start())
-                        .endDate(command.end())
-                        .description(command.description())
-                        .company(company)
-                        .user(company.getUser())
-                        .build();
+        var contract = ContractJpa.builder()
+                .name(command.name())
+                .startDate(command.start())
+                .endDate(command.end())
+                .description(command.description())
+                .company(company)
+                .user(company.getUser())
+                .build();
 
         entityManager.persist(contract);
     }

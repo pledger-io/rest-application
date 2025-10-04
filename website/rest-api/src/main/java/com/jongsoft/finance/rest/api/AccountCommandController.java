@@ -48,13 +48,9 @@ public class AccountCommandController implements AccountCommandApi {
                         accountRequest.getCurrency(),
                         accountRequest.getType());
 
-        var bankAccount =
-                accountProvider
-                        .lookup(accountRequest.getName())
-                        .getOrThrow(
-                                () ->
-                                        StatusException.internalError(
-                                                "Failed to create bank account"));
+        var bankAccount = accountProvider
+                .lookup(accountRequest.getName())
+                .getOrThrow(() -> StatusException.internalError("Failed to create bank account"));
 
         updateBankAccount(bankAccount, accountRequest);
 
@@ -65,21 +61,17 @@ public class AccountCommandController implements AccountCommandApi {
     public HttpResponse<@Valid SavingGoalResponse> createSavingGoalForAccount(
             Long id, SavingGoalRequest savingGoalRequest) {
         logger.info("Creating saving goal for bank account {}.", id);
-        var savingGoal =
-                lookupAccountOrThrow(id)
-                        .createSavingGoal(
-                                savingGoalRequest.getName(),
-                                savingGoalRequest.getGoal(),
-                                savingGoalRequest.getTargetDate());
+        var savingGoal = lookupAccountOrThrow(id)
+                .createSavingGoal(
+                        savingGoalRequest.getName(),
+                        savingGoalRequest.getGoal(),
+                        savingGoalRequest.getTargetDate());
 
-        var createdGoal =
-                lookupAccountOrThrow(id)
-                        .getSavingGoals()
-                        .first(goal -> Objects.equals(savingGoal.getName(), goal.getName()))
-                        .getOrThrow(
-                                () ->
-                                        StatusException.internalError(
-                                                "Could not locate created saving goal"));
+        var createdGoal = lookupAccountOrThrow(id)
+                .getSavingGoals()
+                .first(goal -> Objects.equals(savingGoal.getName(), goal.getName()))
+                .getOrThrow(() ->
+                        StatusException.internalError("Could not locate created saving goal"));
         createdGoal.schedule(Periodicity.MONTHS, 1);
         return HttpResponse.created(AccountMapper.toSavingGoalResponse(createdGoal));
     }

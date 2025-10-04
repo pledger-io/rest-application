@@ -54,19 +54,13 @@ public class ProfileController implements ProfileApi {
         }
 
         var tokenForSession = UUID.randomUUID().toString();
-        application.registerToken(
-                user,
-                tokenForSession,
-                (int)
-                        ChronoUnit.SECONDS.between(
-                                LocalDateTime.now(),
-                                sessionRequest.getExpires().atTime(LocalTime.MIN)));
+        application.registerToken(user, tokenForSession, (int) ChronoUnit.SECONDS.between(
+                LocalDateTime.now(), sessionRequest.getExpires().atTime(LocalTime.MIN)));
 
-        var session =
-                userProvider
-                        .tokens(new UserIdentifier(user))
-                        .filter(token -> tokenForSession.equals(token.getToken()))
-                        .head();
+        var session = userProvider
+                .tokens(new UserIdentifier(user))
+                .filter(token -> tokenForSession.equals(token.getToken()))
+                .head();
 
         return HttpResponse.created(convert(session));
     }
@@ -117,10 +111,9 @@ public class ProfileController implements ProfileApi {
             throw StatusException.forbidden("Cannot access 2-factor1 of another user.");
         }
 
-        var userAccount =
-                userProvider
-                        .lookup(new UserIdentifier(user))
-                        .getOrThrow(() -> StatusException.notFound("Cannot find user."));
+        var userAccount = userProvider
+                .lookup(new UserIdentifier(user))
+                .getOrThrow(() -> StatusException.notFound("Cannot find user."));
         switch (patchMultiFactorRequest) {
             case EnableMfaRequest e -> {
                 if (!TwoFactorHelper.verifySecurityCode(
@@ -143,10 +136,9 @@ public class ProfileController implements ProfileApi {
             throw StatusException.forbidden("Cannot patch profile of another user.");
         }
 
-        var userAccount =
-                userProvider
-                        .lookup(new UserIdentifier(user))
-                        .getOrThrow(() -> StatusException.notFound("Cannot find user."));
+        var userAccount = userProvider
+                .lookup(new UserIdentifier(user))
+                .getOrThrow(() -> StatusException.notFound("Cannot find user."));
 
         Optional.ofNullable(patchProfileRequest.getCurrency())
                 .map(Currency::getInstance)
@@ -168,11 +160,10 @@ public class ProfileController implements ProfileApi {
             throw StatusException.forbidden("Cannot revoke sessions of another user.");
         }
 
-        var sessionToken =
-                userProvider.tokens(new UserIdentifier(user)).stream()
-                        .filter(token -> token.getId().intValue() == session)
-                        .findFirst()
-                        .orElseThrow(() -> StatusException.notFound("Invalid session ID."));
+        var sessionToken = userProvider.tokens(new UserIdentifier(user)).stream()
+                .filter(token -> token.getId().intValue() == session)
+                .findFirst()
+                .orElseThrow(() -> StatusException.notFound("Invalid session ID."));
 
         sessionToken.revoke();
         return HttpResponse.noContent();
@@ -190,10 +181,9 @@ public class ProfileController implements ProfileApi {
         response.setId(sessionToken.getId().intValue());
         response.setDescription(sessionToken.getDescription());
         response.setToken(sessionToken.getToken());
-        response.setValid(
-                new DateRange(
-                        sessionToken.getValidity().from().toLocalDate(),
-                        sessionToken.getValidity().until().toLocalDate()));
+        response.setValid(new DateRange(
+                sessionToken.getValidity().from().toLocalDate(),
+                sessionToken.getValidity().until().toLocalDate()));
         return response;
     }
 }

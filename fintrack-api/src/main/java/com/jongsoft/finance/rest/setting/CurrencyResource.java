@@ -90,10 +90,8 @@ public class CurrencyResource {
         return currencyProvider
                 .lookup(currencyCode)
                 .map(CurrencyResponse::new)
-                .getOrThrow(
-                        () ->
-                                StatusException.notFound(
-                                        NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
+                .getOrThrow(() ->
+                        StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
     }
 
     @Secured(AuthenticationRoles.IS_ADMIN)
@@ -122,16 +120,13 @@ public class CurrencyResource {
             @PathVariable String currencyCode, @Valid @Body CurrencyRequest request) {
         return currencyProvider
                 .lookup(currencyCode)
-                .map(
-                        currency -> {
-                            currency.rename(request.name(), request.code(), request.getSymbol());
-                            return currency;
-                        })
+                .map(currency -> {
+                    currency.rename(request.name(), request.code(), request.getSymbol());
+                    return currency;
+                })
                 .map(CurrencyResponse::new)
-                .getOrThrow(
-                        () ->
-                                StatusException.notFound(
-                                        NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
+                .getOrThrow(() ->
+                        StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
     }
 
     @Secured(AuthenticationRoles.IS_ADMIN)
@@ -149,26 +144,23 @@ public class CurrencyResource {
             @PathVariable String currencyCode, @Valid @Body CurrencyPatchRequest request) {
         return currencyProvider
                 .lookup(currencyCode)
-                .map(
-                        currency -> {
-                            if (request.enabled() != null) {
-                                if (request.enabled()) {
-                                    currency.enable();
-                                } else {
-                                    currency.disable();
-                                }
-                            }
+                .map(currency -> {
+                    if (request.enabled() != null) {
+                        if (request.enabled()) {
+                            currency.enable();
+                        } else {
+                            currency.disable();
+                        }
+                    }
 
-                            if (request.decimalPlaces() != null) {
-                                currency.accuracy(request.decimalPlaces());
-                            }
+                    if (request.decimalPlaces() != null) {
+                        currency.accuracy(request.decimalPlaces());
+                    }
 
-                            return currency;
-                        })
+                    return currency;
+                })
                 .map(CurrencyResponse::new)
-                .getOrThrow(
-                        () ->
-                                StatusException.notFound(
-                                        NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
+                .getOrThrow(() ->
+                        StatusException.notFound(NO_CURRENCY_WITH_CODE_MESSAGE + currencyCode));
     }
 }

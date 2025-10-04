@@ -42,7 +42,8 @@ public class ComputeBalanceDelegate implements JavaDelegate, JavaBean {
         }
 
         if (execution.hasVariableLocal("date")) {
-            String isoDate = execution.<StringValue>getVariableLocalTyped("date").getValue();
+            String isoDate =
+                    execution.<StringValue>getVariableLocalTyped("date").getValue();
             requestBuilder.range(Dates.range(LocalDate.of(1900, 1, 1), LocalDate.parse(isoDate)));
         } else {
             requestBuilder.range(Dates.range(LocalDate.of(1900, 1, 1), LocalDate.of(2900, 1, 1)));
