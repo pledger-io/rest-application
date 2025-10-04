@@ -3,6 +3,7 @@ package com.jongsoft.finance.rest.extension;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.providers.UserProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.CurrentUserProvider;
@@ -49,6 +50,18 @@ public class PledgerContext {
 
   public PledgerContext withDebtor(String name, String currency) {
       return withBankAccount(name, currency, "debtor");
+  }
+
+  public PledgerContext withCategory(String name) {
+      var categoryProvider = applicationContext.getBean(CategoryProvider.class);
+      if (categoryProvider.lookup(name).isPresent()) {
+          return this;
+      }
+
+      applicationContext.getBean(CurrentUserProvider.class)
+            .currentUser()
+            .createCategory(name);
+      return this;
   }
 
   void reset() {
