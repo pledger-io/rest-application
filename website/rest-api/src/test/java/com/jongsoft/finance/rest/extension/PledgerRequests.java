@@ -288,4 +288,11 @@ public class PledgerRequests {
               .log().ifValidationFails();
     }
 
+    public ValidatableResponse createExport() {
+        return given(requestSpecification)
+              .get("/api/export")
+          .then()
+              .log().ifValidationFails();
+    }
+
 }
