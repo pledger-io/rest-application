@@ -281,4 +281,11 @@ public class PledgerRequests {
               .log().ifValidationFails();
     }
 
+    public ValidatableResponse fetchAccountTypes() {
+        return given(requestSpecification)
+              .get("/api/account-types")
+          .then()
+              .log().ifValidationFails();
+    }
+
 }

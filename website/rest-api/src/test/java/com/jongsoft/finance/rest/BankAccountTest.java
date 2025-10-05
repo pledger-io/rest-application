@@ -17,6 +17,21 @@ import static org.hamcrest.Matchers.*;
 public class BankAccountTest {
 
     @Test
+    void listAllAccountTypes(PledgerContext pledgerContext, PledgerRequests requests) {
+        pledgerContext.withUser("bank-account-types@account.local");
+
+        requests.fetchAccountTypes()
+              .statusCode(200)
+              .body("$", hasSize(6))
+              .body("[0]", equalTo("cash"))
+              .body("[1]", equalTo("credit_card"))
+              .body("[2]", equalTo("default"))
+              .body("[3]", equalTo("joined"))
+              .body("[4]", equalTo("joined_savings"))
+              .body("[5]", equalTo("savings"));
+    }
+
+    @Test
     void creatingNewBankAccount(PledgerContext pledgerContext, PledgerRequests requests) {
         pledgerContext.withUser("bank-account-create@account.local");
 
