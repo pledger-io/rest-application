@@ -7,7 +7,7 @@ required:
   - detected-date
   - message
   - metadata
-parameters:
+properties:
   type:
     description: The type of insight
     type: string
