@@ -13,13 +13,13 @@ public interface InsightMapper {
 
     static InsightResponse toInsightResponse(SpendingInsight insight) {
         return new InsightResponse(
-              InsightResponseType.valueOf(insight.getType().name()),
-              insight.getCategory(),
-              InsightResponseSeverity.valueOf(insight.getSeverity().name()),
-              insight.getScore(),
-              insight.getDetectedDate(),
-              insight.getMessage(),
-              Map.copyOf(insight.getMetadata()));
+                InsightResponseType.valueOf(insight.getType().name()),
+                insight.getCategory(),
+                InsightResponseSeverity.valueOf(insight.getSeverity().name()),
+                insight.getScore(),
+                insight.getDetectedDate(),
+                insight.getMessage(),
+                Map.copyOf(insight.getMetadata()));
     }
 
     static PatternResponse toPatternResponse(SpendingPattern pattern) {

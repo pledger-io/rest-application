@@ -4,7 +4,7 @@ properties:
     type: array
     items:
       allOf:
-        - '#/components/schemas/account-response'
+        - $ref: '#/components/schemas/account-response'
         - type: object
           properties:
             icon:
@@ -12,15 +12,25 @@ properties:
               description: The icon of the account, in a base64 encoded string
   categories:
     type: array
-    items: '#/components/schemas/category-response'
+    items: { $ref: '#/components/schemas/category-response' }
   budget:
     type: array
-    items: '#/components/schemas/budget-response'
+    items:
+      type: object
+      properties:
+        period: { $ref: '#/components/schemas/date-range' }
+        expenses:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              expected: { type: number }
   contract:
     type: array
     items:
       allOf:
-        - '#/components/schemas/contract-response'
+        - $ref: '#/components/schemas/contract-response'
         - type: object
           properties:
             contract:
@@ -28,8 +38,9 @@ properties:
               description: The HEX encoded attached contract file
   tags:
     type: array
-    items: '#/components/schemas/tag-response'
+    items:
+      type: string
   transaction:
     type: array
-    items: '#/components/schemas/transaction-response'
+    items: { $ref: '#/components/schemas/transaction-response' }
 # todo add transaction rules

@@ -81,6 +81,9 @@ properties:
     description: "The multi-line split of the transaction, eg: purchased items"
     items:
       type: object
+      required:
+        - description
+        - amount
       properties:
         description:
           type: string

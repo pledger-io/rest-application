@@ -27,6 +27,7 @@ dependencies {
     implementation(mn.validation)
 
     implementation(libs.lang)
+    implementation(libs.bouncy)
 
     implementation(project(":core"))
     implementation(project(":domain"))
