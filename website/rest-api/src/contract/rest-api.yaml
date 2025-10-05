@@ -816,7 +816,9 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                type: array
+                items:
+                  type: string
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
     post:
@@ -833,6 +835,22 @@ paths:
       responses:
         "204":
           description: Confirmation the tag was created
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /api/tags/{tag}:
+    parameters:
+      - name: tag
+        schema:
+          type: string
+        in: path
+        required: true
+    delete:
+      operationId: deleteTag
+      tags: [ tag-command ]
+      responses:
+        "204":
+          description: Confirmation the tag was deleted
         "400": { $ref: '#/components/responses/400' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }

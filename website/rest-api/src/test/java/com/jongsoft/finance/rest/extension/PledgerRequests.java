@@ -244,4 +244,41 @@ public class PledgerRequests {
               .log().ifValidationFails();
     }
 
+    public ValidatableResponse searchContracts(String name) {
+        return given(requestSpecification)
+              .queryParam("name", name)
+          .when()
+              .get("/api/contracts")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse createTag(String name) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .body(Map.of("name", name))
+          .when()
+              .post("/api/tags")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse searchTags(String name) {
+        return given(requestSpecification)
+              .queryParam("name", name)
+          .when()
+              .get("/api/tags")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse deleteTag(String name) {
+        return given(requestSpecification)
+              .pathParam("name", name)
+          .when()
+              .delete("/api/tags/{name}")
+          .then()
+              .log().ifValidationFails();
+    }
+
 }
