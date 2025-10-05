@@ -5,16 +5,20 @@ required:
 properties:
   accounts:
     type: array
-    items: integer
+    items:
+      type: long
   categories:
     type: array
-    items: integer
+    items:
+      type: long
   contracts:
     type: array
-    items: integer
+    items:
+      type: long
   expenses:
     type: array
-    items: integer
+    items:
+      type: long
   range:
     $ref: '#/components/schemas/date-range'
   type:
