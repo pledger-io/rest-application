@@ -9,6 +9,10 @@ import java.time.temporal.ChronoUnit;
 
 interface AccountMapper {
 
+    static AccountLink toAccountLink(Account account) {
+        return new AccountLink(account.getId(), account.getName(), account.getType());
+    }
+
     static AccountResponse toAccountResponse(Account account) {
         var accountNumbers = new AccountResponseAllOfAccount();
         var response = new AccountResponse(

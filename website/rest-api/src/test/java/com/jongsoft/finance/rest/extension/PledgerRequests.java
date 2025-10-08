@@ -5,6 +5,7 @@ import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class PledgerRequests {
               .contentType(ContentType.JSON)
               .body(bankAccount)
           .when()
-              .post("/api/accounts")
+              .post("/v2/api/accounts")
           .then()
               .log().ifValidationFails();
     }
@@ -33,7 +34,7 @@ public class PledgerRequests {
               .pathParam("id", id)
               .body(bankAccount)
           .when()
-              .put("/api/accounts/{id}")
+              .put("/v2/api/accounts/{id}")
           .then()
               .log().ifValidationFails();
     }
@@ -42,7 +43,7 @@ public class PledgerRequests {
         return given(requestSpecification)
               .pathParam("id", id)
           .when()
-              .get("/api/accounts/{id}")
+              .get("/v2/api/accounts/{id}")
           .then()
               .log().ifValidationFails();
     }
@@ -51,7 +52,7 @@ public class PledgerRequests {
         return given(requestSpecification)
               .pathParam("id", id)
           .when()
-              .delete("/api/accounts/{id}")
+              .delete("/v2/api/accounts/{id}")
           .then()
               .log().ifValidationFails();
     }
@@ -62,7 +63,7 @@ public class PledgerRequests {
               .pathParam("id", id)
               .body(Map.of("name", name, "goal", goal, "targetDate", targetDate.toString()))
           .when()
-            .post("/api/accounts/{id}/saving-goals")
+            .post("/v2/api/accounts/{id}/saving-goals")
           .then()
               .log().ifValidationFails();
     }
@@ -74,7 +75,7 @@ public class PledgerRequests {
               .pathParam("savingGoalId", savingGoalId)
               .body(Map.of("goal", goal, "targetDate", targetDate.toString()))
           .when()
-              .put("/api/accounts/{id}/saving-goals/{savingGoalId}")
+              .put("/v2/api/accounts/{id}/saving-goals/{savingGoalId}")
           .then()
               .log().ifValidationFails();
     }
@@ -83,7 +84,7 @@ public class PledgerRequests {
         return given(requestSpecification)
               .pathParam("id", accountId)
           .when()
-              .get("/api/accounts/{id}/saving-goals")
+              .get("/v2/api/accounts/{id}/saving-goals")
           .then()
               .log().ifValidationFails();
     }
@@ -95,7 +96,7 @@ public class PledgerRequests {
               .pathParam("goal-id", savingGoalId)
               .body(Map.of("amount", amount))
           .when()
-              .post("/api/accounts/{id}/saving-goals/{goal-id}/make-reservation")
+              .post("/v2/api/accounts/{id}/saving-goals/{goal-id}/make-reservation")
           .then()
               .log().ifValidationFails();
     }
@@ -106,7 +107,7 @@ public class PledgerRequests {
               .pathParam("id", accountId)
               .pathParam("savingGoalId", savingGoalId)
           .when()
-              .delete("/api/accounts/{id}/saving-goals/{savingGoalId}")
+              .delete("/v2/api/accounts/{id}/saving-goals/{savingGoalId}")
           .then()
               .log().ifValidationFails();
     }
@@ -124,7 +125,7 @@ public class PledgerRequests {
         }
 
         return request.when()
-              .get("/api/accounts")
+              .get("/v2/api/accounts")
           .then()
               .log().ifValidationFails();
     }
@@ -134,7 +135,7 @@ public class PledgerRequests {
               .contentType(ContentType.JSON)
               .body(Map.of("name", name, "description", description))
           .when()
-              .post("/api/categories")
+              .post("/v2/api/categories")
           .then()
               .log().ifValidationFails();
     }
@@ -144,7 +145,7 @@ public class PledgerRequests {
               .contentType(ContentType.JSON)
               .pathParam("id", id)
           .when()
-              .get("/api/categories/{id}")
+              .get("/v2/api/categories/{id}")
           .then()
               .log().ifValidationFails();
     }
@@ -155,7 +156,7 @@ public class PledgerRequests {
               .pathParam("id", id)
               .body(Map.of("name", name, "description", description))
           .when()
-              .put("/api/categories/{id}")
+              .put("/v2/api/categories/{id}")
           .then()
               .log().ifValidationFails();
     }
@@ -165,7 +166,7 @@ public class PledgerRequests {
               .contentType(ContentType.JSON)
               .pathParam("id", id)
           .when()
-              .delete("/api/categories/{id}")
+              .delete("/v2/api/categories/{id}")
           .then()
               .log().ifValidationFails();
     }
@@ -179,7 +180,7 @@ public class PledgerRequests {
         }
 
         return request.when()
-              .get("/api/categories")
+              .get("/v2/api/categories")
           .then()
               .log().ifValidationFails();
     }
@@ -195,7 +196,7 @@ public class PledgerRequests {
                     "end", endDate.toString()
               ))
           .when()
-              .post("/api/contracts")
+              .post("/v2/api/contracts")
           .then()
               .log().ifValidationFails();
     }
@@ -204,7 +205,7 @@ public class PledgerRequests {
         return given(requestSpecification)
               .pathParam("id", contractId)
           .when()
-              .get("/api/contracts/{id}")
+              .get("/v2/api/contracts/{id}")
           .then()
               .log().ifValidationFails();
     }
@@ -220,7 +221,7 @@ public class PledgerRequests {
                     "end", endDate.toString()
               ))
           .when()
-              .put("/api/contracts/{id}")
+              .put("/v2/api/contracts/{id}")
           .then()
               .log().ifValidationFails();
     }
@@ -230,7 +231,7 @@ public class PledgerRequests {
               .contentType(ContentType.JSON)
               .pathParam("id", contractId)
           .when()
-              .post("/api/contracts/{id}/warn-before-expiration")
+              .post("/v2/api/contracts/{id}/warn-before-expiration")
           .then()
               .log().ifValidationFails();
     }
@@ -239,16 +240,23 @@ public class PledgerRequests {
         return given(requestSpecification)
               .pathParam("id", contractId)
           .when()
-              .delete("/api/contracts/{id}")
+              .delete("/v2/api/contracts/{id}")
           .then()
               .log().ifValidationFails();
     }
 
-    public ValidatableResponse searchContracts(String name) {
-        return given(requestSpecification)
-              .queryParam("name", name)
-          .when()
-              .get("/api/contracts")
+    public ValidatableResponse searchContracts(String name, String status) {
+        var request = given(requestSpecification);
+
+        if (name != null) {
+            request.queryParam("name", name);
+        }
+        if (status != null) {
+            request.queryParam("status", status);
+        }
+
+        return request.when()
+              .get("/v2/api/contracts")
           .then()
               .log().ifValidationFails();
     }
@@ -258,7 +266,7 @@ public class PledgerRequests {
               .contentType(ContentType.JSON)
               .body(Map.of("name", name))
           .when()
-              .post("/api/tags")
+              .post("/v2/api/tags")
           .then()
               .log().ifValidationFails();
     }
@@ -267,7 +275,7 @@ public class PledgerRequests {
         return given(requestSpecification)
               .queryParam("name", name)
           .when()
-              .get("/api/tags")
+              .get("/v2/api/tags")
           .then()
               .log().ifValidationFails();
     }
@@ -276,21 +284,63 @@ public class PledgerRequests {
         return given(requestSpecification)
               .pathParam("name", name)
           .when()
-              .delete("/api/tags/{name}")
+              .delete("/v2/api/tags/{name}")
           .then()
               .log().ifValidationFails();
     }
 
     public ValidatableResponse fetchAccountTypes() {
         return given(requestSpecification)
-              .get("/api/account-types")
+              .get("/v2/api/account-types")
           .then()
               .log().ifValidationFails();
     }
 
     public ValidatableResponse createExport() {
         return given(requestSpecification)
-              .get("/api/export")
+              .get("/v2/api/export")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse createScheduleMonthly(long sourceAccount, long destinationAccount, String name, double amount) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .body(Map.of(
+                    "name", name,
+                    "amount", amount,
+                    "schedule", Map.of(
+                          "interval", 1,
+                          "periodicity", "MONTHS"),
+                    "transferBetween", Map.of(
+                          "source", Map.of("id", sourceAccount),
+                          "destination", Map.of("id", destinationAccount)
+                    )))
+          .when()
+              .post("/v2/api/schedules")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse patchScheduleDateRange(long scheduleId, LocalDate startDate, LocalDate endDate) {
+        return given(requestSpecification)
+              .contentType(ContentType.JSON)
+              .pathParam("id", scheduleId)
+              .body(Map.of(
+                    "activeBetween", Map.of(
+                        "startDate", startDate.toString(),
+                        "endDate", endDate.toString())))
+          .when()
+              .patch("/v2/api/schedules/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse fetchSchedule(long scheduleId) {
+        return given(requestSpecification)
+              .pathParam("id", scheduleId)
+          .when()
+              .get("/v2/api/schedules/{id}")
           .then()
               .log().ifValidationFails();
     }

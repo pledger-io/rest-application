@@ -57,7 +57,7 @@ public class SecurityTest {
             "username", "test@account.local",
             "password", "test123"))
         .when()
-          .post("/api/user-account")
+          .post("/v2/api/user-account")
         .then()
           .log().ifValidationFails()
           .statusCode(204);
@@ -66,7 +66,7 @@ public class SecurityTest {
     given(spec)
         .header(HttpHeaders.AUTHORIZATION, "Bearer " + getToken())
         .pathParam("user-account", "test@account.local")
-        .get("/api/user-account/{user-account}")
+        .get("/v2/api/user-account/{user-account}")
         .then()
           .log().ifValidationFails()
           .statusCode(200)
@@ -81,7 +81,7 @@ public class SecurityTest {
         .body(Map.of(
             "theme", "dark",
             "currency", "GBP"))
-        .patch("/api/user-account/{user-account}")
+        .patch("/v2/api/user-account/{user-account}")
         .then()
           .log().ifValidationFails(LogDetail.ALL)
           .statusCode(200)

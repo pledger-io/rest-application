@@ -110,6 +110,11 @@ public class PledgerContext {
               .getOrThrow(() -> new RuntimeException("Cannot find account " + company));
 
         account.createContract(name, name, startDate, endDate);
+        if (endDate.isBefore(LocalDate.now())) {
+            contractProvider.lookup(name)
+                  .getOrThrow(() -> new RuntimeException("Cannot find contract " + name))
+                  .terminate();
+        }
         return this;
     }
 

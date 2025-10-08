@@ -105,7 +105,7 @@ class ScheduleCommandController implements ScheduleCommandApi {
         var schedule = scheduleProvider
                 .lookup(id)
                 .getOrThrow(() -> StatusException.notFound("The schedule cannot be found."));
-        if (schedule.getEnd().isBefore(LocalDate.now())) {
+        if (schedule.getEnd() != null && schedule.getEnd().isBefore(LocalDate.now())) {
             throw StatusException.gone("The schedule has already ended.");
         }
 

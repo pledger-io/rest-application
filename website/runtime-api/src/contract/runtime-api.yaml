@@ -13,7 +13,7 @@ security:
   - bearerAuth: [ ]
 
 paths:
-  /api/runtime-engine/{processDefinition}:
+  /v2/api/runtime-engine/{processDefinition}:
     parameters:
       - $ref: '#/components/parameters/process-definition'
     get:
@@ -52,7 +52,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
 
-  /api/runtime-engine/{processDefinition}/{businessKey}:
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}:
     parameters:
       - $ref: '#/components/parameters/process-definition'
       - $ref: '#/components/parameters/business-key'
@@ -73,7 +73,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
 
-  /api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}:
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}:
     parameters:
       - $ref: '#/components/parameters/process-definition'
       - $ref: '#/components/parameters/business-key'
@@ -100,7 +100,7 @@ paths:
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/403' }
 
-  /api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/tasks:
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/tasks:
     parameters:
       - $ref: '#/components/parameters/process-definition'
       - $ref: '#/components/parameters/business-key'
@@ -119,7 +119,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
 
-  /api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/tasks/{taskId}:
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/tasks/{taskId}:
     parameters:
       - $ref: '#/components/parameters/process-definition'
       - $ref: '#/components/parameters/instance-id'
@@ -156,7 +156,7 @@ paths:
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/403' }
 
-  /api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/tasks/{taskId}/variables:
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/tasks/{taskId}/variables:
     parameters:
       - $ref: '#/components/parameters/process-definition'
       - $ref: '#/components/parameters/business-key'
@@ -186,7 +186,7 @@ paths:
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/403' }
 
-  /api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/variables:
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/variables:
     parameters:
       - $ref: '#/components/parameters/business-key'
       - $ref: '#/components/parameters/process-definition'
@@ -204,7 +204,7 @@ paths:
                 items: { $ref: '#/components/schemas/variable-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/variables/{variableId}:
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/variables/{variableId}:
     parameters:
       - $ref: '#/components/parameters/process-definition'
       - $ref: '#/components/parameters/business-key'

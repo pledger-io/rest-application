@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @MicronautTest(environments = {"jpa", "h2", "test"}, transactional = false)
 @PledgerTest
@@ -69,5 +68,29 @@ public class ContractTest {
 
         requests.deleteContract(contractId)
               .statusCode(204);
+    }
+
+    @Test
+    void searchForContract(PledgerContext context, PledgerRequests requests) {
+        context.withUser("contract-search@account.local")
+              .withCreditor("Amazon", "EUR")
+              .withCreditor("Netflix", "EUR")
+              .withContract("Netflix", "Monthly subscription", LocalDate.now().minusDays(1), LocalDate.now().plusYears(1))
+              .withContract("Amazon", "Amazon Prime", LocalDate.now().minusYears(1), LocalDate.now().minusDays(1));
+
+        requests.searchContracts("monthly", null)
+              .statusCode(200)
+              .body("$", hasSize(1))
+              .body("[0].name", equalTo("Monthly subscription"));
+
+        requests.searchContracts(null, "INACTIVE")
+              .statusCode(200)
+              .body("$", hasSize(1))
+              .body("[0].name", equalTo("Amazon Prime"));
+
+        requests.searchContracts(null, "ACTIVE")
+              .statusCode(200)
+              .body("$", hasSize(1))
+              .body("[0].name", equalTo("Monthly subscription"));
     }
 }

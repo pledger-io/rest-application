@@ -40,6 +40,7 @@ public class ScheduledTransaction implements AggregateBase, Schedulable {
     private Schedule schedule;
     private LocalDate start;
     private LocalDate end;
+    private boolean deleted;
 
     public ScheduledTransaction(
             String name, Schedule schedule, Account source, Account destination, double amount) {

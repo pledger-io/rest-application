@@ -13,7 +13,7 @@ security:
   - bearerAuth: [ ]
 
 paths:
-  /api/budgets:
+  /v2/api/budgets:
     get:
       operationId: findByFilter
       tags: [ budget-fetcher ]
@@ -76,7 +76,7 @@ paths:
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/404' }
 
-  /api/budgets/expenses:
+  /v2/api/budgets/expenses:
     get:
       operationId: findExpensesByFilter
       tags: [ budget-fetcher ]
@@ -115,7 +115,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/404' }
-  /api/budgets/expenses/balance:
+  /v2/api/budgets/expenses/balance:
     get:
       operationId: computeBudgetExpenseBalance
       tags: [ budget-fetcher ]

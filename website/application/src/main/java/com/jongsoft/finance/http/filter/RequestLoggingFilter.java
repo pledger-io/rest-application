@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 
-@Filter("/**")
+@Filter("/v2/api/**")
 public class RequestLoggingFilter implements HttpServerFilter {
 
     private final Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);

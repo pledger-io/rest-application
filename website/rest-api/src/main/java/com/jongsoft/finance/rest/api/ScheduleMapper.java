@@ -1,10 +1,9 @@
 package com.jongsoft.finance.rest.api;
 
+import static com.jongsoft.finance.rest.api.AccountMapper.toAccountLink;
+
 import com.jongsoft.finance.domain.transaction.ScheduledTransaction;
-import com.jongsoft.finance.rest.model.DateRange;
-import com.jongsoft.finance.rest.model.Periodicity;
-import com.jongsoft.finance.rest.model.ScheduleResponse;
-import com.jongsoft.finance.rest.model.TransactionScheduleResponse;
+import com.jongsoft.finance.rest.model.*;
 
 interface ScheduleMapper {
 
@@ -15,6 +14,9 @@ interface ScheduleMapper {
                         scheduledTransaction.getSchedule().periodicity().name()),
                 scheduledTransaction.getSchedule().interval());
         var response = new TransactionScheduleResponse();
+        var transferBetween = new ScheduleRequestTransferBetween(
+                toAccountLink(scheduledTransaction.getSource()),
+                toAccountLink(scheduledTransaction.getDestination()));
 
         response.id(scheduledTransaction.getId());
         response.schedule(schedule);
@@ -23,6 +25,7 @@ interface ScheduleMapper {
         response.description(scheduledTransaction.getDescription());
         response.activeBetween(
                 new DateRange(scheduledTransaction.getStart(), scheduledTransaction.getEnd()));
+        response.transferBetween(transferBetween);
 
         if (scheduledTransaction.getContract() != null) {
             response.forContract(

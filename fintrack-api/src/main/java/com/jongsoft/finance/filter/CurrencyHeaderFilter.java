@@ -13,7 +13,7 @@ import io.micronaut.http.filter.ServerFilterChain;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 
-@Filter("/**")
+@Filter("/api/**")
 public class CurrencyHeaderFilter implements HttpServerFilter {
 
     private final Logger log = getLogger(CurrencyHeaderFilter.class);

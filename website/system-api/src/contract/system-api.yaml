@@ -45,7 +45,7 @@ paths:
             application/json:
               schema: { type: string }
 
-  /api/user-account:
+  /v2/api/user-account:
     post:
       operationId: createUser
       tags: [ security ]
@@ -58,7 +58,7 @@ paths:
         "204":
           description: Confirmation the account was created
         "400": { $ref: '#/components/responses/400' }
-  /api/user-account/verify-2-factor:
+  /v2/api/user-account/verify-2-factor:
     post:
       operationId: verifyTwoFactor
       tags: [ security ]
@@ -80,7 +80,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
 
-  /api/user-account/{user}:
+  /v2/api/user-account/{user}:
     parameters:
       - name: user
         in: path
@@ -124,7 +124,7 @@ paths:
         "400": { $ref: '#/components/responses/400' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/user-account/{user}/sessions:
+  /v2/api/user-account/{user}/sessions:
     parameters:
       - name: user
         in: path
@@ -166,7 +166,7 @@ paths:
         "400": { $ref: '#/components/responses/400' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/user-account/{user}/sessions/{session}:
+  /v2/api/user-account/{user}/sessions/{session}:
     parameters:
       - name: user
         in: path
@@ -192,7 +192,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/404' }
-  /api/user-account/{user}/2-factor:
+  /v2/api/user-account/{user}/2-factor:
     parameters:
       - name: user
         in: path
@@ -254,7 +254,7 @@ paths:
             application/json:
               schema: { $ref: './components/i18n-response.yaml' }
 
-  /api/currencies:
+  /v2/api/currencies:
     get:
       operationId: getCurrencies
       tags: [ currency ]
@@ -284,7 +284,7 @@ paths:
         "400": { $ref: '#/components/responses/400' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/currencies/{currencyCode}:
+  /v2/api/currencies/{currencyCode}:
     parameters:
       - name: currencyCode
         description: The currency code
@@ -340,7 +340,7 @@ paths:
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/404' }
 
-  /api/settings:
+  /v2/api/settings:
     get:
       operationId: getAllSettings
       tags: [ settings ]
@@ -354,7 +354,7 @@ paths:
                 items: { $ref: '#/components/schemas/setting-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/settings/{setting}:
+  /v2/api/settings/{setting}:
     parameters:
       - name: setting
         description: The setting name
@@ -377,7 +377,7 @@ paths:
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/404' }
 
-  /api/files:
+  /v2/api/files:
     post:
       operationId: uploadFile
       tags: [ files ]
@@ -399,7 +399,7 @@ paths:
               schema: { $ref: "#/components/schemas/file-response" }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/files/{fileCode}:
+  /v2/api/files/{fileCode}:
     parameters:
       - name: fileCode
         in: path
