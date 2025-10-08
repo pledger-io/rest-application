@@ -26,7 +26,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-@Filter("/**")
+@Filter("/api/**")
 public class AuthenticationFilter implements HttpServerFilter {
 
     private final Logger log = LoggerFactory.getLogger(AuthenticationFilter.class);

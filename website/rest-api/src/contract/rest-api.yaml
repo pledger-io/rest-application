@@ -23,7 +23,7 @@ security:
   - bearerAuth: []
 
 paths:
-  /api/account-types:
+  /v2/api/account-types:
     get:
       operationId: getAccountTypes
       tags: [ system-information ]
@@ -41,7 +41,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
 
-  /api/export:
+  /v2/api/export:
     get:
       operationId: exportUserAccount
       tags: [ export ]
@@ -60,7 +60,7 @@ paths:
   #                  Account creation / search
   #-------------------------------------------------------------------
 
-  /api/accounts:
+  /v2/api/accounts:
     get:
       operationId: getAccounts
       tags: [ account-fetcher ]
@@ -108,7 +108,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
 
-  /api/accounts/top-by-spending:
+  /v2/api/accounts/top-by-spending:
     get:
       operationId: getTopAccountsBySpending
       tags: [ account-fetcher ]
@@ -139,7 +139,7 @@ paths:
   #                     Account manipulations
   #-------------------------------------------------------------------
 
-  /api/accounts/{id}:
+  /v2/api/accounts/{id}:
     parameters:
       - name: id
         description: The identifier of the account
@@ -200,7 +200,7 @@ paths:
   #                     Account saving goals
   #-------------------------------------------------------------------
 
-  /api/accounts/{id}/saving-goals:
+  /v2/api/accounts/{id}/saving-goals:
     parameters:
       - name: id
         description: The identifier of the account
@@ -244,7 +244,7 @@ paths:
         "400": { $ref: '#/components/responses/400' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/accounts/{id}/saving-goals/{goalId}:
+  /v2/api/accounts/{id}/saving-goals/{goalId}:
     parameters:
       - name: id
         description: The identifier of the account
@@ -291,7 +291,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/404' }
-  /api/accounts/{id}/saving-goals/{goalId}/make-reservation:
+  /v2/api/accounts/{id}/saving-goals/{goalId}/make-reservation:
     parameters:
       - name: id
         description: The identifier of the account
@@ -330,7 +330,7 @@ paths:
   #                     Transaction searching
   #-------------------------------------------------------------------
 
-  /api/transactions:
+  /v2/api/transactions:
     get:
       operationId: findTransactionBy
       tags: [ transaction-fetcher ]
@@ -387,7 +387,7 @@ paths:
   #                     Transaction control
   #-------------------------------------------------------------------
 
-  /api/transactions/{id}:
+  /v2/api/transactions/{id}:
     parameters:
       - name: id
         description: The identifier of the transaction
@@ -465,7 +465,7 @@ paths:
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/404' }
 
-  /api/balance:
+  /v2/api/balance:
     post:
       operationId: computeBalanceWithFilter
       tags: [ statistics-balance ]
@@ -483,7 +483,7 @@ paths:
              schema: { $ref: '#/components/schemas/balance-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/balance/{partition}:
+  /v2/api/balance/{partition}:
     parameters:
       - name: partition
         in: path
@@ -510,7 +510,7 @@ paths:
                 items: { $ref: '#/components/schemas/partitioned-balance-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/balance/by-date/{type}:
+  /v2/api/balance/by-date/{type}:
     parameters:
       - name: type
         in: path
@@ -538,7 +538,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
 
-  /api/detected/insight:
+  /v2/api/detected/insight:
     get:
       operationId: getInsightsByFilters
       tags: [ insight ]
@@ -565,7 +565,7 @@ paths:
                 items: { $ref: '#/components/schemas/insight-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/detected/pattern:
+  /v2/api/detected/pattern:
     get:
       operationId: getPatternsByFilters
       tags: [ insight ]
@@ -597,7 +597,7 @@ paths:
   #                   Category creation / search
   #-------------------------------------------------------------------
 
-  /api/categories:
+  /v2/api/categories:
     get:
       operationId: findCategoriesBy
       tags: [ category-fetcher ]
@@ -634,7 +634,7 @@ paths:
   #                   Category command
   #-------------------------------------------------------------------
 
-  /api/categories/{id}:
+  /v2/api/categories/{id}:
     parameters:
       - name: id
         description: The identifier of the category
@@ -687,7 +687,7 @@ paths:
   #                   Contract creation / search
   #-------------------------------------------------------------------
 
-  /api/contracts:
+  /v2/api/contracts:
     get:
       operationId: findContractBy
       tags: [ contract-fetcher ]
@@ -729,7 +729,7 @@ paths:
   #                   Category command
   #-------------------------------------------------------------------
 
-  /api/contracts/{id}:
+  /v2/api/contracts/{id}:
     parameters:
       - name: id
         description: The identifier of the contract
@@ -778,7 +778,7 @@ paths:
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/404' }
 
-  /api/contracts/{id}/warn-before-expiration:
+  /v2/api/contracts/{id}/warn-before-expiration:
     parameters:
       - name: id
         description: The identifier of the contract
@@ -804,7 +804,7 @@ paths:
   #                   Tag creation / search
   #-------------------------------------------------------------------
 
-  /api/tags:
+  /v2/api/tags:
     get:
       operationId: findTagsBy
       tags: [ tag-fetcher ]
@@ -838,7 +838,7 @@ paths:
         "400": { $ref: '#/components/responses/400' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/tags/{tag}:
+  /v2/api/tags/{tag}:
     parameters:
       - name: tag
         schema:
@@ -859,7 +859,7 @@ paths:
   #                   Scheduling creation / search
   #-------------------------------------------------------------------
 
-  /api/schedules:
+  /v2/api/schedules:
     get:
       operationId: findScheduleByFilter
       tags: [ schedule-fetcher ]
@@ -891,7 +891,7 @@ paths:
                 items: { $ref: '#/components/schemas/transaction-schedule-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-    put:
+    post:
       operationId: createSchedule
       tags: [ schedule-command ]
       requestBody:
@@ -908,7 +908,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
 
-  /api/schedules/{id}:
+  /v2/api/schedules/{id}:
     parameters:
       - name: id
         description: The identifier of the schedule

@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 
-@Filter("/**")
+@Filter("/api/**")
 public class LocaleHeaderFilter implements HttpServerFilter {
 
     private final Logger log = LoggerFactory.getLogger(LocaleHeaderFilter.class);

@@ -55,7 +55,7 @@ public class FileTest {
       given(spec)
         .multiPart("upload", new File(file))
       .when()
-        .post("/api/files")
+        .post("/v2/api/files")
       .then()
         .log().ifError()
         .statusCode(201)
@@ -67,7 +67,7 @@ public class FileTest {
     var fileContent = given(spec)
         .pathParam("fileCode", fileCode)
       .when()
-        .get("/api/files/{fileCode}")
+        .get("/v2/api/files/{fileCode}")
       .then()
         .statusCode(200)
         .extract()
@@ -79,14 +79,14 @@ public class FileTest {
 
     given(spec)
         .pathParam("fileCode", fileCode)
-        .delete("/api/files/{fileCode}")
+        .delete("/v2/api/files/{fileCode}")
       .then()
         .statusCode(204);
 
     given(spec)
         .pathParam("fileCode", fileCode)
       .when()
-        .get("/api/files/{fileCode}")
+        .get("/v2/api/files/{fileCode}")
       .then()
         .statusCode(500);
   }

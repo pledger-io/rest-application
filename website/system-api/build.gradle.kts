@@ -50,4 +50,5 @@ dependencies {
     testImplementation(mn.micronaut.test.rest.assured)
     testImplementation(mn.micronaut.test.junit5)
     testImplementation(libs.bundles.junit)
+    testImplementation(mn.micronaut.http.server.jetty)
 }

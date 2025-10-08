@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@MicronautTest(environments = {"h2", "test"})
+@MicronautTest(environments = {"jpa", "h2", "test"})
 public class ProcessEngineTest {
 
   @MockBean(AuthenticationFacade.class)
@@ -39,7 +39,7 @@ public class ProcessEngineTest {
               "endBalance", "100.0"))
         .when()
           .pathParam("processDefinition", "AccountReconcile")
-          .post("/api/runtime-engine/{processDefinition}")
+          .post("/v2/api/runtime-engine/{processDefinition}")
         .then()
           .log().ifError()
           .statusCode(201)
@@ -53,7 +53,7 @@ public class ProcessEngineTest {
           .pathParam("processDefinition", "AccountReconcile")
           .pathParam("instanceId", id)
         .when()
-          .get("/api/runtime-engine/{processDefinition}/13/{instanceId}")
+          .get("/v2/api/runtime-engine/{processDefinition}/13/{instanceId}")
         .then()
           .log().ifError()
           .statusCode(200)
@@ -64,7 +64,7 @@ public class ProcessEngineTest {
     RestAssured.given(spec)
           .pathParam("processDefinition", "AccountReconcile")
         .when()
-          .get("/api/runtime-engine/{processDefinition}")
+          .get("/v2/api/runtime-engine/{processDefinition}")
         .then()
           .log().ifValidationFails()
           .statusCode(200)
@@ -76,7 +76,7 @@ public class ProcessEngineTest {
           .pathParam("businessKey", "15")
           .pathParam("instanceId", id)
         .when()
-          .delete("/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}")
+          .delete("/v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}")
         .then()
           .log().ifError()
           .statusCode(204);
@@ -85,7 +85,7 @@ public class ProcessEngineTest {
     RestAssured.given(spec)
           .pathParam("processDefinition", "AccountReconcile")
         .when()
-          .get("/api/runtime-engine/{processDefinition}")
+          .get("/v2/api/runtime-engine/{processDefinition}")
         .then()
           .log().ifValidationFails()
           .statusCode(200)

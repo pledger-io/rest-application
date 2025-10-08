@@ -13,7 +13,7 @@ security:
   - bearerAuth: [ ]
 
 paths:
-  /api/batch-importer:
+  /v2/api/batch-importer:
     get:
       operationId: getJobsByFilters
       tags: [ batch-importer ]
@@ -51,7 +51,7 @@ paths:
         "400": { $ref: '#/components/responses/400' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
-  /api/batch-importer/{slug}:
+  /v2/api/batch-importer/{slug}:
     parameters:
       - name: slug
         required: true
@@ -80,7 +80,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/404' }
-  /api/batch-importer-config:
+  /v2/api/batch-importer-config:
     get:
       operationId: getConfigurations
       tags: [ batch-importer ]

@@ -12,7 +12,7 @@ import org.slf4j.MDC;
 
 import java.util.UUID;
 
-@Filter("/**")
+@Filter("/v2/api/**")
 public class CorrelationIdFilter implements HttpServerFilter {
     @Override
     public Publisher<MutableHttpResponse<?>> doFilter(

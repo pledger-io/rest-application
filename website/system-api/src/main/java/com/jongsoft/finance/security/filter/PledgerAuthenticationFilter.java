@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-@Filter("/**")
+@Filter("/v2/api/**")
 public class PledgerAuthenticationFilter implements HttpServerFilter {
 
     private final Logger logger;
