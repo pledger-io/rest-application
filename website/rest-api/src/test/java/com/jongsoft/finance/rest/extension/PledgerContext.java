@@ -1,9 +1,11 @@
 package com.jongsoft.finance.rest.extension;
 
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.providers.*;
+import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.lang.Control;
@@ -115,6 +117,20 @@ public class PledgerContext {
                   .getOrThrow(() -> new RuntimeException("Cannot find contract " + name))
                   .terminate();
         }
+        return this;
+    }
+
+    public PledgerContext withSchedule(String source, String company, String name, double amount, LocalDate startDate, LocalDate endDate) {
+        var account = applicationContext.getBean(AccountProvider.class).lookup(source)
+              .getOrThrow(() -> new RuntimeException("Cannot find account " + source));
+        var destination = applicationContext.getBean(AccountProvider.class).lookup(company)
+              .getOrThrow(() -> new RuntimeException("Cannot find account " + company));
+
+        account.createSchedule(name, new ScheduleValue(Periodicity.MONTHS, 1), destination, amount);
+        var schedule = applicationContext.getBean(TransactionScheduleProvider.class)
+              .lookup().first(s -> s.getName().equals(name)).getOrThrow(() -> new RuntimeException("Cannot find schedule " + name));
+        schedule.limit(startDate, endDate);
+
         return this;
     }
 
