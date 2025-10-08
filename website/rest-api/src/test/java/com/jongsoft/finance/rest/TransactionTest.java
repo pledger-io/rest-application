@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 @MicronautTest(environments = {"jpa", "h2", "test"}, transactional = false)
 @PledgerTest
@@ -49,5 +48,25 @@ public class TransactionTest {
               .body("transferBetween.destination.name", equalTo("Netflix"))
               .body("activeBetween.startDate", equalTo(LocalDate.now().toString()))
               .body("activeBetween.endDate", equalTo(LocalDate.now().plusMonths(12).toString()));
+
+        requests.deleteSchedule(scheduleId)
+              .statusCode(204);
+
+        requests.fetchSchedule(scheduleId)
+              .statusCode(410);
+    }
+
+    @Test
+    void searchForSchedule(PledgerContext context, PledgerRequests requests) {
+        context.withUser("transaction-schedule-search@account.local")
+              .withBankAccount("Checking", "EUR", "default")
+              .withCreditor("Netflix", "EUR")
+              .withSchedule("Checking", "Netflix", "Monthly payment", 19.99, LocalDate.now(), LocalDate.now().plusMonths(12));
+
+        requests.searchSchedules(null, null)
+              .statusCode(200)
+              .body("$", hasSize(1))
+              .body("[0].name", equalTo("Monthly payment"))
+              .body("[0].amount", equalTo(19.99F));
     }
 }

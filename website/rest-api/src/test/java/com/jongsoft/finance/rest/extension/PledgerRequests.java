@@ -345,4 +345,28 @@ public class PledgerRequests {
               .log().ifValidationFails();
     }
 
+    public ValidatableResponse deleteSchedule(long scheduleId) {
+        return given(requestSpecification)
+              .pathParam("id", scheduleId)
+          .when()
+              .delete("/v2/api/schedules/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse searchSchedules(List<Integer> accounts, Integer contractId) {
+        var request = given(requestSpecification);
+        if (accounts != null) {
+            request.queryParam("account", accounts);
+        }
+        if (contractId != null) {
+            request.queryParam("contract", contractId);
+        }
+
+        return request.when()
+              .get("/v2/api/schedules")
+          .then()
+              .log().ifValidationFails();
+    }
+
 }
