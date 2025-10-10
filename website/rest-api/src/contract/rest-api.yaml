@@ -342,6 +342,7 @@ paths:
         - $ref: '#/components/parameters/account-filter'
         - $ref: '#/components/parameters/expense-filter'
         - $ref: '#/components/parameters/category-filter'
+        - $ref: '#/components/parameters/contract-filter'
         - $ref: '#/components/parameters/tag-filter'
         - $ref: '#/components/parameters/import-id-filter'
         - name: description
@@ -981,6 +982,7 @@ components:
     account-filter: { $ref: 'parameters/accounts.yaml' }
     expense-filter: { $ref: 'parameters/budgets.yaml' }
     category-filter: { $ref: 'parameters/categories.yaml' }
+    contract-filter: { $ref: 'parameters/contracts.yaml' }
     tag-filter: { $ref: 'parameters/tags.yaml' }
     import-id-filter: { $ref: 'parameters/import-id.yaml' }
     name-filter: { $ref: 'parameters/name.yaml' }

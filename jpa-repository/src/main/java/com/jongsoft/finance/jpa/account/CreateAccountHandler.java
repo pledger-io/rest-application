@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 @RequiresJpa
 @Transactional
 public class CreateAccountHandler implements CommandHandler<CreateAccountCommand> {
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    private final Logger log = LoggerFactory.getLogger(CreateAccountHandler.class);
 
     private final ReactiveEntityManager entityManager;
 

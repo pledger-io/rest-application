@@ -115,7 +115,7 @@ paths:
             application/json:
               schema:
                 type: array
-                item: { $ref: '#/components/schemas/task-response' }
+                items: { $ref: '#/components/schemas/task-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
 
@@ -140,6 +140,10 @@ paths:
     post:
       operationId: completeTask
       tags: [ task-engine ]
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/task-variable-map' }
       responses:
         "204":
           description: A confirmation that task was completed
@@ -175,13 +179,7 @@ paths:
           description: A map of all named variables of this task
           content:
             application/json:
-              schema:
-                type: object
-                oneOf:
-                  - type: object
-                  - type: array
-                    items:
-                      type: object
+              schema: { $ref: '#/components/schemas/task-variable-map' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/403' }
@@ -218,7 +216,9 @@ paths:
           description: The variable contents
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/variable-response' }
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/variable-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/403' }
@@ -246,4 +246,9 @@ components:
     json-error-response: { $ref: 'components/json-error.yaml' }
     process-instance-response: { $ref: 'components/process-instance.yaml' }
     task-response: { $ref: 'components/task.yaml' }
-    variable-response: { $ref: 'components/variable.yaml' }
+    variable-response: { $ref: 'components/variable-response.yaml' }
+    task-variable-map: { $ref: 'components/task-variable-map.yaml' }
+
+    variable: { $ref: 'components/variable.yaml' }
+    wrapped-variable: { $ref: 'components/wrapped-variable.yaml' }
+    list-variable: { $ref: 'components/list-variable.yaml' }
