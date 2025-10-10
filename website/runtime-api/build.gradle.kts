@@ -30,15 +30,16 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":domain"))
+    implementation(project(":bpmn-process"))
 
     testRuntimeOnly(mn.micronaut.serde.jackson)
     testRuntimeOnly(mn.micronaut.jackson.databind)
     testRuntimeOnly(mn.logback.classic)
-    testRuntimeOnly(project(":bpmn-process"))
     testRuntimeOnly(project(":jpa-repository"))
 
     testImplementation(mn.micronaut.test.rest.assured)
     testImplementation(mn.micronaut.test.junit5)
     testImplementation(libs.bundles.junit)
     testImplementation(mn.micronaut.http.server.jetty)
+    testImplementation(libs.lang)
 }

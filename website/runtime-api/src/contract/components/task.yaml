@@ -12,3 +12,6 @@ properties:
   form:
     type: string
     description: The form to use for the task
+  created:
+    type: string
+    format: date-time

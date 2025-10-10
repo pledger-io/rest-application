@@ -43,6 +43,7 @@ class TransactionFetcherController implements TransactionFetcherApi {
             List<Long> account,
             List<Long> category,
             List<Long> expense,
+            List<Long> contract,
             List<String> tag,
             String importSlug,
             String description,
@@ -66,6 +67,10 @@ class TransactionFetcherController implements TransactionFetcherApi {
         if (!expense.isEmpty()) {
             filter.expenses(
                     Collections.List(expense.stream().map(EntityRef::new).toList()));
+        }
+        if (!contract.isEmpty()) {
+            filter.contracts(
+                    Collections.List(contract.stream().map(EntityRef::new).toList()));
         }
         if (!tag.isEmpty()) {
             // todo not yet supported
