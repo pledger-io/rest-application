@@ -1,5 +1,4 @@
 name: account
-required: true
 in: query
 schema:
   type: array

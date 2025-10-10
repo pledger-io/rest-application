@@ -59,6 +59,7 @@ public class PledgerRequests {
 
     public ValidatableResponse createSavingGoal(long id, String name, double goal, LocalDate targetDate) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .pathParam("id", id)
               .body(Map.of("name", name, "goal", goal, "targetDate", targetDate.toString()))
@@ -70,6 +71,7 @@ public class PledgerRequests {
 
     public ValidatableResponse updateSavingGoal(long accountId, long savingGoalId, double goal, LocalDate targetDate) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .pathParam("id", accountId)
               .pathParam("savingGoalId", savingGoalId)
@@ -82,6 +84,7 @@ public class PledgerRequests {
 
     public ValidatableResponse fetchSavingGoals(long accountId) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .pathParam("id", accountId)
           .when()
               .get("/v2/api/accounts/{id}/saving-goals")
@@ -91,6 +94,7 @@ public class PledgerRequests {
 
     public ValidatableResponse reserveMoneyForSavingGoal(long accountId, long savingGoalId, double amount) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .pathParam("id", accountId)
               .pathParam("goal-id", savingGoalId)
@@ -103,6 +107,7 @@ public class PledgerRequests {
 
     public ValidatableResponse deleteSavingGoal(long accountId, long savingGoalId) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .pathParam("id", accountId)
               .pathParam("savingGoalId", savingGoalId)
@@ -114,6 +119,7 @@ public class PledgerRequests {
 
     public ValidatableResponse searchBankAccounts(int offset, int limit, List<String> type, String accountName) {
         var request = given(requestSpecification)
+              .log().ifValidationFails()
               .queryParam("offset", offset)
               .queryParam("numberOfResults", limit);
 
@@ -132,6 +138,7 @@ public class PledgerRequests {
 
     public ValidatableResponse createCategory(String name, String description) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .body(Map.of("name", name, "description", description))
           .when()
@@ -142,6 +149,7 @@ public class PledgerRequests {
 
     public ValidatableResponse fetchCategory(long id) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .pathParam("id", id)
           .when()
@@ -152,6 +160,7 @@ public class PledgerRequests {
 
     public ValidatableResponse updateCategory(long id, String name, String description) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .pathParam("id", id)
               .body(Map.of("name", name, "description", description))
@@ -163,6 +172,7 @@ public class PledgerRequests {
 
     public ValidatableResponse deleteCategory(long id) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .pathParam("id", id)
           .when()
@@ -173,6 +183,7 @@ public class PledgerRequests {
 
     public ValidatableResponse searchCategories(int offset, int limit, String name) {
         var request = given(requestSpecification)
+              .log().ifValidationFails()
               .queryParam("offset", offset)
               .queryParam("numberOfResults", limit);
         if (name != null) {
@@ -187,6 +198,7 @@ public class PledgerRequests {
 
     public ValidatableResponse createContract(long accountId, String name, String description, LocalDate startDate, LocalDate endDate) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .body(Map.of(
                     "company", Map.of("id", accountId),
@@ -203,6 +215,7 @@ public class PledgerRequests {
 
     public ValidatableResponse fetchContract(long contractId) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .pathParam("id", contractId)
           .when()
               .get("/v2/api/contracts/{id}")
@@ -212,6 +225,7 @@ public class PledgerRequests {
 
     public ValidatableResponse updateContract(long contractId, String name, String description, LocalDate startDate, LocalDate endDate) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .pathParam("id", contractId)
               .body(Map.of(
@@ -228,6 +242,7 @@ public class PledgerRequests {
 
     public ValidatableResponse warnBeforeContractExpires(long contractId) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .pathParam("id", contractId)
           .when()
@@ -238,6 +253,7 @@ public class PledgerRequests {
 
     public ValidatableResponse deleteContract(long contractId) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .pathParam("id", contractId)
           .when()
               .delete("/v2/api/contracts/{id}")
@@ -246,7 +262,8 @@ public class PledgerRequests {
     }
 
     public ValidatableResponse searchContracts(String name, String status) {
-        var request = given(requestSpecification);
+        var request = given(requestSpecification)
+              .log().ifValidationFails();
 
         if (name != null) {
             request.queryParam("name", name);
@@ -263,6 +280,7 @@ public class PledgerRequests {
 
     public ValidatableResponse createTag(String name) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .body(Map.of("name", name))
           .when()
@@ -273,6 +291,7 @@ public class PledgerRequests {
 
     public ValidatableResponse searchTags(String name) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .queryParam("name", name)
           .when()
               .get("/v2/api/tags")
@@ -282,6 +301,7 @@ public class PledgerRequests {
 
     public ValidatableResponse deleteTag(String name) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .pathParam("name", name)
           .when()
               .delete("/v2/api/tags/{name}")
@@ -291,6 +311,7 @@ public class PledgerRequests {
 
     public ValidatableResponse fetchAccountTypes() {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .get("/v2/api/account-types")
           .then()
               .log().ifValidationFails();
@@ -298,6 +319,7 @@ public class PledgerRequests {
 
     public ValidatableResponse createExport() {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .get("/v2/api/export")
           .then()
               .log().ifValidationFails();
@@ -305,6 +327,7 @@ public class PledgerRequests {
 
     public ValidatableResponse createScheduleMonthly(long sourceAccount, long destinationAccount, String name, double amount) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .body(Map.of(
                     "name", name,
@@ -324,6 +347,7 @@ public class PledgerRequests {
 
     public ValidatableResponse patchScheduleDateRange(long scheduleId, LocalDate startDate, LocalDate endDate) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .contentType(ContentType.JSON)
               .pathParam("id", scheduleId)
               .body(Map.of(
@@ -338,6 +362,7 @@ public class PledgerRequests {
 
     public ValidatableResponse fetchSchedule(long scheduleId) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .pathParam("id", scheduleId)
           .when()
               .get("/v2/api/schedules/{id}")
@@ -347,6 +372,7 @@ public class PledgerRequests {
 
     public ValidatableResponse deleteSchedule(long scheduleId) {
         return given(requestSpecification)
+              .log().ifValidationFails()
               .pathParam("id", scheduleId)
           .when()
               .delete("/v2/api/schedules/{id}")
@@ -355,7 +381,8 @@ public class PledgerRequests {
     }
 
     public ValidatableResponse searchSchedules(List<Integer> accounts, Integer contractId) {
-        var request = given(requestSpecification);
+        var request = given(requestSpecification)
+              .log().ifValidationFails();
         if (accounts != null) {
             request.queryParam("account", accounts);
         }
@@ -365,6 +392,92 @@ public class PledgerRequests {
 
         return request.when()
               .get("/v2/api/schedules")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse createTransaction(long fromAccount, long toAccount, double amount, String currency, LocalDate date, String description) {
+        return given(requestSpecification)
+              .log().ifValidationFails()
+              .contentType(ContentType.JSON)
+              .body(Map.of(
+                    "date", date.toString(),
+                    "currency", currency,
+                    "description", description,
+                    "amount", amount,
+                    "source", fromAccount,
+                    "target", toAccount))
+          .when()
+              .post("/v2/api/transactions")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse fetchTransaction(long id) {
+        return given(requestSpecification)
+              .log().ifValidationFails()
+              .pathParam("id", id)
+          .when()
+              .get("/v2/api/transactions/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse updateTransaction(long id, long fromAccount, long toAccount, String description, double amount, LocalDate date, Long categoryId, Long expenseId, Long contractId, String tag) {
+        var body = new HashMap<String, Object>();
+        body.put("source", fromAccount);
+        body.put("target", toAccount);
+        body.put("date", date.toString());
+        body.put("description", description);
+        body.put("amount", amount);
+        body.put("currency", "EUR");
+
+        if (categoryId != null) {
+            body.put("category", categoryId);
+        }
+        if (expenseId != null) {
+            body.put("expense", expenseId);
+        }
+        if (contractId != null) {
+            body.put("contract", contractId);
+        }
+        if (tag != null) {
+            body.put("tags", List.of(tag));
+        }
+
+        return given(requestSpecification)
+              .log().ifValidationFails()
+              .contentType(ContentType.JSON)
+              .pathParam("id", id)
+              .body(body)
+          .when()
+              .put("/v2/api/transactions/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse deleteTransaction(long id) {
+        return given(requestSpecification)
+              .pathParam("id", id)
+          .when()
+              .delete("/v2/api/transactions/{id}")
+          .then()
+              .log().ifValidationFails();
+    }
+
+    public ValidatableResponse searchTransactionsForAccounts(int offset, int limit, LocalDate startDate, LocalDate endDate, List<Long> accountIds) {
+        var request = given(requestSpecification)
+              .log().ifValidationFails()
+              .queryParam("offset", offset)
+              .queryParam("numberOfResults", limit)
+              .queryParam("startDate", startDate.toString())
+              .queryParam("endDate", endDate.toString());
+        if (accountIds != null) {
+            request.queryParam("account", accountIds);
+        }
+
+        return request.when()
+              .get("/v2/api/transactions")
           .then()
               .log().ifValidationFails();
     }

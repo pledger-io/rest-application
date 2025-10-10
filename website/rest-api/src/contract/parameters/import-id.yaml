@@ -1,5 +1,5 @@
-name: tag
-required: true
+name: importSlug
+required: false
 in: query
 schema:
   type: string

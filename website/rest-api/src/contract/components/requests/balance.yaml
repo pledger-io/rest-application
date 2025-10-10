@@ -6,19 +6,23 @@ properties:
   accounts:
     type: array
     items:
-      type: long
+      type: integer
+      format: int64
   categories:
     type: array
     items:
-      type: long
+      type: integer
+      format: int64
   contracts:
     type: array
     items:
-      type: long
+      type: integer
+      format: int64
   expenses:
     type: array
     items:
-      type: long
+      type: integer
+      format: int64
   range:
     $ref: '#/components/schemas/date-range'
   type:

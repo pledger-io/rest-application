@@ -79,6 +79,7 @@ public class Transaction implements AggregateBase, Serializable {
 
     private Date created;
     private Date updated;
+    private boolean deleted;
 
     public Transaction(Account from, Account to, double amount) {
         var toAmount = Math.abs(amount);

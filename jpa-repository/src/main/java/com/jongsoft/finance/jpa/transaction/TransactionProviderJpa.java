@@ -220,6 +220,7 @@ public class TransactionProviderJpa implements TransactionProvider {
                         .map(tags -> Collections.List(tags).map(TagJpa::getName))
                         .getOrSupply(Collections::List))
                 .transactions(parts)
+                .deleted(source.getDeleted() != null)
                 .build();
     }
 
