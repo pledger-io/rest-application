@@ -360,6 +360,8 @@ paths:
           description: Filter based on the currency code
           schema:
             type: string
+            minLength: 3
+            maxLength: 3
             example: 'EUR'
       responses:
         "200": { $ref: '#/components/responses/paged-transaction' }

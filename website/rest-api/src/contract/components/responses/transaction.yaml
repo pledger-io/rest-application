@@ -49,9 +49,9 @@ properties:
     type: string
     description: The type of transaction
     enum:
-      - '"CREDIT"'
-      - '"DEBIT"'
-      - '"TRANSFER"'
+      - CREDIT
+      - DEBIT
+      - TRANSFER
   dates:
     description: All dates relevant for this transaction
     type: object
