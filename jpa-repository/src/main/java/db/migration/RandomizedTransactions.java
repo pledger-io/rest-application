@@ -20,8 +20,8 @@ public class RandomizedTransactions {
 
     static String url =
             "jdbc:h2:mem:Pledger;DB_CLOSE_DELAY=-1;MODE=MariaDB"; // replace with your database url
-    static String user = "fintrack"; // replace with your database user
-    static String password = "fintrack"; // replace with your database password
+    static String user = "pledger"; // replace with your database user
+    static String password = "pledger"; // replace with your database password
 
     static String loremIpsum =
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor"

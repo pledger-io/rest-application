@@ -1,10 +1,23 @@
 plugins {
     id("io.micronaut.application")
+    id("io.micronaut.openapi")
 }
 
 micronaut {
     runtime("jetty")
     testRuntime("junit5")
+
+    processing {
+        incremental(true)
+    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.addAll(listOf(
+        "-Amicronaut.openapi.enabled=true",
+        "-Amicronaut.openapi.packages=com.jongsoft.finance",
+        "-Amicronaut.openapi.target.file=build/classes/java/main/META-INF/swagger/pledger-api.yml"
+    ))
 }
 
 dependencies {
@@ -15,6 +28,9 @@ dependencies {
     implementation(mn.micronaut.serde.api)
     implementation(mn.validation)
 
+    implementation(mn.micronaut.micrometer.core)
+    implementation(mn.micronaut.micrometer.registry.prometheus)
+
     // Email dependencies
     implementation(mn.micronaut.email.javamail)
     implementation(mn.micronaut.email.template)
@@ -23,7 +39,6 @@ dependencies {
     // Http Server
     implementation(mn.micronaut.http.server.jetty)
     implementation(mn.micronaut.http.validation)
-    implementation(mn.micronaut.openapi.adoc)
 
     implementation(project(":core"))
     implementation(project(":domain"))
@@ -42,17 +57,17 @@ dependencies {
     // Contains the health checker
     implementation(mn.micronaut.management)
 
-    runtimeOnly(project(":jpa-repository"))
-    runtimeOnly(project(":bpmn-process"))
+    implementation(project(":jpa-repository"))
+    implementation(project(":bpmn-process"))
 
     // Libraries for running analysis and transaction corrections
-    runtimeOnly(project(":learning:learning-module"))
-    runtimeOnly(project(":learning:learning-module-rules"))
-    runtimeOnly(project(":learning:learning-module-llm"))
-    runtimeOnly(project(":learning:learning-module-spending-patterns"))
+    implementation(project(":learning:learning-module"))
+    implementation(project(":learning:learning-module-rules"))
+    implementation(project(":learning:learning-module-llm"))
+    implementation(project(":learning:learning-module-spending-patterns"))
 
-    runtimeOnly(project(":transaction-importer:transaction-importer-api"))
-    runtimeOnly(project(":transaction-importer:transaction-importer-csv"))
+    implementation(project(":transaction-importer:transaction-importer-api"))
+    implementation(project(":transaction-importer:transaction-importer-csv"))
 }
 
 tasks.processResources {

@@ -42,7 +42,7 @@ public class ProfileController implements ProfileApi {
         this.userProvider = userProvider;
         this.authenticationFacade = authenticationFacade;
         this.application = application;
-        this.logger = LoggerFactory.getLogger(ProfileApi.class);
+        this.logger = LoggerFactory.getLogger(ProfileController.class);
     }
 
     @Override

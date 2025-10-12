@@ -146,8 +146,8 @@ class StatisticsBalanceController implements StatisticsBalanceApi {
         }
         if (balanceRequest.getType() != null) {
             switch (balanceRequest.getType()) {
-                case INCOME -> filter.onlyIncome(true);
-                case EXPENSE -> filter.onlyIncome(false);
+                case INCOME -> filter.ownAccounts().onlyIncome(true);
+                case EXPENSE -> filter.ownAccounts().onlyIncome(false);
                 case ALL -> filter.ownAccounts();
             }
         }
