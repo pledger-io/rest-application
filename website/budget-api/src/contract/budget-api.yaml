@@ -18,8 +18,19 @@ paths:
       operationId: findByFilter
       tags: [ budget-fetcher ]
       parameters:
-        - $ref: '#/components/parameters/start-date'
-        - $ref: '#/components/parameters/end-date'
+        - name: year
+          required: false
+          description: The year to get the budget for
+          in: query
+          schema: { type: int }
+        - name: month
+          required: false
+          description: The year to get the budget for
+          in: query
+          schema:
+            type: int
+            min: 1
+            max: 12
         - name: firstOnly
           description: If true, only the first budget will be returned.
           in: query
@@ -29,9 +40,7 @@ paths:
           description: The list of matching budget periods
           content:
             application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/budget-response' }
+              schema: { $ref: '#/components/schemas/budget-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
     post:
@@ -120,18 +129,35 @@ paths:
       operationId: computeBudgetExpenseBalance
       tags: [ budget-fetcher ]
       parameters:
-        - $ref: '#/components/parameters/start-date'
-        - $ref: '#/components/parameters/end-date'
+        - name: year
+          required: true
+          description: The year to get the budget for
+          in: query
+          schema: { type: int }
+        - name: month
+          required: true
+          description: The year to get the budget for
+          in: query
+          schema:
+            type: int
+            min: 1
+            max: 12
         - name: expenseId
           description: Optional list of expense identifiers to filter on
           in: query
-          schema: { type: integer }
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
       responses:
         "200":
           description: The current balance
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/computed-expense-response' }
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/computed-expense-response' }
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
         "404": { $ref: '#/components/responses/404' }

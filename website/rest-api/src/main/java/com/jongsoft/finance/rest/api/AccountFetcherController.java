@@ -4,6 +4,7 @@ import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.providers.AccountTypeProvider;
 import com.jongsoft.finance.rest.model.*;
 import com.jongsoft.lang.Collections;
 
@@ -22,10 +23,15 @@ import java.util.List;
 class AccountFetcherController implements AccountFetcherApi {
 
     private final Logger logger;
+    private final AccountTypeProvider accountTypeProvider;
     private final AccountProvider accountProvider;
     private final FilterFactory filterFactory;
 
-    AccountFetcherController(AccountProvider accountProvider, FilterFactory filterFactory) {
+    AccountFetcherController(
+            AccountTypeProvider accountTypeProvider,
+            AccountProvider accountProvider,
+            FilterFactory filterFactory) {
+        this.accountTypeProvider = accountTypeProvider;
         this.accountProvider = accountProvider;
         this.filterFactory = filterFactory;
         this.logger = LoggerFactory.getLogger(AccountFetcherController.class);
@@ -49,8 +55,10 @@ class AccountFetcherController implements AccountFetcherApi {
 
         var page = offset / numberOfResults;
         var filter = filterFactory.account().page(Math.max(0, page), Math.max(1, numberOfResults));
-        if (type != null && !type.isEmpty()) {
+        if (!type.isEmpty()) {
             filter.types(Collections.List(type));
+        } else {
+            filter.types(accountTypeProvider.lookup(false));
         }
         if (accountName != null) {
             filter.name(accountName, false);

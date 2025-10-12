@@ -233,7 +233,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
 
-  /i18n/{languageCode}:
+  /v2/api/i18n/{languageCode}:
     get:
       security: []
       tags:

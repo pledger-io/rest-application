@@ -23,7 +23,10 @@ public class UserAccountJpa extends EntityJpa {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "two_factor_enabled")
     private boolean twoFactorEnabled;
+
+    @Column(name = "two_factor_secret")
     private String twoFactorSecret;
 
     private String theme;

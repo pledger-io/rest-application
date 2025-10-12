@@ -50,6 +50,7 @@ paths:
         user.
       responses:
         "200":
+          description: The JSON of the export
           content:
             application/json:
               schema: { $ref: '#/components/schemas/export-profile-response' }

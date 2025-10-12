@@ -9,19 +9,19 @@ import jakarta.validation.constraints.NotNull;
 @ConfigurationProperties("datasources.default")
 public interface CamundaDatasourceConfiguration {
 
-    @Bindable(defaultValue = "jdbc:h2:mem:fintrack;DB_CLOSE_DELAY=1000")
+    @Bindable
     @NotBlank
     String getUrl();
 
-    @Bindable(defaultValue = "sa")
+    @Bindable
     @NotBlank
     String getUsername();
 
-    @Bindable(defaultValue = "")
+    @Bindable
     @NotNull
     String getPassword();
 
-    @Bindable(defaultValue = "org.h2.Driver")
+    @Bindable
     @NotBlank
     String getDriverClassName();
 

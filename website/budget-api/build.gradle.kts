@@ -26,5 +26,8 @@ dependencies {
     implementation(mn.micronaut.serde.api)
     implementation(mn.validation)
 
+    implementation(libs.lang)
+
+    implementation(project(":core"))
     implementation(project(":domain"))
 }

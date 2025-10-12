@@ -6,6 +6,7 @@ import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Filter;
 import io.micronaut.http.filter.HttpServerFilter;
 import io.micronaut.http.filter.ServerFilterChain;
+import io.micronaut.http.filter.ServerFilterPhase;
 
 import org.reactivestreams.Publisher;
 import org.slf4j.MDC;
@@ -14,6 +15,12 @@ import java.util.UUID;
 
 @Filter("/v2/api/**")
 public class CorrelationIdFilter implements HttpServerFilter {
+
+    @Override
+    public int getOrder() {
+        return ServerFilterPhase.FIRST.order();
+    }
+
     @Override
     public Publisher<MutableHttpResponse<?>> doFilter(
             HttpRequest<?> request, ServerFilterChain chain) {
@@ -23,8 +30,6 @@ public class CorrelationIdFilter implements HttpServerFilter {
             MDC.put("correlationId", UUID.randomUUID().toString());
         }
 
-        return Publishers.then(chain.proceed(request), response -> {
-            MDC.remove("correlationId");
-        });
+        return Publishers.then(chain.proceed(request), _ -> MDC.remove("correlationId"));
     }
 }
