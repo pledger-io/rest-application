@@ -9,6 +9,7 @@ import com.jongsoft.finance.spending.Detector;
 import com.jongsoft.finance.spending.SpendingAnalyticsEnabled;
 import com.jongsoft.lang.Dates;
 
+import io.micrometer.core.annotation.Timed;
 import io.micronaut.transaction.annotation.Transactional;
 
 import jakarta.inject.Singleton;
@@ -36,6 +37,7 @@ class AnalysisRunner {
     }
 
     @Transactional
+    @Timed("insight.monthly.analysis")
     public boolean analyzeForUser(YearMonth month) {
         if (!transactionDetectors.stream().allMatch(Detector::readyForAnalysis)) {
             log.debug("Not all transaction detectors are ready for analysis. Skipping analysis.");

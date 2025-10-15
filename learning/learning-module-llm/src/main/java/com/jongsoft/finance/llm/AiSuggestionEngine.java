@@ -10,6 +10,7 @@ import com.jongsoft.finance.llm.agent.ClassificationAgent;
 import com.jongsoft.finance.llm.agent.TransactionExtractorAgent;
 import com.jongsoft.finance.llm.stores.ClassificationEmbeddingStore;
 
+import io.micrometer.core.annotation.Timed;
 import io.micronaut.context.annotation.Primary;
 
 import jakarta.inject.Singleton;
@@ -42,8 +43,10 @@ class AiSuggestionEngine implements SuggestionEngine {
     }
 
     @Override
+    @Timed("learning.language-model.suggest")
     public SuggestionResult makeSuggestions(SuggestionInput transactionInput) {
         log.debug("Starting classification on {}.", transactionInput);
+
         var nullSafeInput = new SuggestionInput(
                 transactionInput.date(),
                 Optional.ofNullable(transactionInput.description()).orElse(""),
@@ -60,6 +63,7 @@ class AiSuggestionEngine implements SuggestionEngine {
     }
 
     @Override
+    @Timed("learning.language-model.extract")
     public Optional<TransactionResult> extractTransaction(String transactionInput) {
         var extracted = transactionExtractorAgent.extractTransaction(
                 UUID.randomUUID(), LocalDate.now(), transactionInput);

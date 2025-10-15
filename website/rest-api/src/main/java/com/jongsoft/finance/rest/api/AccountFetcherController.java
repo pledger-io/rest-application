@@ -5,8 +5,10 @@ import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.AccountProvider;
 import com.jongsoft.finance.providers.AccountTypeProvider;
+import com.jongsoft.finance.providers.SettingProvider;
 import com.jongsoft.finance.rest.model.*;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Dates;
 
 import io.micronaut.http.annotation.Controller;
 
@@ -26,14 +28,17 @@ class AccountFetcherController implements AccountFetcherApi {
     private final AccountTypeProvider accountTypeProvider;
     private final AccountProvider accountProvider;
     private final FilterFactory filterFactory;
+    private final SettingProvider settingProvider;
 
     AccountFetcherController(
             AccountTypeProvider accountTypeProvider,
             AccountProvider accountProvider,
-            FilterFactory filterFactory) {
+            FilterFactory filterFactory,
+            SettingProvider settingProvider) {
         this.accountTypeProvider = accountTypeProvider;
         this.accountProvider = accountProvider;
         this.filterFactory = filterFactory;
+        this.settingProvider = settingProvider;
         this.logger = LoggerFactory.getLogger(AccountFetcherController.class);
     }
 
@@ -84,7 +89,25 @@ class AccountFetcherController implements AccountFetcherApi {
     @Override
     public List<@Valid AccountSpendingResponse> getTopAccountsBySpending(
             LocalDate startDate, LocalDate endDate, AccountType type, Boolean useOwnAccounts) {
-        return List.of();
+        logger.info("Fetching top accounts by spending.");
+
+        var filter = filterFactory.account().page(0, settingProvider.getAutocompleteLimit());
+        switch (type) {
+            case DEBIT -> filter.types(Collections.List("debtor"));
+            case CREDITOR -> filter.types(Collections.List("creditor"));
+            default -> throw StatusException.badRequest("Invalid account type");
+        }
+
+        var ascending =
+                switch (type) {
+                    case DEBIT -> true;
+                    case CREDITOR -> false;
+                };
+
+        return accountProvider
+                .top(filter, Dates.range(startDate, endDate), ascending)
+                .map(this::toAccountSpendingResponse)
+                .toJava();
     }
 
     private Account lookupAccountOrThrow(Long id) {
@@ -96,5 +119,13 @@ class AccountFetcherController implements AccountFetcherApi {
             throw StatusException.gone("Bank account has been removed from the system");
         }
         return bankAccount;
+    }
+
+    private AccountSpendingResponse toAccountSpendingResponse(
+            AccountProvider.AccountSpending accountSpending) {
+        return new AccountSpendingResponse(
+                AccountMapper.toAccountResponse(accountSpending.account()),
+                accountSpending.average(),
+                accountSpending.total());
     }
 }

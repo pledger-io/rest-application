@@ -65,11 +65,13 @@ public class ContractCommandController implements ContractCommandApi {
         logger.info("Updating contract {}.", id);
 
         var contract = locateByIdOrThrow(id);
-        contract.change(
-                contractRequest.getName(),
-                contractRequest.getDescription(),
-                contractRequest.getStart(),
-                contractRequest.getEnd());
+        if (contractRequest.getName() != null) {
+            contract.change(
+                    contractRequest.getName(),
+                    contractRequest.getDescription(),
+                    contractRequest.getStart(),
+                    contractRequest.getEnd());
+        }
 
         if (contractRequest.getAttachmentCode() != null) {
             contract.registerUpload(contractRequest.getAttachmentCode());
