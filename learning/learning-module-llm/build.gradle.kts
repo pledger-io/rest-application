@@ -15,6 +15,8 @@ dependencies {
 
     implementation(mn.micronaut.context)
     implementation(mn.micronaut.data.tx)
+    implementation(mn.micronaut.micrometer.core)
+
     implementation(libs.lang)
     implementation(llm.bundles.langchain4j)
     runtimeOnly(mn.snakeyaml)

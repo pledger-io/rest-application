@@ -36,7 +36,7 @@ class ScheduleCommandController implements ScheduleCommandApi {
     @Override
     public HttpResponse<@Valid TransactionScheduleResponse> createSchedule(
             ScheduleRequest scheduleRequest) {
-        logger.info("Creating new transaction schedule.");
+        logger.info("Creating new transaction schedule {}.", scheduleRequest.getName());
 
         var source = accountProvider
                 .lookup(scheduleRequest.getTransferBetween().getSource().getId())

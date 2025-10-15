@@ -30,6 +30,7 @@ dependencies {
 
     implementation(mn.micronaut.micrometer.core)
     implementation(mn.micronaut.micrometer.registry.prometheus)
+    implementation(mn.hibernate.micrometer)
 
     // Email dependencies
     implementation(mn.micronaut.email.javamail)
@@ -39,6 +40,7 @@ dependencies {
     // Http Server
     implementation(mn.micronaut.http.server.jetty)
     implementation(mn.micronaut.http.validation)
+    implementation(mn.micronaut.hibernate.validator)
 
     implementation(project(":core"))
     implementation(project(":domain"))

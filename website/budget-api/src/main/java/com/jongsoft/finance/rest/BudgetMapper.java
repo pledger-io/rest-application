@@ -12,6 +12,7 @@ public interface BudgetMapper {
 
     static BudgetResponse toBudgetResponse(Budget budget) {
         return new BudgetResponse(
+                BigDecimal.valueOf(budget.getExpectedIncome()),
                 new DateRange(budget.getStart(), budget.getEnd()),
                 budget.getExpenses().map(BudgetMapper::toBudgetExpense).toJava());
     }

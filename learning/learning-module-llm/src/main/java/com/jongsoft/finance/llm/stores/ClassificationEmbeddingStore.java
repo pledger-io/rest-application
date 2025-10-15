@@ -19,6 +19,7 @@ import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2Embedding
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 
+import io.micrometer.core.annotation.Timed;
 import io.micronaut.context.event.ShutdownEvent;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
@@ -57,6 +58,9 @@ public class ClassificationEmbeddingStore {
         this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
     }
 
+    @Timed(
+            value = "learning.language-model.classify",
+            extraTags = {"perform-classify"})
     public Optional<SuggestionResult> classify(SuggestionInput input) {
         var textSegment = TextSegment.from(input.description());
 
@@ -103,11 +107,17 @@ public class ClassificationEmbeddingStore {
     }
 
     @EventListener
+    @Timed(
+            value = "learning.language-model.classify",
+            extraTags = {"transaction-update"})
     void handleClassificationChanged(LinkTransactionCommand command) {
         updateClassifications(transactionProvider.lookup(command.id()).get());
     }
 
     @EventListener
+    @Timed(
+            value = "learning.language-model.classify",
+            extraTags = {"transaction-create"})
     void handleTransactionAdded(TransactionCreated transactionCreated) {
         updateClassifications(
                 transactionProvider.lookup(transactionCreated.transactionId()).get());

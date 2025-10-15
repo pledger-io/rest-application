@@ -70,6 +70,8 @@ class BudgetFetcherController implements BudgetFetcherApi {
             var filter = filterFactory
                     .transaction()
                     .range(dateRange)
+                    .onlyIncome(false)
+                    .ownAccounts()
                     .expenses(Collections.List(new EntityRef(expense.getId())));
             var balance = transactionProvider
                     .balance(filter)

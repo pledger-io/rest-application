@@ -29,7 +29,7 @@ class BudgetCommandController implements BudgetCommandApi {
             BudgetProvider budgetProvider, CurrentUserProvider currentUserProvider) {
         this.budgetProvider = budgetProvider;
         this.currentUserProvider = currentUserProvider;
-        this.logger = LoggerFactory.getLogger(BudgetCommandApi.class);
+        this.logger = LoggerFactory.getLogger(BudgetCommandController.class);
     }
 
     @Override
