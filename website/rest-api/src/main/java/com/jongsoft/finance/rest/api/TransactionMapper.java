@@ -38,8 +38,8 @@ public interface TransactionMapper {
         if (transaction.isSplit()) {
             var splitFor =
                     switch (transaction.computeType()) {
-                        case CREDIT -> source;
-                        case DEBIT -> destination;
+                        case CREDIT -> destination;
+                        case DEBIT -> source;
                         case TRANSFER ->
                             throw StatusException.internalError(
                                     "Split transaction cannot be a transfer");
@@ -49,7 +49,7 @@ public interface TransactionMapper {
                     .getTransactions()
                     .filter(t -> t.getAccount().equals(splitFor))
                     .map(part -> new TransactionResponseSplitInner(
-                            part.getAccount().getName(), part.getAmount()))
+                            part.getDescription(), part.getAmount()))
                     .forEach(response::addSplitItem);
         }
 

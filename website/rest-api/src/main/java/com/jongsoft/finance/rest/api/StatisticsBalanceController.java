@@ -124,6 +124,8 @@ class StatisticsBalanceController implements StatisticsBalanceApi {
         if (balanceRequest.getAccounts() != null
                 && !balanceRequest.getAccounts().isEmpty()) {
             filter.accounts(toEntityRefList(balanceRequest.getAccounts()));
+        } else {
+            filter.ownAccounts();
         }
         if (balanceRequest.getCategories() != null
                 && !balanceRequest.getCategories().isEmpty()) {
@@ -146,9 +148,9 @@ class StatisticsBalanceController implements StatisticsBalanceApi {
         }
         if (balanceRequest.getType() != null) {
             switch (balanceRequest.getType()) {
-                case INCOME -> filter.ownAccounts().onlyIncome(true);
-                case EXPENSE -> filter.ownAccounts().onlyIncome(false);
-                case ALL -> filter.ownAccounts();
+                case INCOME -> filter.onlyIncome(true);
+                case EXPENSE -> filter.onlyIncome(false);
+                case ALL -> filter.hashCode();
             }
         }
 

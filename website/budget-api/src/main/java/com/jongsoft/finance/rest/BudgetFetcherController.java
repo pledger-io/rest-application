@@ -123,7 +123,7 @@ class BudgetFetcherController implements BudgetFetcherApi {
     @Override
     public List<@Valid ExpenseResponse> findExpensesByFilter(String name) {
         logger.info("Finding expenses by name {}.", name);
-        var filter = filterFactory.expense().name(name, true);
+        var filter = filterFactory.expense().name(name, false);
 
         return expenseProvider
                 .lookup(filter)
