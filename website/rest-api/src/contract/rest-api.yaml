@@ -27,6 +27,7 @@ paths:
     get:
       operationId: getAccountTypes
       tags: [ system-information ]
+      summary: Get account types
       description: >
         Get a listing of all available account types in the system.
       responses:
@@ -45,6 +46,7 @@ paths:
     get:
       operationId: exportUserAccount
       tags: [ export ]
+      summary: Export profile
       description: >
         Create an export of all information that belongs to the authenticated
         user.
@@ -65,6 +67,7 @@ paths:
     get:
       operationId: getAccounts
       tags: [ account-fetcher ]
+      summary: Search accounts
       description: >
         List available accounts that the current user has access to
       parameters:
@@ -93,6 +96,7 @@ paths:
     post:
       operationId: createAccount
       tags: [ account-command ]
+      summary: Create account
       description: >
         Create a new account for the current user
       requestBody:
@@ -113,6 +117,11 @@ paths:
     get:
       operationId: getTopAccountsBySpending
       tags: [ account-fetcher ]
+      summary: Top account by spending
+      description: >
+        Returns the top spending accounts for the current user within the optional date range.
+        You can filter by account type or include only your own accounts using useOwnAccounts.
+        The response is an array ordered by highest spending, each item providing account and amount details.
       parameters:
         - $ref: '#/components/parameters/start-date'
         - $ref: '#/components/parameters/end-date'
@@ -153,6 +162,7 @@ paths:
     get:
       operationId: getAccountById
       tags: [ account-fetcher ]
+      summary: Get account
       description: >
         Get account details by id for the current user
       responses:
@@ -168,6 +178,7 @@ paths:
     put:
       operationId: updateAccountById
       tags: [ account-command ]
+      summary: Update account
       description: >
         Update account details by id for the current user
       requestBody:
@@ -188,6 +199,7 @@ paths:
     delete:
       operationId: deleteAccountById
       tags: [ account-command ]
+      summary: Delete account
       description: >
         Delete account details by id for the current user
       responses:
@@ -214,6 +226,7 @@ paths:
     get:
       operationId: getSavingGoalsForAccount
       tags: [ account-fetcher ]
+      summary: List saving goals
       description: >
         Get the saving goals for the account, note this can only be called if the account type is SAVINGS.
       responses:
@@ -230,6 +243,7 @@ paths:
     post:
       operationId: createSavingGoalForAccount
       tags: [ account-command ]
+      summary: Create saving goal
       description: >
         Create a new saving goal for the account, note this can only be called if the account type is SAVINGS.
       requestBody:
@@ -266,6 +280,7 @@ paths:
     put:
       operationId: updateSavingGoalForAccount
       tags: [ account-command ]
+      summary: Update saving goal
       description: >
         Update a saving goal for the account, note this can only be called if the account type is SAVINGS.
       requestBody:
@@ -284,6 +299,7 @@ paths:
     delete:
       operationId: deleteSavingGoalForAccount
       tags: [ account-command ]
+      summary: Delete saving goal
       description: >
         Remove a saving goal for the account, note this can only be called if the account type is SAVINGS.
       responses:
@@ -313,6 +329,7 @@ paths:
     post:
       operationId: makeReservationForSavingGoal
       tags: [ account-command ]
+      summary: Reserve money saving goal
       description: >
         Make a reservation for the saving goal, note this can only be called if the account type is SAVINGS.
       requestBody:
@@ -335,6 +352,12 @@ paths:
     get:
       operationId: findTransactionBy
       tags: [ transaction-fetcher ]
+      summary: Search transactions
+      description: >
+        Search the current user's transactions using optional filters such as date range,
+        account, budget/expense, category, contract, tags, description text, type, import id,
+        and currency. Results are returned as a paged list that can be navigated with offset
+        and number-of-results parameters.
       parameters:
         - $ref: '#/components/parameters/start-date'
         - $ref: '#/components/parameters/end-date'
@@ -372,6 +395,7 @@ paths:
     post:
       operationId: createTransaction
       tags: [ transaction-command ]
+      summary: Create transaction
       description: Create a new transaction in the system
       requestBody:
         content:
@@ -404,6 +428,7 @@ paths:
     get:
       operationId: getTransactionById
       tags: [ transaction-fetcher ]
+      summary: Fetch transaction
       description: Fetch a single transaction from the system
       responses:
         "200":
@@ -417,6 +442,7 @@ paths:
     put:
       operationId: updateTransaction
       tags: [ transaction-command ]
+      summary: Update transaction
       description: Update a transaction in the system
       requestBody:
         content:
@@ -435,6 +461,7 @@ paths:
     patch:
       operationId: splitTransaction
       tags: [ transaction-command ]
+      summary: Split transaction
       description: Provide the new split for the transaction
       requestBody:
         content:
@@ -461,6 +488,7 @@ paths:
     delete:
       operationId: deleteTransaction
       tags: [ transaction-command ]
+      summary: Delete transaction
       description: Remove a transaction from the system
       responses:
         "204":
@@ -473,6 +501,7 @@ paths:
     post:
       operationId: computeBalanceWithFilter
       tags: [ statistics-balance ]
+      summary: Compute balance
       description: >
         Computes a balance for the user based on the filters applied.
       requestBody:
@@ -498,6 +527,7 @@ paths:
     post:
       operationId: computePartitionedBalanceWithFilter
       tags: [ statistics-balance ]
+      summary: Compute partitioned balance
       description: >
         Computes a balance for the user based on the filters applied.
       requestBody:
@@ -525,6 +555,7 @@ paths:
     post:
       operationId: computeBalanceGroupedByDate
       tags: [ statistics-balance ]
+      summary: Compute date partitioned balance
       description: >
         Computes the balance grouping it by date as indicated in the `type`.
       requestBody:
@@ -546,6 +577,10 @@ paths:
     get:
       operationId: getInsightsByFilters
       tags: [ insight ]
+      summary: Fetch insights
+      description: >
+        Retrieve detected financial insights for a given year and optional month.
+        Returns an array of insights for the current user.
       parameters:
         - name: year
           in: query
@@ -573,6 +608,10 @@ paths:
     get:
       operationId: getPatternsByFilters
       tags: [ insight ]
+      summary: Fetch patterns
+      description: >
+        Retrieve detected spending patterns for a given year and optional month.
+        Returns an array of patterns for the current user.
       parameters:
         - name: year
           in: query
@@ -605,6 +644,10 @@ paths:
     get:
       operationId: findCategoriesBy
       tags: [ category-fetcher ]
+      summary: Search categories
+      description: >
+        Retrieve a paged list of categories that match the optional name filter.
+        Use offset and number-of-results to paginate through the result set.
       parameters:
         - $ref: '#/components/parameters/name-filter'
         - $ref: '#/components/parameters/offset'
@@ -620,6 +663,10 @@ paths:
     post:
       operationId: createCategory
       tags: [ category-command ]
+      summary: Create category
+      description: >
+        Create a new category using the provided request body. Returns the created
+        category with its generated identifier and details.
       requestBody:
         content:
           application/json:
@@ -651,6 +698,10 @@ paths:
     get:
       operationId: getCategoryById
       tags: [ category-fetcher ]
+      summary: Fetch category
+      description: >
+        Retrieve a single category by its identifier. Returns the full category details
+        if it exists and the user has access.
       responses:
         "200":
           description: The category
@@ -663,6 +714,10 @@ paths:
     put:
       operationId: updateCategory
       tags: [ category-command ]
+      summary: Update category
+      description: >
+        Update an existing category identified by its id using the provided request body.
+        Returns the updated category details.
       requestBody:
         content:
           application/json:
@@ -680,6 +735,10 @@ paths:
     delete:
       operationId: deleteCategoryById
       tags: [ category-command ]
+      summary: Delete category
+      description: >
+        Delete a category by its identifier. On success, a 204 No Content is returned
+        to confirm removal.
       responses:
         "204":
           description: Confirmation that a transaction was removed
@@ -695,6 +754,10 @@ paths:
     get:
       operationId: findContractBy
       tags: [ contract-fetcher ]
+      summary: Search contracts
+      description: >
+        Retrieve contracts filtered by optional name and status (ACTIVE or INACTIVE).
+        Returns a list of matching contracts for the current user.
       parameters:
         - $ref: '#/components/parameters/name-filter'
         - name: status
@@ -715,6 +778,8 @@ paths:
     post:
       operationId: createContract
       tags: [ contract-command ]
+      summary: Create contract
+      description: Create a new contract in the application.
       requestBody:
         content:
           application/json:
@@ -746,6 +811,8 @@ paths:
     get:
       operationId: getContractById
       tags: [ contract-fetcher ]
+      summary: Fetch contract
+      description: Fetch a single contract by its unique identifier.
       responses:
         "200":
           description: The contract
@@ -758,6 +825,8 @@ paths:
     put:
       operationId: updateContract
       tags: [ contract-command ]
+      summary: Update contract
+      description: Update an existing contract in the application.
       requestBody:
         content:
           application/json:
@@ -775,6 +844,8 @@ paths:
     delete:
       operationId: deleteContractById
       tags: [ contract-command ]
+      summary: Delete contract
+      description: Marks a contract that it is no longer relevant in the application.
       responses:
         "204":
           description: Confirmation that a contract was removed
@@ -795,6 +866,7 @@ paths:
     post:
       operationId: warnBeforeContractExpiry
       tags: [ contract-command ]
+      summary: Warn before end
       description: Send out a warning e-mail before the contract expiry date
       responses:
         "204":
@@ -812,6 +884,9 @@ paths:
     get:
       operationId: findTagsBy
       tags: [ tag-fetcher ]
+      summary: Search tags
+      description: >
+        Return a list of tag names matching the optional name filter for the current user.
       parameters:
         - $ref: '#/components/parameters/name-filter'
       responses:
@@ -828,6 +903,9 @@ paths:
     post:
       operationId: createTag
       tags: [ tag-command ]
+      summary: Create tag
+      description: >
+        Create a new tag with the given name for the current user. Returns 204 on success.
       requestBody:
         content:
           application/json:
@@ -852,6 +930,10 @@ paths:
     delete:
       operationId: deleteTag
       tags: [ tag-command ]
+      summary: Delete tag
+      description: >
+        Delete an existing tag by its name. Returns 204 on success; if the tag does not exist,
+        a 404 may be returned.
       responses:
         "204":
           description: Confirmation the tag was deleted
@@ -867,6 +949,10 @@ paths:
     get:
       operationId: findScheduleByFilter
       tags: [ schedule-fetcher ]
+      summary: Search schedules
+      description: >
+        List transaction schedules matching optional filters on account and contract.
+        Returns all schedules the current user has access to.
       parameters:
         - name: account
           description: >
@@ -898,6 +984,10 @@ paths:
     post:
       operationId: createSchedule
       tags: [ schedule-command ]
+      summary: Create schedule
+      description: >
+        Create a new transaction schedule using the provided request body. Returns the
+        created schedule including its identifier and configuration.
       requestBody:
         content:
           application/json:
@@ -925,6 +1015,10 @@ paths:
     get:
       operationId: findScheduleById
       tags: [ schedule-fetcher ]
+      summary: Fetch schedule
+      description: >
+        Retrieve a single transaction schedule by its identifier. Returns full details
+        of the schedule if found.
       responses:
         "200":
           description: The schedule
@@ -937,6 +1031,10 @@ paths:
     patch:
       operationId: updateSchedule
       tags: [ schedule-command ]
+      summary: Update schedule
+      description: >
+        Partially update an existing transaction schedule using the provided patch
+        request. Returns the updated schedule.
       requestBody:
         content:
           application/json:
@@ -954,6 +1052,10 @@ paths:
     delete:
       operationId: deleteSchedule
       tags: [ schedule-command ]
+      summary: Delete schedule
+      description: >
+        Delete a transaction schedule by its identifier. Returns 204 on successful
+        deletion.
       responses:
         "204":
           description: Confirmation the schedule was deleted

@@ -11,7 +11,7 @@ import java.util.List;
 public record CSVConfiguration(
         @JsonProperty("has-headers") boolean headers,
         @JsonProperty("date-format") String dateFormat,
-        @JsonProperty("delimiter") char delimiter,
+        @JsonProperty("delimiter") String delimiter,
         @JsonProperty("custom-indicator") TransactionTypeIndicator transactionTypeIndicator,
         @JsonProperty("column-roles") List<ColumnRole> columnRoles)
         implements ImporterConfiguration {}

@@ -23,6 +23,7 @@ paths:
       operationId: openIdConfiguration
       tags: [ open-id ]
       security: []
+      summary: Get configuration
       description: >
         Get the configuration needed to setup an OpenId integration in the front-end.
       responses:
@@ -36,6 +37,7 @@ paths:
       operationId: getJwtSignature
       tags: [ security ]
       security: []
+      summary: Get JWT signature
       description: >
         Get the public key used to verify the JWT signature.
       responses:
@@ -50,6 +52,7 @@ paths:
       operationId: createUser
       tags: [ security ]
       security: []
+      summary: Create user
       requestBody:
         content:
           application/json:
@@ -62,6 +65,7 @@ paths:
     post:
       operationId: verifyTwoFactor
       tags: [ security ]
+      summary: Verify 2-factor
       description: >
         Used to verify the user token against that what is expected. If
         valid the user will get a new JWT with updated authorizations.
@@ -91,6 +95,7 @@ paths:
     get:
       operationId: getProfile
       tags: [ profile ]
+      summary: Get profile
       description: >
         Get the profile of the authenticated user
       responses:
@@ -104,6 +109,7 @@ paths:
     patch:
       operationId: patchProfile
       tags: [ profile ]
+      summary: Update profile
       description: >
         Update a part of the users profile
       requestBody:
@@ -135,6 +141,7 @@ paths:
     get:
       operationId: listSessions
       tags: [ profile ]
+      summary: List sessions
       description: >
         Retrieve a list of all active sessions of the user
       responses:
@@ -150,6 +157,7 @@ paths:
     post:
       operationId: createSession
       tags: [ profile ]
+      summary: Create session
       description: >
         Start a new durable long term session. This can for
         example be used in a mobile app.
@@ -183,6 +191,7 @@ paths:
     delete:
       operationId: revokeSession
       tags: [ profile ]
+      summary: Revoke session
       description: >
         Revoke a session. This will disable any future use
         of the session in any app.
@@ -203,6 +212,7 @@ paths:
     get:
       operationId: generateQrCode
       tags: [ profile ]
+      summary: Create QR code
       description: >
         Get the QR-code that can be used to active the 2-factor
         authentication.
@@ -219,6 +229,7 @@ paths:
     patch:
       operationId: patch2Factor
       tags: [ profile ]
+      summary: Update 2-factor
       description: >
         Enable or disable the 2-factor authentication 
         for the user.
@@ -258,6 +269,7 @@ paths:
     get:
       operationId: getCurrencies
       tags: [ currency ]
+      summary: Search currencies
       responses:
         "200":
           description: The list of currencies
@@ -271,6 +283,7 @@ paths:
     post:
       operationId: createCurrency
       tags: [ currency ]
+      summary: Create currency
       requestBody:
         content:
           application/json:
@@ -296,6 +309,7 @@ paths:
     get:
       operationId: getCurrencyByCode
       tags: [ currency ]
+      summary: Fetch currency
       responses:
         "200":
           description: The currency
@@ -308,6 +322,7 @@ paths:
     put:
       operationId: updateCurrencyByCode
       tags: [ currency ]
+      summary: Update currency
       requestBody:
         content:
           application/json:
@@ -325,6 +340,7 @@ paths:
     patch:
       operationId: patchCurrencyByCode
       tags: [ currency ]
+      summary: Patch currency
       requestBody:
         content:
           application/json:
@@ -344,6 +360,7 @@ paths:
     get:
       operationId: getAllSettings
       tags: [ settings ]
+      summary: Fetch settings
       responses:
         "200":
           description: The list of currencies
@@ -365,6 +382,7 @@ paths:
     patch:
       operationId: patchSetting
       tags: [ settings ]
+      summary: Update setting
       requestBody:
         content:
           application/json:
@@ -381,6 +399,7 @@ paths:
     post:
       operationId: uploadFile
       tags: [ files ]
+      summary: Create file
       requestBody:
         content:
           'multipart/form-data':
@@ -409,6 +428,7 @@ paths:
     get:
       operationId: downloadFile
       tags: [ files ]
+      summary: Download file
       description: >
         Download an existing file from the system. If encryption is enabled this
         will throw an exception if the file was not uploaded by the user 
@@ -427,6 +447,7 @@ paths:
     delete:
       operationId: deleteFile
       tags: [ files ]
+      summary: Delete file
       responses:
         "204":
           description: Confirmation the file was removed

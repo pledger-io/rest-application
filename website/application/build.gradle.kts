@@ -12,15 +12,11 @@ micronaut {
     }
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs.addAll(listOf(
-        "-Amicronaut.openapi.enabled=true",
-        "-Amicronaut.openapi.packages=com.jongsoft.finance",
-        "-Amicronaut.openapi.target.file=build/classes/java/main/META-INF/swagger/pledger-api.yml"
-    ))
-}
 
 dependencies {
+    annotationProcessor(mn.micronaut.openapi.asProvider())
+    compileOnly(mn.micronaut.openapi.annotations)
+
     // Security setup
     implementation(mn.micronaut.security.annotations)
     implementation(mn.micronaut.security)
@@ -73,6 +69,28 @@ dependencies {
 }
 
 tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    from("../budget-api/src/contract") {
+        into("META-INF/swagger")
+        exclude("*-api.yaml")
+    }
+    from("../importer-api/src/contract") {
+        into("META-INF/swagger")
+        exclude("*-api.yaml")
+    }
+    from("../system-api/src/contract") {
+        into("META-INF/swagger")
+        exclude("*-api.yaml")
+    }
+    from("../runtime-api/src/contract") {
+        into("META-INF/swagger")
+        exclude("*-api.yaml")
+    }
+    from("../rest-api/src/contract") {
+        into("META-INF/swagger")
+        exclude("*-api.yaml")
+    }
+
     filesMatching("**/micronaut-banner.txt") {
         filter { line ->
             var updated = line.replace("\${application.version}", project.version.toString())

@@ -60,7 +60,7 @@ public class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
 
             try (var reader = new CSVReaderBuilder(inputStream)
                     .withCSVParser(new CSVParserBuilder()
-                            .withSeparator(csvConfiguration.delimiter())
+                            .withSeparator(csvConfiguration.delimiter().charAt(0))
                             .build())
                     .build()) {
 
@@ -119,7 +119,7 @@ public class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
     private TransactionDTO readLine(String[] line, CSVConfiguration configuration) {
         Function<ColumnRole, String> columnLocator =
                 (role) -> Control.Try(() -> line[configuration.columnRoles().indexOf(role)])
-                        .recover(x -> null)
+                        .recover(_ -> null)
                         .get();
         Function<String, LocalDate> parseDate = (date) -> date != null
                 ? LocalDate.parse(date, DateTimeFormatter.ofPattern(configuration.dateFormat()))

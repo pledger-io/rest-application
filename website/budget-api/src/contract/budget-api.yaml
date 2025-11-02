@@ -17,6 +17,11 @@ paths:
     get:
       operationId: findByFilter
       tags: [ budget-fetcher ]
+      summary: Search budgets
+      description: >
+        Retrieve budget periods for the authenticated user. You can filter by
+        year and/or month. When firstOnly is true, only the first matching
+        budget period is returned.
       parameters:
         - name: year
           required: false
@@ -25,7 +30,7 @@ paths:
           schema: { type: int }
         - name: month
           required: false
-          description: The year to get the budget for
+          description: The month to get the budget for
           in: query
           schema:
             type: int
@@ -46,6 +51,7 @@ paths:
     post:
       operationId: createInitialBudget
       tags: [ budget-command ]
+      summary: Create budget
       description: >
         Create the initial budget for the current user. This
         can only be called once if no budget exists for the
@@ -66,6 +72,7 @@ paths:
     patch:
       operationId: updateCurrentBudget
       tags: [ budget-command ]
+      summary: Update budget
       description: >
         Update the current budget for the current user. This operation will also
         index all expenses based upon the difference between the previous expected income
@@ -89,6 +96,11 @@ paths:
     get:
       operationId: findExpensesByFilter
       tags: [ budget-fetcher ]
+      summary: Search expenses
+      description: >
+        Search expenses within the currently active budget for the authenticated
+        user. You can provide a partial name to filter the results. Returns the
+        matching expenses.
       parameters:
         - name: name
           description: Filter expenses based upon the partial name
@@ -108,6 +120,7 @@ paths:
     patch:
       operationId: updateExpense
       tags: [ budget-command ]
+      summary: Update expense
       description: >
         Create or update an expense under the current active budget.
       requestBody:
@@ -128,6 +141,12 @@ paths:
     get:
       operationId: computeBudgetExpenseBalance
       tags: [ budget-fetcher ]
+      summary: Compute expense balance
+      description: >
+        Compute the budget-vs-spending balance for one month of the authenticated
+        user. Provide year and month to select the period. Optionally pass one or
+        more expenseId values to limit the calculation to specific expenses.
+        Returns the computed balance per expense for the selected period.
       parameters:
         - name: year
           required: true
@@ -136,7 +155,7 @@ paths:
           schema: { type: int }
         - name: month
           required: true
-          description: The year to get the budget for
+          description: The month to get the budget for
           in: query
           schema:
             type: int

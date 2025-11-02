@@ -19,6 +19,7 @@ paths:
     get:
       operationId: getProcessInstances
       tags: [ process-engine ]
+      summary: Historic instances
       description: >
         Lists the historic executions for the provided process definition key
       responses:
@@ -34,6 +35,7 @@ paths:
     post:
       operationId: startProcessInstance
       tags: [ process-engine ]
+      summary: Start process
       description: >
         Starts a new process instance for the provided process definition key
       requestBody:
@@ -59,6 +61,7 @@ paths:
     get:
       operationId: getProcessInstancesByBusinessKey
       tags: [ process-engine ]
+      summary: History by business key
       description: >
         List the history executions for the provided definition key, 
         but only once with matching business key
@@ -81,6 +84,7 @@ paths:
     get:
       operationId: getProcessInstance
       tags: [ process-engine ]
+      summary: Fetch process instance
       responses:
         "200":
           description: The process instance
@@ -93,6 +97,7 @@ paths:
     delete:
       operationId: deleteProcessInstance
       tags: [ process-engine ]
+      summary: Delete process instance
       responses:
         "204":
           description: A confirmation that the process instance was deleted
@@ -108,6 +113,7 @@ paths:
     get:
       operationId: getTasks
       tags: [ task-engine ]
+      summary: Search tasks for process
       responses:
         "200":
           description: A list of tasks for the process instance
@@ -128,6 +134,7 @@ paths:
     get:
       operationId: getTaskById
       tags: [ task-engine ]
+      summary: Fetch task
       responses:
         "200":
           description: The updated task
@@ -140,6 +147,7 @@ paths:
     post:
       operationId: completeTask
       tags: [ task-engine ]
+      summary: Complete task
       requestBody:
         content:
           application/json:
@@ -153,6 +161,7 @@ paths:
     delete:
       operationId: deleteTask
       tags: [ task-engine ]
+      summary: Delete task
       responses:
         "204":
           description: A confirmation that task was deleted
@@ -169,6 +178,7 @@ paths:
     get:
       operationId: getTaskVariables
       tags: [ task-engine ]
+      summary: Fetch task variables
       parameters:
         - name: variable
           in: query
@@ -192,6 +202,7 @@ paths:
     get:
       operationId: getVariables
       tags: [ variable-engine ]
+      summary: Fetch process variables
       responses:
         "200":
           description: A list of variables for the process instance
@@ -211,6 +222,7 @@ paths:
     get:
       operationId: getVariableById
       tags: [ variable-engine ]
+      summary: Fetch variable
       responses:
         "200":
           description: The variable contents
@@ -247,8 +259,8 @@ components:
     process-instance-response: { $ref: 'components/process-instance.yaml' }
     task-response: { $ref: 'components/task.yaml' }
     variable-response: { $ref: 'components/variable-response.yaml' }
-    task-variable-map: { $ref: 'components/task-variable-map.yaml' }
+    task-variable-map:
+      type: object
+      format: TaskVariableMap
 
     variable: { $ref: 'components/variable.yaml' }
-    wrapped-variable: { $ref: 'components/wrapped-variable.yaml' }
-    list-variable: { $ref: 'components/list-variable.yaml' }

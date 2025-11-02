@@ -14,6 +14,12 @@ micronaut {
             useAuth = true
             useReactive = false
             generatedAnnotation = false
+            importMapping = mapOf(
+                "VariableMap" to "com.jongsoft.finance.rest.model.runtime.VariableMap",
+            )
+            typeMapping = mapOf(
+                "object+TaskVariableMap" to "VariableMap"
+            )
         }
     }
 }

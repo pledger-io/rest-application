@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 class TaskEngineController implements TaskEngineApi {
@@ -25,7 +26,7 @@ class TaskEngineController implements TaskEngineApi {
 
     TaskEngineController(TaskService taskService) {
         this.taskService = taskService;
-        this.logger = LoggerFactory.getLogger(TaskEngineApi.class);
+        this.logger = LoggerFactory.getLogger(TaskEngineController.class);
     }
 
     @Override
@@ -34,7 +35,7 @@ class TaskEngineController implements TaskEngineApi {
             String instanceId,
             String businessKey,
             String taskId,
-            TaskVariableMap taskVariableMap) {
+            VariableMap taskVariableMap) {
         logger.info("Completing task {} for process instance {}.", taskId, instanceId);
 
         var variables = new HashMap<String, Object>();
@@ -63,7 +64,7 @@ class TaskEngineController implements TaskEngineApi {
     }
 
     @Override
-    public TaskVariableMap getTaskVariables(
+    public VariableMap getTaskVariables(
             String processDefinition,
             String businessKey,
             String instanceId,
@@ -71,8 +72,10 @@ class TaskEngineController implements TaskEngineApi {
             String variable) {
         logger.info("Getting variables for task {} for process instance {}.", taskId, instanceId);
 
-        var map = new HashMap<String, Object>();
-        var variables = taskService.getVariables(taskId);
+        var map = new HashMap<String, ProcessVariable>();
+        var variables = variable != null
+                ? Map.of(variable, taskService.getVariable(taskId, variable))
+                : taskService.getVariables(taskId);
         for (var entry : variables.entrySet()) {
             if (entry.getKey().equals("username")) {
                 continue;
@@ -80,7 +83,7 @@ class TaskEngineController implements TaskEngineApi {
             map.put(entry.getKey(), convert(entry.getValue()));
         }
 
-        return new TaskVariableMap(map);
+        return new VariableMap(map);
     }
 
     @Override
@@ -112,6 +115,8 @@ class TaskEngineController implements TaskEngineApi {
         return switch (value) {
             case Collection list ->
                 new ListVariable(list.stream().map(this::convert).toList());
+            case ProcessVariable variable -> variable;
+            case null -> null;
             default -> new WrappedVariable(value);
         };
     }

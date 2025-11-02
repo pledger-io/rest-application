@@ -1,6 +1,7 @@
 allOf:
   - $ref: '#/components/schemas/paged-response'
   - type: object
+    required: [ content ]
     properties:
       content:
         type: array

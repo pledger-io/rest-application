@@ -43,6 +43,7 @@ public class BatchImport implements AggregateBase {
         this.slug = UUID.randomUUID().toString();
         this.config = config;
         this.fileCode = fileCode;
+        this.created = new Date();
 
         CreateImportJobCommand.importJobCreated(config.getId(), slug, fileCode);
     }
