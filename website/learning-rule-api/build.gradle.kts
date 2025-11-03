@@ -8,18 +8,22 @@ micronaut {
     testRuntime("junit5")
 
     openapi {
-        server("importer", file("src/contract/importer-api.yaml")) {
+        server(file("src/contract/learning-rule-api.yaml")) {
             apiPackageName = "com.jongsoft.finance.rest"
-            modelPackageName = "com.jongsoft.finance.rest.model"
+            modelPackageName = "com.jongsoft.finance.rest.model.rule"
             useAuth = true
             useReactive = false
             generatedAnnotation = false
 
             importMapping = mapOf(
-                "ExternalErrorResponse" to "io.micronaut.http.hateoas.JsonError",
+                "JsonError" to "io.micronaut.http.hateoas.JsonError",
+                "RuleOperation" to "com.jongsoft.finance.core.RuleOperation",
+                "RuleColumn" to "com.jongsoft.finance.core.RuleColumn",
             )
             typeMapping = mapOf(
-                "json-error-response" to "ExternalErrorResponse"
+                "json-error-response" to "JsonError",
+                "operation-type" to "RuleOperation",
+                "rule-column" to "RuleColumn"
             )
         }
     }

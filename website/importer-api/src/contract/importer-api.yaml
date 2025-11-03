@@ -151,4 +151,3 @@ components:
     batch-job-response: { $ref: 'components/batch-job.yaml' }
     paged-batch-job-response: { $ref: 'components/paged-batch-job.yaml' }
     configuration-response: { $ref: 'components/configuration.yaml' }
-    json-error-response: { $ref: 'components/json-error.yaml' }

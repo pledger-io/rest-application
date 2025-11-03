@@ -16,9 +16,11 @@ micronaut {
             generatedAnnotation = false
             importMapping = mapOf(
                 "VariableMap" to "com.jongsoft.finance.rest.model.runtime.VariableMap",
+                "ExternalErrorResponse" to "io.micronaut.http.hateoas.JsonError",
             )
             typeMapping = mapOf(
-                "object+TaskVariableMap" to "VariableMap"
+                "object+TaskVariableMap" to "VariableMap",
+                "json-error-response" to "ExternalErrorResponse"
             )
         }
     }

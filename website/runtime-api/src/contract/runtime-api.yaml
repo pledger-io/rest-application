@@ -255,7 +255,6 @@ components:
     task-id: { $ref: './parameters/task-id.yaml' }
 
   schemas:
-    json-error-response: { $ref: 'components/json-error.yaml' }
     process-instance-response: { $ref: 'components/process-instance.yaml' }
     task-response: { $ref: 'components/task.yaml' }
     variable-response: { $ref: 'components/variable-response.yaml' }

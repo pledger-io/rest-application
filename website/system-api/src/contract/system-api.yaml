@@ -477,7 +477,6 @@ components:
     session-request: { $ref: './components/requests/session.yaml' }
     currency-response: { $ref: './components/responses/currency.yaml' }
     setting-response: { $ref: './components/responses/setting.yaml' }
-    json-error-response: { $ref: './components/json-error.yaml' }
     file-response: { $ref: './components/responses/file.yaml' }
     user-profile-response: { $ref: './components/responses/user-profile.yaml' }
     session-response: { $ref: './components/responses/session.yaml' }

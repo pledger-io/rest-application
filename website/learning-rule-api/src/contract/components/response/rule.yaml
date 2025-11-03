@@ -1,0 +1,45 @@
+type: object
+required: [ id, name, active, restrictive, sort ]
+properties:
+  id:
+    type: integer
+    format: int64
+  name:
+    type: string
+  description:
+    type: string
+  active:
+    type: boolean
+  restrictive:
+    type: boolean
+  sort:
+    type: integer
+    format: int32
+  changes:
+    type: array
+    items:
+      type: object
+      required: [ id, field, change ]
+      properties:
+        id:
+          type: integer
+          format: int64
+        field:
+          $ref: '#/components/schemas/rule-column'
+        change:
+          type: string
+  conditions:
+    type: array
+    items:
+      type: object
+      required: [ id, field, operation, condition ]
+      properties:
+        id:
+          type: integer
+          format: int64
+        field:
+          $ref: '#/components/schemas/rule-column'
+        operation:
+          $ref: '#/components/schemas/operation-type'
+        condition:
+          type: string

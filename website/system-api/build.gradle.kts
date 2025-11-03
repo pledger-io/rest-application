@@ -14,6 +14,13 @@ micronaut {
             useAuth = true
             useReactive = false
             generatedAnnotation = false
+
+            importMapping = mapOf(
+                "ExternalErrorResponse" to "io.micronaut.http.hateoas.JsonError",
+            )
+            typeMapping = mapOf(
+                "json-error-response" to "ExternalErrorResponse"
+            )
         }
     }
 }

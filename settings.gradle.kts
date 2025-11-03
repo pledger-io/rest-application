@@ -71,6 +71,7 @@ include(
     "bpmn-process",
     "jpa-repository",
     "website:rest-api",
+    "website:learning-rule-api",
     "website:runtime-api",
     "website:importer-api",
     "website:system-api",
