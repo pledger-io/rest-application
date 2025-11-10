@@ -18,7 +18,7 @@ jobs:
           distribution: 'temurin'
           architecture: x64
       - name: Prepare gradle installation
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Build with Gradle
         run: ./gradlew check
       - name: Upload build results
