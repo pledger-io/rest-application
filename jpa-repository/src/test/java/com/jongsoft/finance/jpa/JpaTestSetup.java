@@ -1,6 +1,7 @@
 package com.jongsoft.finance.jpa;
 
 import com.jongsoft.finance.core.Encoder;
+import com.jongsoft.finance.security.AuthenticationFacade;
 import io.micronaut.core.io.IOUtils;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;

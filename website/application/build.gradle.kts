@@ -47,6 +47,7 @@ dependencies {
     implementation(project(":website:budget-api"))
     implementation(project(":website:rest-api"))
     implementation(project(":website:importer-api"))
+    implementation(project(":website:learning-rule-api"))
 
     runtimeOnly(mn.logback.classic)
     runtimeOnly(mn.micronaut.serde.jackson)
@@ -83,6 +84,10 @@ tasks.processResources {
         exclude("*-api.yaml")
     }
     from("../runtime-api/src/contract") {
+        into("META-INF/swagger")
+        exclude("*-api.yaml")
+    }
+    from("../learning-rule-api/src/contract") {
         into("META-INF/swagger")
         exclude("*-api.yaml")
     }

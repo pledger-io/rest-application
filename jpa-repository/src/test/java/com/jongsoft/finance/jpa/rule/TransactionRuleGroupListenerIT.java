@@ -5,6 +5,7 @@ import com.jongsoft.finance.messaging.commands.rule.CreateRuleGroupCommand;
 import com.jongsoft.finance.messaging.commands.rule.RenameRuleGroupCommand;
 import com.jongsoft.finance.messaging.commands.rule.ReorderRuleGroupCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
@@ -63,6 +64,7 @@ class TransactionRuleGroupListenerIT extends JpaTestSetup {
     }
 
     @MockBean
+    @Replaces
     AuthenticationFacade authenticationFacade() {
         return Mockito.mock(AuthenticationFacade.class);
     }

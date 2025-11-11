@@ -41,4 +41,14 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":domain"))
+
+    testRuntimeOnly(mn.micronaut.serde.jackson)
+    testRuntimeOnly(mn.micronaut.jackson.databind)
+    testRuntimeOnly(mn.logback.classic)
+
+    testRuntimeOnly(project(":jpa-repository"))
+
+    testImplementation(mn.micronaut.test.rest.assured)
+    testImplementation(libs.bundles.junit)
+    testImplementation(mn.micronaut.http.server.jetty)
 }

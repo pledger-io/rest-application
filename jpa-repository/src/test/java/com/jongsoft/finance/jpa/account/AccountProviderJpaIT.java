@@ -10,6 +10,7 @@ import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Dates;
 import com.jongsoft.lang.collection.Sequence;
+import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
@@ -174,6 +175,7 @@ class AccountProviderJpaIT extends JpaTestSetup {
     }
 
     @MockBean
+    @Replaces
     AuthenticationFacade authenticationFacade() {
         return Mockito.mock(AuthenticationFacade.class);
     }

@@ -199,9 +199,7 @@ components:
     404: { $ref: './responses/404-response.yaml' }
 
   schemas:
-    rule-group-response:
-      type: array
-      items: { $ref: '#/components/schemas/create-rule-group-request' }
+    rule-group-response: { $ref: '#/components/schemas/rule-group' }
     rule-group:
       type: object
       required: [ name, sort ]

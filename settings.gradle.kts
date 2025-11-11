@@ -46,15 +46,17 @@ dependencyResolutionManagement {
         }
 
         create("llm") {
-            val langchain4jVersion: String = "1.5.0"
+            val langchain4jVersion: String = "1.8.0"
+            val betaVersion: String = "$langchain4jVersion-beta15"
             library("core", "dev.langchain4j", "langchain4j").version(langchain4jVersion)
-            library("retriever-sql", "dev.langchain4j", "langchain4j-pgvector").version("1.3.0-beta9")
-            library("store", "dev.langchain4j", "langchain4j-embeddings-all-minilm-l6-v2").version("1.3.0-beta9")
+            library("retriever-sql", "dev.langchain4j", "langchain4j-pgvector").version(betaVersion)
+            library("store", "dev.langchain4j", "langchain4j-embeddings-all-minilm-l6-v2").version(betaVersion)
+            library("agentic", "dev.langchain4j", "langchain4j-agentic").version(betaVersion)
             library("model-openai", "dev.langchain4j", "langchain4j-open-ai").version(langchain4jVersion)
             library("model-ollama", "dev.langchain4j", "langchain4j-ollama").version(langchain4jVersion)
 
             bundle("embeddings", listOf("core", "store", "retriever-sql"))
-            bundle("langchain4j", listOf("core", "retriever-sql", "store", "model-openai", "model-ollama"))
+            bundle("langchain4j", listOf("core", "retriever-sql", "store", "agentic", "model-openai", "model-ollama"))
         }
     }
 }

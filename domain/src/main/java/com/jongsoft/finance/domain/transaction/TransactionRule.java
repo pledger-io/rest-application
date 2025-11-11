@@ -10,6 +10,7 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.commands.rule.ChangeConditionCommand;
 import com.jongsoft.finance.messaging.commands.rule.ChangeRuleCommand;
 import com.jongsoft.finance.messaging.commands.rule.ReorderRuleCommand;
+import com.jongsoft.finance.messaging.commands.rule.RuleRemovedCommand;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.List;
@@ -168,6 +169,7 @@ public class TransactionRule implements AggregateBase {
 
     public void remove() {
         deleted = true;
+        RuleRemovedCommand.ruleRemoved(id);
     }
 
     public void registerCondition(RuleColumn field, RuleOperation operation, String condition) {

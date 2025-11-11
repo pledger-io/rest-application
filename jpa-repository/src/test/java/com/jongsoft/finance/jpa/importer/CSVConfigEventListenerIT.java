@@ -4,6 +4,7 @@ import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.importer.entity.ImportConfig;
 import com.jongsoft.finance.messaging.commands.importer.CreateConfigurationCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
@@ -49,6 +50,7 @@ class CSVConfigEventListenerIT extends JpaTestSetup {
     }
 
     @MockBean
+    @Replaces
     AuthenticationFacade authenticationFacade() {
         return Mockito.mock(AuthenticationFacade.class);
     }
