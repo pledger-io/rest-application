@@ -18,6 +18,8 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.util.Optional.ofNullable;
+
 @Controller
 class LearningRuleCommandController implements LearningRuleCommandApi {
 
@@ -41,14 +43,14 @@ class LearningRuleCommandController implements LearningRuleCommandApi {
         logger.info("Creating rule {} in group {}.", ruleRequest.getName(), group);
         var rule = currentUserProvider
                 .currentUser()
-                .createRule(ruleRequest.getName(), ruleRequest.getRestrictive());
+                .createRule(ruleRequest.getName(), ofNullable(ruleRequest.getRestrictive()).orElse(false));
 
         rule.assign(group);
         rule.change(
                 ruleRequest.getName(),
                 ruleRequest.getDescription(),
                 ruleRequest.getRestrictive(),
-                ruleRequest.getActive());
+                ofNullable(ruleRequest.getActive()).orElse(false));
 
         ruleRequest
                 .getChanges()
