@@ -1,5 +1,7 @@
 package com.jongsoft.finance.rest.api;
 
+import static java.util.Optional.ofNullable;
+
 import com.jongsoft.finance.core.Removable;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
@@ -17,8 +19,6 @@ import jakarta.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static java.util.Optional.ofNullable;
 
 @Controller
 class LearningRuleCommandController implements LearningRuleCommandApi {
@@ -43,7 +43,9 @@ class LearningRuleCommandController implements LearningRuleCommandApi {
         logger.info("Creating rule {} in group {}.", ruleRequest.getName(), group);
         var rule = currentUserProvider
                 .currentUser()
-                .createRule(ruleRequest.getName(), ofNullable(ruleRequest.getRestrictive()).orElse(false));
+                .createRule(
+                        ruleRequest.getName(),
+                        ofNullable(ruleRequest.getRestrictive()).orElse(false));
 
         rule.assign(group);
         rule.change(

@@ -25,7 +25,7 @@ public class TransactionTest {
 
         var sourceId = requests.searchBankAccounts(0, 1, List.of(), "checking")
               .extract().jsonPath().getLong("content[0].id");
-        var destinationId = requests.searchBankAccounts(0, 1, List.of(), "netfl")
+        var destinationId = requests.searchBankAccounts(0, 1, List.of("creditor"), "netfl")
               .extract().jsonPath().getLong("content[0].id");
 
         var scheduleId = requests.createScheduleMonthly(sourceId, destinationId, "Netflix Monthly Payment", 19.99)
@@ -82,7 +82,8 @@ public class TransactionTest {
 
         var sourceId = requests.searchBankAccounts(0, 1, List.of(), "checking")
               .extract().jsonPath().getLong("content[0].id");
-        var destinationId = requests.searchBankAccounts(0, 1, List.of(), "netfl")
+        var destinationId = requests.searchBankAccounts(0, 1, List.of("creditor"), "netfl")
+              .body("content[0].id", notNullValue())
               .extract().jsonPath().getLong("content[0].id");
 
         var id = requests.createTransaction(sourceId, destinationId, 19.99, "EUR", LocalDate.now(), "Monthly payment")

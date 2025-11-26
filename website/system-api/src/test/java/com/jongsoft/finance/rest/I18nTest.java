@@ -14,7 +14,7 @@ public class I18nTest {
     spec.given()
           .pathParam("languageCode", "nl")
         .when()
-          .get("/i18n/{languageCode}")
+          .get("/v2/api/i18n/{languageCode}")
         .then()
           .statusCode(200)
           .body("'common.action.edit'", equalTo("Bewerken"));
@@ -25,7 +25,7 @@ public class I18nTest {
     spec.given()
           .pathParam("languageCode", "en")
         .when()
-          .get("/i18n/{languageCode}")
+          .get("/v2/api/i18n/{languageCode}")
         .then()
           .statusCode(200)
           .body("'common.action.edit'", equalTo("Edit"));
@@ -36,7 +36,7 @@ public class I18nTest {
     spec.given()
           .pathParam("languageCode", "de")
         .when()
-          .get("/i18n/{languageCode}")
+          .get("/v2/api/i18n/{languageCode}")
         .then()
           .statusCode(200)
           .body("'common.action.edit'", equalTo("Bearbeiten"));

@@ -20,7 +20,7 @@ public class ContractTest {
         context.withUser("contract-create@account.local")
               .withCreditor("Netflix", "EUR");
 
-        var accountId = requests.searchBankAccounts(0,1, List.of(), "Netflix")
+        var accountId = requests.searchBankAccounts(0,1, List.of("creditor"), "Netflix")
               .extract().jsonPath().getLong("content[0].id");
 
         var contractId = requests.createContract(accountId, "Netflix Monthly", "Monthly subscription", LocalDate.now(), LocalDate.now().plusYears(1))

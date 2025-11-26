@@ -78,5 +78,4 @@ include(
     "website:importer-api",
     "website:system-api",
     "website:budget-api",
-    "website:application",
-    "fintrack-api")
+    "website:application")
