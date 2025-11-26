@@ -22,7 +22,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew check
       - name: Upload build results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: build-artifact
           path: |
@@ -31,7 +31,7 @@ jobs:
             **/build/reports/jacoco/test/*.xml
             **/build/asciidoc/**
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-artifact
           path: |
