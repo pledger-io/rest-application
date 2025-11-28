@@ -5,6 +5,7 @@ import com.jongsoft.finance.jpa.tag.TagJpa;
 import com.jongsoft.finance.messaging.commands.tag.CreateTagCommand;
 import com.jongsoft.finance.messaging.commands.transaction.DeleteTagCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
@@ -59,6 +60,7 @@ class TagEventListenerIT extends JpaTestSetup {
     }
 
     @MockBean
+    @Replaces
     AuthenticationFacade authenticationFacade() {
         return Mockito.mock(AuthenticationFacade.class);
     }

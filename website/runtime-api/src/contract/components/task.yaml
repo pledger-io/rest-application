@@ -1,0 +1,17 @@
+type: object
+required:
+  - id
+  - name
+properties:
+  id:
+    type: string
+  name:
+    type: string
+  definition:
+    type: string
+  form:
+    type: string
+    description: The form to use for the task
+  created:
+    type: string
+    format: date-time

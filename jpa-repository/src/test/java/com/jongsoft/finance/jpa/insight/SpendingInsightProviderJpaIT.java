@@ -8,6 +8,7 @@ import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.messaging.commands.insight.CreateSpendingInsight;
 import com.jongsoft.finance.providers.SpendingInsightProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import jakarta.inject.Inject;
 import org.assertj.core.api.Assertions;
@@ -132,6 +133,7 @@ class SpendingInsightProviderJpaIT extends JpaTestSetup {
     }
 
     @MockBean
+    @Replaces
     AuthenticationFacade authenticationFacade() {
         return Mockito.mock(AuthenticationFacade.class);
     }

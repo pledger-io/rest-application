@@ -1,0 +1,13 @@
+type: object
+required:
+  - id
+  - name
+  - expected
+properties:
+  id:
+    type: integer
+    format: int64
+  name:
+    type: string
+  expected:
+    type: number

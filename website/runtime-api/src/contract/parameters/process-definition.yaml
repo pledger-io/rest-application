@@ -1,0 +1,4 @@
+name: processDefinition
+in: path
+schema:
+  type: string

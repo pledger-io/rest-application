@@ -8,10 +8,10 @@ package com.jongsoft.finance.messaging;
  */
 public interface CommandHandler<T extends ApplicationEvent> {
 
-  /**
-   * Process the command to apply the changes indicated in the command.
-   *
-   * @param command the actual command
-   */
-  void handle(T command);
+    /**
+     * Process the command to apply the changes indicated in the command.
+     *
+     * @param command the actual command
+     */
+    void handle(T command);
 }

@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class PairProjection<K, T> {
-  private final K key;
-  private final T value;
+    private final K key;
+    private final T value;
 }

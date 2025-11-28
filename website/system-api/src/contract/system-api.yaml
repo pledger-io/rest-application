@@ -1,0 +1,503 @@
+openapi: 3.1.0
+info:
+  title: Pledger.io System API
+  version: 3.0.0
+  contact:
+    name: Jong Soft Development
+    url: https://github.com/pledger-io/rest-application
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+tags:
+  - name: i18n
+    description: i18n
+
+security:
+  - bearerAuth: []
+
+paths:
+
+  /.well-known/openid-connect:
+    get:
+      operationId: openIdConfiguration
+      tags: [ open-id ]
+      security: []
+      summary: Get configuration
+      description: >
+        Get the configuration needed to setup an OpenId integration in the front-end.
+      responses:
+        "200":
+          description: The configuration
+          content:
+            application/json:
+              schema: { $ref: './components/open-id-configuration.yaml' }
+  /.well-known/public-key:
+    get:
+      operationId: getJwtSignature
+      tags: [ security ]
+      security: []
+      summary: Get JWT signature
+      description: >
+        Get the public key used to verify the JWT signature.
+      responses:
+        "200":
+          description: The public key
+          content:
+            application/json:
+              schema: { type: string }
+
+  /v2/api/user-account:
+    post:
+      operationId: createUser
+      tags: [ security ]
+      security: []
+      summary: Create user
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/user-request' }
+      responses:
+        "204":
+          description: Confirmation the account was created
+        "400": { $ref: '#/components/responses/400' }
+  /v2/api/user-account/verify-2-factor:
+    post:
+      operationId: verifyTwoFactor
+      tags: [ security ]
+      summary: Verify 2-factor
+      description: >
+        Used to verify the user token against that what is expected. If
+        valid the user will get a new JWT with updated authorizations.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/token-request" }
+      responses:
+        "200":
+          description: Confirmation the 2 factor was OK
+          content:
+            application/json:
+              schema:
+                type: object
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  /v2/api/user-account/{user}:
+    parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: string
+          example: e@example.nl
+    get:
+      operationId: getProfile
+      tags: [ profile ]
+      summary: Get profile
+      description: >
+        Get the profile of the authenticated user
+      responses:
+        "200":
+          description: The users profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/user-profile-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    patch:
+      operationId: patchProfile
+      tags: [ profile ]
+      summary: Update profile
+      description: >
+        Update a part of the users profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                theme: { type: string, example: 'dark' }
+                currency: { type: string, example: "EUR" }
+                password: { type: string }
+      responses:
+        "200":
+          description: The users profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/user-profile-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /v2/api/user-account/{user}/sessions:
+    parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: string
+          example: e@example.nl
+    get:
+      operationId: listSessions
+      tags: [ profile ]
+      summary: List sessions
+      description: >
+        Retrieve a list of all active sessions of the user
+      responses:
+        "200":
+          description: A list of the users session
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/session-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createSession
+      tags: [ profile ]
+      summary: Create session
+      description: >
+        Start a new durable long term session. This can for
+        example be used in a mobile app.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/session-request' }
+      responses:
+        "201":
+          description: The created session
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/session-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /v2/api/user-account/{user}/sessions/{session}:
+    parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: string
+          example: e@example.nl
+      - name: session
+        in: path
+        required: true
+        schema:
+          type: integer
+          example: 123
+    delete:
+      operationId: revokeSession
+      tags: [ profile ]
+      summary: Revoke session
+      description: >
+        Revoke a session. This will disable any future use
+        of the session in any app.
+      responses:
+        "204":
+          description: Confirmation the session is deleted
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+  /v2/api/user-account/{user}/2-factor:
+    parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: string
+          example: e@example.nl
+    get:
+      operationId: generateQrCode
+      tags: [ profile ]
+      summary: Create QR code
+      description: >
+        Get the QR-code that can be used to active the 2-factor
+        authentication.
+      responses:
+        "200":
+          description: The content of the file
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    patch:
+      operationId: patch2Factor
+      tags: [ profile ]
+      summary: Update 2-factor
+      description: >
+        Enable or disable the 2-factor authentication 
+        for the user.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/patch-multi-factor-request' }
+      responses:
+        "204":
+          description: Confirmation that the command was executed
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  /v2/api/i18n/{languageCode}:
+    get:
+      security: []
+      tags:
+        - i18n
+      summary: Get i18n
+      operationId: getTranslations
+      parameters:
+        - name: languageCode
+          in: path
+          required: true
+          schema:
+            type: string
+            example: en
+      responses:
+        "200":
+          description: getTranslations 200 response
+          content:
+            application/json:
+              schema: { $ref: './components/i18n-response.yaml' }
+
+  /v2/api/currencies:
+    get:
+      operationId: getCurrencies
+      tags: [ currency ]
+      summary: Search currencies
+      responses:
+        "200":
+          description: The list of currencies
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/currency-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createCurrency
+      tags: [ currency ]
+      summary: Create currency
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/currency-request' }
+      responses:
+        "201":
+          description: The created currency
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/currency-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /v2/api/currencies/{currencyCode}:
+    parameters:
+      - name: currencyCode
+        description: The currency code
+        in: path
+        required: true
+        schema:
+          type: string
+          example: EUR
+    get:
+      operationId: getCurrencyByCode
+      tags: [ currency ]
+      summary: Fetch currency
+      responses:
+        "200":
+          description: The currency
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/currency-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    put:
+      operationId: updateCurrencyByCode
+      tags: [ currency ]
+      summary: Update currency
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/currency-request' }
+      responses:
+        "200":
+          description: The updated currency
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/currency-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    patch:
+      operationId: patchCurrencyByCode
+      tags: [ currency ]
+      summary: Patch currency
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/patch-currency-request' }
+      responses:
+        "200":
+          description: The updated currency
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/currency-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+  /v2/api/settings:
+    get:
+      operationId: getAllSettings
+      tags: [ settings ]
+      summary: Fetch settings
+      responses:
+        "200":
+          description: The list of currencies
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/setting-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /v2/api/settings/{setting}:
+    parameters:
+      - name: setting
+        description: The setting name
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      operationId: patchSetting
+      tags: [ settings ]
+      summary: Update setting
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/setting-request' }
+      responses:
+        "204":
+          description: Confirmation the setting was updated
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+  /v2/api/files:
+    post:
+      operationId: uploadFile
+      tags: [ files ]
+      summary: Create file
+      requestBody:
+        content:
+          'multipart/form-data':
+            schema:
+              type: object
+              properties:
+                upload:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "201":
+          description: The file code for the created file
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/file-response" }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /v2/api/files/{fileCode}:
+    parameters:
+      - name: fileCode
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: downloadFile
+      tags: [ files ]
+      summary: Download file
+      description: >
+        Download an existing file from the system. If encryption is enabled this
+        will throw an exception if the file was not uploaded by the user 
+        downloading it.
+      responses:
+        "200":
+          description: The content of the file
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    delete:
+      operationId: deleteFile
+      tags: [ files ]
+      summary: Delete file
+      responses:
+        "204":
+          description: Confirmation the file was removed
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    400: { $ref: './responses/400-response.yaml' }
+    401: { $ref: './responses/401-response.yaml' }
+    403: { $ref: './responses/403-response.yaml' }
+    404: { $ref: './responses/404-response.yaml' }
+  schemas:
+    date-range: { $ref: './components/date-range.yaml' }
+    token-request: { $ref: './components/requests/token.yaml' }
+    user-request: { $ref: './components/requests/user.yaml' }
+    currency-request: { $ref: './components/requests/currency.yaml' }
+    setting-request: { $ref: './components/requests/setting.yaml' }
+    patch-currency-request: { $ref: './components/requests/patch-currency.yaml' }
+    patch-multi-factor-request: { $ref: './components/requests/patch-multi-factor.yaml' }
+    session-request: { $ref: './components/requests/session.yaml' }
+    currency-response: { $ref: './components/responses/currency.yaml' }
+    setting-response: { $ref: './components/responses/setting.yaml' }
+    file-response: { $ref: './components/responses/file.yaml' }
+    user-profile-response: { $ref: './components/responses/user-profile.yaml' }
+    session-response: { $ref: './components/responses/session.yaml' }
+
+    enable-mfa-request:
+      type: object
+      required:
+        - action
+        - verificationCode
+      properties:
+        verificationCode:
+          type: string
+          min: 4
+          max: 8
+        action:
+          type: string
+    disable-mfa-request:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+

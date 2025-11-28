@@ -1,0 +1,61 @@
+type: object
+description: A bank account for the user
+required:
+  - account
+  - id
+  - name
+  - type
+allOf:
+  - $ref: "#/components/schemas/account-link"
+  - type: object
+    properties:
+      description:
+        type: string
+        description: The description for the account
+      iconFileCode:
+        type: string
+        description: The file code for the image of the account
+      account:
+        type: object
+        description: Bank identification numbers for the account
+        properties:
+          iban:
+            type: string
+          bic:
+            type: string
+          number:
+            type: string
+          currency:
+            type: string
+      interest:
+        description: >
+          The interest information for the account, only used for loans,
+          debts and mortgage
+        type: object
+        required:
+          - periodicity
+          - interest
+        properties:
+          periodicity:
+            description: The interval the interest is calculated on
+            $ref: "#/components/schemas/periodicity"
+          interest:
+            type: number
+            description: The amount of interest that is owed
+            format: double
+            example: 0.0754
+      history:
+        type: object
+        description: Transaction history information for the account
+        required:
+          - firstTransaction
+          - lastTransaction
+        properties:
+          firstTransaction:
+            type: string
+            description: The date of the first recorded transaction for the account
+            format: date
+          lastTransaction:
+            type: string
+            description: The date of the latest recorded transaction for the account
+            format: date

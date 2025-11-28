@@ -1,0 +1,12 @@
+type: object
+required:
+  - authority
+  - client-id
+  - client-secret
+properties:
+  authority:
+    type: string
+  client-id:
+    type: string
+  client-secret:
+    type: string

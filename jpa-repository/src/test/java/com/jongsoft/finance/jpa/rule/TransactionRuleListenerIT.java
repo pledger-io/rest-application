@@ -6,7 +6,9 @@ import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.messaging.commands.rule.ChangeConditionCommand;
 import com.jongsoft.finance.messaging.commands.rule.ChangeRuleCommand;
 import com.jongsoft.finance.messaging.commands.rule.ReorderRuleCommand;
+import com.jongsoft.finance.messaging.commands.rule.RuleRemovedCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
@@ -68,7 +70,17 @@ class TransactionRuleListenerIT extends JpaTestSetup {
         Assertions.assertThat(check.getSort()).isEqualTo(2);
     }
 
+    @Test
+    void removeRule() {
+        eventPublisher.publishEvent(
+              new RuleRemovedCommand(2L));
+
+        var check = entityManager.find(RuleJpa.class, 2L);
+        Assertions.assertThat(check.isArchived()).isTrue();
+    }
+
     @MockBean
+    @Replaces
     AuthenticationFacade authenticationFacade() {
         return Mockito.mock(AuthenticationFacade.class);
     }

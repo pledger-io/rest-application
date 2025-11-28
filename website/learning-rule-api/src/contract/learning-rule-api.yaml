@@ -1,0 +1,220 @@
+openapi: 3.1.0
+info:
+  title: Pledger.io Learning Rule API
+  version: 3.0.0
+  contact:
+    name: Jong Soft Development
+    url: https://github.com/pledger-io/rest-application
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+security:
+  - bearerAuth: [ ]
+
+paths:
+  /v2/api/transaction-rules:
+    get:
+      operationId: fetchRuleGroups
+      tags: [ learning-rule-fetcher ]
+      summary: Fetch rule groups
+      responses:
+        "200":
+          description: The list of rule groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/rule-group-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createRuleGroup
+      tags: [ learning-rule-command ]
+      summary: Create rule group
+      requestBody:
+        description: >
+          The request body for creating a new rule group.
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/rule-group' }
+      responses:
+        "204":
+          description: Confirmation that the group was created.
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  /v2/api/transaction-rules/{group}:
+    parameters:
+      - name: group
+        required: true
+        in: path
+        description: The name of the group
+        schema:
+          type: string
+    get:
+      operationId: fetchRulesByGroup
+      tags: [ learning-rule-fetcher ]
+      summary: Fetch rules by group
+      responses:
+        "200":
+          description: The list of rule groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/rule-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    delete:
+      operationId: deleteRuleGroup
+      tags: [ learning-rule-command ]
+      summary: Delete rule group
+      responses:
+        "204":
+          description: Confirmation that the group was deleted.
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    patch:
+      operationId: updateRuleGroup
+      tags: [ learning-rule-command ]
+      summary: Update rule group
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/patch-rule-group-request' }
+      responses:
+        "204":
+          description: Confirmation that the group was deleted.
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    post:
+      operationId: createRule
+      tags: [ learning-rule-command ]
+      summary: Create rule
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/rule-request' }
+      responses:
+        "201":
+          description: The created rule
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/rule-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+  /v2/api/transaction-rules/{group}/{ruleId}:
+    parameters:
+      - name: group
+        required: true
+        in: path
+        description: The name of the group
+        schema:
+          type: string
+      - name: ruleId
+        required: true
+        in: path
+        description: The name of the group
+        schema:
+          type: integer
+          format: int64
+    get:
+      operationId: fetchRule
+      tags: [ learning-rule-fetcher ]
+      summary: Fetch rule
+      responses:
+        "200":
+          description: The rule
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/rule-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    put:
+      operationId: updateRule
+      tags: [ learning-rule-command ]
+      summary: Update rule
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/rule-request' }
+      responses:
+        "200":
+          description: The updated rule
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/rule-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    patch:
+      operationId: patchRule
+      tags: [ learning-rule-command ]
+      summary: Patch rule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ move ]
+              properties:
+                move:
+                  type: string
+                  enum: [ UP, DOWN ]
+      responses:
+        "204":
+          description: The rule was patched
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    delete:
+      operationId: deleteRule
+      tags: [ learning-rule-command ]
+      summary: Delete rule
+      responses:
+        "204":
+          description: The rule was deleted
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    400: { $ref: './responses/400-response.yaml' }
+    401: { $ref: './responses/401-response.yaml' }
+    403: { $ref: './responses/403-response.yaml' }
+    404: { $ref: './responses/404-response.yaml' }
+
+  schemas:
+    rule-group-response: { $ref: '#/components/schemas/rule-group' }
+    rule-group:
+      type: object
+      required: [ name, sort ]
+      properties:
+        sort:
+          type: integer
+          format: int32
+        name:
+          type: string
+
+    rule-column: { $ref: 'components/rule-column.yaml' }
+    operation-type: { $ref: 'components/operation-type.yaml' }
+
+    create-rule-group-request: { $ref: 'components/request/create-rule-group.yaml' }
+    patch-rule-group-request: { $ref: 'components/request/patch-rule-group.yaml' }
+    rule-request: { $ref: 'components/request/rule.yaml' }
+
+    rule-response: { $ref: 'components/response/rule.yaml' }

@@ -1,5 +1,6 @@
 package com.jongsoft.finance.domain.account;
 
+import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.messaging.commands.contract.AttachFileToContractCommand;
@@ -88,7 +89,7 @@ class ContractTest {
                 .startDate(start)
                 .build();
 
-        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+        StatusException exception = Assertions.assertThrows(StatusException.class,
                 contract::warnBeforeExpires);
 
         Mockito.verify(applicationEventPublisher, Mockito.never()).publishEvent(WarnBeforeExpiryCommand.class);
@@ -189,7 +190,7 @@ class ContractTest {
 
     @Test
     void terminate_notExpired() {
-        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+        StatusException exception = Assertions.assertThrows(StatusException.class,
                 () -> Contract.builder()
                         .id(1L)
                         .endDate(LocalDate.now().plusDays(2))
@@ -204,7 +205,7 @@ class ContractTest {
 
     @Test
     void terminate_alreadyTerminated() {
-        IllegalStateException exception = Assertions.assertThrows(IllegalStateException.class,
+        StatusException exception = Assertions.assertThrows(StatusException.class,
                 () -> Contract.builder()
                         .id(1L)
                         .endDate(LocalDate.of(2010, 1, 1))

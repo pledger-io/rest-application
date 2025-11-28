@@ -5,7 +5,7 @@ import com.jongsoft.finance.messaging.ApplicationEvent;
 
 public record CreateBudgetCommand(Budget budget) implements ApplicationEvent {
 
-  public static void budgetCreated(Budget budget) {
-    new CreateBudgetCommand(budget).publish();
-  }
+    public static void budgetCreated(Budget budget) {
+        new CreateBudgetCommand(budget).publish();
+    }
 }

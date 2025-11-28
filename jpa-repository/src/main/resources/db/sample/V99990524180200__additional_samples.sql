@@ -1,6 +1,6 @@
 INSERT INTO user_account (id, username, password, currency, gravatar, two_factor_enabled, two_factor_secret, theme)
 VALUES (1, 'sample@e', '$2a$10$yZfinpG8MZtbjfKeNnrwlu4GMJuQLAV1.QnzcJPyrxjVIZMuPLYpi', null, null, false,
-        'G5GABYRVECPIDLLG', 'dark');
+        'G5GABYRVECPIDLLG', 'light');
 
 insert into user_roles select 1, id from role;
 

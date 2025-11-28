@@ -8,12 +8,14 @@ import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.commands.importer.CompleteImportJobCommand;
 import com.jongsoft.finance.messaging.commands.importer.CreateImportJobCommand;
 import com.jongsoft.finance.messaging.commands.importer.DeleteImportJobCommand;
-import java.util.Date;
-import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
+import java.util.Date;
+import java.util.UUID;
 
 @Getter
 @Builder
@@ -22,44 +24,47 @@ import lombok.Getter;
 @EqualsAndHashCode(of = {"id"})
 public class BatchImport implements AggregateBase {
 
-  private Long id;
-  private Date created;
-  private Date finished;
+    private Long id;
+    private Date created;
+    private Date finished;
 
-  private String slug;
-  private String fileCode;
+    private String slug;
+    private String fileCode;
 
-  private transient BatchImportConfig config;
-  private transient UserAccount user;
+    private transient BatchImportConfig config;
+    private transient UserAccount user;
 
-  private double totalIncome;
-  private double totalExpense;
+    private double totalIncome;
+    private double totalExpense;
 
-  @BusinessMethod
-  public BatchImport(BatchImportConfig config, UserAccount user, String fileCode) {
-    this.user = user;
-    this.slug = UUID.randomUUID().toString();
-    this.config = config;
-    this.fileCode = fileCode;
+    @BusinessMethod
+    public BatchImport(BatchImportConfig config, UserAccount user, String fileCode) {
+        this.user = user;
+        this.slug = UUID.randomUUID().toString();
+        this.config = config;
+        this.fileCode = fileCode;
+        this.created = new Date();
 
-    CreateImportJobCommand.importJobCreated(config.getId(), slug, fileCode);
-  }
-
-  public void archive() {
-    if (this.finished != null) {
-      throw StatusException.badRequest("Cannot archive an import job that has finished running.");
+        CreateImportJobCommand.importJobCreated(config.getId(), slug, fileCode);
     }
 
-    DeleteImportJobCommand.importJobDeleted(id);
-  }
+    public void archive() {
+        if (this.finished != null) {
+            throw StatusException.badRequest(
+                    "Cannot archive an import job that has finished running.");
+        }
 
-  @BusinessMethod
-  public void finish(Date date) {
-    if (this.finished != null) {
-      throw StatusException.badRequest("Cannot finish an import which has already completed.");
+        DeleteImportJobCommand.importJobDeleted(id);
     }
 
-    this.finished = date;
-    CompleteImportJobCommand.importJobCompleted(id);
-  }
+    @BusinessMethod
+    public void finish(Date date) {
+        if (this.finished != null) {
+            throw StatusException.badRequest(
+                    "Cannot finish an import which has already completed.");
+        }
+
+        this.finished = date;
+        CompleteImportJobCommand.importJobCompleted(id);
+    }
 }

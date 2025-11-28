@@ -1,0 +1,39 @@
+type: object
+description: A filter that can be applied when computing the balance
+required:
+  - range
+properties:
+  accounts:
+    type: array
+    items:
+      type: integer
+      format: int64
+  categories:
+    type: array
+    items:
+      type: integer
+      format: int64
+  contracts:
+    type: array
+    items:
+      type: integer
+      format: int64
+  expenses:
+    type: array
+    items:
+      type: integer
+      format: int64
+  range:
+    $ref: '#/components/schemas/date-range'
+  type:
+    type: string
+    description: Filter a type of transaction
+    enum: [ INCOME, EXPENSE, ALL ]
+  currency:
+    type: string
+    description: Filter on a specific currency code.
+    min: 3
+    max: 3
+  importSlug:
+    type: string
+    description: Filter on the batch import job that created transactions

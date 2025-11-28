@@ -1,0 +1,8 @@
+type: object
+properties:
+  username:
+    type: string
+    example: me@example.org
+  password:
+    type: string
+    example: this.password.is.to.simple

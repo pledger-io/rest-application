@@ -2,19 +2,20 @@ package com.jongsoft.finance.messaging.commands.schedule;
 
 import com.jongsoft.finance.messaging.ApplicationEvent;
 import com.jongsoft.finance.schedule.Schedulable;
+
 import java.util.Map;
 
 public interface ScheduleCommand extends ApplicationEvent {
 
-  String processDefinition();
+    String processDefinition();
 
-  Schedulable schedulable();
+    Schedulable schedulable();
 
-  default String businessKey() {
-    return "bk_" + processDefinition() + "_" + schedulable().getId();
-  }
+    default String businessKey() {
+        return "bk_" + processDefinition() + "_" + schedulable().getId();
+    }
 
-  default Map<String, Object> variables() {
-    return Map.of();
-  }
+    default Map<String, Object> variables() {
+        return Map.of();
+    }
 }

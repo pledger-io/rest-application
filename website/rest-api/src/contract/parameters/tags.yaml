@@ -1,0 +1,8 @@
+name: tag
+required: false
+in: query
+schema:
+  type: array
+  items:
+    type: string
+    example: groceries

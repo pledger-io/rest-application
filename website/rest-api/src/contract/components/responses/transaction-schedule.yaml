@@ -1,0 +1,31 @@
+type: object
+properties:
+  id:
+    type: integer
+    format: int64
+  name:
+    type: string
+    description: The name for the transaction schedule
+  description:
+    type: string
+    description: The description for the transaction schedule
+  activeBetween:
+    $ref: "#/components/schemas/date-range"
+  schedule:
+    $ref: "#/components/schemas/schedule-response"
+  amount:
+    type: number
+    format: double
+  forContract:
+    $ref: "#/components/schemas/contract-response"
+  transferBetween:
+    type: object
+    description: The source and destination accounts for the transfer
+    required:
+      - source
+      - destination
+    properties:
+      source:
+        $ref: "#/components/schemas/account-link"
+      destination:
+        $ref: "#/components/schemas/account-link"

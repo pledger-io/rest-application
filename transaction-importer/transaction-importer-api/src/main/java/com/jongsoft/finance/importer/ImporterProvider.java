@@ -7,16 +7,16 @@ import com.jongsoft.finance.importer.api.TransactionConsumer;
 
 public interface ImporterProvider<T extends ImporterConfiguration> {
 
-  void readTransactions(
-      TransactionConsumer consumer,
-      ImporterConfiguration updatedConfiguration,
-      BatchImport importJob);
+    void readTransactions(
+            TransactionConsumer consumer,
+            ImporterConfiguration updatedConfiguration,
+            BatchImport importJob);
 
-  T loadConfiguration(BatchImportConfig batchImportConfig);
+    T loadConfiguration(BatchImportConfig batchImportConfig);
 
-  <X extends ImporterConfiguration> boolean supports(X configuration);
+    <X extends ImporterConfiguration> boolean supports(X configuration);
 
-  default String getImporterType() {
-    return this.getClass().getSimpleName();
-  }
+    default String getImporterType() {
+        return this.getClass().getSimpleName();
+    }
 }

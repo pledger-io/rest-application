@@ -4,5 +4,5 @@ import java.util.Properties;
 
 public interface MailDaemon extends JavaBean {
 
-  void send(String recipient, String template, Properties mailProperties);
+    void send(String recipient, String template, Properties mailProperties);
 }

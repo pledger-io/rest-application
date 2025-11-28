@@ -1,0 +1,92 @@
+type: object
+description: A transaction representing a transfer of money between two accounts
+properties:
+  id:
+    type: integer
+    description: The identifier of this transaction
+    format: int64
+    example: 1
+  description:
+    type: string
+    description: The description of the transaction
+    example: Purchase of flowers
+  currency:
+    type: string
+    description: The currency the transaction was in
+    example: EUR
+  amount:
+    type: number
+    description: The amount of money transferred from one account into the other
+    format: double
+    example: 30.5
+  metadata:
+    description: The meta-information of the transaction
+    type: object
+    properties:
+      category:
+        type: string
+        description: The category this transaction was linked to
+        example: Food related expenses
+      budget:
+        type: string
+        description: The budget expense this transaction contributes to
+        example: Dining out
+      contract:
+        type: string
+        description: This transaction is part of this contract
+        example: Weekly dining
+      import:
+        type: string
+        description: The import job that created the transaction
+        example: 0b9b79faddd9ad388f3aa3b59048b7cd
+      tags:
+        type: array
+        description: The tags that the transaction has
+        example: ["food", "dining"]
+        items:
+          type: string
+  type:
+    type: string
+    description: The type of transaction
+    enum:
+      - CREDIT
+      - DEBIT
+      - TRANSFER
+  dates:
+    description: All dates relevant for this transaction
+    type: object
+    properties:
+      transaction:
+        type: string
+        description: The date this transaction was created
+        format: date
+      booked:
+        type: string
+        description: The date the transaction was recorded into the books
+        format: date
+      interest:
+        type: string
+        description: The date from which the transaction gets interest applied
+        format: date
+  destination:
+    description: The account where the money went to
+    allOf:
+      - $ref: "#/components/schemas/account-link"
+  source:
+    description: The account where the money came from
+    allOf:
+      - $ref: "#/components/schemas/account-link"
+  split:
+    type: array
+    description: "The multi-line split of the transaction, eg: purchased items"
+    items:
+      type: object
+      required:
+        - description
+        - amount
+      properties:
+        description:
+          type: string
+        amount:
+          type: number
+          format: double

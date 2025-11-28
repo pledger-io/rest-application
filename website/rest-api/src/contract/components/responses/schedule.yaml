@@ -1,0 +1,16 @@
+type: object
+description: The schedule that allocations are created automatically
+required:
+  - interval
+  - periodicity
+properties:
+  periodicity:
+    description: The type of the interval
+    example: MONTHS
+    allOf:
+      - $ref: "#/components/schemas/periodicity"
+  interval:
+    type: integer
+    description: The actual interval
+    format: int32
+    example: 3

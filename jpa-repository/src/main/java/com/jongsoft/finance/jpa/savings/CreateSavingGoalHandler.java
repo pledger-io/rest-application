@@ -6,8 +6,11 @@ import com.jongsoft.finance.jpa.account.AccountJpa;
 import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.savings.CreateSavingGoalCommand;
+
 import io.micronaut.transaction.annotation.Transactional;
+
 import jakarta.inject.Singleton;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -16,24 +19,24 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 public class CreateSavingGoalHandler implements CommandHandler<CreateSavingGoalCommand> {
 
-  private final ReactiveEntityManager entityManager;
+    private final ReactiveEntityManager entityManager;
 
-  public CreateSavingGoalHandler(ReactiveEntityManager entityManager) {
-    this.entityManager = entityManager;
-  }
+    public CreateSavingGoalHandler(ReactiveEntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
-  @Override
-  @BusinessEventListener
-  public void handle(CreateSavingGoalCommand command) {
-    log.info("[{}] - Creating new saving goal.", command.name());
+    @Override
+    @BusinessEventListener
+    public void handle(CreateSavingGoalCommand command) {
+        log.info("[{}] - Creating new saving goal.", command.name());
 
-    var entity = SavingGoalJpa.builder()
-        .goal(command.goal())
-        .targetDate(command.targetDate())
-        .name(command.name())
-        .account(entityManager.getById(AccountJpa.class, command.accountId()))
-        .build();
+        var entity = SavingGoalJpa.builder()
+                .goal(command.goal())
+                .targetDate(command.targetDate())
+                .name(command.name())
+                .account(entityManager.getById(AccountJpa.class, command.accountId()))
+                .build();
 
-    entityManager.persist(entity);
-  }
+        entityManager.persist(entity);
+    }
 }

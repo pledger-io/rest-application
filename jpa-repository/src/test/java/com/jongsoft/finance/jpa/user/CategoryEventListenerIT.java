@@ -6,6 +6,7 @@ import com.jongsoft.finance.messaging.commands.category.CreateCategoryCommand;
 import com.jongsoft.finance.messaging.commands.category.DeleteCategoryCommand;
 import com.jongsoft.finance.messaging.commands.category.RenameCategoryCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
@@ -70,6 +71,7 @@ class CategoryEventListenerIT extends JpaTestSetup {
     }
 
     @MockBean
+    @Replaces
     AuthenticationFacade authenticationFacade() {
         return Mockito.mock(AuthenticationFacade.class);
     }

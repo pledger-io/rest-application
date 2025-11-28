@@ -1,0 +1,32 @@
+type: object
+required:
+  - slug
+  - created
+  - config
+  - balance
+properties:
+  slug:
+    type: string
+    description: The unique identifier of the import job
+  created:
+    type: string
+    format: date
+    description: The date the job was created
+  finished:
+    type: string
+    format: date
+    description: The date the job was finished
+  config:
+    $ref: '#/components/schemas/configuration-response'
+  balance:
+    type: object
+    required: [ income, expenses ]
+    properties:
+      income:
+        type: number
+        format: double
+        description: The total amount of money earned in this import
+      expenses:
+        type: number
+        format: double
+        description: The total amount of money spent in this import

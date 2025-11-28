@@ -1,0 +1,6 @@
+type: object
+example:
+  'common.hello': 'Hello'
+  'common.test': 'Test'
+additionalProperties:
+  type: string

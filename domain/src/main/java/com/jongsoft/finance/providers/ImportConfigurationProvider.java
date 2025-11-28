@@ -6,7 +6,7 @@ import com.jongsoft.lang.control.Optional;
 
 public interface ImportConfigurationProvider {
 
-  Optional<BatchImportConfig> lookup(String name);
+    Optional<BatchImportConfig> lookup(String name);
 
-  Sequence<BatchImportConfig> lookup();
+    Sequence<BatchImportConfig> lookup();
 }

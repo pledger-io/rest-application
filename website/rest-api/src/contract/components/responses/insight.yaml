@@ -1,0 +1,53 @@
+type: object
+required:
+  - type
+  - category
+  - severity
+  - score
+  - detected-date
+  - message
+  - metadata
+properties:
+  type:
+    description: The type of insight
+    type: string
+    enum:
+      - UNUSUAL_AMOUNT
+      - UNUSUAL_FREQUENCY
+      - UNUSUAL_MERCHANT
+      - UNUSUAL_TIMING
+      - POTENTIAL_DUPLICATE
+      - BUDGET_EXCEEDED
+      - SPENDING_SPIKE
+      - UNUSUAL_LOCATION
+  category:
+    description: The category of the insight
+    type: string
+  severity:
+    description: The severity of the insight
+    type: string
+    enum:
+      - INFO
+      - WARNING
+      - ALERT
+  score:
+    description: The confidence score of the insight (0.0 to 1.0)
+    type: number
+    format: double
+    min: 0.0
+    max: 1.0
+  detected-date:
+    description: The date when the insight was detected
+    type: string
+    format: date
+  message:
+    description: The message describing the insight
+    type: string
+  transaction-id:
+    description: Any involved transaction identifier
+    type: integer
+  metadata:
+    description: Additional metadata for the insight
+    type: object
+    additionalProperties:
+      type: object

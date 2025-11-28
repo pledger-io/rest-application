@@ -1,0 +1,13 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: The unique identifier for the session
+  description:
+    type: string
+    description: The description of the session
+  token:
+    type: string
+    description: The long lived token that can be used for this session
+  valid:
+    $ref: '#/components/schemas/date-range'

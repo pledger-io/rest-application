@@ -1,0 +1,20 @@
+type: object
+required:
+  - id
+  - name
+  - type
+  - fileCode
+properties:
+  id:
+    type: integer
+    format: int64
+    description: The configuration identifier
+  name:
+    type: string
+    description: The name of the configuration
+  type:
+    type: string
+    description: The type of importer that will be used
+  fileCode:
+    type: string
+    description: The file code to get the contents of the configuration

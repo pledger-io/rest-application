@@ -1,0 +1,4 @@
+name: variableId
+in: path
+schema:
+  type: string

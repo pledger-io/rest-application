@@ -7,6 +7,7 @@ import com.jongsoft.finance.messaging.commands.insight.CompleteAnalyzeJob;
 import com.jongsoft.finance.messaging.commands.insight.CreateAnalyzeJob;
 import com.jongsoft.finance.providers.AnalyzeJobProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -105,6 +106,7 @@ class AnalyzeJobProviderJpaIT extends JpaTestSetup {
   }
 
   @MockBean
+  @Replaces
   AuthenticationFacade authenticationFacade() {
     return Mockito.mock(AuthenticationFacade.class);
   }

@@ -1,0 +1,45 @@
+type: object
+required:
+  - id
+  - name
+  - company
+  - start
+  - end
+properties:
+  id:
+    type: integer
+    description: The identifier of the contract
+    format: int64
+  name:
+    type: string
+    description: The name of the contract
+    example: Cable company
+  description:
+    type: string
+    description: The description for the contract
+  contractAvailable:
+    type: boolean
+    description: Indicator for an digital copy of the contract being present
+  fileToken:
+    type: string
+    description: The file token to get the digital copy
+  start:
+    type: string
+    description: The start date of the contract
+    format: date
+  end:
+    type: string
+    description: The end date of the contract
+    format: date
+  terminated:
+    type: boolean
+    description: Indicator that the contract has ended and is closed by the
+      user
+  notification:
+    type: boolean
+    description: Indicator if a pre-emptive warning is active before the contract
+      end date
+  company:
+    description: The company / account the contract is with
+    allOf:
+      - $ref: "#/components/schemas/account-link"

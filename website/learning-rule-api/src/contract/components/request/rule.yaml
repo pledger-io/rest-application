@@ -1,0 +1,44 @@
+type: object
+required: [ name, active, restrictive ]
+properties:
+  name:
+    type: string
+    description: The name of the rule
+  description:
+    type: string
+    description: A long description of the rule
+  active:
+    type: boolean
+    description: Should the rule be executed when the engine runs
+  restrictive:
+    type: boolean
+    description: Should the rule execution stop after a positive match
+  changes:
+    type: array
+    description: List of all the changes to be applied
+    items:
+      type: object
+      required: [  field, change ]
+      properties:
+        column:
+          $ref: '#/components/schemas/rule-column'
+        value:
+          type: string
+          description: The value to be applied, this could be an identifier
+  conditions:
+    type: array
+    description: List of all pre-conditions that must be met
+    items:
+      type: object
+      required: [ field, operation, condition ]
+      properties:
+        column:
+          description: The column on which the change is effected
+          $ref: '#/components/schemas/rule-column'
+        operation:
+          description: The type of comparison operation to perform
+          $ref: '#/components/schemas/operation-type'
+        value:
+          type: string
+          description: The value the column must have to match the pre-condition
+          example: My personal account
