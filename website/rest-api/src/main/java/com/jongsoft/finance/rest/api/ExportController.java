@@ -85,6 +85,7 @@ public class ExportController implements ExportApi {
     private ExportProfileResponseBudgetInner toBudgetResponse(Budget budget) {
         var response = new ExportProfileResponseBudgetInner();
 
+        response.setIncome(budget.getExpectedIncome());
         response.period(new DateRange(budget.getStart(), budget.getEnd()));
         for (var expense : budget.getExpenses()) {
             var responseExpense = new ExportProfileResponseBudgetInnerExpensesInner();
