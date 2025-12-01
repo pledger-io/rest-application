@@ -89,7 +89,7 @@ public class ExportController implements ExportApi {
         for (var expense : budget.getExpenses()) {
             var responseExpense = new ExportProfileResponseBudgetInnerExpensesInner();
             responseExpense.name(expense.getName());
-            responseExpense.expected(new BigDecimal(expense.computeBudget()));
+            responseExpense.expected(BigDecimal.valueOf(expense.computeBudget()));
             response.addExpensesItem(responseExpense);
         }
 
