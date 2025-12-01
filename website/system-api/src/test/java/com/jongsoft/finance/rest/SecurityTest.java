@@ -15,6 +15,7 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -73,6 +74,30 @@ public class SecurityTest {
           .body("theme", equalTo("light"))
           .body("currency", equalTo("EUR"))
           .body("mfa", equalTo(false));
+
+      given(spec)
+          .header(HttpHeaders.AUTHORIZATION, "Bearer " + getToken())
+          .pathParam("user-account", "test@account.local")
+          .body(Map.of("description", "Long session", "expires", "2028-02-01"))
+          .post("/v2/api/user-account/{user-account}/sessions")
+          .then()
+          .log()
+          .ifValidationFails()
+          .statusCode(201)
+          .body("description", equalTo("Pledger.io Web login"))
+          .body("valid.startDate", equalTo(LocalDate.now().toString()))
+          .body("valid.endDate", equalTo("2028-01-31"));
+
+      given(spec)
+          .header(HttpHeaders.AUTHORIZATION, "Bearer " + getToken())
+          .pathParam("user-account", "test@account.local")
+          .get("/v2/api/user-account/{user-account}/sessions")
+          .then()
+          .log().ifValidationFails()
+          .statusCode(200)
+          .body("[0].description", equalTo("Pledger.io Web login"))
+          .body("[0].valid.startDate", equalTo(LocalDate.now().toString()))
+          .body("[0].valid.endDate", equalTo("2028-01-31"));
 
     // change currency to GBP
     given(spec)
