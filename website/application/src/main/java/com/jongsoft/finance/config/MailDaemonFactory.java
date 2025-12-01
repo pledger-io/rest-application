@@ -51,6 +51,7 @@ public class MailDaemonFactory {
 
             var email = Email.builder()
                     .to(recipient)
+                    .from("no-reply@pledger-io")
                     .subject("Pleger.io: Welcome to the family!")
                     .body(new MultipartBody(
                             new TemplateBody<>(

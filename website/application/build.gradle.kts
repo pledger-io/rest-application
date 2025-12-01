@@ -52,6 +52,7 @@ dependencies {
     runtimeOnly(mn.logback.classic)
     runtimeOnly(mn.micronaut.serde.jackson)
     runtimeOnly(mn.micronaut.jackson.databind)
+    runtimeOnly(mn.eclipse.angus)
 
     // Contains the health checker
     implementation(mn.micronaut.management)

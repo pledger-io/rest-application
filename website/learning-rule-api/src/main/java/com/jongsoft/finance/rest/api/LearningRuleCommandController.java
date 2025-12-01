@@ -51,7 +51,7 @@ class LearningRuleCommandController implements LearningRuleCommandApi {
         rule.change(
                 ruleRequest.getName(),
                 ruleRequest.getDescription(),
-                ruleRequest.getRestrictive(),
+                ofNullable(ruleRequest.getRestrictive()).orElse(false),
                 ofNullable(ruleRequest.getActive()).orElse(false));
 
         ruleRequest
