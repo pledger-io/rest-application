@@ -1,0 +1,35 @@
+type: object
+required:
+  - name
+  - amount
+  - schedule
+  - transferBetween
+properties:
+  name:
+    type: string
+    minLength: 1
+  amount:
+    type: number
+    format: double
+  schedule:
+    type: object
+    required:
+      - periodicity
+      - interval
+    properties:
+      periodicity:
+        $ref: "#/components/schemas/periodicity"
+      interval:
+        type: integer
+        format: int32
+  transferBetween:
+    type: object
+    description: The source and destination accounts for the transfer
+    required:
+      - source
+      - destination
+    properties:
+      source:
+        $ref: "#/components/schemas/account-link"
+      destination:
+        $ref: "#/components/schemas/account-link"

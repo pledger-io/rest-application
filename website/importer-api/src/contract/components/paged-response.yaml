@@ -1,0 +1,26 @@
+type: object
+required:
+  - info
+properties:
+  info:
+    type: object
+    required:
+      - pageSize
+      - pages
+      - records
+    properties:
+      records:
+        type: integer
+        description: The total amount of matches
+        format: int64
+        example: 20
+      pages:
+        type: integer
+        description: The amount of pages available
+        format: int32
+        example: 2
+      pageSize:
+        type: integer
+        description: The amount of matches per page
+        format: int32
+        example: 15

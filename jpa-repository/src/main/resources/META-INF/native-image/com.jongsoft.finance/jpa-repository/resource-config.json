@@ -2,6 +2,9 @@
   "resources": {
     "includes": [
       {
+        "pattern": "application-.*\\.properties"
+      },
+      {
         "pattern": "db/camunda/h2/.*"
       },
       {

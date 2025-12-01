@@ -1,0 +1,7 @@
+type: string
+enum:
+  - EQUALS
+  - CONTAINS
+  - STARTS_WITH
+  - LESS_THAN
+  - MORE_THAN

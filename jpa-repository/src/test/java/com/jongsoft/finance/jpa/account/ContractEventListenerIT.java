@@ -4,6 +4,7 @@ import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.messaging.commands.contract.*;
 import com.jongsoft.finance.security.AuthenticationFacade;
+import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
 import jakarta.inject.Inject;
@@ -96,6 +97,7 @@ class ContractEventListenerIT extends JpaTestSetup {
     }
 
     @MockBean
+    @Replaces
     AuthenticationFacade authenticationFacade() {
         return Mockito.mock(AuthenticationFacade.class);
     }

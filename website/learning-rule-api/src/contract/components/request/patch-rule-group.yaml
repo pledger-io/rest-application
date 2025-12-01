@@ -1,0 +1,10 @@
+type: object
+description: >
+  Patch part of the rule group.
+  Either `name` or `move` must be provided.
+properties:
+  name:
+    type: string
+  move:
+    type: string
+    enum: [ UP, DOWN ]

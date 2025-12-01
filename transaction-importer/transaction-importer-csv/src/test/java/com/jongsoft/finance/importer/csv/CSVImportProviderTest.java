@@ -62,7 +62,7 @@ class CSVImportProviderTest {
                 .isNotNull()
                 .extracting(CSVConfiguration::delimiter, CSVConfiguration::headers, CSVConfiguration::dateFormat, CSVConfiguration::transactionTypeIndicator, CSVConfiguration::columnRoles)
                 .isEqualTo(List.of(
-                        ',',
+                        ",",
                         true,
                         "yyyyMMdd",
                         new TransactionTypeIndicator("Bij", "Af"),

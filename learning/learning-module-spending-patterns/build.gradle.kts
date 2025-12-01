@@ -24,6 +24,7 @@ dependencies {
     implementation(mn.micronaut.data.tx.hibernate)
     implementation(mn.micronaut.data.jpa)
     implementation(mn.micronaut.data.jdbc)
+    implementation(mn.micronaut.micrometer.core)
     implementation(mn.micronaut.runtime)
     implementation(mn.validation)
 

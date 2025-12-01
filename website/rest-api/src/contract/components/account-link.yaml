@@ -1,0 +1,19 @@
+type: object
+required:
+  - id
+  - name
+  - type
+properties:
+  id:
+    type: integer
+    description: The identifier of the account
+    format: int64
+    example: 3212
+  name:
+    type: string
+    description: "The account name, is unique for the user"
+    example: Fast food & co
+  type:
+    type: string
+    description: "The type of account, as defined by the account type API"
+    example: creditor

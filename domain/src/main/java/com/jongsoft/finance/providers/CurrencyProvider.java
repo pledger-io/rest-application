@@ -6,10 +6,10 @@ import com.jongsoft.lang.control.Optional;
 
 public interface CurrencyProvider extends DataProvider<Currency>, Exportable<Currency> {
 
-  Optional<Currency> lookup(String code);
+    Optional<Currency> lookup(String code);
 
-  @Override
-  default boolean supports(Class<?> supportingClass) {
-    return Currency.class.equals(supportingClass);
-  }
+    @Override
+    default boolean supports(Class<?> supportingClass) {
+        return Currency.class.equals(supportingClass);
+    }
 }

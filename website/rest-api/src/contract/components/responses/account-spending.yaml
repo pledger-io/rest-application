@@ -1,0 +1,16 @@
+type: object
+description:
+  The spending for a specific account
+required:
+  - account
+  - total
+  - average
+properties:
+  account:
+    $ref: '#/components/schemas/account-response'
+  total:
+    type: number
+    format: double
+  average:
+    type: number
+    format: double

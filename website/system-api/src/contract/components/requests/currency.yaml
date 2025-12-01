@@ -1,0 +1,16 @@
+type: object
+required:
+  - name
+  - code
+  - symbol
+properties:
+  name:
+    type: string
+  code:
+    type: string
+    min: 3
+    max: 3
+  symbol:
+    type: string
+    minLength: 1
+    maxLength: 1

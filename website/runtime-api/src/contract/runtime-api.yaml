@@ -1,0 +1,265 @@
+openapi: 3.1.0
+info:
+  title: Pledger.io Runtime Engine
+  version: 3.0.0
+  contact:
+    name: Jong Soft Development
+    url: https://github.com/pledger-io/rest-application
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+security:
+  - bearerAuth: [ ]
+
+paths:
+  /v2/api/runtime-engine/{processDefinition}:
+    parameters:
+      - $ref: '#/components/parameters/process-definition'
+    get:
+      operationId: getProcessInstances
+      tags: [ process-engine ]
+      summary: Historic instances
+      description: >
+        Lists the historic executions for the provided process definition key
+      responses:
+        "200":
+          description: A list of process instances
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/process-instance-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: startProcessInstance
+      tags: [ process-engine ]
+      summary: Start process
+      description: >
+        Starts a new process instance for the provided process definition key
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: object
+      responses:
+        "201":
+          description: The created process instance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/process-instance-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}:
+    parameters:
+      - $ref: '#/components/parameters/process-definition'
+      - $ref: '#/components/parameters/business-key'
+    get:
+      operationId: getProcessInstancesByBusinessKey
+      tags: [ process-engine ]
+      summary: History by business key
+      description: >
+        List the history executions for the provided definition key, 
+        but only once with matching business key
+      responses:
+        "200":
+          description: A list of process instances
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/process-instance-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}:
+    parameters:
+      - $ref: '#/components/parameters/process-definition'
+      - $ref: '#/components/parameters/business-key'
+      - $ref: '#/components/parameters/instance-id'
+    get:
+      operationId: getProcessInstance
+      tags: [ process-engine ]
+      summary: Fetch process instance
+      responses:
+        "200":
+          description: The process instance
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/process-instance-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/403' }
+    delete:
+      operationId: deleteProcessInstance
+      tags: [ process-engine ]
+      summary: Delete process instance
+      responses:
+        "204":
+          description: A confirmation that the process instance was deleted
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/403' }
+
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/tasks:
+    parameters:
+      - $ref: '#/components/parameters/process-definition'
+      - $ref: '#/components/parameters/business-key'
+      - $ref: '#/components/parameters/instance-id'
+    get:
+      operationId: getTasks
+      tags: [ task-engine ]
+      summary: Search tasks for process
+      responses:
+        "200":
+          description: A list of tasks for the process instance
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/task-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/tasks/{taskId}:
+    parameters:
+      - $ref: '#/components/parameters/process-definition'
+      - $ref: '#/components/parameters/instance-id'
+      - $ref: '#/components/parameters/business-key'
+      - $ref: '#/components/parameters/task-id'
+    get:
+      operationId: getTaskById
+      tags: [ task-engine ]
+      summary: Fetch task
+      responses:
+        "200":
+          description: The updated task
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/task-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/403' }
+    post:
+      operationId: completeTask
+      tags: [ task-engine ]
+      summary: Complete task
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/task-variable-map' }
+      responses:
+        "204":
+          description: A confirmation that task was completed
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/403' }
+    delete:
+      operationId: deleteTask
+      tags: [ task-engine ]
+      summary: Delete task
+      responses:
+        "204":
+          description: A confirmation that task was deleted
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/403' }
+
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/tasks/{taskId}/variables:
+    parameters:
+      - $ref: '#/components/parameters/process-definition'
+      - $ref: '#/components/parameters/business-key'
+      - $ref: '#/components/parameters/instance-id'
+      - $ref: '#/components/parameters/task-id'
+    get:
+      operationId: getTaskVariables
+      tags: [ task-engine ]
+      summary: Fetch task variables
+      parameters:
+        - name: variable
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A map of all named variables of this task
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/task-variable-map' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/403' }
+
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/variables:
+    parameters:
+      - $ref: '#/components/parameters/business-key'
+      - $ref: '#/components/parameters/process-definition'
+      - $ref: '#/components/parameters/instance-id'
+    get:
+      operationId: getVariables
+      tags: [ variable-engine ]
+      summary: Fetch process variables
+      responses:
+        "200":
+          description: A list of variables for the process instance
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/variable-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+  /v2/api/runtime-engine/{processDefinition}/{businessKey}/{instanceId}/variables/{variableId}:
+    parameters:
+      - $ref: '#/components/parameters/process-definition'
+      - $ref: '#/components/parameters/business-key'
+      - $ref: '#/components/parameters/instance-id'
+      - $ref: '#/components/parameters/variable-id'
+    get:
+      operationId: getVariableById
+      tags: [ variable-engine ]
+      summary: Fetch variable
+      responses:
+        "200":
+          description: The variable contents
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/variable-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/403' }
+
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    401: { $ref: './responses/401-response.yaml' }
+    403: { $ref: './responses/403-response.yaml' }
+    404: { $ref: './responses/404-response.yaml' }
+
+  parameters:
+    business-key: { $ref: './parameters/business-key.yaml' }
+    instance-id: { $ref: './parameters/instance-id.yaml' }
+    process-definition: { $ref: './parameters/process-definition.yaml' }
+    variable-id: { $ref: './parameters/variable-id.yaml' }
+    task-id: { $ref: './parameters/task-id.yaml' }
+
+  schemas:
+    process-instance-response: { $ref: 'components/process-instance.yaml' }
+    task-response: { $ref: 'components/task.yaml' }
+    variable-response: { $ref: 'components/variable-response.yaml' }
+    task-variable-map:
+      type: object
+      format: TaskVariableMap
+
+    variable: { $ref: 'components/variable.yaml' }

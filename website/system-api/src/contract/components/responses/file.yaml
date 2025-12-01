@@ -1,0 +1,6 @@
+type: object
+required:
+  - fileCode
+properties:
+  fileCode:
+    type: string

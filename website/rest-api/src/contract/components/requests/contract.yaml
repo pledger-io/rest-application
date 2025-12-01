@@ -1,0 +1,26 @@
+type: object
+properties:
+  name:
+    minLength: 1
+    type: string
+    description: The name of the contract.
+    example: Contract 1
+  description:
+    type: string
+    description: The description of the contract.
+    example: Contract 1 description
+  company:
+    description: The company the contract is with.
+    allOf:
+      - $ref: "#/components/schemas/account-link"
+  start:
+    type: string
+    description: The start date of the contract.
+    format: date
+  end:
+    type: string
+    description: The end date of the contract.
+    format: date
+  attachmentCode:
+    type: string
+    description: The file code to get the digital copy of the contract.

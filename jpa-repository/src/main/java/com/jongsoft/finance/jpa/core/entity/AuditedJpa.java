@@ -4,36 +4,38 @@ import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import java.util.Date;
+
 import lombok.Getter;
+
+import java.util.Date;
 
 @Getter
 @MappedSuperclass
 public abstract class AuditedJpa extends EntityJpa {
 
-  @Column(updatable = false)
-  private Date created;
+    @Column(updatable = false)
+    private Date created;
 
-  private Date updated;
-  private Date deleted;
+    private Date updated;
+    private Date deleted;
 
-  public AuditedJpa() {}
+    public AuditedJpa() {}
 
-  protected AuditedJpa(Long id, Date created, Date updated, Date deleted) {
-    super(id);
+    protected AuditedJpa(Long id, Date created, Date updated, Date deleted) {
+        super(id);
 
-    this.created = created;
-    this.updated = updated;
-    this.deleted = deleted;
-  }
-
-  @PreUpdate
-  @PrePersist
-  void initialize() {
-    if (created == null) {
-      created = new Date();
+        this.created = created;
+        this.updated = updated;
+        this.deleted = deleted;
     }
 
-    updated = new Date();
-  }
+    @PreUpdate
+    @PrePersist
+    void initialize() {
+        if (created == null) {
+            created = new Date();
+        }
+
+        updated = new Date();
+    }
 }

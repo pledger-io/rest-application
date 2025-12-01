@@ -1,8 +1,10 @@
 package com.jongsoft.finance.jpa.currency;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,35 +13,35 @@ import lombok.Getter;
 @Table(name = "currency")
 public class CurrencyJpa extends EntityJpa {
 
-  private String name;
-  private char symbol;
-  private String code;
+    private String name;
+    private char symbol;
+    private String code;
 
-  private int decimalPlaces;
-  private boolean enabled;
+    private int decimalPlaces;
+    private boolean enabled;
 
-  private boolean archived;
+    private boolean archived;
 
-  public CurrencyJpa() {
-    super();
-  }
+    public CurrencyJpa() {
+        super();
+    }
 
-  @Builder
-  protected CurrencyJpa(
-      Long id,
-      String name,
-      char symbol,
-      String code,
-      int decimalPlaces,
-      boolean enabled,
-      boolean archived) {
-    super(id);
+    @Builder
+    protected CurrencyJpa(
+            Long id,
+            String name,
+            char symbol,
+            String code,
+            int decimalPlaces,
+            boolean enabled,
+            boolean archived) {
+        super(id);
 
-    this.name = name;
-    this.symbol = symbol;
-    this.code = code;
-    this.decimalPlaces = decimalPlaces;
-    this.enabled = enabled;
-    this.archived = archived;
-  }
+        this.name = name;
+        this.symbol = symbol;
+        this.code = code;
+        this.decimalPlaces = decimalPlaces;
+        this.enabled = enabled;
+        this.archived = archived;
+    }
 }

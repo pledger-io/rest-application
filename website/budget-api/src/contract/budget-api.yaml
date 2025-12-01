@@ -1,0 +1,209 @@
+openapi: 3.1.0
+info:
+  title: Pledger.io Budget API
+  version: 3.0.0
+  contact:
+    name: Jong Soft Development
+    url: https://github.com/pledger-io/rest-application
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+security:
+  - bearerAuth: [ ]
+
+paths:
+  /v2/api/budgets:
+    get:
+      operationId: findByFilter
+      tags: [ budget-fetcher ]
+      summary: Search budgets
+      description: >
+        Retrieve budget periods for the authenticated user. You can filter by
+        year and/or month. When firstOnly is true, only the first matching
+        budget period is returned.
+      parameters:
+        - name: year
+          required: false
+          description: The year to get the budget for
+          in: query
+          schema: { type: int }
+        - name: month
+          required: false
+          description: The month to get the budget for
+          in: query
+          schema:
+            type: int
+            min: 1
+            max: 12
+        - name: firstOnly
+          description: If true, only the first budget will be returned.
+          in: query
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: The list of matching budget periods
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/budget-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    post:
+      operationId: createInitialBudget
+      tags: [ budget-command ]
+      summary: Create budget
+      description: >
+        Create the initial budget for the current user. This
+        can only be called once if no budget exists for the
+        current user.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/budget-request' }
+      responses:
+        "201":
+          description: The created budget
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/budget-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+    patch:
+      operationId: updateCurrentBudget
+      tags: [ budget-command ]
+      summary: Update budget
+      description: >
+        Update the current budget for the current user. This operation will also
+        index all expenses based upon the difference between the previous expected income
+        and the new expected income.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/budget-request' }
+      responses:
+        "200":
+          description: The created budget
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/budget-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+  /v2/api/budgets/expenses:
+    get:
+      operationId: findExpensesByFilter
+      tags: [ budget-fetcher ]
+      summary: Search expenses
+      description: >
+        Search expenses within the currently active budget for the authenticated
+        user. You can provide a partial name to filter the results. Returns the
+        matching expenses.
+      parameters:
+        - name: name
+          description: Filter expenses based upon the partial name
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: The found expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/expense-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+    patch:
+      operationId: updateExpense
+      tags: [ budget-command ]
+      summary: Update expense
+      description: >
+        Create or update an expense under the current active budget.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/expense-request' }
+      responses:
+        "200":
+          description: The updated budget
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/budget-response' }
+        "400": { $ref: '#/components/responses/400' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+  /v2/api/budgets/expenses/balance:
+    get:
+      operationId: computeBudgetExpenseBalance
+      tags: [ budget-fetcher ]
+      summary: Compute expense balance
+      description: >
+        Compute the budget-vs-spending balance for one month of the authenticated
+        user. Provide year and month to select the period. Optionally pass one or
+        more expenseId values to limit the calculation to specific expenses.
+        Returns the computed balance per expense for the selected period.
+      parameters:
+        - name: year
+          required: true
+          description: The year to get the budget for
+          in: query
+          schema: { type: int }
+        - name: month
+          required: true
+          description: The month to get the budget for
+          in: query
+          schema:
+            type: int
+            min: 1
+            max: 12
+        - name: expenseId
+          description: Optional list of expense identifiers to filter on
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+      responses:
+        "200":
+          description: The current balance
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/computed-expense-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
+        "404": { $ref: '#/components/responses/404' }
+
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    400: { $ref: './responses/400-response.yaml' }
+    401: { $ref: './responses/401-response.yaml' }
+    403: { $ref: './responses/403-response.yaml' }
+    404: { $ref: './responses/404-response.yaml' }
+
+  parameters:
+    # date range related parameters
+    start-date: { $ref: 'parameters/startDate.yaml' }
+    end-date: { $ref: 'parameters/endDate.yaml' }
+
+  schemas:
+    budget-request: { $ref: 'components/requests/budget.yaml' }
+    expense-request: { $ref: 'components/requests/expense.yaml' }
+    date-range: { $ref: 'components/date-range.yaml' }
+    json-error-response: { $ref: 'components/responses/json-error.yaml' }
+    budget-response: { $ref: 'components/responses/budget.yaml' }
+    expense-response: { $ref: 'components/responses/expense.yaml' }
+    computed-expense-response: { $ref: 'components/responses/computed-expense.yaml' }

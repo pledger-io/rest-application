@@ -1,0 +1,19 @@
+type: object
+required:
+  - id
+  - label
+properties:
+  id:
+    type: integer
+    format: int64
+    description: The unique identifier for the category
+  name:
+    type: string
+    description: The name for the category
+  description:
+    type: string
+    description: The description for the category
+  lastUsed:
+    type: string
+    format: date
+    description: The last date the category was used

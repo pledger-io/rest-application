@@ -6,8 +6,11 @@ import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.providers.CategoryProvider;
 import com.jongsoft.finance.security.CurrentUserProvider;
 import com.jongsoft.finance.serialized.CategoryJson;
+
 import jakarta.inject.Singleton;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.variable.value.StringValue;
@@ -26,36 +29,37 @@ import org.camunda.bpm.engine.variable.value.StringValue;
 @Singleton
 public class ProcessCreateCategoryDelegate implements JavaDelegate, JavaBean {
 
-  private final CurrentUserProvider currentUserProvider;
-  private final CategoryProvider categoryProvider;
-  private final ProcessMapper mapper;
+    private final CurrentUserProvider currentUserProvider;
+    private final CategoryProvider categoryProvider;
+    private final ProcessMapper mapper;
 
-  ProcessCreateCategoryDelegate(
-      CurrentUserProvider currentUserProvider,
-      CategoryProvider categoryProvider,
-      ProcessMapper mapper) {
-    this.currentUserProvider = currentUserProvider;
-    this.categoryProvider = categoryProvider;
-    this.mapper = mapper;
-  }
+    ProcessCreateCategoryDelegate(
+            CurrentUserProvider currentUserProvider,
+            CategoryProvider categoryProvider,
+            ProcessMapper mapper) {
+        this.currentUserProvider = currentUserProvider;
+        this.categoryProvider = categoryProvider;
+        this.mapper = mapper;
+    }
 
-  @Override
-  public void execute(DelegateExecution execution) throws Exception {
-    var categoryJson = mapper.readSafe(
-        execution.<StringValue>getVariableLocalTyped("category").getValue(), CategoryJson.class);
+    @Override
+    public void execute(DelegateExecution execution) throws Exception {
+        var categoryJson = mapper.readSafe(
+                execution.<StringValue>getVariableLocalTyped("category").getValue(),
+                CategoryJson.class);
 
-    log.debug(
-        "{}: Processing category creation from json '{}'",
-        execution.getCurrentActivityName(),
-        categoryJson.getLabel());
+        log.debug(
+                "{}: Processing category creation from json '{}'",
+                execution.getCurrentActivityName(),
+                categoryJson.getLabel());
 
-    categoryProvider.lookup(categoryJson.getLabel()).ifNotPresent(() -> {
-      currentUserProvider.currentUser().createCategory(categoryJson.getLabel());
+        categoryProvider.lookup(categoryJson.getLabel()).ifNotPresent(() -> {
+            currentUserProvider.currentUser().createCategory(categoryJson.getLabel());
 
-      categoryProvider
-          .lookup(categoryJson.getLabel())
-          .ifPresent(
-              category -> category.rename(categoryJson.getLabel(), categoryJson.getDescription()));
-    });
-  }
+            categoryProvider
+                    .lookup(categoryJson.getLabel())
+                    .ifPresent(category -> category.rename(
+                            categoryJson.getLabel(), categoryJson.getDescription()));
+        });
+    }
 }

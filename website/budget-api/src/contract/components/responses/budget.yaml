@@ -1,0 +1,14 @@
+type: object
+required:
+  - income
+  - period
+  - expenses
+properties:
+  income:
+    type: number
+  period:
+    $ref: '#/components/schemas/date-range'
+  expenses:
+    type: array
+    items:
+      $ref: '#/components/schemas/expense-response'

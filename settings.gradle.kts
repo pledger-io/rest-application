@@ -9,6 +9,7 @@ pluginManagement {
         id("org.sonarqube").version("7.1.0.6387")
         id("org.openapi.generator").version("7.17.0")
         id("com.diffplug.spotless").version("8.1.0")
+        id("io.micronaut.openapi").version("4.5.4")
 
         id("signing")
         id("maven-publish")
@@ -41,20 +42,21 @@ dependencyResolutionManagement {
         }
 
         create("mn") {
-            val micronautVersion: String by settings
-            from("io.micronaut.platform:micronaut-platform:${micronautVersion}")
+            from("io.micronaut.platform:micronaut-platform:4.9.3")
         }
 
         create("llm") {
-            val langchain4jVersion: String = "1.5.0"
+            val langchain4jVersion: String = "1.8.0"
+            val betaVersion: String = "$langchain4jVersion-beta15"
             library("core", "dev.langchain4j", "langchain4j").version(langchain4jVersion)
-            library("retriever-sql", "dev.langchain4j", "langchain4j-pgvector").version("1.3.0-beta9")
-            library("store", "dev.langchain4j", "langchain4j-embeddings-all-minilm-l6-v2").version("1.3.0-beta9")
+            library("retriever-sql", "dev.langchain4j", "langchain4j-pgvector").version(betaVersion)
+            library("store", "dev.langchain4j", "langchain4j-embeddings-all-minilm-l6-v2").version(betaVersion)
+            library("agentic", "dev.langchain4j", "langchain4j-agentic").version(betaVersion)
             library("model-openai", "dev.langchain4j", "langchain4j-open-ai").version(langchain4jVersion)
             library("model-ollama", "dev.langchain4j", "langchain4j-ollama").version(langchain4jVersion)
 
             bundle("embeddings", listOf("core", "store", "retriever-sql"))
-            bundle("langchain4j", listOf("core", "retriever-sql", "store", "model-openai", "model-ollama"))
+            bundle("langchain4j", listOf("core", "retriever-sql", "store", "agentic", "model-openai", "model-ollama"))
         }
     }
 }
@@ -70,4 +72,10 @@ include(
     "learning:learning-module-spending-patterns",
     "bpmn-process",
     "jpa-repository",
-    "fintrack-api")
+    "website:rest-api",
+    "website:learning-rule-api",
+    "website:runtime-api",
+    "website:importer-api",
+    "website:system-api",
+    "website:budget-api",
+    "website:application")

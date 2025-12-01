@@ -1,0 +1,8 @@
+discriminator:
+  propertyName: action
+  mapping:
+    ENABLE: '#/components/schemas/enable-mfa-request'
+    DISABLE: '#/components/schemas/disable-mfa-request'
+oneOf:
+  - $ref: '#/components/schemas/enable-mfa-request'
+  - $ref: '#/components/schemas/disable-mfa-request'

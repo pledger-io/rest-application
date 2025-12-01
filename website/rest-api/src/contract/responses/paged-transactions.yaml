@@ -1,0 +1,4 @@
+description: The transactions matching the filters in a paged way
+content:
+  application/json:
+    schema: { $ref: '#/components/schemas/paged-transaction-response' }

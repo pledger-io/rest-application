@@ -1,0 +1,28 @@
+type: object
+required:
+  - id
+  - left
+  - dailyLeft
+  - spent
+  - dailySpent
+properties:
+  id:
+    description: The identifier of the expense
+    type: integer
+    format: int64
+  left:
+    description: The amount of money left to spend on the expense
+    type: number
+    format: double
+  dailyLeft:
+    description: The amount of money left to spend on the expense each day
+    type: number
+    format: double
+  spent:
+    description: The amount of money spent on the expense
+    type: number
+    format: double
+  dailySpent:
+    description: The amount of money spent on the expense each day
+    type: number
+    format: double

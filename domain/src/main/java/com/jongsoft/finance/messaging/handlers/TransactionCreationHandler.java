@@ -4,11 +4,11 @@ import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionComm
 
 public interface TransactionCreationHandler {
 
-  /**
-   * Handle the creation of a transaction
-   *
-   * @param command the command
-   * @return the id of the created transaction
-   */
-  long handleCreatedEvent(CreateTransactionCommand command);
+    /**
+     * Handle the creation of a transaction
+     *
+     * @param command the command
+     * @return the id of the created transaction
+     */
+    long handleCreatedEvent(CreateTransactionCommand command);
 }

@@ -1,0 +1,16 @@
+type: object
+required:
+  - id
+  - process
+  - businessKey
+  - state
+properties:
+  id:
+    type: string
+  process:
+    type: string
+  businessKey:
+    type: string
+  state:
+    type: string
+    enum: [ACTIVE, COMPLETED]

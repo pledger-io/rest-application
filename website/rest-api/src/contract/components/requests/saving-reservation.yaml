@@ -1,0 +1,7 @@
+type: object
+description: A saving reservation for a specific amount
+required: [ amount ]
+properties:
+  amount:
+    type: number
+    format: double

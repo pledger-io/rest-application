@@ -6,5 +6,5 @@ import com.jongsoft.lang.control.Optional;
 
 public interface DataProvider<T> extends SupportIndicating<T>, JavaBean {
 
-  Optional<T> lookup(long id);
+    Optional<T> lookup(long id);
 }
