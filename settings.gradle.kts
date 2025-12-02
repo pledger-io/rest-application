@@ -42,7 +42,7 @@ dependencyResolutionManagement {
         }
 
         create("mn") {
-            from("io.micronaut.platform:micronaut-platform:4.9.3")
+            from("io.micronaut.platform:micronaut-platform:4.10.3")
         }
 
         create("llm") {
