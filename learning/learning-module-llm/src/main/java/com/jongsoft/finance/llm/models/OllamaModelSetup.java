@@ -25,6 +25,7 @@ import io.micronaut.context.annotation.Requires;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.List;
 
 @Factory
@@ -77,6 +78,7 @@ class OllamaModelSetup {
                 .modelName(configuration.getOllama().getModel())
                 .baseUrl(configuration.getOllama().getUri())
                 .temperature(configuration.getTemperature())
+                .timeout(Duration.ofSeconds(45))
                 .build();
     }
 
