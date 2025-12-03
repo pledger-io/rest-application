@@ -231,7 +231,7 @@ paths:
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
   /v2/api/ai/extract:
-    get:
+    post:
       operationId: extractTransaction
       tags: [ learning-rule-applier ]
       summary: Extract transaction

@@ -54,10 +54,14 @@ class LearningRuleApplierController implements LearningRuleApplierApi {
         response.setDate(extracted.date());
         response.setAmount(extracted.amount());
         response.setDescription(extracted.description());
-        response.setFrom(new ExtractedResponseFrom(
-                extracted.from().id(), extracted.from().name()));
-        response.setTo(
-                new ExtractedResponseFrom(extracted.to().id(), extracted.to().name()));
+        if (extracted.from() != null) {
+            response.setFrom(new ExtractedResponseFrom(
+                    extracted.from().id(), extracted.from().name()));
+        }
+        if (extracted.to() != null) {
+            response.setTo(new ExtractedResponseFrom(
+                    extracted.to().id(), extracted.to().name()));
+        }
         response.setType(ExtractedResponseType.valueOf(extracted.type().name()));
         return response;
     }
