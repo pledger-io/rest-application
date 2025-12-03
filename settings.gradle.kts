@@ -9,7 +9,7 @@ pluginManagement {
         id("org.sonarqube").version("7.1.0.6387")
         id("org.openapi.generator").version("7.17.0")
         id("com.diffplug.spotless").version("8.1.0")
-        id("io.micronaut.openapi").version("4.5.4")
+        id("io.micronaut.openapi").version("4.6.1")
 
         id("signing")
         id("maven-publish")
