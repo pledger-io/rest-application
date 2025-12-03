@@ -144,7 +144,7 @@ class TransactionCommandController implements TransactionCommandApi {
         updateTransactionRelations(transaction, transactionRequest);
         transaction.describe(transactionRequest.getDescription());
         transaction.book(
-                transaction.getDate(), transaction.getBookDate(), transaction.getInterestDate());
+            transactionRequest.getDate(), transactionRequest.getBookDate(), transactionRequest.getInterestDate());
         if (!transaction.isSplit()) {
             transaction.changeAmount(
                     transactionRequest.getAmount(), transactionRequest.getCurrency());
