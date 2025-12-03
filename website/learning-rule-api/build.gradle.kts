@@ -41,6 +41,7 @@ dependencies {
 
     implementation(project(":core"))
     implementation(project(":domain"))
+    implementation(project(":learning:learning-module"))
 
     testRuntimeOnly(mn.micronaut.serde.jackson)
     testRuntimeOnly(mn.micronaut.jackson.databind)
