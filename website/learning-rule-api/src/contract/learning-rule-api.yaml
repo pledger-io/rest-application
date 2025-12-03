@@ -230,6 +230,27 @@ paths:
                       type: string
         "401": { $ref: '#/components/responses/401' }
         "403": { $ref: '#/components/responses/403' }
+  /v2/api/ai/extract:
+    get:
+      operationId: extractTransaction
+      tags: [ learning-rule-applier ]
+      summary: Extract transaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+      responses:
+        "200":
+          description: The extracted transaction
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/extracted-response' }
+        "401": { $ref: '#/components/responses/401' }
+        "403": { $ref: '#/components/responses/403' }
 
 components:
   securitySchemes:
@@ -264,3 +285,4 @@ components:
     rule-request: { $ref: 'components/request/rule.yaml' }
 
     rule-response: { $ref: 'components/response/rule.yaml' }
+    extracted-response: { $ref: 'components/response/extracted-transaction.yaml' }
