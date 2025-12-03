@@ -5,6 +5,7 @@ import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.learning.SuggestionResult;
 import com.jongsoft.finance.rest.LearningRuleApplierApi;
 import com.jongsoft.finance.rest.model.rule.SuggestClassifications200Response;
+
 import io.micronaut.http.annotation.Controller;
 
 import java.time.LocalDate;
@@ -20,13 +21,14 @@ class LearningRuleApplierController implements LearningRuleApplierApi {
     }
 
     @Override
-    public SuggestClassifications200Response suggestClassifications(Double amount, String description, String source, String destination) {
+    public SuggestClassifications200Response suggestClassifications(
+            Double amount, String description, String source, String destination) {
         SuggestionInput convertedRequest = new SuggestionInput(
-            LocalDate.now(),
-            description,
-            source,
-            destination,
-            Optional.ofNullable(amount).orElse(0.0));
+                LocalDate.now(),
+                description,
+                source,
+                destination,
+                Optional.ofNullable(amount).orElse(0.0));
 
         SuggestionResult suggested = suggestionEngine.makeSuggestions(convertedRequest);
 
@@ -36,5 +38,4 @@ class LearningRuleApplierController implements LearningRuleApplierApi {
         response.setTags(suggested.tags());
         return response;
     }
-
 }
