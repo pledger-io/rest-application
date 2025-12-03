@@ -2,7 +2,7 @@ project_id_env: CROWDIN_PROJECT_ID
 api_token_env: CROWDIN_PERSONAL_TOKEN
 
 files:
-  - source: "fintrack-api/src/main/resources/i18n/messages.properties"
-    translation: "fintrack-api/src/main/resources/i18n/messages_%two_letters_code%.properties"
-  - source: "fintrack-api/src/main/resources/i18n/ValidationMessages.properties"
-    translation: "fintrack-api/src/main/resources/i18n/ValidationMessages_%two_letters_code%.properties"
+  - source: "website/system-api/src/main/resources/i18n/messages.properties"
+    translation: "website/system-api/src/main/resources/i18n/messages_%two_letters_code%.properties"
+  - source: "website/system-api/src/main/resources/i18n/ValidationMessages.properties"
+    translation: "website/system-api/src/main/resources/i18n/ValidationMessages_%two_letters_code%.properties"
