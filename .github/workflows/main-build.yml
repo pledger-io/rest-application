@@ -1,7 +1,10 @@
-name: Build Snapshot
+name: Verify software and quality
 
 on:
   push:
+    branches:
+      - master
+  pull_request:
     branches:
       - master
 
@@ -11,22 +14,35 @@ permissions:
   checks: write
 
 jobs:
-  build:
-    uses: ./.github/workflows/component-build.yml
-  quality-gate:
+  build-verify:
     runs-on: ubuntu-latest
-    needs: build
     steps:
+# Set up the build environment
       - uses: actions/checkout@v6
       - name: Configure Java version
         uses: actions/setup-java@v5
         with:
-          java-version: '24'
+          java-version: '25'
           distribution: 'temurin'
           architecture: x64
-      - name: Download build artifact
-        uses: actions/download-artifact@v6
-        with:
-          name: build-artifact
+      - name: Prepare gradle installation
+        uses: gradle/actions/setup-gradle@v5
+# Check the software
+      - name: Build the application
+        run: ./gradlew classes
+      - name: Verify the software
+        run: ./gradlew check -x classes
+# Run the quality gate
       - name: Quality gate
         run: ./gradlew sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.gradle.skipCompile=true -Dsonar.host.url=https://sonarcloud.io
+# Run the test report actions
+      - name: Test Report
+        uses: dorny/test-reporter@v2
+        if: success() || failure()
+        with:
+          artifact: test-artifact
+          name: Junit Test
+          path: ./**/TEST-*.xml
+          reporter: java-junit
+          list-suites: 'failed'
+          list-tests: 'failed'
