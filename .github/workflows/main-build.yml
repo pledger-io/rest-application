@@ -29,13 +29,19 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 # Check the software
       - name: Build the application
-        run: ./gradlew classes
+        run: ./gradlew classes -q
       - name: Verify the software
-        run: ./gradlew check -x classes
+        run: ./gradlew check -x classes -q
 # Run the quality gate
       - name: Quality gate
         run: ./gradlew sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.gradle.skipCompile=true -Dsonar.host.url=https://sonarcloud.io
 # Run the test report actions
+      - name: Upload test results
+        uses: actions/upload-artifact@v5
+        with:
+          name: test-artifact
+          path: |
+            **/build/test-results/**
       - name: Test Report
         uses: dorny/test-reporter@v2
         if: success() || failure()
