@@ -26,8 +26,6 @@ jobs:
 # Build the software
       - name: Build the classes
         run: ./gradlew classes -q
-      - name: JAR the application
-        run: ./gradlew jar -x classes
 # Publish the JAR file
       - name: Publish artifacts
         run: |
@@ -35,6 +33,7 @@ jobs:
           NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
           echo "New version: ${NEW_VERSION}"
           echo "Github username: ${GITHUB_ACTOR}"
+          ./gradlew jar -x classes -Pversion=${NEW_VERSION}
           ./gradlew -Pversion=${NEW_VERSION} publish -x jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
