@@ -66,5 +66,12 @@ public class CategoryTest {
               .body("info.pages", equalTo(1))
               .body("info.pageSize", equalTo(3))
               .body("content[0].name", equalTo("Grocery"));
+
+        requests.searchCategories(0, 3, "Groc")
+            .statusCode(200)
+            .body("info.records", equalTo(1))
+            .body("info.pages", equalTo(1))
+            .body("info.pageSize", equalTo(3))
+            .body("content[0].name", equalTo("Grocery"));
     }
 }

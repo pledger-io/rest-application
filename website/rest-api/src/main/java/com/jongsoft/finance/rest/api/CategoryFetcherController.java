@@ -34,7 +34,7 @@ public class CategoryFetcherController implements CategoryFetcherApi {
         var page = offset / numberOfResults;
         var filter = filterFactory.category().page(Math.max(0, page), Math.max(1, numberOfResults));
         if (name != null) {
-            filter.label(name, false);
+            filter.label(name.toLowerCase(), false);
         }
 
         var results = categoryProvider.lookup(filter);
