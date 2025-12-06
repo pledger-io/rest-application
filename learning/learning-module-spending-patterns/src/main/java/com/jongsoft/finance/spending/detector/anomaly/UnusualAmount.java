@@ -14,7 +14,7 @@ public class UnusualAmount implements Anomaly {
     @Override
     public Optional<SpendingInsight> detect(
             Transaction transaction, UserCategoryStatistics statistics) {
-        var typicalAmount = statistics.amounts().get(transaction.getBudget());
+        var typicalAmount = statistics.amounts().get(getExpense(transaction));
         if (typicalAmount == null) {
             return Optional.empty();
         }
@@ -36,7 +36,7 @@ public class UnusualAmount implements Anomaly {
 
             return Optional.of(SpendingInsight.builder()
                     .type(InsightType.UNUSUAL_AMOUNT)
-                    .category(transaction.getBudget())
+                    .category(getExpense(transaction))
                     .severity(getSeverityFromScore(score))
                     .score(score)
                     .detectedDate(transaction.getDate())

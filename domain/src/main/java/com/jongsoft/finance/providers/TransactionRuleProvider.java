@@ -16,4 +16,8 @@ public interface TransactionRuleProvider
     default boolean supports(Class<?> supportingClass) {
         return TransactionRule.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "TRANSACTION_RULE";
+    }
 }

@@ -3,7 +3,7 @@ micronaut.application.storage.location: ./build/
 application:
   ai:
     ollama:
-      model: qwen3:1.7b
+      model: qwen2.5-coder:1.5b
       force-augmentation: false
     vectors:
       storage: ${micronaut.application.storage.location}/vectors

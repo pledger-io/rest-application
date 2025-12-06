@@ -15,10 +15,11 @@ values (1, 'Sample 1', 1, 0),
 
 insert into transaction_journal (ID, created, updated, T_DATE, DESCRIPTION, currency_id, TYPE, USER_ID)
 values (1, '2019-01-01', '2019-01-01', '2019-01-01', 'Sample transaction', 1, 'CREDIT', 1),
-       (2, '2019-01-02', '2019-01-02', '2019-01-02', 'Split transaction sample', 1, 'CREDIT', 1);
+       (2, '2019-01-02', '2019-01-02', '2019-01-02', 'Split transaction sample', 1, 'CREDIT', 1),
+       (3, '2019-01-01', '2019-01-01', '2019-01-01', 'Categorized transaction', 1, 'CREDIT', 1);
 
-insert into transaction_journal (ID, created, updated, T_DATE, DESCRIPTION, currency_id, TYPE, USER_ID, CATEGORY_ID)
-values (3, '2019-01-01', '2019-01-01', '2019-01-01', 'Categorized transaction', 1, 'CREDIT', 1, 1);
+insert into transaction_journal_meta (journal_id, entity_id, relation_type)
+values (3, 1, 'CATEGORY');
 
 insert into transaction_part (ID, created, updated, deleted, JOURNAL_ID, ACCOUNT_ID, AMOUNT)
 values (1, '2019-01-01', '2019-01-01', null, 1, 1, 20.2),

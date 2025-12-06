@@ -1,6 +1,6 @@
 package com.jongsoft.finance.domain.core;
 
-import com.jongsoft.finance.core.AggregateBase;
+import com.jongsoft.finance.domain.Classifier;
 
 import io.micronaut.serde.annotation.Serdeable;
 
@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 @EqualsAndHashCode(of = {"id"})
-public class EntityRef implements AggregateBase {
+public class EntityRef implements Classifier {
 
     private final Long id;
 
@@ -18,7 +18,7 @@ public class EntityRef implements AggregateBase {
     }
 
     @Serdeable
-    public record NamedEntity(long id, String name) implements AggregateBase {
+    public record NamedEntity(long id, String name) implements Classifier {
         @Override
         public Long getId() {
             return id;

@@ -27,7 +27,7 @@ public class AmountPattern implements Pattern {
             var averageAmount = calculateAverage(amountPerDate);
             return Optional.of(SpendingPattern.builder()
                     .type(amountPatternType)
-                    .category(transaction.getCategory())
+                    .category(getExpense(transaction))
                     .detectedDate(transaction.getDate().withDayOfMonth(1))
                     .confidence(0.85)
                     .metadata(Map.of(

@@ -1,5 +1,7 @@
 package com.jongsoft.finance.jpa.transaction;
 
+import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.*;
+
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.core.EntityRef;
@@ -42,19 +44,19 @@ public class TransactionFilterCommand extends JpaFilterBuilder<TransactionJourna
 
     @Override
     public TransactionProvider.FilterCommand categories(Sequence<EntityRef> value) {
-        query().fieldEqOneOf("category.id", ID_REDUCER.apply(value).toArray());
+        filterOnLink(CATEGORY.name(), value);
         return this;
     }
 
     @Override
     public TransactionProvider.FilterCommand contracts(Sequence<EntityRef> value) {
-        query().fieldEqOneOf("contract.id", ID_REDUCER.apply(value).toArray());
+        filterOnLink(CONTRACT.name(), value);
         return this;
     }
 
     @Override
     public TransactionProvider.FilterCommand expenses(Sequence<EntityRef> value) {
-        query().fieldEqOneOf("budget.id", ID_REDUCER.apply(value).toArray());
+        filterOnLink(EXPENSE.name(), value);
         return this;
     }
 
@@ -143,5 +145,12 @@ public class TransactionFilterCommand extends JpaFilterBuilder<TransactionJourna
     @Override
     public Class<TransactionJournal> entityType() {
         return TransactionJournal.class;
+    }
+
+    private void filterOnLink(String relationType, Sequence<EntityRef> value) {
+        query().whereExists(subQuery -> subQuery.from("metadata")
+                .fieldEqParentField("journal.id", "id")
+                .fieldEq("relationType", relationType)
+                .fieldEqOneOf("entityId", ID_REDUCER.apply(value).toArray()));
     }
 }

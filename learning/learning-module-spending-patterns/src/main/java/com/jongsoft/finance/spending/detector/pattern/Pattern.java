@@ -1,5 +1,8 @@
 package com.jongsoft.finance.spending.detector.pattern;
 
+import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.EXPENSE;
+
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.SpendingPattern;
 import com.jongsoft.finance.domain.transaction.Transaction;
 
@@ -13,4 +16,8 @@ public interface Pattern {
 
     Optional<SpendingPattern> detect(
             Transaction transaction, List<EmbeddingMatch<TextSegment>> matches);
+
+    default String getExpense(Transaction transaction) {
+        return ((EntityRef.NamedEntity) transaction.getMetadata().get(EXPENSE.name())).name();
+    }
 }

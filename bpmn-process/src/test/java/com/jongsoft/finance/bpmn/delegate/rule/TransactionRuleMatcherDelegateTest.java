@@ -4,6 +4,7 @@ import com.jongsoft.finance.core.RuleColumn;
 import com.jongsoft.finance.core.RuleOperation;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.domain.transaction.TransactionRule;
 import com.jongsoft.finance.providers.TransactionRuleProvider;
@@ -20,6 +21,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
+import java.util.List;
+
+import static org.mockito.Mockito.mock;
 
 class TransactionRuleMatcherDelegateTest {
     private static final Account TO_ACCOUNT = Account.builder().id(1L).type("checking").name("To Account").build();
@@ -35,12 +39,12 @@ class TransactionRuleMatcherDelegateTest {
 
     @BeforeEach
     void setup() {
-        transactionProvider = Mockito.mock(TransactionProvider.class);
-        transactionRuleProvider = Mockito.mock(TransactionRuleProvider.class);
-        ruleEngine = Mockito.mock(RuleEngine.class);
-        subject = new TransactionRuleMatcherDelegate(ruleEngine, transactionProvider);
+        transactionProvider = mock(TransactionProvider.class);
+        transactionRuleProvider = mock(TransactionRuleProvider.class);
+        ruleEngine = mock(RuleEngine.class);
+        subject = new TransactionRuleMatcherDelegate(ruleEngine, transactionProvider, List.of(), mock(FilterFactory.class));
 
-        delegateExecution = Mockito.mock(DelegateExecution.class);
+        delegateExecution = mock(DelegateExecution.class);
         transaction = Transaction.builder()
                 .id(1L)
                 .date(TRANSACTION_DATE)
@@ -55,7 +59,6 @@ class TransactionRuleMatcherDelegateTest {
                                 .account(FROM_ACCOUNT)
                                 .build()
                 ))
-                .category("blue")
                 .description("Income Salary May 2018")
                 .build();
 

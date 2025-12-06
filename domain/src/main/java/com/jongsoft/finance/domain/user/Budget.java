@@ -4,6 +4,7 @@ import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.messaging.commands.budget.CloseBudgetCommand;
 import com.jongsoft.finance.messaging.commands.budget.CreateBudgetCommand;
 import com.jongsoft.finance.messaging.commands.budget.CreateExpenseCommand;
@@ -28,7 +29,7 @@ public class Budget implements AggregateBase {
     @Getter
     @ToString(of = "name")
     @EqualsAndHashCode(of = "id")
-    public class Expense implements AggregateBase {
+    public class Expense implements Classifier {
         private Long id;
         private final String name;
         private double lowerBound;

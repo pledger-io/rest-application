@@ -34,6 +34,19 @@ public class ImportProviderJpa implements ImportProvider {
     }
 
     @Override
+    public Optional<BatchImport> lookup(long id) {
+        log.trace("Importer lookup by id: {}", id);
+
+        return entityManager
+                .from(ImportJpa.class)
+                .fieldEq("id", id)
+                .fieldEq("archived", false)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .singleResult()
+                .map(this::convert);
+    }
+
+    @Override
     public Optional<BatchImport> lookup(String slug) {
         log.trace("Importer lookup by slug: {}", slug);
 

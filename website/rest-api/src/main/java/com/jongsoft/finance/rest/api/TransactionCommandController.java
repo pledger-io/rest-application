@@ -1,12 +1,11 @@
 package com.jongsoft.finance.rest.api;
 
+import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.*;
+
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.domain.account.Contract;
-import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.SplitRecord;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
 import com.jongsoft.finance.providers.*;
@@ -14,7 +13,6 @@ import com.jongsoft.finance.rest.model.SplitTransactionRequestInner;
 import com.jongsoft.finance.rest.model.TransactionRequest;
 import com.jongsoft.finance.rest.model.TransactionResponse;
 import com.jongsoft.lang.Collections;
-import com.jongsoft.lang.Value;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
@@ -37,23 +35,14 @@ class TransactionCommandController implements TransactionCommandApi {
     private final TransactionProvider transactionProvider;
     private final TransactionCreationHandler transactionCreationHandler;
 
-    private final CategoryProvider categoryProvider;
-    private final ExpenseProvider expenseProvider;
-    private final ContractProvider contractProvider;
     private final AccountProvider accountProvider;
 
     TransactionCommandController(
             TransactionProvider transactionProvider,
             TransactionCreationHandler transactionCreationHandler,
-            CategoryProvider categoryProvider,
-            ExpenseProvider expenseProvider,
-            ContractProvider contractProvider,
             AccountProvider accountProvider) {
         this.transactionProvider = transactionProvider;
         this.transactionCreationHandler = transactionCreationHandler;
-        this.categoryProvider = categoryProvider;
-        this.expenseProvider = expenseProvider;
-        this.contractProvider = contractProvider;
         this.accountProvider = accountProvider;
         this.logger = LoggerFactory.getLogger(TransactionCommandController.class);
     }
@@ -65,21 +54,6 @@ class TransactionCommandController implements TransactionCommandApi {
                 transactionBuilder -> transactionBuilder
                         .currency(request.getCurrency())
                         .description(request.getDescription())
-                        .budget(Optional.ofNullable(request.getExpense())
-                                .map(expenseProvider::lookup)
-                                .map(Value::get)
-                                .map(EntityRef.NamedEntity::name)
-                                .orElse(null))
-                        .category(Optional.ofNullable(request.getCategory())
-                                .map(categoryProvider::lookup)
-                                .map(Value::get)
-                                .map(Category::getLabel)
-                                .orElse(null))
-                        .contract(Optional.ofNullable(request.getContract())
-                                .map(contractProvider::lookup)
-                                .map(Value::get)
-                                .map(Contract::getName)
-                                .orElse(null))
                         .date(request.getDate())
                         .bookDate(request.getBookDate())
                         .interestDate(request.getInterestDate())
@@ -104,11 +78,13 @@ class TransactionCommandController implements TransactionCommandApi {
 
         var id = transactionCreationHandler.handleCreatedEvent(
                 new CreateTransactionCommand(transaction));
-        var transactionWithId = transactionProvider
-                .lookup(id)
-                .getOrThrow(() ->
-                        StatusException.internalError("Transaction not found after creation."));
-        return HttpResponse.created(TransactionMapper.toTransactionResponse(transactionWithId));
+        var transactionWithId = lookupTransactionByIdOrThrow(id);
+        transactionWithId.link(EXPENSE, request.getExpense());
+        transactionWithId.link(CATEGORY, request.getCategory());
+        transactionWithId.link(CONTRACT, request.getContract());
+
+        return HttpResponse.created(
+                TransactionMapper.toTransactionResponse(lookupTransactionByIdOrThrow(id)));
     }
 
     @Override
@@ -152,7 +128,7 @@ class TransactionCommandController implements TransactionCommandApi {
                     transactionRequest.getAmount(), transactionRequest.getCurrency());
         }
 
-        return TransactionMapper.toTransactionResponse(transaction);
+        return TransactionMapper.toTransactionResponse(lookupTransactionByIdOrThrow(id));
     }
 
     private void updateAccounts(Transaction transaction, TransactionRequest request) {
@@ -170,23 +146,9 @@ class TransactionCommandController implements TransactionCommandApi {
     }
 
     private void updateTransactionRelations(Transaction transaction, TransactionRequest request) {
-        Optional.ofNullable(request.getExpense())
-                .map(expenseProvider::lookup)
-                .map(Value::get)
-                .map(EntityRef.NamedEntity::name)
-                .ifPresentOrElse(transaction::linkToBudget, () -> transaction.linkToBudget(null));
-        Optional.ofNullable(request.getCategory())
-                .map(categoryProvider::lookup)
-                .map(Value::get)
-                .map(Category::getLabel)
-                .ifPresentOrElse(
-                        transaction::linkToCategory, () -> transaction.linkToCategory(null));
-        Optional.ofNullable(request.getContract())
-                .map(contractProvider::lookup)
-                .map(Value::get)
-                .map(Contract::getName)
-                .ifPresentOrElse(
-                        transaction::linkToContract, () -> transaction.linkToContract(null));
+        transaction.link(EXPENSE, request.getExpense());
+        transaction.link(CATEGORY, request.getCategory());
+        transaction.link(CONTRACT, request.getContract());
         Optional.ofNullable(request.getTags())
                 .map(Collections::List)
                 .ifPresentOrElse(transaction::tag, () -> transaction.tag(Collections.List()));

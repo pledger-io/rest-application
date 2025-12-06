@@ -2,7 +2,7 @@ package com.jongsoft.finance.messaging.commands.transaction;
 
 import com.jongsoft.finance.messaging.ApplicationEvent;
 
-public record LinkTransactionCommand(long id, LinkType type, String relation)
+public record LinkTransactionCommand(long id, LinkType type, Long relationId)
         implements ApplicationEvent {
     public enum LinkType {
         CATEGORY,
@@ -11,7 +11,7 @@ public record LinkTransactionCommand(long id, LinkType type, String relation)
         IMPORT
     }
 
-    public static void linkCreated(long id, LinkType type, String relation) {
-        new LinkTransactionCommand(id, type, relation).publish();
+    public static void linkCreated(long id, LinkType type, Long relationId) {
+        new LinkTransactionCommand(id, type, relationId).publish();
     }
 }

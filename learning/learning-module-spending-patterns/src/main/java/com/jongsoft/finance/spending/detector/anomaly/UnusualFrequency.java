@@ -38,7 +38,7 @@ public class UnusualFrequency implements Anomaly {
     @Override
     public Optional<SpendingInsight> detect(
             Transaction transaction, UserCategoryStatistics statistics) {
-        var typicalFrequency = statistics.frequencies().get(transaction.getBudget());
+        var typicalFrequency = statistics.frequencies().get(getExpense(transaction));
         if (typicalFrequency == null || typicalFrequency.getN() < 3) {
             log.trace(
                     "Not enough data for transaction {}. Skipping anomaly detection.",
@@ -56,7 +56,7 @@ public class UnusualFrequency implements Anomaly {
 
             return Optional.of(SpendingInsight.builder()
                     .type(InsightType.UNUSUAL_FREQUENCY)
-                    .category(transaction.getBudget())
+                    .category(getExpense(transaction))
                     .severity(getSeverityFromScore(score))
                     .score(score)
                     .detectedDate(transaction.getDate())
@@ -85,7 +85,7 @@ public class UnusualFrequency implements Anomaly {
                 .lookup(transaction.getDate().getYear(), transaction.getDate().getMonthValue())
                 .stream()
                 .flatMap(b -> b.getExpenses().stream())
-                .filter(e -> e.getName().equalsIgnoreCase(transaction.getBudget()))
+                .filter(e -> e.getName().equalsIgnoreCase(getExpense(transaction)))
                 .findFirst()
                 .orElseThrow();
 

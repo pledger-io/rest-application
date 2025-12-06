@@ -22,6 +22,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class TransactionEventListenerIT extends JpaTestSetup {
 
     @Inject
@@ -77,7 +79,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
         eventPublisher.publishEvent(new RegisterFailureCommand(1L, FailureCode.POSSIBLE_DUPLICATE));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
-        Assertions.assertThat(check.getFailureCode()).isEqualTo(FailureCode.POSSIBLE_DUPLICATE);
+        assertThat(check.getFailureCode()).isEqualTo(FailureCode.POSSIBLE_DUPLICATE);
     }
 
     @Test
@@ -88,13 +90,13 @@ class TransactionEventListenerIT extends JpaTestSetup {
                 "USD"));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
-        Assertions.assertThat(check.getCurrency().getCode()).isEqualTo("USD");
+        assertThat(check.getCurrency().getCode()).isEqualTo("USD");
 
         var part1 = entityManager.find(TransactionJpa.class, 1L);
-        Assertions.assertThat(part1.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(40.55));
+        assertThat(part1.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(40.55));
 
         var part2 = entityManager.find(TransactionJpa.class, 2L);
-        Assertions.assertThat(part2.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(-40.55));
+        assertThat(part2.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(-40.55));
     }
 
     @Test
@@ -103,7 +105,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
                 new DescribeTransactionCommand( 1L, "Updated description"));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
-        Assertions.assertThat(check.getDescription()).isEqualTo("Updated description");
+        assertThat(check.getDescription()).isEqualTo("Updated description");
     }
 
     @Test
@@ -115,9 +117,9 @@ class TransactionEventListenerIT extends JpaTestSetup {
                 LocalDate.of(2030, 1, 2)));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
-        Assertions.assertThat(check.getDate()).isEqualTo(LocalDate.of(2030, 1, 1));
-        Assertions.assertThat(check.getInterestDate()).isEqualTo(LocalDate.of(2030, 1, 2));
-        Assertions.assertThat(check.getBookDate()).isEqualTo(LocalDate.of(2030, 1, 3));
+        assertThat(check.getDate()).isEqualTo(LocalDate.of(2030, 1, 1));
+        assertThat(check.getInterestDate()).isEqualTo(LocalDate.of(2030, 1, 2));
+        assertThat(check.getBookDate()).isEqualTo(LocalDate.of(2030, 1, 3));
     }
 
     @Test
@@ -125,10 +127,13 @@ class TransactionEventListenerIT extends JpaTestSetup {
         eventPublisher.publishEvent(new LinkTransactionCommand(
                 1L,
                 LinkTransactionCommand.LinkType.CATEGORY,
-                "Test"));
+                2L));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
-        Assertions.assertThat(check.getCategory().getLabel()).isEqualTo("Test");
+        assertThat(check.getMetadata())
+            .anySatisfy(metadata -> assertThat(metadata)
+                .hasFieldOrPropertyWithValue("entityId", 2L)
+                .hasFieldOrPropertyWithValue("relationType", "CATEGORY"));
     }
 
     @Test
@@ -138,7 +143,9 @@ class TransactionEventListenerIT extends JpaTestSetup {
                 LinkTransactionCommand.LinkType.CATEGORY,
                 null));
         var check = entityManager.find(TransactionJournal.class, 3L);
-        Assertions.assertThat(check.getCategory()).isNull();
+
+        assertThat(check.getMetadata())
+            .noneSatisfy(metadata -> assertThat(metadata.getRelationType()).isEqualTo("CATEGORY"));
     }
 
     @Test
@@ -148,8 +155,8 @@ class TransactionEventListenerIT extends JpaTestSetup {
                 Collections.List("Food")));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
-        Assertions.assertThat(check.getTags()).hasSize(1);
-        Assertions.assertThat(check.getTags().iterator().next().getName()).isEqualTo("Food");
+        assertThat(check.getTags()).hasSize(1);
+        assertThat(check.getTags().iterator().next().getName()).isEqualTo("Food");
     }
 
     @Test
@@ -177,7 +184,7 @@ class TransactionEventListenerIT extends JpaTestSetup {
         var check = entityManager.find(TransactionJournal.class, 1L);
 
         var parts = Collections.List(check.getTransactions());
-        Assertions.assertThat(parts.filter(part -> Objects.isNull(part.getDeleted()))).hasSize(3);
+        assertThat(parts.filter(part -> Objects.isNull(part.getDeleted()))).hasSize(3);
     }
 
     @Test
@@ -185,13 +192,13 @@ class TransactionEventListenerIT extends JpaTestSetup {
         eventPublisher.publishEvent(new DeleteTransactionCommand(1L));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
-        Assertions.assertThat(check.getDeleted()).isNotNull();
+        assertThat(check.getDeleted()).isNotNull();
 
         var part1 = entityManager.find(TransactionJpa.class, 2L);
         var part2 = entityManager.find(TransactionJpa.class, 2L);
 
-        Assertions.assertThat(part1.getDeleted()).isNotNull();
-        Assertions.assertThat(part2.getDeleted()).isNotNull();
+        assertThat(part1.getDeleted()).isNotNull();
+        assertThat(part2.getDeleted()).isNotNull();
     }
 
     @MockBean

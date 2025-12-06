@@ -1,5 +1,7 @@
 package com.jongsoft.finance.spending.scheduler;
 
+import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.EXPENSE;
+
 import com.jongsoft.finance.domain.insight.Insight;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -78,7 +80,7 @@ class AnalysisRunner {
     }
 
     private List<? extends Insight> processTransaction(Transaction transaction) {
-        if (transaction.getCategory() == null && transaction.getBudget() == null) {
+        if (!transaction.getMetadata().containsKey(EXPENSE.name())) {
             return List.of(); // Skip transactions without a category
         }
 
