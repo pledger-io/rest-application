@@ -53,4 +53,8 @@ public interface SpendingPatternProvider extends Exportable<SpendingPattern> {
     default boolean supports(Class<?> supportingClass) {
         return SpendingPattern.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "SPENDING_PATTERN";
+    }
 }

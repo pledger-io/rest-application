@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 class TransactionProviderJpaIT extends JpaTestSetup {
 
@@ -57,6 +58,23 @@ class TransactionProviderJpaIT extends JpaTestSetup {
 
         var check = transactionProvider.lookup(filter);
         Assertions.assertThat(check.content()).hasSize(1);
+    }
+
+    @Test
+    void lookup_category() {
+        var filter = filterFactory.transaction()
+            .categories(Collections.List(new EntityRef(1L)))
+            .onlyIncome(false);
+
+        var check = transactionProvider.lookup(filter);
+        Assertions.assertThat(check.content()).hasSize(1);
+
+        filter = filterFactory.transaction()
+            .categories(Collections.List(new EntityRef(2L)))
+            .onlyIncome(false);
+
+        check = transactionProvider.lookup(filter);
+        Assertions.assertThat(check.content()).hasSize(0);
     }
 
     @Test

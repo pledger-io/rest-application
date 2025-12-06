@@ -21,4 +21,8 @@ public interface CategoryProvider extends DataProvider<Category>, Exportable<Cat
     default boolean supports(Class<?> supportingClass) {
         return Category.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "CATEGORY";
+    }
 }

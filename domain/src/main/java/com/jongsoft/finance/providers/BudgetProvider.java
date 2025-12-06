@@ -18,4 +18,8 @@ public interface BudgetProvider extends Exportable<Budget> {
     default boolean supports(Class<?> supportingClass) {
         return Budget.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "BUDGET";
+    }
 }

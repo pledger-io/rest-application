@@ -21,4 +21,8 @@ public interface TagProvider extends Exportable<Tag> {
     default boolean supports(Class<?> supportingClass) {
         return Tag.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "TAG";
+    }
 }

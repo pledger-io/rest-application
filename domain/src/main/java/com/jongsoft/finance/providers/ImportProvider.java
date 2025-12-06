@@ -4,7 +4,7 @@ import com.jongsoft.finance.ResultPage;
 import com.jongsoft.finance.domain.importer.BatchImport;
 import com.jongsoft.lang.control.Optional;
 
-public interface ImportProvider {
+public interface ImportProvider extends DataProvider<BatchImport> {
 
     interface FilterCommand {
         default int page() {
@@ -23,4 +23,12 @@ public interface ImportProvider {
     Optional<BatchImport> lookup(String slug);
 
     ResultPage<BatchImport> lookup(FilterCommand filter);
+
+    default boolean supports(Class<?> supportingClass) {
+        return BatchImport.class.equals(supportingClass);
+    }
+
+    default String typeOf() {
+        return "IMPORT";
+    }
 }

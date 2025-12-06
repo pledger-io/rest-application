@@ -1,6 +1,11 @@
 package com.jongsoft.finance.llm.stores;
 
+import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.CATEGORY;
+import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.EXPENSE;
+
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.learning.SuggestionResult;
 import com.jongsoft.finance.learning.stores.EmbeddingStoreFiller;
@@ -109,7 +114,7 @@ public class ClassificationEmbeddingStore {
     @EventListener
     @Timed(
             value = "learning.language-model.classify",
-            extraTags = {"transaction-update"})
+            extraTags = {"action", "transaction-update"})
     void handleClassificationChanged(LinkTransactionCommand command) {
         updateClassifications(transactionProvider.lookup(command.id()).get());
     }
@@ -117,7 +122,7 @@ public class ClassificationEmbeddingStore {
     @EventListener
     @Timed(
             value = "learning.language-model.classify",
-            extraTags = {"transaction-create"})
+            extraTags = {"action", "transaction-create"})
     void handleTransactionAdded(TransactionCreated transactionCreated) {
         updateClassifications(
                 transactionProvider.lookup(transactionCreated.transactionId()).get());
@@ -133,14 +138,20 @@ public class ClassificationEmbeddingStore {
     private void updateClassifications(Transaction transaction) {
         logger.trace("Updating categorisation for transaction {}", transaction.getId());
 
+        var category = (Category) transaction.getMetadata().get(CATEGORY.name());
+        var expense = (EntityRef.NamedEntity) transaction.getMetadata().get(EXPENSE.name());
+
         var tags = transaction.getTags().isEmpty()
                 ? ""
                 : transaction.getTags().reduce((left, right) -> left + ";" + right);
         var metadata = Map.of(
                 "id", transaction.getId().toString(),
                 "user", currentUserProvider.currentUser().getUsername().email(),
-                "category", Control.Option(transaction.getCategory()).getOrSupply(() -> ""),
-                "budget", Control.Option(transaction.getBudget()).getOrSupply(() -> ""),
+                "category", Control.Option(category).map(Category::getLabel).getOrSupply(() -> ""),
+                "budget",
+                        Control.Option(expense)
+                                .map(EntityRef.NamedEntity::name)
+                                .getOrSupply(() -> ""),
                 "tags", tags);
         var textSegment =
                 TextSegment.textSegment(transaction.getDescription(), Metadata.from(metadata));

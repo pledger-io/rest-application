@@ -46,4 +46,9 @@ public interface AccountProvider extends DataProvider<Account>, Exportable<Accou
     default boolean supports(Class<?> supportingClass) {
         return Account.class.equals(supportingClass);
     }
+
+    @Override
+    default String typeOf() {
+        return "ACCOUNT";
+    }
 }

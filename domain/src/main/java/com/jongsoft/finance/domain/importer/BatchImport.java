@@ -2,8 +2,8 @@ package com.jongsoft.finance.domain.importer;
 
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
-import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.messaging.commands.importer.CompleteImportJobCommand;
 import com.jongsoft.finance.messaging.commands.importer.CreateImportJobCommand;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @Aggregate
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
-public class BatchImport implements AggregateBase {
+public class BatchImport implements Classifier {
 
     private Long id;
     private Date created;

@@ -2,7 +2,7 @@ package com.jongsoft.finance.domain.user;
 
 import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
-import com.jongsoft.finance.core.AggregateBase;
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.messaging.commands.category.CreateCategoryCommand;
 import com.jongsoft.finance.messaging.commands.category.DeleteCategoryCommand;
 import com.jongsoft.finance.messaging.commands.category.RenameCategoryCommand;
@@ -20,7 +20,7 @@ import java.time.LocalDate;
 @Aggregate
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Category implements AggregateBase {
+public class Category implements Classifier {
 
     private Long id;
     private String label;

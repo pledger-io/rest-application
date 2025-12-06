@@ -5,11 +5,7 @@ import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.core.TransactionType;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.jpa.account.AccountJpa;
-import com.jongsoft.finance.jpa.budget.ExpenseJpa;
-import com.jongsoft.finance.jpa.category.CategoryJpa;
-import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.currency.CurrencyJpa;
-import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.tag.TagJpa;
 import com.jongsoft.finance.messaging.CommandHandler;
@@ -74,21 +70,9 @@ public class CreateTransactionHandler
                         command.transaction().computeType().name()))
                 .failureCode(command.transaction().getFailureCode())
                 .transactions(new HashSet<>())
-                .category(Control.Option(command.transaction().getCategory())
-                        .map(this::category)
-                        .getOrSupply(() -> null))
-                .budget(Control.Option(command.transaction().getBudget())
-                        .map(this::expense)
-                        .getOrSupply(() -> null))
-                .contract(Control.Option(command.transaction().getContract())
-                        .map(this::contract)
-                        .getOrSupply(() -> null))
                 .tags(Control.Option(command.transaction().getTags())
                         .map(Sequence::distinct)
                         .map(set -> set.map(this::tag).toJava())
-                        .getOrSupply(() -> null))
-                .batchImport(Control.Option(command.transaction().getImportSlug())
-                        .map(this::job)
                         .getOrSupply(() -> null))
                 .build();
 
@@ -109,42 +93,6 @@ public class CreateTransactionHandler
 
         TransactionCreated.transactionCreated(jpaEntity.getId());
         return jpaEntity.getId();
-    }
-
-    private CategoryJpa category(String label) {
-        return entityManager
-                .from(CategoryJpa.class)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .fieldEq("label", label)
-                .singleResult()
-                .getOrSupply(() -> null);
-    }
-
-    private ExpenseJpa expense(String name) {
-        return entityManager
-                .from(ExpenseJpa.class)
-                .fieldEq("name", name)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .getOrSupply(() -> null);
-    }
-
-    private ContractJpa contract(String name) {
-        return entityManager
-                .from(ContractJpa.class)
-                .fieldEq("name", name)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .getOrSupply(() -> null);
-    }
-
-    private ImportJpa job(String slug) {
-        return entityManager
-                .from(ImportJpa.class)
-                .fieldEq("slug", slug)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .getOrSupply(() -> null);
     }
 
     private TagJpa tag(String name) {

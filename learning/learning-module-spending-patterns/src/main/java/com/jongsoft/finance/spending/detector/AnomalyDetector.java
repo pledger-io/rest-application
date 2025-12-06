@@ -1,6 +1,7 @@
 package com.jongsoft.finance.spending.detector;
 
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -67,8 +68,9 @@ class AnomalyDetector implements Detector<SpendingInsight> {
                         .range(Dates.range(startDate, LocalDate.now())))
                 .content()
                 .stream()
-                .filter(t -> t.getBudget() != null)
-                .collect(Collectors.groupingBy(Transaction::getBudget));
+                .filter(t -> t.getMetadata().containsKey("EXPENSE"))
+                .collect(Collectors.groupingBy(transaction ->
+                        ((EntityRef.NamedEntity) transaction.getMetadata().get("EXPENSE")).name()));
         for (var budgetTransactions : transactionsPerBudget.entrySet()) {
             var budget = budgetTransactions.getKey();
             var amountPerBudget = userCategoryStatistics
@@ -110,9 +112,10 @@ class AnomalyDetector implements Detector<SpendingInsight> {
     @Override
     public List<SpendingInsight> detect(Transaction transaction) {
         var userStatistics = userCategoryStatistics.get();
+        var expense = (EntityRef.NamedEntity) transaction.getMetadata().get("EXPENSE");
         if (userStatistics == null
-                || transaction.getBudget() == null
-                || !userStatistics.amounts().containsKey(transaction.getBudget())) {
+                || expense == null
+                || !userStatistics.amounts().containsKey(expense.name())) {
             return List.of();
         }
 

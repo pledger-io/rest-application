@@ -1,5 +1,6 @@
 package com.jongsoft.finance.spending.detector;
 
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.SpendingPattern;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.learning.stores.EmbeddingStoreFiller;
@@ -112,7 +113,7 @@ class PatternDetector implements Detector<SpendingPattern> {
     @Override
     public List<SpendingPattern> detect(Transaction transaction) {
         // Skip transactions without a category or budget
-        if (transaction.getCategory() == null && transaction.getBudget() == null) {
+        if (!transaction.getMetadata().containsKey("EXPENSE")) {
             return List.of();
         }
 
@@ -164,17 +165,19 @@ class PatternDetector implements Detector<SpendingPattern> {
     }
 
     private TextSegment createTextSegment(Transaction transaction) {
+        var expense = (EntityRef.NamedEntity) transaction.getMetadata().get("EXPENSE");
+
         Map<String, String> metadata = new HashMap<>();
         metadata.put("id", transaction.getId().toString());
         metadata.put("user", currentUserProvider.currentUser().getUsername().email());
         metadata.put("date", transaction.getDate().toString());
         metadata.put(
                 "amount", String.valueOf(transaction.computeAmount(transaction.computeFrom())));
-        metadata.put("budget", transaction.getBudget() != null ? transaction.getBudget() : "");
+        metadata.put("budget", expense != null ? expense.name() : "");
 
         // Create a rich text representation of the transaction
         String text =
-                String.format("%s - %s", transaction.getBudget(), transaction.getDescription());
+                String.format("%s - %s", metadata.get("budget"), transaction.getDescription());
 
         return TextSegment.textSegment(text, Metadata.from(metadata));
     }

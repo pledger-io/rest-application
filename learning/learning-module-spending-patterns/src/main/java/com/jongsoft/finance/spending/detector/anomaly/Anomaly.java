@@ -1,5 +1,8 @@
 package com.jongsoft.finance.spending.detector.anomaly;
 
+import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.EXPENSE;
+
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.Severity;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.domain.transaction.Transaction;
@@ -18,5 +21,9 @@ public interface Anomaly {
         } else {
             return Severity.INFO;
         }
+    }
+
+    default String getExpense(Transaction transaction) {
+        return ((EntityRef.NamedEntity) transaction.getMetadata().get(EXPENSE.name())).name();
     }
 }

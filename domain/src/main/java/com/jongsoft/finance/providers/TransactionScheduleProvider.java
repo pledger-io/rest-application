@@ -21,4 +21,8 @@ public interface TransactionScheduleProvider extends DataProvider<ScheduledTrans
     default boolean supports(Class<?> supportingClass) {
         return ScheduledTransaction.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "SCHEDULED_TRANSACTION";
+    }
 }
