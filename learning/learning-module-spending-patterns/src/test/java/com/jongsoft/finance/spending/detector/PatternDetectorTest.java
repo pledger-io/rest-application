@@ -1,6 +1,8 @@
 package com.jongsoft.finance.spending.detector;
 
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.SpendingPattern;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.user.UserAccount;
@@ -28,6 +30,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +43,14 @@ class PatternDetectorTest {
    * The PatternDetector class is responsible for detecting spending patterns in transactions
    * by using multiple pattern detectors and an embedding model.
    */
+
+  private Map<String, ? extends Classifier> forExpense(String expense) {
+      return Map.of("EXPENSE", new EntityRef.NamedEntity(1L, expense));
+  }
+
+  private Map<String, ? extends Classifier> forCategory(String category) {
+      return Map.of("CATEGORY", new EntityRef.NamedEntity(1L, category));
+  }
 
   private TransactionProvider transactionProvider;
   private CurrentUserProvider currentUserProvider;
@@ -149,7 +160,7 @@ class PatternDetectorTest {
     Transaction transaction = mock(Transaction.class);
     when(transaction.getId()).thenReturn(transactionId);
     when(transaction.getDate()).thenReturn(LocalDate.now());
-    when(transaction.getBudget()).thenReturn("Test Budget");
+    doReturn(forExpense("Test Budget")).when(transaction).getMetadata();
     when(transaction.getDescription()).thenReturn("Test Description");
 
     // Mock the account and amount
@@ -171,7 +182,7 @@ class PatternDetectorTest {
         embeddingStoreFiller);
 
     // Act
-    detector.handleClassificationChanged(new LinkTransactionCommand(transactionId, LinkTransactionCommand.LinkType.CATEGORY, "Test"));
+    detector.handleClassificationChanged(new LinkTransactionCommand(transactionId, LinkTransactionCommand.LinkType.CATEGORY, 1L));
 
     // Assert
     verify(mockProvider).lookup(transactionId);
@@ -186,7 +197,7 @@ class PatternDetectorTest {
     Transaction transaction = mock(Transaction.class);
     when(transaction.getId()).thenReturn(transactionId);
     when(transaction.getDate()).thenReturn(LocalDate.now());
-    when(transaction.getBudget()).thenReturn("Test Budget");
+    doReturn(forExpense("Test Budget")).when(transaction).getMetadata();
     when(transaction.getDescription()).thenReturn("Test Description");
 
     // Mock the account and amount
@@ -220,8 +231,7 @@ class PatternDetectorTest {
   void shouldReturnEmptyListWhenTransactionHasNoCategoryOrBudget() {
     // Arrange
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn(null);
-    when(transaction.getBudget()).thenReturn(null);
+    doReturn(Map.of()).when(transaction).getMetadata();
 
     // Act
     List<SpendingPattern> patterns = patternDetector.detect(transaction);
@@ -234,8 +244,7 @@ class PatternDetectorTest {
   void shouldReturnEmptyListWhenNotEnoughMatches() {
     // Arrange
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Groceries");
-    when(transaction.getBudget()).thenReturn("Food");
+    doReturn(forCategory("Groceries")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.now());
     Account account = mock(Account.class);
     when(transaction.computeFrom()).thenReturn(account);
@@ -260,8 +269,7 @@ class PatternDetectorTest {
   void shouldDetectPatternsWhenEnoughMatches() {
     // Arrange
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Groceries");
-    when(transaction.getBudget()).thenReturn("Food");
+    doReturn(forCategory("Groceries")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.now());
     Account account = mock(Account.class);
     when(transaction.computeFrom()).thenReturn(account);
@@ -344,7 +352,7 @@ class PatternDetectorTest {
     @Override
     public List<SpendingPattern> detect(Transaction transaction) {
       // Skip the null check from the parent class to test the embedding search
-      if (transaction.getCategory() == null && transaction.getBudget() == null) {
+      if (transaction.getMetadata() == null) {
         return List.of();
       }
 

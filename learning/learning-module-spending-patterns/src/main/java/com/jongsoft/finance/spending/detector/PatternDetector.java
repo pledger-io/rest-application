@@ -113,7 +113,8 @@ class PatternDetector implements Detector<SpendingPattern> {
     @Override
     public List<SpendingPattern> detect(Transaction transaction) {
         // Skip transactions without a category or budget
-        if (!transaction.getMetadata().containsKey("EXPENSE")) {
+        if (!transaction.getMetadata().containsKey("CATEGORY")
+                && !transaction.getMetadata().containsKey("EXPENSE")) {
             return List.of();
         }
 
