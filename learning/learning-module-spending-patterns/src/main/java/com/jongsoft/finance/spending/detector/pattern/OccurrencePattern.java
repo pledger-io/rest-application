@@ -45,7 +45,7 @@ public class OccurrencePattern implements Pattern {
 
             return Optional.of(SpendingPattern.builder()
                     .type(detected)
-                    .category(getExpense(transaction))
+                    .category(getCategory(transaction))
                     .detectedDate(transaction.getDate().withDayOfMonth(1))
                     .confidence(calculateConfidence(matches))
                     .metadata(Map.of(

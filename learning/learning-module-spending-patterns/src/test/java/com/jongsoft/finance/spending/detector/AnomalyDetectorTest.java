@@ -1,7 +1,9 @@
 package com.jongsoft.finance.spending.detector;
 
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -17,6 +19,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,6 +33,10 @@ class AnomalyDetectorTest {
    * The AnomalyDetector class is responsible for detecting anomalies in transactions
    * by using multiple anomaly detectors.
    */
+
+  private Map<String, ? extends Classifier> forExpense(String expense) {
+      return Map.of("EXPENSE", new EntityRef.NamedEntity(1L, expense));
+  }
 
   @Test
   void shouldBeReadyForAnalysis() {
@@ -60,7 +67,7 @@ class AnomalyDetectorTest {
 
     // Create a test transaction
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Groceries");
+    doReturn(forExpense("Groceries")).when(transaction).getMetadata();
 
     // Create a mock anomaly that returns an insight
     Anomaly mockAnomaly = mock(Anomaly.class);
@@ -91,7 +98,7 @@ class AnomalyDetectorTest {
 
     // Create a transaction without a budget
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn(null);
+    doReturn(Map.of()).when(transaction).getMetadata();
 
     // Act
     List<SpendingInsight> insights = anomalyDetector.detect(transaction);
@@ -113,7 +120,7 @@ class AnomalyDetectorTest {
 
     // Create a transaction with a budget that has no statistics
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Groceries");
+    doReturn(forExpense("Groceries")).when(transaction).getMetadata();
 
     // Act
     List<SpendingInsight> insights = detector.detect(transaction);
@@ -135,8 +142,8 @@ class AnomalyDetectorTest {
     // Mock transactions and their grouping by budget
     Transaction transaction1 = mock(Transaction.class);
     Transaction transaction2 = mock(Transaction.class);
-    when(transaction1.getBudget()).thenReturn("Groceries");
-    when(transaction2.getBudget()).thenReturn("Groceries");
+    doReturn(forExpense("Groceries")).when(transaction1).getMetadata();
+    doReturn(forExpense("Groceries")).when(transaction2).getMetadata();
     when(transaction1.computeAmount(any())).thenReturn(100.0);
     when(transaction2.computeAmount(any())).thenReturn(200.0);
     when(filterFactory.transaction()).thenReturn(mock(TransactionProvider.FilterCommand.class, InvocationOnMock::getMock));
@@ -177,7 +184,7 @@ class AnomalyDetectorTest {
 
     // Mock transactions for the first update
     Transaction transaction1 = mock(Transaction.class);
-    when(transaction1.getBudget()).thenReturn("Entertainment");
+    doReturn(forExpense("Entertainment")).when(transaction1).getMetadata();
     when(transaction1.computeAmount(any())).thenReturn(150.0);
     when(transaction1.getDate()).thenReturn(LocalDate.now().minusMonths(1));
     when(filterFactory.transaction()).thenReturn(mock(TransactionProvider.FilterCommand.class, InvocationOnMock::getMock));
@@ -188,7 +195,7 @@ class AnomalyDetectorTest {
 
     // Mock transactions for the second update
     Transaction transaction2 = mock(Transaction.class);
-    when(transaction2.getBudget()).thenReturn("Groceries");
+    doReturn(forExpense("Groceries")).when(transaction2).getMetadata();
     when(transaction2.computeAmount(any())).thenReturn(250.0);
     when(transaction2.getDate()).thenReturn(LocalDate.now().minusMonths(2));
 
@@ -248,7 +255,7 @@ class AnomalyDetectorTest {
       // If we have test anomalies, use them instead of the real ones
       if (!testAnomalies.isEmpty()) {
         var userStatistics = getUserCategoryStatistics().get();
-        if (!userStatistics.amounts().containsKey(transaction.getBudget())) {
+        if (!userStatistics.amounts().containsKey(((EntityRef.NamedEntity)transaction.getMetadata().get("EXPENSE")).name())) {
           return List.of();
         }
 

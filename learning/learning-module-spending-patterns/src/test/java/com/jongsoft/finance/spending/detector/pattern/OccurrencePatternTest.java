@@ -1,8 +1,11 @@
 package com.jongsoft.finance.spending.detector.pattern;
 
+import com.jongsoft.finance.domain.Classifier;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.PatternType;
 import com.jongsoft.finance.domain.insight.SpendingPattern;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.domain.user.Category;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import org.junit.jupiter.api.Test;
@@ -11,11 +14,11 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class OccurrencePatternTest {
 
@@ -24,13 +27,17 @@ class OccurrencePatternTest {
    * The `detect` method identifies recurring weekly or monthly patterns in transactions.
    */
 
+  private Map<String, ? extends Classifier> forCategory(String category) {
+      return Map.of("CATEGORY", Category.builder().label(category).build());
+  }
+
   @Test
   void shouldDetectWeeklyPattern() {
     // Arrange
     OccurrencePattern occurrencePattern = new OccurrencePattern();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Groceries");
+    doReturn(forCategory("Groceries")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
     // Create a list of embedding matches with weekly pattern (every Monday)
@@ -66,7 +73,7 @@ class OccurrencePatternTest {
     OccurrencePattern occurrencePattern = new OccurrencePattern();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Rent");
+    doReturn(forCategory("Rent")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
     // Create a list of embedding matches with monthly pattern (1st of each month)
@@ -101,7 +108,7 @@ class OccurrencePatternTest {
     OccurrencePattern occurrencePattern = new OccurrencePattern();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Entertainment");
+    doReturn(forCategory("Entertainment")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
     // Create a list of embedding matches with irregular intervals
@@ -130,7 +137,7 @@ class OccurrencePatternTest {
     OccurrencePattern occurrencePattern = new OccurrencePattern();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Travel");
+    doReturn(forCategory("Travel")).when(transaction).getMetadata();
 
     // Create an empty list of embedding matches
     List<EmbeddingMatch<TextSegment>> matches = new ArrayList<>();
@@ -148,7 +155,7 @@ class OccurrencePatternTest {
     OccurrencePattern occurrencePattern = new OccurrencePattern();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Dining");
+    doReturn(forCategory("Dining")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
     // Create a list with only 2 matches (not enough to establish a pattern)

@@ -1,10 +1,12 @@
 package com.jongsoft.finance.spending.detector.pattern;
 
+import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.CATEGORY;
 import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.EXPENSE;
 
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.SpendingPattern;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.domain.user.Category;
 
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
@@ -17,7 +19,7 @@ public interface Pattern {
     Optional<SpendingPattern> detect(
             Transaction transaction, List<EmbeddingMatch<TextSegment>> matches);
 
-    default String getExpense(Transaction transaction) {
-        return ((EntityRef.NamedEntity) transaction.getMetadata().get(EXPENSE.name())).name();
+    default String getCategory(Transaction transaction) {
+        return ((Category) transaction.getMetadata().get(CATEGORY.name())).getLabel();
     }
 }

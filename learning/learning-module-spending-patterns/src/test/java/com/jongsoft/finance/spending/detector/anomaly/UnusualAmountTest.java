@@ -1,11 +1,14 @@
 package com.jongsoft.finance.spending.detector.anomaly;
 
+import com.jongsoft.finance.domain.Classifier;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.Severity;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,13 +22,17 @@ class UnusualAmountTest {
    * compared to the typical amounts for a budget category.
    */
 
+  private Map<String, ? extends Classifier> forExpense(String expense) {
+      return Map.of("EXPENSE", new EntityRef.NamedEntity(1L, expense));
+  }
+
   @Test
   void shouldDetectUnusuallyHighAmount() {
     // Arrange
     UnusualAmount unusualAmount = new UnusualAmount();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Groceries");
+    doReturn(forExpense("Groceries")).when(transaction).getMetadata();
     when(transaction.getId()).thenReturn(123L);
     when(transaction.getDate()).thenReturn(java.time.LocalDate.now());
     when(transaction.computeTo()).thenReturn(mock(com.jongsoft.finance.domain.account.Account.class));
@@ -66,7 +73,7 @@ class UnusualAmountTest {
     UnusualAmount unusualAmount = new UnusualAmount();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Utilities");
+    doReturn(forExpense("Utilities")).when(transaction).getMetadata();
     when(transaction.getId()).thenReturn(456L);
     when(transaction.getDate()).thenReturn(java.time.LocalDate.now());
     when(transaction.computeTo()).thenReturn(mock(com.jongsoft.finance.domain.account.Account.class));
@@ -103,7 +110,7 @@ class UnusualAmountTest {
     UnusualAmount unusualAmount = new UnusualAmount();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Entertainment");
+    doReturn(forExpense("Entertainment")).when(transaction).getMetadata();
     when(transaction.computeTo()).thenReturn(mock(com.jongsoft.finance.domain.account.Account.class));
     when(transaction.computeAmount(any())).thenReturn(105.0); // Normal amount
 
@@ -134,7 +141,7 @@ class UnusualAmountTest {
     UnusualAmount unusualAmount = new UnusualAmount();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Travel");
+    doReturn(forExpense("Travel")).when(transaction).getMetadata();
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
     UserCategoryStatistics.BudgetStatisticsMap amountsMap = new UserCategoryStatistics.BudgetStatisticsMap();
@@ -153,7 +160,7 @@ class UnusualAmountTest {
     UnusualAmount unusualAmount = new UnusualAmount();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Dining");
+    doReturn(forExpense("Dining")).when(transaction).getMetadata();
     when(transaction.computeTo()).thenReturn(mock(com.jongsoft.finance.domain.account.Account.class));
     when(transaction.computeAmount(any())).thenReturn(50.0);
 

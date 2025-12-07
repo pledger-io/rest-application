@@ -1,5 +1,7 @@
 package com.jongsoft.finance.spending.detector.anomaly;
 
+import com.jongsoft.finance.domain.Classifier;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.Severity;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.domain.transaction.Transaction;
@@ -10,6 +12,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -43,7 +46,11 @@ class UnusualFrequencyTest {
    * compared to the typical frequency for a budget category.
    */
 
-  @Test
+  private Map<String, ? extends Classifier> forExpense(String expense) {
+      return Map.of("EXPENSE", new EntityRef.NamedEntity(1L, expense));
+  }
+
+    @Test
   void shouldDetectUnusuallyHighFrequency() {
     // Arrange
     TransactionProvider transactionProvider = mock(TransactionProvider.class);
@@ -55,7 +62,7 @@ class UnusualFrequencyTest {
         transactionProvider, filterFactory, budgetProvider, 10L);
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Groceries");
+    doReturn(forExpense("Groceries")).when(transaction).getMetadata();
     when(transaction.getId()).thenReturn(123L);
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
@@ -98,7 +105,7 @@ class UnusualFrequencyTest {
         transactionProvider, filterFactory, budgetProvider, 1L);
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Utilities");
+    doReturn(forExpense("Utilities")).when(transaction).getMetadata();
     when(transaction.getId()).thenReturn(456L);
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
@@ -137,7 +144,7 @@ class UnusualFrequencyTest {
         transactionProvider, filterFactory, budgetProvider, 3L);
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Entertainment");
+    doReturn(forExpense("Entertainment")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
@@ -169,7 +176,7 @@ class UnusualFrequencyTest {
     UnusualFrequency unusualFrequency = new UnusualFrequency(transactionProvider, filterFactory, budgetProvider);
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Travel");
+    doReturn(forExpense("Travel")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
@@ -193,7 +200,7 @@ class UnusualFrequencyTest {
     UnusualFrequency unusualFrequency = new UnusualFrequency(transactionProvider, filterFactory, budgetProvider);
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getBudget()).thenReturn("Dining");
+    doReturn(forExpense("Dining")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
