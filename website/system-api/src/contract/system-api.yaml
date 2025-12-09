@@ -360,6 +360,7 @@ paths:
     get:
       operationId: getAllSettings
       tags: [ settings ]
+      security: [ ]
       summary: Fetch settings
       responses:
         "200":
