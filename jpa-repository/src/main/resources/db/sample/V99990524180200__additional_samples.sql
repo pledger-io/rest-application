@@ -76,9 +76,9 @@ VALUES (100, 1, 'Personal checking', 'This is a sample account used for day to d
        (116, 1, 'Gas Station', null, null, null, null, false, 7, 1, 0.00000, null, null);
 
 -- setup the mortgage initial balance
-insert into transaction_journal(id, user_id, created, updated, t_date, deleted, description, category_id, budget_id,
-                                type, currency_id)
-values (1, 1, '2016-01-01', '2016-01-01', '2016-01-01', null, 'Opening balance', 3, null, 'CREDIT', 1);
+insert into transaction_journal(id, user_id, created, updated, t_date, deleted, description, type, currency_id)
+values (1, 1, '2016-01-01', '2016-01-01', '2016-01-01', null, 'Opening balance', 'CREDIT', 1);
+insert into transaction_journal_meta(journal_id, entity_id, relation_type) values (1, 3, 'CATEGORY');
 
 insert into transaction_part(id, created, updated, journal_id, account_id, amount, description)
 values (1, '2016-01-01', '2016-01-01', 1, 104, -323000, 'Opening balance'),
@@ -106,36 +106,25 @@ CALL InsertRandomTransactions(100, 116, 2, 45, 80, 'Fuel for car', 'Gas');
 CALL InsertContract('IRS monthly payment', 112, '2018-01-01', '2020-06-01', 120);
 CALL InsertContract('Cable Subscription', 115, '2016-01-01', '2050-06-01', 120);
 
-update transaction_journal
-set budget_id = 1
-where exists (select 1
-              from transaction_part
-              where transaction_journal.id = transaction_part.journal_id
-                and transaction_part.account_id = 110);
-update transaction_journal
-set budget_id = 2
-where exists (select 1
-              from transaction_part
-              where transaction_journal.id = transaction_part.journal_id
-                and transaction_part.account_id in (104,116));
-update transaction_journal
-set budget_id = 4
-where exists (select 1
-              from transaction_part
-              where transaction_journal.id = transaction_part.journal_id
-                and transaction_part.account_id in (114));
-update transaction_journal
-set budget_id = 5
-where exists (select 1
-              from transaction_part
-              where transaction_journal.id = transaction_part.journal_id
-                and transaction_part.account_id in (115));
-update transaction_journal
-set budget_id = 6
-where exists (select 1
-              from transaction_part
-              where transaction_journal.id = transaction_part.journal_id
-                and transaction_part.account_id in (112));
+insert into transaction_journal_meta(journal_id, entity_id, relation_type)
+select journal_id, 1, 'EXPENSE' from transaction_part
+where transaction_part.account_id = 110;
+
+insert into transaction_journal_meta(journal_id, entity_id, relation_type)
+select journal_id, 2, 'EXPENSE' from transaction_part
+where transaction_part.account_id in (104,116);
+
+insert into transaction_journal_meta(journal_id, entity_id, relation_type)
+select journal_id, 4, 'EXPENSE' from transaction_part
+where transaction_part.account_id in (114);
+
+insert into transaction_journal_meta(journal_id, entity_id, relation_type)
+select journal_id, 5, 'EXPENSE' from transaction_part
+where transaction_part.account_id in (115);
+
+insert into transaction_journal_meta(journal_id, entity_id, relation_type)
+select journal_id, 6, 'EXPENSE' from transaction_part
+where transaction_part.account_id in (112);
 
 insert into rule_group(id, name, sort, user_id)
 values (1,'Shopping classification', 0, 1),

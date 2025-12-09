@@ -1,9 +1,7 @@
 package com.jongsoft.finance.spending.detector.pattern;
 
 import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.CATEGORY;
-import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand.LinkType.EXPENSE;
 
-import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.SpendingPattern;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.user.Category;
