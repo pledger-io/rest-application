@@ -43,8 +43,11 @@ public class RandomizedTransactions {
             String category) {
         var transactionSql =
                 "INSERT INTO transaction_journal(user_id, created, updated, t_date, description,"
-                        + " category_id, type, currency_id) VALUES (1, ?, ?, ?, ?, (SELECT id FROM"
-                        + " category WHERE label = ?), 'CREDIT', 1)";
+                        + " type, currency_id) VALUES (1, ?, ?, ?, ?, 'CREDIT', 1)";
+        var metaDataSql =
+                """
+            INSERT INTO transaction_journal_meta(journal_id, entity_id, relation_type)
+             VALUES (?, (SELECT id FROM category WHERE label = ?), 'CATEGORY')""";
         var partSql =
                 """
 INSERT INTO transaction_part(journal_id, created, updated, account_id, description, amount)
@@ -54,7 +57,8 @@ VALUES (
 
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
             try (PreparedStatement journalStatement = conn.prepareStatement(transactionSql);
-                    PreparedStatement partStatement = conn.prepareStatement(partSql)) {
+                    PreparedStatement partStatement = conn.prepareStatement(partSql);
+                    PreparedStatement metaDataStatement = conn.prepareStatement(metaDataSql)) {
                 for (int year = 2016; year <= LocalDate.now().getYear(); year++) {
                     log.info(
                             "Creating transactions for year {} and description {}",
@@ -79,7 +83,6 @@ VALUES (
                             journalStatement.setString(2, date);
                             journalStatement.setString(3, date);
                             journalStatement.setString(4, updatedDescription);
-                            journalStatement.setString(5, category);
                             journalStatement.executeUpdate();
 
                             // create the transaction parts
@@ -94,6 +97,11 @@ VALUES (
                             partStatement.setInt(5, destination);
                             partStatement.setDouble(7, amount);
                             partStatement.executeUpdate();
+
+                            metaDataStatement.setInt(
+                                    1, journalStatement.getGeneratedKeys().getInt(1));
+                            metaDataStatement.setString(2, category);
+                            metaDataStatement.executeUpdate();
                         }
                     }
                 }
