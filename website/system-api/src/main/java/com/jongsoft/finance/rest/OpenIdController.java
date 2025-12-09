@@ -3,11 +3,9 @@ package com.jongsoft.finance.rest;
 import com.jongsoft.finance.config.OpenIdConfiguration;
 import com.jongsoft.finance.rest.model.OpenIdConfiguration200Response;
 
-import io.micronaut.context.annotation.Requires;
 import io.micronaut.http.annotation.Controller;
 
 @Controller
-@Requires(env = "openid")
 public class OpenIdController implements OpenIdApi {
 
     private final OpenIdConfiguration openIdConfiguration;
