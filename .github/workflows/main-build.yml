@@ -37,7 +37,7 @@ jobs:
         run: ./gradlew sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.gradle.skipCompile=true -Dsonar.host.url=https://sonarcloud.io
 # Run the test report actions
       - name: Upload test results
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: test-artifact
           path: |
