@@ -6,7 +6,7 @@ pluginManagement {
         id("io.micronaut.library").version("4.6.1")
         id("io.micronaut.application").version("4.6.1")
         id("io.freefair.lombok").version("9.1.0")
-        id("org.sonarqube").version("7.2.1.6560")
+        id("org.sonarqube").version("7.2.2.6593")
         id("org.openapi.generator").version("7.17.0")
         id("com.diffplug.spotless").version("8.1.0")
         id("io.micronaut.openapi").version("4.5.4")
@@ -42,7 +42,7 @@ dependencyResolutionManagement {
         }
 
         create("mn") {
-            from("io.micronaut.platform:micronaut-platform:4.10.4")
+            from("io.micronaut.platform:micronaut-platform:4.10.5")
         }
 
         create("llm") {
