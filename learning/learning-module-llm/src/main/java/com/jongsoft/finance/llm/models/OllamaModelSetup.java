@@ -11,10 +11,7 @@ import com.jongsoft.finance.providers.TagProvider;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.ollama.OllamaChatModel;
-import dev.langchain4j.model.ollama.OllamaEmbeddingModel;
-import dev.langchain4j.model.ollama.OllamaModelCard;
-import dev.langchain4j.model.ollama.OllamaModels;
+import dev.langchain4j.model.ollama.*;
 import dev.langchain4j.rag.AugmentationResult;
 import dev.langchain4j.rag.RetrievalAugmentor;
 
@@ -37,9 +34,9 @@ class OllamaModelSetup {
     private final AiConfiguration configuration;
     private OllamaModelCard chosenModel;
 
-    OllamaModelSetup(AiConfiguration configuration) {
+    OllamaModelSetup(AiConfiguration configuration, OllamaModelResolver modelResolver) {
         this.configuration = configuration;
-        retrieveModelInfo();
+        this.chosenModel = modelResolver.resolveModel();
     }
 
     @Bean
@@ -92,14 +89,5 @@ class OllamaModelSetup {
 
     private boolean noToolSupport() {
         return !chosenModel.getTemplate().contains(".Tools");
-    }
-
-    private void retrieveModelInfo() {
-        var modelsResponse = OllamaModels.builder()
-                .baseUrl(configuration.getOllama().getUri())
-                .build()
-                .modelCard(configuration.getOllama().getModel());
-
-        chosenModel = modelsResponse.content();
     }
 }
