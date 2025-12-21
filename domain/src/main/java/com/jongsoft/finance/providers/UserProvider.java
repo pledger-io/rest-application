@@ -21,4 +21,8 @@ public interface UserProvider extends DataProvider<UserAccount> {
     default boolean supports(Class<?> supportingClass) {
         return UserAccount.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "USER";
+    }
 }

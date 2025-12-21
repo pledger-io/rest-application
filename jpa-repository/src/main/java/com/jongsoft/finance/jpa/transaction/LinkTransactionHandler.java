@@ -2,15 +2,13 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
-import com.jongsoft.finance.jpa.budget.ExpenseJpa;
-import com.jongsoft.finance.jpa.category.CategoryJpa;
-import com.jongsoft.finance.jpa.contract.ContractJpa;
-import com.jongsoft.finance.jpa.core.entity.EntityJpa;
-import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
+import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand;
-import com.jongsoft.finance.security.AuthenticationFacade;
+import com.jongsoft.finance.providers.DataProvider;
+import com.jongsoft.lang.control.Optional;
 
 import io.micronaut.transaction.annotation.Transactional;
 
@@ -19,6 +17,9 @@ import jakarta.inject.Singleton;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+import java.util.Objects;
+
 @Slf4j
 @Singleton
 @RequiresJpa
@@ -26,13 +27,14 @@ import lombok.extern.slf4j.Slf4j;
 public class LinkTransactionHandler implements CommandHandler<LinkTransactionCommand> {
 
     private final ReactiveEntityManager entityManager;
-    private final AuthenticationFacade authenticationFacade;
+    private final List<DataProvider<? extends Classifier>> metadataProviders;
 
     @Inject
     public LinkTransactionHandler(
-            ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+            ReactiveEntityManager entityManager,
+            List<DataProvider<? extends Classifier>> metadataProviders) {
         this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
+        this.metadataProviders = metadataProviders;
     }
 
     @Override
@@ -40,73 +42,32 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
     public void handle(LinkTransactionCommand command) {
         log.info("[{}] - Processing transaction relation change {}", command.id(), command.type());
 
-        var updateQuery =
-                entityManager.update(TransactionJournal.class).fieldEq("id", command.id());
-
-        switch (command.type()) {
-            case CATEGORY ->
-                updateQuery.set("category", fetchRelation(command.type(), command.relation()));
-            case CONTRACT ->
-                updateQuery.set("contract", fetchRelation(command.type(), command.relation()));
-            case EXPENSE ->
-                updateQuery.set("budget", fetchRelation(command.type(), command.relation()));
-            case IMPORT ->
-                updateQuery.set("batchImport", fetchRelation(command.type(), command.relation()));
+        // remove any outdated relationships
+        entityManager
+                .getEntityManager()
+                .createQuery(
+                        "delete from TransactionMetaJpa t where t.journal.id = :id and t.relationType = :type")
+                .setParameter("id", command.id())
+                .setParameter("type", command.type().name())
+                .executeUpdate();
+        if (command.relationId() == null) {
+            return;
         }
-        updateQuery.execute();
-    }
 
-    private EntityJpa fetchRelation(LinkTransactionCommand.LinkType type, String relation) {
-        return switch (type) {
-            case CATEGORY -> category(relation);
-            case CONTRACT -> contract(relation);
-            case EXPENSE -> expense(relation);
-            case IMPORT -> job(relation);
-        };
-    }
+        var relatedEntity = metadataProviders.stream()
+                .filter(provider ->
+                        Objects.equals(provider.typeOf(), command.type().name()))
+                .findFirst()
+                .map(provider -> provider.lookup(command.relationId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .orElseThrow(() -> StatusException.badRequest(
+                        "Could not locate " + command.type() + " with id " + command.relationId()));
 
-    private CategoryJpa category(String label) {
-        if (label == null) {
-            return null;
-        }
-        return entityManager
-                .from(CategoryJpa.class)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .fieldEq("label", label)
-                .singleResult()
-                .getOrThrow(() -> new IllegalArgumentException("Category not found"));
-    }
-
-    private ExpenseJpa expense(String name) {
-        if (name == null) {
-            return null;
-        }
-        return entityManager
-                .from(ExpenseJpa.class)
-                .fieldEq("name", name)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .getOrThrow(() -> new IllegalArgumentException("Budget not found"));
-    }
-
-    private ContractJpa contract(String name) {
-        if (name == null) {
-            return null;
-        }
-        return entityManager
-                .from(ContractJpa.class)
-                .fieldEq("name", name)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .getOrThrow(() -> new IllegalArgumentException("Contract not found"));
-    }
-
-    private ImportJpa job(String slug) {
-        return entityManager
-                .from(ImportJpa.class)
-                .fieldEq("slug", slug)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .getOrThrow(() -> new IllegalArgumentException("Job not found"));
+        var journal = entityManager.getById(TransactionJournal.class, command.id());
+        var entity = new TransactionMetaJpa(journal, command.type().name(), relatedEntity.getId());
+        entityManager.persist(entity);
+        // needed to update hibernate level-1 cache
+        journal.getMetadata().add(entity);
     }
 }

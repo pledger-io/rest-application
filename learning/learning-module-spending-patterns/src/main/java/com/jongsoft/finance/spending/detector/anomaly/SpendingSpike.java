@@ -48,7 +48,7 @@ public class SpendingSpike implements Anomaly {
 
             return Optional.of(SpendingInsight.builder()
                     .type(InsightType.SPENDING_SPIKE)
-                    .category(transaction.getBudget())
+                    .category(getExpense(transaction))
                     .severity(getSeverityFromScore(score))
                     .score(score)
                     .detectedDate(transaction.getDate().withDayOfMonth(1))
@@ -69,7 +69,7 @@ public class SpendingSpike implements Anomaly {
                 .lookup(transaction.getDate().getYear(), transaction.getDate().getMonthValue())
                 .stream()
                 .flatMap(b -> b.getExpenses().stream())
-                .filter(e -> e.getName().equalsIgnoreCase(transaction.getBudget()))
+                .filter(e -> e.getName().equalsIgnoreCase(getExpense(transaction)))
                 .findFirst()
                 .orElseThrow();
         var filter = filterFactory

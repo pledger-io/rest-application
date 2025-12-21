@@ -2,16 +2,14 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
-import com.jongsoft.finance.jpa.budget.ExpenseJpa;
-import com.jongsoft.finance.jpa.category.CategoryJpa;
-import com.jongsoft.finance.jpa.contract.ContractJpa;
-import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.jpa.query.expression.Expressions;
 import com.jongsoft.finance.jpa.tag.TagJpa;
+import com.jongsoft.finance.providers.DataProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
@@ -31,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 @ReadOnly
@@ -41,12 +41,16 @@ public class TransactionProviderJpa implements TransactionProvider {
 
     private final Logger log = LoggerFactory.getLogger(TransactionProviderJpa.class);
 
+    private final List<DataProvider<? extends Classifier>> metadataProviders;
     private final AuthenticationFacade authenticationFacade;
     private final ReactiveEntityManager entityManager;
 
     @Inject
     public TransactionProviderJpa(
-            AuthenticationFacade authenticationFacade, ReactiveEntityManager entityManager) {
+            List<DataProvider<? extends Classifier>> metadataProviders,
+            AuthenticationFacade authenticationFacade,
+            ReactiveEntityManager entityManager) {
+        this.metadataProviders = metadataProviders;
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
     }
@@ -190,11 +194,7 @@ public class TransactionProviderJpa implements TransactionProvider {
             return null;
         }
 
-        var parts = Collections.List(source.getTransactions())
-                .filter(entity -> Objects.isNull(entity.getDeleted()))
-                .map(this::convertPart);
-
-        return Transaction.builder()
+        var builder = Transaction.builder()
                 .id(source.getId())
                 .created(source.getCreated())
                 .updated(source.getUpdated())
@@ -202,26 +202,33 @@ public class TransactionProviderJpa implements TransactionProvider {
                 .bookDate(source.getBookDate())
                 .interestDate(source.getInterestDate())
                 .failureCode(source.getFailureCode())
-                .budget(Control.Option(source.getBudget())
-                        .map(ExpenseJpa::getName)
-                        .getOrSupply(() -> null))
-                .category(Control.Option(source.getCategory())
-                        .map(CategoryJpa::getLabel)
-                        .getOrSupply(() -> null))
                 .currency(source.getCurrency().getCode())
-                .importSlug(Control.Option(source.getBatchImport())
-                        .map(ImportJpa::getSlug)
-                        .getOrSupply(() -> null))
                 .description(source.getDescription())
-                .contract(Control.Option(source.getContract())
-                        .map(ContractJpa::getName)
-                        .getOrSupply(() -> null))
                 .tags(Control.Option(source.getTags())
                         .map(tags -> Collections.List(tags).map(TagJpa::getName))
                         .getOrSupply(Collections::List))
-                .transactions(parts)
-                .deleted(source.getDeleted() != null)
-                .build();
+                .deleted(source.getDeleted() != null);
+
+        builder.transactions(source.getTransactions().stream()
+                .map(this::convertPart)
+                .collect(com.jongsoft.lang.collection.support.Collections.collector(
+                        com.jongsoft.lang.Collections::List)));
+
+        var metadata = new HashMap<String, Classifier>();
+        for (var relation : source.getMetadata()) {
+            metadataProviders.stream()
+                    .filter(provider ->
+                            Objects.equals(provider.typeOf(), relation.getRelationType()))
+                    .map(provider -> provider.lookup(relation.getEntityId()))
+                    .findFirst()
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .ifPresent(matchingEntity ->
+                            metadata.put(relation.getRelationType(), matchingEntity));
+        }
+        builder.metadata(metadata);
+
+        return builder.build();
     }
 
     private Transaction.Part convertPart(TransactionJpa transaction) {

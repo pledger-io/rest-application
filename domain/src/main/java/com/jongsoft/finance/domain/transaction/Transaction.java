@@ -4,6 +4,7 @@ import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.FailureCode;
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.messaging.commands.transaction.*;
 import com.jongsoft.lang.Collections;
@@ -19,6 +20,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -68,13 +70,12 @@ public class Transaction implements AggregateBase, Serializable {
 
     private String description;
     private String currency;
-    private String category;
-    private String budget;
-    private String contract;
+
+    private Map<String, ? extends Classifier> metadata;
     private String importSlug;
     private Sequence<String> tags;
 
-    private Sequence<Part> transactions;
+    private List<Part> transactions;
     private FailureCode failureCode;
 
     private Date created;
@@ -160,7 +161,7 @@ public class Transaction implements AggregateBase, Serializable {
         this.transactions =
                 this.transactions.reject(t -> t.getAccount().equals(notOwn)).union(splitParts);
 
-        SplitTransactionCommand.transactionSplit(id, transactions);
+        SplitTransactionCommand.transactionSplit(id, Collections.List(transactions));
     }
 
     @BusinessMethod
@@ -182,29 +183,8 @@ public class Transaction implements AggregateBase, Serializable {
     }
 
     @BusinessMethod
-    public void linkToCategory(String label) {
-        if (!Objects.equals(this.category, label)) {
-            this.category = label;
-            LinkTransactionCommand.linkCreated(
-                    id, LinkTransactionCommand.LinkType.CATEGORY, category);
-        }
-    }
-
-    @BusinessMethod
-    public void linkToBudget(String budget) {
-        if (budget != null && !Objects.equals(this.budget, budget)) {
-            this.budget = budget;
-            LinkTransactionCommand.linkCreated(id, LinkTransactionCommand.LinkType.EXPENSE, budget);
-        }
-    }
-
-    @BusinessMethod
-    public void linkToContract(String contract) {
-        if (!Objects.equals(this.contract, contract)) {
-            this.contract = contract;
-            LinkTransactionCommand.linkCreated(
-                    id, LinkTransactionCommand.LinkType.CONTRACT, contract);
-        }
+    public void link(LinkTransactionCommand.LinkType type, Long id) {
+        LinkTransactionCommand.linkCreated(this.id, type, id);
     }
 
     @BusinessMethod
@@ -219,16 +199,6 @@ public class Transaction implements AggregateBase, Serializable {
     public void registerFailure(FailureCode failureCode) {
         this.failureCode = failureCode;
         RegisterFailureCommand.registerFailure(id, failureCode);
-    }
-
-    @BusinessMethod
-    public void linkToImport(String slug) {
-        if (this.importSlug != null) {
-            throw new IllegalStateException(
-                    "Cannot link transaction to an import, it's already linked.");
-        }
-
-        this.importSlug = slug;
     }
 
     @BusinessMethod

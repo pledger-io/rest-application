@@ -12,4 +12,8 @@ public interface CurrencyProvider extends DataProvider<Currency>, Exportable<Cur
     default boolean supports(Class<?> supportingClass) {
         return Currency.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "CURRENCY";
+    }
 }

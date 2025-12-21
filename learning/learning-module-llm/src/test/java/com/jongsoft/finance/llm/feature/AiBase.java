@@ -47,6 +47,11 @@ class AiBase {
     }
 
     @MockBean
+    ExpenseProvider expenseProvider() {
+        return Mockito.mock(ExpenseProvider.class);
+    }
+
+    @MockBean
     CurrentUserProvider currentUserProvider() {
         var mock = Mockito.mock(CurrentUserProvider.class);
         Mockito.when(mock.currentUser()).thenReturn(UserAccount.builder().username(new UserIdentifier("test@user")).build());

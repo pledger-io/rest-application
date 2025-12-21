@@ -4,6 +4,7 @@ import com.jongsoft.finance.annotation.Aggregate;
 import com.jongsoft.finance.annotation.BusinessMethod;
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.messaging.commands.contract.*;
 import com.jongsoft.finance.messaging.commands.schedule.CreateScheduleForContractCommand;
 import com.jongsoft.finance.schedule.Schedule;
@@ -21,7 +22,7 @@ import java.time.LocalDate;
 @Aggregate
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
-public class Contract implements AggregateBase, Serializable {
+public class Contract implements AggregateBase, Serializable, Classifier {
 
     private Long id;
     private String name;

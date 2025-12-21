@@ -2,12 +2,8 @@ package com.jongsoft.finance.jpa.transaction;
 
 import com.jongsoft.finance.core.FailureCode;
 import com.jongsoft.finance.core.TransactionType;
-import com.jongsoft.finance.jpa.budget.ExpenseJpa;
-import com.jongsoft.finance.jpa.category.CategoryJpa;
-import com.jongsoft.finance.jpa.contract.ContractJpa;
 import com.jongsoft.finance.jpa.core.entity.AuditedJpa;
 import com.jongsoft.finance.jpa.currency.CurrencyJpa;
-import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.tag.TagJpa;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 
@@ -20,6 +16,8 @@ import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -50,22 +48,6 @@ public class TransactionJournal extends AuditedJpa {
 
     @ManyToOne
     @JoinColumn
-    private CategoryJpa category;
-
-    @ManyToOne
-    @JoinColumn
-    private ExpenseJpa budget;
-
-    @ManyToOne
-    @JoinColumn
-    private ContractJpa contract;
-
-    @ManyToOne
-    @JoinColumn
-    private ImportJpa batchImport;
-
-    @ManyToOne
-    @JoinColumn
     private CurrencyJpa currency;
 
     @JoinTable(
@@ -78,6 +60,9 @@ public class TransactionJournal extends AuditedJpa {
     @Where(clause = "deleted is null")
     @OneToMany(mappedBy = "journal", fetch = FetchType.EAGER, orphanRemoval = true)
     private Set<TransactionJpa> transactions;
+
+    @OneToMany(mappedBy = "journal", fetch = FetchType.EAGER, orphanRemoval = true)
+    private Set<TransactionMetaJpa> metadata;
 
     public TransactionJournal() {
         super();
@@ -96,10 +81,7 @@ public class TransactionJournal extends AuditedJpa {
             TransactionType type,
             FailureCode failureCode,
             UserAccountJpa user,
-            CategoryJpa category,
-            ExpenseJpa budget,
-            ContractJpa contract,
-            ImportJpa batchImport,
+            Set<TransactionMetaJpa> metadata,
             CurrencyJpa currency,
             Set<TagJpa> tags,
             Set<TransactionJpa> transactions) {
@@ -112,10 +94,7 @@ public class TransactionJournal extends AuditedJpa {
         this.type = type;
         this.failureCode = failureCode;
         this.user = user;
-        this.category = category;
-        this.budget = budget;
-        this.contract = contract;
-        this.batchImport = batchImport;
+        this.metadata = Optional.ofNullable(metadata).orElseGet(HashSet::new);
         this.currency = currency;
         this.tags = tags;
         this.transactions = transactions;

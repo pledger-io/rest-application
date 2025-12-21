@@ -9,4 +9,6 @@ package com.jongsoft.finance;
 public interface SupportIndicating<T> {
 
     boolean supports(Class<?> supportingClass);
+
+    String typeOf();
 }
