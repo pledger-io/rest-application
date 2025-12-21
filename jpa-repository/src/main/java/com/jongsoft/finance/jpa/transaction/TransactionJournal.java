@@ -16,6 +16,8 @@ import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -92,7 +94,7 @@ public class TransactionJournal extends AuditedJpa {
         this.type = type;
         this.failureCode = failureCode;
         this.user = user;
-        this.metadata = metadata;
+        this.metadata = Optional.ofNullable(metadata).orElseGet(HashSet::new);
         this.currency = currency;
         this.tags = tags;
         this.transactions = transactions;

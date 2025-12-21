@@ -1,5 +1,6 @@
 package com.jongsoft.finance.rest.extension;
 
+import com.jongsoft.lang.time.Range;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
@@ -480,6 +481,23 @@ public class PledgerRequests {
               .get("/v2/api/transactions")
           .then()
               .log().ifValidationFails();
+    }
+
+    public ValidatableResponse computeBalance(Range<LocalDate> range, List<Long> accountIds, List<Long> categories) {
+        return given(requestSpecification)
+                .log().ifValidationFails()
+                .contentType(ContentType.JSON)
+                .body(Map.of(
+                    "range", Map.of(
+                        "startDate", range.from().toString(),
+                        "endDate", range.until().toString()),
+                    "accounts", accountIds,
+                    "categories", categories
+                ))
+            .when()
+                .post("/v2/api/balance")
+            .then()
+                .log().ifValidationFails();
     }
 
 }

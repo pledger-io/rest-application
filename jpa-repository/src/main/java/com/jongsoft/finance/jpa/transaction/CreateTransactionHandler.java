@@ -3,6 +3,7 @@ package com.jongsoft.finance.jpa.transaction;
 import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.core.TransactionType;
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.jpa.account.AccountJpa;
 import com.jongsoft.finance.jpa.currency.CurrencyJpa;
@@ -12,9 +13,11 @@ import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.CreateTransactionCommand;
 import com.jongsoft.finance.messaging.handlers.TransactionCreationHandler;
 import com.jongsoft.finance.messaging.notifications.TransactionCreated;
+import com.jongsoft.finance.providers.DataProvider;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
+import com.jongsoft.lang.control.Optional;
 
 import io.micronaut.transaction.annotation.Transactional;
 
@@ -25,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Singleton
@@ -35,12 +40,16 @@ public class CreateTransactionHandler
 
     private final ReactiveEntityManager entityManager;
     private final AuthenticationFacade authenticationFacade;
+    private final List<DataProvider<? extends Classifier>> metadataProviders;
 
     @Inject
     public CreateTransactionHandler(
-            ReactiveEntityManager entityManager, AuthenticationFacade authenticationFacade) {
+            ReactiveEntityManager entityManager,
+            AuthenticationFacade authenticationFacade,
+            List<DataProvider<? extends Classifier>> metadataProviders) {
         this.entityManager = entityManager;
         this.authenticationFacade = authenticationFacade;
+        this.metadataProviders = metadataProviders;
     }
 
     @Override
@@ -89,6 +98,23 @@ public class CreateTransactionHandler
 
             jpaEntity.getTransactions().add(transferJpa);
             entityManager.persist(transferJpa);
+        }
+
+        if (command.transaction().getMetadata() != null) {
+            for (var relation : command.transaction().getMetadata().entrySet()) {
+                var relatedEntity = metadataProviders.stream()
+                        .filter(provider -> Objects.equals(provider.typeOf(), relation.getKey()))
+                        .findFirst()
+                        .map(provider -> provider.lookup(relation.getValue().getId()))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get);
+                relatedEntity.ifPresent(entity -> {
+                    var metaDataEntity =
+                            new TransactionMetaJpa(jpaEntity, relation.getKey(), entity.getId());
+                    jpaEntity.getMetadata().add(metaDataEntity);
+                    entityManager.persist(metaDataEntity);
+                });
+            }
         }
 
         TransactionCreated.transactionCreated(jpaEntity.getId());

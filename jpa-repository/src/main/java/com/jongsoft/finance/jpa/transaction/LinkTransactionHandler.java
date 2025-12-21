@@ -4,12 +4,10 @@ import com.jongsoft.finance.RequiresJpa;
 import com.jongsoft.finance.annotation.BusinessEventListener;
 import com.jongsoft.finance.core.exception.StatusException;
 import com.jongsoft.finance.domain.Classifier;
-import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.messaging.CommandHandler;
 import com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand;
 import com.jongsoft.finance.providers.DataProvider;
-import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.control.Optional;
 
 import io.micronaut.transaction.annotation.Transactional;
@@ -29,16 +27,13 @@ import java.util.Objects;
 public class LinkTransactionHandler implements CommandHandler<LinkTransactionCommand> {
 
     private final ReactiveEntityManager entityManager;
-    private final AuthenticationFacade authenticationFacade;
     private final List<DataProvider<? extends Classifier>> metadataProviders;
 
     @Inject
     public LinkTransactionHandler(
             ReactiveEntityManager entityManager,
-            AuthenticationFacade authenticationFacade,
             List<DataProvider<? extends Classifier>> metadataProviders) {
         this.entityManager = entityManager;
-        this.authenticationFacade = authenticationFacade;
         this.metadataProviders = metadataProviders;
     }
 
@@ -74,14 +69,5 @@ public class LinkTransactionHandler implements CommandHandler<LinkTransactionCom
         entityManager.persist(entity);
         // needed to update hibernate level-1 cache
         journal.getMetadata().add(entity);
-    }
-
-    private ImportJpa job(String slug) {
-        return entityManager
-                .from(ImportJpa.class)
-                .fieldEq("slug", slug)
-                .fieldEq("user.username", authenticationFacade.authenticated())
-                .singleResult()
-                .getOrThrow(() -> new IllegalArgumentException("Job not found"));
     }
 }

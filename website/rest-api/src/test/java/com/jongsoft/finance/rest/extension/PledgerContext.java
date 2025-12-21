@@ -1,22 +1,24 @@
 package com.jongsoft.finance.rest.extension;
 
 import com.jongsoft.finance.StorageService;
+import com.jongsoft.finance.domain.Classifier;
+import com.jongsoft.finance.domain.account.Account;
 import com.jongsoft.finance.domain.transaction.ScheduleValue;
+import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.domain.user.UserAccount;
 import com.jongsoft.finance.domain.user.UserIdentifier;
 import com.jongsoft.finance.providers.*;
 import com.jongsoft.finance.schedule.Periodicity;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
 import io.micronaut.context.ApplicationContext;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -134,7 +136,61 @@ public class PledgerContext {
         return this;
     }
 
+    public TransactionContext withTransaction(String source, String target, double amount) {
+        var account = applicationContext.getBean(AccountProvider.class).lookup(source)
+            .getOrThrow(() -> new RuntimeException("Cannot find account " + source));
+        var destination = applicationContext.getBean(AccountProvider.class).lookup(target)
+            .getOrThrow(() -> new RuntimeException("Cannot find account " + target));
+
+        return new TransactionContext(account, destination, amount);
+    }
+
     void reset() {
 
+    }
+
+    public class TransactionContext {
+
+        private final Account source;
+        private final Account destination;
+        private final double amount;
+        private List<String> tags;
+        private LocalDate date;
+        private Map<String, Classifier> metadata;
+
+        TransactionContext(Account source, Account destination, double amount) {
+            this.source = source;
+            this.destination = destination;
+            this.amount = amount;
+            this.metadata = new HashMap<>();
+        }
+
+        public TransactionContext withTags(String... tags) {
+            this.tags = List.of(tags);
+            return this;
+        }
+
+        public TransactionContext withCategory(String category) {
+            var categoryProvider = applicationContext.getBean(CategoryProvider.class);
+            var entity = categoryProvider.lookup(category).getOrThrow(() -> new RuntimeException("Cannot find category " + category));
+            metadata.put("CATEGORY", entity);
+            return this;
+        }
+
+        public TransactionContext on(LocalDate date) {
+            this.date = date;
+            return this;
+        }
+
+        public PledgerContext upsert() {
+            source.createTransaction(destination, amount, Transaction.Type.CREDIT, builder -> {
+                builder.tags(Collections.List(tags));
+                builder.date(date);
+                builder.currency(source.getCurrency());
+                builder.description("Test transaction");
+                builder.metadata(metadata);
+            }).register();
+            return PledgerContext.this;
+        }
     }
 }
