@@ -46,8 +46,8 @@ dependencyResolutionManagement {
         }
 
         create("llm") {
-            val langchain4jVersion: String = "1.9.1"
-            val betaVersion: String = "$langchain4jVersion-beta17"
+            val langchain4jVersion: String = "1.10.0"
+            val betaVersion: String = "$langchain4jVersion-beta18"
             library("core", "dev.langchain4j", "langchain4j").version(langchain4jVersion)
             library("retriever-sql", "dev.langchain4j", "langchain4j-pgvector").version(betaVersion)
             library("store", "dev.langchain4j", "langchain4j-embeddings-all-minilm-l6-v2").version(betaVersion)
