@@ -43,7 +43,9 @@ class AiSuggestionEngine implements SuggestionEngine {
     }
 
     @Override
-    @Timed("learning.language-model.suggest")
+    @Timed(
+            value = "learning.language-model",
+            extraTags = {"action", "classify-transaction"})
     public SuggestionResult makeSuggestions(SuggestionInput transactionInput) {
         log.debug("Starting classification on {}.", transactionInput);
 
@@ -63,7 +65,9 @@ class AiSuggestionEngine implements SuggestionEngine {
     }
 
     @Override
-    @Timed("learning.language-model.extract")
+    @Timed(
+            value = "learning.language-model",
+            extraTags = {"action", "extract-transaction"})
     public Optional<TransactionResult> extractTransaction(String transactionInput) {
         var extracted = transactionExtractorAgent.extractTransaction(
                 UUID.randomUUID(), LocalDate.now(), transactionInput);
@@ -91,8 +95,7 @@ class AiSuggestionEngine implements SuggestionEngine {
                 transactionInput.toAccount(),
                 transactionInput.amount(),
                 translateDate(transactionInput));
-        return new SuggestionResult(
-                suggestion.category(), suggestion.subCategory(), suggestion.tags());
+        return new SuggestionResult(suggestion.budget(), suggestion.category(), suggestion.tags());
     }
 
     private String translateDate(SuggestionInput transactionInput) {

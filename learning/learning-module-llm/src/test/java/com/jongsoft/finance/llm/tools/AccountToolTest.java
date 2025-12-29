@@ -13,12 +13,12 @@ import org.mockito.invocation.InvocationOnMock;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-class AccountLookupToolTest {
+class AccountToolTest {
 
     @Test
     void lookup() {
         var mockAccountProvider = mock(AccountProvider.class);
-        var subject = new AccountLookupTool(mockAccountProvider, generateFilterMock());
+        var subject = new AccountTool(mockAccountProvider, generateFilterMock());
 
         when(mockAccountProvider.lookup(any(AccountProvider.FilterCommand.class)))
                 .thenReturn(ResultPage.of(Account.builder().id(1L).name("My account").type("checking").build()));
@@ -33,7 +33,7 @@ class AccountLookupToolTest {
     @Test
     void lookupFallback() {
         var mockAccountProvider = mock(AccountProvider.class);
-        var subject = new AccountLookupTool(mockAccountProvider, generateFilterMock());
+        var subject = new AccountTool(mockAccountProvider, generateFilterMock());
 
         when(mockAccountProvider.synonymOf("My account"))
                 .thenReturn(Control.Option(Account.builder().id(1L).name("My account").type("checking").build()));

@@ -14,13 +14,13 @@ import java.util.List;
 
 @Singleton
 @AiEnabled
-public class TagClassificationTool implements AiTool {
+public class TagTool {
 
-    private final Logger logger = org.slf4j.LoggerFactory.getLogger(TagClassificationTool.class);
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(TagTool.class);
 
     private final TagProvider tagProvider;
 
-    public TagClassificationTool(TagProvider tagProvider) {
+    public TagTool(TagProvider tagProvider) {
         this.tagProvider = tagProvider;
     }
 

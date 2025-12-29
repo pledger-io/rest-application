@@ -16,13 +16,13 @@ import java.util.stream.Stream;
 
 @Singleton
 @AiEnabled
-public class BudgetClassificationTool implements AiTool {
+public class BudgetTool {
 
-    private final Logger logger = org.slf4j.LoggerFactory.getLogger(BudgetClassificationTool.class);
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(BudgetTool.class);
 
     private final BudgetProvider budgetProvider;
 
-    BudgetClassificationTool(BudgetProvider budgetProvider) {
+    BudgetTool(BudgetProvider budgetProvider) {
         this.budgetProvider = budgetProvider;
     }
 

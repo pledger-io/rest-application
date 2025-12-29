@@ -14,7 +14,7 @@ class TagClassificationToolTest {
     @Test
     void listKnownTags() {
         var mockProvider = mock(TagProvider.class);
-        var subject = new TagClassificationTool(mockProvider);
+        var subject = new TagTool(mockProvider);
 
         when(mockProvider.lookup()).thenReturn(Collections.List(
                 new Tag("food"),
