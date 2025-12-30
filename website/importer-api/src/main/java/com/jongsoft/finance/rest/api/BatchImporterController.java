@@ -120,12 +120,19 @@ class BatchImporterController implements BatchImporterApi {
     }
 
     private BatchJobResponse convertToJobResponse(BatchImport batchImport) {
-        return new BatchJobResponse(
+        var response = new BatchJobResponse(
                 batchImport.getSlug(),
                 LocalDate.ofInstant(batchImport.getCreated().toInstant(), ZoneId.of("UTC")),
                 convertToConfigResponse(batchImport.getConfig()),
                 new BatchJobResponseBalance(
                         batchImport.getTotalIncome(), batchImport.getTotalExpense()));
+
+        if (batchImport.getFinished() != null) {
+            response.finished(
+                    LocalDate.ofInstant(batchImport.getFinished().toInstant(), ZoneId.of("UTC")));
+        }
+
+        return response;
     }
 
     private ConfigurationResponse convertToConfigResponse(BatchImportConfig config) {

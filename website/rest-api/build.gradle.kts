@@ -34,7 +34,7 @@ dependencies {
 
     // Needed for running the tests
     testRuntimeOnly(mn.micronaut.serde.jackson)
-    testRuntimeOnly(mn.micronaut.jackson.databind)
+    //testRuntimeOnly(mn.micronaut.jackson.databind)
     testRuntimeOnly(mn.logback.classic)
 
     testRuntimeOnly(project(":jpa-repository"))

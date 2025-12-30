@@ -119,15 +119,16 @@ public class CreateTransactionDelegate implements JavaDelegate, JavaBean {
                             filterFactory.expense().name(parsedTransaction.budget(), true)))
                     .map(ResultPage::content)
                     .map(Sequence::head)
-                    .ifPresent(value -> transaction.link(
-                            LinkTransactionCommand.LinkType.EXPENSE, value.getId()));
+                    .ifPresent(value -> LinkTransactionCommand.linkCreated(
+                            transactionId, LinkTransactionCommand.LinkType.EXPENSE, value.getId()));
         }
 
         this.<ImportProvider>lookupDataProvider("IMPORT")
                 .map(provider -> provider.lookup(batchImportSlug))
                 .filter(com.jongsoft.lang.control.Optional::isPresent)
                 .map(Value::get)
-                .ifPresent(value -> transaction.link(IMPORT, value.getId()));
+                .ifPresent(value ->
+                        LinkTransactionCommand.linkCreated(transactionId, IMPORT, value.getId()));
 
         execution.setVariable("transactionId", transactionId);
     }

@@ -115,11 +115,13 @@ class StatisticsBalanceController implements StatisticsBalanceApi {
     }
 
     private TransactionProvider.FilterCommand toFilterCommand(BalanceRequest balanceRequest) {
-        var filter = filterFactory
-                .transaction()
-                .range(Dates.range(
-                        balanceRequest.getRange().getStartDate(),
-                        balanceRequest.getRange().getEndDate()));
+        var filter = filterFactory.transaction();
+
+        if (balanceRequest.getRange() != null) {
+            filter.range(Dates.range(
+                    balanceRequest.getRange().getStartDate(),
+                    balanceRequest.getRange().getEndDate()));
+        }
 
         if (balanceRequest.getAccounts() != null
                 && !balanceRequest.getAccounts().isEmpty()) {

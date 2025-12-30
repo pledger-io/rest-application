@@ -5,6 +5,7 @@ import static com.jongsoft.finance.messaging.commands.transaction.LinkTransactio
 import com.jongsoft.finance.core.AggregateBase;
 import com.jongsoft.finance.core.SystemAccountTypes;
 import com.jongsoft.finance.domain.core.EntityRef;
+import com.jongsoft.finance.jpa.importer.entity.ImportJpa;
 import com.jongsoft.finance.jpa.query.JpaFilterBuilder;
 import com.jongsoft.finance.jpa.query.expression.Expressions;
 import com.jongsoft.finance.jpa.query.expression.FieldEquation;
@@ -92,7 +93,13 @@ public class TransactionFilterCommand extends JpaFilterBuilder<TransactionJourna
 
     @Override
     public TransactionProvider.FilterCommand importSlug(String value) {
-        query().fieldEq("batchImport.slug", value);
+        query().whereExists(subQuery -> subQuery.from("metadata")
+                .fieldEqParentField("journal.id", "id")
+                .fieldEq("relationType", "IMPORT")
+                .whereExists(importFilter -> importFilter
+                        .from(ImportJpa.class)
+                        .fieldEq("slug", value)
+                        .fieldEqParentField("id", "entityId")));
         return this;
     }
 
