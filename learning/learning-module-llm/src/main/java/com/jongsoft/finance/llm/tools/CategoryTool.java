@@ -14,13 +14,12 @@ import java.util.List;
 
 @Singleton
 @AiEnabled
-public class CategoryClassificationTool implements AiTool {
+public class CategoryTool {
 
-    private final Logger logger =
-            org.slf4j.LoggerFactory.getLogger(CategoryClassificationTool.class);
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(CategoryTool.class);
     private final CategoryProvider categoryProvider;
 
-    CategoryClassificationTool(CategoryProvider categoryProvider) {
+    CategoryTool(CategoryProvider categoryProvider) {
         this.categoryProvider = categoryProvider;
     }
 

@@ -21,7 +21,7 @@ dependencies {
     testCompileOnly(mn.lombok)
 
     // Investigate if this can be swapped for micronaut serde
-    implementation(mn.micronaut.jackson.databind)
+//    implementation(mn.micronaut.jackson.databind)
     implementation(mn.micronaut.serde.jackson)
     implementation(mn.validation)
     implementation(mn.micronaut.json.schema.annotations)

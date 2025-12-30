@@ -1,6 +1,8 @@
 package com.jongsoft.finance.spending.detector.anomaly;
 
+import com.jongsoft.finance.domain.Classifier;
 import com.jongsoft.finance.domain.account.Account;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.Severity;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.domain.transaction.Transaction;
@@ -23,6 +25,10 @@ class UnusualMerchantTest {
    * of typical merchants for a budget category.
    */
 
+  private Map<String, ? extends Classifier> forExpense(String expense) {
+      return Map.of("EXPENSE", new EntityRef.NamedEntity(1L, expense));
+  }
+
   @Test
   void shouldDetectUnusualMerchant() {
     // Arrange
@@ -32,7 +38,7 @@ class UnusualMerchantTest {
     Account merchantAccount = mock(Account.class);
     when(merchantAccount.getName()).thenReturn("New Merchant");
     when(transaction.computeTo()).thenReturn(merchantAccount);
-    when(transaction.getBudget()).thenReturn("Groceries");
+    doReturn(forExpense("Groceries")).when(transaction).getMetadata();
     when(transaction.getId()).thenReturn(123L);
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
@@ -69,7 +75,7 @@ class UnusualMerchantTest {
     Account merchantAccount = mock(Account.class);
     when(merchantAccount.getName()).thenReturn("Supermarket");
     when(transaction.computeTo()).thenReturn(merchantAccount);
-    when(transaction.getBudget()).thenReturn("Groceries");
+    doReturn(forExpense("Groceries")).when(transaction).getMetadata();
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
     Set<String> typicalMerchants = new HashSet<>();
@@ -97,7 +103,7 @@ class UnusualMerchantTest {
     Account merchantAccount = mock(Account.class);
     when(merchantAccount.getName()).thenReturn("New Merchant");
     when(transaction.computeTo()).thenReturn(merchantAccount);
-    when(transaction.getBudget()).thenReturn("Travel");
+    doReturn(forExpense("Travel")).when(transaction).getMetadata();
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
     Map<String, Set<String>> merchantMap = new HashMap<>();
@@ -120,7 +126,7 @@ class UnusualMerchantTest {
     Account merchantAccount = mock(Account.class);
     when(merchantAccount.getName()).thenReturn("New Merchant");
     when(transaction.computeTo()).thenReturn(merchantAccount);
-    when(transaction.getBudget()).thenReturn("Entertainment");
+    doReturn(forExpense("Entertainment")).when(transaction).getMetadata();
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
     Map<String, Set<String>> merchantMap = new HashMap<>();

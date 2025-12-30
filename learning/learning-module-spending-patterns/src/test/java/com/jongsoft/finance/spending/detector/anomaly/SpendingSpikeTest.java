@@ -1,8 +1,11 @@
 package com.jongsoft.finance.spending.detector.anomaly;
 
+import com.jongsoft.finance.domain.Classifier;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.Severity;
 import com.jongsoft.finance.domain.insight.SpendingInsight;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.factory.FilterFactory;
 import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
@@ -25,6 +28,10 @@ class SpendingSpikeTest {
    * by comparing the current month's total spending against the average of the last few months' spending.
    */
 
+  private Map<String, ? extends Classifier> forExpense(String expense) {
+      return Map.of("EXPENSE", new EntityRef.NamedEntity(1L, expense));
+  }
+
   @Test
   void shouldDetectSpendingSpikeWhenCurrentMonthSpendingExceedsThreshold() {
     FilterFactory filterFactory = mock(FilterFactory.class);
@@ -34,7 +41,7 @@ class SpendingSpikeTest {
 
     Transaction transaction = mock(Transaction.class);
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 1));
-    when(transaction.getBudget()).thenReturn("Food");
+    doReturn(forExpense("Food")).when(transaction).getMetadata();
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
 
@@ -68,7 +75,7 @@ class SpendingSpikeTest {
 
     Transaction transaction = mock(Transaction.class);
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 1));
-    when(transaction.getBudget()).thenReturn("Utilities");
+    doReturn(forExpense("Utilities")).when(transaction).getMetadata();
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
 
@@ -96,7 +103,7 @@ class SpendingSpikeTest {
 
     Transaction transaction = mock(Transaction.class);
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 1));
-    when(transaction.getBudget()).thenReturn("Travel");
+    doReturn(forExpense("Travel")).when(transaction).getMetadata();
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
 
@@ -119,7 +126,7 @@ class SpendingSpikeTest {
 
     Transaction transaction = mock(Transaction.class);
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 1));
-    when(transaction.getBudget()).thenReturn("Entertainment");
+    doReturn(forExpense("Entertainment")).when(transaction).getMetadata();
 
     UserCategoryStatistics statistics = mock(UserCategoryStatistics.class);
 

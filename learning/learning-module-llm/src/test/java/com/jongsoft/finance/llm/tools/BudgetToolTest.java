@@ -12,12 +12,12 @@ import java.util.Arrays;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class BudgetClassificationToolTest {
+class BudgetToolTest {
 
     @Test
     void listKnownCategories() {
         var mockBudgetProvider = mock(BudgetProvider.class);
-        var subject = new BudgetClassificationTool(mockBudgetProvider);
+        var subject = new BudgetTool(mockBudgetProvider);
 
         var budget = Budget.builder().build();
         for (var expense : Arrays.asList("Food", "Transportation", "Shopping", "Entertainment")) {

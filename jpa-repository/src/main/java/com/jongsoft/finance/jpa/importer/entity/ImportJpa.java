@@ -1,7 +1,6 @@
 package com.jongsoft.finance.jpa.importer.entity;
 
 import com.jongsoft.finance.jpa.core.entity.EntityJpa;
-import com.jongsoft.finance.jpa.transaction.TransactionJournal;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 
 import jakarta.persistence.*;
@@ -10,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Getter
@@ -33,9 +31,6 @@ public class ImportJpa extends EntityJpa {
     @JoinColumn
     private UserAccountJpa user;
 
-    @OneToMany(mappedBy = "batchImport")
-    private List<TransactionJournal> transactions;
-
     @Builder
     private ImportJpa(
             Date created,
@@ -44,8 +39,7 @@ public class ImportJpa extends EntityJpa {
             String fileCode,
             ImportConfig config,
             UserAccountJpa user,
-            boolean archived,
-            List<TransactionJournal> transactions) {
+            boolean archived) {
         this.created = created;
         this.finished = finished;
         this.slug = slug;
@@ -53,7 +47,6 @@ public class ImportJpa extends EntityJpa {
         this.config = config;
         this.user = user;
         this.archived = archived;
-        this.transactions = transactions;
     }
 
     protected ImportJpa() {}

@@ -14,14 +14,14 @@ import org.slf4j.Logger;
 
 @Singleton
 @AiEnabled
-public class AccountLookupTool implements AiTool {
-    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AccountLookupTool.class);
+public class AccountTool {
+    private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AccountTool.class);
     private static final AccountDTO UNKNOWN_ACCOUNT = new AccountDTO(-1L, "Unknown", "");
 
     private final AccountProvider accountProvider;
     private final FilterFactory filterFactory;
 
-    public AccountLookupTool(AccountProvider accountProvider, FilterFactory filterFactory) {
+    public AccountTool(AccountProvider accountProvider, FilterFactory filterFactory) {
         this.accountProvider = accountProvider;
         this.filterFactory = filterFactory;
     }

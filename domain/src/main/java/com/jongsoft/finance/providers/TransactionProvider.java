@@ -170,4 +170,8 @@ public interface TransactionProvider extends DataProvider<Transaction> {
     default boolean supports(Class<?> supportingClass) {
         return Transaction.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "TRANSACTION";
+    }
 }

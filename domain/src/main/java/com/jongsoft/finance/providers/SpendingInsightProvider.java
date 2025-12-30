@@ -53,4 +53,8 @@ public interface SpendingInsightProvider extends Exportable<SpendingInsight> {
     default boolean supports(Class<?> supportingClass) {
         return SpendingInsight.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "SPENDING_INSIGHT";
+    }
 }

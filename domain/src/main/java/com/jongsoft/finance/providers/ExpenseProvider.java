@@ -14,4 +14,8 @@ public interface ExpenseProvider extends DataProvider<EntityRef.NamedEntity> {
     default boolean supports(Class<?> supportingClass) {
         return EntityRef.NamedEntity.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "EXPENSE";
+    }
 }

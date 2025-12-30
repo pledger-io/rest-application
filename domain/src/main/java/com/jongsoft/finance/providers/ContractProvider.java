@@ -14,4 +14,8 @@ public interface ContractProvider extends DataProvider<Contract>, Exportable<Con
     default boolean supports(Class<?> supportingClass) {
         return Contract.class.equals(supportingClass);
     }
+
+    default String typeOf() {
+        return "CONTRACT";
+    }
 }

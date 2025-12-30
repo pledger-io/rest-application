@@ -40,12 +40,15 @@ properties:
   # classification fields
   category:
     type: integer
+    format: int64
     description: The category this transaction falls into
   expense:
     type: integer
+    format: int64
     description: The expense grouping this transaction falls into
   contract:
     type: integer
+    format: int64
     description: The contract this payment was for
 
   tags:

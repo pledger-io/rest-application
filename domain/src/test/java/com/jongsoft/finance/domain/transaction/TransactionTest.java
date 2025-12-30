@@ -196,47 +196,14 @@ class TransactionTest {
     }
 
     @Test
-    void linkToCategory() {
+    void linkEntity() {
         var captor = ArgumentCaptor.forClass(LinkTransactionCommand.class);
 
-        transaction.linkToCategory("Test-1");
-
+        transaction.link(LinkTransactionCommand.LinkType.EXPENSE, 1L);
         Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
         assertThat(captor.getValue().id()).isEqualTo(1L);
-        assertThat(captor.getValue().relation()).isEqualTo("Test-1");
-        assertThat(captor.getValue().type()).isEqualTo(LinkTransactionCommand.LinkType.CATEGORY);
-    }
-
-    @Test
-    void linkToContract() {
-        var captor = ArgumentCaptor.forClass(LinkTransactionCommand.class);
-
-        transaction.linkToContract("Sample contract");
-
-        Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().id()).isEqualTo(1L);
-        assertThat(captor.getValue().relation()).isEqualTo("Sample contract");
-        assertThat(captor.getValue().type()).isEqualTo(LinkTransactionCommand.LinkType.CONTRACT);
-    }
-
-    @Test
-    void linkToBudget() {
-        var captor = ArgumentCaptor.forClass(LinkTransactionCommand.class);
-
-        transaction.linkToBudget("Budget 1");
-        Mockito.verify(applicationEventPublisher).publishEvent(captor.capture());
-        assertThat(captor.getValue().id()).isEqualTo(1L);
-        assertThat(captor.getValue().relation()).isEqualTo("Budget 1");
+        assertThat(captor.getValue().relationId()).isEqualTo(1L);
         assertThat(captor.getValue().type()).isEqualTo(LinkTransactionCommand.LinkType.EXPENSE);
-    }
-
-    @Test
-    void linkToImport() {
-        transaction.linkToImport("Test-1");
-        assertThat(transaction.getImportSlug()).isEqualTo("Test-1");
-
-        IllegalStateException thrown = assertThrows(IllegalStateException.class, () -> transaction.linkToImport("Test-2"));
-        assertThat(thrown.getMessage()).isEqualTo("Cannot link transaction to an import, it's already linked.");
     }
 
     @Test

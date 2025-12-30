@@ -4,6 +4,7 @@ TRUNCATE TABLE user_account;
 TRUNCATE TABLE user_roles;
 TRUNCATE TABLE user_account_token;
 TRUNCATE TABLE account;
+TRUNCATE TABLE transaction_journal_meta;
 TRUNCATE TABLE transaction_journal;
 TRUNCATE TABLE transaction_part;
 TRUNCATE TABLE account_synonym;

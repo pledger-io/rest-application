@@ -1,19 +1,11 @@
 package com.jongsoft.finance.llm.models;
 
 import com.jongsoft.finance.llm.AiEnabled;
-import com.jongsoft.finance.llm.ToolSupplier;
-import com.jongsoft.finance.llm.augmenters.ClassificationAugmenter;
 import com.jongsoft.finance.llm.configuration.AiConfiguration;
-import com.jongsoft.finance.llm.tools.AiTool;
-import com.jongsoft.finance.providers.BudgetProvider;
-import com.jongsoft.finance.providers.CategoryProvider;
-import com.jongsoft.finance.providers.TagProvider;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.ollama.*;
-import dev.langchain4j.rag.AugmentationResult;
-import dev.langchain4j.rag.RetrievalAugmentor;
 
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
@@ -23,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.List;
 
 @Factory
 @AiEnabled
@@ -37,32 +28,6 @@ class OllamaModelSetup {
     OllamaModelSetup(AiConfiguration configuration, OllamaModelResolver modelResolver) {
         this.configuration = configuration;
         this.chosenModel = modelResolver.resolveModel();
-    }
-
-    @Bean
-    ToolSupplier toolSupplier(List<AiTool> knownTools) {
-        if (configuration.getOllama().isForceAugmentation() || noToolSupport()) {
-            return () -> new Object[0];
-        }
-
-        log.debug("Setting up Ai tools to be used with Ollama.");
-        return () -> knownTools.toArray(new AiTool[0]);
-    }
-
-    @Bean
-    @AiEnabled.ClassificationAgent
-    RetrievalAugmentor classificationAugmenter(
-            BudgetProvider budgetProvider,
-            CategoryProvider categoryProvider,
-            TagProvider tagProvider) {
-        if (configuration.getOllama().isForceAugmentation() || noToolSupport()) {
-            log.debug("Creating a classification augmenter since tools are not supported.");
-            return new ClassificationAugmenter(budgetProvider, categoryProvider, tagProvider);
-        }
-
-        return (userMessage) -> AugmentationResult.builder()
-                .chatMessage(userMessage.chatMessage())
-                .build();
     }
 
     @Bean

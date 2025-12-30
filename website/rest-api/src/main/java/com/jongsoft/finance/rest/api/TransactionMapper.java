@@ -1,7 +1,10 @@
 package com.jongsoft.finance.rest.api;
 
 import com.jongsoft.finance.core.exception.StatusException;
+import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.domain.user.Budget;
+import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.rest.model.*;
 
 public interface TransactionMapper {
@@ -25,9 +28,15 @@ public interface TransactionMapper {
         response.destination(
                 new AccountLink(destination.getId(), destination.getName(), destination.getType()));
 
-        metadata.contract(transaction.getContract());
-        metadata.budget(transaction.getBudget());
-        metadata.category(transaction.getCategory());
+        if (transaction.getMetadata().containsKey("CONTRACT")) {
+            metadata.contract(((Contract) transaction.getMetadata().get("CONTRACT")).getName());
+        }
+        if (transaction.getMetadata().containsKey("EXPENSE")) {
+            metadata.budget(((Budget.Expense) transaction.getMetadata().get("EXPENSE")).getName());
+        }
+        if (transaction.getMetadata().containsKey("CATEGORY")) {
+            metadata.category(((Category) transaction.getMetadata().get("CATEGORY")).getLabel());
+        }
         metadata._import(transaction.getImportSlug());
         metadata.tags(transaction.getTags().toJava());
 

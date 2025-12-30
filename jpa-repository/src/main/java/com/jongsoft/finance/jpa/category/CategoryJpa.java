@@ -28,8 +28,13 @@ public class CategoryJpa extends EntityJpa {
     @JoinColumn(nullable = false, updatable = false)
     private UserAccountJpa user;
 
-    @Formula("(select max(tj.t_date) from transaction_journal tj where tj.category_id = id and"
-            + " tj.deleted is null)")
+    @Formula(
+            """
+            (select max(tj.t_date)
+             from
+                transaction_journal tj
+                join transaction_journal_meta tjm on tjm.journal_id = tj.id and tjm.relation_type = 'CATEGORY'
+            where tjm.entity_id = id and tj.deleted is null)""")
     private LocalDate lastTransaction;
 
     @Builder

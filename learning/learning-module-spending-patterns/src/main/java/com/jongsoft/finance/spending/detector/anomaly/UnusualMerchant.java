@@ -17,7 +17,7 @@ public class UnusualMerchant implements Anomaly {
     public Optional<SpendingInsight> detect(
             Transaction transaction, UserCategoryStatistics statistics) {
         var merchant = transaction.computeTo().getName();
-        var typicalMerchants = statistics.typicalMerchants().get(transaction.getBudget());
+        var typicalMerchants = statistics.typicalMerchants().get(getExpense(transaction));
         if (typicalMerchants == null || typicalMerchants.isEmpty()) {
             log.trace(
                     "Not enough data for transaction {}. Skipping anomaly detection.",
@@ -30,7 +30,7 @@ public class UnusualMerchant implements Anomaly {
 
             return Optional.of(SpendingInsight.builder()
                     .type(InsightType.UNUSUAL_MERCHANT)
-                    .category(transaction.getBudget())
+                    .category(getExpense(transaction))
                     .severity(Severity.INFO)
                     .score(score)
                     .detectedDate(LocalDate.now())

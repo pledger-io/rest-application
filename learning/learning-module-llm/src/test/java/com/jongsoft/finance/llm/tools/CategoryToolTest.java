@@ -9,12 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class CategoryClassificationToolTest {
+class CategoryToolTest {
 
     @Test
     void listKnownSubCategories() {
         var mockProvider = mock(CategoryProvider.class);
-        var subject = new CategoryClassificationTool(mockProvider);
+        var subject = new CategoryTool(mockProvider);
 
         when(mockProvider.lookup())
                 .thenReturn(Collections.List(

@@ -1,8 +1,11 @@
 package com.jongsoft.finance.spending.detector.pattern;
 
+import com.jongsoft.finance.domain.Classifier;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.PatternType;
 import com.jongsoft.finance.domain.insight.SpendingPattern;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.domain.user.Category;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import org.junit.jupiter.api.Test;
@@ -10,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,13 +26,17 @@ class SeasonalPatternTest {
    * The `detect` method identifies seasonal patterns in transactions.
    */
 
+  private Map<String, ? extends Classifier> forCategory(String category) {
+      return Map.of("CATEGORY", Category.builder().label(category).build());
+  }
+
   @Test
   void shouldDetectSummerPattern() {
     // Arrange
     SeasonalPattern seasonalPattern = new SeasonalPattern();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Travel");
+    doReturn(forCategory("Travel")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 6, 15)); // Summer
 
     // Create a list of embedding matches with summer concentration
@@ -70,7 +78,7 @@ class SeasonalPatternTest {
     SeasonalPattern seasonalPattern = new SeasonalPattern();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Skiing");
+    doReturn(forCategory("Skiing")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 1, 15)); // Winter
 
     // Create a list of embedding matches with winter concentration
@@ -117,7 +125,7 @@ class SeasonalPatternTest {
     SeasonalPattern seasonalPattern = new SeasonalPattern();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Groceries");
+    doReturn(forCategory("Groceries")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
     // Create a list of embedding matches with even distribution across months
@@ -145,7 +153,7 @@ class SeasonalPatternTest {
     SeasonalPattern seasonalPattern = new SeasonalPattern();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Entertainment");
+    doReturn(forCategory("Entertainment")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
     // Create an empty list of embedding matches
@@ -164,7 +172,7 @@ class SeasonalPatternTest {
     SeasonalPattern seasonalPattern = new SeasonalPattern();
 
     Transaction transaction = mock(Transaction.class);
-    when(transaction.getCategory()).thenReturn("Dining");
+    doReturn(forCategory("Dining")).when(transaction).getMetadata();
     when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
     // Create a list with only a few matches (not enough to establish a seasonal pattern)

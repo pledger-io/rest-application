@@ -1,9 +1,14 @@
 package com.jongsoft.finance.llm.feature;
 
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.transaction.Transaction;
+import com.jongsoft.finance.domain.user.Budget;
+import com.jongsoft.finance.domain.user.Category;
 import com.jongsoft.finance.learning.SuggestionInput;
 import com.jongsoft.finance.learning.SuggestionResult;
 import com.jongsoft.finance.llm.stores.ClassificationEmbeddingStore;
+import com.jongsoft.finance.messaging.commands.transaction.LinkTransactionCommand;
+import com.jongsoft.finance.providers.ExpenseProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Control;
@@ -13,8 +18,10 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 class ClassificationEmbeddingStoreIT extends AiBase {
 
@@ -22,26 +29,33 @@ class ClassificationEmbeddingStoreIT extends AiBase {
     private ClassificationEmbeddingStore classificationEmbeddingStore;
 
     @Inject private TransactionProvider transactionProvider;
+    @Inject private ExpenseProvider expenseProvider;
 
     @Test
     void classifyTransaction() throws InterruptedException {
+        when(expenseProvider.lookup(1L)).thenReturn(Control.Option(new EntityRef.NamedEntity(1L, "Shopping")));
+
         var transaction = Transaction.builder()
                 .id(1L)
                 .description("Buy a new laptop")
-                .category("Electronics")
+                .metadata(Map.of(
+                    "CATEGORY", Category.builder().label("Electronics").build(),
+                    "EXPENSE", new EntityRef.NamedEntity(1L, "Shopping")))
                 .tags(Collections.List("laptop", "shopping"))
                 .build();
         var transaction2 = Transaction.builder()
                 .id(2L)
                 .description("Grocery shopping at the supermarket")
-                .category("Groceries")
+                .metadata(Map.of(
+                    "CATEGORY", Category.builder().label("Groceries").build(),
+                    "EXPENSE", new EntityRef.NamedEntity(1L, "Shopping")))
                 .tags(Collections.List("groceries", "shopping"))
                 .build();
 
-        Mockito.when(transactionProvider.lookup(1L)).thenReturn(Control.Option(transaction));
-        Mockito.when(transactionProvider.lookup(2L)).thenReturn(Control.Option(transaction2));
-        transaction.linkToBudget("Shopping");
-        transaction2.linkToBudget("Shopping");
+        when(transactionProvider.lookup(1L)).thenReturn(Control.Option(transaction));
+        when(transactionProvider.lookup(2L)).thenReturn(Control.Option(transaction2));
+        transaction.link(LinkTransactionCommand.LinkType.EXPENSE, 1L);
+        transaction2.link(LinkTransactionCommand.LinkType.EXPENSE, 1L);
 
         Thread.sleep(50);
 
@@ -63,19 +77,33 @@ class ClassificationEmbeddingStoreIT extends AiBase {
         var transaction = Transaction.builder()
                 .id(1L)
                 .description("Buy a new laptop")
-                .category("Electronics")
+                .metadata(
+                    Map.of(
+                        "CATEGORY", Category.builder().label("Electronics").build(),
+                        "EXPENSE", new EntityRef.NamedEntity(1L, "Shopping")))
                 .tags(Collections.List("laptop", "shopping"))
                 .build();
-        Mockito.when(transactionProvider.lookup(1L)).thenReturn(Control.Option(transaction));
+        var updatedTransaction = Transaction.builder()
+            .id(1L)
+            .description("Buy a new laptop")
+            .metadata(
+                Map.of(
+                    "CATEGORY", Category.builder().label("Online shopping").build(),
+                    "EXPENSE", new EntityRef.NamedEntity(1L, "Shopping")))
+            .tags(Collections.List("laptop", "shopping"))
+            .build();
+        when(transactionProvider.lookup(1L))
+            .thenReturn(Control.Option(transaction))
+            .thenReturn(Control.Option(updatedTransaction));
 
-        transaction.linkToBudget("Shopping");
+        transaction.link(LinkTransactionCommand.LinkType.EXPENSE, 1L);
         var suggestion = classificationEmbeddingStore.classify(new SuggestionInput(null, "Shopping for a laptop", null, null, 0));
         assertThat(suggestion)
                 .as("Suggestion should be present for laptop")
                 .isPresent()
                 .contains(new SuggestionResult("Shopping", "Electronics", List.of("laptop", "shopping")));
 
-        transaction.linkToCategory("Online shopping");
+        transaction.link(LinkTransactionCommand.LinkType.CATEGORY, 2L);
         Thread.sleep(50);
         suggestion = classificationEmbeddingStore.classify(new SuggestionInput(null, "Shopping for a laptop", null, null, 0));
         assertThat(suggestion)

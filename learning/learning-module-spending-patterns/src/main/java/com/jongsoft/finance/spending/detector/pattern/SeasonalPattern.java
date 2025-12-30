@@ -40,7 +40,7 @@ public class SeasonalPattern implements Pattern {
         if (isSignificantlyMoreThanAverage(numberInMonth, avgPerMonth)) {
             return Optional.of(SpendingPattern.builder()
                     .type(PatternType.SEASONAL)
-                    .category(transaction.getCategory())
+                    .category(getCategory(transaction))
                     .detectedDate(transaction.getDate().withDayOfMonth(1))
                     .confidence(.75)
                     .metadata(Map.of("season", getCurrentSeason(transaction.getDate())))

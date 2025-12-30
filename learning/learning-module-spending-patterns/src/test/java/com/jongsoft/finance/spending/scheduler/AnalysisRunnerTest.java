@@ -1,6 +1,8 @@
 package com.jongsoft.finance.spending.scheduler;
 
 import com.jongsoft.finance.ResultPage;
+import com.jongsoft.finance.domain.Classifier;
+import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.Insight;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,6 +25,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class AnalysisRunnerTest {
+
+    private Map<String, ? extends Classifier> forExpense(String expense) {
+        return Map.of("EXPENSE", new EntityRef.NamedEntity(1L, expense));
+    }
+
+    private Map<String, ? extends Classifier> forCategory(String category) {
+        return Map.of("CATEGORY", new EntityRef.NamedEntity(1L, category));
+    }
     private List<Detector<?>> transactionDetectors;
     private FilterFactory filterFactory;
     private TransactionProvider transactionProvider;
@@ -90,7 +101,7 @@ class AnalysisRunnerTest {
 
         // Create a mock transaction
         Transaction mockTransaction = mock(Transaction.class);
-        when(mockTransaction.getCategory()).thenReturn("TestCategory");
+        doReturn(forCategory("TestCategory")).when(mockTransaction).getMetadata();
 
         // Create a mock insight
         Insight mockInsight = mock(Insight.class);
@@ -139,8 +150,7 @@ class AnalysisRunnerTest {
 
         // Create a mock transaction with a category
         Transaction mockTransaction = mock(Transaction.class);
-        when(mockTransaction.getCategory()).thenReturn("TestCategory");
-        when(mockTransaction.getBudget()).thenReturn(null);
+        doReturn(forExpense("TestCategory")).when(mockTransaction).getMetadata();
 
         // Create a mock insight
         Insight mockInsight = mock(Insight.class);
@@ -166,10 +176,9 @@ class AnalysisRunnerTest {
         // Arrange
         when(mockDetector.readyForAnalysis()).thenReturn(true);
 
-        // Create a mock transaction with a budget
+        // Create a mock transaction with a budget (expense)
         Transaction mockTransaction = mock(Transaction.class);
-        when(mockTransaction.getCategory()).thenReturn(null);
-        when(mockTransaction.getBudget()).thenReturn("TestBudget");
+        doReturn(forExpense("TestBudget")).when(mockTransaction).getMetadata();
 
         // Create a mock insight
         Insight mockInsight = mock(Insight.class);
@@ -197,8 +206,7 @@ class AnalysisRunnerTest {
 
         // Create a mock transaction without category or budget
         Transaction mockTransaction = mock(Transaction.class);
-        when(mockTransaction.getCategory()).thenReturn(null);
-        when(mockTransaction.getBudget()).thenReturn(null);
+        doReturn(Map.of()).when(mockTransaction).getMetadata();
 
         // Set up transaction provider
         ResultPage<Transaction> transactionPage = ResultPage.of(mockTransaction);
