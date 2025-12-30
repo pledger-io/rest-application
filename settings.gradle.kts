@@ -7,7 +7,7 @@ pluginManagement {
         id("io.micronaut.application").version("4.6.1")
         id("io.freefair.lombok").version("9.1.0")
         id("org.sonarqube").version("7.2.2.6593")
-        id("org.openapi.generator").version("7.17.0")
+        id("org.openapi.generator").version("7.18.0")
         id("com.diffplug.spotless").version("8.1.0")
         id("io.micronaut.openapi").version("4.5.4")
 
@@ -42,12 +42,12 @@ dependencyResolutionManagement {
         }
 
         create("mn") {
-            from("io.micronaut.platform:micronaut-platform:4.10.5")
+            from("io.micronaut.platform:micronaut-platform:4.10.6")
         }
 
         create("llm") {
-            val langchain4jVersion: String = "1.9.1"
-            val betaVersion: String = "$langchain4jVersion-beta17"
+            val langchain4jVersion: String = "1.10.0"
+            val betaVersion: String = "$langchain4jVersion-beta18"
             library("core", "dev.langchain4j", "langchain4j").version(langchain4jVersion)
             library("retriever-sql", "dev.langchain4j", "langchain4j-pgvector").version(betaVersion)
             library("store", "dev.langchain4j", "langchain4j-embeddings-all-minilm-l6-v2").version(betaVersion)
