@@ -1,4 +1,4 @@
-rootProject.name="Pledger"
+rootProject.name="pledger-io"
 
 pluginManagement {
     plugins {
@@ -60,22 +60,3 @@ dependencyResolutionManagement {
         }
     }
 }
-
-include(
-    "core",
-    "domain",
-    "transaction-importer:transaction-importer-api",
-    "transaction-importer:transaction-importer-csv",
-    "learning:learning-module",
-    "learning:learning-module-rules",
-    "learning:learning-module-llm",
-    "learning:learning-module-spending-patterns",
-    "bpmn-process",
-    "jpa-repository",
-    "website:rest-api",
-    "website:learning-rule-api",
-    "website:runtime-api",
-    "website:importer-api",
-    "website:system-api",
-    "website:budget-api",
-    "website:application")

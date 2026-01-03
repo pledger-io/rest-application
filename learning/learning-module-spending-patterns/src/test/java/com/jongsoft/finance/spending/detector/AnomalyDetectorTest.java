@@ -11,7 +11,6 @@ import com.jongsoft.finance.providers.BudgetProvider;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.spending.detector.anomaly.Anomaly;
 import com.jongsoft.finance.spending.detector.anomaly.UserCategoryStatistics;
-import net.bytebuddy.matcher.ElementMatchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 

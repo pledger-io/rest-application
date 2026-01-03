@@ -1,5 +1,5 @@
 plugins {
-    id("io.micronaut.library") apply false
+    id("io.micronaut.library")
     id("com.diffplug.spotless")
     id("maven-publish")
     id("java")
@@ -17,57 +17,48 @@ sonar {
 
 group = "com.jongsoft.finance"
 
-subprojects {
-    apply(plugin = "java")
-    apply(plugin = "maven-publish")
-    apply(plugin = "jacoco")
-    apply(plugin = "com.diffplug.spotless")
+micronaut {
+    testRuntime("junit5")
+    runtime("netty")
+}
 
-    if (project.name != "fintrack-api") {
-        apply(plugin = "io.micronaut.library")
+spotless {
+    java {
+        target("src/main/java/**")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+        palantirJavaFormat("2.75.0").style("AOSP")
     }
+}
 
-    tasks.check {
-        finalizedBy(tasks.jacocoTestReport)
-    }
+dependencies {
+    implementation(mn.micronaut.runtime)
+    implementation(mn.micronaut.data.jpa)
 
-    tasks.jacocoTestReport {
-        reports {
-            xml.required = true
+    implementation(mn.log4j)
+
+    implementation(libs.lang)
+
+    testImplementation(libs.bundles.junit)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.jongsoft.finance"
+            version = System.getProperty("version")
+            from(components["java"])
         }
     }
 
-    tasks.classes {
-        dependsOn("spotlessApply")
-    }
-
-    spotless {
-        java {
-            target("src/main/java/**")
-            removeUnusedImports()
-            trimTrailingWhitespace()
-            endWithNewline()
-            palantirJavaFormat("2.75.0").style("AOSP")
-        }
-    }
-
-    publishing {
-        publications {
-            create<MavenPublication>("maven") {
-                groupId = "com.jongsoft.finance"
-                version = System.getProperty("version")
-                from(components["java"])
-            }
-        }
-
-        repositories {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/pledger-io/rest-application")
-                credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
-                }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/pledger-io/rest-application")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }

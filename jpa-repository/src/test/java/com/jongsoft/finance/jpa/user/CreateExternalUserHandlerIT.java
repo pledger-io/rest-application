@@ -3,7 +3,6 @@ package com.jongsoft.finance.jpa.user;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.jpa.user.entity.UserAccountJpa;
 import com.jongsoft.finance.messaging.commands.user.CreateExternalUserCommand;
-import com.jongsoft.finance.messaging.commands.user.CreateUserCommand;
 import com.jongsoft.finance.security.AuthenticationFacade;
 import com.jongsoft.lang.Collections;
 import io.micronaut.context.event.ApplicationEventPublisher;

@@ -1,6 +1,5 @@
 package com.jongsoft.finance.jpa.account;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.jongsoft.finance.domain.account.Contract;
 import com.jongsoft.finance.jpa.JpaTestSetup;
 import com.jongsoft.finance.providers.ContractProvider;

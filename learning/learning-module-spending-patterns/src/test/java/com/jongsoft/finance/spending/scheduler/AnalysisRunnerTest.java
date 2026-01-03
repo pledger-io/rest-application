@@ -6,7 +6,6 @@ import com.jongsoft.finance.domain.core.EntityRef;
 import com.jongsoft.finance.domain.insight.Insight;
 import com.jongsoft.finance.domain.transaction.Transaction;
 import com.jongsoft.finance.factory.FilterFactory;
-import com.jongsoft.finance.messaging.ApplicationEvent;
 import com.jongsoft.finance.messaging.EventBus;
 import com.jongsoft.finance.providers.TransactionProvider;
 import com.jongsoft.finance.spending.Detector;
