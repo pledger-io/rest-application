@@ -1,8 +1,8 @@
 package com.jongsoft.finance.core.domain.jpa.query;
 
-import com.jongsoft.finance.core.adapter.api.AuthenticationFacade;
-import com.jongsoft.finance.core.domain.WithId;
+import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.jpa.entity.UserAccountJpa;
+import com.jongsoft.finance.core.value.WithId;
 import com.jongsoft.lang.collection.Map;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.collection.support.Collections;
@@ -16,7 +16,6 @@ import java.util.stream.Collector;
 @Singleton
 public class ReactiveEntityManager {
     private final EntityManager entityManager;
-
     private final AuthenticationFacade authenticationFacade;
 
     ReactiveEntityManager(EntityManager entityManager, AuthenticationFacade authenticationFacade) {
@@ -89,5 +88,9 @@ public class ReactiveEntityManager {
     public static <T>
             Collector<T, ? extends ArrayList<T>, ? extends Sequence<T>> sequenceCollector() {
         return Collections.collector(com.jongsoft.lang.Collections::List);
+    }
+
+    public EntityManager getEntityManager() {
+        return entityManager;
     }
 }

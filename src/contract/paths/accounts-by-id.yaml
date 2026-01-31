@@ -1,0 +1,58 @@
+parameters:
+  - name: id
+    description: The identifier of the account
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getAccountById
+  tags: [ account-fetcher ]
+  summary: Get account
+  description: >
+    Get account details by id for the current user
+  responses:
+    "200":
+      description: The created account
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/account-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404":
+      description: Saving goal not found
+put:
+  operationId: updateAccountById
+  tags: [ account-command ]
+  summary: Update account
+  description: >
+    Update account details by id for the current user
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/account-request' }
+  responses:
+    "200":
+      description: The created account
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/account-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404":
+      description: Saving goal not found
+delete:
+  operationId: deleteAccountById
+  tags: [ account-command ]
+  summary: Delete account
+  description: >
+    Delete account details by id for the current user
+  responses:
+    "204":
+      description: Confirmation that the account was deleted
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

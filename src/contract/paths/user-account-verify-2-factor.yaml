@@ -1,0 +1,21 @@
+post:
+  operationId: verifyTwoFactor
+  tags: [ security ]
+  summary: Verify 2-factor
+  description: >
+    Used to verify the user token against that what is expected. If
+    valid the user will get a new JWT with updated authorizations.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: "#/components/schemas/token-request" }
+  responses:
+    "200":
+      description: Confirmation the 2 factor was OK
+      content:
+        application/json:
+          schema:
+            type: object
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

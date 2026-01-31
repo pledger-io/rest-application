@@ -1,6 +1,7 @@
 package com.jongsoft.finance.core.domain.jpa.query.expression;
 
 import com.jongsoft.finance.core.domain.jpa.query.BooleanExpression;
+
 import jakarta.persistence.Query;
 
 record FieldBetween<T>(String tableAlias, String fieldId, String field, T start, T end)

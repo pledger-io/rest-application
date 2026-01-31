@@ -1,0 +1,55 @@
+get:
+  operationId: findScheduleByFilter
+  tags: [ schedule-fetcher ]
+  summary: Search schedules
+  description: >
+    List transaction schedules matching optional filters on account and contract.
+    Returns all schedules the current user has access to.
+  parameters:
+    - name: account
+      description: >
+        Identifiers of accounts to filter for. Can be either a source or destination
+        for the schedule.
+      in: query
+      schema:
+        type: array
+        items:
+          type: integer
+    - name: contract
+      in: query
+      description: >
+        Identifiers of contracts to filter on.
+      schema:
+        type: array
+        items:
+          type: integer
+  responses:
+    "200":
+      description: The list of schedules based upon the filters
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/transaction-schedule-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createSchedule
+  tags: [ schedule-command ]
+  summary: Create schedule
+  description: >
+    Create a new transaction schedule using the provided request body. Returns the
+    created schedule including its identifier and configuration.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/transaction-schedule-request' }
+  responses:
+    "201":
+      description: Confirmation the schedule was created
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/transaction-schedule-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

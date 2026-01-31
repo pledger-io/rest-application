@@ -1,0 +1,30 @@
+get:
+  operationId: getInsightsByFilters
+  tags: [ insight ]
+  summary: Fetch insights
+  description: >
+    Retrieve detected financial insights for a given year and optional month.
+    Returns an array of insights for the current user.
+  parameters:
+    - name: year
+      in: query
+      schema:
+        type: integer
+        min: 1990
+        max: 9999
+    - name: month
+      in: query
+      schema:
+        type: integer
+        min: 1
+        max: 12
+  responses:
+    "200":
+      description: The list of detected insights
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/detected-insight-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

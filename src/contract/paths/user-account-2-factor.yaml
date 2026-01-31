@@ -1,0 +1,41 @@
+parameters:
+  - name: user
+    in: path
+    required: true
+    schema:
+      type: string
+      example: e@example.nl
+get:
+  operationId: generateQrCode
+  tags: [ profile ]
+  summary: Create QR code
+  description: >
+    Get the QR-code that can be used to active the 2-factor
+    authentication.
+  responses:
+    "200":
+      description: The content of the file
+      content:
+        '*/*':
+          schema:
+            type: string
+            format: byte
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+patch:
+  operationId: patch2Factor
+  tags: [ profile ]
+  summary: Update 2-factor
+  description: >
+    Enable or disable the 2-factor authentication 
+    for the user.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/patch-multi-factor-request' }
+  responses:
+    "204":
+      description: Confirmation that the command was executed
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

@@ -1,0 +1,65 @@
+get:
+  operationId: findTransactionBy
+  tags: [ transaction-fetcher ]
+  summary: Search transactions
+  description: >
+    Search the current user's transactions using optional filters such as date range,
+    account, budget/expense, category, contract, tags, description text, type, import id,
+    and currency. Results are returned as a paged list that can be navigated with offset
+    and number-of-results parameters.
+  parameters:
+    - $ref: '#/components/parameters/start-date'
+    - $ref: '#/components/parameters/end-date'
+    - $ref: '#/components/parameters/number-of-results'
+    - $ref: '#/components/parameters/offset'
+    - $ref: '#/components/parameters/account-filter'
+    - $ref: '#/components/parameters/expense-filter'
+    - $ref: '#/components/parameters/category-filter'
+    - $ref: '#/components/parameters/contract-filter'
+    - $ref: '#/components/parameters/tag-filter'
+    - $ref: '#/components/parameters/import-slug-filter'
+    - name: description
+      in: query
+      description: Filter on a part of the transaction description
+      schema:
+        type: string
+    - name: type
+      in: query
+      description: Filter on the transaction type
+      schema:
+        type: string
+        enum: [ 'INCOME', 'EXPENSE', 'TRANSFER' ]
+    - name: currency
+      in: query
+      description: Filter based on the currency code
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 3
+        example: 'EUR'
+  responses:
+    "200":
+      description: The transactions matching the filters in a paged way
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/transaction-paged-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createTransaction
+  tags: [ transaction-command ]
+  summary: Create transaction
+  description: Create a new transaction in the system
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/transaction-request' }
+  responses:
+    "201":
+      description: The created transaction
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/transaction-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

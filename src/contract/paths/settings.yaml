@@ -1,0 +1,15 @@
+get:
+  operationId: getAllSettings
+  tags: [ settings ]
+  security: [ ]
+  summary: Fetch settings
+  responses:
+    "200":
+      description: The list of currencies
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/setting-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

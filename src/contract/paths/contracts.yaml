@@ -1,0 +1,42 @@
+get:
+  operationId: findContractBy
+  tags: [ contract-fetcher ]
+  summary: Search contracts
+  description: >
+    Retrieve contracts filtered by optional name and status (ACTIVE or INACTIVE).
+    Returns a list of matching contracts for the current user.
+  parameters:
+    - $ref: '#/components/parameters/name-filter'
+    - name: status
+      in: query
+      schema:
+        type: string
+        enum: [ ACTIVE, INACTIVE ]
+  responses:
+    "200":
+      description: The contracts matching the filters
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/contract-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createContract
+  tags: [ contract-command ]
+  summary: Create contract
+  description: Create a new contract in the application.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/contract-request' }
+  responses:
+    "201":
+      description: The created contract
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/contract-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

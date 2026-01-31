@@ -1,0 +1,56 @@
+type: object
+properties:
+  accounts:
+    type: array
+    items:
+      allOf:
+        - $ref: '#/components/schemas/account-response'
+        - type: object
+          properties:
+            icon:
+              type: string
+              description: The icon of the account, in a base64 encoded string
+  categories:
+    type: array
+    items: { $ref: '#/components/schemas/category-response' }
+  budget:
+    type: array
+    items:
+      type: object
+      properties:
+        income: { type: number, format: double }
+        period: { $ref: '#/components/schemas/date-range' }
+        expenses:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              expected: { type: number }
+  contract:
+    type: array
+    items:
+      allOf:
+        - $ref: '#/components/schemas/contract-response'
+        - type: object
+          properties:
+            contract:
+              type: string
+              description: The HEX encoded attached contract file
+  tags:
+    type: array
+    items:
+      type: string
+  schedules:
+    type: array
+    items:
+      allOf:
+        - $ref: '#/components/schemas/transaction-schedule-response'
+        - type: object
+          properties:
+            lastRun: { type: string, format: date }
+            nextRun: { type: string, format: date }
+  transaction:
+    type: array
+    items: { $ref: '#/components/schemas/transaction-response' }
+# todo add transaction rules

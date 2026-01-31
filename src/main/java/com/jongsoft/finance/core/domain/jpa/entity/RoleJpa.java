@@ -1,6 +1,8 @@
 package com.jongsoft.finance.core.domain.jpa.entity;
 
-import com.jongsoft.finance.core.domain.WithId;import jakarta.persistence.*;
+import com.jongsoft.finance.core.value.WithId;
+
+import jakarta.persistence.*;
 
 import java.util.Objects;
 import java.util.Set;
@@ -27,13 +29,16 @@ public class RoleJpa implements WithId {
         this.users = users;
     }
 
-    @Override public Long getId() {
+    @Override
+    public Long getId() {
         return id;
     }
 
     public String getName() {
-    return name;
-}@Override
+        return name;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o instanceof RoleJpa other) {
             return Objects.equals(other.name, name);

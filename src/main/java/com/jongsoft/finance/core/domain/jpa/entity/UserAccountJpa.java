@@ -1,21 +1,24 @@
 package com.jongsoft.finance.core.domain.jpa.entity;
 
-import com.jongsoft.finance.jpa.core.entity.EntityJpa;
+import com.jongsoft.finance.core.value.WithId;
+
+import io.micronaut.core.annotation.Introspected;
 
 import jakarta.persistence.*;
-
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Singular;
 
 import java.util.Currency;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
 @Entity
+@Introspected
 @Table(name = "user_account")
-public class UserAccountJpa extends EntityJpa {
+public class UserAccountJpa implements WithId {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
+    private Long id;
 
     @Column(name = "username", unique = true, nullable = false)
     private String username;
@@ -41,11 +44,8 @@ public class UserAccountJpa extends EntityJpa {
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<RoleJpa> roles = new HashSet<>();
 
-    public UserAccountJpa() {
-        super();
-    }
+    public UserAccountJpa() {}
 
-    @Builder
     private UserAccountJpa(
             String username,
             String password,
@@ -54,7 +54,7 @@ public class UserAccountJpa extends EntityJpa {
             String theme,
             Currency currency,
             byte[] gravatar,
-            @Singular Set<RoleJpa> roles) {
+            Set<RoleJpa> roles) {
         this.username = username;
         this.password = password;
         this.twoFactorEnabled = twoFactorEnabled;
@@ -63,5 +63,53 @@ public class UserAccountJpa extends EntityJpa {
         this.currency = currency;
         this.gravatar = gravatar;
         this.roles = roles;
+    }
+
+    public static UserAccountJpa of(
+            String username,
+            String password,
+            String twoFactorSecret,
+            String theme,
+            Currency currency,
+            Set<RoleJpa> roles) {
+        return new UserAccountJpa(
+                username, password, false, twoFactorSecret, theme, currency, null, roles);
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public boolean isTwoFactorEnabled() {
+        return twoFactorEnabled;
+    }
+
+    public String getTwoFactorSecret() {
+        return twoFactorSecret;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public byte[] getGravatar() {
+        return gravatar;
+    }
+
+    public Set<RoleJpa> getRoles() {
+        return roles;
     }
 }

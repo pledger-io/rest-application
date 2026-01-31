@@ -1,0 +1,43 @@
+parameters:
+  - name: user
+    in: path
+    required: true
+    schema:
+      type: string
+      example: e@example.nl
+get:
+  operationId: listSessions
+  tags: [ profile ]
+  summary: List sessions
+  description: >
+    Retrieve a list of all active sessions of the user
+  responses:
+    "200":
+      description: A list of the users session
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/session-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createSession
+  tags: [ profile ]
+  summary: Create session
+  description: >
+    Start a new durable long term session. This can for
+    example be used in a mobile app.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/session-request' }
+  responses:
+    "201":
+      description: The created session
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/session-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

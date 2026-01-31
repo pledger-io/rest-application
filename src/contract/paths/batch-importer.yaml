@@ -1,0 +1,39 @@
+get:
+  operationId: getJobsByFilters
+  tags: [ batch-importer ]
+  summary: Search import jobs
+  parameters:
+    - $ref: '#/components/parameters/number-of-results'
+    - $ref: '#/components/parameters/offset'
+  responses:
+    "200":
+      description: The batch jobs that were executed
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/batch-job-paged-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createJob
+  tags: [ batch-importer ]
+  summary: Create import job
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            configuration:
+              type: string
+            fileToken:
+              type: string
+  responses:
+    "201":
+      description: The created batch job
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/batch-job-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

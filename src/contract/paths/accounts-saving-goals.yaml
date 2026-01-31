@@ -1,0 +1,45 @@
+parameters:
+  - name: id
+    description: The identifier of the account
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getSavingGoalsForAccount
+  tags: [ account-fetcher ]
+  summary: List saving goals
+  description: >
+    Get the saving goals for the account, note this can only be called if the account type is SAVINGS.
+  responses:
+    "200":
+      description: The list of saving goals
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/saving-goal-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+post:
+  operationId: createSavingGoalForAccount
+  tags: [ account-command ]
+  summary: Create saving goal
+  description: >
+    Create a new saving goal for the account, note this can only be called if the account type is SAVINGS.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/saving-goal-request' }
+  responses:
+    "201":
+      description: The created saving goal
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/saving-goal-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

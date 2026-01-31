@@ -1,0 +1,57 @@
+parameters:
+  - name: currencyCode
+    description: The currency code
+    in: path
+    required: true
+    schema:
+      type: string
+      example: EUR
+get:
+  operationId: getCurrencyByCode
+  tags: [ currency ]
+  summary: Fetch currency
+  responses:
+    "200":
+      description: The currency
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/currency-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateCurrencyByCode
+  tags: [ currency ]
+  summary: Update currency
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/currency-request' }
+  responses:
+    "200":
+      description: The updated currency
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/currency-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+patch:
+  operationId: patchCurrencyByCode
+  tags: [ currency ]
+  summary: Patch currency
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/currency-patch-request' }
+  responses:
+    "200":
+      description: The updated currency
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/currency-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

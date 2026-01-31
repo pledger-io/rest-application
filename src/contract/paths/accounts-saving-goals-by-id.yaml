@@ -1,0 +1,48 @@
+parameters:
+  - name: id
+    description: The identifier of the account
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+  - name: goalId
+    description: The identifier of the saving goal
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+put:
+  operationId: updateSavingGoalForAccount
+  tags: [ account-command ]
+  summary: Update saving goal
+  description: >
+    Update a saving goal for the account, note this can only be called if the account type is SAVINGS.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/saving-goal-request' }
+  responses:
+    "200":
+      description: The updated saving goal
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/saving-goal-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+delete:
+  operationId: deleteSavingGoalForAccount
+  tags: [ account-command ]
+  summary: Delete saving goal
+  description: >
+    Remove a saving goal for the account, note this can only be called if the account type is SAVINGS.
+  responses:
+    "204":
+      description: Confirmation that the saving goal was deleted
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

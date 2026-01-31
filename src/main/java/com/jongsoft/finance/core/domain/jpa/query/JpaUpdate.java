@@ -1,6 +1,7 @@
 package com.jongsoft.finance.core.domain.jpa.query;
 
 import com.jongsoft.finance.core.domain.jpa.query.expression.Expressions;
+
 import jakarta.persistence.EntityManager;
 
 import org.slf4j.Logger;

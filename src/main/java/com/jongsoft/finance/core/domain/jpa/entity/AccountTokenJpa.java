@@ -1,16 +1,22 @@
 package com.jongsoft.finance.core.domain.jpa.entity;
 
-import jakarta.persistence.*;
+import com.jongsoft.finance.core.value.WithId;
 
-import lombok.Builder;
-import lombok.Getter;
+import io.micronaut.core.annotation.Introspected;
+
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-@Getter
 @Entity
+@Introspected
 @Table(name = "user_account_token")
 public class AccountTokenJpa implements WithId {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
+    private Long id;
 
     @ManyToOne
     @JoinColumn
@@ -32,14 +38,13 @@ public class AccountTokenJpa implements WithId {
         super();
     }
 
-    @Builder
     public AccountTokenJpa(
             Long id,
             UserAccountJpa user,
             String refreshToken,
             LocalDateTime expires,
             String description) {
-        super(id);
+        this.id = id;
         this.user = user;
         this.refreshToken = refreshToken;
         this.expires = expires;
@@ -56,5 +61,30 @@ public class AccountTokenJpa implements WithId {
         if (description == null) {
             description = "Pledger.io Web login";
         }
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    public UserAccountJpa getUser() {
+        return user;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public LocalDateTime getCreated() {
+        return created;
+    }
+
+    public LocalDateTime getExpires() {
+        return expires;
     }
 }

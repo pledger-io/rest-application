@@ -1,0 +1,48 @@
+get:
+  operationId: getAccounts
+  tags: [ account-fetcher ]
+  summary: Search accounts
+  description: >
+    List available accounts that the current user has access to
+  parameters:
+    - name: type
+      description: The account type to filter on
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+    - $ref: '#/components/parameters/offset'
+    - $ref: '#/components/parameters/number-of-results'
+    - name: accountName
+      in: query
+      description: A partial name of an account to look for
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The list of accounts
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/account-paged-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createAccount
+  tags: [ account-command ]
+  summary: Create account
+  description: >
+    Create a new account for the current user
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/account-request' }
+  responses:
+    "201":
+      description: The created account
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/account-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

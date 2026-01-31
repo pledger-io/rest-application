@@ -28,53 +28,6 @@ class LanguageModelStarter {
     private static final Logger log = LoggerFactory.getLogger(LanguageModelStarter.class);
 
     @Bean
-    BudgetAgent budgetAgent(ChatModel model, BudgetTool budgetTool) {
-        log.info("Setting up budget chat agent.");
-        return AgenticServices.agentBuilder(BudgetAgent.class)
-                .chatModel(model)
-                .chatMemoryProvider(chatMemoryProvider())
-                .tools(budgetTool)
-                .name("budget-agent")
-                .build();
-    }
-
-    @Bean
-    CategoryAgent categoryAgent(ChatModel model, CategoryTool categoryTool) {
-        log.info("Setting up category chat agent.");
-        return AgenticServices.agentBuilder(CategoryAgent.class)
-                .chatModel(model)
-                .chatMemoryProvider(chatMemoryProvider())
-                .tools(categoryTool)
-                .name("category-agent")
-                .build();
-    }
-
-    @Bean
-    TagAgent tagAgent(ChatModel model, TagTool tagTool) {
-        log.info("Setting up tag chat agent.");
-        return AgenticServices.agentBuilder(TagAgent.class)
-                .chatModel(model)
-                .chatMemoryProvider(chatMemoryProvider())
-                .tools(tagTool)
-                .name("tag-agent")
-                .build();
-    }
-
-    @Bean
-    public ClassificationAgent transactionSupportAgent(
-            ChatModel model,
-            BudgetAgent budgetAgent,
-            CategoryAgent categoryAgent,
-            TagTool tagTool) {
-        log.info("Setting up transaction support chat agent.");
-        return AgenticServices.agentBuilder(ClassificationAgent.class)
-                .chatModel(model)
-                .chatMemoryProvider(chatMemoryProvider())
-                .tools(budgetAgent, categoryAgent, tagTool)
-                .build();
-    }
-
-    @Bean
     public TransactionExtractorAgent transactionExtractorAgent(
             ChatModel model, AccountTool accountTool) {
         log.info("Setting up transaction extractor chat agent.");
@@ -92,11 +45,4 @@ class LanguageModelStarter {
         return Executors.newScheduledThreadPool(5);
     }
 
-    private ChatMemoryProvider chatMemoryProvider() {
-        return memoryId -> MessageWindowChatMemory.builder()
-                .id(memoryId)
-                .maxMessages(10)
-                .chatMemoryStore(new InMemoryChatMemoryStore())
-                .build();
-    }
 }

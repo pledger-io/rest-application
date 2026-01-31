@@ -1,0 +1,30 @@
+get:
+  operationId: getTopAccountsBySpending
+  tags: [ account-fetcher ]
+  summary: Top account by spending
+  description: >
+    Returns the top spending accounts for the current user within the optional date range.
+    You can filter by account type or include only your own accounts using useOwnAccounts.
+    The response is an array ordered by highest spending, each item providing account and amount details.
+  parameters:
+    - $ref: '#/components/parameters/start-date'
+    - $ref: '#/components/parameters/end-date'
+    - name: type
+      description: Filter on the type of account. Must not be set when useOwnAccounts is provided.
+      in: query
+      schema: { $ref: '#/components/schemas/account-type' }
+    - name: useOwnAccounts
+      description: Filter on all of the users own accounts. If set the type filter will be ignored.
+      in: query
+      schema:
+        type: boolean
+  responses:
+    "200":
+      description: The list of top spending accounts
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/account-spending-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

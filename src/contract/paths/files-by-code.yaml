@@ -1,0 +1,35 @@
+parameters:
+  - name: fileCode
+    in: path
+    required: true
+    schema:
+      type: string
+get:
+  operationId: downloadFile
+  tags: [ files ]
+  summary: Download file
+  description: >
+    Download an existing file from the system. If encryption is enabled this
+    will throw an exception if the file was not uploaded by the user 
+    downloading it.
+  responses:
+    "200":
+      description: The content of the file
+      content:
+        '*/*':
+          schema:
+            type: string
+            format: byte
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteFile
+  tags: [ files ]
+  summary: Delete file
+  responses:
+    "204":
+      description: Confirmation the file was removed
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

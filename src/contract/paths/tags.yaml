@@ -1,0 +1,39 @@
+get:
+  operationId: findTagsBy
+  tags: [ tag-fetcher ]
+  summary: Search tags
+  description: >
+    Return a list of tag names matching the optional name filter for the current user.
+  parameters:
+    - $ref: '#/components/parameters/name-filter'
+  responses:
+    "200":
+      description: The tags matching the filters
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createTag
+  tags: [ tag-command ]
+  summary: Create tag
+  description: >
+    Create a new tag with the given name for the current user. Returns 204 on success.
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+  responses:
+    "204":
+      description: Confirmation the tag was created
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

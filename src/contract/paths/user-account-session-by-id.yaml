@@ -1,0 +1,26 @@
+parameters:
+  - name: user
+    in: path
+    required: true
+    schema:
+      type: string
+      example: e@example.nl
+  - name: session
+    in: path
+    required: true
+    schema:
+      type: integer
+      example: 123
+delete:
+  operationId: revokeSession
+  tags: [ profile ]
+  summary: Revoke session
+  description: >
+    Revoke a session. This will disable any future use
+    of the session in any app.
+  responses:
+    "204":
+      description: Confirmation the session is deleted
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

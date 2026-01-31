@@ -1,6 +1,7 @@
 package com.jongsoft.finance.core.domain.jpa.query.expression;
 
 import com.jongsoft.finance.core.domain.jpa.query.BooleanExpression;
+
 import jakarta.persistence.Query;
 
 public record OrExpression(BooleanExpression left, BooleanExpression right)

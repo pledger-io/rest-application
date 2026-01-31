@@ -1,0 +1,30 @@
+get:
+  operationId: getPatternsByFilters
+  tags: [ insight ]
+  summary: Fetch patterns
+  description: >
+    Retrieve detected spending patterns for a given year and optional month.
+    Returns an array of patterns for the current user.
+  parameters:
+    - name: year
+      in: query
+      schema:
+        type: integer
+        min: 1990
+        max: 9999
+    - name: month
+      in: query
+      schema:
+        type: integer
+        min: 1
+        max: 12
+  responses:
+    "200":
+      description: The list of detected patterns
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/detected-pattern-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
