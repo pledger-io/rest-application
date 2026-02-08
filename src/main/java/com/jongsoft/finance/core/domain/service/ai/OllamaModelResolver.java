@@ -35,14 +35,14 @@ class OllamaModelResolver {
     OllamaModelCard resolveModel() {
         log.info("Checking for model {}.", configuration.getOllama().getModel());
         if (missesRequiredModel()) {
-            fetchModel();
+            fetchModel(configuration.getOllama().getModel());
+            fetchModel(configuration.getOllama().getEmbeddingModel());
         }
 
         return ollamaModels.modelCard(configuration.getOllama().getModel()).content();
     }
 
-    private void fetchModel() {
-        var modelName = configuration.getOllama().getModel();
+    private void fetchModel(String modelName) {
         log.info("Model {} is missing, attempting to pull it from Ollama.", modelName);
         var request = HttpRequest.POST(
                 configuration.getOllama().getUri() + "/api/pull", Map.of("model", modelName));
@@ -52,7 +52,12 @@ class OllamaModelResolver {
 
     private boolean missesRequiredModel() {
         return ollamaModels.availableModels().content().stream()
-                .noneMatch(model ->
-                        Objects.equals(configuration.getOllama().getModel(), model.getModel()));
+                        .filter(model -> Objects.equals(
+                                        configuration.getOllama().getModel(), model.getModel())
+                                || Objects.equals(
+                                        configuration.getOllama().getEmbeddingModel(),
+                                        model.getModel()))
+                        .count()
+                != 2;
     }
 }

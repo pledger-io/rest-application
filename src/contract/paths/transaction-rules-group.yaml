@@ -1,0 +1,63 @@
+parameters:
+  - name: group
+    required: true
+    in: path
+    description: The name of the group
+    schema:
+      type: string
+get:
+  operationId: fetchRulesByGroup
+  tags: [ learning-rule-fetcher ]
+  summary: Fetch rules by group
+  responses:
+    "200":
+      description: The list of rule groups
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/rule-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteRuleGroup
+  tags: [ learning-rule-command ]
+  summary: Delete rule group
+  responses:
+    "204":
+      description: Confirmation that the group was deleted.
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+patch:
+  operationId: updateRuleGroup
+  tags: [ learning-rule-command ]
+  summary: Update rule group
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/rule-group-patch-request' }
+  responses:
+    "204":
+      description: Confirmation that the group was deleted.
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+post:
+  operationId: createRule
+  tags: [ learning-rule-command ]
+  summary: Create rule
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/rule-request' }
+  responses:
+    "201":
+      description: The created rule
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/rule-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

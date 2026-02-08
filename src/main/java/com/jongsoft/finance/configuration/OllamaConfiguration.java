@@ -7,6 +7,7 @@ public class OllamaConfiguration {
 
     private String uri;
     private String model;
+    private String embeddingModel;
     private boolean forceAugmentation;
 
     public String getUri() {
@@ -23,6 +24,14 @@ public class OllamaConfiguration {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public void setEmbeddingModel(String embeddingModel) {
+        this.embeddingModel = embeddingModel;
+    }
+
+    public String getEmbeddingModel() {
+        return embeddingModel;
     }
 
     public boolean isForceAugmentation() {

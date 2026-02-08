@@ -1,6 +1,7 @@
 package com.jongsoft.finance.contract.domain.jpa.entity;
 
 import com.jongsoft.finance.banking.domain.jpa.entity.AccountJpa;
+import com.jongsoft.finance.banking.domain.jpa.entity.TransactionScheduleJpa;
 import com.jongsoft.finance.core.domain.jpa.entity.UserAccountJpa;
 import com.jongsoft.finance.core.value.WithId;
 
@@ -33,6 +34,9 @@ public class ContractJpa implements WithId {
 
     @ManyToOne
     private UserAccountJpa user;
+
+    @OneToOne
+    private TransactionScheduleJpa schedule;
 
     private boolean warningActive;
     private boolean archived;
@@ -98,6 +102,10 @@ public class ContractJpa implements WithId {
 
     public boolean isNotificationSend() {
         return notificationSend;
+    }
+
+    public TransactionScheduleJpa getSchedule() {
+        return schedule;
     }
 
     public static ContractJpa create(

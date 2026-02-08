@@ -1,0 +1,29 @@
+get:
+  operationId: fetchRuleGroups
+  tags: [ learning-rule-fetcher ]
+  summary: Fetch rule groups
+  responses:
+    "200":
+      description: The list of rule groups
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/rule-group-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createRuleGroup
+  tags: [ learning-rule-command ]
+  summary: Create rule group
+  requestBody:
+    description: >
+      The request body for creating a new rule group.
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/rule-group-response' }
+  responses:
+    "204":
+      description: Confirmation that the group was created.
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

@@ -25,7 +25,7 @@ public class RuleGroupJpa implements WithId {
     @JoinColumn
     private UserAccountJpa user;
 
-    private RuleGroupJpa(String name, int sort, UserAccountJpa user) {
+    public RuleGroupJpa(String name, int sort, UserAccountJpa user) {
         this.name = name;
         this.sort = sort;
         this.archived = false;

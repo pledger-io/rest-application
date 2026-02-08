@@ -4,6 +4,7 @@ import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.domain.commands.CreateScheduleForRelationCommand;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.Classifier;
+import com.jongsoft.finance.banking.domain.model.TransactionSchedule;
 import com.jongsoft.finance.contract.domain.commands.*;
 import com.jongsoft.finance.core.value.Schedule;
 
@@ -24,6 +25,7 @@ public class Contract implements Serializable, Classifier {
     private LocalDate endDate;
 
     private String fileToken;
+    private TransactionSchedule schedule;
 
     private boolean uploaded;
     private boolean notifyBeforeEnd;
@@ -39,6 +41,7 @@ public class Contract implements Serializable, Classifier {
             LocalDate startDate,
             LocalDate endDate,
             String fileToken,
+            TransactionSchedule schedule,
             boolean uploaded,
             boolean notifyBeforeEnd,
             boolean terminated) {
@@ -52,6 +55,7 @@ public class Contract implements Serializable, Classifier {
         this.uploaded = uploaded;
         this.notifyBeforeEnd = notifyBeforeEnd;
         this.terminated = terminated;
+        this.schedule = schedule;
     }
 
     private Contract(
@@ -153,6 +157,10 @@ public class Contract implements Serializable, Classifier {
                     "Contract has not yet expired.", "contract.not.expired");
         }
 
+        if (schedule != null) {
+            schedule.terminate();
+        }
+
         this.terminated = true;
         TerminateContractCommand.contractTerminated(id);
     }
@@ -199,6 +207,10 @@ public class Contract implements Serializable, Classifier {
 
     public boolean isTerminated() {
         return terminated;
+    }
+
+    public TransactionSchedule getSchedule() {
+        return schedule;
     }
 
     @Override

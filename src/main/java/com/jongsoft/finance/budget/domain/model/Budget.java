@@ -180,7 +180,7 @@ public class Budget {
         CreateExpenseCommand.expenseCreated(name, start, BigDecimal.valueOf(upperBound));
     }
 
-    void activate() {
+    public void activate() {
         if (id == null && !active) {
             active = true;
             expenses.forEach(e -> e.budget = this);

@@ -41,8 +41,7 @@ public class Account implements Serializable, Classifier {
 
     private boolean remove;
 
-    private Account(UserIdentifier user, String name, String currency, String type) {
-        this.user = user;
+    private Account(String name, String currency, String type) {
         this.name = name;
         this.currency = currency;
         this.type = type;
@@ -311,6 +310,6 @@ public class Account implements Serializable, Classifier {
     }
 
     public static Account create(UserIdentifier user, String name, String currency, String type) {
-        return new Account(user, name, currency, type);
+        return new Account(name, currency, type);
     }
 }

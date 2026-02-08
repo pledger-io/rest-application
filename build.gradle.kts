@@ -33,9 +33,13 @@ micronaut {
 
             importMapping = mapOf(
                 "JsonError" to "io.micronaut.http.hateoas.JsonError",
+                "RuleOperation" to "com.jongsoft.finance.suggestion.types.RuleOperation",
+                "RuleColumn" to "com.jongsoft.finance.suggestion.types.RuleColumn",
             )
             typeMapping = mapOf(
-                "json-error-response" to "JsonError"
+                "json-error-response" to "JsonError",
+                "operation-type" to "RuleOperation",
+                "rule-column" to "RuleColumn"
             )
         }
     }

@@ -51,9 +51,6 @@ public class TransactionScheduleJpa implements WithId {
     @ManyToOne
     private AccountJpa destination;
 
-    //    @ManyToOne
-    //    private ContractJpa contract;
-
     public TransactionScheduleJpa(
             double amount,
             String name,

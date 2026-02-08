@@ -5,10 +5,7 @@ import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.rest.TransactionFetcherApi;
-import com.jongsoft.finance.rest.model.FindTransactionByTypeParameter;
-import com.jongsoft.finance.rest.model.PagedResponseInfo;
-import com.jongsoft.finance.rest.model.TransactionPagedResponse;
-import com.jongsoft.finance.rest.model.TransactionResponse;
+import com.jongsoft.finance.rest.model.*;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.Dates;
 

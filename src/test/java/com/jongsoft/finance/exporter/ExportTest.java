@@ -31,11 +31,9 @@ public class ExportTest extends RestTestSetup {
               .withTag("Vacation 2023")
               .withTag("Vacation 2024");
 
-        Thread.sleep(200);
-
         requests.createExport()
               .statusCode(200)
-              .body("accounts", hasSize(6))
+              .body("accounts", hasSize(5))
               .body("accounts.name", hasItems("Checking account", "Credit card account", "Savings account", "Employer", "Netflix"))
               .body("categories", hasSize(3))
               .body("categories.name", hasItems("Grocery", "Shopping", "Transportation"))

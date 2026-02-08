@@ -50,7 +50,7 @@ class OllamaModelSetup {
     EmbeddingModel embeddingModel() {
         return OllamaEmbeddingModel.builder()
                 .baseUrl(configuration.getOllama().getUri())
-                .modelName(configuration.getOllama().getModel())
+                .modelName(configuration.getOllama().getEmbeddingModel())
                 .build();
     }
 }

@@ -102,6 +102,14 @@ paths:
   /v2/api/batch-importer/{slug}: { $ref: './paths/batch-importer-by-slug.yaml' }
   /v2/api/batch-importer-config: { $ref: './paths/batch-importer-config.yaml' }
 
+# Suggestions rule operations
+  /v2/api/transaction-rules: { $ref: './paths/transaction-rules.yaml' }
+  /v2/api/transaction-rules/{group}: { $ref: './paths/transaction-rules-group.yaml' }
+  /v2/api/transaction-rules/{group}/{ruleId}: { $ref: './paths/transaction-rules-rule.yaml' }
+
+  /v2/api/ai/auto-complete: { $ref: './paths/ai-auto-complete.yaml' }
+  /v2/api/ai/extract: { $ref: './paths/ai-extract.yaml' }
+
 components:
   securitySchemes:
     bearerAuth:
@@ -134,6 +142,8 @@ components:
     account-link: { $ref: './components/account-link.yaml' }
     paged-response: { $ref: './components/paged-response.yaml' }
     account-type: { $ref: './components/account-type.yaml' }
+    rule-column: { $ref: 'components/rule-column.yaml' }
+    operation-type: { $ref: 'components/operation-type.yaml' }
 
     user-request: { $ref: './components/request/user.yaml' }
     token-request: { $ref: './components/request/token.yaml' }
@@ -153,6 +163,8 @@ components:
     budget-request: { $ref: './components/request/budget.yaml' }
     expense-request: { $ref: './components/request/expense.yaml' }
     balance-request: { $ref: './components/request/balance.yaml' }
+    rule-request: { $ref: './components/request/transaction-rule.yaml' }
+    rule-group-patch-request: { $ref: './components/request/transaction-rule-group-patch.yaml' }
 
     user-profile-response: { $ref: './components/response/user-profile.yaml' }
     export-profile-response: { $ref: 'components/response/export-profile.yaml' }
@@ -172,6 +184,7 @@ components:
     transaction-response: { $ref: './components/response/transaction.yaml' }
     transaction-paged-response: { $ref: './components/response/transaction-paged.yaml' }
     transaction-schedule-response: { $ref: './components/response/transaction-schedule.yaml' }
+    extracted-transaction-response: { $ref: './components/response/extracted-transaction.yaml' }
     budget-response: { $ref: './components/response/budget.yaml' }
     expense-response: { $ref: './components/response/expense.yaml' }
     expense-computed-response: { $ref: './components/response/expense-computed.yaml' }
@@ -183,6 +196,8 @@ components:
     batch-job-response: { $ref: './components/response/batch-job.yaml' }
     batch-job-paged-response: { $ref: './components/response/batch-job-paged.yaml' }
     batch-configuration-response: { $ref: './components/response/batch-configuration.yaml' }
+    rule-response: { $ref: './components/response/transaction-rule.yaml' }
+    rule-group-response: { $ref: './components/response/transaction-rule-group.yaml' }
 
     enable-mfa-request:
       type: object

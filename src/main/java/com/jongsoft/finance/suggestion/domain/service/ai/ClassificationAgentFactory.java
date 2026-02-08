@@ -1,6 +1,6 @@
 package com.jongsoft.finance.suggestion.domain.service.ai;
 
-import com.jongsoft.finance.banking.service.tools.TagTool;
+import com.jongsoft.finance.banking.domain.service.tools.TagTool;
 import com.jongsoft.finance.budget.domain.service.ai.BudgetAgent;
 import com.jongsoft.finance.classification.domain.service.ai.CategoryAgent;
 

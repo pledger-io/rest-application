@@ -9,6 +9,8 @@ import com.jongsoft.finance.suggestion.domain.service.rule.matcher.NumberMatcher
 import com.jongsoft.finance.suggestion.domain.service.rule.matcher.StringMatcher;
 import com.jongsoft.finance.suggestion.types.RuleColumn;
 
+import io.micrometer.core.annotation.Timed;
+
 import jakarta.inject.Singleton;
 
 import java.util.List;
@@ -26,6 +28,9 @@ class RuleSuggestionEngine implements SuggestionEngine {
     }
 
     @Override
+    @Timed(
+            value = "learning.language-model",
+            extraTags = {"action", "classify-transaction"})
     public SuggestionResult makeSuggestions(SuggestionInput transactionInput) {
         var ruleDataset = new RuleDataSet();
         if (transactionInput.description() != null) {

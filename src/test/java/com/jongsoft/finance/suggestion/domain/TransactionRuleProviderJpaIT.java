@@ -3,6 +3,7 @@ package com.jongsoft.finance.suggestion.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.jongsoft.finance.JpaTestSetup;
+import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleGroupProvider;
 import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleProvider;
 
 import jakarta.inject.Inject;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 class TransactionRuleProviderJpaIT extends JpaTestSetup {
 
     @Inject private TransactionRuleProvider ruleProvider;
+    @Inject private TransactionRuleGroupProvider ruleGroupProvider;
 
     @BeforeEach
     void setup() {
@@ -40,5 +42,22 @@ class TransactionRuleProviderJpaIT extends JpaTestSetup {
                 .hasSize(1)
                 .first()
                 .satisfies(rule -> assertThat(rule.getName()).isEqualTo("Income rule"));
+    }
+
+    @Test
+    @DisplayName("Lookup all rule groups")
+    void lookup_groups() {
+        Assertions.assertThat(ruleGroupProvider.lookup())
+            .hasSize(2)
+            .first()
+            .satisfies(
+                rule -> Assertions.assertThat(rule.getName()).isEqualTo("Grocery stores"));
+    }
+
+    @Test
+    @DisplayName("Lookup rule group by name")
+    void lookup_group_name() {
+        var check = ruleGroupProvider.lookup("Grocery stores");
+        Assertions.assertThat(check.isPresent()).isTrue();
     }
 }
