@@ -3,6 +3,8 @@ package com.jongsoft.finance.exporter.domain.service.csv;
 import com.jongsoft.finance.JpaTestSetup;
 import com.jongsoft.finance.banking.types.TransactionType;
 import com.jongsoft.finance.core.adapter.api.StorageService;
+import com.jongsoft.finance.exporter.adapter.api.ImportConfigurationProvider;
+import com.jongsoft.finance.exporter.adapter.api.ImportProvider;
 import com.jongsoft.finance.exporter.domain.model.BatchImport;
 import com.jongsoft.finance.exporter.domain.model.BatchImportConfig;
 import com.jongsoft.finance.exporter.domain.service.TransactionConsumer;
@@ -28,6 +30,12 @@ import java.util.List;
 class CSVImportProviderTest extends JpaTestSetup {
 
     @Inject
+    private ImportConfigurationProvider configurationProvider;
+
+    @Inject
+    private ImportProvider importProvider;
+
+    @Inject
     private CSVImportProvider csvImportProvider;
 
     @Inject
@@ -42,17 +50,24 @@ class CSVImportProviderTest extends JpaTestSetup {
         return Mockito.mock(StorageService.class);
     }
 
+    private String batchImportSlug;
+
     @BeforeEach
     void setup() {
         loadDataset("sql/clean-up.sql", "sql/base-setup.sql");
+        BatchImportConfig.create("csv", "CSV Tester", "my-secret-files");
+        this.batchImportSlug = BatchImport.create(
+                        configurationProvider.lookup("CSV Tester").get(), "my-secret-import-files")
+                .getSlug();
     }
 
     @Test
     @DisplayName("Load configuration file is missing")
     void loadConfiguration_fileMissing() {
+        var importConfig = configurationProvider.lookup("CSV Tester").get();
         Assertions.assertThatException()
                 .describedAs("No CSV configuration found on disk: my-secret-files")
-                .isThrownBy(() -> csvImportProvider.loadConfiguration(createBatchImportConfig()))
+                .isThrownBy(() -> csvImportProvider.loadConfiguration(importConfig))
                 .isInstanceOf(IllegalStateException.class)
                 .withMessage("No CSV configuration found on disk: my-secret-files");
     }
@@ -65,7 +80,8 @@ class CSVImportProviderTest extends JpaTestSetup {
                         .getResourceAsStream("/exporter/configuration/valid-config.json")
                         .readAllBytes()));
 
-        var configuration = csvImportProvider.loadConfiguration(createBatchImportConfig());
+        var importConfig = configurationProvider.lookup("CSV Tester").get();
+        var configuration = csvImportProvider.loadConfiguration(importConfig);
 
         Assertions.assertThat(configuration)
                 .isNotNull()
@@ -101,8 +117,9 @@ class CSVImportProviderTest extends JpaTestSetup {
                         .readAllBytes()));
 
         var consumer = Mockito.mock(TransactionConsumer.class);
+        var batchImport = importProvider.lookup(batchImportSlug).get();
 
-        csvImportProvider.readTransactions(consumer, createCSVConfiguration(), createBatchImport());
+        csvImportProvider.readTransactions(consumer, createCSVConfiguration(), batchImport);
 
         var transactionCaptor = ArgumentCaptor.forClass(TransactionDTO.class);
         Mockito.verify(consumer, Mockito.times(1)).accept(transactionCaptor.capture());
@@ -124,8 +141,9 @@ class CSVImportProviderTest extends JpaTestSetup {
                         .readAllBytes()));
 
         var consumer = Mockito.mock(TransactionConsumer.class);
+        var batchImport = importProvider.lookup(batchImportSlug).get();
 
-        csvImportProvider.readTransactions(consumer, createCSVConfiguration(), createBatchImport());
+        csvImportProvider.readTransactions(consumer, createCSVConfiguration(), batchImport);
 
         var transactionCaptor = ArgumentCaptor.forClass(TransactionDTO.class);
         Mockito.verify(consumer, Mockito.times(1)).accept(transactionCaptor.capture());
@@ -143,17 +161,9 @@ class CSVImportProviderTest extends JpaTestSetup {
         Assertions.assertThat(csvImportProvider.getImporterType()).isEqualTo("CSVImportProvider");
     }
 
-    private BatchImport createBatchImport() {
-        return BatchImport.create(createBatchImportConfig(), "my-secret-import-files");
-    }
-
     private CSVConfiguration createCSVConfiguration() throws IOException {
         return objectMapper.readValue(
-                getClass().getResourceAsStream("/exporter//configuration/valid-config.json"),
+                getClass().getResourceAsStream("/exporter/configuration/valid-config.json"),
                 CSVConfiguration.class);
-    }
-
-    private BatchImportConfig createBatchImportConfig() {
-        return BatchImportConfig.create("csv", "CSV Tester", "my-secret-files");
     }
 }

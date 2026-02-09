@@ -1,2 +1,0 @@
-alter table transaction_journal_meta drop constraint transaction_journal_meta_entity_id_uindex;
-alter table transaction_journal_meta add constraint transaction_journal_meta_entity_id_uindex unique (journal_id, entity_id, relation_type);
