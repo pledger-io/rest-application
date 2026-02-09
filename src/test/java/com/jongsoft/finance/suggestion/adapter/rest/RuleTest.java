@@ -1,11 +1,10 @@
-package com.jongsoft.finance.rest;
+package com.jongsoft.finance.suggestion.adapter.rest;
 
-import com.jongsoft.finance.domain.user.UserAccount;
-import com.jongsoft.finance.domain.user.UserIdentifier;
-import com.jongsoft.finance.messaging.EventBus;
-import com.jongsoft.finance.providers.UserProvider;
-import com.jongsoft.finance.security.AuthenticationFacade;
-import com.jongsoft.finance.security.CurrentUserProvider;
+import com.jongsoft.finance.core.adapter.api.CurrentUserProvider;
+import com.jongsoft.finance.core.adapter.api.UserProvider;
+import com.jongsoft.finance.core.domain.AuthenticationFacade;
+import com.jongsoft.finance.core.domain.model.UserAccount;
+import com.jongsoft.finance.core.value.UserIdentifier;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.context.event.ApplicationEventPublisher;
 import io.micronaut.test.annotation.MockBean;
@@ -13,11 +12,11 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
@@ -25,10 +24,10 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@MicronautTest(environments = {"jpa", "h2", "test"}, transactional = false)
-public class RuleTest {
+@DisplayName("Regression - Transaction Rules")
+@MicronautTest(environments = {"jpa", "h2", "test", "test-jpa"}, transactional = false)
+class RuleTest {
 
-    @Inject private ApplicationEventPublisher eventPublisher;
     @Inject private UserProvider userProvider;
 
     @MockBean
@@ -50,12 +49,12 @@ public class RuleTest {
 
     @BeforeEach
     void setup() {
-        new EventBus(eventPublisher);
         userProvider.lookup(new UserIdentifier("test-account@local"))
-              .ifNotPresent(() -> new UserAccount("test-account@local", "test123"));
+              .ifNotPresent(() -> UserAccount.create("test-account@local", "test123"));
     }
 
     @Test
+    @DisplayName("Create a rule in a group")
     void createRuleInGroup(RequestSpecification spec) {
         given(spec)
             .contentType("application/json")

@@ -3,7 +3,6 @@ package com.jongsoft.finance.suggestion.adapter.rest;
 import static java.util.Optional.ofNullable;
 
 import com.jongsoft.finance.StatusException;
-import com.jongsoft.finance.core.adapter.api.CurrentUserProvider;
 import com.jongsoft.finance.rest.LearningRuleCommandApi;
 import com.jongsoft.finance.rest.model.*;
 import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleGroupProvider;
@@ -25,15 +24,11 @@ class LearningRuleCommandController implements LearningRuleCommandApi {
     private final Logger logger;
     private final TransactionRuleGroupProvider ruleGroupProvider;
     private final TransactionRuleProvider ruleProvider;
-    private final CurrentUserProvider currentUserProvider;
 
     LearningRuleCommandController(
-            TransactionRuleGroupProvider ruleGroupProvider,
-            TransactionRuleProvider ruleProvider,
-            CurrentUserProvider currentUserProvider) {
+            TransactionRuleGroupProvider ruleGroupProvider, TransactionRuleProvider ruleProvider) {
         this.ruleGroupProvider = ruleGroupProvider;
         this.ruleProvider = ruleProvider;
-        this.currentUserProvider = currentUserProvider;
         this.logger = LoggerFactory.getLogger(LearningRuleCommandController.class);
     }
 

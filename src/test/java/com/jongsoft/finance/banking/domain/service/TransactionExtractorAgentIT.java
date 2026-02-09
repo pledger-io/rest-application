@@ -1,16 +1,24 @@
-package com.jongsoft.finance.llm.feature;
+package com.jongsoft.finance.banking.domain.service;
+
+import static org.mockito.Mockito.doReturn;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.JsonParseException;
-import com.jongsoft.finance.domain.account.Account;
-import com.jongsoft.finance.llm.agent.TransactionExtractorAgent;
-import com.jongsoft.finance.llm.dto.AccountDTO;
-import com.jongsoft.finance.llm.dto.TransactionDTO;
-import com.jongsoft.finance.providers.AccountProvider;
+import com.jongsoft.finance.AiBase;
+import com.jongsoft.finance.banking.adapter.api.AccountProvider;
+import com.jongsoft.finance.banking.domain.model.Account;
+import com.jongsoft.finance.banking.domain.service.ai.TransactionDTO;
+import com.jongsoft.finance.banking.domain.service.ai.TransactionExtractorAgent;
+import com.jongsoft.finance.banking.domain.service.tools.AccountDTO;
 import com.jongsoft.lang.Control;
+
+import io.micronaut.context.annotation.Replaces;
+import io.micronaut.test.annotation.MockBean;
+
 import jakarta.inject.Inject;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -23,15 +31,22 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-@EnabledIfEnvironmentVariable(named = "AI_ENABLED", matches = "true")
+@EnabledIfEnvironmentVariable(named = "AI_ENGINE", matches = "ollama")
 class TransactionExtractorAgentIT extends AiBase {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionExtractorAgentIT.class);
+
     @Inject
     private TransactionExtractorAgent transactionExtractorAgent;
 
     @Inject
     private AccountProvider accountProvider;
+
+    @MockBean
+    @Replaces
+    AccountProvider mockAccountProvider() {
+        return Mockito.mock(AccountProvider.class);
+    }
 
     @Test
     void testExtractTransaction_en() throws IOException {
@@ -39,16 +54,18 @@ class TransactionExtractorAgentIT extends AiBase {
     }
 
     private void testExtractionForLanguage(String language) throws IOException {
-        var inputStream = getClass().getResourceAsStream("/%s/extractor-data.json".formatted(language));
-        ObjectMapper objectMapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule());
-        List<ExtractorTestCase> testCases = objectMapper.readValue(inputStream, new TypeReference<>() {});
+        var inputStream = getClass()
+                .getResourceAsStream("/banking/%s/extractor-data.json".formatted(language));
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        List<ExtractorTestCase> testCases =
+                objectMapper.readValue(inputStream, new TypeReference<>() {});
 
         for (var testCase : testCases) {
             prepareAccountMock(testCase.expected().fromAccount());
             prepareAccountMock(testCase.expected().toAccount());
             try {
-                var extractedTransaction = transactionExtractorAgent.extractTransaction(UUID.randomUUID(), LocalDate.now(), testCase.input());
+                var extractedTransaction = transactionExtractorAgent.extractTransaction(
+                        UUID.randomUUID(), LocalDate.now(), testCase.input());
                 var expectedTransaction = testCase.expected();
 
                 try {
@@ -58,8 +75,10 @@ class TransactionExtractorAgentIT extends AiBase {
                             .isEqualTo(expectedTransaction);
                 } catch (AssertionError e) {
                     System.out.println(testCase.name());
-                    System.out.println("Expected: " + objectMapper.writeValueAsString(expectedTransaction));
-                    System.out.println("Actual:   " + objectMapper.writeValueAsString(extractedTransaction));
+                    System.out.println(
+                            "Expected: " + objectMapper.writeValueAsString(expectedTransaction));
+                    System.out.println(
+                            "Actual:   " + objectMapper.writeValueAsString(extractedTransaction));
                 }
             } catch (JsonParseException e) {
                 log.error("Failed to parse JSON for: {}\n", testCase.input(), e);
@@ -71,14 +90,14 @@ class TransactionExtractorAgentIT extends AiBase {
         if (accountDTO == null || accountDTO.name().isBlank()) {
             return;
         }
-        Mockito.when(accountProvider.synonymOf(accountDTO.name())).thenReturn(
-                Control.Option(Account.builder()
-                        .id(1L)
-                        .name(accountDTO.name())
-                        .type("CREDITOR")
-                        .build()));
+
+        var account = Mockito.mock(Account.class);
+        doReturn(1L).when(account).getId();
+        doReturn(accountDTO.name()).when(account).getName();
+        doReturn("CREDITOR").when(account).getType();
+        Mockito.when(accountProvider.synonymOf(accountDTO.name()))
+                .thenReturn(Control.Option(account));
     }
 
     public record ExtractorTestCase(String input, String name, TransactionDTO expected) {}
-
 }

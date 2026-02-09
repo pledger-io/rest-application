@@ -1,5 +1,6 @@
 package com.jongsoft.finance.suggestion.domain.service.ai;
 
+import com.jongsoft.finance.AiBase;
 import com.jongsoft.finance.banking.domain.model.Tag;
 import com.jongsoft.finance.budget.adapter.api.BudgetProvider;
 import com.jongsoft.finance.budget.domain.model.Budget;
@@ -27,7 +28,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@EnabledIfEnvironmentVariable(named = "AI_ENABLED", matches = "true")
+@EnabledIfEnvironmentVariable(named = "AI_ENGINE", matches = "ollama")
 class ClassificationAgentIT extends AiBase {
 
     @Inject

@@ -2,6 +2,7 @@ package com.jongsoft.finance.suggestion.domain.service.ai;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.jongsoft.finance.AiBase;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
 import com.jongsoft.finance.banking.domain.model.Transaction;
