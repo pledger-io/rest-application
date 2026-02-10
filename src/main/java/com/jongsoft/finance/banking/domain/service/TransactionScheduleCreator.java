@@ -1,8 +1,8 @@
 package com.jongsoft.finance.banking.domain.service;
 
-import com.jongsoft.finance.banking.adapter.api.TransactionCreationHandler;
 import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
 import com.jongsoft.finance.banking.domain.commands.CreateTransactionCommand;
+import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
 import com.jongsoft.finance.banking.domain.model.TransactionSchedule;
 import com.jongsoft.finance.banking.types.TransactionType;
 import com.jongsoft.finance.core.adapter.api.UserProvider;

@@ -1,4 +1,4 @@
-package com.jongsoft.finance.banking.adapter.api;
+package com.jongsoft.finance.banking.domain.model;
 
 import com.jongsoft.finance.banking.domain.commands.CreateTransactionCommand;
 

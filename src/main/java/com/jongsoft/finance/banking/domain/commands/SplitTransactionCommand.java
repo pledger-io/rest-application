@@ -1,14 +1,14 @@
 package com.jongsoft.finance.banking.domain.commands;
 
 import com.jongsoft.finance.ApplicationEvent;
-import com.jongsoft.finance.banking.domain.model.Transaction;
 
 import java.util.List;
 
-public record SplitTransactionCommand(long id, List<Transaction.Part> split)
-        implements ApplicationEvent {
+public record SplitTransactionCommand(long id, List<Part> split) implements ApplicationEvent {
 
-    public static void transactionSplit(long id, List<Transaction.Part> split) {
+    public record Part(Long id, long accountId, double amount, String description) {}
+
+    public static void transactionSplit(long id, List<Part> split) {
         new SplitTransactionCommand(id, split).publish();
     }
 }

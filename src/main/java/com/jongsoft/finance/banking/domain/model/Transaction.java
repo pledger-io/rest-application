@@ -210,7 +210,12 @@ public class Transaction implements Serializable {
         this.transactions =
                 this.transactions.reject(t -> t.getAccount().equals(notOwn)).union(splitParts);
 
-        SplitTransactionCommand.transactionSplit(id, transactions.stream().toList());
+        SplitTransactionCommand.transactionSplit(
+                id,
+                transactions.stream()
+                        .map(t -> new SplitTransactionCommand.Part(
+                                t.id, t.account.getId(), t.getAmount(), t.getDescription()))
+                        .toList());
     }
 
     public void changeAccount(boolean isFromAccount, Account account) {

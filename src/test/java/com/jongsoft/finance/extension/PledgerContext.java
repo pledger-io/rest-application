@@ -2,7 +2,7 @@ package com.jongsoft.finance.extension;
 
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.TagProvider;
-import com.jongsoft.finance.banking.adapter.api.TransactionCreationHandler;
+import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
 import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
 import com.jongsoft.finance.banking.domain.commands.CreateTransactionCommand;
 import com.jongsoft.finance.banking.domain.commands.LinkTransactionCommand;

@@ -4,12 +4,12 @@ import static com.jongsoft.finance.banking.types.TransactionLinkType.*;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
-import com.jongsoft.finance.banking.adapter.api.TransactionCreationHandler;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
 import com.jongsoft.finance.banking.domain.commands.CreateTransactionCommand;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.SplitRecord;
 import com.jongsoft.finance.banking.domain.model.Transaction;
+import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
 import com.jongsoft.finance.banking.types.TransactionType;
 import com.jongsoft.finance.rest.TransactionCommandApi;
 import com.jongsoft.finance.rest.model.SplitTransactionRequestInner;

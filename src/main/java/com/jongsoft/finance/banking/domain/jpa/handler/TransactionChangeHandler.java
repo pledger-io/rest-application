@@ -2,11 +2,10 @@ package com.jongsoft.finance.banking.domain.jpa.handler;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
-import com.jongsoft.finance.banking.adapter.api.TransactionCreationHandler;
 import com.jongsoft.finance.banking.domain.commands.*;
 import com.jongsoft.finance.banking.domain.jpa.entity.*;
 import com.jongsoft.finance.banking.domain.model.Classifier;
-import com.jongsoft.finance.banking.domain.model.Transaction;
+import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.jpa.entity.CurrencyJpa;
 import com.jongsoft.finance.core.domain.jpa.query.ReactiveEntityManager;
@@ -211,7 +210,7 @@ class TransactionChangeHandler implements TransactionCreationHandler {
                 TransactionJournal.class, Collections.Map("id", command.id()));
         var splits = Collections.List(command.split());
 
-        var survivors = splits.map(Transaction.Part::getId).reject(Objects::isNull);
+        var survivors = splits.map(SplitTransactionCommand.Part::id).reject(Objects::isNull);
 
         // Mark all old parts as deleted
         var deletedIds = Collections.List(transaction.getTransactions())
@@ -225,23 +224,22 @@ class TransactionChangeHandler implements TransactionCreationHandler {
                 .execute();
 
         // Add new parts
-        splits.filter(part -> part.getId() == null)
+        splits.filter(part -> part.id() == null)
                 .map(part -> new TransactionJpa(
-                        entityManager.getById(
-                                AccountJpa.class, part.getAccount().getId()),
+                        entityManager.getById(AccountJpa.class, part.accountId()),
                         transaction,
-                        BigDecimal.valueOf(part.getAmount()),
-                        part.getDescription()))
+                        BigDecimal.valueOf(part.amount()),
+                        part.description()))
                 .forEach(entityPart -> {
                     transaction.getTransactions().add(entityPart);
                     entityManager.persist(entityPart);
                 });
 
         // Update existing parts
-        splits.filter(part -> Objects.nonNull(part.getId())).forEach(part -> entityManager
+        splits.filter(part -> Objects.nonNull(part.id())).forEach(part -> entityManager
                 .update(TransactionJpa.class)
-                .set("amount", part.getAmount())
-                .fieldEq("id", part.getId())
+                .set("amount", part.amount())
+                .fieldEq("id", part.id())
                 .execute());
     }
 

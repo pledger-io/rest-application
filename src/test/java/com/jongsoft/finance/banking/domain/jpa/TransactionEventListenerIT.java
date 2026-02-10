@@ -138,9 +138,11 @@ class TransactionEventListenerIT extends JpaTestSetup {
         SplitTransactionCommand.transactionSplit(
                 1L,
                 List.of(
-                        Transaction.Part.create(fromAccount, 20.2, ""),
-                        Transaction.Part.create(toAccount, -10.1, "Changed part 1"),
-                        Transaction.Part.create(toAccount, -10.1, "Changed part 2")));
+                        new SplitTransactionCommand.Part(null, fromAccount.getId(), 20.2, ""),
+                        new SplitTransactionCommand.Part(
+                                null, toAccount.getId(), -10.1, "Changed part 1"),
+                        new SplitTransactionCommand.Part(
+                                null, toAccount.getId(), -10.1, "Changed part 2")));
 
         var check = entityManager.find(TransactionJournal.class, 1L);
 
