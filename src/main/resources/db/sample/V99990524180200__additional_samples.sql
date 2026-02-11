@@ -1,5 +1,5 @@
 INSERT INTO user_account (id, username, password, currency, gravatar, two_factor_enabled, two_factor_secret, theme)
-VALUES (1, 'sample@e', '$2a$10$yZfinpG8MZtbjfKeNnrwlu4GMJuQLAV1.QnzcJPyrxjVIZMuPLYpi', null, null, false,
+VALUES (1, 'sample@e', '$2a$10$yZfinpG8MZtbjfKeNnrwlu4GMJuQLAV1.QnzcJPyrxjVIZMuPLYpi', 'EUR', null, false,
         'G5GABYRVECPIDLLG', 'light');
 
 insert into user_roles select 1, id from role;
@@ -16,7 +16,8 @@ values (1, 'Groceries', 'Groceries', false, 1)
      , (9, 'Reconcile', 'Reconcile', false, 1)
      , (10, 'Other', 'Other', false, 1)
      , (11, 'Gas', 'Gas', false, 1)
-     , (12, 'Car', 'Car', false, 1);
+     , (12, 'Car', 'Car', false, 1)
+     , (13, 'Entertainment', 'Entertainment', false, 1);
 
 insert into tags (id, name, archived, user_id)
 values (1, 'groceries', false, 1)
@@ -107,23 +108,23 @@ CALL InsertContract('IRS monthly payment', 112, '2018-01-01', '2020-06-01', 120)
 CALL InsertContract('Cable Subscription', 115, '2016-01-01', '2050-06-01', 120);
 
 insert into transaction_journal_meta(journal_id, entity_id, relation_type)
-select journal_id, 1, 'EXPENSE' from transaction_part
+select distinct journal_id, 1, 'EXPENSE' from transaction_part
 where transaction_part.account_id = 110;
 
 insert into transaction_journal_meta(journal_id, entity_id, relation_type)
-select journal_id, 2, 'EXPENSE' from transaction_part
+select distinct journal_id, 2, 'EXPENSE' from transaction_part
 where transaction_part.account_id in (104,116);
 
 insert into transaction_journal_meta(journal_id, entity_id, relation_type)
-select journal_id, 4, 'EXPENSE' from transaction_part
+select distinct journal_id, 4, 'EXPENSE' from transaction_part
 where transaction_part.account_id in (114);
 
 insert into transaction_journal_meta(journal_id, entity_id, relation_type)
-select journal_id, 5, 'EXPENSE' from transaction_part
+select distinct journal_id, 5, 'EXPENSE' from transaction_part
 where transaction_part.account_id in (115);
 
 insert into transaction_journal_meta(journal_id, entity_id, relation_type)
-select journal_id, 6, 'EXPENSE' from transaction_part
+select distinct journal_id, 6, 'EXPENSE' from transaction_part
 where transaction_part.account_id in (112);
 
 insert into rule_group(id, name, sort, user_id)

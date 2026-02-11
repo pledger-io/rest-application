@@ -7,7 +7,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * This class is used to generate randomized transactions for the Pledger application. It should
@@ -47,7 +49,7 @@ public class RandomizedTransactions {
         var metaDataSql =
                 """
             INSERT INTO transaction_journal_meta(journal_id, entity_id, relation_type)
-             VALUES (?, (SELECT id FROM category WHERE label = ?), 'CATEGORY')""";
+             VALUES ((SELECT id FROM transaction_journal WHERE t_date = ? AND description = ? AND type = 'CREDIT' AND user_id = 1 limit 1), (SELECT id FROM category WHERE label = ?), 'CATEGORY')""";
         var partSql =
                 """
 INSERT INTO transaction_part(journal_id, created, updated, account_id, description, amount)
@@ -72,10 +74,12 @@ VALUES (
                                         .format(java.time.format.DateTimeFormatter.ofPattern(
                                                 "MMMM")));
 
+                        Set<Integer> alreadyPicked = new HashSet<>(transactionsPerMonth);
                         for (int i = 0; i < transactionsPerMonth; i++) {
-                            int day = rand.nextInt(lastDayOfMonth) + 1;
+                            int day = computeNextDay(alreadyPicked, lastDayOfMonth);
                             double amount = rand.nextDouble(lower, upper);
 
+                            alreadyPicked.add(day);
                             String date = String.format("%d-%02d-%02d", year, month, day);
 
                             // create the transaction
@@ -98,9 +102,9 @@ VALUES (
                             partStatement.setDouble(7, amount);
                             partStatement.executeUpdate();
 
-                            metaDataStatement.setInt(
-                                    1, journalStatement.getGeneratedKeys().getInt(1));
-                            metaDataStatement.setString(2, category);
+                            metaDataStatement.setString(1, date);
+                            metaDataStatement.setString(2, updatedDescription);
+                            metaDataStatement.setString(3, category);
                             metaDataStatement.executeUpdate();
                         }
                     }
@@ -109,6 +113,14 @@ VALUES (
         } catch (SQLException e) {
             log.error("Failed to create randomized transaction: {}", e.getMessage());
         }
+    }
+
+    private static int computeNextDay(Set<Integer> alreadyPicked, int lastDayOfMonth) {
+        int day = rand.nextInt(lastDayOfMonth) + 1;
+        while (alreadyPicked.contains(day)) {
+            day = rand.nextInt(lastDayOfMonth) + 1;
+        }
+        return day;
     }
 
     public static void createContract(
