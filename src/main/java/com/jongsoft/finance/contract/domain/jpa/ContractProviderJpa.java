@@ -1,5 +1,6 @@
 package com.jongsoft.finance.contract.domain.jpa;
 
+import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
 import com.jongsoft.finance.contract.adapter.api.ContractProvider;
 import com.jongsoft.finance.contract.domain.jpa.entity.ContractJpa;
 import com.jongsoft.finance.contract.domain.jpa.mapper.ContractMapper;
@@ -17,7 +18,7 @@ import jakarta.inject.Singleton;
 
 @ReadOnly
 @Singleton
-class ContractProviderJpa implements ContractProvider {
+class ContractProviderJpa implements ContractProvider, LinkableProvider<Contract> {
     private final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(ContractProviderJpa.class);
 
@@ -85,5 +86,10 @@ class ContractProviderJpa implements ContractProvider {
                 .stream()
                 .map(contractMapper::mapToDomain)
                 .collect(Collections.collector(com.jongsoft.lang.Collections::List));
+    }
+
+    @Override
+    public String typeOf() {
+        return "CONTRACT";
     }
 }

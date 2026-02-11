@@ -37,6 +37,7 @@ paths:
 
 # Export operations
   /v2/api/export: { $ref: './paths/export.yaml' }
+  /v2/api/import: { $ref: './paths/import.yaml' }
 
 # Language support operations
   /v2/api/i18n/{languageCode}: { $ref: './paths/i18n.yaml' }

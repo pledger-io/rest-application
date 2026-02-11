@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -324,6 +325,17 @@ public class PledgerRequests {
               .get("/v2/api/export")
           .then()
               .log().ifValidationFails();
+    }
+
+    public ValidatableResponse importProfile(String resourceFile) throws IOException {
+        var importingFile = PledgerRequests.class.getResourceAsStream(resourceFile);
+        return given(requestSpecification)
+                .log().ifValidationFails()
+                .contentType(ContentType.JSON)
+                .body(importingFile.readAllBytes())
+                .post("/v2/api/import")
+            .then()
+            .log().ifValidationFails();
     }
 
     public ValidatableResponse createScheduleMonthly(long sourceAccount, long destinationAccount, String name, double amount) {

@@ -1,0 +1,16 @@
+post:
+  operationId: importUserAccount
+  tags: [ import ]
+  summary: Import profile
+  description: >
+    Import profile from external source.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/export-profile-response' }
+  responses:
+    "204":
+      description: Profile imported successfully.
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
