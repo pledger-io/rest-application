@@ -35,8 +35,10 @@ micronaut {
                 "JsonError" to "io.micronaut.http.hateoas.JsonError",
                 "RuleOperation" to "com.jongsoft.finance.suggestion.types.RuleOperation",
                 "RuleColumn" to "com.jongsoft.finance.suggestion.types.RuleColumn",
-            )
+                "ProcessVariable" to "com.jongsoft.finance.core.domain.model.ProcessVariable",
+                )
             typeMapping = mapOf(
+                "process-variable" to "ProcessVariable",
                 "json-error-response" to "JsonError",
                 "operation-type" to "RuleOperation",
                 "rule-column" to "RuleColumn"
@@ -129,6 +131,7 @@ dependencies {
     // Setup for the test suites
     testImplementation(mn.micronaut.test.junit5)
     testImplementation(mn.micronaut.test.rest.assured)
+    testImplementation(libs.awaitly)
     testImplementation(mn.junit.jupiter.api)
     testImplementation(mn.mockito.core)
     testImplementation(mn.assertj.core)

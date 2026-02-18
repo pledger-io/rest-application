@@ -1,0 +1,40 @@
+parameters:
+  - name: slug
+    required: true
+    in: path
+    description: The unique identifier
+    schema:
+      type: string
+get:
+  operationId: getTasks
+  tags: [ batch-task-engine ]
+  summary: Search tasks for process
+  responses:
+    "200":
+      description: A list of tasks for the process instance
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/task-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: completeTask
+  tags: [ batch-task-engine ]
+  summary: Complete task
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [ name, variables ]
+          properties:
+            name: { type: string }
+            variables: { $ref: '#/components/schemas/process-variable' }
+  responses:
+    "204":
+      description: A confirmation that task was completed
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/403' }

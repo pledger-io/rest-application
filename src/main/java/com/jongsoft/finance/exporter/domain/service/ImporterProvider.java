@@ -12,8 +12,6 @@ public interface ImporterProvider<T extends ImporterConfiguration> {
 
     T loadConfiguration(BatchImportConfig batchImportConfig);
 
-    <X extends ImporterConfiguration> boolean supports(X configuration);
-
     default String getImporterType() {
         return this.getClass().getSimpleName();
     }

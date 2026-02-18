@@ -2,10 +2,13 @@ package com.jongsoft.finance.exporter.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.exporter.adapter.api.ImportConfigurationProvider;
+import com.jongsoft.finance.exporter.adapter.api.ImportProcesEngine;
 import com.jongsoft.finance.exporter.adapter.api.ImportProvider;
 import com.jongsoft.finance.exporter.domain.model.BatchImport;
 import com.jongsoft.finance.exporter.domain.model.BatchImportConfig;
+import com.jongsoft.finance.exporter.domain.model.UserTask;
 import com.jongsoft.finance.rest.BatchImporterApi;
+import com.jongsoft.finance.rest.BatchTaskEngineApi;
 import com.jongsoft.finance.rest.model.*;
 
 import io.micronaut.http.HttpResponse;
@@ -21,17 +24,20 @@ import java.time.ZoneId;
 import java.util.List;
 
 @Controller
-class BatchImporterController implements BatchImporterApi {
+class BatchImporterController implements BatchImporterApi, BatchTaskEngineApi {
 
     private final Logger logger;
     private final ImportProvider importProvider;
     private final ImportConfigurationProvider importConfigurationProvider;
+    private final ImportProcesEngine importProcessEngine;
 
     BatchImporterController(
             ImportProvider importProvider,
-            ImportConfigurationProvider importConfigurationProvider) {
+            ImportConfigurationProvider importConfigurationProvider,
+            ImportProcesEngine importProcessEngine) {
         this.importProvider = importProvider;
         this.importConfigurationProvider = importConfigurationProvider;
+        this.importProcessEngine = importProcessEngine;
         this.logger = LoggerFactory.getLogger(BatchImporterController.class);
     }
 
@@ -111,6 +117,26 @@ class BatchImporterController implements BatchImporterApi {
         return new BatchJobPagedResponse(
                 new PagedResponseInfo(result.total(), result.pages(), result.pageSize()),
                 result.content().map(this::convertToJobResponse).toJava());
+    }
+
+    @Override
+    public List<@Valid TaskResponse> getTasks(String slug) {
+        logger.info("Retrieving tasks for job with slug {}.", slug);
+        List<UserTask> tasksForBatch = importProcessEngine.getTasksForBatch(slug);
+        return tasksForBatch.stream()
+                .map(task -> {
+                    TaskResponse converted = new TaskResponse(task.id(), task.type());
+                    converted.setVariables(task.properties());
+                    return converted;
+                })
+                .toList();
+    }
+
+    @Override
+    public HttpResponse<Void> completeTask(String slug, CompleteTaskRequest request) {
+        logger.info("Completing task '{}' for {}.", request.getName(), slug);
+        importProcessEngine.completeTask(slug, request.getName(), request.getVariables());
+        return HttpResponse.noContent();
     }
 
     private BatchJobResponse convertToJobResponse(BatchImport batchImport) {

@@ -24,7 +24,7 @@ public class FilesController implements FilesApi {
 
     public FilesController(StorageService storageService) {
         this.storageService = storageService;
-        this.logger = org.slf4j.LoggerFactory.getLogger(FilesApi.class);
+        this.logger = org.slf4j.LoggerFactory.getLogger(FilesController.class);
     }
 
     @Override

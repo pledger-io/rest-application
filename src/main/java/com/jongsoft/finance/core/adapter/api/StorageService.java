@@ -2,6 +2,8 @@ package com.jongsoft.finance.core.adapter.api;
 
 import com.jongsoft.lang.control.Optional;
 
+import java.nio.file.Path;
+
 public interface StorageService {
 
     /**
@@ -20,4 +22,6 @@ public interface StorageService {
      * @param token the token of the file
      */
     void remove(String token);
+
+    Path getUploadPath();
 }

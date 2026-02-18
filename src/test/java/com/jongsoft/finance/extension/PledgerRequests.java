@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -493,6 +494,78 @@ public class PledgerRequests {
               .get("/v2/api/transactions")
           .then()
               .log().ifValidationFails();
+    }
+
+    public ValidatableResponse createAttachment(String resourceLocation) {
+        var file = getClass().getResource(resourceLocation).getFile();
+        return given(requestSpecification)
+                .log().ifValidationFails()
+                .contentType(ContentType.MULTIPART)
+                .multiPart("upload", new File(file))
+            .when()
+                .post("/v2/api/files")
+            .then()
+                .log().ifValidationFails();
+    }
+
+    public ValidatableResponse createBatchConfig(String name, String type, String fileCode) {
+        return given(requestSpecification)
+                .log().ifValidationFails()
+                .contentType(ContentType.JSON)
+                .body(Map.of(
+                    "name", name,
+                    "type", type,
+                    "fileCode", fileCode
+                ))
+            .when()
+                .post("/v2/api/batch-importer-config")
+            .then()
+                .log().ifValidationFails();
+    }
+
+    public ValidatableResponse createBatchJob(String configuration, String fileCode) {
+        return given(requestSpecification)
+                .log().ifValidationFails()
+                .contentType(ContentType.JSON)
+                .body(Map.of(
+                    "configuration", configuration,
+                    "fileToken", fileCode
+                ))
+            .when()
+                .post("/v2/api/batch-importer")
+            .then()
+                .log().ifValidationFails();
+    }
+
+    public ValidatableResponse fetchBatchJob(String batchSlug) {
+        return given(requestSpecification)
+                .log().ifValidationFails()
+                .contentType(ContentType.JSON)
+            .when()
+                .get("/v2/api/batch-importer/" + batchSlug)
+            .then()
+                .log().ifValidationFails();
+    }
+
+    public ValidatableResponse fetchBatchTasks(String batchSlug) {
+        return given(requestSpecification)
+                .log().ifValidationFails()
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/v2/api/batch-importer/" + batchSlug + "/tasks")
+            .then()
+                .log().ifValidationFails();
+    }
+
+    public ValidatableResponse completeBatchTask(String batchSlug, String task, Map<String, Object> data) {
+        return given(requestSpecification)
+                .log().ifValidationFails()
+                .contentType(ContentType.JSON)
+                .body(Map.of("name", task, "variables", data))
+            .when()
+                .post("/v2/api/batch-importer/" + batchSlug + "/tasks")
+            .then()
+            .   log().ifValidationFails();
     }
 
     public ValidatableResponse computeBalance(Range<LocalDate> range, List<Long> accountIds, List<Long> categories) {

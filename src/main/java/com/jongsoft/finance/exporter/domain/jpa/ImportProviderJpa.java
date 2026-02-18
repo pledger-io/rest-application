@@ -7,6 +7,7 @@ import com.jongsoft.finance.exporter.adapter.api.ImportProvider;
 import com.jongsoft.finance.exporter.domain.jpa.entity.ImportJpa;
 import com.jongsoft.finance.exporter.domain.jpa.mapper.BatchImportMapper;
 import com.jongsoft.finance.exporter.domain.model.BatchImport;
+import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 
 import io.micronaut.transaction.annotation.ReadOnly;
@@ -35,6 +36,17 @@ public class ImportProviderJpa implements ImportProvider {
         this.authenticationFacade = authenticationFacade;
         this.entityManager = entityManager;
         this.mapper = mapper;
+    }
+
+    @Override
+    public Sequence<BatchImport> lookup() {
+        return entityManager
+                .from(ImportJpa.class)
+                .fieldEq("archived", false)
+                .fieldEq("user.username", authenticationFacade.authenticated())
+                .stream()
+                .map(mapper::toModel)
+                .collect(ReactiveEntityManager.sequenceCollector());
     }
 
     @Override

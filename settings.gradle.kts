@@ -33,6 +33,7 @@ dependencyResolutionManagement {
             library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
             library("csv", "com.opencsv", "opencsv").version("5.12.0")
             library("archunit", "com.tngtech.archunit", "archunit-junit5").version("1.4.1")
+            library("awaitly", "org.awaitility", "awaitility").version("3.0.0")
         }
 
         create("mn") {

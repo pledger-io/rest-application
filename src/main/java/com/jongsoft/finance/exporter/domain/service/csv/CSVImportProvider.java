@@ -15,7 +15,6 @@ import com.opencsv.exceptions.CsvValidationException;
 
 import io.micronaut.serde.ObjectMapper;
 
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -36,7 +35,6 @@ class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
     private final StorageService storageService;
     private final ObjectMapper objectMapper;
 
-    @Inject
     public CSVImportProvider(StorageService storageService, ObjectMapper objectMapper) {
         this.storageService = storageService;
         this.objectMapper = objectMapper;
@@ -109,11 +107,6 @@ class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
             throw new IllegalStateException("Failed to load CSV configuration from disk: "
                     + batchImportConfig.getFileCode());
         }
-    }
-
-    @Override
-    public <X extends ImporterConfiguration> boolean supports(X configuration) {
-        return configuration instanceof CSVConfiguration;
     }
 
     private TransactionDTO readLine(String[] line, CSVConfiguration configuration) {

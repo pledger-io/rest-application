@@ -1,13 +1,15 @@
 package com.jongsoft.finance.extension;
 
+import static org.mockito.Mockito.*;
+
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.TagProvider;
-import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
 import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
 import com.jongsoft.finance.banking.domain.commands.CreateTransactionCommand;
 import com.jongsoft.finance.banking.domain.commands.LinkTransactionCommand;
 import com.jongsoft.finance.banking.domain.commands.TagTransactionCommand;
 import com.jongsoft.finance.banking.domain.model.*;
+import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
 import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.banking.types.TransactionType;
 import com.jongsoft.finance.classification.adapter.api.CategoryProvider;
@@ -22,16 +24,15 @@ import com.jongsoft.finance.core.domain.model.UserAccount;
 import com.jongsoft.finance.core.value.Periodicity;
 import com.jongsoft.finance.core.value.UserIdentifier;
 import com.jongsoft.lang.Control;
+
 import io.micronaut.context.ApplicationContext;
+
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class PledgerContext {
 
@@ -41,10 +42,10 @@ public class PledgerContext {
     public PledgerContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.storageTokens = new ArrayList<>();
-        applicationContext.registerSingleton(StorageService.class, mock(StorageService.class));
     }
 
     public PledgerContext withStorage() {
+        applicationContext.registerSingleton(StorageService.class, mock(StorageService.class));
         var storageService = applicationContext.getBean(StorageService.class);
         Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
             byte[] original = invocation.getArgument(0);

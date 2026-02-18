@@ -88,6 +88,11 @@ class DiskStorageService implements StorageService {
     }
 
     @Override
+    public Path getUploadPath() {
+        return uploadRootDirectory;
+    }
+
+    @Override
     public void remove(String token) {
         try {
             Files.deleteIfExists(uploadRootDirectory.resolve(token));

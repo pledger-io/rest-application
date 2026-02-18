@@ -101,6 +101,7 @@ paths:
 # Batch importer operations
   /v2/api/batch-importer: { $ref: './paths/batch-importer.yaml' }
   /v2/api/batch-importer/{slug}: { $ref: './paths/batch-importer-by-slug.yaml' }
+  /v2/api/batch-importer/{slug}/tasks: { $ref: './paths/batch-importer-by-slug-tasks.yaml' }
   /v2/api/batch-importer-config: { $ref: './paths/batch-importer-config.yaml' }
 
 # Suggestions rule operations
@@ -199,6 +200,7 @@ components:
     batch-configuration-response: { $ref: './components/response/batch-configuration.yaml' }
     rule-response: { $ref: './components/response/transaction-rule.yaml' }
     rule-group-response: { $ref: './components/response/transaction-rule-group.yaml' }
+    task-response: { $ref: './components/response/task.yaml' }
 
     enable-mfa-request:
       type: object
