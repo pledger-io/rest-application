@@ -7,31 +7,24 @@ import com.jongsoft.finance.core.domain.commands.CreateUserCommand;
 import com.jongsoft.finance.core.domain.commands.InternalAuthenticationEvent;
 
 import io.micronaut.runtime.event.annotation.EventListener;
+import io.micronaut.scheduling.annotation.Async;
 
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 
 import org.slf4j.Logger;
-
-import java.time.Duration;
-import java.util.concurrent.ExecutorService;
 
 @Singleton
 class CreateUserHandler {
     private final Logger log = org.slf4j.LoggerFactory.getLogger(CreateUserHandler.class);
 
-    private final ExecutorService executorService;
-
-    CreateUserHandler(@Named("default") ExecutorService executorService) {
-        this.executorService = executorService;
-    }
-
+    @Async
     @EventListener
     public void userWasCreated(CreateUserCommand command) {
         log.info("[{}] - Creating reconcile account for user.", command.username());
         createReconcileAccount(command.username());
     }
 
+    @Async
     @EventListener
     public void externalUserWasCreated(CreateExternalUserCommand command) {
         log.info("[{}] - Creating reconcile account for external user.", command.username());
@@ -39,16 +32,8 @@ class CreateUserHandler {
     }
 
     private void createReconcileAccount(String username) {
-        executorService.submit(() -> {
-            try {
-                // must sleep to ensure the user account was created first
-                Thread.sleep(Duration.ofSeconds(1));
-                InternalAuthenticationEvent.authenticate(username);
-                CreateAccountCommand.accountCreated(
-                        "Reconcile Account", "EUR", SystemAccountTypes.RECONCILE.label());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        InternalAuthenticationEvent.authenticate(username);
+        CreateAccountCommand.accountCreated(
+                "Reconcile Account", "EUR", SystemAccountTypes.RECONCILE.label());
     }
 }

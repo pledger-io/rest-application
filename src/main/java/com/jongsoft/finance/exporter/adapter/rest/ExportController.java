@@ -8,6 +8,7 @@ import com.jongsoft.finance.banking.adapter.rest.TransactionMapper;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.Tag;
 import com.jongsoft.finance.banking.domain.model.TransactionSchedule;
+import com.jongsoft.finance.banking.types.SystemAccountTypes;
 import com.jongsoft.finance.budget.adapter.api.BudgetProvider;
 import com.jongsoft.finance.budget.domain.model.Budget;
 import com.jongsoft.finance.classification.adapter.api.CategoryProvider;
@@ -67,7 +68,11 @@ public class ExportController implements ExportApi {
 
         // todo convert Rules
 
-        response.accounts(accountProvider.lookup().map(this::toAccountResponse).toJava());
+        response.accounts(accountProvider
+                .lookup()
+                .filter(a -> !a.getType().equals(SystemAccountTypes.RECONCILE.label()))
+                .map(this::toAccountResponse)
+                .toJava());
         response.setCategories(categoryProvider
                 .lookup()
                 .map(CategoryMapper::toCategoryResponse)

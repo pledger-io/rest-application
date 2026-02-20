@@ -29,7 +29,7 @@ public class ReactiveEntityManager {
         } else {
             entityManager.merge(entity);
         }
-        entityManager.flush();
+        // entityManager.flush();
     }
 
     /**

@@ -61,6 +61,10 @@ tasks.classes {
     dependsOn("spotlessApply")
 }
 
+tasks.test {
+    maxParallelForks = 1
+}
+
 tasks.processResources {
     filesMatching("**/micronaut-banner.txt") {
         filter { line ->

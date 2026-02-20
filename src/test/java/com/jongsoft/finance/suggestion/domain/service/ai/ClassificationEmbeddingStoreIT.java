@@ -104,7 +104,7 @@ class ClassificationEmbeddingStoreIT extends AiBase {
         groceryPurchase.link(
                 TransactionLinkType.EXPENSE, budget.getExpenses().get(0).getId());
 
-        Thread.sleep(50);
+        Thread.sleep(1000);
 
         var suggestion = aiRuleEngine.makeSuggestions(
                 new SuggestionInput(null, "Shopping for a laptop", null, null, 0));
