@@ -17,18 +17,13 @@ import com.jongsoft.finance.classification.domain.model.Category;
 import com.jongsoft.finance.contract.adapter.api.ContractProvider;
 import com.jongsoft.finance.contract.domain.model.Contract;
 import com.jongsoft.finance.core.adapter.api.CurrentUserProvider;
-import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.adapter.api.UserProvider;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.model.UserAccount;
 import com.jongsoft.finance.core.value.Periodicity;
 import com.jongsoft.finance.core.value.UserIdentifier;
-import com.jongsoft.lang.Control;
 
 import io.micronaut.context.ApplicationContext;
-
-import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -36,24 +31,13 @@ import java.util.*;
 
 public class PledgerContext {
 
-    private final List<String> storageTokens;
     private final ApplicationContext applicationContext;
 
     public PledgerContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
-        this.storageTokens = new ArrayList<>();
     }
 
     public PledgerContext withStorage() {
-        applicationContext.registerSingleton(StorageService.class, mock(StorageService.class));
-        var storageService = applicationContext.getBean(StorageService.class);
-        Mockito.when(storageService.store(Mockito.any())).thenAnswer((Answer<String>) invocation -> {
-            byte[] original = invocation.getArgument(0);
-            String token = UUID.randomUUID().toString();
-            Mockito.when(storageService.read(token)).thenReturn(Control.Option(original));
-            storageTokens.add(token);
-            return token;
-        });
         return this;
     }
 

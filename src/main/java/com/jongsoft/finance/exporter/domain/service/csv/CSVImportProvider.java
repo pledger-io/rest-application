@@ -4,7 +4,7 @@ import com.jongsoft.finance.banking.types.TransactionType;
 import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.exporter.domain.model.BatchImport;
 import com.jongsoft.finance.exporter.domain.model.BatchImportConfig;
-import com.jongsoft.finance.exporter.domain.service.ImporterConfiguration;
+import com.jongsoft.finance.exporter.domain.model.ImporterConfiguration;
 import com.jongsoft.finance.exporter.domain.service.ImporterProvider;
 import com.jongsoft.finance.exporter.domain.service.TransactionConsumer;
 import com.jongsoft.finance.exporter.domain.service.TransactionDTO;

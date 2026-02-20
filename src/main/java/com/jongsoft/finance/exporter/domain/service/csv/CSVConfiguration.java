@@ -1,7 +1,7 @@
 package com.jongsoft.finance.exporter.domain.service.csv;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.jongsoft.finance.exporter.domain.service.ImporterConfiguration;
+import com.jongsoft.finance.exporter.domain.model.ImporterConfiguration;
 
 import io.micronaut.serde.annotation.Serdeable;
 

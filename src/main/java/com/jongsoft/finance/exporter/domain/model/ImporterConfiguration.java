@@ -1,4 +1,4 @@
-package com.jongsoft.finance.exporter.domain.service;
+package com.jongsoft.finance.exporter.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.jongsoft.finance.core.domain.model.ProcessVariable;
