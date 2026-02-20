@@ -62,6 +62,7 @@ paths:
   /v2/api/accounts/{id}/saving-goals: { $ref: './paths/accounts-saving-goals.yaml' }
   /v2/api/accounts/{id}/saving-goals/{goalId}: { $ref: './paths/accounts-saving-goals-by-id.yaml' }
   /v2/api/accounts/{id}/saving-goals/{goalId}/make-reservation: { $ref: './paths/accounts-saving-goals-reservation.yaml' }
+  /v2/api/accounts/{id}/reconcile: { $ref: './paths/accounts-reconcile.yaml' }
 
 # Contract operations
   /v2/api/contracts: { $ref: './paths/contracts.yaml' }
@@ -155,6 +156,7 @@ components:
     currency-patch-request: { $ref: './components/request/currency-patch.yaml' }
     setting-request: { $ref: './components/request/setting.yaml' }
     account-request: { $ref: './components/request/account.yaml' }
+    account-reconcile-request: { $ref: './components/request/account-reconcile.yaml' }
     saving-goal-request: { $ref: './components/request/saving-goal.yaml' }
     saving-reservation-request: { $ref: './components/request/saving-goal-reservation.yaml' }
     contract-request: { $ref: './components/request/contract.yaml' }
@@ -178,6 +180,7 @@ components:
     account-response: { $ref: './components/response/account.yaml' }
     account-paged-response: { $ref: './components/response/accounts-paged.yaml' }
     account-spending-response: { $ref: './components/response/account-spending.yaml' }
+    account-reconcile-response: { $ref: './components/response/account-reconciled.yaml' }
     saving-goal-response: { $ref: './components/response/saving-goal.yaml' }
     schedule-response: { $ref: './components/response/schedule.yaml' }
     contract-response: { $ref: './components/response/contract.yaml' }

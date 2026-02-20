@@ -17,15 +17,18 @@ import com.jongsoft.finance.classification.domain.model.Category;
 import com.jongsoft.finance.contract.adapter.api.ContractProvider;
 import com.jongsoft.finance.contract.domain.model.Contract;
 import com.jongsoft.finance.core.adapter.api.CurrentUserProvider;
+import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.adapter.api.UserProvider;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.model.UserAccount;
 import com.jongsoft.finance.core.value.Periodicity;
 import com.jongsoft.finance.core.value.UserIdentifier;
 
+import com.jongsoft.lang.Control;
 import io.micronaut.context.ApplicationContext;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -38,6 +41,19 @@ public class PledgerContext {
     }
 
     public PledgerContext withStorage() {
+        return this;
+    }
+
+    public PledgerContext cleanStorage() {
+        var uploadPath = applicationContext.getBean(StorageService.class).getUploadPath();
+        Control.Try(() -> {
+            Files.walk(uploadPath)
+                .sorted(Comparator.reverseOrder()) // Sort to delete files before directories
+                .filter(path -> !path.equals(uploadPath)) // Keep the root directory itself
+                .forEach(path -> {
+                    Control.Try(() -> Files.deleteIfExists(path));
+                });
+        });
         return this;
     }
 

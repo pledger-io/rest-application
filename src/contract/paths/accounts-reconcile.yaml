@@ -1,0 +1,47 @@
+parameters:
+  - name: id
+    description: The identifier of the account
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: fetchAccountsReconcile
+  tags: [ account-fetcher ]
+  responses:
+    "200":
+      description: >
+        The list of pending reconciliations that the user started.
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/account-reconcile-response'
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: reconcileAccount
+  tags: [ account-command ]
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/account-reconcile-request'
+  responses:
+    "200":
+      description: >
+        Failed to reconcile the account. The previous year must be reconciled first.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/account-reconcile-response'
+    "204":
+      description: >
+        The reconciliation was successful.
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

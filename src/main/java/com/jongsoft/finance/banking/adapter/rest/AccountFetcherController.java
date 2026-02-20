@@ -3,6 +3,7 @@ package com.jongsoft.finance.banking.adapter.rest;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.AccountTypeProvider;
+import com.jongsoft.finance.banking.adapter.api.Reconcile;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.core.adapter.api.SettingProvider;
 import com.jongsoft.finance.core.domain.FilterProvider;
@@ -30,16 +31,19 @@ class AccountFetcherController implements AccountFetcherApi {
     private final AccountProvider accountProvider;
     private final FilterProvider<AccountProvider.FilterCommand> filterFactory;
     private final SettingProvider settingProvider;
+    private final Reconcile reconcile;
 
     AccountFetcherController(
             AccountTypeProvider accountTypeProvider,
             AccountProvider accountProvider,
             FilterProvider<AccountProvider.FilterCommand> filterFactory,
-            SettingProvider settingProvider) {
+            SettingProvider settingProvider,
+            Reconcile reconcile) {
         this.accountTypeProvider = accountTypeProvider;
         this.accountProvider = accountProvider;
         this.filterFactory = filterFactory;
         this.settingProvider = settingProvider;
+        this.reconcile = reconcile;
         this.logger = LoggerFactory.getLogger(AccountFetcherController.class);
     }
 
@@ -109,6 +113,20 @@ class AccountFetcherController implements AccountFetcherApi {
                 .top(filter, Dates.range(startDate, endDate), ascending)
                 .map(this::toAccountSpendingResponse)
                 .toJava();
+    }
+
+    @Override
+    public List<AccountReconcileResponse> fetchAccountsReconcile(Long accountId) {
+        logger.info("Fetching accounts reconcile for bank account {}.", accountId);
+        lookupAccountOrThrow(accountId);
+
+        return reconcile.fetchAccountsReconcile(accountId).stream()
+                .map(reconcile -> new AccountReconcileResponse(
+                        reconcile.year(),
+                        new AccountReconcileRequestBalance(
+                                reconcile.startBalance(), reconcile.endBalance()),
+                        new AccountReconcileResponseComputed(reconcile.computedStartBalance())))
+                .toList();
     }
 
     private Account lookupAccountOrThrow(Long id) {

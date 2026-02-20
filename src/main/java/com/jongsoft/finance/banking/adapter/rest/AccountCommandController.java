@@ -2,7 +2,9 @@ package com.jongsoft.finance.banking.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
+import com.jongsoft.finance.banking.adapter.api.Reconcile;
 import com.jongsoft.finance.banking.domain.model.Account;
+import com.jongsoft.finance.banking.domain.model.AccountReconciliation;
 import com.jongsoft.finance.banking.domain.model.SavingGoal;
 import com.jongsoft.finance.core.adapter.api.CurrentUserProvider;
 import com.jongsoft.finance.core.value.Periodicity;
@@ -27,11 +29,15 @@ public class AccountCommandController implements AccountCommandApi {
     private final Logger logger;
     private final AccountProvider accountProvider;
     private final CurrentUserProvider currentUserProvider;
+    private final Reconcile reconcile;
 
     public AccountCommandController(
-            AccountProvider accountProvider, CurrentUserProvider currentUserProvider) {
+            AccountProvider accountProvider,
+            CurrentUserProvider currentUserProvider,
+            Reconcile reconcile) {
         this.accountProvider = accountProvider;
         this.currentUserProvider = currentUserProvider;
+        this.reconcile = reconcile;
         this.logger = LoggerFactory.getLogger(AccountCommandController.class);
     }
 
@@ -126,6 +132,30 @@ public class AccountCommandController implements AccountCommandApi {
         var savingGoal = lookupSavingGoalOrThrow(goalId, bankAccount);
         savingGoal.adjustGoal(savingGoalRequest.getGoal(), savingGoalRequest.getTargetDate());
         return AccountMapper.toSavingGoalResponse(savingGoal);
+    }
+
+    @Override
+    public HttpResponse<AccountReconcileResponse> reconcileAccount(
+            Long accountId, AccountReconcileRequest accountReconcileRequest) {
+        logger.info("Reconciling bank account {}.", accountId);
+
+        lookupAccountOrThrow(accountId);
+        var reconcileResult = reconcile.reconcile(
+                accountId,
+                accountReconcileRequest.getPeriod(),
+                accountReconcileRequest.getBalance().getStart(),
+                accountReconcileRequest.getBalance().getEnd());
+
+        if (reconcileResult.isPresent()) {
+            AccountReconciliation reconcile = reconcileResult.get();
+            return HttpResponse.ok(new AccountReconcileResponse(
+                    reconcile.year(),
+                    new AccountReconcileRequestBalance(
+                            reconcile.startBalance(), reconcile.endBalance()),
+                    new AccountReconcileResponseComputed(reconcile.computedStartBalance())));
+        }
+
+        return HttpResponse.noContent();
     }
 
     private void updateBankAccount(Account bankAccount, AccountRequest accountRequest) {

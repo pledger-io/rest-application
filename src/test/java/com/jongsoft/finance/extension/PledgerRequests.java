@@ -60,6 +60,18 @@ public class PledgerRequests {
               .log().ifValidationFails();
     }
 
+    public ValidatableResponse reconcileAccount(long id, int year, double open, double close) {
+        return given(requestSpecification)
+              .log().ifValidationFails()
+              .contentType(ContentType.JSON)
+              .pathParam("id", id)
+              .body(Map.of("period", year, "balance", Map.of("start", open, "end", close)))
+          .when()
+              .post("/v2/api/accounts/{id}/reconcile")
+          .then()
+              .log().ifValidationFails();
+    }
+
     public ValidatableResponse createSavingGoal(long id, String name, double goal, LocalDate targetDate) {
         return given(requestSpecification)
               .log().ifValidationFails()

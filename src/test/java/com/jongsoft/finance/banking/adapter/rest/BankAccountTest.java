@@ -169,4 +169,28 @@ public class BankAccountTest extends RestTestSetup {
               .body("content", hasSize(1))
               .body("content[0].name", equalTo("Netflix"));
     }
+
+    @Test
+    @DisplayName("Reconcile account")
+    void reconcileAccount(PledgerContext pledgerContext, PledgerRequests requests) {
+        pledgerContext.withUser("bank-account-reconcile@account.local")
+            .withBankAccount("Checking account", "EUR", "default");
+
+        var accountId = requests.searchBankAccounts(0, 1, List.of(), "Checking account")
+            .statusCode(200)
+            .body("content", hasSize(1))
+            .extract().jsonPath().getLong("content[0].id");
+
+        requests.reconcileAccount(accountId, 2023, 50.00, 200.0)
+            .statusCode(200)
+            .body("computed.start", equalTo(0F));
+
+        requests.reconcileAccount(accountId, 2022, 0, 50)
+            .statusCode(204);
+
+        requests.reconcileAccount(accountId, 2024, 200, 150)
+            .statusCode(204);
+
+        pledgerContext.cleanStorage();
+    }
 }

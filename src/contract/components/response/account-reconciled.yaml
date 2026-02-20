@@ -1,0 +1,33 @@
+type: object
+description: The response for an account reconciliation
+required: [period, balance, computed]
+properties:
+  period:
+    type: integer
+    format: int32
+    description: The year to reconcile this account for
+  balance:
+    type: object
+    description: The balance for the period
+    required: [start, end]
+    properties:
+      start:
+        type: number
+        description: The starting balance on the start date of the period
+        format: double
+        example: 30.5
+      end:
+        type: number
+        description: The ending balance on the end date of the period
+        format: double
+        example: 35.7
+  computed:
+    type: object
+    description: The computed balance for the period
+    required: [start]
+    properties:
+      start:
+        type: number
+        description: The current opening balance computed from the previous year
+        format: double
+        example: 30.5
