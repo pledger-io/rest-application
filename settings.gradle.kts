@@ -7,7 +7,7 @@ pluginManagement {
         id("io.micronaut.application").version("4.6.1")
         id("io.freefair.lombok").version("9.1.0")
         id("org.sonarqube").version("7.2.2.6593")
-        id("org.openapi.generator").version("7.18.0")
+        id("org.openapi.generator").version("7.20.0")
         id("com.diffplug.spotless").version("8.2.1")
         id("io.micronaut.openapi").version("4.5.4")
 
