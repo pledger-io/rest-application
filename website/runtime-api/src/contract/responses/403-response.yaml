@@ -1,4 +1,0 @@
-description: Not authorized for resource
-content:
-  application/json:
-    schema: { $ref: '#/components/schemas/json-error-response' }

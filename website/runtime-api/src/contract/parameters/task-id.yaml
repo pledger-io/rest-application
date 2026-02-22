@@ -1,4 +1,0 @@
-name: taskId
-in: path
-schema:
-  type: string
