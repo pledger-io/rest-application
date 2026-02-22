@@ -29,7 +29,7 @@ class RuleSuggestionEngine implements SuggestionEngine {
 
     @Override
     @Timed(
-            value = "learning.language-model",
+            value = "learning.rule-based",
             extraTags = {"action", "classify-transaction"})
     public SuggestionResult makeSuggestions(SuggestionInput transactionInput) {
         var ruleDataset = new RuleDataSet();

@@ -60,7 +60,7 @@ class ArchitectureTest {
             .whereLayer("ContractModule").mayOnlyAccessLayers("CoreModule", "BankingModule", "ContractModule")
             .whereLayer("BudgetModule").mayOnlyAccessLayers("CoreModule", "BankingModule", "BudgetModule")
             .whereLayer("ClassificationModule").mayOnlyAccessLayers("CoreModule", "BankingModule", "ClassificationModule")
-            .whereLayer("ExportModule").mayOnlyAccessLayers("CoreModule", "BankingModule", "ClassificationModule", "ContractModule", "BudgetModule")
+            .whereLayer("ExportModule").mayOnlyAccessLayers("CoreModule", "BankingModule", "ClassificationModule", "ContractModule", "BudgetModule", "SuggestionModule")
             .whereLayer("SuggestionModule").mayOnlyAccessLayers("CoreModule", "BankingModule", "ClassificationModule", "ContractModule", "BudgetModule", "SuggestionModule")
             .whereLayer("CoreModule").mayNotAccessAnyLayer()
             .check(classes);

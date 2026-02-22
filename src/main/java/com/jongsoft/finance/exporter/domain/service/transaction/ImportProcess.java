@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.domain.commands.CreateTransactionCommand;
+import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
 import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.domain.model.ProcessVariable;
 import com.jongsoft.finance.exporter.domain.model.AccountMapping;
@@ -13,6 +14,7 @@ import com.jongsoft.finance.exporter.domain.model.UserTask;
 import com.jongsoft.finance.exporter.domain.service.ImporterProvider;
 import com.jongsoft.finance.exporter.domain.service.TransactionDTO;
 import com.jongsoft.finance.exporter.types.ProcessingStage;
+import com.jongsoft.finance.suggestion.domain.commands.ApplyTransactionRulesCommand;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +53,9 @@ public class ImportProcess {
     }
 
     public void process(
-            List<ImporterProvider<?>> importProviders, Function<Long, String> locateCurrency) {
+            List<ImporterProvider<?>> importProviders,
+            Function<Long, String> locateCurrency,
+            TransactionCreationHandler transactionCreationHandler) {
         ImporterProvider<?> relevantProvider = importProviders.stream()
                 .filter(provider -> provider.getImporterType()
                         .equals(batchImport.getConfig().getType()))
@@ -64,7 +68,9 @@ public class ImportProcess {
                     case CONFIGURATION, MISSING_ACCOUNT, COMPLETED ->
                         importContext.getCurrentStage();
                     case ACCOUNT_MAPPING -> processAccountMapping(relevantProvider);
-                    case IMPORTING -> processImporting(relevantProvider, locateCurrency);
+                    case IMPORTING ->
+                        processImporting(
+                                relevantProvider, locateCurrency, transactionCreationHandler);
                 };
         importContext.setCurrentStage(nextStage);
     }
@@ -87,7 +93,8 @@ public class ImportProcess {
             log.debug("No context found, starting configuration process.");
             importContext = new ImportContext();
             var importConfig = relevantProvider.loadConfiguration(batchImport.getConfig());
-            importContext.setConfiguration(new ProcessConfiguration(importConfig, null));
+            importContext.setConfiguration(
+                    new ProcessConfiguration(importConfig, null, false, false));
             importContext.waitForUser();
         }
     }
@@ -179,20 +186,26 @@ public class ImportProcess {
     }
 
     private ProcessingStage processImporting(
-            ImporterProvider<?> relevantProvider, Function<Long, String> locateCurrency) {
+            ImporterProvider<?> relevantProvider,
+            Function<Long, String> locateCurrency,
+            TransactionCreationHandler transactionCreationHandler) {
         String currency = locateCurrency.apply(importContext.getConfiguration().accountId());
         for (TransactionDTO transaction : readTransactions(relevantProvider)) {
             long accountId = importContext.locateAccount(transaction.opposingName());
 
-            CreateTransactionCommand.transactionCreated(
-                    transaction.transactionDate(),
-                    transaction.description(),
-                    transaction.type(),
-                    null,
-                    currency,
-                    importContext.getConfiguration().accountId(),
-                    accountId,
-                    BigDecimal.valueOf(transaction.amount()));
+            var transactionId =
+                    transactionCreationHandler.handleCreatedEvent(new CreateTransactionCommand(
+                            transaction.transactionDate(),
+                            transaction.description(),
+                            transaction.type(),
+                            null,
+                            currency,
+                            importContext.getConfiguration().accountId(),
+                            accountId,
+                            BigDecimal.valueOf(transaction.amount())));
+            if (importContext.getConfiguration().applyRules()) {
+                ApplyTransactionRulesCommand.applyTransactionRules(transactionId);
+            }
         }
 
         batchImport.finish(new Date());

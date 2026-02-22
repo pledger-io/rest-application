@@ -1,6 +1,7 @@
 package com.jongsoft.finance.exporter.domain.service;
 
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
+import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
 import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.adapter.api.UserProvider;
 import com.jongsoft.finance.core.domain.commands.InternalAuthenticationEvent;
@@ -33,18 +34,21 @@ class ImportSchedule {
 
     private final AccountProvider accountProvider;
     private final StorageService storageService;
+    private final TransactionCreationHandler transactionCreationHandler;
 
     ImportSchedule(
             UserProvider userProvider,
             ImportProvider importProvider,
             List<ImporterProvider<?>> importerProviders,
             AccountProvider accountProvider,
-            StorageService storageService) {
+            StorageService storageService,
+            TransactionCreationHandler transactionCreationHandler) {
         this.userProvider = userProvider;
         this.importProvider = importProvider;
         this.importerProviders = importerProviders;
         this.accountProvider = accountProvider;
         this.storageService = storageService;
+        this.transactionCreationHandler = transactionCreationHandler;
     }
 
     @Scheduled(fixedRate = "${application.schedules.exporter.import.rate}")
@@ -77,7 +81,8 @@ class ImportSchedule {
                 log.debug("Continue import process for {}", batchImport.getSlug());
                 process.process(
                         importerProviders,
-                        accountId -> accountProvider.lookup(accountId).get().getCurrency());
+                        accountId -> accountProvider.lookup(accountId).get().getCurrency(),
+                        transactionCreationHandler);
             }
         } catch (IOException e) {
             log.warn("Failed to load context for import {}", batchImport.getId());

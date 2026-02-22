@@ -5,5 +5,9 @@ import com.jongsoft.finance.core.domain.model.ProcessVariable;
 import io.micronaut.serde.annotation.Serdeable;
 
 @Serdeable
-public record ProcessConfiguration(ImporterConfiguration importerConfiguration, Long accountId)
+public record ProcessConfiguration(
+        ImporterConfiguration importerConfiguration,
+        Long accountId,
+        boolean applyRules,
+        boolean generateAccounts)
         implements ProcessVariable {}
