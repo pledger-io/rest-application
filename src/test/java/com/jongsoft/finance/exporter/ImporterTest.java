@@ -136,4 +136,65 @@ class ImporterTest extends RestTestSetup {
                                                 .jsonPath()
                                                 .get("finished") != null);
     }
+
+    @Test
+    @DisplayName("Import with auto-create accounts")
+    void importWithAutoCreate(PledgerContext context, PledgerRequests requests) {
+        context.withUser("csv-transaction-import-create@account.local")
+            .withBankAccount("Checking account", "EUR", "default");
+        requests.authenticate("csv-transaction-import-create@account.local");
+
+        long accountId = requests.searchBankAccounts(0, 1, List.of("default"), "Checking account")
+            .statusCode(200)
+            .extract().jsonPath().getLong("content[0].id");
+
+        String configCode = requests.createAttachment("/exporter/configuration/valid-config.json")
+            .statusCode(201)
+            .extract().body().jsonPath().getString("fileCode");
+
+        requests.createBatchConfig("test-config", "CSVImportProvider", configCode)
+            .statusCode(201)
+            .body("name", equalTo("test-config"))
+            .body("type", equalTo("CSVImportProvider"))
+            .body("fileCode", equalTo(configCode));
+
+        String batchFileCode = requests.createAttachment("/exporter/csv-files/single-deposit.csv")
+            .statusCode(201)
+            .body("fileCode", notNullValue())
+            .extract().body().jsonPath().getString("fileCode");
+
+        String batchSlug = requests.createBatchJob("test-config", batchFileCode)
+            .statusCode(201)
+            .body("slug", notNullValue())
+            .body("config.name", equalTo("test-config"))
+            .body("finished", nullValue())
+            .extract().jsonPath().getString("slug");
+
+        await()
+            .atMost(15, TimeUnit.SECONDS)
+            .pollInterval(1, TimeUnit.SECONDS)
+            .until(() -> requests.fetchBatchTasks(batchSlug).extract().statusCode() == 200);
+
+        Map<String, Object> configuration = requests.fetchBatchTasks(batchSlug)
+            .statusCode(200)
+            .body("$", hasSize(1))
+            .body("[0].name", equalTo("configuration"))
+            .extract().jsonPath().getMap("[0].variables");
+
+        configuration.put("accountId", accountId);
+        configuration.put("generateAccounts", true);
+        configuration.put("applyRules", true);
+
+        requests.completeBatchTask(batchSlug, "configuration", configuration)
+            .statusCode(204);
+
+        await().atMost(30, TimeUnit.SECONDS)
+            .pollInterval(1, TimeUnit.SECONDS)
+            .until(
+                () ->
+                    requests.fetchBatchJob(batchSlug)
+                        .extract()
+                        .jsonPath()
+                        .get("finished") != null);
+    }
 }

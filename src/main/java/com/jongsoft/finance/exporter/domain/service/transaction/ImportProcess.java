@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.domain.commands.CreateTransactionCommand;
+import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
 import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.domain.model.ProcessVariable;
@@ -177,8 +178,20 @@ public class ImportProcess {
 
         if (importContext.hasMissingAccounts()) {
             log.debug("Missing accounts: {}", importContext.getAccountMapping().size());
-            importContext.waitForUser();
-            return ProcessingStage.MISSING_ACCOUNT;
+            if (importContext.getConfiguration().generateAccounts()) {
+                importContext.getAccountMapping().entrySet().stream()
+                        .filter(entry -> entry.getValue() == null)
+                        .forEach(entry -> {
+                            Account.create(null, entry.getKey(), "EUR", "creditor");
+                            importContext.addMapping(
+                                    entry.getKey(), accountResolver.apply(entry.getKey()));
+                        });
+            }
+
+            if (importContext.hasMissingAccounts()) {
+                importContext.waitForUser();
+                return ProcessingStage.MISSING_ACCOUNT;
+            }
         }
 
         log.debug("Account mapping complete, starting import process.");
