@@ -7,7 +7,7 @@ pluginManagement {
         id("io.micronaut.application").version("4.6.1")
         id("org.sonarqube").version("7.2.2.6593")
         id("com.diffplug.spotless").version("8.2.1")
-        id("io.micronaut.openapi").version("4.5.4")
+        id("io.micronaut.openapi").version("4.6.2")
 
         id("signing")
         id("maven-publish")
@@ -34,7 +34,7 @@ dependencyResolutionManagement {
         }
 
         create("mn") {
-            from("io.micronaut.platform:micronaut-platform:4.10.6")
+            from("io.micronaut.platform:micronaut-platform:4.10.8")
         }
 
         create("llm") {
