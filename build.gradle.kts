@@ -13,6 +13,7 @@ sonar {
     properties {
         property("sonar.projectKey", "pledger-io_rest-application")
         property("sonar.organization", "pledger-io")
+        property("sonar.junit.reportPaths", "build/test-results/test")
     }
 }
 
