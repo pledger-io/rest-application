@@ -27,7 +27,7 @@ dependencyResolutionManagement {
             library("lang", "com.jongsoft.lang", "language").version("1.1.6")
             library("lang.xml", "com.jongsoft.lang", "language-fasterxml").version("1.1.0")
             library("otp", "dev.samstevens.totp", "totp").version("1.7.1")
-            library("camunda", "org.camunda.bpm", "camunda-engine").version("7.23.0")
+            library("camunda", "org.camunda.bpm", "camunda-engine").version("7.24.0")
             library("bouncy", "org.bouncycastle", "bcprov-jdk18on").version("1.83")
             library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.83")
             library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
