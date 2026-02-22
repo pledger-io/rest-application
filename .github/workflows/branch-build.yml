@@ -1,8 +1,6 @@
 name: Branch Build
 on:
   push:
-    branches-ignore:
-      - master
 
 permissions:
   packages: write
@@ -11,6 +9,7 @@ permissions:
 
 jobs:
   check-software:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
      - uses: actions/checkout@v6
@@ -26,7 +25,11 @@ jobs:
        run: ./gradlew classes -q
      - name: Verify the software
        run: ./gradlew check -x classes -q
-       continue-on-error: true
+       continue-on-error: ${{github.event_name != 'pull_request' || github.event.base.ref != 'master'}}
+
+     - name: Quality gate
+       run: ./gradlew sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.gradle.skipCompile=true -Dsonar.host.url=https://sonarcloud.io
+       if: success() && (github.event_name == 'pull_request' || github.event.base.ref != 'master')
 
      - name: Upload test results
        uses: actions/upload-artifact@v6
