@@ -65,6 +65,12 @@ tasks.test {
     maxParallelForks = 1
 }
 
+tasks.jacocoTestReport {
+    reports {
+        xml.required = true
+    }
+}
+
 tasks.processResources {
     filesMatching("**/micronaut-banner.txt") {
         filter { line ->
