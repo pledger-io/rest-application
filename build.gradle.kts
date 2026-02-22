@@ -63,6 +63,7 @@ tasks.classes {
 
 tasks.test {
     maxParallelForks = 1
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.jacocoTestReport {
