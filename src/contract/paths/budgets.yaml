@@ -1,0 +1,77 @@
+get:
+  operationId: findByFilter
+  tags: [ budget-fetcher ]
+  summary: Search budgets
+  description: >
+    Retrieve budget periods for the authenticated user. You can filter by
+    year and/or month. When firstOnly is true, only the first matching
+    budget period is returned.
+  parameters:
+    - name: year
+      required: false
+      description: The year to get the budget for
+      in: query
+      schema: { type: int }
+    - name: month
+      required: false
+      description: The month to get the budget for
+      in: query
+      schema:
+        type: int
+        min: 1
+        max: 12
+    - name: firstOnly
+      description: If true, only the first budget will be returned.
+      in: query
+      schema: { type: boolean }
+  responses:
+    "200":
+      description: The list of matching budget periods
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/budget-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createInitialBudget
+  tags: [ budget-command ]
+  summary: Create budget
+  description: >
+    Create the initial budget for the current user. This
+    can only be called once if no budget exists for the
+    current user.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/budget-request' }
+  responses:
+    "201":
+      description: The created budget
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/budget-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+patch:
+  operationId: updateCurrentBudget
+  tags: [ budget-command ]
+  summary: Update budget
+  description: >
+    Update the current budget for the current user. This operation will also
+    index all expenses based upon the difference between the previous expected income
+    and the new expected income.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/budget-request' }
+  responses:
+    "200":
+      description: The created budget
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/budget-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

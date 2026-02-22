@@ -1,0 +1,40 @@
+@startuml
+title Pledger.io Layer Design
+
+package generated {
+    [API Interface] <<..finance.rest..>> as api_interface #Orange/PowderBlue
+}
+
+package domain {
+    [Database] <<..finance..domain.jpa..>> as jpa_layer #white/PowderBlue
+    [Commands] <<..finance..domain.commands..>> as command_layer #white/PowderBlue
+    [Model] <<..finance..domain.model..>> as model_layer #white/PowderBlue
+    [Service] <<..finance..domain.service..>> as service_layer #white/LightGray
+}
+
+package adapter {
+    [Internal API] <<..finance..adapter.api..>> as api_layer #white/Green
+    [REST API] <<..finance..adapter.rest..>> as rest_layer #white/Green
+}
+
+jpa_layer --> command_layer : listens to
+jpa_layer -> model_layer : instantiates
+jpa_layer -up-> api_layer : implements
+
+model_layer --> command_layer : initiates
+
+rest_layer --> model_layer : uses
+rest_layer -> api_layer : uses
+rest_layer ----> command_layer : uses
+
+rest_layer -up-> api_interface: implements
+
+api_layer --> model_layer : uses
+
+service_layer -up-> api_layer : implements
+service_layer -up-> model_layer : uses
+service_layer -right-> command_layer : uses
+
+api_interface ---> model_layer: uses
+
+@enduml

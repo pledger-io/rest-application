@@ -1,0 +1,19 @@
+get:
+  security: []
+  tags:
+    - i18n
+  summary: Get i18n
+  operationId: getTranslations
+  parameters:
+    - name: languageCode
+      in: path
+      required: true
+      schema:
+        type: string
+        example: en
+  responses:
+    "200":
+      description: getTranslations 200 response
+      content:
+        application/json:
+          schema: { $ref: './components/i18n-response.yaml' }

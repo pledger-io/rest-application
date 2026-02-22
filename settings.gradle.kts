@@ -1,4 +1,4 @@
-rootProject.name="Pledger"
+rootProject.name="pledger-io"
 
 pluginManagement {
     plugins {
@@ -32,13 +32,8 @@ dependencyResolutionManagement {
             library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.83")
             library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
             library("csv", "com.opencsv", "opencsv").version("5.12.0")
-
-            // testing dependencies
-            version("junit.version", "6.0.1")
-            library("junit.jupiter", "org.junit.jupiter", "junit-jupiter-api").versionRef("junit.version")
-            library("assertj","org.assertj", "assertj-core").version("3.27.6")
-            library("mockito","org.mockito", "mockito-core").version("5.21.0")
-            bundle("junit", listOf("junit.jupiter", "assertj", "mockito"))
+            library("archunit", "com.tngtech.archunit", "archunit-junit5").version("1.4.1")
+            library("awaitly", "org.awaitility", "awaitility").version("3.0.0")
         }
 
         create("mn") {
@@ -60,22 +55,3 @@ dependencyResolutionManagement {
         }
     }
 }
-
-include(
-    "core",
-    "domain",
-    "transaction-importer:transaction-importer-api",
-    "transaction-importer:transaction-importer-csv",
-    "learning:learning-module",
-    "learning:learning-module-rules",
-    "learning:learning-module-llm",
-    "learning:learning-module-spending-patterns",
-    "bpmn-process",
-    "jpa-repository",
-    "website:rest-api",
-    "website:learning-rule-api",
-    "website:runtime-api",
-    "website:importer-api",
-    "website:system-api",
-    "website:budget-api",
-    "website:application")

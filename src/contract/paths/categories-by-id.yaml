@@ -1,0 +1,59 @@
+parameters:
+  - name: id
+    description: The identifier of the category
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getCategoryById
+  tags: [ category-fetcher ]
+  summary: Fetch category
+  description: >
+    Retrieve a single category by its identifier. Returns the full category details
+    if it exists and the user has access.
+  responses:
+    "200":
+      description: The category
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/category-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateCategory
+  tags: [ category-command ]
+  summary: Update category
+  description: >
+    Update an existing category identified by its id using the provided request body.
+    Returns the updated category details.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/category-request' }
+  responses:
+    "200":
+      description: The updated category
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/category-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteCategoryById
+  tags: [ category-command ]
+  summary: Delete category
+  description: >
+    Delete a category by its identifier. On success, a 204 No Content is returned
+    to confirm removal.
+  responses:
+    "204":
+      description: Confirmation that a transaction was removed
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

@@ -1,0 +1,53 @@
+parameters:
+  - name: id
+    description: The identifier of the contract
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getContractById
+  tags: [ contract-fetcher ]
+  summary: Fetch contract
+  description: Fetch a single contract by its unique identifier.
+  responses:
+    "200":
+      description: The contract
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/contract-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateContract
+  tags: [ contract-command ]
+  summary: Update contract
+  description: Update an existing contract in the application.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/contract-request' }
+  responses:
+    "200":
+      description: The updated category
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/contract-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteContractById
+  tags: [ contract-command ]
+  summary: Delete contract
+  description: Marks a contract that it is no longer relevant in the application.
+  responses:
+    "204":
+      description: Confirmation that a contract was removed
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

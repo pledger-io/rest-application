@@ -1,0 +1,142 @@
+{
+  "accounts":[
+    {
+      "id": 1,
+      "name": "Checking account",
+      "description": "Base checking account",
+      "type": "default",
+      "account": {
+        "bic": "COBADEFFXXX",
+        "iban": "DE89370400440532013000",
+        "currency": "EUR"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Big Spender Enc.",
+      "description": "My employer's bank account",
+      "type": "debtor",
+      "account": {
+        "bic": "8DHE2DH",
+        "iban": "DE893704001230532013000",
+        "currency": "EUR"
+      }
+    },
+    {
+      "id": 3,
+      "name": "Wallmart",
+      "description": "Base bank account for Wallmart",
+      "type": "creditor",
+      "account": {
+        "currency": "EUR"
+      }
+    },
+    {
+      "id": 4,
+      "name": "Netflix",
+      "description": "Base bank account for Netflix",
+      "type": "creditor",
+      "account": {
+        "currency": "EUR"
+      }
+    }
+  ],
+  "categories": [
+    {
+      "name": "Streaming Services",
+      "description": "Streaming services"
+    },
+    {
+      "name": "Groceries",
+      "description": "Groceries"
+    }
+  ],
+  "tags": [
+    "streaming",
+    "groceries",
+    "shopping",
+    "food",
+    "drinks"
+  ],
+  "contract": [
+    {
+      "name": "Netflix monthly subscription",
+      "description": "Netflix subscription services",
+      "start": "2021-01-01",
+      "end": "2024-01-01",
+      "terminated": true,
+      "company": {
+        "id": 4,
+        "name": "Netflix"
+      }
+    },
+    {
+      "name": "Netflix updated subscription",
+      "description": "Netflix updated subscription",
+      "start": "2026-01-01",
+      "end": "2028-01-01",
+      "notification": true,
+      "company": {
+        "id": 4,
+        "name": "Netflix"
+      }
+    }
+  ],
+  "budget": [
+    {
+      "income": 2800,
+      "period": {
+        "startDate": "2018-06-01"
+      },
+      "expenses": [
+        {
+          "name": "Streaming services",
+          "expected": 150
+        },
+        {
+          "name": "Groceries",
+          "expected": 500
+        }
+      ]
+    },
+    {
+      "income": 2500,
+      "period": {
+        "startDate": "2015-01-01",
+        "endDate": "2018-06-01"
+      },
+      "expenses": [
+        {
+          "name": "Streaming services",
+          "expected": 150
+        },
+        {
+          "name": "Groceries",
+          "expected": 400
+        }
+      ]
+    }
+  ],
+  "transaction": [
+    {
+      "dates": {
+        "transaction": "2021-05-04"
+      },
+      "description": "Netflix monthly payment",
+      "type": "CREDIT",
+      "currency": "EUR",
+      "amount": 19.95,
+      "source": {
+        "id": 1
+      },
+      "destination": {
+        "id": 4
+      },
+      "metadata": {
+        "category": "Streaming Services",
+        "budget": "Streaming services",
+        "contract": "Netflix updated subscription"
+      }
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+parameters:
+  - name: tag
+    schema:
+      type: string
+    in: path
+    required: true
+delete:
+  operationId: deleteTag
+  tags: [ tag-command ]
+  summary: Delete tag
+  description: >
+    Delete an existing tag by its name. Returns 204 on success; if the tag does not exist,
+    a 404 may be returned.
+  responses:
+    "204":
+      description: Confirmation the tag was deleted
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

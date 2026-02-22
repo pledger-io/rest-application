@@ -1,0 +1,17 @@
+get:
+  operationId: getAccountTypes
+  tags: [ system-information ]
+  summary: Get account types
+  description: >
+    Get a listing of all available account types in the system.
+  responses:
+    "200":
+      description: A list of all available account types
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

@@ -1,0 +1,22 @@
+parameters:
+  - name: setting
+    description: The setting name
+    in: path
+    required: true
+    schema:
+      type: string
+patch:
+  operationId: patchSetting
+  tags: [ settings ]
+  summary: Update setting
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/setting-request' }
+  responses:
+    "204":
+      description: Confirmation the setting was updated
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

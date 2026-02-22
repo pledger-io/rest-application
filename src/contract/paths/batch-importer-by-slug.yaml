@@ -1,0 +1,30 @@
+parameters:
+  - name: slug
+    required: true
+    in: path
+    description: The unique identifier
+    schema:
+      type: string
+get:
+  operationId: getJobBySlug
+  tags: [ batch-importer ]
+  summary: Get import job
+  responses:
+    "200":
+      description: The batch job
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/batch-job-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteJobBySlug
+  tags: [ batch-importer ]
+  summary: Delete import job
+  responses:
+    "204":
+      description: Confirmation that the batch job was deleted
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

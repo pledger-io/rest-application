@@ -1,0 +1,13 @@
+get:
+  operationId: openIdConfiguration
+  tags: [ open-id ]
+  security: []
+  summary: Get configuration
+  description: >
+    Get the configuration needed to setup an OpenId integration in the front-end.
+  responses:
+    "200":
+      description: The configuration
+      content:
+        application/json:
+          schema: { $ref: '../components/response/open-id-configuration.yaml' }

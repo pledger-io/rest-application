@@ -1,0 +1,74 @@
+parameters:
+  - name: group
+    required: true
+    in: path
+    description: The name of the group
+    schema:
+      type: string
+  - name: ruleId
+    required: true
+    in: path
+    description: The name of the group
+    schema:
+      type: integer
+      format: int64
+get:
+  operationId: fetchRule
+  tags: [ learning-rule-fetcher ]
+  summary: Fetch rule
+  responses:
+    "200":
+      description: The rule
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/rule-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateRule
+  tags: [ learning-rule-command ]
+  summary: Update rule
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/rule-request' }
+  responses:
+    "200":
+      description: The updated rule
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/rule-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+patch:
+  operationId: patchRule
+  tags: [ learning-rule-command ]
+  summary: Patch rule
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [ move ]
+          properties:
+            move:
+              type: string
+              enum: [ UP, DOWN ]
+  responses:
+    "204":
+      description: The rule was patched
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteRule
+  tags: [ learning-rule-command ]
+  summary: Delete rule
+  responses:
+    "204":
+      description: The rule was deleted
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

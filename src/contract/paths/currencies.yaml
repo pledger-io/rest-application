@@ -1,0 +1,31 @@
+get:
+  operationId: getCurrencies
+  tags: [ currency ]
+  summary: Search currencies
+  responses:
+    "200":
+      description: The list of currencies
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/currency-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createCurrency
+  tags: [ currency ]
+  summary: Create currency
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/currency-request' }
+  responses:
+    "201":
+      description: The created currency
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/currency-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

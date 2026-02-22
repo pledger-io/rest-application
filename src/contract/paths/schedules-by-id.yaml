@@ -1,0 +1,59 @@
+parameters:
+  - name: id
+    description: The identifier of the schedule
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 123
+get:
+  operationId: findScheduleById
+  tags: [ schedule-fetcher ]
+  summary: Fetch schedule
+  description: >
+    Retrieve a single transaction schedule by its identifier. Returns full details
+    of the schedule if found.
+  responses:
+    "200":
+      description: The schedule
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/transaction-schedule-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+patch:
+  operationId: updateSchedule
+  tags: [ schedule-command ]
+  summary: Update schedule
+  description: >
+    Partially update an existing transaction schedule using the provided patch
+    request. Returns the updated schedule.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/transaction-schedule-patch-request' }
+  responses:
+    "200":
+      description: The updated schedule
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/transaction-schedule-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteSchedule
+  tags: [ schedule-command ]
+  summary: Delete schedule
+  description: >
+    Delete a transaction schedule by its identifier. Returns 204 on successful
+    deletion.
+  responses:
+    "204":
+      description: Confirmation the schedule was deleted
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

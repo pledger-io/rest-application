@@ -1,0 +1,44 @@
+get:
+  operationId: suggestClassifications
+  tags: [ learning-rule-applier ]
+  summary: Classify transaction
+  parameters:
+    - name: amount
+      required: false
+      in: query
+      schema:
+        type: number
+        format: double
+    - name: description
+      required: false
+      in: query
+      schema:
+        type: string
+    - name: source
+      required: false
+      in: query
+      schema:
+        type: string
+    - name: destination
+      required: false
+      in: query
+      schema:
+        type: string
+  responses:
+    "200":
+      description: The suggestions made by Pledger.io
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              budget:
+                type: string
+              category:
+                type: string
+              tags:
+                type: array
+                items:
+                  type: string
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

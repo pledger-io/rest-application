@@ -1,0 +1,44 @@
+get:
+  operationId: findExpensesByFilter
+  tags: [ budget-fetcher ]
+  summary: Search expenses
+  description: >
+    Search expenses within the currently active budget for the authenticated
+    user. You can provide a partial name to filter the results. Returns the
+    matching expenses.
+  parameters:
+    - name: name
+      description: Filter expenses based upon the partial name
+      in: query
+      schema: { type: string }
+  responses:
+    "200":
+      description: The found expenses
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/expense-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+patch:
+  operationId: updateExpense
+  tags: [ budget-command ]
+  summary: Update expense
+  description: >
+    Create or update an expense under the current active budget.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/expense-request' }
+  responses:
+    "200":
+      description: The updated budget
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/budget-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

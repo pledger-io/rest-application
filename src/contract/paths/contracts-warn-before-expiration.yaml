@@ -1,0 +1,21 @@
+parameters:
+  - name: id
+    description: The identifier of the contract
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 123
+post:
+  operationId: warnBeforeContractExpiry
+  tags: [ contract-command ]
+  summary: Warn before end
+  description: Send out a warning e-mail before the contract expiry date
+  responses:
+    "204":
+      description: Confirmation that a contract was removed
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

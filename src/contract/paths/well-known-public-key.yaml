@@ -1,0 +1,13 @@
+get:
+  operationId: getJwtSignature
+  tags: [ security ]
+  security: []
+  summary: Get JWT signature
+  description: >
+    Get the public key used to verify the JWT signature.
+  responses:
+    "200":
+      description: The public key
+      content:
+        application/json:
+          schema: { type: string }

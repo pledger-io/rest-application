@@ -1,0 +1,80 @@
+parameters:
+  - name: id
+    description: The identifier of the transaction
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getTransactionById
+  tags: [ transaction-fetcher ]
+  summary: Fetch transaction
+  description: Fetch a single transaction from the system
+  responses:
+    "200":
+      description: The matching transaction
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/transaction-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateTransaction
+  tags: [ transaction-command ]
+  summary: Update transaction
+  description: Update a transaction in the system
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/transaction-request' }
+  responses:
+    "200":
+      description: The updated transaction
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/transaction-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+patch:
+  operationId: splitTransaction
+  tags: [ transaction-command ]
+  summary: Split transaction
+  description: Provide the new split for the transaction
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              description:
+                type: string
+              amount:
+                type: number
+  responses:
+    "200":
+      description: The updated transaction
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/transaction-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteTransaction
+  tags: [ transaction-command ]
+  summary: Delete transaction
+  description: Remove a transaction from the system
+  responses:
+    "204":
+      description: Confirmation that a transaction was removed
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

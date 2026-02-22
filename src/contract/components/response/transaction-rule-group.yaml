@@ -1,0 +1,8 @@
+type: object
+required: [ name, sort ]
+properties:
+  sort:
+    type: integer
+    format: int32
+  name:
+    type: string

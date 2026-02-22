@@ -1,0 +1,27 @@
+parameters:
+  - name: type
+    in: path
+    required: true
+    schema:
+      type: string
+      enum: [ daily, monthly ]
+post:
+  operationId: computeBalanceGroupedByDate
+  tags: [ statistics-balance ]
+  summary: Compute date partitioned balance
+  description: >
+    Computes the balance grouping it by date as indicated in the `type`.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/balance-request' }
+  responses:
+    "200":
+      description: The balance for the given filters
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/balance-dated-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

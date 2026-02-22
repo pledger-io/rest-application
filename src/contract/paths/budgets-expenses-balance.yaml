@@ -1,0 +1,42 @@
+get:
+  operationId: computeBudgetExpenseBalance
+  tags: [ budget-fetcher ]
+  summary: Compute expense balance
+  description: >
+    Compute the budget-vs-spending balance for one month of the authenticated
+    user. Provide year and month to select the period. Optionally pass one or
+    more expenseId values to limit the calculation to specific expenses.
+    Returns the computed balance per expense for the selected period.
+  parameters:
+    - name: year
+      required: true
+      description: The year to get the budget for
+      in: query
+      schema: { type: int }
+    - name: month
+      required: true
+      description: The month to get the budget for
+      in: query
+      schema:
+        type: int
+        min: 1
+        max: 12
+    - name: expenseId
+      description: Optional list of expense identifiers to filter on
+      in: query
+      schema:
+        type: array
+        items:
+          type: integer
+          format: int64
+  responses:
+    "200":
+      description: The current balance
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/expense-computed-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

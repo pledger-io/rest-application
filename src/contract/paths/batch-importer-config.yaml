@@ -1,0 +1,42 @@
+get:
+  operationId: getConfigurations
+  tags: [ batch-importer ]
+  summary: Search configuration
+  responses:
+    "200":
+      description: A list of all available configurations
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/batch-configuration-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createConfiguration
+  tags: [ batch-importer ]
+  summary: Create configuration
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [ name, type, fileCode ]
+          properties:
+            name:
+              type: string
+              description: The name of the configuration
+            type:
+              type: string
+              description: The type of importer that will be used
+            fileCode:
+              type: string
+              description: The file code to get the contents of the configuration
+  responses:
+    "201":
+      description: THe created configuration
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/batch-configuration-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

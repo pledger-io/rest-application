@@ -1,0 +1,13 @@
+post:
+  operationId: createUser
+  tags: [ security ]
+  security: []
+  summary: Create user
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/user-request' }
+  responses:
+    "204":
+      description: Confirmation the account was created
+    "400": { $ref: '#/components/responses/400' }

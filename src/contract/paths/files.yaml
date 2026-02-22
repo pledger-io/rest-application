@@ -1,0 +1,22 @@
+post:
+  operationId: uploadFile
+  tags: [ files ]
+  summary: Create file
+  requestBody:
+    content:
+      'multipart/form-data':
+        schema:
+          type: object
+          properties:
+            upload:
+              type: string
+              format: binary
+    required: true
+  responses:
+    "201":
+      description: The file code for the created file
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/file-response" }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
