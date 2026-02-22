@@ -35,6 +35,7 @@ public class StatisticalTest extends RestTestSetup {
                 .withCategory("TV Services")
                 .on(of(2023, 2, 1))
                 .upsert();
+        requests.authenticate("compute-balance-account@account.local");
 
         requests.computeBalance(range(of(2023, 1, 1), of(2023, 3, 1)), List.of(), List.of())
             .statusCode(200)

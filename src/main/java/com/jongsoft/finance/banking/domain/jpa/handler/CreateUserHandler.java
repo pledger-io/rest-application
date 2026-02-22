@@ -2,12 +2,9 @@ package com.jongsoft.finance.banking.domain.jpa.handler;
 
 import com.jongsoft.finance.banking.domain.commands.CreateAccountCommand;
 import com.jongsoft.finance.banking.types.SystemAccountTypes;
-import com.jongsoft.finance.core.domain.commands.CreateExternalUserCommand;
-import com.jongsoft.finance.core.domain.commands.CreateUserCommand;
-import com.jongsoft.finance.core.domain.commands.InternalAuthenticationEvent;
+import com.jongsoft.finance.core.domain.commands.UserCreatedCommand;
 
 import io.micronaut.runtime.event.annotation.EventListener;
-import io.micronaut.scheduling.annotation.Async;
 
 import jakarta.inject.Singleton;
 
@@ -17,22 +14,9 @@ import org.slf4j.Logger;
 class CreateUserHandler {
     private final Logger log = org.slf4j.LoggerFactory.getLogger(CreateUserHandler.class);
 
-    @Async
     @EventListener
-    public void userWasCreated(CreateUserCommand command) {
+    public void userWasCreated(UserCreatedCommand command) {
         log.info("[{}] - Creating reconcile account for user.", command.username());
-        createReconcileAccount(command.username());
-    }
-
-    @Async
-    @EventListener
-    public void externalUserWasCreated(CreateExternalUserCommand command) {
-        log.info("[{}] - Creating reconcile account for external user.", command.username());
-        createReconcileAccount(command.username());
-    }
-
-    private void createReconcileAccount(String username) {
-        InternalAuthenticationEvent.authenticate(username);
         CreateAccountCommand.accountCreated(
                 "Reconcile Account", "EUR", SystemAccountTypes.RECONCILE.label());
     }

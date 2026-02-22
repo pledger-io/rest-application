@@ -30,6 +30,7 @@ public class ExportTest extends RestTestSetup {
               .withSchedule("Checking account", "Netflix", "Netflix monthly", 19.95, LocalDate.now().minusYears(1), LocalDate.now().plusYears(1))
               .withTag("Vacation 2023")
               .withTag("Vacation 2024");
+        requests.authenticate("export-test@account.local");
 
         requests.createExport()
               .statusCode(200)

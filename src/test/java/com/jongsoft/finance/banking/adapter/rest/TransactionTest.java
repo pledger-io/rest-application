@@ -20,6 +20,7 @@ public class TransactionTest extends RestTestSetup {
         context.withUser("transaction-schedule-create@account.local")
               .withBankAccount("Checking", "EUR", "default")
               .withCreditor("Netflix", "EUR");
+        requests.authenticate("transaction-schedule-create@account.local");
 
         var sourceId = requests.searchBankAccounts(0, 1, List.of(), "checking")
               .extract().jsonPath().getLong("content[0].id");
@@ -63,6 +64,7 @@ public class TransactionTest extends RestTestSetup {
               .withBankAccount("Checking", "EUR", "default")
               .withCreditor("Netflix", "EUR")
               .withSchedule("Checking", "Netflix", "Monthly payment", 19.99, LocalDate.now(), LocalDate.now().plusMonths(12));
+        requests.authenticate("transaction-schedule-search@account.local");
 
         requests.searchSchedules(null, null)
               .statusCode(200)
@@ -77,6 +79,7 @@ public class TransactionTest extends RestTestSetup {
         context.withUser("transaction-create@account.local")
               .withBankAccount("Checking", "EUR", "default")
               .withCreditor("Netflix", "EUR");
+        requests.authenticate("transaction-create@account.local");
 
         var sourceId = requests.searchBankAccounts(0, 1, List.of(), "checking")
               .extract().jsonPath().getLong("content[0].id");

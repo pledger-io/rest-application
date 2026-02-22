@@ -58,6 +58,7 @@ class UserChangeHandler {
                 roles);
 
         entityManager.persist(entity);
+        UserCreatedCommand.userCreated(command.username());
     }
 
     @EventListener
@@ -80,6 +81,8 @@ class UserChangeHandler {
                 roles);
 
         entityManager.persist(entity);
+        InternalAuthenticationEvent.authenticate(command.username());
+        UserCreatedCommand.userCreated(command.username());
     }
 
     @EventListener

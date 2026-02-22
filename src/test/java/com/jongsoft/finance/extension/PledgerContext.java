@@ -1,7 +1,5 @@
 package com.jongsoft.finance.extension;
 
-import static org.mockito.Mockito.*;
-
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.TagProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
@@ -19,12 +17,11 @@ import com.jongsoft.finance.contract.domain.model.Contract;
 import com.jongsoft.finance.core.adapter.api.CurrentUserProvider;
 import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.adapter.api.UserProvider;
-import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.model.UserAccount;
 import com.jongsoft.finance.core.value.Periodicity;
 import com.jongsoft.finance.core.value.UserIdentifier;
-
 import com.jongsoft.lang.Control;
+
 import io.micronaut.context.ApplicationContext;
 
 import java.math.BigDecimal;
@@ -61,12 +58,6 @@ public class PledgerContext {
         applicationContext.getBean(UserProvider.class)
               .lookup(new UserIdentifier(user))
               .ifNotPresent(() -> UserAccount.create(user, "test123"));
-        when(applicationContext.getBean(AuthenticationFacade.class).authenticated()).thenReturn(user);
-        when(applicationContext.getBean(CurrentUserProvider.class).currentUser())
-              .thenAnswer(_ ->
-                    applicationContext.getBean(UserProvider.class)
-                          .lookup(new UserIdentifier(user))
-                          .getOrThrow(() -> new RuntimeException("Cannot find user " + user)));
         return this;
     }
 

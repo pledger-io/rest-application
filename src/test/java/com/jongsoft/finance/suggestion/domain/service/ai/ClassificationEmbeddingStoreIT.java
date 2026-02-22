@@ -17,11 +17,13 @@ import com.jongsoft.finance.extension.PledgerContext;
 import com.jongsoft.finance.suggestion.domain.model.SuggestionInput;
 import com.jongsoft.finance.suggestion.domain.model.SuggestionResult;
 import com.jongsoft.lang.Collections;
+import com.jongsoft.lang.Control;
 
 import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -46,7 +48,7 @@ class ClassificationEmbeddingStoreIT extends AiBase {
     private CategoryProvider categoryProvider;
 
     @Test
-    void classifyTransaction(PledgerContext pledgerContext) throws InterruptedException {
+    void classifyTransaction(PledgerContext pledgerContext) {
         pledgerContext
                 .withUser("classify-transaction@local")
                 .withCategory("Groceries")
@@ -104,7 +106,7 @@ class ClassificationEmbeddingStoreIT extends AiBase {
         groceryPurchase.link(
                 TransactionLinkType.EXPENSE, budget.getExpenses().get(0).getId());
 
-        Thread.sleep(1000);
+        Control.Try(() -> Thread.sleep(Duration.ofMillis(10)));
 
         var suggestion = aiRuleEngine.makeSuggestions(
                 new SuggestionInput(null, "Shopping for a laptop", null, null, 0));

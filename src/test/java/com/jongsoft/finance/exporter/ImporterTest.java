@@ -23,6 +23,7 @@ class ImporterTest extends RestTestSetup {
     void importSampleProfile(PledgerContext context, PledgerRequests requests) throws IOException {
         context.withUser("sample-profile-import@account.local")
             .withStorage();
+        requests.authenticate("sample-profile-import@account.local");
 
         requests.importProfile("/exporter/importer/profile-sample.json")
             .statusCode(204);
@@ -59,6 +60,7 @@ class ImporterTest extends RestTestSetup {
     void importCSVTransactions(PledgerContext context, PledgerRequests requests) {
         context.withUser("csv-transaction-import@account.local")
             .withBankAccount("Checking account", "EUR", "default");
+        requests.authenticate("csv-transaction-import@account.local");
 
         long accountId = requests.searchBankAccounts(0, 1, List.of("default"), "Checking account")
             .statusCode(200)

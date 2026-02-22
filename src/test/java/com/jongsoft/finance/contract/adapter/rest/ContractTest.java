@@ -15,9 +15,10 @@ public class ContractTest extends RestTestSetup {
 
     @Test
     @DisplayName("Create, update, fetch and delete a contract")
-    void createContract(PledgerContext context, PledgerRequests requests) throws InterruptedException {
+    void createContract(PledgerContext context, PledgerRequests requests) {
         context.withUser("contract-create@account.local")
               .withCreditor("Netflix", "EUR");
+        requests.authenticate("contract-create@account.local");
 
         var accountId = requests.searchBankAccounts(0,1, List.of("creditor"), "Netflix")
               .extract().jsonPath().getLong("content[0].id");
@@ -77,6 +78,7 @@ public class ContractTest extends RestTestSetup {
               .withCreditor("Netflix", "EUR")
               .withContract("Netflix", "Monthly subscription", LocalDate.now().minusDays(1), LocalDate.now().plusYears(1))
               .withContract("Amazon", "Amazon Prime", LocalDate.now().minusYears(1), LocalDate.now().minusDays(1));
+        requests.authenticate("contract-search@account.local");
 
         requests.searchContracts("monthly", null)
               .statusCode(200)

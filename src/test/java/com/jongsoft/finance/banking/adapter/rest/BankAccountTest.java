@@ -19,6 +19,7 @@ public class BankAccountTest extends RestTestSetup {
     @DisplayName("List all account types")
     void listAllAccountTypes(PledgerContext pledgerContext, PledgerRequests requests) {
         pledgerContext.withUser("bank-account-types@account.local");
+        requests.authenticate("bank-account-types@account.local");
 
         requests.fetchAccountTypes()
               .statusCode(200)
@@ -35,6 +36,7 @@ public class BankAccountTest extends RestTestSetup {
     @DisplayName("Create new bank account")
     void creatingNewBankAccount(PledgerContext pledgerContext, PledgerRequests requests) {
         pledgerContext.withUser("bank-account-create@account.local");
+        requests.authenticate("bank-account-create@account.local");
 
         var id = requests.createBankAccount(Map.of(
                     "name", "Lidl Stores",
@@ -82,6 +84,7 @@ public class BankAccountTest extends RestTestSetup {
     void createSavingsAccountWithGoals(PledgerContext pledgerContext, PledgerRequests requests) {
         pledgerContext.withUser("bank-account-savings@account.local")
               .withBankAccount("Savings account", "EUR", "savings");
+        requests.authenticate("bank-account-savings@account.local");
 
         var accountId = requests.searchBankAccounts(0, 1, List.of(), "Savings account")
               .statusCode(200)
@@ -135,6 +138,7 @@ public class BankAccountTest extends RestTestSetup {
     @DisplayName("Fetch non existing account")
     void fetchingNonExistingAccount(PledgerContext pledgerContext, PledgerRequests requests) {
         pledgerContext.withUser("bank-account-missing@account.local");
+        requests.authenticate("bank-account-missing@account.local");
 
         requests.fetchBankAccount(1000000L)
               .statusCode(404)
@@ -150,6 +154,7 @@ public class BankAccountTest extends RestTestSetup {
               .withBankAccount("Checking account", "EUR", "default")
               .withDebtor("Employer", "EUR")
               .withCreditor("Netflix", "EUR");
+        requests.authenticate("bank-account-search@account.local");
 
         requests.searchBankAccounts(0, 3, List.of(), "account")
               .statusCode(200)
@@ -175,6 +180,7 @@ public class BankAccountTest extends RestTestSetup {
     void reconcileAccount(PledgerContext pledgerContext, PledgerRequests requests) {
         pledgerContext.withUser("bank-account-reconcile@account.local")
             .withBankAccount("Checking account", "EUR", "default");
+        requests.authenticate("bank-account-reconcile@account.local");
 
         var accountId = requests.searchBankAccounts(0, 1, List.of(), "Checking account")
             .statusCode(200)

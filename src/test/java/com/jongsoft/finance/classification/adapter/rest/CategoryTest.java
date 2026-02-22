@@ -17,6 +17,7 @@ public class CategoryTest extends RestTestSetup {
     @DisplayName("Create, update, fetch and delete a category")
     void createNewCategory(PledgerContext context, PledgerRequests requests) {
         context.withUser("category-create@account.local");
+        requests.authenticate("category-create@account.local");
 
         var id = requests.createCategory("Groceries", "Grocery items")
               .statusCode(201)
@@ -52,6 +53,7 @@ public class CategoryTest extends RestTestSetup {
               .withCategory("Grocery")
               .withCategory("Shopping")
               .withCategory("Transportation");
+        requests.authenticate("category-search@account.local");
 
         requests.searchCategories(0, 3, null)
               .statusCode(200)

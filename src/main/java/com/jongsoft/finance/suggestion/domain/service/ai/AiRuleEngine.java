@@ -38,8 +38,11 @@ import jakarta.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Primary
 @Singleton
@@ -56,6 +59,7 @@ class AiRuleEngine implements SuggestionEngine {
 
     private final TransactionProvider transactionProvider;
     private final FilterProvider<TransactionProvider.FilterCommand> filterProvider;
+    private final ExecutorService executors = Executors.newFixedThreadPool(10);
 
     AiRuleEngine(
             ClassificationAgent classificationAgent,
@@ -126,7 +130,12 @@ class AiRuleEngine implements SuggestionEngine {
             value = "learning.language-model.classify",
             extraTags = {"action", "transaction-update"})
     void handleClassificationChanged(LinkTransactionCommand command) {
-        updateClassifications(transactionProvider.lookup(command.id()).get());
+        String userAccount = currentUserProvider.currentUser().getUsername().email();
+        executors.submit(() -> {
+            Control.Try(() -> Thread.sleep(Duration.ofMillis(10)));
+            InternalAuthenticationEvent.authenticate(userAccount);
+            updateClassifications(transactionProvider.lookup(command.id()).get());
+        });
     }
 
     @EventListener
@@ -200,16 +209,34 @@ class AiRuleEngine implements SuggestionEngine {
         var category = transaction.getMetadata().get(CATEGORY.name());
         var expense = transaction.getMetadata().get(EXPENSE.name());
 
+        var embedding = embeddingModel.embed(TextSegment.textSegment(transaction.getDescription()));
+        var exactMatch = classificationStore
+                .embeddingStore()
+                .search(EmbeddingSearchRequest.builder()
+                        .filter(MetadataFilterBuilder.metadataKey("user")
+                                .isEqualTo(currentUserProvider
+                                        .currentUser()
+                                        .getUsername()
+                                        .email()))
+                        .queryEmbedding(embedding.content())
+                        .minScore(1D)
+                        .maxResults(1)
+                        .build());
+
         var tags = transaction.getTags().isEmpty()
                 ? ""
                 : transaction.getTags().reduce((left, right) -> left + ";" + right);
         var metadata = Map.of(
-                "id", transaction.getId().toString(),
                 "user", currentUserProvider.currentUser().getUsername().email(),
                 "category",
                         Control.Option(category).map(Classifier::toString).getOrSupply(() -> ""),
                 "budget", Control.Option(expense).map(Classifier::toString).getOrSupply(() -> ""),
                 "tags", tags);
+        if (!exactMatch.matches().isEmpty()) {
+            var firstMatch = exactMatch.matches().getFirst();
+            classificationStore.embeddingStore().removeAll(List.of(firstMatch.embeddingId()));
+        }
+
         var textSegment =
                 TextSegment.textSegment(transaction.getDescription(), Metadata.from(metadata));
 
@@ -223,8 +250,6 @@ class AiRuleEngine implements SuggestionEngine {
                                         .getUsername()
                                         .email())));
 
-        classificationStore
-                .embeddingStore()
-                .add(embeddingModel.embed(textSegment).content(), textSegment);
+        classificationStore.embeddingStore().add(embedding.content(), textSegment);
     }
 }

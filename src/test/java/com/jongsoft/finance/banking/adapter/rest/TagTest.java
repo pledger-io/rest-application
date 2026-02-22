@@ -15,6 +15,7 @@ public class TagTest  extends RestTestSetup {
     @DisplayName("Create, update, fetch and delete a tag")
     void createNewTag(PledgerContext context, PledgerRequests requests) {
         context.withUser("tags-create@account.local");
+        requests.authenticate("tags-create@account.local");
 
         requests.createTag("Holidays 2023")
               .statusCode(204);

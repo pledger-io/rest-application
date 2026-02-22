@@ -1,14 +1,16 @@
 package com.jongsoft.finance.extension;
 
-import com.jongsoft.finance.core.adapter.api.CurrentUserProvider;
 import com.jongsoft.finance.core.adapter.api.Encoder;
-import com.jongsoft.finance.core.domain.AuthenticationFacade;
+
 import io.micronaut.context.ApplicationContext;
+import io.micronaut.security.authentication.Authentication;
+import io.micronaut.security.token.generator.AccessRefreshTokenGenerator;
 import io.micronaut.test.extensions.junit5.MicronautJunit5Extension;
 import io.restassured.specification.RequestSpecification;
+
 import org.junit.jupiter.api.extension.*;
 
-import static org.mockito.Mockito.mock;
+import java.util.function.Function;
 
 public class PledgerTestExtension implements ParameterResolver, BeforeAllCallback, AfterAllCallback {
 
@@ -44,7 +46,6 @@ public class PledgerTestExtension implements ParameterResolver, BeforeAllCallbac
               .getStore(ExtensionContext.Namespace.create(MicronautJunit5Extension.class));
         var applicationContext = store.get(ApplicationContext.class, ApplicationContext.class);
 
-        applicationContext.registerSingleton(CurrentUserProvider.class, mock(CurrentUserProvider.class));
         applicationContext.registerSingleton(Encoder.class, new Encoder() {
             @Override
             public String encrypt(String value) {
@@ -57,10 +58,15 @@ public class PledgerTestExtension implements ParameterResolver, BeforeAllCallbac
             }
         });
 
+        Function<String, String> bearerTokenProvider = (username) -> applicationContext.getBean(AccessRefreshTokenGenerator.class)
+            .generate(Authentication.build(username))
+            .get()
+            .getAccessToken();
+
         getStore(context)
               .put(PledgerContext.class, new PledgerContext(applicationContext));
         getStore(context)
-              .put(PledgerRequests.class, new PledgerRequests(applicationContext.getBean(RequestSpecification.class)));
+              .put(PledgerRequests.class, new PledgerRequests(applicationContext.getBean(RequestSpecification.class), bearerTokenProvider));
     }
 
     @Override
