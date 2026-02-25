@@ -3,8 +3,8 @@ rootProject.name="pledger-io"
 pluginManagement {
     plugins {
         id("java")
-        id("io.micronaut.library").version("4.6.1")
-        id("io.micronaut.application").version("4.6.1")
+        id("io.micronaut.library").version("4.6.2")
+        id("io.micronaut.application").version("4.6.2")
         id("org.sonarqube").version("7.2.2.6593")
         id("com.diffplug.spotless").version("8.2.1")
         id("io.micronaut.openapi").version("4.6.2")
@@ -34,7 +34,7 @@ dependencyResolutionManagement {
         }
 
         create("mn") {
-            from("io.micronaut.platform:micronaut-platform:4.10.8")
+            from("io.micronaut.platform:micronaut-platform:4.10.9")
         }
 
         create("llm") {
