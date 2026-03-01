@@ -4,6 +4,8 @@ import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.core.domain.FilterProvider;
+import com.jongsoft.finance.exporter.adapter.api.ImportProvider;
+import com.jongsoft.finance.exporter.domain.model.BatchImport;
 import com.jongsoft.finance.rest.TransactionFetcherApi;
 import com.jongsoft.finance.rest.model.*;
 import com.jongsoft.lang.Collections;
@@ -24,12 +26,15 @@ class TransactionFetcherController implements TransactionFetcherApi {
 
     private final TransactionProvider transactionProvider;
     private final FilterProvider<TransactionProvider.FilterCommand> filterFactory;
+    private final ImportProvider importProvider;
 
     TransactionFetcherController(
             TransactionProvider transactionProvider,
-            FilterProvider<TransactionProvider.FilterCommand> filterFactory) {
+            FilterProvider<TransactionProvider.FilterCommand> filterFactory,
+            ImportProvider importProvider) {
         this.transactionProvider = transactionProvider;
         this.filterFactory = filterFactory;
+        this.importProvider = importProvider;
         this.logger = LoggerFactory.getLogger(TransactionFetcherController.class);
     }
 
@@ -75,8 +80,10 @@ class TransactionFetcherController implements TransactionFetcherApi {
             // todo not yet supported
         }
         if (importSlug != null) {
-            // todo fix
-            // filter.importSlug(importSlug);
+            filter.importSlug(importProvider
+                    .lookup(importSlug)
+                    .map(BatchImport::getId)
+                    .getOrThrow(() -> StatusException.badRequest("Invalid import slug")));
         }
         if (description != null) {
             filter.description(description, false);
