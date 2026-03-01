@@ -159,6 +159,7 @@ public class PledgerContext {
             this.destination = destination;
             this.amount = amount;
             this.metadata = new HashMap<>();
+            this.tags = List.of();
         }
 
         public TransactionContext withTags(String... tags) {
@@ -189,7 +190,10 @@ public class PledgerContext {
                 BigDecimal.valueOf(amount));
             var id = applicationContext.getBean(TransactionCreationHandler.class).handleCreatedEvent(command);
 
-            LinkTransactionCommand.linkCreated(id, TransactionLinkType.CATEGORY, metadata.get("CATEGORY").getId());
+            if (metadata.containsKey("CATEGORY")) {
+                LinkTransactionCommand.linkCreated(
+                        id, TransactionLinkType.CATEGORY, metadata.get("CATEGORY").getId());
+            }
             TagTransactionCommand.tagCreated(id, com.jongsoft.lang.Collections.List(tags));
 
             return PledgerContext.this;

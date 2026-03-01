@@ -1,0 +1,21 @@
+get:
+  operationId: exportTransactions
+  tags: [ export ]
+  summary: Export transactions
+  description: >
+    Export transactions in CSV format.
+  responses:
+    '200':
+      description: OK
+      headers:
+        Content-Disposition:
+          description: Suggested filename for download
+          schema:
+            type: string
+      content:
+        text/csv:
+          schema:
+            type: string
+            format: binary
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

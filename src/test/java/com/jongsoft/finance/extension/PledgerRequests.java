@@ -442,6 +442,17 @@ public class PledgerRequests {
                 .ifValidationFails();
     }
 
+    public ValidatableResponse exportTransactions() {
+        return given(requestSpecification)
+            .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+            .log()
+            .ifValidationFails()
+            .get("/v2/api/export/transactions")
+            .then()
+            .log()
+            .ifValidationFails();
+    }
+
     public ValidatableResponse importProfile(String resourceFile) throws IOException {
         var importingFile = PledgerRequests.class.getResourceAsStream(resourceFile);
         return given(requestSpecification)

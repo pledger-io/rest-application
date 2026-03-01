@@ -1,5 +1,7 @@
 package com.jongsoft.finance.exporter.adapter.rest;
 
+import static java.util.Optional.ofNullable;
+
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.TagProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
@@ -7,8 +9,10 @@ import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
 import com.jongsoft.finance.banking.adapter.rest.TransactionMapper;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.Tag;
+import com.jongsoft.finance.banking.domain.model.Transaction;
 import com.jongsoft.finance.banking.domain.model.TransactionSchedule;
 import com.jongsoft.finance.banking.types.SystemAccountTypes;
+import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.budget.adapter.api.BudgetProvider;
 import com.jongsoft.finance.budget.domain.model.Budget;
 import com.jongsoft.finance.classification.adapter.api.CategoryProvider;
@@ -23,16 +27,32 @@ import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleGroupProvider;
 import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleProvider;
 import com.jongsoft.finance.suggestion.adapter.rest.RuleMapper;
 import com.jongsoft.finance.suggestion.domain.model.TransactionRuleGroup;
+import com.jongsoft.lang.Control;
 
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.server.types.files.FileCustomizableResponseType;
+import io.micronaut.http.server.types.files.StreamedFile;
 
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Controller
 public class ExportController implements ExportApi {
+    private final Logger log = LoggerFactory.getLogger(ExportController.class);
+
+    private final ExecutorService exportExecutor = Executors.newSingleThreadExecutor();
 
     private final AccountProvider accountProvider;
     private final CategoryProvider categoryProvider;
@@ -99,6 +119,70 @@ public class ExportController implements ExportApi {
                 scheduleProvider.lookup().map(this::toScheduleResponse).toJava());
 
         return response;
+    }
+
+    @Override
+    public HttpResponse<FileCustomizableResponseType> exportTransactions() {
+        PipedOutputStream outputStream = new PipedOutputStream();
+        try {
+            PipedInputStream inputStream = new PipedInputStream(outputStream);
+            byte[] header =
+                    ("Date,Booking Date,Interest Date,From name,From IBAN,To name,To IBAN,Description,Category,Budget,Contract,Amount\n")
+                            .getBytes();
+            outputStream.write(header);
+
+            int currentPage = 0;
+
+            var filter = filterFactory.create().ownAccounts().page(currentPage, 100);
+            var transactions = transactionProvider.lookup(filter);
+            do {
+                for (Transaction transaction : transactions.content()) {
+                    String csvLine = transaction.getDate().toString() + ","
+                            + ofNullable(transaction.getBookDate())
+                                    .map(LocalDate::toString)
+                                    .orElse("")
+                            + ","
+                            + ofNullable(transaction.getInterestDate())
+                                    .map(LocalDate::toString)
+                                    .orElse("")
+                            + ","
+                            + transaction.computeFrom().getName() + ","
+                            + ofNullable(transaction.computeFrom().getIban()).orElse("") + ","
+                            + transaction.computeTo().getName() + ","
+                            + ofNullable(transaction.computeTo().getIban()).orElse("") + ","
+                            + transaction.getDescription() + ","
+                            + ofNullable(transaction
+                                            .getMetadata()
+                                            .get(TransactionLinkType.CATEGORY.name()))
+                                    .map(Object::toString)
+                                    .orElse("")
+                            + ","
+                            + ofNullable(transaction
+                                            .getMetadata()
+                                            .get(TransactionLinkType.EXPENSE.name()))
+                                    .map(Object::toString)
+                                    .orElse("")
+                            + ","
+                            + ofNullable(transaction
+                                            .getMetadata()
+                                            .get(TransactionLinkType.CONTRACT.name()))
+                                    .map(Object::toString)
+                                    .orElse("")
+                            + ","
+                            + transaction.computeAmount(transaction.computeTo())
+                            + System.lineSeparator();
+                    var output = Control.Try(() -> outputStream.write(csvLine.getBytes()));
+                    if (output.isFailure()) {
+                        log.error("Failed to write transaction to CSV.", output.getCause());
+                    }
+                }
+                filter.page(++currentPage, 100);
+            } while (transactions.hasNext());
+
+            return HttpResponse.ok(new StreamedFile(inputStream, MediaType.TEXT_CSV_TYPE));
+        } catch (IOException e) {
+            return HttpResponse.serverError();
+        }
     }
 
     private ExportProfileResponseRuleGroupsInner convertRuleGroup(TransactionRuleGroup ruleGroup) {
