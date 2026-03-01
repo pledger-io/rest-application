@@ -1,6 +1,7 @@
 package com.jongsoft.finance.contract.domain.jpa;
 
 import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
+import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.contract.adapter.api.ContractProvider;
 import com.jongsoft.finance.contract.domain.jpa.entity.ContractJpa;
 import com.jongsoft.finance.contract.domain.jpa.mapper.ContractMapper;
@@ -90,6 +91,6 @@ class ContractProviderJpa implements ContractProvider, LinkableProvider<Contract
 
     @Override
     public String typeOf() {
-        return "CONTRACT";
+        return TransactionLinkType.CONTRACT.name();
     }
 }

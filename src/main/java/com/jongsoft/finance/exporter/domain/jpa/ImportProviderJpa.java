@@ -1,5 +1,7 @@
 package com.jongsoft.finance.exporter.domain.jpa;
 
+import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
+import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.ResultPage;
 import com.jongsoft.finance.core.domain.jpa.query.ReactiveEntityManager;
@@ -20,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 @ReadOnly
 @Singleton
-public class ImportProviderJpa implements ImportProvider {
+public class ImportProviderJpa implements ImportProvider, LinkableProvider<BatchImport> {
 
     private final Logger log = LoggerFactory.getLogger(ImportProviderJpa.class);
 
@@ -88,5 +90,10 @@ public class ImportProviderJpa implements ImportProvider {
                 .limit(filter.pageSize())
                 .paged()
                 .map(mapper::toModel);
+    }
+
+    @Override
+    public String typeOf() {
+        return TransactionLinkType.IMPORT.name();
     }
 }

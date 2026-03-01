@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -135,6 +136,13 @@ class ImporterTest extends RestTestSetup {
                                                 .extract()
                                                 .jsonPath()
                                                 .get("finished") != null);
+
+        requests.searchTransactionsForAccounts(0, 10, LocalDate.parse("1900-01-01"),LocalDate.parse("2023-01-01"), List.of(accountId))
+            .statusCode(200)
+            .body("content", hasSize(1))
+            .body("content[0].dates.transaction", equalTo("2016-05-31"))
+            .body("content[0].destination.name", equalTo("Janssen PA"))
+            .body("content[0].amount", equalTo(14.19F));
     }
 
     @Test

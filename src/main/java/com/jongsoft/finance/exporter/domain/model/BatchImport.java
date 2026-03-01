@@ -91,6 +91,11 @@ public class BatchImport implements Classifier {
         return config;
     }
 
+    @Override
+    public String toString() {
+        return slug;
+    }
+
     public static BatchImport create(BatchImportConfig config, String fileCode) {
         return new BatchImport(config, fileCode);
     }

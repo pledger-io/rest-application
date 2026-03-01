@@ -2,6 +2,7 @@ package com.jongsoft.finance.banking.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.domain.model.Transaction;
+import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.rest.model.*;
 
 public interface TransactionMapper {
@@ -25,14 +26,29 @@ public interface TransactionMapper {
         response.destination(
                 new AccountLink(destination.getId(), destination.getName(), destination.getType()));
 
-        if (transaction.getMetadata().containsKey("CONTRACT")) {
-            metadata.contract(transaction.getMetadata().get("CONTRACT").toString());
+        if (transaction.getMetadata().containsKey(TransactionLinkType.CONTRACT.name())) {
+            metadata.contract(transaction
+                    .getMetadata()
+                    .get(TransactionLinkType.CONTRACT.name())
+                    .toString());
         }
-        if (transaction.getMetadata().containsKey("EXPENSE")) {
-            metadata.budget(transaction.getMetadata().get("EXPENSE").toString());
+        if (transaction.getMetadata().containsKey(TransactionLinkType.EXPENSE.name())) {
+            metadata.budget(transaction
+                    .getMetadata()
+                    .get(TransactionLinkType.EXPENSE.name())
+                    .toString());
         }
-        if (transaction.getMetadata().containsKey("CATEGORY")) {
-            metadata.category(transaction.getMetadata().get("CATEGORY").toString());
+        if (transaction.getMetadata().containsKey(TransactionLinkType.CATEGORY.name())) {
+            metadata.category(transaction
+                    .getMetadata()
+                    .get(TransactionLinkType.CATEGORY.name())
+                    .toString());
+        }
+        if (transaction.getMetadata().containsKey(TransactionLinkType.IMPORT.name())) {
+            metadata._import(transaction
+                    .getMetadata()
+                    .get(TransactionLinkType.IMPORT.name())
+                    .toString());
         }
         metadata._import(transaction.getImportSlug());
         metadata.tags(transaction.getTags().toJava());

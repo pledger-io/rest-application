@@ -1,6 +1,7 @@
 package com.jongsoft.finance.classification.domain.jpa;
 
 import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
+import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.classification.adapter.api.CategoryProvider;
 import com.jongsoft.finance.classification.domain.jpa.entity.CategoryJpa;
 import com.jongsoft.finance.classification.domain.jpa.filter.CategoryFilterCommand;
@@ -91,6 +92,6 @@ public class CategoryProviderJpa implements CategoryProvider, LinkableProvider<C
 
     @Override
     public String typeOf() {
-        return "CATEGORY";
+        return TransactionLinkType.CATEGORY.name();
     }
 }

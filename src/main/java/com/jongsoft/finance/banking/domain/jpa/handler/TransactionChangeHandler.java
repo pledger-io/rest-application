@@ -159,6 +159,7 @@ class TransactionChangeHandler implements TransactionCreationHandler {
 
         var journal = entityManager.getById(TransactionJournal.class, command.id());
         if (command.relationId() == null) {
+            log.trace("Removing relation {} from transaction {}", command.type(), command.id());
             journal.getMetadata()
                     .removeIf(m -> m.getRelationType().equals(command.type().name()));
             return;
