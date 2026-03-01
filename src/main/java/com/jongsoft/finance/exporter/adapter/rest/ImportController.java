@@ -1,5 +1,7 @@
 package com.jongsoft.finance.exporter.adapter.rest;
 
+import static java.lang.Long.parseLong;
+
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
@@ -20,6 +22,8 @@ import com.jongsoft.finance.core.value.Periodicity;
 import com.jongsoft.finance.rest.ImportApi;
 import com.jongsoft.finance.rest.model.*;
 import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleProvider;
+import com.jongsoft.finance.suggestion.domain.commands.CreateRuleGroupCommand;
+import com.jongsoft.finance.suggestion.domain.model.TransactionRule;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Collectors;
 
@@ -82,19 +86,25 @@ class ImportController implements ImportApi {
     @Override
     public HttpResponse<Void> importUserAccount(ExportProfileResponse profile) {
         Map<Long, Long> accountMap = new HashMap<>();
+        Map<Long, Long> categoryMap = new HashMap<>();
+        Map<Long, Long> contractMap = new HashMap<>();
         if (profile.getAccounts() != null) {
             profile.getAccounts()
                     .forEach(account -> accountMap.put(account.getId(), importAccount(account)));
         }
         if (profile.getCategories() != null) {
-            profile.getCategories().forEach(this::importCategory);
+            profile.getCategories()
+                    .forEach(category ->
+                            categoryMap.put(category.getId(), importCategory(category)));
         }
         if (profile.getTags() != null) {
             profile.getTags().forEach(tag -> Tag.create(tag.trim()));
         }
 
         if (profile.getContract() != null) {
-            profile.getContract().forEach(contract -> importContract(accountMap, contract));
+            profile.getContract()
+                    .forEach(contract -> contractMap.put(
+                            contract.getId(), importContract(accountMap, contract)));
         }
 
         if (profile.getBudget() != null) {
@@ -105,6 +115,12 @@ class ImportController implements ImportApi {
 
         if (profile.getSchedules() != null) {
             profile.getSchedules().forEach(schedule -> importSchedule(accountMap, schedule));
+        }
+
+        if (profile.getRuleGroups() != null) {
+            profile.getRuleGroups()
+                    .forEach(ruleGroup ->
+                            importRuleGroup(contractMap, categoryMap, accountMap, ruleGroup));
         }
 
         if (profile.getTransaction() != null) {
@@ -230,7 +246,7 @@ class ImportController implements ImportApi {
         }
     }
 
-    private void importContract(
+    private long importContract(
             Map<Long, Long> accountMap, ExportProfileResponseContractInner importContract) {
         log.trace("Importing contract {}.", importContract.getName());
         var company = accountProvider
@@ -255,11 +271,14 @@ class ImportController implements ImportApi {
         } else if (Objects.equals(importContract.getNotification(), Boolean.TRUE)) {
             createdContract.warnBeforeExpires();
         }
+
+        return createdContract.getId();
     }
 
-    private void importCategory(CategoryResponse importCategory) {
+    private long importCategory(CategoryResponse importCategory) {
         log.trace("Importing category {}.", importCategory.getName());
         Category.create(importCategory.getName(), importCategory.getDescription());
+        return categoryProvider.lookup(importCategory.getName()).get().getId();
     }
 
     private long importAccount(ExportProfileResponseAccountsInner importAccount) {
@@ -294,6 +313,40 @@ class ImportController implements ImportApi {
         }
 
         return createdAccount.getId();
+    }
+
+    private void importRuleGroup(
+            Map<Long, Long> contractMap,
+            Map<Long, Long> categoryMap,
+            Map<Long, Long> accountMap,
+            ExportProfileResponseRuleGroupsInner ruleGroup) {
+        CreateRuleGroupCommand.ruleGroupCreated(ruleGroup.getName());
+
+        for (var rule : ruleGroup.getRules()) {
+            var toCreate = TransactionRule.create(rule.getName(), rule.getRestrictive());
+            toCreate.assign(ruleGroup.getName());
+            toCreate.change(
+                    rule.getName(), rule.getDescription(), rule.getRestrictive(), rule.getActive());
+            for (var change : rule.getChanges()) {
+                var updatedChange =
+                        switch (change.getField()) {
+                            case BUDGET -> null; // todo find a way to map the budget expense id
+                            case CATEGORY ->
+                                categoryMap.get(parseLong(change.getChange())).toString();
+                            case CONTRACT ->
+                                contractMap.get(parseLong(change.getChange())).toString();
+                            case SOURCE_ACCOUNT, TO_ACCOUNT, CHANGE_TRANSFER_TO ->
+                                accountMap.get(parseLong(change.getChange())).toString();
+                            default -> change.getChange();
+                        };
+                toCreate.registerChange(change.getField(), updatedChange);
+            }
+            for (var condition : rule.getConditions()) {
+                toCreate.registerCondition(
+                        condition.getField(), condition.getOperation(), condition.getCondition());
+            }
+            transactionRuleProvider.save(toCreate);
+        }
     }
 
     private String saveToEncryptedStorage(String hexEncodedBytes) {

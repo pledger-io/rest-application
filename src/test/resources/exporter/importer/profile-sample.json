@@ -43,10 +43,12 @@
   ],
   "categories": [
     {
+      "id": 1,
       "name": "Streaming Services",
       "description": "Streaming services"
     },
     {
+      "id": 2,
       "name": "Groceries",
       "description": "Groceries"
     }
@@ -60,6 +62,7 @@
   ],
   "contract": [
     {
+      "id": 1,
       "name": "Netflix monthly subscription",
       "description": "Netflix subscription services",
       "start": "2021-01-01",
@@ -71,6 +74,7 @@
       }
     },
     {
+      "id": 2,
       "name": "Netflix updated subscription",
       "description": "Netflix updated subscription",
       "start": "2026-01-01",
@@ -113,6 +117,50 @@
         {
           "name": "Groceries",
           "expected": 400
+        }
+      ]
+    }
+  ],
+  "ruleGroups": [
+    {
+      "name": "Streaming Services",
+      "rules": [
+        {
+          "name": "Netflix monthly subscription",
+          "description": "Netflix subscription services",
+          "restrictive": true,
+          "active": true,
+          "changes": [
+            {
+              "field": "TO_ACCOUNT",
+              "change": "4"
+            },
+            {
+              "field": "CATEGORY",
+              "change": "1"
+            },
+            {
+              "field": "CONTRACT",
+              "change": "2"
+            }
+          ],
+          "conditions": [
+            {
+              "field": "TO_ACCOUNT",
+              "operation": "STARTS_WITH",
+              "condition": "Netflix"
+            },
+            {
+              "field": "AMOUNT",
+              "operation": "MORE_THAN",
+              "condition": "15"
+            },
+            {
+              "field": "AMOUNT",
+              "operation": "LESS_THAN",
+              "condition": "25"
+            }
+          ]
         }
       ]
     }
