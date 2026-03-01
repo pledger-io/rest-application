@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.domain.commands.CreateTransactionCommand;
+import com.jongsoft.finance.banking.domain.commands.LinkTransactionCommand;
+import com.jongsoft.finance.banking.domain.commands.RegisterSynonymCommand;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
+import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.domain.model.ProcessVariable;
 import com.jongsoft.finance.exporter.domain.model.AccountMapping;
@@ -157,6 +160,8 @@ public class ImportProcess {
                 if (accountId == null) {
                     throw StatusException.badRequest("Missing account id.");
                 }
+
+                RegisterSynonymCommand.synonymRegistered(accountId, name);
                 importContext.addMapping(name, accountId);
                 if (!importContext.hasMissingAccounts()) {
                     importContext.userReplied();
@@ -170,6 +175,11 @@ public class ImportProcess {
 
     private ProcessingStage processAccountMapping(ImporterProvider<?> relevantProvider) {
         var transactions = readTransactions(relevantProvider);
+        if (transactions.isEmpty()) {
+            log.debug("No transactions found, re-starting configuration process.");
+            importContext.waitForUser();
+            return ProcessingStage.CONFIGURATION;
+        }
 
         transactions.stream()
                 .map(TransactionDTO::opposingName)
@@ -216,6 +226,8 @@ public class ImportProcess {
                             importContext.getConfiguration().accountId(),
                             accountId,
                             BigDecimal.valueOf(transaction.amount())));
+            LinkTransactionCommand.linkCreated(
+                    transactionId, TransactionLinkType.IMPORT, batchImport.getId());
             if (importContext.getConfiguration().applyRules()) {
                 ApplyTransactionRulesCommand.applyTransactionRules(transactionId);
             }

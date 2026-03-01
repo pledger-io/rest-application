@@ -72,13 +72,12 @@ class ImportSchedule {
     }
 
     private void processImport(BatchImport batchImport) {
-        log.info("Processing import {}", batchImport.getSlug());
         ImportProcess process = new ImportProcess(this::lookupAccount, batchImport, storageService);
 
         try {
             process.loadContext(importerProviders);
             if (!process.isWaiting()) {
-                log.debug("Continue import process for {}", batchImport.getSlug());
+                log.info("Continue import {}", batchImport.getSlug());
                 process.process(
                         importerProviders,
                         accountId -> accountProvider.lookup(accountId).get().getCurrency(),

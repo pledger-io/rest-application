@@ -93,6 +93,7 @@ class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
         try {
             var jsonBytes = storageService.read(batchImportConfig.getFileCode());
             if (jsonBytes.isPresent()) {
+                logger.trace("CSV configuration found on disk: {}", jsonBytes);
                 return objectMapper.readValue(jsonBytes.get(), CSVConfiguration.class);
             }
 
