@@ -237,7 +237,7 @@ public class JpaQuery<E> extends BaseQuery<JpaQuery<E>> {
 
     private String generateHql(boolean withModifiers) {
         if (conditions().isEmpty()) {
-            logger.warn("Query ran without any filters against {}.", table.getSimpleName());
+            logger.trace("Query ran without any filters against {}.", table.getSimpleName());
         }
 
         StringBuilder hql = new StringBuilder("FROM %s e".formatted(table.getSimpleName()));
