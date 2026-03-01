@@ -19,6 +19,10 @@ import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.rest.ExportApi;
 import com.jongsoft.finance.rest.model.*;
+import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleGroupProvider;
+import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleProvider;
+import com.jongsoft.finance.suggestion.adapter.rest.RuleMapper;
+import com.jongsoft.finance.suggestion.domain.model.TransactionRuleGroup;
 
 import io.micronaut.http.annotation.Controller;
 
@@ -37,6 +41,8 @@ public class ExportController implements ExportApi {
     private final TagProvider tagProvider;
     private final TransactionProvider transactionProvider;
     private final TransactionScheduleProvider scheduleProvider;
+    private final TransactionRuleProvider transactionRuleProvider;
+    private final TransactionRuleGroupProvider transactionRuleGroupProvider;
     private final FilterProvider<TransactionProvider.FilterCommand> filterFactory;
 
     private final StorageService storageService;
@@ -49,6 +55,8 @@ public class ExportController implements ExportApi {
             TagProvider tagProvider,
             TransactionProvider transactionProvider,
             TransactionScheduleProvider scheduleProvider,
+            TransactionRuleProvider transactionRuleProvider,
+            TransactionRuleGroupProvider transactionRuleGroupProvider,
             FilterProvider<TransactionProvider.FilterCommand> filterFactory,
             StorageService storageService) {
         this.accountProvider = accountProvider;
@@ -58,6 +66,8 @@ public class ExportController implements ExportApi {
         this.tagProvider = tagProvider;
         this.transactionProvider = transactionProvider;
         this.scheduleProvider = scheduleProvider;
+        this.transactionRuleProvider = transactionRuleProvider;
+        this.transactionRuleGroupProvider = transactionRuleGroupProvider;
         this.filterFactory = filterFactory;
         this.storageService = storageService;
     }
@@ -66,7 +76,10 @@ public class ExportController implements ExportApi {
     public ExportProfileResponse exportUserAccount() {
         var response = new ExportProfileResponse();
 
-        // todo convert Rules
+        response.setRuleGroups(transactionRuleGroupProvider
+                .lookup()
+                .map(this::convertRuleGroup)
+                .toJava());
 
         response.accounts(accountProvider
                 .lookup()
@@ -84,6 +97,18 @@ public class ExportController implements ExportApi {
         response.setTransaction(lookupRelevantTransactions());
         response.setSchedules(
                 scheduleProvider.lookup().map(this::toScheduleResponse).toJava());
+
+        return response;
+    }
+
+    private ExportProfileResponseRuleGroupsInner convertRuleGroup(TransactionRuleGroup ruleGroup) {
+        var response =
+                new ExportProfileResponseRuleGroupsInner(ruleGroup.getSort(), ruleGroup.getName());
+
+        transactionRuleProvider
+                .lookup(ruleGroup.getName())
+                .map(RuleMapper::convertToRuleResponse)
+                .forEach(response::addRulesItem);
 
         return response;
     }

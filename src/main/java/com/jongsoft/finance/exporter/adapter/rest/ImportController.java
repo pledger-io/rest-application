@@ -19,6 +19,7 @@ import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.core.value.Periodicity;
 import com.jongsoft.finance.rest.ImportApi;
 import com.jongsoft.finance.rest.model.*;
+import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleProvider;
 import com.jongsoft.lang.Collections;
 import com.jongsoft.lang.collection.Collectors;
 
@@ -49,6 +50,7 @@ class ImportController implements ImportApi {
     private final TransactionCreationHandler transactionCreationHandler;
     private final TransactionProvider transactionProvider;
     private final ExpenseProvider expenseProvider;
+    private final TransactionRuleProvider transactionRuleProvider;
 
     private final FilterProvider<ExpenseProvider.FilterCommand> expenseFilterFactory;
 
@@ -62,6 +64,7 @@ class ImportController implements ImportApi {
             TransactionCreationHandler transactionCreationHandler,
             TransactionProvider transactionProvider,
             ExpenseProvider expenseProvider,
+            TransactionRuleProvider transactionRuleProvider,
             FilterProvider<ExpenseProvider.FilterCommand> expenseFilterFactory) {
         this.storageService = storageService;
         this.accountProvider = accountProvider;
@@ -72,6 +75,7 @@ class ImportController implements ImportApi {
         this.transactionCreationHandler = transactionCreationHandler;
         this.transactionProvider = transactionProvider;
         this.expenseProvider = expenseProvider;
+        this.transactionRuleProvider = transactionRuleProvider;
         this.expenseFilterFactory = expenseFilterFactory;
     }
 

@@ -53,4 +53,13 @@ properties:
   transaction:
     type: array
     items: { $ref: '#/components/schemas/transaction-response' }
-# todo add transaction rules
+  ruleGroups:
+    type: array
+    items:
+      allOf:
+        - $ref: '#/components/schemas/rule-group-response'
+        - type: object
+          properties:
+            rules:
+              type: array
+              items: { $ref: '#/components/schemas/rule-response' }

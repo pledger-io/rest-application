@@ -5,7 +5,7 @@ import com.jongsoft.finance.rest.model.RuleResponseChangesInner;
 import com.jongsoft.finance.rest.model.RuleResponseConditionsInner;
 import com.jongsoft.finance.suggestion.domain.model.TransactionRule;
 
-interface RuleMapper {
+public interface RuleMapper {
 
     static RuleResponse convertToRuleResponse(TransactionRule rule) {
         RuleResponse response = new RuleResponse(
