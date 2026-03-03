@@ -2,4 +2,5 @@ name: importSlug
 required: false
 in: query
 schema:
-  type: string
+  type: integer
+  format: int64

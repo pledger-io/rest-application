@@ -37,6 +37,7 @@ micronaut {
                 "RuleOperation" to "com.jongsoft.finance.suggestion.types.RuleOperation",
                 "RuleColumn" to "com.jongsoft.finance.suggestion.types.RuleColumn",
                 "ProcessVariable" to "com.jongsoft.finance.core.domain.model.ProcessVariable",
+                "Writable" to "io.micronaut.core.io.Writable"
                 )
             typeMapping = mapOf(
                 "process-variable" to "ProcessVariable",

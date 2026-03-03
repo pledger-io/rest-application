@@ -7,15 +7,9 @@ get:
   responses:
     '200':
       description: OK
-      headers:
-        Content-Disposition:
-          description: Suggested filename for download
-          schema:
-            type: string
       content:
         text/csv:
           schema:
-            type: string
-            format: binary
+            type: Writable
     "401": { $ref: '#/components/responses/401' }
     "403": { $ref: '#/components/responses/403' }

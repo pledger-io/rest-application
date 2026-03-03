@@ -88,6 +88,7 @@ class ImportController implements ImportApi {
         Map<Long, Long> accountMap = new HashMap<>();
         Map<Long, Long> categoryMap = new HashMap<>();
         Map<Long, Long> contractMap = new HashMap<>();
+        Map<Long, Long> expenseMap = new HashMap<>();
         if (profile.getAccounts() != null) {
             profile.getAccounts()
                     .forEach(account -> accountMap.put(account.getId(), importAccount(account)));
@@ -110,7 +111,8 @@ class ImportController implements ImportApi {
         if (profile.getBudget() != null) {
             profile.getBudget().stream()
                     .sorted(Comparator.comparing(l -> l.getPeriod().getStartDate()))
-                    .forEach(this::importBudget);
+                    .map(this::importBudget)
+                    .forEach(expenseMap::putAll);
         }
 
         if (profile.getSchedules() != null) {
@@ -119,8 +121,8 @@ class ImportController implements ImportApi {
 
         if (profile.getRuleGroups() != null) {
             profile.getRuleGroups()
-                    .forEach(ruleGroup ->
-                            importRuleGroup(contractMap, categoryMap, accountMap, ruleGroup));
+                    .forEach(ruleGroup -> importRuleGroup(
+                            contractMap, categoryMap, accountMap, expenseMap, ruleGroup));
         }
 
         if (profile.getTransaction() != null) {
@@ -218,7 +220,7 @@ class ImportController implements ImportApi {
         }
     }
 
-    private void importBudget(ExportProfileResponseBudgetInner importBudget) {
+    private Map<Long, Long> importBudget(ExportProfileResponseBudgetInner importBudget) {
         log.trace("Importing budget from {}.", importBudget.getPeriod().getStartDate());
 
         var budgetStart = importBudget.getPeriod().getStartDate();
@@ -244,6 +246,20 @@ class ImportController implements ImportApi {
                 existingExpense.updateExpense(expense.getExpected().doubleValue());
             }
         }
+
+        Map<Long, Long> expenseMap = new HashMap<>();
+        for (var expense : budgetProvider
+                .lookup(budgetStart.getYear(), budgetStart.getMonthValue())
+                .get()
+                .getExpenses()) {
+            var importedId = importBudget.getExpenses().stream()
+                    .filter(e -> e.getName().equals(expense.getName()))
+                    .findFirst()
+                    .map(ExportProfileResponseBudgetInnerExpensesInner::getId)
+                    .orElseThrow();
+            expenseMap.put(importedId, expense.getId());
+        }
+        return expenseMap;
     }
 
     private long importContract(
@@ -319,6 +335,7 @@ class ImportController implements ImportApi {
             Map<Long, Long> contractMap,
             Map<Long, Long> categoryMap,
             Map<Long, Long> accountMap,
+            Map<Long, Long> expenseMap,
             ExportProfileResponseRuleGroupsInner ruleGroup) {
         CreateRuleGroupCommand.ruleGroupCreated(ruleGroup.getName());
 
@@ -330,7 +347,8 @@ class ImportController implements ImportApi {
             for (var change : rule.getChanges()) {
                 var updatedChange =
                         switch (change.getField()) {
-                            case BUDGET -> null; // todo find a way to map the budget expense id
+                            case BUDGET ->
+                                expenseMap.get(parseLong(change.getChange())).toString();
                             case CATEGORY ->
                                 categoryMap.get(parseLong(change.getChange())).toString();
                             case CONTRACT ->

@@ -20,39 +20,34 @@ import com.jongsoft.finance.classification.adapter.rest.CategoryMapper;
 import com.jongsoft.finance.contract.adapter.api.ContractProvider;
 import com.jongsoft.finance.contract.domain.model.Contract;
 import com.jongsoft.finance.core.adapter.api.StorageService;
+import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.FilterProvider;
+import com.jongsoft.finance.core.domain.commands.InternalAuthenticationEvent;
 import com.jongsoft.finance.rest.ExportApi;
 import com.jongsoft.finance.rest.model.*;
 import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleGroupProvider;
 import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleProvider;
 import com.jongsoft.finance.suggestion.adapter.rest.RuleMapper;
 import com.jongsoft.finance.suggestion.domain.model.TransactionRuleGroup;
-import com.jongsoft.lang.Control;
 
-import io.micronaut.http.HttpResponse;
-import io.micronaut.http.MediaType;
+import io.micronaut.core.io.Writable;
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.server.types.files.FileCustomizableResponseType;
-import io.micronaut.http.server.types.files.StreamedFile;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Controller
 public class ExportController implements ExportApi {
     private final Logger log = LoggerFactory.getLogger(ExportController.class);
 
-    private final ExecutorService exportExecutor = Executors.newSingleThreadExecutor();
+    private final AuthenticationFacade authenticationFacade;
 
     private final AccountProvider accountProvider;
     private final CategoryProvider categoryProvider;
@@ -68,6 +63,7 @@ public class ExportController implements ExportApi {
     private final StorageService storageService;
 
     public ExportController(
+            AuthenticationFacade authenticationFacade,
             AccountProvider accountProvider,
             CategoryProvider categoryProvider,
             ContractProvider contractProvider,
@@ -79,6 +75,7 @@ public class ExportController implements ExportApi {
             TransactionRuleGroupProvider transactionRuleGroupProvider,
             FilterProvider<TransactionProvider.FilterCommand> filterFactory,
             StorageService storageService) {
+        this.authenticationFacade = authenticationFacade;
         this.accountProvider = accountProvider;
         this.categoryProvider = categoryProvider;
         this.contractProvider = contractProvider;
@@ -94,6 +91,7 @@ public class ExportController implements ExportApi {
 
     @Override
     public ExportProfileResponse exportUserAccount() {
+        log.info("Exporting user account.");
         var response = new ExportProfileResponse();
 
         response.setRuleGroups(transactionRuleGroupProvider
@@ -122,67 +120,86 @@ public class ExportController implements ExportApi {
     }
 
     @Override
-    public HttpResponse<FileCustomizableResponseType> exportTransactions() {
-        PipedOutputStream outputStream = new PipedOutputStream();
-        try {
-            PipedInputStream inputStream = new PipedInputStream(outputStream);
-            byte[] header =
-                    ("Date,Booking Date,Interest Date,From name,From IBAN,To name,To IBAN,Description,Category,Budget,Contract,Amount\n")
-                            .getBytes();
-            outputStream.write(header);
+    public Writable exportTransactions() {
+        log.info("Exporting transactions.");
+        String userAccount = authenticationFacade.authenticated();
+        return outputStream -> {
+            try {
+                InternalAuthenticationEvent.authenticate(userAccount);
+                BufferedWriter buffered = new BufferedWriter(outputStream);
+                buffered.write(
+                        "Date,Booking Date,Interest Date,From name,From IBAN,To name,To IBAN,Description,Category,Budget,Contract,Amount\n");
 
-            int currentPage = 0;
-
-            var filter = filterFactory.create().ownAccounts().page(currentPage, 100);
-            var transactions = transactionProvider.lookup(filter);
-            do {
-                for (Transaction transaction : transactions.content()) {
-                    String csvLine = transaction.getDate().toString() + ","
-                            + ofNullable(transaction.getBookDate())
-                                    .map(LocalDate::toString)
-                                    .orElse("")
-                            + ","
-                            + ofNullable(transaction.getInterestDate())
-                                    .map(LocalDate::toString)
-                                    .orElse("")
-                            + ","
-                            + transaction.computeFrom().getName() + ","
-                            + ofNullable(transaction.computeFrom().getIban()).orElse("") + ","
-                            + transaction.computeTo().getName() + ","
-                            + ofNullable(transaction.computeTo().getIban()).orElse("") + ","
-                            + transaction.getDescription() + ","
-                            + ofNullable(transaction
-                                            .getMetadata()
-                                            .get(TransactionLinkType.CATEGORY.name()))
-                                    .map(Object::toString)
-                                    .orElse("")
-                            + ","
-                            + ofNullable(transaction
-                                            .getMetadata()
-                                            .get(TransactionLinkType.EXPENSE.name()))
-                                    .map(Object::toString)
-                                    .orElse("")
-                            + ","
-                            + ofNullable(transaction
-                                            .getMetadata()
-                                            .get(TransactionLinkType.CONTRACT.name()))
-                                    .map(Object::toString)
-                                    .orElse("")
-                            + ","
-                            + transaction.computeAmount(transaction.computeTo())
-                            + System.lineSeparator();
-                    var output = Control.Try(() -> outputStream.write(csvLine.getBytes()));
-                    if (output.isFailure()) {
-                        log.error("Failed to write transaction to CSV.", output.getCause());
+                int currentPage = 0;
+                var filter = filterFactory.create().ownAccounts().page(currentPage, 25);
+                var transactions = transactionProvider.lookup(filter);
+                do {
+                    log.debug("Processing page {} of transactions", currentPage);
+                    for (Transaction transaction : transactions.content()) {
+                        buffered.write(csv(transaction.getDate().toString()));
+                        buffered.write(',');
+                        buffered.write(csv(ofNullable(transaction.getBookDate())
+                                .map(LocalDate::toString)
+                                .orElse("")));
+                        buffered.write(',');
+                        buffered.write(csv(ofNullable(transaction.getInterestDate())
+                                .map(LocalDate::toString)
+                                .orElse("")));
+                        buffered.write(',');
+                        buffered.write(csv(transaction.computeFrom().getName()));
+                        buffered.write(',');
+                        buffered.write(csv(
+                                ofNullable(transaction.computeFrom().getIban()).orElse("")));
+                        buffered.write(',');
+                        buffered.write(csv(transaction.computeTo().getName()));
+                        buffered.write(',');
+                        buffered.write(csv(
+                                ofNullable(transaction.computeTo().getIban()).orElse("")));
+                        buffered.write(',');
+                        buffered.write(csv(transaction.getDescription()));
+                        buffered.write(',');
+                        buffered.write(csv(ofNullable(transaction
+                                        .getMetadata()
+                                        .get(TransactionLinkType.CATEGORY.name()))
+                                .map(Object::toString)
+                                .orElse("")));
+                        buffered.write(',');
+                        buffered.write(csv(ofNullable(transaction
+                                        .getMetadata()
+                                        .get(TransactionLinkType.EXPENSE.name()))
+                                .map(Object::toString)
+                                .orElse("")));
+                        buffered.write(',');
+                        buffered.write(csv(ofNullable(transaction
+                                        .getMetadata()
+                                        .get(TransactionLinkType.CONTRACT.name()))
+                                .map(Object::toString)
+                                .orElse("")));
+                        buffered.write(',');
+                        buffered.write(csv(String.valueOf(
+                                transaction.computeAmount(transaction.computeTo()))));
+                        buffered.newLine();
                     }
-                }
-                filter.page(++currentPage, 100);
-            } while (transactions.hasNext());
 
-            return HttpResponse.ok(new StreamedFile(inputStream, MediaType.TEXT_CSV_TYPE));
-        } catch (IOException e) {
-            return HttpResponse.serverError();
-        }
+                    buffered.flush();
+                    outputStream.flush();
+                    filter.page(++currentPage, 100);
+                } while (transactions.hasNext());
+            } catch (IOException e) {
+                log.error("Failed to write transactions to CSV.", e);
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    private static String csv(String value) {
+        if (value == null) return "";
+        boolean mustQuote = value.indexOf(',') >= 0
+                || value.indexOf('"') >= 0
+                || value.indexOf('\n') >= 0
+                || value.indexOf('\r') >= 0;
+        if (!mustQuote) return value;
+        return "\"" + value.replace("\"", "\"\"") + "\"";
     }
 
     private ExportProfileResponseRuleGroupsInner convertRuleGroup(TransactionRuleGroup ruleGroup) {
@@ -235,18 +252,15 @@ public class ExportController implements ExportApi {
     }
 
     private ExportProfileResponseBudgetInner toBudgetResponse(Budget budget) {
-        var response = new ExportProfileResponseBudgetInner();
-
-        response.setIncome(budget.getExpectedIncome());
-        response.period(new DateRange(budget.getStart(), budget.getEnd()));
-        for (var expense : budget.getExpenses()) {
-            var responseExpense = new ExportProfileResponseBudgetInnerExpensesInner();
-            responseExpense.name(expense.getName());
-            responseExpense.expected(BigDecimal.valueOf(expense.computeBudget()));
-            response.addExpensesItem(responseExpense);
-        }
-
-        return response;
+        return new ExportProfileResponseBudgetInner(
+                budget.getExpectedIncome(),
+                new DateRange(budget.getStart(), budget.getEnd()),
+                budget.getExpenses()
+                        .map(expense -> new ExportProfileResponseBudgetInnerExpensesInner(
+                                expense.getId(),
+                                expense.getName(),
+                                BigDecimal.valueOf(expense.computeBudget())))
+                        .toJava());
     }
 
     private ExportProfileResponseContractInner toContractResponse(Contract contract) {

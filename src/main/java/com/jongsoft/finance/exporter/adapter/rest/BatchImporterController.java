@@ -141,6 +141,7 @@ class BatchImporterController implements BatchImporterApi, BatchTaskEngineApi {
 
     private BatchJobResponse convertToJobResponse(BatchImport batchImport) {
         var response = new BatchJobResponse(
+                batchImport.getId(),
                 batchImport.getSlug(),
                 LocalDate.ofInstant(batchImport.getCreated().toInstant(), ZoneId.of("UTC")),
                 convertToConfigResponse(batchImport.getConfig()),

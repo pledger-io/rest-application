@@ -94,10 +94,12 @@
       },
       "expenses": [
         {
+          "id": 1,
           "name": "Streaming services",
           "expected": 150
         },
         {
+          "id": 2,
           "name": "Groceries",
           "expected": 500
         }
@@ -111,10 +113,12 @@
       },
       "expenses": [
         {
+          "id": 1,
           "name": "Streaming services",
           "expected": 150
         },
         {
+          "id": 2,
           "name": "Groceries",
           "expected": 400
         }
