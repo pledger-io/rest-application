@@ -43,6 +43,8 @@ jobs:
          ./gradlew jar -x classes -Pversion=${SNAPSHOT_VERSION}
          ./gradlew -Pversion=${SNAPSHOT_VERSION} publish -x jar
        if: github.ref == 'refs/heads/master'
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
      - name: Test Report
        uses: dorny/test-reporter@v2
