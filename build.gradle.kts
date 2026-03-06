@@ -7,6 +7,8 @@ plugins {
     id("org.sonarqube")
     id("jacoco")
     id("io.micronaut.openapi")
+
+    id("pl.allegro.tech.build.axion-release") version "1.21.1"
 }
 
 sonar {
@@ -14,6 +16,12 @@ sonar {
         property("sonar.projectKey", "pledger-io_rest-application")
         property("sonar.organization", "pledger-io")
         property("sonar.junit.reportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+    }
+}
+
+scmVersion {
+    tag {
+        prefix.set("")
     }
 }
 

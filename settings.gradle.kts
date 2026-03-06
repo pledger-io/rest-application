@@ -6,7 +6,7 @@ pluginManagement {
         id("io.micronaut.library").version("4.6.1")
         id("io.micronaut.application").version("4.6.1")
         id("org.sonarqube").version("7.2.2.6593")
-        id("com.diffplug.spotless").version("8.2.1")
+        id("com.diffplug.spotless").version("8.3.0")
         id("io.micronaut.openapi").version("4.6.2")
 
         id("signing")
