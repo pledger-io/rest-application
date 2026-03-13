@@ -5,6 +5,7 @@ import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
 import com.jongsoft.finance.banking.domain.model.Classifier;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
+import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.rest.StatisticsBalanceApi;
 import com.jongsoft.finance.rest.model.*;
@@ -83,7 +84,12 @@ class StatisticsBalanceController implements StatisticsBalanceApi {
         Sequence<? extends Classifier> entities =
                 switch (partition) {
                     case ACCOUNT -> accountProvider.lookup();
-                    case CATEGORY, BUDGET ->
+                    case BUDGET -> linkableProviders.stream()
+                        .filter(provider -> provider.typeOf().equals(TransactionLinkType.EXPENSE.name()))
+                        .findFirst()
+                        .map(LinkableProvider::lookup)
+                        .orElse(Collections.List());
+                    default ->
                         linkableProviders.stream()
                                 .filter(provider -> provider.typeOf().equals(partition.name()))
                                 .findFirst()
