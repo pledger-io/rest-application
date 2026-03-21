@@ -37,6 +37,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Singleton
 @SpendingAnalyticsEnabled
@@ -45,6 +47,7 @@ class PatternDetector implements Detector<SpendingPattern> {
     private static final double SIMILARITY_THRESHOLD = 0.9;
     private static final int MIN_TRANSACTIONS_FOR_PATTERN = 3;
 
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PatternDetector.class);
 
     private final TransactionProvider transactionProvider;
@@ -80,20 +83,23 @@ class PatternDetector implements Detector<SpendingPattern> {
         if (patternVectorStore.shouldInitialize()) {
             log.debug("Initially filling pattern vector store with transactions.");
             for (UserAccount userAccount : userProvider.lookup()) {
-                InternalAuthenticationEvent.authenticate(
-                        userAccount.getUsername().email());
-                var processingPage = 0;
-                var filterApplied = filterProvider.create().ownAccounts().page(processingPage, 500);
-                ResultPage<Transaction> transactionPage;
-                do {
-                    transactionPage = transactionProvider.lookup(filterApplied);
-                    transactionPage.content().forEach(this::indexTransaction);
-                    filterApplied.page(++processingPage, 500);
-                    log.trace(
-                            "Processed page {} of transactions for user {}.",
-                            processingPage,
+                executorService.submit(() -> {
+                    InternalAuthenticationEvent.authenticate(
                             userAccount.getUsername().email());
-                } while (transactionPage.hasNext());
+                    var processingPage = 0;
+                    var filterApplied =
+                            filterProvider.create().ownAccounts().page(processingPage, 500);
+                    ResultPage<Transaction> transactionPage;
+                    do {
+                        transactionPage = transactionProvider.lookup(filterApplied);
+                        transactionPage.content().forEach(this::indexTransaction);
+                        filterApplied.page(++processingPage, 500);
+                        log.trace(
+                                "Processed page {} of transactions for user {}.",
+                                processingPage,
+                                userAccount.getUsername().email());
+                    } while (transactionPage.hasNext());
+                });
             }
         }
         hasInitialized = true;
@@ -103,6 +109,7 @@ class PatternDetector implements Detector<SpendingPattern> {
     void handleShutdown(ShutdownEvent shutdownEvent) {
         log.info("Shutting down pattern detector embedding store.");
         patternVectorStore.close();
+        executorService.shutdown();
     }
 
     @EventListener

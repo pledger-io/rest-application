@@ -25,7 +25,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
 # Build the software
       - name: Build the classes
-        run: ./gradlew classes -q
+        run: |
+          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
+          ./gradlew classes -q -Pversion=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
 # Publish the JAR file
       - name: Publish artifacts
         run: |

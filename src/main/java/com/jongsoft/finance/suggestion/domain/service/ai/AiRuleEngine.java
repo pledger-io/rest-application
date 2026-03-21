@@ -30,6 +30,7 @@ import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 import io.micrometer.core.annotation.Timed;
 import io.micronaut.context.annotation.Primary;
 import io.micronaut.context.annotation.Requires;
+import io.micronaut.context.event.ShutdownEvent;
 import io.micronaut.context.event.StartupEvent;
 import io.micronaut.runtime.event.annotation.EventListener;
 
@@ -48,7 +49,6 @@ import java.util.concurrent.Executors;
 @Singleton
 @Requires(env = "ai")
 class AiRuleEngine implements SuggestionEngine {
-
     private final Logger log = LoggerFactory.getLogger(AiRuleEngine.class);
     private final ClassificationAgent classificationAgent;
 
@@ -107,22 +107,32 @@ class AiRuleEngine implements SuggestionEngine {
         log.info("Initializing classification embedding store.");
         if (classificationStore.shouldInitialize()) {
             for (UserAccount userAccount : userProvider.lookup()) {
-                InternalAuthenticationEvent.authenticate(
-                        userAccount.getUsername().email());
-                var processingPage = 0;
-                var filterApplied = filterProvider.create().ownAccounts().page(processingPage, 500);
-                ResultPage<Transaction> transactionPage;
-                do {
-                    transactionPage = transactionProvider.lookup(filterApplied);
-                    transactionPage.content().forEach(this::updateClassifications);
-                    filterApplied.page(++processingPage, 500);
-                    log.trace(
-                            "Processed page {} of transactions for user {}.",
-                            processingPage,
+                executors.submit(() -> {
+                    InternalAuthenticationEvent.authenticate(
                             userAccount.getUsername().email());
-                } while (transactionPage.hasNext());
+                    var processingPage = 0;
+                    var filterApplied =
+                            filterProvider.create().ownAccounts().page(processingPage, 500);
+                    ResultPage<Transaction> transactionPage;
+                    do {
+                        transactionPage = transactionProvider.lookup(filterApplied);
+                        transactionPage.content().forEach(this::updateClassifications);
+                        filterApplied.page(++processingPage, 500);
+                        log.trace(
+                                "Processed page {} of transactions for user {}.",
+                                processingPage,
+                                userAccount.getUsername().email());
+                    } while (transactionPage.hasNext());
+                });
             }
         }
+    }
+
+    @EventListener
+    void handleShutdown(ShutdownEvent shutdownEvent) {
+        log.info("Shutting down classification embedding store.");
+        classificationStore.close();
+        executors.shutdown();
     }
 
     @EventListener
