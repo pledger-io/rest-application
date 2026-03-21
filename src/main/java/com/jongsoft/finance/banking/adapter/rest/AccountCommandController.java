@@ -173,6 +173,10 @@ public class AccountCommandController implements AccountCommandApi {
                     Periodicity.valueOf(accountRequest.getInterestPeriodicity().name()));
         }
 
+        if (accountRequest.getImageIcon() != null) {
+            bankAccount.registerIcon(accountRequest.getImageIcon());
+        }
+
         bankAccount.changeAccount(
                 accountRequest.getIban(), accountRequest.getBic(), accountRequest.getNumber());
     }

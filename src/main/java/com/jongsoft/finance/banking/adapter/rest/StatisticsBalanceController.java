@@ -84,11 +84,13 @@ class StatisticsBalanceController implements StatisticsBalanceApi {
         Sequence<? extends Classifier> entities =
                 switch (partition) {
                     case ACCOUNT -> accountProvider.lookup();
-                    case BUDGET -> linkableProviders.stream()
-                        .filter(provider -> provider.typeOf().equals(TransactionLinkType.EXPENSE.name()))
-                        .findFirst()
-                        .map(LinkableProvider::lookup)
-                        .orElse(Collections.List());
+                    case BUDGET ->
+                        linkableProviders.stream()
+                                .filter(provider -> provider.typeOf()
+                                        .equals(TransactionLinkType.EXPENSE.name()))
+                                .findFirst()
+                                .map(LinkableProvider::lookup)
+                                .orElse(Collections.List());
                     default ->
                         linkableProviders.stream()
                                 .filter(provider -> provider.typeOf().equals(partition.name()))
