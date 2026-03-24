@@ -1,0 +1,37 @@
+get:
+  operationId: findClients
+  tags: [ client-fetcher ]
+  summary: Search clients
+  description: >
+    Retrieve clients filtered by optional name.
+    Returns a list of matching clients for the current user.
+  parameters:
+    - $ref: '#/components/parameters/name-filter'
+  responses:
+    "200":
+      description: The clients matching the filters
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/client-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createClient
+  tags: [ client-command ]
+  summary: Create client
+  description: Create a new client in the application.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/client-request' }
+  responses:
+    "201":
+      description: The created client
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/client-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

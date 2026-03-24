@@ -787,4 +787,307 @@ public class PledgerRequests {
                 .log()
                 .ifValidationFails();
     }
+
+    public ValidatableResponse createClient(Map<String, Object> clientRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .log()
+                .ifValidationFails()
+                .contentType(ContentType.JSON)
+                .body(clientRequest)
+                .when()
+                .post("/v2/api/clients")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse fetchClient(long id) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .pathParam("id", id)
+                .when()
+                .get("/v2/api/clients/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse findClients(String name) {
+        var request =
+                given(requestSpecification)
+                        .header(
+                                "Authorization",
+                                "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                        .log()
+                        .ifValidationFails();
+        if (name != null) {
+            request.queryParam("name", name);
+        }
+        return request.when().get("/v2/api/clients").then().log().ifValidationFails();
+    }
+
+    public ValidatableResponse updateClient(long id, Map<String, Object> clientRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .pathParam("id", id)
+                .body(clientRequest)
+                .when()
+                .put("/v2/api/clients/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse archiveClient(long id) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .pathParam("id", id)
+                .when()
+                .delete("/v2/api/clients/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse createProject(Map<String, Object> projectRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .body(projectRequest)
+                .when()
+                .post("/v2/api/projects")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse fetchProject(long id) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .pathParam("id", id)
+                .when()
+                .get("/v2/api/projects/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse findProjects(String name, Long clientId, Boolean billableOnly) {
+        var request =
+                given(requestSpecification)
+                        .header(
+                                "Authorization",
+                                "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                        .log()
+                        .ifValidationFails();
+        if (name != null) {
+            request.queryParam("name", name);
+        }
+        if (clientId != null) {
+            request.queryParam("clientId", clientId);
+        }
+        if (billableOnly != null) {
+            request.queryParam("billableOnly", billableOnly);
+        }
+        return request.when().get("/v2/api/projects").then().log().ifValidationFails();
+    }
+
+    public ValidatableResponse updateProject(long id, Map<String, Object> projectRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .pathParam("id", id)
+                .body(projectRequest)
+                .when()
+                .put("/v2/api/projects/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse archiveProject(long id) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .pathParam("id", id)
+                .when()
+                .delete("/v2/api/projects/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse createTimeEntry(Map<String, Object> timeEntryRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .body(timeEntryRequest)
+                .when()
+                .post("/v2/api/time-entries")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse fetchTimeEntry(long id) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .pathParam("id", id)
+                .when()
+                .get("/v2/api/time-entries/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse findTimeEntries(
+            LocalDate startDate, LocalDate endDate, Long projectId, Boolean invoiced) {
+        var request =
+                given(requestSpecification)
+                        .header(
+                                "Authorization",
+                                "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                        .log()
+                        .ifValidationFails()
+                        .queryParam("startDate", startDate.toString())
+                        .queryParam("endDate", endDate.toString());
+        if (projectId != null) {
+            request.queryParam("projectId", projectId);
+        }
+        if (invoiced != null) {
+            request.queryParam("invoiced", invoiced);
+        }
+        return request.when().get("/v2/api/time-entries").then().log().ifValidationFails();
+    }
+
+    public ValidatableResponse updateTimeEntry(long id, Map<String, Object> timeEntryRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .pathParam("id", id)
+                .body(timeEntryRequest)
+                .when()
+                .put("/v2/api/time-entries/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse deleteTimeEntry(long id) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .pathParam("id", id)
+                .when()
+                .delete("/v2/api/time-entries/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse createInvoiceTemplate(Map<String, Object> templateRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .body(templateRequest)
+                .when()
+                .post("/v2/api/invoice-templates")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse createTaxBracket(Map<String, Object> taxBracketRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .body(taxBracketRequest)
+                .when()
+                .post("/v2/api/tax-brackets")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse createInvoice(Map<String, Object> invoiceRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .body(invoiceRequest)
+                .when()
+                .post("/v2/api/invoices")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse fetchInvoice(long id) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .pathParam("id", id)
+                .when()
+                .get("/v2/api/invoices/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse findInvoices(String invoiceNumber, Long clientId, Boolean finalized) {
+        var request =
+                given(requestSpecification)
+                        .header(
+                                "Authorization",
+                                "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                        .log()
+                        .ifValidationFails();
+        if (invoiceNumber != null) {
+            request.queryParam("invoiceNumber", invoiceNumber);
+        }
+        if (clientId != null) {
+            request.queryParam("clientId", clientId);
+        }
+        if (finalized != null) {
+            request.queryParam("finalized", finalized);
+        }
+        return request.when().get("/v2/api/invoices").then().log().ifValidationFails();
+    }
+
+    public ValidatableResponse updateInvoice(long id, Map<String, Object> invoiceRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .pathParam("id", id)
+                .body(invoiceRequest)
+                .when()
+                .put("/v2/api/invoices/{id}")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse addInvoiceLine(long invoiceId, Map<String, Object> lineRequest) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .pathParam("id", invoiceId)
+                .body(lineRequest)
+                .when()
+                .post("/v2/api/invoices/{id}/lines")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse finalizeInvoice(long invoiceId, String pdfToken) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .contentType(ContentType.JSON)
+                .pathParam("id", invoiceId)
+                .body(Map.of("pdfToken", pdfToken))
+                .when()
+                .post("/v2/api/invoices/{id}/finalize")
+                .then()
+                .log()
+                .ifValidationFails();
+    }
 }

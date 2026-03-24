@@ -1,0 +1,35 @@
+parameters:
+  - name: id
+    description: The identifier of the invoice
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+post:
+  operationId: finalizeInvoice
+  tags: [ invoice-command ]
+  summary: Finalize invoice
+  description: >
+    Finalize an invoice, making it read-only and generating a PDF.
+    All attached time entries will be marked as invoiced.
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            pdfToken:
+              type: string
+              description: The file token for the generated PDF
+  responses:
+    "200":
+      description: The finalized invoice
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/invoice-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

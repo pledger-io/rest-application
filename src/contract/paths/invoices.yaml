@@ -1,0 +1,52 @@
+get:
+  operationId: findInvoices
+  tags: [ invoice-fetcher ]
+  summary: Search invoices
+  description: >
+    Retrieve invoices filtered by optional invoice number, client, and finalized status.
+    Returns a list of matching invoices for the current user.
+  parameters:
+    - name: invoiceNumber
+      in: query
+      description: Filter by invoice number
+      schema:
+        type: string
+    - name: clientId
+      in: query
+      description: Filter by client ID
+      schema:
+        type: integer
+        format: int64
+    - name: finalized
+      in: query
+      description: Filter by finalized status
+      schema:
+        type: boolean
+  responses:
+    "200":
+      description: The invoices matching the filters
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/invoice-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createInvoice
+  tags: [ invoice-command ]
+  summary: Create invoice
+  description: Create a new invoice in the application.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/invoice-request' }
+  responses:
+    "201":
+      description: The created invoice
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/invoice-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

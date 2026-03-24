@@ -1,0 +1,28 @@
+parameters:
+  - name: id
+    description: The identifier of the invoice
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+post:
+  operationId: addInvoiceLine
+  tags: [ invoice-command ]
+  summary: Add invoice line
+  description: Add a new line to an invoice. Cannot add if already finalized.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/invoice-line-request' }
+  responses:
+    "201":
+      description: The updated invoice
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/invoice-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

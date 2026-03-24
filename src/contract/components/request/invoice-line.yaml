@@ -1,0 +1,40 @@
+type: object
+required:
+  - description
+  - quantity
+  - unit
+  - unitPrice
+  - taxBracketId
+properties:
+  description:
+    minLength: 1
+    type: string
+    description: Description of the line item
+    example: Consulting services
+  quantity:
+    type: number
+    description: The quantity
+    format: double
+    minimum: 0.01
+    example: 40
+  unit:
+    minLength: 1
+    type: string
+    description: The unit of measurement
+    example: hours
+  unitPrice:
+    type: number
+    description: Price per unit
+    format: double
+    minimum: 0
+    example: 150.00
+  taxBracketId:
+    type: integer
+    description: The ID of the tax bracket to apply
+    format: int64
+  timeEntryIds:
+    type: array
+    description: IDs of time entries to attach to this line
+    items:
+      type: integer
+      format: int64

@@ -1,0 +1,54 @@
+parameters:
+  - name: id
+    description: The identifier of the time entry
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getTimeEntryById
+  tags: [ time-entry-fetcher ]
+  summary: Fetch time entry
+  description: Fetch a single time entry by its unique identifier.
+  responses:
+    "200":
+      description: The time entry
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/time-entry-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateTimeEntry
+  tags: [ time-entry-command ]
+  summary: Update time entry
+  description: Update an existing time entry. Cannot update if already invoiced.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/time-entry-request' }
+  responses:
+    "200":
+      description: The updated time entry
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/time-entry-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteTimeEntryById
+  tags: [ time-entry-command ]
+  summary: Delete time entry
+  description: Delete a time entry. Cannot delete if already invoiced.
+  responses:
+    "204":
+      description: Confirmation that the time entry was deleted
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

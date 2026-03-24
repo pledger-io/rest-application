@@ -1,0 +1,37 @@
+type: object
+required:
+  - id
+  - name
+  - client
+  - billable
+properties:
+  id:
+    type: integer
+    description: The identifier of the project
+    format: int64
+  name:
+    type: string
+    description: The name of the project
+    example: Website Redesign
+  description:
+    type: string
+    description: The description of the project
+    example: Complete redesign of corporate website
+  client:
+    description: The client this project belongs to
+    allOf:
+      - $ref: "#/components/schemas/client-response"
+  startDate:
+    type: string
+    description: The start date of the project
+    format: date
+  endDate:
+    type: string
+    description: The end date of the project
+    format: date
+  archived:
+    type: boolean
+    description: Indicator if the project is archived
+  billable:
+    type: boolean
+    description: When false, time on this project cannot be invoiced

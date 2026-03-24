@@ -1,0 +1,48 @@
+get:
+  operationId: findProjects
+  tags: [ project-fetcher ]
+  summary: Search projects
+  description: >
+    Retrieve projects filtered by optional name and client.
+    Returns a list of matching projects for the current user.
+  parameters:
+    - $ref: '#/components/parameters/name-filter'
+    - name: clientId
+      in: query
+      description: Filter by client ID
+      schema:
+        type: integer
+        format: int64
+    - name: billableOnly
+      in: query
+      description: When true, only projects whose time can be invoiced are returned
+      schema:
+        type: boolean
+  responses:
+    "200":
+      description: The projects matching the filters
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/project-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createProject
+  tags: [ project-command ]
+  summary: Create project
+  description: Create a new project in the application.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/project-request' }
+  responses:
+    "201":
+      description: The created project
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/project-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

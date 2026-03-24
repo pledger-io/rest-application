@@ -1,0 +1,32 @@
+type: object
+required:
+  - name
+  - clientId
+properties:
+  name:
+    minLength: 1
+    type: string
+    description: The name of the project
+    example: Website Redesign
+  description:
+    type: string
+    description: The description of the project
+    example: Complete redesign of corporate website
+  clientId:
+    type: integer
+    description: The ID of the client this project belongs to
+    format: int64
+  startDate:
+    type: string
+    description: The start date of the project
+    format: date
+  endDate:
+    type: string
+    description: The end date of the project
+    format: date
+  billable:
+    type: boolean
+    description: >
+      When false, time entries on this project cannot be added to invoices.
+      Defaults to true when omitted.
+    default: true

@@ -1,0 +1,53 @@
+parameters:
+  - name: id
+    description: The identifier of the project
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getProjectById
+  tags: [ project-fetcher ]
+  summary: Fetch project
+  description: Fetch a single project by its unique identifier.
+  responses:
+    "200":
+      description: The project
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/project-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateProject
+  tags: [ project-command ]
+  summary: Update project
+  description: Update an existing project in the application.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/project-request' }
+  responses:
+    "200":
+      description: The updated project
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/project-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: archiveProjectById
+  tags: [ project-command ]
+  summary: Archive project
+  description: Marks a project as archived so it no longer appears in listings.
+  responses:
+    "204":
+      description: Confirmation that the project was archived
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

@@ -1,0 +1,19 @@
+type: object
+required:
+  - id
+  - name
+  - rate
+properties:
+  id:
+    type: integer
+    description: The identifier of the tax bracket
+    format: int64
+  name:
+    type: string
+    description: The name of the tax bracket
+    example: VAT 21%
+  rate:
+    type: number
+    description: The tax rate as a decimal
+    format: double
+    example: 0.21

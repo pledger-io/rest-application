@@ -1,0 +1,52 @@
+type: object
+required:
+  - id
+  - description
+  - quantity
+  - unit
+  - unitPrice
+  - taxBracket
+properties:
+  id:
+    type: integer
+    description: The identifier of the invoice line
+    format: int64
+  description:
+    type: string
+    description: Description of the line item
+    example: Consulting services
+  quantity:
+    type: number
+    description: The quantity
+    format: double
+    example: 40
+  unit:
+    type: string
+    description: The unit of measurement
+    example: hours
+  unitPrice:
+    type: number
+    description: Price per unit
+    format: double
+    example: 150.00
+  taxBracket:
+    description: The tax bracket applied
+    allOf:
+      - $ref: "#/components/schemas/tax-bracket-response"
+  timeEntries:
+    type: array
+    description: Time entries attached to this line
+    items:
+      $ref: "#/components/schemas/time-entry-response"
+  subtotal:
+    type: number
+    description: Subtotal before tax
+    format: double
+  taxAmount:
+    type: number
+    description: Tax amount
+    format: double
+  total:
+    type: number
+    description: Total including tax
+    format: double
