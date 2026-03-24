@@ -136,6 +136,7 @@ dependencies {
     implementation(libs.otp)
 
     implementation(libs.csv)
+    implementation(libs.openpdf)
 
     // Machine learning dependencies
     implementation(llm.bundles.embeddings)

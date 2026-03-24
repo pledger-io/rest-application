@@ -31,6 +31,7 @@ dependencyResolutionManagement {
             library("csv", "com.opencsv", "opencsv").version("5.12.0")
             library("archunit", "com.tngtech.archunit", "archunit-junit5").version("1.4.1")
             library("awaitly", "org.awaitility", "awaitility").version("4.3.0")
+            library("openpdf", "com.github.librepdf", "openpdf").version("2.0.3")
         }
 
         create("mn") {
