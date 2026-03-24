@@ -44,7 +44,7 @@ class BudgetCommandController implements BudgetCommandApi {
 
         Budget.create(
                 LocalDate.of(budgetRequest.getYear(), budgetRequest.getMonth(), 1),
-                budgetRequest.getIncome());
+                budgetRequest.getIncome()).activate();
 
         var budget = budgetProvider
                 .lookup(budgetRequest.getYear(), budgetRequest.getMonth())
