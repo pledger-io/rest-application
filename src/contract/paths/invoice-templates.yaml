@@ -1,0 +1,36 @@
+get:
+  operationId: findInvoiceTemplates
+  tags: [ invoice-template-fetcher ]
+  summary: Search invoice templates
+  description: >
+    Retrieve invoice templates for the current user.
+  parameters:
+    - $ref: '#/components/parameters/name-filter'
+  responses:
+    "200":
+      description: The invoice templates
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/invoice-template-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createInvoiceTemplate
+  tags: [ invoice-template-command ]
+  summary: Create invoice template
+  description: Create a new invoice template.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/invoice-template-request' }
+  responses:
+    "201":
+      description: The created invoice template
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/invoice-template-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }

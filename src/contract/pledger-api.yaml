@@ -18,6 +18,30 @@ tags:
     description: Operations to manipulate account information
   - name: transaction-fetcher
     description: Operations to fetch transaction information
+  - name: client-fetcher
+    description: Operations to fetch client information
+  - name: client-command
+    description: Operations to manipulate client information
+  - name: project-fetcher
+    description: Operations to fetch project information
+  - name: project-command
+    description: Operations to manipulate project information
+  - name: time-entry-fetcher
+    description: Operations to fetch time entry information
+  - name: time-entry-command
+    description: Operations to manipulate time entry information
+  - name: invoice-fetcher
+    description: Operations to fetch invoice information
+  - name: invoice-command
+    description: Operations to manipulate invoice information
+  - name: invoice-template-fetcher
+    description: Operations to fetch invoice template information
+  - name: invoice-template-command
+    description: Operations to manipulate invoice template information
+  - name: tax-bracket-fetcher
+    description: Operations to fetch tax bracket information
+  - name: tax-bracket-command
+    description: Operations to manipulate tax bracket information
 
 security:
   - bearerAuth: []
@@ -69,6 +93,32 @@ paths:
   /v2/api/contracts: { $ref: './paths/contracts.yaml' }
   /v2/api/contracts/{id}: { $ref: './paths/contracts-by-id.yaml' }
   /v2/api/contracts/{id}/warn-before-expiration: { $ref: './paths/contracts-warn-before-expiration.yaml' }
+
+# Client operations
+  /v2/api/clients: { $ref: './paths/clients.yaml' }
+  /v2/api/clients/{id}: { $ref: './paths/clients-by-id.yaml' }
+
+# Project operations
+  /v2/api/projects: { $ref: './paths/projects.yaml' }
+  /v2/api/projects/{id}: { $ref: './paths/projects-by-id.yaml' }
+
+# Time entry operations
+  /v2/api/time-entries: { $ref: './paths/time-entries.yaml' }
+  /v2/api/time-entries/{id}: { $ref: './paths/time-entries-by-id.yaml' }
+
+# Invoice operations
+  /v2/api/invoices: { $ref: './paths/invoices.yaml' }
+  /v2/api/invoices/{id}: { $ref: './paths/invoices-by-id.yaml' }
+  /v2/api/invoices/{id}/lines: { $ref: './paths/invoices-by-id-lines.yaml' }
+  /v2/api/invoices/{id}/finalize: { $ref: './paths/invoices-by-id-finalize.yaml' }
+
+# Invoice template operations
+  /v2/api/invoice-templates: { $ref: './paths/invoice-templates.yaml' }
+  /v2/api/invoice-templates/{id}: { $ref: './paths/invoice-templates-by-id.yaml' }
+
+# Tax bracket operations
+  /v2/api/tax-brackets: { $ref: './paths/tax-brackets.yaml' }
+  /v2/api/tax-brackets/{id}: { $ref: './paths/tax-brackets-by-id.yaml' }
 
 # Tag operations
   /v2/api/tags: { $ref: './paths/tags.yaml' }
@@ -131,7 +181,9 @@ components:
     offset: { $ref: './parameters/offset.yaml' }
     number-of-results: { $ref: './parameters/number-of-results.yaml' }
     start-date: { $ref: 'parameters/startDate.yaml' }
+    startDate-filter: { $ref: 'parameters/startDate.yaml' }
     end-date: { $ref: 'parameters/endDate.yaml' }
+    endDate-filter: { $ref: 'parameters/endDate.yaml' }
     name-filter: { $ref: 'parameters/name.yaml' }
     account-filter: { $ref: 'parameters/accounts.yaml' }
     expense-filter: { $ref: 'parameters/expenses.yaml' }
@@ -161,6 +213,13 @@ components:
     saving-goal-request: { $ref: './components/request/saving-goal.yaml' }
     saving-reservation-request: { $ref: './components/request/saving-goal-reservation.yaml' }
     contract-request: { $ref: './components/request/contract.yaml' }
+    client-request: { $ref: './components/request/client.yaml' }
+    project-request: { $ref: './components/request/project.yaml' }
+    time-entry-request: { $ref: './components/request/time-entry.yaml' }
+    invoice-request: { $ref: './components/request/invoice.yaml' }
+    invoice-line-request: { $ref: './components/request/invoice-line.yaml' }
+    invoice-template-request: { $ref: './components/request/invoice-template.yaml' }
+    tax-bracket-request: { $ref: './components/request/tax-bracket.yaml' }
     category-request: { $ref: './components/request/category.yaml' }
     transaction-request: { $ref: './components/request/transaction.yaml' }
     transaction-schedule-request: { $ref: './components/request/transaction-schedule.yaml' }
@@ -185,6 +244,13 @@ components:
     saving-goal-response: { $ref: './components/response/saving-goal.yaml' }
     schedule-response: { $ref: './components/response/schedule.yaml' }
     contract-response: { $ref: './components/response/contract.yaml' }
+    client-response: { $ref: './components/response/client.yaml' }
+    project-response: { $ref: './components/response/project.yaml' }
+    time-entry-response: { $ref: './components/response/time-entry.yaml' }
+    invoice-response: { $ref: './components/response/invoice.yaml' }
+    invoice-line-response: { $ref: './components/response/invoice-line.yaml' }
+    invoice-template-response: { $ref: './components/response/invoice-template.yaml' }
+    tax-bracket-response: { $ref: './components/response/tax-bracket.yaml' }
     category-response: { $ref: './components/response/category.yaml' }
     category-paged-response: { $ref: './components/response/categories-paged.yaml' }
     transaction-response: { $ref: './components/response/transaction.yaml' }

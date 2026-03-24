@@ -1,0 +1,42 @@
+parameters:
+  - name: id
+    description: The identifier of the invoice
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getInvoiceById
+  tags: [ invoice-fetcher ]
+  summary: Fetch invoice
+  description: Fetch a single invoice by its unique identifier.
+  responses:
+    "200":
+      description: The invoice
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/invoice-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateInvoice
+  tags: [ invoice-command ]
+  summary: Update invoice
+  description: Update an existing invoice. Cannot update if already finalized.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/invoice-request' }
+  responses:
+    "200":
+      description: The updated invoice
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/invoice-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

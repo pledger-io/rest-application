@@ -1,0 +1,29 @@
+type: object
+required:
+  - invoiceNumber
+  - clientId
+  - invoiceDate
+  - dueDate
+  - templateId
+properties:
+  invoiceNumber:
+    minLength: 1
+    type: string
+    description: The invoice number
+    example: INV-2024-001
+  clientId:
+    type: integer
+    description: The ID of the client this invoice is for
+    format: int64
+  invoiceDate:
+    type: string
+    description: The invoice date
+    format: date
+  dueDate:
+    type: string
+    description: The payment due date
+    format: date
+  templateId:
+    type: integer
+    description: The ID of the template to use
+    format: int64

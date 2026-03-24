@@ -1,0 +1,31 @@
+type: object
+required:
+  - id
+  - project
+  - date
+  - hours
+properties:
+  id:
+    type: integer
+    description: The identifier of the time entry
+    format: int64
+  project:
+    description: The project this time entry belongs to
+    allOf:
+      - $ref: "#/components/schemas/project-response"
+  date:
+    type: string
+    description: The date of the time entry
+    format: date
+  hours:
+    type: number
+    description: The number of hours worked
+    format: double
+    example: 8.5
+  description:
+    type: string
+    description: Description of the work performed
+    example: Frontend development
+  invoiced:
+    type: boolean
+    description: Indicator if this time entry has been invoiced

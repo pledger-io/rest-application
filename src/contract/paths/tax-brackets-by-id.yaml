@@ -1,0 +1,53 @@
+parameters:
+  - name: id
+    description: The identifier of the tax bracket
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getTaxBracketById
+  tags: [ tax-bracket-fetcher ]
+  summary: Fetch tax bracket
+  description: Fetch a single tax bracket by its unique identifier.
+  responses:
+    "200":
+      description: The tax bracket
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/tax-bracket-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateTaxBracket
+  tags: [ tax-bracket-command ]
+  summary: Update tax bracket
+  description: Update an existing tax bracket in the application.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/tax-bracket-request' }
+  responses:
+    "200":
+      description: The updated tax bracket
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/tax-bracket-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteTaxBracketById
+  tags: [ tax-bracket-command ]
+  summary: Delete tax bracket
+  description: Permanently deletes a tax bracket from the application.
+  responses:
+    "204":
+      description: Confirmation that the tax bracket was deleted
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

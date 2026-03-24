@@ -1,0 +1,18 @@
+type: object
+required:
+  - name
+properties:
+  name:
+    minLength: 1
+    type: string
+    description: The name of the template
+    example: Standard Invoice
+  headerContent:
+    type: string
+    description: The header content for the invoice
+  footerContent:
+    type: string
+    description: The footer content for the invoice
+  logoToken:
+    type: string
+    description: The file token for the logo image

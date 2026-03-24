@@ -1,0 +1,53 @@
+parameters:
+  - name: id
+    description: The identifier of the client
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getClientById
+  tags: [ client-fetcher ]
+  summary: Fetch client
+  description: Fetch a single client by its unique identifier.
+  responses:
+    "200":
+      description: The client
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/client-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateClient
+  tags: [ client-command ]
+  summary: Update client
+  description: Update an existing client in the application.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/client-request' }
+  responses:
+    "200":
+      description: The updated client
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/client-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: archiveClientById
+  tags: [ client-command ]
+  summary: Archive client
+  description: Marks a client as archived so it no longer appears in listings.
+  responses:
+    "204":
+      description: Confirmation that the client was archived
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

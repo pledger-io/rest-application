@@ -1,0 +1,24 @@
+type: object
+required:
+  - projectId
+  - date
+  - hours
+properties:
+  projectId:
+    type: integer
+    description: The ID of the project this time entry belongs to
+    format: int64
+  date:
+    type: string
+    description: The date of the time entry
+    format: date
+  hours:
+    type: number
+    description: The number of hours worked
+    format: double
+    minimum: 0.01
+    example: 8.5
+  description:
+    type: string
+    description: Description of the work performed
+    example: Frontend development

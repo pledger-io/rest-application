@@ -1,0 +1,14 @@
+type: object
+required:
+  - name
+  - rate
+properties:
+  name:
+    type: string
+    description: The name of the tax bracket
+    example: "VAT 21%"
+  rate:
+    type: number
+    format: double
+    description: The tax rate as a percentage (e.g., 21.0 for 21%)
+    example: 21.0

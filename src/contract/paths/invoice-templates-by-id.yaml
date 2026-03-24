@@ -1,0 +1,53 @@
+parameters:
+  - name: id
+    description: The identifier of the invoice template
+    in: path
+    required: true
+    schema:
+      type: integer
+      format: int64
+      example: 1234567890
+get:
+  operationId: getInvoiceTemplateById
+  tags: [ invoice-template-fetcher ]
+  summary: Fetch invoice template
+  description: Fetch a single invoice template by its unique identifier.
+  responses:
+    "200":
+      description: The invoice template
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/invoice-template-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+put:
+  operationId: updateInvoiceTemplate
+  tags: [ invoice-template-command ]
+  summary: Update invoice template
+  description: Update an existing invoice template.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/invoice-template-request' }
+  responses:
+    "200":
+      description: The updated invoice template
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/invoice-template-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }
+delete:
+  operationId: deleteInvoiceTemplateById
+  tags: [ invoice-template-command ]
+  summary: Delete invoice template
+  description: Permanently deletes an invoice template from the application.
+  responses:
+    "204":
+      description: Confirmation that the invoice template was deleted
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+    "404": { $ref: '#/components/responses/404' }

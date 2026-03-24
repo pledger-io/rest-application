@@ -1,0 +1,56 @@
+type: object
+required:
+  - id
+  - invoiceNumber
+  - client
+  - invoiceDate
+  - dueDate
+  - template
+properties:
+  id:
+    type: integer
+    description: The identifier of the invoice
+    format: int64
+  invoiceNumber:
+    type: string
+    description: The invoice number
+    example: INV-2024-001
+  client:
+    description: The client this invoice is for
+    allOf:
+      - $ref: "#/components/schemas/client-response"
+  invoiceDate:
+    type: string
+    description: The invoice date
+    format: date
+  dueDate:
+    type: string
+    description: The payment due date
+    format: date
+  template:
+    description: The template used for this invoice
+    allOf:
+      - $ref: "#/components/schemas/invoice-template-response"
+  lines:
+    type: array
+    description: Invoice lines
+    items:
+      $ref: "#/components/schemas/invoice-line-response"
+  finalized:
+    type: boolean
+    description: Indicator if the invoice is finalized
+  pdfToken:
+    type: string
+    description: The file token for the generated PDF
+  subtotal:
+    type: number
+    description: Total before tax
+    format: double
+  taxTotal:
+    type: number
+    description: Total tax amount
+    format: double
+  total:
+    type: number
+    description: Grand total
+    format: double

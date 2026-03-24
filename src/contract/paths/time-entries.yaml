@@ -1,0 +1,49 @@
+get:
+  operationId: findTimeEntries
+  tags: [ time-entry-fetcher ]
+  summary: Search time entries
+  description: >
+    Retrieve time entries filtered by project and date range.
+    Returns a list of matching time entries for the current user.
+  parameters:
+    - name: projectId
+      in: query
+      description: Filter by project ID
+      schema:
+        type: integer
+        format: int64
+    - $ref: '#/components/parameters/startDate-filter'
+    - $ref: '#/components/parameters/endDate-filter'
+    - name: invoiced
+      in: query
+      description: Filter by invoiced status
+      schema:
+        type: boolean
+  responses:
+    "200":
+      description: The time entries matching the filters
+      content:
+        application/json:
+          schema:
+            type: array
+            items: { $ref: '#/components/schemas/time-entry-response' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
+post:
+  operationId: createTimeEntry
+  tags: [ time-entry-command ]
+  summary: Create time entry
+  description: Create a new time entry for a project.
+  requestBody:
+    content:
+      application/json:
+        schema: { $ref: '#/components/schemas/time-entry-request' }
+  responses:
+    "201":
+      description: The created time entry
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/time-entry-response' }
+    "400": { $ref: '#/components/responses/400' }
+    "401": { $ref: '#/components/responses/401' }
+    "403": { $ref: '#/components/responses/403' }
