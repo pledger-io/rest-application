@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Controller
-public class InvoiceTemplateFetcherController implements InvoiceTemplateFetcherApi {
+class InvoiceTemplateFetcherController implements InvoiceTemplateFetcherApi {
 
     private final Logger logger;
     private final InvoiceTemplateProvider invoiceTemplateProvider;

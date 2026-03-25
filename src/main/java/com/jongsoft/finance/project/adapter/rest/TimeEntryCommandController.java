@@ -11,15 +11,13 @@ import com.jongsoft.finance.rest.model.TimeEntryResponse;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 
-import jakarta.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 
 @Controller
-public class TimeEntryCommandController implements TimeEntryCommandApi {
+class TimeEntryCommandController implements TimeEntryCommandApi {
 
     private final Logger logger;
     private final ProjectProvider projectProvider;
@@ -33,8 +31,7 @@ public class TimeEntryCommandController implements TimeEntryCommandApi {
     }
 
     @Override
-    public HttpResponse<@Valid TimeEntryResponse> createTimeEntry(
-            TimeEntryRequest timeEntryRequest) {
+    public HttpResponse<TimeEntryResponse> createTimeEntry(TimeEntryRequest timeEntryRequest) {
         logger.info("Creating time entry for project {}.", timeEntryRequest.getProjectId());
 
         var project = projectProvider
@@ -59,8 +56,7 @@ public class TimeEntryCommandController implements TimeEntryCommandApi {
         if (entries.isEmpty()) {
             throw StatusException.internalError("Failed to create time entry");
         }
-        var created = entries.get(entries.size() - 1);
-        return HttpResponse.created(TimeEntryMapper.toTimeEntryResponse(created));
+        return HttpResponse.created(TimeEntryMapper.toTimeEntryResponse(entries.getLast()));
     }
 
     @Override

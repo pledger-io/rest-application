@@ -19,8 +19,10 @@ properties:
     example: Complete redesign of corporate website
   client:
     description: The client this project belongs to
-    allOf:
-      - $ref: "#/components/schemas/client-response"
+    type: object
+    required: [ id ]
+    properties:
+      id: {type: integer, format: int64}
   startDate:
     type: string
     description: The start date of the project

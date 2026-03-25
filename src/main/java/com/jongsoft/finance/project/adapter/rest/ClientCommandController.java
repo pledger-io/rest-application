@@ -10,13 +10,11 @@ import com.jongsoft.finance.rest.model.ClientResponse;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 
-import jakarta.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
-public class ClientCommandController implements ClientCommandApi {
+class ClientCommandController implements ClientCommandApi {
 
     private final Logger logger;
     private final ClientProvider clientProvider;
@@ -27,7 +25,7 @@ public class ClientCommandController implements ClientCommandApi {
     }
 
     @Override
-    public HttpResponse<@Valid ClientResponse> createClient(ClientRequest clientRequest) {
+    public HttpResponse<ClientResponse> createClient(ClientRequest clientRequest) {
         logger.info("Creating client {}.", clientRequest.getName());
 
         Client.create(

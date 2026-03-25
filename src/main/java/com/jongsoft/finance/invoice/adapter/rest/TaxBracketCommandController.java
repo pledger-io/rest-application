@@ -10,13 +10,11 @@ import com.jongsoft.finance.rest.model.TaxBracketResponse;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 
-import jakarta.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
-public class TaxBracketCommandController implements TaxBracketCommandApi {
+class TaxBracketCommandController implements TaxBracketCommandApi {
 
     private final Logger logger;
     private final TaxBracketProvider taxBracketProvider;
@@ -27,11 +25,7 @@ public class TaxBracketCommandController implements TaxBracketCommandApi {
     }
 
     @Override
-    public HttpResponse<@Valid TaxBracketResponse> createTaxBracket(
-            @io.micronaut.http.annotation.Body
-                    @io.micronaut.core.annotation.Nullable(inherited = true)
-                    @jakarta.validation.Valid
-                    TaxBracketRequest taxBracketRequest) {
+    public HttpResponse<TaxBracketResponse> createTaxBracket(TaxBracketRequest taxBracketRequest) {
         logger.info("Creating tax bracket {}.", taxBracketRequest.getName());
 
         TaxBracket.create(
@@ -46,13 +40,7 @@ public class TaxBracketCommandController implements TaxBracketCommandApi {
     }
 
     @Override
-    public TaxBracketResponse updateTaxBracket(
-            @io.micronaut.http.annotation.PathVariable("id") @jakarta.validation.constraints.NotNull
-                    Long id,
-            @io.micronaut.http.annotation.Body
-                    @io.micronaut.core.annotation.Nullable(inherited = true)
-                    @jakarta.validation.Valid
-                    TaxBracketRequest taxBracketRequest) {
+    public TaxBracketResponse updateTaxBracket(Long id, TaxBracketRequest taxBracketRequest) {
         logger.info("Updating tax bracket {}.", id);
 
         var taxBracket = locateByIdOrThrow(id);
@@ -64,9 +52,7 @@ public class TaxBracketCommandController implements TaxBracketCommandApi {
     }
 
     @Override
-    public HttpResponse<Void> deleteTaxBracketById(
-            @io.micronaut.http.annotation.PathVariable("id") @jakarta.validation.constraints.NotNull
-                    Long id) {
+    public HttpResponse<Void> deleteTaxBracketById(Long id) {
         logger.info("Deleting tax bracket {}.", id);
 
         locateByIdOrThrow(id).delete();

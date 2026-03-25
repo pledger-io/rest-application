@@ -1,5 +1,6 @@
 package com.jongsoft.finance.invoice.domain.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -7,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.jongsoft.finance.core.adapter.api.LocalizationCatalog;
 import com.jongsoft.finance.core.adapter.api.StorageService;
-import com.jongsoft.finance.core.domain.service.LocalizableMessageCatalog;
 import com.jongsoft.finance.invoice.domain.model.Invoice;
 import com.jongsoft.finance.invoice.domain.model.InvoiceLine;
 import com.jongsoft.finance.invoice.domain.model.InvoiceTemplate;
@@ -26,12 +27,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @Tag("unit")
 @DisplayName("Unit - OpenPdf invoice PDF service")
@@ -46,7 +46,18 @@ class OpenPdfInvoicePdfServiceTest {
     @BeforeEach
     void setUp() {
         StorageService storage = mock(StorageService.class);
-        service = new OpenPdfInvoicePdfService(storage, new LocalizableMessageCatalog());
+        service = new OpenPdfInvoicePdfService(storage, new LocalizationCatalog() {
+
+            @Override
+            public String get(Locale locale, String key) {
+                return key + "_" + locale.getLanguage();
+            }
+
+            @Override
+            public Map<String, String> getCatalog(String language) {
+                return Map.of();
+            }
+        });
 
         TaxBracket vat = mock(TaxBracket.class);
         when(vat.getRate()).thenReturn(new BigDecimal("0.21"));
@@ -120,7 +131,10 @@ class OpenPdfInvoicePdfServiceTest {
     void renderPdf_dutchContainsFactuur() throws IOException {
         byte[] pdf = service.renderPdf(invoice, client, Locale.forLanguageTag("nl"));
         String text = textFromPdf(pdf);
-        assertTrue(text.contains("Factuur"), "Dutch bundle should put Factuur in the PDF body");
+
+        assertThat(text)
+                .describedAs("Dutch bundle should contain invoice.pdf.title_nl")
+                .contains("invoice.pdf.title_nl");
     }
 
     @Test
@@ -131,7 +145,7 @@ class OpenPdfInvoicePdfServiceTest {
             assertEquals(1, reader.getNumberOfPages());
         }
         String text = textFromPdf(pdf);
-        assertFalse(text.contains("Time entry details"));
+        assertThat(text).contains("invoice.pdf.invoiceNumber_en");
     }
 
     @Test
@@ -154,8 +168,8 @@ class OpenPdfInvoicePdfServiceTest {
             assertTrue(reader.getNumberOfPages() >= 2, "annex should start on page 2");
         }
         String text = textFromPdf(pdf);
-        assertTrue(text.contains("Time entry details"), "annex title should appear");
-        assertTrue(text.contains("Deep work on API"), "time entry description should appear");
+
+        assertThat(text).contains(" invoice.pdf.timeEntries.project").contains("Deep work on API");
     }
 
     private static String textFromPdf(byte[] pdf) throws IOException {

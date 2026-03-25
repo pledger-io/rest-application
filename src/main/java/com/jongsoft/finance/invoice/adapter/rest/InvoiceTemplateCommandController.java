@@ -10,13 +10,11 @@ import com.jongsoft.finance.rest.model.InvoiceTemplateResponse;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 
-import jakarta.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
-public class InvoiceTemplateCommandController implements InvoiceTemplateCommandApi {
+class InvoiceTemplateCommandController implements InvoiceTemplateCommandApi {
 
     private final Logger logger;
     private final InvoiceTemplateProvider invoiceTemplateProvider;
@@ -27,11 +25,8 @@ public class InvoiceTemplateCommandController implements InvoiceTemplateCommandA
     }
 
     @Override
-    public HttpResponse<@Valid InvoiceTemplateResponse> createInvoiceTemplate(
-            @io.micronaut.http.annotation.Body
-                    @io.micronaut.core.annotation.Nullable(inherited = true)
-                    @jakarta.validation.Valid
-                    InvoiceTemplateRequest invoiceTemplateRequest) {
+    public HttpResponse<InvoiceTemplateResponse> createInvoiceTemplate(
+            InvoiceTemplateRequest invoiceTemplateRequest) {
         logger.info("Creating invoice template {}.", invoiceTemplateRequest.getName());
 
         InvoiceTemplate.create(
@@ -50,12 +45,7 @@ public class InvoiceTemplateCommandController implements InvoiceTemplateCommandA
 
     @Override
     public InvoiceTemplateResponse updateInvoiceTemplate(
-            @io.micronaut.http.annotation.PathVariable("id") @jakarta.validation.constraints.NotNull
-                    Long id,
-            @io.micronaut.http.annotation.Body
-                    @io.micronaut.core.annotation.Nullable(inherited = true)
-                    @jakarta.validation.Valid
-                    InvoiceTemplateRequest invoiceTemplateRequest) {
+            Long id, InvoiceTemplateRequest invoiceTemplateRequest) {
         logger.info("Updating invoice template {}.", id);
 
         var template = locateByIdOrThrow(id);
@@ -69,9 +59,7 @@ public class InvoiceTemplateCommandController implements InvoiceTemplateCommandA
     }
 
     @Override
-    public HttpResponse<Void> deleteInvoiceTemplateById(
-            @io.micronaut.http.annotation.PathVariable("id") @jakarta.validation.constraints.NotNull
-                    Long id) {
+    public HttpResponse<Void> deleteInvoiceTemplateById(Long id) {
         logger.info("Deleting invoice template {}.", id);
 
         locateByIdOrThrow(id).delete();

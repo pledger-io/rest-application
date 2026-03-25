@@ -16,7 +16,7 @@ public class Project implements Serializable {
     private Long id;
     private String name;
     private String description;
-    private Client client;
+    private ClientIdentifier client;
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean billable;
@@ -27,7 +27,7 @@ public class Project implements Serializable {
             Long id,
             String name,
             String description,
-            Client client,
+            ClientIdentifier client,
             LocalDate startDate,
             LocalDate endDate,
             boolean billable,
@@ -45,7 +45,7 @@ public class Project implements Serializable {
     private Project(
             String name,
             String description,
-            Client client,
+            ClientIdentifier client,
             LocalDate startDate,
             LocalDate endDate,
             boolean billable) {
@@ -61,7 +61,7 @@ public class Project implements Serializable {
         this.billable = billable;
         this.archived = false;
         CreateProjectCommand.projectCreated(
-                client.getId(), name, description, startDate, endDate, billable);
+                client.id(), name, description, startDate, endDate, billable);
     }
 
     public void update(
@@ -103,7 +103,7 @@ public class Project implements Serializable {
         return description;
     }
 
-    public Client getClient() {
+    public ClientIdentifier getClient() {
         return client;
     }
 
@@ -131,7 +131,7 @@ public class Project implements Serializable {
     public static Project create(
             String name,
             String description,
-            Client client,
+            ClientIdentifier client,
             LocalDate startDate,
             LocalDate endDate,
             boolean billable) {

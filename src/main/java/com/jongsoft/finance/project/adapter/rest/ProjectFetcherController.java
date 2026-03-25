@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Controller
-public class ProjectFetcherController implements ProjectFetcherApi {
+class ProjectFetcherController implements ProjectFetcherApi {
 
     private final Logger logger;
     private final ProjectProvider projectProvider;

@@ -3,6 +3,7 @@ package com.jongsoft.finance.project.adapter.rest;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.project.adapter.api.ClientProvider;
 import com.jongsoft.finance.project.adapter.api.ProjectProvider;
+import com.jongsoft.finance.project.domain.model.Client;
 import com.jongsoft.finance.project.domain.model.Project;
 import com.jongsoft.finance.rest.ProjectCommandApi;
 import com.jongsoft.finance.rest.model.ProjectRequest;
@@ -11,13 +12,11 @@ import com.jongsoft.finance.rest.model.ProjectResponse;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 
-import jakarta.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
-public class ProjectCommandController implements ProjectCommandApi {
+class ProjectCommandController implements ProjectCommandApi {
 
     private final Logger logger;
     private final ProjectProvider projectProvider;
@@ -31,11 +30,12 @@ public class ProjectCommandController implements ProjectCommandApi {
     }
 
     @Override
-    public HttpResponse<@Valid ProjectResponse> createProject(ProjectRequest projectRequest) {
+    public HttpResponse<ProjectResponse> createProject(ProjectRequest projectRequest) {
         logger.info("Creating project {}.", projectRequest.getName());
 
         var client = clientProvider
                 .lookup(projectRequest.getClientId())
+                .map(Client::getIdentifier)
                 .getOrThrow(
                         () -> StatusException.badRequest("Client not found", "client.not.found"));
 

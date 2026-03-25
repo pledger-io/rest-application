@@ -17,15 +17,13 @@ import com.jongsoft.finance.rest.model.InvoiceResponse;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 
-import jakarta.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 
 @Controller
-public class InvoiceCommandController implements InvoiceCommandApi {
+class InvoiceCommandController implements InvoiceCommandApi {
 
     private final Logger logger;
     private final InvoiceProvider invoiceProvider;
@@ -49,11 +47,7 @@ public class InvoiceCommandController implements InvoiceCommandApi {
     }
 
     @Override
-    public HttpResponse<@Valid InvoiceResponse> createInvoice(
-            @io.micronaut.http.annotation.Body
-                    @io.micronaut.core.annotation.Nullable(inherited = true)
-                    @jakarta.validation.Valid
-                    InvoiceRequest invoiceRequest) {
+    public HttpResponse<InvoiceResponse> createInvoice(InvoiceRequest invoiceRequest) {
         logger.info("Creating invoice {}.", invoiceRequest.getInvoiceNumber());
 
         var client = clientProvider
@@ -82,13 +76,7 @@ public class InvoiceCommandController implements InvoiceCommandApi {
     }
 
     @Override
-    public InvoiceResponse updateInvoice(
-            @io.micronaut.http.annotation.PathVariable("id") @jakarta.validation.constraints.NotNull
-                    Long id,
-            @io.micronaut.http.annotation.Body
-                    @io.micronaut.core.annotation.Nullable(inherited = true)
-                    @jakarta.validation.Valid
-                    InvoiceRequest invoiceRequest) {
+    public InvoiceResponse updateInvoice(Long id, InvoiceRequest invoiceRequest) {
         logger.info("Updating invoice {}.", id);
 
         var invoice = locateByIdOrThrow(id);
@@ -113,13 +101,8 @@ public class InvoiceCommandController implements InvoiceCommandApi {
     }
 
     @Override
-    public HttpResponse<@Valid InvoiceResponse> addInvoiceLine(
-            @io.micronaut.http.annotation.PathVariable("id") @jakarta.validation.constraints.NotNull
-                    Long id,
-            @io.micronaut.http.annotation.Body
-                    @io.micronaut.core.annotation.Nullable(inherited = true)
-                    @jakarta.validation.Valid
-                    InvoiceLineRequest invoiceLineRequest) {
+    public HttpResponse<InvoiceResponse> addInvoiceLine(
+            Long id, InvoiceLineRequest invoiceLineRequest) {
         logger.info("Adding line to invoice {}.", id);
 
         var invoice = locateByIdOrThrow(id);
@@ -158,13 +141,7 @@ public class InvoiceCommandController implements InvoiceCommandApi {
     }
 
     @Override
-    public InvoiceResponse finalizeInvoice(
-            @io.micronaut.http.annotation.PathVariable("id") @jakarta.validation.constraints.NotNull
-                    Long id,
-            @io.micronaut.http.annotation.Body
-                    @io.micronaut.core.annotation.Nullable(inherited = true)
-                    @jakarta.validation.Valid
-                    FinalizeInvoiceRequest finalizeInvoiceRequest) {
+    public InvoiceResponse finalizeInvoice(Long id, FinalizeInvoiceRequest finalizeInvoiceRequest) {
         logger.info("Finalizing invoice {}.", id);
 
         var invoice = locateByIdOrThrow(id);
