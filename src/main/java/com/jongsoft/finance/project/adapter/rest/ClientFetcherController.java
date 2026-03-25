@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Controller
-public class ClientFetcherController implements ClientFetcherApi {
+class ClientFetcherController implements ClientFetcherApi {
 
     private final Logger logger;
     private final ClientProvider clientProvider;
@@ -32,7 +32,7 @@ public class ClientFetcherController implements ClientFetcherApi {
                     .lookup(name)
                     .map(ClientMapper::toClientResponse)
                     .map(List::of)
-                    .getOrSupply(java.util.List::of);
+                    .getOrSupply(List::of);
         }
 
         return clientProvider.lookup().map(ClientMapper::toClientResponse).toJava();

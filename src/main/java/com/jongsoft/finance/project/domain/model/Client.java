@@ -59,6 +59,10 @@ public class Client implements Serializable {
         return id;
     }
 
+    public ClientIdentifier getIdentifier() {
+        return new ClientIdentifier(id);
+    }
+
     public String getName() {
         return name;
     }

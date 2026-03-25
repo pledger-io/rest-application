@@ -1,6 +1,7 @@
 package com.jongsoft.finance.project.domain.jpa.mapper;
 
 import com.jongsoft.finance.project.domain.jpa.entity.ProjectJpa;
+import com.jongsoft.finance.project.domain.model.ClientIdentifier;
 import com.jongsoft.finance.project.domain.model.Project;
 
 import io.micronaut.context.annotation.Mapper;
@@ -19,7 +20,7 @@ public abstract class ProjectMapper {
     @Mapper.Mapping(to = "client", from = "#{this.mapClient(entity)}")
     public abstract Project toDomain(ProjectJpa entity);
 
-    public com.jongsoft.finance.project.domain.model.Client mapClient(ProjectJpa entity) {
-        return clientMapper.toDomain(entity.getClient());
+    public ClientIdentifier mapClient(ProjectJpa entity) {
+        return clientMapper.toIdentifier(entity.getClient());
     }
 }

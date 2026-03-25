@@ -25,6 +25,6 @@ class InvoiceModule implements Module {
 
     @Override
     public List<String> requiresModules() {
-        return List.of("PROJECT");
+        return List.of("BANKING", "PROJECT");
     }
 }

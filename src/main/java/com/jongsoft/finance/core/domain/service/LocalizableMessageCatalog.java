@@ -1,5 +1,7 @@
 package com.jongsoft.finance.core.domain.service;
 
+import com.jongsoft.finance.core.adapter.api.LocalizationCatalog;
+
 import jakarta.inject.Singleton;
 
 import java.io.IOException;
@@ -11,21 +13,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Loads merged {@code /i18n/messages*.properties} and {@code /i18n/ValidationMessages*.properties}
- * the same way as {@link com.jongsoft.finance.core.adapter.rest.I18nController}, for server-side
- * localization (PDF, emails, etc.).
- */
 @Singleton
-public class LocalizableMessageCatalog {
+class LocalizableMessageCatalog implements LocalizationCatalog {
 
     private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
     private final ConcurrentHashMap<String, Properties> cache = new ConcurrentHashMap<>();
 
-    /**
-     * Resolves a message for the given locale, falling back to English when the key is missing.
-     */
     public String get(Locale locale, String key) {
         Locale effective = effectiveLocale(locale);
         Properties props = bundleFor(effective);
@@ -39,10 +33,9 @@ public class LocalizableMessageCatalog {
         return value != null ? value : key;
     }
 
-    /**
-     * All entries for API consumers (same shape as {@code I18nApi#getTranslations}).
-     */
-    public Map<String, String> asMap(Locale locale) {
+    @Override
+    public Map<String, String> getCatalog(String localeCode) {
+        Locale locale = Locale.forLanguageTag(localeCode);
         Properties props = bundleFor(effectiveLocale(locale));
         Map<String, String> map = new HashMap<>();
         for (String name : props.stringPropertyNames()) {
@@ -53,7 +46,7 @@ public class LocalizableMessageCatalog {
 
     private Properties bundleFor(Locale locale) {
         String cacheKey = resourceSuffix(locale);
-        return cache.computeIfAbsent(cacheKey, k -> loadMerged(k));
+        return cache.computeIfAbsent(cacheKey, LocalizableMessageCatalog::loadMerged);
     }
 
     private static String resourceSuffix(Locale locale) {

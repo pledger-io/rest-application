@@ -1,7 +1,7 @@
 package com.jongsoft.finance.invoice.domain.service;
 
+import com.jongsoft.finance.core.adapter.api.LocalizationCatalog;
 import com.jongsoft.finance.core.adapter.api.StorageService;
-import com.jongsoft.finance.core.domain.service.LocalizableMessageCatalog;
 import com.jongsoft.finance.invoice.adapter.api.InvoicePdfService;
 import com.jongsoft.finance.invoice.domain.model.Invoice;
 import com.jongsoft.finance.invoice.domain.model.InvoiceLine;
@@ -81,9 +81,9 @@ class OpenPdfInvoicePdfService implements InvoicePdfService {
     private static final String K_TIME_ENTRIES_DESCRIPTION = "invoice.pdf.timeEntries.description";
 
     private final StorageService storageService;
-    private final LocalizableMessageCatalog messages;
+    private final LocalizationCatalog messages;
 
-    OpenPdfInvoicePdfService(StorageService storageService, LocalizableMessageCatalog messages) {
+    OpenPdfInvoicePdfService(StorageService storageService, LocalizationCatalog messages) {
         this.storageService = storageService;
         this.messages = messages;
     }

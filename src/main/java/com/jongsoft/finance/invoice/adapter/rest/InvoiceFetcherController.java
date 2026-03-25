@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Controller
-public class InvoiceFetcherController implements InvoiceFetcherApi {
+class InvoiceFetcherController implements InvoiceFetcherApi {
 
     private final Logger logger;
     private final InvoiceProvider invoiceProvider;

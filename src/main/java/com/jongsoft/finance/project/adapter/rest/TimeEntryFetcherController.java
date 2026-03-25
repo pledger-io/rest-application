@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
-public class TimeEntryFetcherController implements TimeEntryFetcherApi {
+class TimeEntryFetcherController implements TimeEntryFetcherApi {
 
     private final Logger logger;
     private final TimeEntryProvider timeEntryProvider;
