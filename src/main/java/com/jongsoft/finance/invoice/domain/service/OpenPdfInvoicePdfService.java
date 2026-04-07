@@ -97,12 +97,9 @@ class OpenPdfInvoicePdfService implements InvoicePdfService {
             PdfWriter.getInstance(document, buffer);
             document.open();
 
-            addOptionalLogo(document, invoice);
+            addBrandedHeader(document, invoice, loc);
             addTemplateHeader(document, invoice);
             document.add(spacer(4f));
-
-            document.add(new Paragraph(t(loc, K_TITLE), TITLE));
-            document.add(spacer(8f));
 
             document.add(invoiceMetadataPanel(invoice, client, loc));
             document.add(spacer(10f));
@@ -135,23 +132,52 @@ class OpenPdfInvoicePdfService implements InvoicePdfService {
         return messages.get(locale, key) + ": " + value;
     }
 
-    private void addOptionalLogo(Document document, Invoice invoice) throws DocumentException {
+    private void addBrandedHeader(Document document, Invoice invoice, Locale locale)
+            throws DocumentException {
+        PdfPTable header = new PdfPTable(2);
+        header.setWidthPercentage(100);
+        header.setWidths(new float[] {2.2f, 1f});
+
+        PdfPCell titleCell = new PdfPCell();
+        titleCell.setBorder(PdfPCell.NO_BORDER);
+        titleCell.setPadding(0);
+        titleCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        titleCell.addElement(new Paragraph(t(locale, K_TITLE), TITLE));
+        titleCell.addElement(
+                new Paragraph(lbl(locale, K_INVOICE_NUMBER, invoice.getInvoiceNumber()), HEADING));
+        header.addCell(titleCell);
+
+        PdfPCell logoCell = new PdfPCell();
+        logoCell.setBorder(PdfPCell.NO_BORDER);
+        logoCell.setPadding(0);
+        logoCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        logoCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+
+        Image logo = loadLogo(invoice);
+        if (logo != null) {
+            logo.scaleToFit(165, 65);
+            logo.setAlignment(Element.ALIGN_RIGHT);
+            logoCell.addElement(logo);
+        }
+        header.addCell(logoCell);
+
+        document.add(header);
+        document.add(spacer(6f));
+    }
+
+    private Image loadLogo(Invoice invoice) {
         var token = invoice.getTemplate().getLogoToken();
         if (token == null || token.isBlank()) {
-            return;
+            return null;
         }
         var logo = storageService.read(token);
         if (!logo.isPresent()) {
-            return;
+            return null;
         }
         byte[] bytes = logo.get();
         try {
-            Image img = Image.getInstance(bytes);
-            img.scaleToFit(140, 70);
-            img.setAlignment(Element.ALIGN_LEFT);
-            document.add(img);
-            document.add(new Paragraph(" ", SMALL));
-        } catch (IOException e) {
+            return Image.getInstance(bytes);
+        } catch (IOException | RuntimeException e) {
             throw new IllegalStateException("Failed to read invoice logo image", e);
         }
     }

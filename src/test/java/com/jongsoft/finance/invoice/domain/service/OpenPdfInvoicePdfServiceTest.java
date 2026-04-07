@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.jongsoft.finance.core.adapter.api.LocalizationCatalog;
@@ -17,6 +18,7 @@ import com.jongsoft.finance.invoice.domain.model.TaxBracket;
 import com.jongsoft.finance.project.domain.model.Client;
 import com.jongsoft.finance.project.domain.model.Project;
 import com.jongsoft.finance.project.domain.model.TimeEntry;
+import com.jongsoft.lang.Control;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.parser.PdfTextExtractor;
 
@@ -25,6 +27,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -33,6 +37,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 @Tag("unit")
 @DisplayName("Unit - OpenPdf invoice PDF service")
 class OpenPdfInvoicePdfServiceTest {
@@ -40,7 +46,9 @@ class OpenPdfInvoicePdfServiceTest {
     private static final byte[] PDF_MAGIC = new byte[] {'%', 'P', 'D', 'F', '-'};
 
     private OpenPdfInvoicePdfService service;
+    private StorageService storage;
     private Invoice invoice;
+    private InvoiceTemplate template;
     private Client client;
 
     @BeforeEach
@@ -71,7 +79,7 @@ class OpenPdfInvoicePdfServiceTest {
         when(line.getTotal()).thenReturn(new BigDecimal("121.00"));
         when(line.getTimeEntries()).thenReturn(List.of());
 
-        InvoiceTemplate template = mock(InvoiceTemplate.class);
+        template = mock(InvoiceTemplate.class);
         when(template.getLogoToken()).thenReturn(null);
         when(template.getHeaderContent()).thenReturn(null);
         when(template.getFooterContent()).thenReturn(null);
@@ -172,6 +180,20 @@ class OpenPdfInvoicePdfServiceTest {
         assertThat(text).contains(" invoice.pdf.timeEntries.project").contains("Deep work on API");
     }
 
+    @Test
+    @DisplayName("Invoice template logo token loads and renders business logo")
+    void renderPdf_withBusinessLogo_usesTemplateLogoToken() throws Exception {
+        byte[] withoutLogo = service.renderPdf(invoice, client, Locale.ENGLISH);
+
+        when(template.getLogoToken()).thenReturn("business-logo");
+        byte[] logo = createBusinessLogoBytes();
+        when(storage.read("business-logo")).thenReturn(Control.Option(logo));
+
+        byte[] pdf = service.renderPdf(invoice, client, Locale.ENGLISH);
+        assertTrue(pdf.length > withoutLogo.length, "logo should increase PDF size");
+        verify(storage).read("business-logo");
+    }
+
     private static String textFromPdf(byte[] pdf) throws IOException {
         try (PdfReader reader = new PdfReader(pdf)) {
             PdfTextExtractor extractor = new PdfTextExtractor(reader);
@@ -181,5 +203,23 @@ class OpenPdfInvoicePdfServiceTest {
             }
             return sb.toString();
         }
+    }
+
+    private static byte[] createBusinessLogoBytes() throws IOException {
+        BufferedImage logo = new BufferedImage(240, 80, BufferedImage.TYPE_INT_RGB);
+        for (int y = 0; y < logo.getHeight(); y++) {
+            for (int x = 0; x < logo.getWidth(); x++) {
+                // Opaque blue gradient to ensure the image is clearly visible in PDF.
+                int red = 30;
+                int green = 85 + (x * 70 / logo.getWidth());
+                int blue = 175 + (y * 60 / logo.getHeight());
+                int rgb = (red << 16) | (green << 8) | blue;
+                logo.setRGB(x, y, rgb);
+            }
+        }
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        ImageIO.write(logo, "png", output);
+        return output.toByteArray();
     }
 }
