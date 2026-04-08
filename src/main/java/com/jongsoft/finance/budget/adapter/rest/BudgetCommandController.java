@@ -43,8 +43,9 @@ class BudgetCommandController implements BudgetCommandApi {
                         "A budget already exists, cannot start a new one."));
 
         Budget.create(
-                LocalDate.of(budgetRequest.getYear(), budgetRequest.getMonth(), 1),
-                budgetRequest.getIncome()).activate();
+                        LocalDate.of(budgetRequest.getYear(), budgetRequest.getMonth(), 1),
+                        budgetRequest.getIncome())
+                .activate();
 
         var budget = budgetProvider
                 .lookup(budgetRequest.getYear(), budgetRequest.getMonth())
