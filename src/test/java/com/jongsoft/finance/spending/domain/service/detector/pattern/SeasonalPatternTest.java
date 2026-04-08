@@ -3,6 +3,7 @@ package com.jongsoft.finance.spending.domain.service.detector.pattern;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.jongsoft.finance.EventBus;
 import com.jongsoft.finance.banking.domain.model.Classifier;
 import com.jongsoft.finance.banking.domain.model.Transaction;
 import com.jongsoft.finance.classification.domain.model.Category;
@@ -12,6 +13,9 @@ import com.jongsoft.finance.spending.types.PatternType;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 
+import io.micronaut.context.event.ApplicationEventPublisher;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -32,6 +36,11 @@ class SeasonalPatternTest {
      */
     private Map<String, ? extends Classifier> forCategory(String category) {
         return Map.of("CATEGORY", Category.create(category, ""));
+    }
+
+    @BeforeEach
+    void setup() {
+        new EventBus(mock(ApplicationEventPublisher.class));
     }
 
     @Test

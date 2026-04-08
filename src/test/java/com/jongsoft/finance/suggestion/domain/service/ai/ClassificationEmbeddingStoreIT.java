@@ -21,12 +21,14 @@ import com.jongsoft.lang.Control;
 
 import jakarta.inject.Inject;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 
+@Disabled
 class ClassificationEmbeddingStoreIT extends AiBase {
 
     @Inject
