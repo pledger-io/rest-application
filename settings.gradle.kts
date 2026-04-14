@@ -26,7 +26,7 @@ dependencyResolutionManagement {
             library("lang.xml", "com.jongsoft.lang", "language-fasterxml").version("1.1.0")
             library("otp", "dev.samstevens.totp", "totp").version("1.7.1")
             library("bouncy", "org.bouncycastle", "bcprov-jdk18on").version("1.83")
-            library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.83")
+            library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.84")
             library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
             library("csv", "com.opencsv", "opencsv").version("5.12.0")
             library("archunit", "com.tngtech.archunit", "archunit-junit5").version("1.4.1")
