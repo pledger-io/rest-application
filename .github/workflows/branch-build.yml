@@ -19,7 +19,7 @@ jobs:
          distribution: 'temurin'
          architecture: x64
      - name: Prepare gradle installation
-       uses: gradle/actions/setup-gradle@v5
+       uses: gradle/actions/setup-gradle@v6
      - name: Build the application
        run: ./gradlew classes -q
      - name: Verify the software
