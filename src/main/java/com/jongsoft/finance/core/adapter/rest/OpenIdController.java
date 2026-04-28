@@ -1,6 +1,6 @@
 package com.jongsoft.finance.core.adapter.rest;
 
-import com.jongsoft.finance.configuration.settings.OpenIdConfiguration;
+import com.jongsoft.finance.core.settings.OpenIdConfiguration;
 import com.jongsoft.finance.rest.OpenIdApi;
 import com.jongsoft.finance.rest.model.OpenIdConfiguration200Response;
 

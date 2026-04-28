@@ -7,7 +7,6 @@ package generated {
 
 package application {
     package configuration as app_config {
-        [Configuration] <<..finance.configuration.settings..>> as configuration_layer #white/LightGray
         [Conditions] <<..finance.configuration.conditions..>> as condition_layer #white/LightGray
     }
 }
@@ -15,6 +14,7 @@ package application {
 package module {
     package configuration as mod_config {
         [Annotations] <<..finance..annotations..>> as annotation_layer #white/LightGray
+        [Configuration] <<..finance..settings..>> as configuration_layer #white/LightGray
     }
     package domain {
         [Database] <<..finance..domain.jpa..>> as jpa_layer #white/PowderBlue
