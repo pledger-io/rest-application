@@ -3,6 +3,7 @@ package com.jongsoft.finance.banking.adapter.rest;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.Classifier;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.core.domain.FilterProvider;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
+@BankingModuleEnabled
 class TransactionFetcherController implements TransactionFetcherApi {
 
     private final Logger logger;

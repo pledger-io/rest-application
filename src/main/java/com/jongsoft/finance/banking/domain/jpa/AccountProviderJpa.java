@@ -1,6 +1,7 @@
 package com.jongsoft.finance.banking.domain.jpa;
 
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.jpa.entity.AccountJpa;
 import com.jongsoft.finance.banking.domain.jpa.entity.AccountSynonymJpa;
 import com.jongsoft.finance.banking.domain.jpa.entity.TransactionJpa;
@@ -28,6 +29,7 @@ import java.time.LocalDate;
 
 @ReadOnly
 @Singleton
+@BankingModuleEnabled
 class AccountProviderJpa implements AccountProvider {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 

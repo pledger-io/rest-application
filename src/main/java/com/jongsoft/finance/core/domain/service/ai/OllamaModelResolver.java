@@ -1,6 +1,6 @@
 package com.jongsoft.finance.core.domain.service.ai;
 
-import com.jongsoft.finance.configuration.AiConfiguration;
+import com.jongsoft.finance.configuration.settings.AiConfiguration;
 
 import dev.langchain4j.model.ollama.OllamaModelCard;
 import dev.langchain4j.model.ollama.OllamaModels;

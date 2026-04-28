@@ -1,6 +1,7 @@
 package com.jongsoft.finance.banking.adapter.rest;
 
 import com.jongsoft.finance.banking.adapter.api.AccountTypeProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.rest.SystemInformationApi;
 
 import io.micronaut.http.annotation.Controller;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Controller
+@BankingModuleEnabled
 class SystemInformationController implements SystemInformationApi {
 
     private final Logger logger;

@@ -1,6 +1,7 @@
 package com.jongsoft.finance.banking.domain.service;
 
 import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.commands.CreateTransactionCommand;
 import com.jongsoft.finance.banking.domain.model.TransactionCreationHandler;
 import com.jongsoft.finance.banking.domain.model.TransactionSchedule;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Singleton
+@BankingModuleEnabled
 class TransactionScheduleCreator {
 
     private final Logger log = org.slf4j.LoggerFactory.getLogger(TransactionScheduleCreator.class);

@@ -1,4 +1,4 @@
-package com.jongsoft.finance.banking.domain.jpa.handler;
+package com.jongsoft.finance.banking.domain.jpa.mapper;
 
 import com.jongsoft.finance.banking.domain.jpa.entity.TransactionScheduleJpa;
 import com.jongsoft.finance.banking.domain.model.ScheduleValue;

@@ -2,6 +2,7 @@ package com.jongsoft.finance.banking.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.TagProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.Tag;
 import com.jongsoft.finance.rest.TagCommandApi;
 import com.jongsoft.finance.rest.model.CreateTagRequest;
@@ -12,6 +13,7 @@ import io.micronaut.http.annotation.Controller;
 import org.slf4j.Logger;
 
 @Controller
+@BankingModuleEnabled
 class TagCommandController implements TagCommandApi {
 
     private final Logger logger;

@@ -5,27 +5,43 @@ package generated {
     [API Interface] <<..finance.rest..>> as api_interface #Orange/PowderBlue
 }
 
-package domain {
-    [Database] <<..finance..domain.jpa..>> as jpa_layer #white/PowderBlue
-    [Commands] <<..finance..domain.commands..>> as command_layer #white/PowderBlue
-    [Model] <<..finance..domain.model..>> as model_layer #white/PowderBlue
-    [Service] <<..finance..domain.service..>> as service_layer #white/LightGray
+package application {
+    package configuration as app_config {
+        [Configuration] <<..finance.configuration.settings..>> as configuration_layer #white/LightGray
+        [Conditions] <<..finance.configuration.conditions..>> as condition_layer #white/LightGray
+    }
 }
 
-package adapter {
-    [Internal API] <<..finance..adapter.api..>> as api_layer #white/Green
-    [REST API] <<..finance..adapter.rest..>> as rest_layer #white/Green
+package module {
+    package configuration as mod_config {
+        [Annotations] <<..finance..annotations..>> as annotation_layer #white/LightGray
+    }
+    package domain {
+        [Database] <<..finance..domain.jpa..>> as jpa_layer #white/PowderBlue
+        [Commands] <<..finance..domain.commands..>> as command_layer #white/PowderBlue
+        [Model] <<..finance..domain.model..>> as model_layer #white/PowderBlue
+        [Service] <<..finance..domain.service..>> as service_layer #white/LightGray
+    }
+
+    package adapter {
+        [Internal API] <<..finance..adapter.api..>> as api_layer #white/Green
+        [REST API] <<..finance..adapter.rest..>> as rest_layer #white/Green
+    }
 }
+
 
 jpa_layer --> command_layer : listens to
 jpa_layer -> model_layer : instantiates
 jpa_layer -up-> api_layer : implements
+jpa_layer -up-> annotation_layer : uses
 
 model_layer --> command_layer : initiates
 
 rest_layer --> model_layer : uses
 rest_layer -> api_layer : uses
 rest_layer ----> command_layer : uses
+rest_layer -left-> annotation_layer : uses
+rest_layer -up-> configuration_layer : uses
 
 rest_layer -up-> api_interface: implements
 
@@ -34,7 +50,12 @@ api_layer --> model_layer : uses
 service_layer -up-> api_layer : implements
 service_layer -up-> model_layer : uses
 service_layer -right-> command_layer : uses
+service_layer -left-> annotation_layer : uses
+service_layer -up-> configuration_layer : uses
 
 api_interface ---> model_layer: uses
+
+annotation_layer -up-> condition_layer : uses
+condition_layer -down-> api_layer : uses
 
 @enduml

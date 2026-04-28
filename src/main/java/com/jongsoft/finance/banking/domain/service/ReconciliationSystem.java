@@ -6,6 +6,7 @@ import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.Reconcile;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.AccountReconciliation;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Singleton
+@BankingModuleEnabled
 class ReconciliationSystem implements Reconcile {
 
     private final Logger log = org.slf4j.LoggerFactory.getLogger(ReconciliationSystem.class);

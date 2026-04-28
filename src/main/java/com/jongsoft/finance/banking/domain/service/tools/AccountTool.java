@@ -1,6 +1,7 @@
 package com.jongsoft.finance.banking.domain.service.tools;
 
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.core.domain.FilterProvider;
 
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 
 @Singleton
 @Requires(env = "ai")
+@BankingModuleEnabled
 public class AccountTool {
     private static final Logger LOGGER = org.slf4j.LoggerFactory.getLogger(AccountTool.class);
     private static final AccountDTO UNKNOWN_ACCOUNT = new AccountDTO(-1L, "Unknown", "");
