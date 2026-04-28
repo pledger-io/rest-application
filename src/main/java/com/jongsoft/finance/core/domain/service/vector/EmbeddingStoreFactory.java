@@ -1,7 +1,7 @@
 package com.jongsoft.finance.core.domain.service.vector;
 
-import com.jongsoft.finance.configuration.settings.VectorConfiguration;
 import com.jongsoft.finance.core.domain.service.Encryption;
+import com.jongsoft.finance.core.settings.VectorConfiguration;
 import com.jongsoft.lang.Control;
 
 import io.micronaut.context.annotation.Factory;
