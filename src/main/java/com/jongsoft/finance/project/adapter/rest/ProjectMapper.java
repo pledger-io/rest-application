@@ -1,8 +1,8 @@
 package com.jongsoft.finance.project.adapter.rest;
 
 import com.jongsoft.finance.project.domain.model.Project;
+import com.jongsoft.finance.rest.model.ClientResponse;
 import com.jongsoft.finance.rest.model.ProjectResponse;
-import com.jongsoft.finance.rest.model.ProjectResponseClient;
 
 interface ProjectMapper {
 
@@ -10,7 +10,7 @@ interface ProjectMapper {
         var response = new ProjectResponse(
                 project.getId(),
                 project.getName(),
-                new ProjectResponseClient(project.getClient().id()),
+                new ClientResponse(project.getClient().id(), null),
                 project.isBillable());
         response.setDescription(project.getDescription());
         response.setStartDate(project.getStartDate());

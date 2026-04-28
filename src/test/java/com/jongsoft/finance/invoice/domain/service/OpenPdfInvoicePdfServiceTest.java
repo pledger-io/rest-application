@@ -53,7 +53,7 @@ class OpenPdfInvoicePdfServiceTest {
 
     @BeforeEach
     void setUp() {
-        StorageService storage = mock(StorageService.class);
+        storage = mock(StorageService.class);
         service = new OpenPdfInvoicePdfService(storage, new LocalizationCatalog() {
 
             @Override
