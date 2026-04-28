@@ -1,4 +1,4 @@
-package com.jongsoft.finance.configuration;
+package com.jongsoft.finance.configuration.settings;
 
 import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.context.annotation.Requires;

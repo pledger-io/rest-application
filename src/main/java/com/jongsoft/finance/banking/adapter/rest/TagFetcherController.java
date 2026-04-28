@@ -1,6 +1,7 @@
 package com.jongsoft.finance.banking.adapter.rest;
 
 import com.jongsoft.finance.banking.adapter.api.TagProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.Tag;
 import com.jongsoft.finance.core.adapter.api.SettingProvider;
 import com.jongsoft.finance.core.domain.FilterProvider;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Controller
+@BankingModuleEnabled
 class TagFetcherController implements TagFetcherApi {
 
     private final TagProvider tagProvider;

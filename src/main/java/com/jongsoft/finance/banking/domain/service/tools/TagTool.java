@@ -1,6 +1,7 @@
 package com.jongsoft.finance.banking.domain.service.tools;
 
 import com.jongsoft.finance.banking.adapter.api.TagProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.Tag;
 
 import dev.langchain4j.agent.tool.Tool;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Singleton
 @Requires(env = "ai")
+@BankingModuleEnabled
 public class TagTool {
 
     private final Logger logger = org.slf4j.LoggerFactory.getLogger(TagTool.class);

@@ -4,6 +4,7 @@ import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.AccountTypeProvider;
 import com.jongsoft.finance.banking.adapter.api.Reconcile;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.core.adapter.api.SettingProvider;
 import com.jongsoft.finance.core.domain.FilterProvider;
@@ -24,6 +25,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
+@BankingModuleEnabled
 class AccountFetcherController implements AccountFetcherApi {
 
     private final Logger logger;

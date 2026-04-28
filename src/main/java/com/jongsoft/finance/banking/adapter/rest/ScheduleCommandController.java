@@ -3,6 +3,7 @@ package com.jongsoft.finance.banking.adapter.rest;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.ScheduleValue;
 import com.jongsoft.finance.banking.domain.model.TransactionSchedule;
 import com.jongsoft.finance.core.value.Periodicity;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import java.time.LocalDate;
 
 @Controller
+@BankingModuleEnabled
 class ScheduleCommandController implements ScheduleCommandApi {
 
     private final Logger logger;

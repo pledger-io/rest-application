@@ -2,6 +2,7 @@ package com.jongsoft.finance.banking.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.TransactionAi;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.TransactionResult;
 import com.jongsoft.finance.rest.TransactionExtractorApi;
 import com.jongsoft.finance.rest.model.ExtractTransactionRequest;
@@ -12,6 +13,7 @@ import com.jongsoft.finance.rest.model.ExtractedTransactionResponseType;
 import jakarta.inject.Singleton;
 
 @Singleton
+@BankingModuleEnabled
 class TransactionAiController implements TransactionExtractorApi {
 
     private final TransactionAi transactionAi;

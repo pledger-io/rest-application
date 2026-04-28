@@ -5,6 +5,7 @@ import static com.jongsoft.finance.banking.types.TransactionLinkType.*;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.commands.CreateTransactionCommand;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.SplitRecord;
@@ -31,6 +32,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 @Controller
+@BankingModuleEnabled
 class TransactionCommandController implements TransactionCommandApi {
 
     private final Logger logger;

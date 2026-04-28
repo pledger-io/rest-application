@@ -1,9 +1,10 @@
 package com.jongsoft.finance.banking.domain.jpa;
 
 import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.jpa.entity.TransactionScheduleJpa;
 import com.jongsoft.finance.banking.domain.jpa.filter.TransactionScheduleFilterCommand;
-import com.jongsoft.finance.banking.domain.jpa.handler.TransactionScheduleMapper;
+import com.jongsoft.finance.banking.domain.jpa.mapper.TransactionScheduleMapper;
 import com.jongsoft.finance.banking.domain.model.TransactionSchedule;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.ResultPage;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 
 @ReadOnly
 @Singleton
+@BankingModuleEnabled
 public class TransactionScheduleProviderJpa implements TransactionScheduleProvider {
 
     private final AuthenticationFacade authenticationFacade;

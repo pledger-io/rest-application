@@ -1,11 +1,13 @@
 package com.jongsoft.finance.banking.domain.jpa.filter;
 
 import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.core.domain.FilterProvider;
 
 import jakarta.inject.Singleton;
 
 @Singleton
+@BankingModuleEnabled
 class TransactionScheduleFilterProvider
         implements FilterProvider<TransactionScheduleProvider.FilterCommand> {
     @Override

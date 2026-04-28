@@ -3,6 +3,7 @@ package com.jongsoft.finance.banking.adapter.rest;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.Classifier;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.banking.types.TransactionLinkType;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@BankingModuleEnabled
 class StatisticsBalanceController implements StatisticsBalanceApi {
 
     private final Logger logger;

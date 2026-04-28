@@ -1,6 +1,7 @@
 package com.jongsoft.finance.banking.domain.jpa;
 
 import com.jongsoft.finance.banking.adapter.api.AccountTypeProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.jpa.entity.AccountTypeJpa;
 import com.jongsoft.finance.core.domain.jpa.query.ReactiveEntityManager;
 import com.jongsoft.lang.collection.Sequence;
@@ -16,6 +17,7 @@ import java.util.Comparator;
 
 @ReadOnly
 @Singleton
+@BankingModuleEnabled
 class AccountTypeProviderJpa implements AccountTypeProvider {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(AccountTypeProviderJpa.class);

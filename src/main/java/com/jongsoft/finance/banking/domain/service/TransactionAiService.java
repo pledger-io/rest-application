@@ -1,6 +1,7 @@
 package com.jongsoft.finance.banking.domain.service;
 
 import com.jongsoft.finance.banking.adapter.api.TransactionAi;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.TransactionResult;
 import com.jongsoft.finance.banking.domain.service.ai.TransactionExtractorAgent;
 import com.jongsoft.lang.Control;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Singleton
+@BankingModuleEnabled
 class TransactionAiService implements TransactionAi {
     private final TransactionExtractorAgent transactionExtractorAgent;
 

@@ -2,6 +2,7 @@ package com.jongsoft.finance.banking.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.TransactionScheduleProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.rest.ScheduleFetcherApi;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
+@BankingModuleEnabled
 class ScheduleFetcherController implements ScheduleFetcherApi {
 
     private final Logger logger;

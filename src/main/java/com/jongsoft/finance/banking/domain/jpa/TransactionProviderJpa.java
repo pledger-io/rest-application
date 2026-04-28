@@ -1,6 +1,7 @@
 package com.jongsoft.finance.banking.domain.jpa;
 
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.jpa.entity.TransactionJournal;
 import com.jongsoft.finance.banking.domain.jpa.filter.TransactionFilterCommand;
 import com.jongsoft.finance.banking.domain.jpa.mapper.TransactionMapper;
@@ -29,6 +30,7 @@ import java.util.Comparator;
 
 @ReadOnly
 @Singleton
+@BankingModuleEnabled
 public class TransactionProviderJpa implements TransactionProvider {
 
     private final Logger log = LoggerFactory.getLogger(TransactionProviderJpa.class);

@@ -1,6 +1,7 @@
 package com.jongsoft.finance.banking.domain.jpa;
 
 import com.jongsoft.finance.banking.adapter.api.TagProvider;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.jpa.entity.TagJpa;
 import com.jongsoft.finance.banking.domain.jpa.filter.TagFilterCommand;
 import com.jongsoft.finance.banking.domain.model.Tag;
@@ -17,6 +18,7 @@ import jakarta.inject.Singleton;
 
 @ReadOnly
 @Singleton
+@BankingModuleEnabled
 public class TagProviderJpa implements TagProvider {
 
     private final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TagProviderJpa.class);

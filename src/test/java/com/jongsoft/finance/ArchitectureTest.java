@@ -10,16 +10,26 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 
+import com.tngtech.archunit.core.importer.Location;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
+import java.util.regex.Pattern;
 
 @DisplayName("Architecture rules")
 class ArchitectureTest {
 
     private static final JavaClasses classes = new ClassFileImporter()
         .withImportOption(new ImportOption.DoNotIncludeTests())
+        .withImportOption(new ImportOption() {
+            static final Pattern NO_GENERATED_CLASSES = Pattern.compile(".*\\$.*\\$Definition.*");
+            @Override
+            public boolean includes(Location location) {
+                // exclude generated classes by Micronaut
+                return !location.matches(NO_GENERATED_CLASSES);
+            }
+        })
         .importPackages("com.jongsoft.finance");
 
 

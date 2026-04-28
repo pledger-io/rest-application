@@ -3,6 +3,7 @@ package com.jongsoft.finance.banking.adapter.rest;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.Reconcile;
+import com.jongsoft.finance.banking.annotations.BankingModuleEnabled;
 import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.AccountReconciliation;
 import com.jongsoft.finance.banking.domain.model.SavingGoal;
@@ -24,6 +25,7 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 @Controller
+@BankingModuleEnabled
 public class AccountCommandController implements AccountCommandApi {
 
     private final Logger logger;
