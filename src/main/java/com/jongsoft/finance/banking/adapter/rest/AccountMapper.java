@@ -19,6 +19,7 @@ interface AccountMapper {
                 account.getId(), account.getName(), account.getType(), accountNumbers);
 
         response.setDescription(account.getDescription());
+        response.setIconFileCode(account.getImageFileToken());
         if (account.getInterestPeriodicity() != null) {
             response.setInterest(new AccountResponseAllOfInterest(
                     Periodicity.fromValue(account.getInterestPeriodicity().name()),
