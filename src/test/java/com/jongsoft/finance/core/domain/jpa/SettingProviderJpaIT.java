@@ -25,7 +25,7 @@ class SettingProviderJpaIT extends JpaTestSetup {
     @Test
     @DisplayName("Lookup all settings")
     void lookup() {
-        Assertions.assertThat(settingProvider.lookup()).hasSize(6);
+        Assertions.assertThat(settingProvider.lookup()).hasSize(7);
     }
 
     @Test

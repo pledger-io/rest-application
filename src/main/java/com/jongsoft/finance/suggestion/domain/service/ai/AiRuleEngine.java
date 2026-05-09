@@ -28,10 +28,9 @@ import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 
 import io.micrometer.core.annotation.Timed;
-import io.micronaut.context.annotation.Primary;
-import io.micronaut.context.annotation.Requires;
 import io.micronaut.context.event.ShutdownEvent;
 import io.micronaut.context.event.StartupEvent;
+import io.micronaut.core.annotation.Nullable;
 import io.micronaut.runtime.event.annotation.EventListener;
 
 import jakarta.inject.Singleton;
@@ -45,9 +44,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Primary
 @Singleton
-@Requires(env = "ai")
 class AiRuleEngine implements SuggestionEngine {
     private final Logger log = LoggerFactory.getLogger(AiRuleEngine.class);
     private final ClassificationAgent classificationAgent;
@@ -62,7 +59,7 @@ class AiRuleEngine implements SuggestionEngine {
     private final ExecutorService executors = Executors.newFixedThreadPool(10);
 
     AiRuleEngine(
-            ClassificationAgent classificationAgent,
+            @Nullable ClassificationAgent classificationAgent,
             @ClassificationVectorStore PledgerVectorStore classificationStore,
             EmbeddingModel embeddingModel,
             CurrentUserProvider currentUserProvider,
@@ -158,6 +155,10 @@ class AiRuleEngine implements SuggestionEngine {
     }
 
     private SuggestionResult fallbackToLLM(SuggestionInput transactionInput) {
+        if (classificationAgent == null) {
+            return new SuggestionResult("", "", List.of());
+        }
+
         log.debug("No embedding found for the input, falling back to LLM.");
         var suggestion = classificationAgent.classifyTransaction(
                 UUID.randomUUID(),

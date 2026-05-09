@@ -10,7 +10,7 @@ import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
 
 @Factory
-@Requires(property = "application.ai.engine", value = "memory")
+@Requires(notEnv = "ai")
 class InMemorySetup {
 
     @Bean

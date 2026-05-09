@@ -33,6 +33,10 @@ public interface SettingProvider {
         return !getSetting("RegistrationOpen", true, Boolean::valueOf, SettingType.FLAG);
     }
 
+    default String getClassificationMode() {
+        return getSetting("ClassificationMode", "rule", String::valueOf, SettingType.STRING);
+    }
+
     default <X> X getSetting(
             String setting, X defaultValue, Function<String, X> conversion, SettingType filter) {
         return lookup(setting)
