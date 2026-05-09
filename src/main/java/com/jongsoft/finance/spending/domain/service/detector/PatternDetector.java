@@ -22,7 +22,6 @@ import com.jongsoft.finance.spending.domain.service.vector.PatternVectorStore;
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.embedding.onnx.allminilml6v2.AllMiniLmL6V2EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 
@@ -67,13 +66,14 @@ class PatternDetector implements Detector<SpendingPattern> {
             FilterProvider<TransactionProvider.FilterCommand> filterProvider,
             CurrentUserProvider currentUserProvider,
             UserProvider userProvider,
+            EmbeddingModel embeddingModel,
             @PatternVectorStore PledgerVectorStore patternVectorStore) {
         this.transactionProvider = transactionProvider;
         this.currentUserProvider = currentUserProvider;
         this.userProvider = userProvider;
         this.patternVectorStore = patternVectorStore;
         this.filterProvider = filterProvider;
-        this.embeddingModel = new AllMiniLmL6V2EmbeddingModel();
+        this.embeddingModel = embeddingModel;
         this.patterns =
                 List.of(new OccurrencePattern(), new AmountPattern(), new SeasonalPattern());
     }
