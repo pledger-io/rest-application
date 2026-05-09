@@ -46,10 +46,10 @@ select
 from transaction_journal where batch_import_id is not null;
 
 alter table transaction_journal drop column budget_id;
-alter table transaction_journal drop foreign key fk_transaction_journal_category;
+alter table transaction_journal drop constraint fk_transaction_journal_category;
 alter table transaction_journal drop column category_id;
-alter table transaction_journal drop foreign key fk_transaction_journal_contract;
+alter table transaction_journal drop constraint fk_transaction_journal_contract;
 alter table transaction_journal drop column contract_id;
-alter table transaction_journal drop foreign key fk_transaction_journal_import;
+alter table transaction_journal drop constraint fk_transaction_journal_import;
 alter table transaction_journal drop column batch_import_id;
 
