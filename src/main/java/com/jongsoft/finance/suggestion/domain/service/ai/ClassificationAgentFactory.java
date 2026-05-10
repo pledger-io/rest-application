@@ -10,8 +10,10 @@ import dev.langchain4j.model.chat.ChatModel;
 
 import io.micronaut.context.annotation.Bean;
 import io.micronaut.context.annotation.Factory;
+import io.micronaut.context.annotation.Requires;
 
 @Factory
+@Requires(env = "ai")
 class ClassificationAgentFactory {
 
     private static final org.slf4j.Logger log =
