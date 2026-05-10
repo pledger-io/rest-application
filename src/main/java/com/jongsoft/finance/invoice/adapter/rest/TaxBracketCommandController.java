@@ -2,6 +2,7 @@ package com.jongsoft.finance.invoice.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.invoice.adapter.api.TaxBracketProvider;
+import com.jongsoft.finance.invoice.annotations.InvoiceModuleEnabled;
 import com.jongsoft.finance.invoice.domain.model.TaxBracket;
 import com.jongsoft.finance.rest.TaxBracketCommandApi;
 import com.jongsoft.finance.rest.model.TaxBracketRequest;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
+@InvoiceModuleEnabled
 class TaxBracketCommandController implements TaxBracketCommandApi {
 
     private final Logger logger;

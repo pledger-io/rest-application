@@ -19,6 +19,7 @@ import com.jongsoft.finance.contract.domain.model.Contract;
 import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.core.value.Periodicity;
+import com.jongsoft.finance.exporter.annotations.ExporterModuleEnabled;
 import com.jongsoft.finance.rest.ImportApi;
 import com.jongsoft.finance.rest.model.*;
 import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleProvider;
@@ -41,6 +42,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Controller
+@ExporterModuleEnabled
 class ImportController implements ImportApi {
 
     private final Logger log = LoggerFactory.getLogger(ImportController.class);

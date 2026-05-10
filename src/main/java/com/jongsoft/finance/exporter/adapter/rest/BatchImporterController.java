@@ -4,6 +4,7 @@ import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.exporter.adapter.api.ImportConfigurationProvider;
 import com.jongsoft.finance.exporter.adapter.api.ImportProcesEngine;
 import com.jongsoft.finance.exporter.adapter.api.ImportProvider;
+import com.jongsoft.finance.exporter.annotations.ExporterModuleEnabled;
 import com.jongsoft.finance.exporter.domain.model.BatchImport;
 import com.jongsoft.finance.exporter.domain.model.BatchImportConfig;
 import com.jongsoft.finance.exporter.domain.model.UserTask;
@@ -24,6 +25,7 @@ import java.time.ZoneId;
 import java.util.List;
 
 @Controller
+@ExporterModuleEnabled
 class BatchImporterController implements BatchImporterApi, BatchTaskEngineApi {
 
     private final Logger logger;

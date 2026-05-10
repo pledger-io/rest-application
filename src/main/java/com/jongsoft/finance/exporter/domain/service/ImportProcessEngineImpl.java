@@ -5,6 +5,7 @@ import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.domain.model.ProcessVariable;
 import com.jongsoft.finance.exporter.adapter.api.ImportProcesEngine;
 import com.jongsoft.finance.exporter.adapter.api.ImportProvider;
+import com.jongsoft.finance.exporter.annotations.ExporterModuleEnabled;
 import com.jongsoft.finance.exporter.domain.model.BatchImport;
 import com.jongsoft.finance.exporter.domain.model.UserTask;
 import com.jongsoft.finance.exporter.domain.service.transaction.ImportProcess;
@@ -15,6 +16,7 @@ import jakarta.inject.Singleton;
 import java.util.List;
 
 @Singleton
+@ExporterModuleEnabled
 class ImportProcessEngineImpl implements ImportProcesEngine {
 
     private final ImportProvider importProvider;

@@ -3,6 +3,7 @@ package com.jongsoft.finance.classification.domain.jpa;
 import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
 import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.classification.adapter.api.CategoryProvider;
+import com.jongsoft.finance.classification.annotations.ClassificationModuleEnabled;
 import com.jongsoft.finance.classification.domain.jpa.entity.CategoryJpa;
 import com.jongsoft.finance.classification.domain.jpa.filter.CategoryFilterCommand;
 import com.jongsoft.finance.classification.domain.jpa.mapper.CategoryMapper;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 @ReadOnly
 @Singleton
+@ClassificationModuleEnabled
 public class CategoryProviderJpa implements CategoryProvider, LinkableProvider<Category> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

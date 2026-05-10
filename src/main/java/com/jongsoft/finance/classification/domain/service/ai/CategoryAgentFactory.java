@@ -1,5 +1,6 @@
 package com.jongsoft.finance.classification.domain.service.ai;
 
+import com.jongsoft.finance.classification.annotations.ClassificationModuleEnabled;
 import com.jongsoft.finance.classification.domain.service.tools.CategoryTool;
 
 import dev.langchain4j.agentic.AgenticServices;
@@ -12,6 +13,7 @@ import io.micronaut.context.annotation.Requires;
 
 @Factory
 @Requires(env = "ai")
+@ClassificationModuleEnabled
 class CategoryAgentFactory {
 
     private static final org.slf4j.Logger log =

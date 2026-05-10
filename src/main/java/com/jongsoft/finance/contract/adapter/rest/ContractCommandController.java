@@ -3,6 +3,7 @@ package com.jongsoft.finance.contract.adapter.rest;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.contract.adapter.api.ContractProvider;
+import com.jongsoft.finance.contract.annotations.ContractModuleEnabled;
 import com.jongsoft.finance.contract.domain.model.Contract;
 import com.jongsoft.finance.rest.ContractCommandApi;
 import com.jongsoft.finance.rest.model.ContractRequest;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
+@ContractModuleEnabled
 public class ContractCommandController implements ContractCommandApi {
 
     private final Logger logger;

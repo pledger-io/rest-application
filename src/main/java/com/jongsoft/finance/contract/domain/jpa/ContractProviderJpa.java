@@ -3,6 +3,7 @@ package com.jongsoft.finance.contract.domain.jpa;
 import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
 import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.contract.adapter.api.ContractProvider;
+import com.jongsoft.finance.contract.annotations.ContractModuleEnabled;
 import com.jongsoft.finance.contract.domain.jpa.entity.ContractJpa;
 import com.jongsoft.finance.contract.domain.jpa.mapper.ContractMapper;
 import com.jongsoft.finance.contract.domain.model.Contract;
@@ -19,6 +20,7 @@ import jakarta.inject.Singleton;
 
 @ReadOnly
 @Singleton
+@ContractModuleEnabled
 class ContractProviderJpa implements ContractProvider, LinkableProvider<Contract> {
     private final org.slf4j.Logger log =
             org.slf4j.LoggerFactory.getLogger(ContractProviderJpa.class);

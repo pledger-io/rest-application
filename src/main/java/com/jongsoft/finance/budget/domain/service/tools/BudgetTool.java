@@ -1,6 +1,7 @@
 package com.jongsoft.finance.budget.domain.service.tools;
 
 import com.jongsoft.finance.budget.adapter.api.BudgetProvider;
+import com.jongsoft.finance.budget.annotations.BudgetModuleEnabled;
 import com.jongsoft.finance.budget.domain.model.Budget;
 
 import dev.langchain4j.agent.tool.Tool;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Singleton
+@BudgetModuleEnabled
 @Requires(env = "ai")
 public class BudgetTool {
 

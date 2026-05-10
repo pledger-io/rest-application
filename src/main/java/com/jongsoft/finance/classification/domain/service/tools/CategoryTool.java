@@ -1,6 +1,7 @@
 package com.jongsoft.finance.classification.domain.service.tools;
 
 import com.jongsoft.finance.classification.adapter.api.CategoryProvider;
+import com.jongsoft.finance.classification.annotations.ClassificationModuleEnabled;
 import com.jongsoft.finance.classification.domain.model.Category;
 
 import dev.langchain4j.agent.tool.Tool;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Singleton
 @Requires(env = "ai")
+@ClassificationModuleEnabled
 public class CategoryTool {
 
     private final Logger logger = org.slf4j.LoggerFactory.getLogger(CategoryTool.class);

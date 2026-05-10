@@ -20,13 +20,6 @@ public class ModuleEnabledCondition implements Condition {
 
     @Override
     public boolean matches(ConditionContext context) {
-        ModuleProvider moduleProvider = context.getBean(ModuleProvider.class);
-        if (moduleProvider == null) {
-            logger.error("Cannot find the module provider system, fatal exception.");
-            context.fail("Module provider system not found");
-            return false;
-        }
-
         String requiredModule = context.getComponent()
                 .findAnnotation(Requires.class)
                 .filter(r -> r.get("condition", Condition.class)
@@ -41,9 +34,20 @@ public class ModuleEnabledCondition implements Condition {
             return true;
         }
 
-        logger.info("Checking if module {} is enabled.", requiredModule);
-
         return cachedChecks.computeIfAbsent(
-                requiredModule, _ -> moduleProvider.isModuleEnabled(requiredModule));
+                requiredModule, _ -> lookupModuleStatus(context, requiredModule));
+    }
+
+    private boolean lookupModuleStatus(ConditionContext<?> context, String module) {
+        ModuleProvider moduleProvider = context.getBean(ModuleProvider.class);
+        if (moduleProvider == null) {
+            logger.error("Cannot find the module provider system, fatal exception.");
+            context.fail("Module provider system not found");
+            return true;
+        }
+
+        boolean isEnabled = moduleProvider.isModuleEnabled(module);
+        logger.info("Checking if module {} is enabled, result {}.", module, isEnabled);
+        return isEnabled;
     }
 }

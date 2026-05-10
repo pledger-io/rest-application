@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.jongsoft.finance.JpaTestSetup;
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.core.adapter.api.ModuleProvider;
+import com.jongsoft.finance.core.domain.model.PledgerModule;
 
 import jakarta.inject.Inject;
 
@@ -33,5 +34,15 @@ class ModuleProviderIT extends JpaTestSetup {
         assertThatThrownBy(() -> moduleProvider.isModuleEnabled("MISSING"))
                 .isInstanceOf(StatusException.class)
                 .satisfies(ex -> assertThat(ex.getMessage()).contains("Module not found MISSING"));
+    }
+
+    @Test
+    void verifyBankingModule() {
+        PledgerModule module = moduleProvider.getModule("BANKING").get();
+
+        assertThat(module.getId()).isNotNull();
+        assertThat(module.getCode()).isEqualTo("BANKING");
+        assertThat(module.getRequiredModules()).isEmpty();
+        assertThat(module.isEnabled()).isTrue();
     }
 }

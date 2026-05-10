@@ -1,6 +1,5 @@
 package com.jongsoft.finance;
 
-import com.jongsoft.finance.core.adapter.api.CurrentUserProvider;
 import com.jongsoft.finance.core.adapter.api.Encoder;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import io.micronaut.context.annotation.Replaces;

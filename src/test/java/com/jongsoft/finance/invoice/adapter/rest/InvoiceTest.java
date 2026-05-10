@@ -1,6 +1,7 @@
 package com.jongsoft.finance.invoice.adapter.rest;
 
 import com.jongsoft.finance.RestTestSetup;
+import com.jongsoft.finance.extension.EnabledModules;
 import com.jongsoft.finance.extension.PledgerContext;
 import com.jongsoft.finance.extension.PledgerRequests;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +13,9 @@ import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
 
+@EnabledModules("INVOICE")
 @DisplayName("Regression - Invoices")
-public class InvoiceTest extends RestTestSetup {
+class InvoiceTest extends RestTestSetup {
 
     @Test
     @DisplayName("Create invoice with line, finalize, and find by number")

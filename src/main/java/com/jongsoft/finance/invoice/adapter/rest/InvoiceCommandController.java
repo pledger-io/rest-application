@@ -4,6 +4,7 @@ import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.invoice.adapter.api.InvoiceProvider;
 import com.jongsoft.finance.invoice.adapter.api.InvoiceTemplateProvider;
 import com.jongsoft.finance.invoice.adapter.api.TaxBracketProvider;
+import com.jongsoft.finance.invoice.annotations.InvoiceModuleEnabled;
 import com.jongsoft.finance.invoice.domain.model.Invoice;
 import com.jongsoft.finance.project.adapter.api.ClientProvider;
 import com.jongsoft.finance.project.adapter.api.TimeEntryProvider;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 
 @Controller
+@InvoiceModuleEnabled
 class InvoiceCommandController implements InvoiceCommandApi {
 
     private final Logger logger;

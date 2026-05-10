@@ -23,6 +23,7 @@ import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.core.domain.commands.InternalAuthenticationEvent;
+import com.jongsoft.finance.exporter.annotations.ExporterModuleEnabled;
 import com.jongsoft.finance.rest.ExportApi;
 import com.jongsoft.finance.rest.model.*;
 import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleGroupProvider;
@@ -44,6 +45,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Controller
+@ExporterModuleEnabled
 public class ExportController implements ExportApi {
     private final Logger log = LoggerFactory.getLogger(ExportController.class);
 

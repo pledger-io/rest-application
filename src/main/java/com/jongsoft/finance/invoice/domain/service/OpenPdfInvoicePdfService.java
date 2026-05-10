@@ -3,6 +3,7 @@ package com.jongsoft.finance.invoice.domain.service;
 import com.jongsoft.finance.core.adapter.api.LocalizationCatalog;
 import com.jongsoft.finance.core.adapter.api.StorageService;
 import com.jongsoft.finance.invoice.adapter.api.InvoicePdfService;
+import com.jongsoft.finance.invoice.annotations.InvoiceModuleEnabled;
 import com.jongsoft.finance.invoice.domain.model.Invoice;
 import com.jongsoft.finance.invoice.domain.model.InvoiceLine;
 import com.jongsoft.finance.project.domain.model.Client;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 
 @Singleton
+@InvoiceModuleEnabled
 class OpenPdfInvoicePdfService implements InvoicePdfService {
 
     private static final Color BRAND_BLUE = new Color(37, 99, 235);

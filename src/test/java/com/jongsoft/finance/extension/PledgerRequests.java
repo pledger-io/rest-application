@@ -31,6 +31,15 @@ public class PledgerRequests {
         authenticatedUser = username;
     }
 
+    public PledgerRequests refresh() {
+        given(requestSpecification)
+            .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+            .post("/refresh")
+            .then()
+            .statusCode(200);
+        return this;
+    }
+
     public ValidatableResponse createBankAccount(Map<String, String> bankAccount) {
         return given(requestSpecification)
                 .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))

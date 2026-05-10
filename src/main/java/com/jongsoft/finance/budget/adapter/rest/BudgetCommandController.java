@@ -2,6 +2,7 @@ package com.jongsoft.finance.budget.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.budget.adapter.api.BudgetProvider;
+import com.jongsoft.finance.budget.annotations.BudgetModuleEnabled;
 import com.jongsoft.finance.budget.domain.model.Budget;
 import com.jongsoft.finance.rest.BudgetCommandApi;
 import com.jongsoft.finance.rest.model.BudgetRequest;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Controller
+@BudgetModuleEnabled
 class BudgetCommandController implements BudgetCommandApi {
 
     private final Logger logger;

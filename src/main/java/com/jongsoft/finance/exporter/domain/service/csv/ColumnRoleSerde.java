@@ -1,5 +1,7 @@
 package com.jongsoft.finance.exporter.domain.service.csv;
 
+import com.jongsoft.finance.exporter.annotations.ExporterModuleEnabled;
+
 import io.micronaut.core.type.Argument;
 import io.micronaut.serde.Decoder;
 import io.micronaut.serde.Encoder;
@@ -10,6 +12,7 @@ import jakarta.inject.Singleton;
 import java.io.IOException;
 
 @Singleton
+@ExporterModuleEnabled
 class ColumnRoleSerde implements Serde<ColumnRole> {
     @Override
     public ColumnRole deserialize(

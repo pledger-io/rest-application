@@ -2,6 +2,7 @@ package com.jongsoft.finance.classification.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.classification.adapter.api.CategoryProvider;
+import com.jongsoft.finance.classification.annotations.ClassificationModuleEnabled;
 import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.rest.CategoryFetcherApi;
 import com.jongsoft.finance.rest.model.CategoryPagedResponse;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
+@ClassificationModuleEnabled
 class CategoryFetcherController implements CategoryFetcherApi {
 
     private final Logger logger;

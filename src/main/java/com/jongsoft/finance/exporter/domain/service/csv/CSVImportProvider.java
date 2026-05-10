@@ -2,6 +2,7 @@ package com.jongsoft.finance.exporter.domain.service.csv;
 
 import com.jongsoft.finance.banking.types.TransactionType;
 import com.jongsoft.finance.core.adapter.api.StorageService;
+import com.jongsoft.finance.exporter.annotations.ExporterModuleEnabled;
 import com.jongsoft.finance.exporter.domain.model.BatchImport;
 import com.jongsoft.finance.exporter.domain.model.BatchImportConfig;
 import com.jongsoft.finance.exporter.domain.model.ImporterConfiguration;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.function.Function;
 
 @Singleton
+@ExporterModuleEnabled
 class CSVImportProvider implements ImporterProvider<CSVConfiguration> {
     private final Logger logger = LoggerFactory.getLogger(CSVImportProvider.class);
 

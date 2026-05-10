@@ -4,6 +4,7 @@ import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.banking.types.TransactionLinkType;
 import com.jongsoft.finance.budget.adapter.api.ExpenseProvider;
+import com.jongsoft.finance.budget.annotations.BudgetModuleEnabled;
 import com.jongsoft.finance.budget.domain.jpa.entity.ExpenseJpa;
 import com.jongsoft.finance.budget.domain.jpa.filter.ExpenseFilterCommand;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
@@ -19,6 +20,7 @@ import jakarta.inject.Singleton;
 
 @ReadOnly
 @Singleton
+@BudgetModuleEnabled
 public class ExpenseProviderJpa
         implements ExpenseProvider, LinkableProvider<EntityRef.NamedEntity> {
 

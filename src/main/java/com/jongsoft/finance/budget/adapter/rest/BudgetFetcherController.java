@@ -5,6 +5,7 @@ import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.budget.adapter.api.BudgetProvider;
 import com.jongsoft.finance.budget.adapter.api.ExpenseProvider;
+import com.jongsoft.finance.budget.annotations.BudgetModuleEnabled;
 import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.rest.BudgetFetcherApi;
 import com.jongsoft.finance.rest.model.BudgetResponse;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@BudgetModuleEnabled
 class BudgetFetcherController implements BudgetFetcherApi {
 
     private final Logger logger;

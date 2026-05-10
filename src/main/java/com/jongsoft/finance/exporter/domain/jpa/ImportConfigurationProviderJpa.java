@@ -3,6 +3,7 @@ package com.jongsoft.finance.exporter.domain.jpa;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.exporter.adapter.api.ImportConfigurationProvider;
+import com.jongsoft.finance.exporter.annotations.ExporterModuleEnabled;
 import com.jongsoft.finance.exporter.domain.jpa.entity.ImportConfig;
 import com.jongsoft.finance.exporter.domain.jpa.mapper.ImportConfigMapper;
 import com.jongsoft.finance.exporter.domain.model.BatchImportConfig;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 @ReadOnly
 @Singleton
+@ExporterModuleEnabled
 class ImportConfigurationProviderJpa implements ImportConfigurationProvider {
 
     private final Logger log = LoggerFactory.getLogger(ImportConfigurationProviderJpa.class);

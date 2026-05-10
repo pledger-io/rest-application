@@ -1,5 +1,6 @@
 package com.jongsoft.finance.budget.domain.service.ai;
 
+import com.jongsoft.finance.budget.annotations.BudgetModuleEnabled;
 import com.jongsoft.finance.budget.domain.service.tools.BudgetTool;
 
 import dev.langchain4j.agentic.AgenticServices;
@@ -11,6 +12,7 @@ import io.micronaut.context.annotation.Factory;
 import io.micronaut.context.annotation.Requires;
 
 @Factory
+@BudgetModuleEnabled
 @Requires(env = "ai")
 class BudgetAgentFactory {
 

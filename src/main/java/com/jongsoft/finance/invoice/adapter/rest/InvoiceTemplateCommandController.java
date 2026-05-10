@@ -2,6 +2,7 @@ package com.jongsoft.finance.invoice.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.invoice.adapter.api.InvoiceTemplateProvider;
+import com.jongsoft.finance.invoice.annotations.InvoiceModuleEnabled;
 import com.jongsoft.finance.invoice.domain.model.InvoiceTemplate;
 import com.jongsoft.finance.rest.InvoiceTemplateCommandApi;
 import com.jongsoft.finance.rest.model.InvoiceTemplateRequest;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
+@InvoiceModuleEnabled
 class InvoiceTemplateCommandController implements InvoiceTemplateCommandApi {
 
     private final Logger logger;

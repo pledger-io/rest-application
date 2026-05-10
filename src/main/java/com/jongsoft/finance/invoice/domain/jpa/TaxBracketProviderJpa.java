@@ -3,6 +3,7 @@ package com.jongsoft.finance.invoice.domain.jpa;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.invoice.adapter.api.TaxBracketProvider;
+import com.jongsoft.finance.invoice.annotations.InvoiceModuleEnabled;
 import com.jongsoft.finance.invoice.domain.jpa.entity.TaxBracketJpa;
 import com.jongsoft.finance.invoice.domain.jpa.mapper.TaxBracketMapper;
 import com.jongsoft.finance.invoice.domain.model.TaxBracket;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 @ReadOnly
 @Singleton
+@InvoiceModuleEnabled
 class TaxBracketProviderJpa implements TaxBracketProvider {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 

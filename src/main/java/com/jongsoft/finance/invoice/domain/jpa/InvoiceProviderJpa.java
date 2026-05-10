@@ -3,6 +3,7 @@ package com.jongsoft.finance.invoice.domain.jpa;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.domain.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.invoice.adapter.api.InvoiceProvider;
+import com.jongsoft.finance.invoice.annotations.InvoiceModuleEnabled;
 import com.jongsoft.finance.invoice.domain.jpa.entity.InvoiceJpa;
 import com.jongsoft.finance.invoice.domain.jpa.mapper.InvoiceMapper;
 import com.jongsoft.finance.invoice.domain.model.Invoice;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 @ReadOnly
 @Singleton
+@InvoiceModuleEnabled
 class InvoiceProviderJpa implements InvoiceProvider {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 

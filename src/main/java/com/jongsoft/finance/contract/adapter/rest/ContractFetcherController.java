@@ -2,6 +2,7 @@ package com.jongsoft.finance.contract.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.contract.adapter.api.ContractProvider;
+import com.jongsoft.finance.contract.annotations.ContractModuleEnabled;
 import com.jongsoft.finance.rest.ContractFetcherApi;
 import com.jongsoft.finance.rest.model.ContractResponse;
 import com.jongsoft.finance.rest.model.FindContractByStatusParameter;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Controller
+@ContractModuleEnabled
 public class ContractFetcherController implements ContractFetcherApi {
 
     private final Logger logger;

@@ -8,6 +8,7 @@ import com.jongsoft.finance.core.domain.commands.InternalAuthenticationEvent;
 import com.jongsoft.finance.core.domain.model.UserAccount;
 import com.jongsoft.finance.core.value.WithId;
 import com.jongsoft.finance.exporter.adapter.api.ImportProvider;
+import com.jongsoft.finance.exporter.annotations.ExporterModuleEnabled;
 import com.jongsoft.finance.exporter.domain.model.BatchImport;
 import com.jongsoft.finance.exporter.domain.service.transaction.ImportProcess;
 import com.jongsoft.lang.Control;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Singleton
+@ExporterModuleEnabled
 class ImportSchedule {
     private final Logger log = LoggerFactory.getLogger(ImportSchedule.class);
 

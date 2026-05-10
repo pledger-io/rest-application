@@ -43,9 +43,8 @@ public class PledgerTestExtension implements ParameterResolver, BeforeAllCallbac
     @Override
     public void beforeAll(ExtensionContext context) {
         var store = context.getRoot()
-              .getStore(ExtensionContext.Namespace.create(MicronautJunit5Extension.class));
+            .getStore(ExtensionContext.Namespace.create(MicronautJunit5Extension.class));
         var applicationContext = store.get(ApplicationContext.class, ApplicationContext.class);
-
         applicationContext.registerSingleton(Encoder.class, new Encoder() {
             @Override
             public String encrypt(String value) {

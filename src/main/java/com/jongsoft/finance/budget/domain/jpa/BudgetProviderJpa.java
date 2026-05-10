@@ -3,6 +3,7 @@ package com.jongsoft.finance.budget.domain.jpa;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.jongsoft.finance.budget.adapter.api.BudgetProvider;
+import com.jongsoft.finance.budget.annotations.BudgetModuleEnabled;
 import com.jongsoft.finance.budget.domain.jpa.entity.BudgetJpa;
 import com.jongsoft.finance.budget.domain.jpa.mapper.BudgetMapper;
 import com.jongsoft.finance.budget.domain.model.Budget;
@@ -23,6 +24,7 @@ import java.time.temporal.ChronoUnit;
 
 @ReadOnly
 @Singleton
+@BudgetModuleEnabled
 class BudgetProviderJpa implements BudgetProvider {
 
     private final Logger logger = getLogger(BudgetProviderJpa.class);

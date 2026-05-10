@@ -1,6 +1,7 @@
 package com.jongsoft.finance.contract.domain.service;
 
 import com.jongsoft.finance.contract.adapter.api.ContractProvider;
+import com.jongsoft.finance.contract.annotations.ContractModuleEnabled;
 import com.jongsoft.finance.contract.domain.model.Contract;
 import com.jongsoft.finance.core.adapter.api.UserProvider;
 import com.jongsoft.finance.core.adapter.mail.MailDaemon;
@@ -21,6 +22,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 @Singleton
+@ContractModuleEnabled
 class ContractExpireSchedule {
 
     private final Logger log = LoggerFactory.getLogger(ContractExpireSchedule.class);

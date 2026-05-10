@@ -2,6 +2,7 @@ package com.jongsoft.finance.classification.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.classification.adapter.api.CategoryProvider;
+import com.jongsoft.finance.classification.annotations.ClassificationModuleEnabled;
 import com.jongsoft.finance.classification.domain.model.Category;
 import com.jongsoft.finance.rest.CategoryCommandApi;
 import com.jongsoft.finance.rest.model.CategoryRequest;
@@ -16,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Controller
+@ClassificationModuleEnabled
 class CategoryCommandController implements CategoryCommandApi {
 
     private final Logger logger;
