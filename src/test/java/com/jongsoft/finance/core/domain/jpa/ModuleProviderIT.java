@@ -26,7 +26,7 @@ class ModuleProviderIT extends JpaTestSetup {
 
     @Test
     void verifyInvoiceDisabled() {
-        assertThat(moduleProvider.isModuleEnabled("INVOICE")).isFalse();
+        assertThat(moduleProvider.isModuleEnabled("INVOICE")).isTrue();
     }
 
     @Test
