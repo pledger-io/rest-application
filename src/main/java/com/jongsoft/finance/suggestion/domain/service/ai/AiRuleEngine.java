@@ -16,6 +16,7 @@ import com.jongsoft.finance.core.domain.commands.InternalAuthenticationEvent;
 import com.jongsoft.finance.core.domain.model.UserAccount;
 import com.jongsoft.finance.core.domain.service.vector.PledgerVectorStore;
 import com.jongsoft.finance.suggestion.adapter.api.SuggestionEngine;
+import com.jongsoft.finance.suggestion.adapter.api.SuggestionEngine.AI;
 import com.jongsoft.finance.suggestion.domain.model.SuggestionInput;
 import com.jongsoft.finance.suggestion.domain.model.SuggestionResult;
 import com.jongsoft.finance.suggestion.domain.service.vector.ClassificationVectorStore;
@@ -44,6 +45,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@AI
 @Singleton
 class AiRuleEngine implements SuggestionEngine {
     private final Logger log = LoggerFactory.getLogger(AiRuleEngine.class);

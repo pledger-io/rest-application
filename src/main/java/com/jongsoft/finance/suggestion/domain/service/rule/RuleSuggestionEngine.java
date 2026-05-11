@@ -1,6 +1,7 @@
 package com.jongsoft.finance.suggestion.domain.service.rule;
 
 import com.jongsoft.finance.suggestion.adapter.api.SuggestionEngine;
+import com.jongsoft.finance.suggestion.adapter.api.SuggestionEngine.Rule;
 import com.jongsoft.finance.suggestion.adapter.api.TransactionRuleProvider;
 import com.jongsoft.finance.suggestion.domain.model.SuggestionInput;
 import com.jongsoft.finance.suggestion.domain.model.SuggestionResult;
@@ -15,6 +16,7 @@ import jakarta.inject.Singleton;
 
 import java.util.List;
 
+@Rule
 @Singleton
 class RuleSuggestionEngine implements SuggestionEngine {
 
