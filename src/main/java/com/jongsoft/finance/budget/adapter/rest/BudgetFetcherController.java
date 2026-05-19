@@ -62,7 +62,7 @@ class BudgetFetcherController implements BudgetFetcherApi {
                 .getOrThrow(() ->
                         StatusException.badRequest("Cannot fetch expenses, no budget found."));
 
-        var dateRange = Dates.range(LocalDate.of(year, month, 1), ChronoUnit.YEARS);
+        var dateRange = Dates.range(LocalDate.of(year, month, 1), ChronoUnit.MONTHS);
         var days = (int) ChronoUnit.DAYS.between(dateRange.from(), dateRange.until());
 
         var computedExpenses = new ArrayList<ExpenseComputedResponse>();
