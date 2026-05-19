@@ -3,7 +3,7 @@ rootProject.name="pledger-io"
 pluginManagement {
     plugins {
         id("java")
-        id("io.micronaut.library").version("4.6.2")
+        id("io.micronaut.library").version("5.0.0")
         id("io.micronaut.application").version("4.6.2")
         id("org.sonarqube").version("7.3.0.8198")
         id("com.diffplug.spotless").version("8.5.1")
