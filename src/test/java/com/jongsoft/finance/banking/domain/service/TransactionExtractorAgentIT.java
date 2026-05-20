@@ -4,7 +4,6 @@ import static org.mockito.Mockito.doReturn;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.JsonParseException;
 import com.jongsoft.finance.AiBase;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
@@ -56,7 +55,7 @@ class TransactionExtractorAgentIT extends AiBase {
     private void testExtractionForLanguage(String language) throws IOException {
         var inputStream = getClass()
                 .getResourceAsStream("/banking/%s/extractor-data.json".formatted(language));
-        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+        ObjectMapper objectMapper = new ObjectMapper(); // registerModule(new JavaTimeModule());
         List<ExtractorTestCase> testCases =
                 objectMapper.readValue(inputStream, new TypeReference<>() {});
 

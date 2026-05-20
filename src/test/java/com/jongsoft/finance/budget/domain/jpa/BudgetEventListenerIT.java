@@ -5,7 +5,6 @@ import com.jongsoft.finance.budget.domain.commands.CloseBudgetCommand;
 import com.jongsoft.finance.budget.domain.commands.CreateBudgetCommand;
 import com.jongsoft.finance.budget.domain.commands.CreateExpenseCommand;
 import com.jongsoft.finance.budget.domain.jpa.entity.BudgetJpa;
-import com.jongsoft.finance.core.domain.AuthenticationFacade;
 
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -24,9 +23,6 @@ import java.util.List;
 class BudgetEventListenerIT extends JpaTestSetup {
 
     @Inject
-    private AuthenticationFacade authenticationFacade;
-
-    @Inject
     private EntityManager entityManager;
 
     @BeforeEach
@@ -37,7 +33,7 @@ class BudgetEventListenerIT extends JpaTestSetup {
     @Test
     @DisplayName("Create new budget")
     void handleBudgetCreatedEvent() {
-        Mockito.when(authenticationFacade.authenticated()).thenReturn("demo-user-not");
+        Mockito.doReturn("demo-user-not").when(authenticationFacade).authenticated();
         CreateBudgetCommand.budgetCreated(
                 2500,
                 LocalDate.of(2018, 1, 1),

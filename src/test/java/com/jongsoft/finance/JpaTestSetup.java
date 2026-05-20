@@ -1,6 +1,5 @@
 package com.jongsoft.finance;
 
-import com.jongsoft.finance.core.adapter.api.CurrentUserProvider;
 import com.jongsoft.finance.core.adapter.api.Encoder;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import io.micronaut.context.annotation.Replaces;
@@ -22,7 +21,7 @@ import java.io.InputStreamReader;
 
 @Tag("database")
 @MicronautTest(
-        environments = {"jpa", "h2", "test", "test-jpa"}, startApplication = false)
+        environments = {"jpa", "h2", "test", "test-jpa"}, startApplication = false, rebuildContext = true)
 public abstract class JpaTestSetup {
 
     private final Logger log;
@@ -31,7 +30,7 @@ public abstract class JpaTestSetup {
     private EntityManager entityManager;
 
     @Inject
-    private AuthenticationFacade authenticationFacade;
+    protected AuthenticationFacade authenticationFacade;
 
     public JpaTestSetup() {
         this.log = LoggerFactory.getLogger(getClass());
@@ -45,7 +44,7 @@ public abstract class JpaTestSetup {
     protected void loadDataset(String... files) {
         try {
             for (String file : files) {
-                log.info("Loading dataset file " + file);
+                log.info("Loading dataset file {}", file);
 
                 var stream = getClass().getClassLoader().getResourceAsStream(file);
                 if (stream == null) {
@@ -68,7 +67,7 @@ public abstract class JpaTestSetup {
     }
 
     @MockBean
-    @Replaces
+    @Replaces(AuthenticationFacade.class)
     public AuthenticationFacade authenticationFacade() {
         return Mockito.mock(AuthenticationFacade.class);
     }
