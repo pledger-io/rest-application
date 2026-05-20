@@ -690,6 +690,28 @@ public class PledgerRequests {
                 .ifValidationFails();
     }
 
+    public ValidatableResponse fetchAttachment(String fileCode) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .log()
+                .ifValidationFails()
+                .get("/v2/api/files/" + fileCode)
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
+    public ValidatableResponse deleteAttachment(String fileCode) {
+        return given(requestSpecification)
+                .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+                .log()
+                .ifValidationFails()
+                .delete("/v2/api/files/" + fileCode)
+                .then()
+                .log()
+                .ifValidationFails();
+    }
+
     public ValidatableResponse createBatchConfig(String name, String type, String fileCode) {
         return given(requestSpecification)
                 .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))

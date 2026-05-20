@@ -11,6 +11,12 @@ plugins {
     id("pl.allegro.tech.build.axion-release") version "1.21.1"
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+    }
+}
+
 sonar {
     properties {
         property("sonar.projectKey", "pledger-io_rest-application")

@@ -1,9 +1,12 @@
 package com.jongsoft.finance.core.adapter.rest;
 
+import com.jongsoft.finance.RestTestSetup;
 import com.jongsoft.finance.core.domain.AuthenticationFacade;
 import com.jongsoft.finance.core.adapter.api.UserProvider;
 import com.jongsoft.finance.core.domain.model.UserAccount;
 import com.jongsoft.finance.core.value.UserIdentifier;
+import com.jongsoft.finance.extension.PledgerContext;
+import com.jongsoft.finance.extension.PledgerRequests;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
@@ -24,70 +27,34 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Regression - File Upload")
-@MicronautTest(environments = {"jpa", "h2", "test", "test-jpa"})
-public class FileTest {
+class FileTest extends RestTestSetup {
 
-  @Inject
-  private UserProvider userProvider;
+    @Test
+    @DisplayName("Upload a file and check it can be retrieved")
+    void uploadAndCheckFile(PledgerContext context, PledgerRequests requests) throws IOException {
+        context.withUser("file-upload-test@account.local").withStorage();
+        requests.authenticate("file-upload-test@account.local");
 
-  @Replaces
-  @MockBean
-  public AuthenticationFacade authenticationFacade() {
-    var mockedFacade = mock(AuthenticationFacade.class);
-    when(mockedFacade.authenticated()).thenReturn("test@account.local");
-    return mockedFacade;
-  }
+        String fileCode =
+                requests.createAttachment("/logback.xml")
+                        .statusCode(201)
+                        .body("fileCode", notNullValue())
+                        .extract()
+                        .body()
+                        .jsonPath()
+                        .getString("fileCode");
 
-  @BeforeEach
-  void setupUserAccount() {
-    userProvider.lookup(new UserIdentifier("test@account.local"))
-        .ifNotPresent(() -> UserAccount.create("test@account.local", "test123"));
-  }
+        byte[] fileContent =
+                requests.fetchAttachment(fileCode).statusCode(200)
+                    .extract().body().asByteArray();
 
-  @Test
-  @DisplayName("Upload a file and check it can be retrieved")
-  void uploadAndCheckFile(RequestSpecification spec) throws IOException {
-    var file = getClass().getResource("/logback.xml").getFile();
+        var expected = getClass().getResourceAsStream("/logback.xml").readAllBytes();
+        assertThat(fileContent).containsExactly(expected);
 
-    var fileCode =
-      given(spec)
-        .multiPart("upload", new File(file))
-      .when()
-        .post("/v2/api/files")
-      .then()
-        .log().ifError()
-        .statusCode(201)
-        .body("fileCode", notNullValue())
-        .extract()
-        .jsonPath()
-        .getString("fileCode");
+        requests.deleteAttachment(fileCode)
+                .statusCode(204);
 
-    var fileContent = given(spec)
-        .pathParam("fileCode", fileCode)
-      .when()
-        .get("/v2/api/files/{fileCode}")
-      .then()
-        .statusCode(200)
-        .extract()
-        .asByteArray();
-
-    var expected = Files.readAllBytes(new File(file).toPath());
-    assertThat(fileContent)
-        .containsExactly(expected);
-
-    given(spec)
-        .pathParam("fileCode", fileCode)
-        .delete("/v2/api/files/{fileCode}")
-      .then()
-        .statusCode(204);
-
-    given(spec)
-        .log().ifValidationFails()
-        .pathParam("fileCode", fileCode)
-      .when()
-        .get("/v2/api/files/{fileCode}")
-      .then()
-        .log().ifValidationFails()
-        .statusCode(404);
-  }
+        requests.fetchAttachment(fileCode)
+                .statusCode(404);
+    }
 }

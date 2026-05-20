@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 @MicronautTest(environments = {"jpa", "h2", "test", "test-jpa"})
 public class CurrencyTest {
 
-  @Replaces
+  @Replaces(AuthenticationFacade.class)
   @MockBean
   public AuthenticationFacade authenticationFacade() {
     var mockedFacade = mock(AuthenticationFacade.class);

@@ -45,7 +45,7 @@ class CSVImportProviderTest extends JpaTestSetup {
     private StorageService storageService;
 
     @MockBean
-    @Replaces
+    @Replaces(StorageService.class)
     StorageService storageService() {
         return Mockito.mock(StorageService.class);
     }
