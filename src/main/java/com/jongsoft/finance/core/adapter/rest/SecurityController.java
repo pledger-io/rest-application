@@ -67,7 +67,7 @@ class SecurityController implements SecurityApi {
                 .get();
         Properties registrationProperties = new Properties();
         registrationProperties.put("user", userAccount);
-        mailDaemon.send(userAccount.getUsername().email(), "registered", registrationProperties);
+        mailDaemon.send(userAccount.getUsername().email(), "user-registered", registrationProperties);
 
         return HttpResponse.noContent();
     }
