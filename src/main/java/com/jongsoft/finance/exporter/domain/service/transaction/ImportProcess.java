@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ImportProcess {
@@ -174,17 +175,17 @@ public class ImportProcess {
     }
 
     private ProcessingStage processAccountMapping(ImporterProvider<?> relevantProvider) {
-        var transactions = readTransactions(relevantProvider);
-        if (transactions.isEmpty()) {
+        Consumer<TransactionDTO> accountExtractor = transaction -> {
+            importContext.addMapping(
+                    transaction.opposingName(), accountResolver.apply(transaction.opposingName()));
+        };
+
+        readTransactions(accountExtractor, relevantProvider);
+        if (importContext.getAccountMapping().isEmpty()) {
             log.debug("No transactions found, re-starting configuration process.");
             importContext.waitForUser();
             return ProcessingStage.CONFIGURATION;
         }
-
-        transactions.stream()
-                .map(TransactionDTO::opposingName)
-                .distinct()
-                .forEach(name -> importContext.addMapping(name, accountResolver.apply(name)));
 
         if (importContext.hasMissingAccounts()) {
             log.debug("Missing accounts: {}", importContext.getAccountMapping().size());
@@ -213,7 +214,8 @@ public class ImportProcess {
             Function<Long, String> locateCurrency,
             TransactionCreationHandler transactionCreationHandler) {
         String currency = locateCurrency.apply(importContext.getConfiguration().accountId());
-        for (TransactionDTO transaction : readTransactions(relevantProvider)) {
+
+        Consumer<TransactionDTO> importJob = transaction -> {
             long accountId = importContext.locateAccount(transaction.opposingName());
 
             var transactionId =
@@ -231,18 +233,19 @@ public class ImportProcess {
             if (importContext.getConfiguration().applyRules()) {
                 ApplyTransactionRulesCommand.applyTransactionRules(transactionId);
             }
-        }
+        };
+
+        readTransactions(importJob, relevantProvider);
 
         batchImport.finish(new Date());
         return ProcessingStage.COMPLETED;
     }
 
-    private List<TransactionDTO> readTransactions(ImporterProvider<?> relevantProvider) {
-        List<TransactionDTO> transactions = new ArrayList<>();
+    private void readTransactions(
+            Consumer<TransactionDTO> consumer, ImporterProvider<?> relevantProvider) {
         relevantProvider.readTransactions(
-                transactions::add,
+                consumer::accept,
                 importContext.getConfiguration().importerConfiguration(),
                 batchImport);
-        return transactions;
     }
 }

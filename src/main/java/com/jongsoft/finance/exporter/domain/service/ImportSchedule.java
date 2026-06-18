@@ -51,7 +51,7 @@ class ImportSchedule {
         this.transactionCreationHandler = transactionCreationHandler;
     }
 
-    @Scheduled(fixedRate = "${application.schedules.exporter.import.rate}")
+    @Scheduled(fixedRate = "${application.schedules.exporter.import.rate}", scheduler = "importer")
     void execute() {
         for (UserAccount userAccount : userProvider.lookup()) {
             MDC.put("correlationId", UUID.randomUUID().toString());
