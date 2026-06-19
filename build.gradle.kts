@@ -8,7 +8,7 @@ plugins {
     id("jacoco")
     id("io.micronaut.openapi")
 
-    id("pl.allegro.tech.build.axion-release") version "1.21.1"
+    id("pl.allegro.tech.build.axion-release") version "1.21.2"
 }
 
 java {
