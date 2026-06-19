@@ -2,6 +2,7 @@ package com.jongsoft.finance.exporter.adapter.rest;
 
 import static java.util.Optional.ofNullable;
 
+import com.jongsoft.finance.StatusException;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.TagProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
@@ -310,7 +311,12 @@ public class ExportController implements ExportApi {
     }
 
     private String loadFromEncryptedStorage(String fileToken) {
-        var bytes = storageService.read(fileToken).getOrSupply(() -> new byte[0]);
-        return Hex.toHexString(bytes);
+        try {
+            var bytes = storageService.read(fileToken).getOrSupply(() -> new byte[0]);
+            return Hex.toHexString(bytes);
+        } catch (StatusException e) {
+            log.error("Failed to load file from encrypted storage.", e);
+            return null;
+        }
     }
 }
