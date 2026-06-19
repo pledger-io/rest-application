@@ -3,11 +3,11 @@ rootProject.name="pledger-io"
 pluginManagement {
     plugins {
         id("java")
-        id("io.micronaut.application").version("5.0.0")
-        id("io.micronaut.library").version("5.0.0")
-        id("org.sonarqube").version("7.3.0.8198")
+        id("io.micronaut.application").version("5.0.1")
+        id("io.micronaut.library").version("5.0.1")
+        id("org.sonarqube").version("7.3.1.8318")
         id("com.diffplug.spotless").version("8.7.0")
-        id("io.micronaut.openapi").version("5.0.0")
+        id("io.micronaut.openapi").version("5.0.1")
 
         id("signing")
         id("maven-publish")
