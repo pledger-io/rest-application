@@ -11,7 +11,7 @@ jobs:
   check-software:
     runs-on: ubuntu-latest
     steps:
-     - uses: actions/checkout@v6
+     - uses: actions/checkout@v7
      - name: Configure Java version
        uses: actions/setup-java@v5
        with:
