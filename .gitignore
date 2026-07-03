@@ -13,3 +13,4 @@ out/
 .classpath
 dist/
 node_modules/
+.run
