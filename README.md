@@ -8,13 +8,13 @@
 
 -----------------------
 
-**[Read the documentation](https://www.pledger.io/)**
+**[Product documentation](https://www.pledger.io/)** · **[Backend technical docs](docs/README.md)**
 
 -----------------------
 
 ## About Pledger.io
 Pledger.io is a "self hosted" application that helps in keeping track of your personal finances.
-It helps you keep track of your income and expenses to allow you to spend less many and save more.
+It helps you keep track of your income and expenses to allow you to spend less money and save more.
 
 Using Pledger.io you can keep track of your income vs spending as well as your credit card expenses.
 Pledger.io has the following features:
@@ -34,8 +34,8 @@ In this repository you will find the backend REST application needed to run Pled
 
 To build the application the following needs to be present on your local PC:
 
-* JDK 21 or higher
-* GIT for completing the checkout
+* JDK 25 (Temurin or compatible; matches CI)
+* Git for completing the checkout
 
 You can build the application using the Gradle command:
 
@@ -43,8 +43,16 @@ You can build the application using the Gradle command:
 
 ### Running the backend
 
-The generated phat JAR in the ```fintrack-api``` module can be started, which will run the backend of Pledger.io. To access the
-API documentation use the url:
+Run from Gradle (demo profile with in-memory H2):
+
+    ./gradlew run -Dmicronaut.environments=jpa,demo
+
+Or start the fat JAR produced under `build/libs/` (artifact name `pledger-io`):
+
+    java -jar build/libs/pledger-io-*.jar
+
+To access the API documentation use the url:
 
     http://localhost:8080/spec/index.html
 
+For architecture, ADRs, and further setup notes see [docs/](https://www.pledger.io/architecture/).

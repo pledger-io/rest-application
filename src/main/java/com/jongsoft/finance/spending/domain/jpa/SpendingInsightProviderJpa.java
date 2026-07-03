@@ -102,8 +102,7 @@ public class SpendingInsightProviderJpa implements SpendingInsightProvider {
         // Convert metadata to string values
         Map<String, String> metadata = new HashMap<>();
         for (Map.Entry<String, Object> entry : command.metadata().entrySet()) {
-            metadata.put(
-                    entry.getKey(), entry.getValue() != null ? entry.getValue().toString() : null);
+            metadata.put(entry.getKey(), InsightMetadataSerializer.serialize(entry.getValue()));
         }
 
         // Create the JPA entity

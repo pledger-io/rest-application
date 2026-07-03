@@ -14,5 +14,10 @@ public interface Detector<T extends Insight> {
 
     List<T> detect(Transaction transaction);
 
+    /** Month-level insights derived from a complete month of transactions. */
+    default List<T> detectForMonth(YearMonth month, List<Transaction> transactions) {
+        return List.of();
+    }
+
     boolean readyForAnalysis();
 }

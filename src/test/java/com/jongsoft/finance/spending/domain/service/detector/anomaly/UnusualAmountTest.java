@@ -7,6 +7,7 @@ import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.Classifier;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.banking.domain.model.Transaction;
+import com.jongsoft.finance.configuration.SpendingAnalysisConfiguration;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
 import com.jongsoft.finance.spending.types.Severity;
 
@@ -21,6 +22,7 @@ import java.util.Optional;
 @Tag("unit")
 @DisplayName("Unit - Unusual Amount")
 class UnusualAmountTest {
+    private final SpendingAnalysisConfiguration configuration = new SpendingAnalysisConfiguration();
 
     /**
      * This test class validates the `detect` method in UnusualAmount.
@@ -35,7 +37,7 @@ class UnusualAmountTest {
     @DisplayName("Should detect unusually high amount")
     void shouldDetectUnusuallyHighAmount() {
         // Arrange
-        UnusualAmount unusualAmount = new UnusualAmount();
+        UnusualAmount unusualAmount = new UnusualAmount(configuration);
 
         Transaction transaction = mock(Transaction.class);
         doReturn(forExpense("Groceries")).when(transaction).getMetadata();
@@ -79,7 +81,7 @@ class UnusualAmountTest {
     @DisplayName("Should detect unusually low amount")
     void shouldDetectUnusuallyLowAmount() {
         // Arrange
-        UnusualAmount unusualAmount = new UnusualAmount();
+        UnusualAmount unusualAmount = new UnusualAmount(configuration);
 
         Transaction transaction = mock(Transaction.class);
         doReturn(forExpense("Utilities")).when(transaction).getMetadata();
@@ -119,7 +121,7 @@ class UnusualAmountTest {
     @DisplayName("Do not detect unusually low amount when within normal range")
     void shouldNotDetectUnusualAmountWhenWithinNormalRange() {
         // Arrange
-        UnusualAmount unusualAmount = new UnusualAmount();
+        UnusualAmount unusualAmount = new UnusualAmount(configuration);
 
         Transaction transaction = mock(Transaction.class);
         doReturn(forExpense("Entertainment")).when(transaction).getMetadata();
@@ -152,7 +154,7 @@ class UnusualAmountTest {
     @DisplayName("Handle null statistics gracefully")
     void shouldHandleNullStatistics() {
         // Arrange
-        UnusualAmount unusualAmount = new UnusualAmount();
+        UnusualAmount unusualAmount = new UnusualAmount(configuration);
 
         Transaction transaction = mock(Transaction.class);
         doReturn(forExpense("Travel")).when(transaction).getMetadata();
@@ -173,7 +175,7 @@ class UnusualAmountTest {
     @DisplayName("Handle insufficient data gracefully")
     void shouldHandleInsufficientData() {
         // Arrange
-        UnusualAmount unusualAmount = new UnusualAmount();
+        UnusualAmount unusualAmount = new UnusualAmount(configuration);
 
         Transaction transaction = mock(Transaction.class);
         doReturn(forExpense("Dining")).when(transaction).getMetadata();

@@ -1,14 +1,12 @@
 package com.jongsoft.finance.spending.domain.service;
 
-import static com.jongsoft.finance.banking.types.TransactionLinkType.CATEGORY;
-import static com.jongsoft.finance.banking.types.TransactionLinkType.EXPENSE;
-
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
 import com.jongsoft.finance.banking.domain.model.Transaction;
 import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.spending.domain.commands.CleanInsightsForMonth;
 import com.jongsoft.finance.spending.domain.model.Insight;
 import com.jongsoft.finance.spending.domain.service.detector.Detector;
+import com.jongsoft.finance.spending.domain.service.detector.SpendingCategoryResolver;
 import com.jongsoft.lang.Dates;
 
 import io.micrometer.core.annotation.Timed;
@@ -21,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.YearMonth;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Singleton
 @SpendingAnalyticsEnabled
@@ -56,18 +55,21 @@ class AnalysisRunner {
                     .ownAccounts();
 
             var transactionInMonth =
-                    transactionProvider.lookup(transactionFilter).content();
-            if (transactionInMonth.isEmpty()) {
-                log.trace("No transactions found for {}, skipping analysis.", month);
-                return false;
-            }
+                    transactionProvider.lookup(transactionFilter).content().toJava();
 
             log.debug("Retrieved {} transactions for {}.", transactionInMonth.size(), month);
             transactionDetectors.forEach(detector -> detector.updateBaseline(month));
-            transactionInMonth.stream()
-                    .flatMap(t -> processTransaction(t).stream())
+
+            Stream<? extends Insight> monthLevelInsights = transactionDetectors.stream()
+                    .flatMap(detector ->
+                            detector.detectForMonth(month, transactionInMonth).stream());
+
+            Stream.concat(
+                            transactionInMonth.stream().flatMap(this::processTransaction),
+                            monthLevelInsights)
                     .distinct()
                     .forEach(Insight::signal);
+
             log.debug("Completed monthly spending analysis for {}.", month);
         } catch (Exception e) {
             log.error(
@@ -80,10 +82,9 @@ class AnalysisRunner {
         return true;
     }
 
-    private List<? extends Insight> processTransaction(Transaction transaction) {
-        if (!transaction.getMetadata().containsKey(CATEGORY.name())
-                && !transaction.getMetadata().containsKey(EXPENSE.name())) {
-            return List.of(); // Skip transactions without a category
+    private Stream<? extends Insight> processTransaction(Transaction transaction) {
+        if (!SpendingCategoryResolver.hasCategory(transaction)) {
+            return Stream.empty();
         }
 
         var insightList = new java.util.ArrayList<Insight>();
@@ -94,6 +95,6 @@ class AnalysisRunner {
                     detector.getClass().getSimpleName());
             insightList.addAll(detector.detect(transaction));
         }
-        return insightList;
+        return insightList.stream();
     }
 }

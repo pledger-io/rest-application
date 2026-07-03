@@ -41,6 +41,7 @@ class UnusualMerchantTest {
         Account merchantAccount = mock(Account.class);
         when(merchantAccount.getName()).thenReturn("New Merchant");
         when(transaction.computeTo()).thenReturn(merchantAccount);
+        when(transaction.computeAmount(merchantAccount)).thenReturn(150.0);
         doReturn(forExpense("Groceries")).when(transaction).getMetadata();
         when(transaction.getId()).thenReturn(123L);
 
@@ -53,6 +54,7 @@ class UnusualMerchantTest {
         Map<String, Set<String>> merchantMap = new HashMap<>();
         merchantMap.put("Groceries", typicalMerchants);
         when(statistics.typicalMerchants()).thenReturn(merchantMap);
+        when(statistics.amounts()).thenReturn(new UserCategoryStatistics.BudgetStatisticsMap());
 
         // Act
         Optional<SpendingInsight> result = unusualMerchant.detect(transaction, statistics);
@@ -96,6 +98,72 @@ class UnusualMerchantTest {
 
         // Assert
         assertFalse(result.isPresent());
+    }
+
+    @Test
+    @DisplayName("Do not detect unusual merchant when amount is below category mean")
+    void shouldNotDetectUnusualMerchantWhenAmountIsNotSignificant() {
+        UnusualMerchant unusualMerchant = new UnusualMerchant();
+
+        Transaction transaction = mock(Transaction.class);
+        Account merchantAccount = mock(Account.class);
+        when(merchantAccount.getName()).thenReturn("New Merchant");
+        when(transaction.computeTo()).thenReturn(merchantAccount);
+        when(transaction.computeAmount(merchantAccount)).thenReturn(5.0);
+        doReturn(forExpense("Groceries")).when(transaction).getMetadata();
+
+        UserCategoryStatistics statistics = new UserCategoryStatistics(12);
+        statistics.typicalMerchants().put("Groceries", java.util.Set.of("Supermarket"));
+
+        org.apache.commons.math3.stat.descriptive.DescriptiveStatistics amounts =
+                new org.apache.commons.math3.stat.descriptive.DescriptiveStatistics();
+        amounts.addValue(100.0);
+        amounts.addValue(120.0);
+        amounts.addValue(90.0);
+        amounts.addValue(110.0);
+        amounts.addValue(105.0);
+        statistics.amounts().put("Groceries", amounts);
+
+        assertFalse(unusualMerchant.detect(transaction, statistics).isPresent());
+    }
+
+    @Test
+    @DisplayName("Do not detect unusual merchant when computeTo is null")
+    void shouldNotDetectUnusualMerchantWhenMerchantAccountIsNull() {
+        UnusualMerchant unusualMerchant = new UnusualMerchant();
+
+        Transaction transaction = mock(Transaction.class);
+        when(transaction.computeTo()).thenReturn(null);
+        doReturn(forExpense("Groceries")).when(transaction).getMetadata();
+
+        UserCategoryStatistics statistics = new UserCategoryStatistics(12);
+        statistics.typicalMerchants().put("Groceries", java.util.Set.of("Supermarket"));
+
+        assertFalse(unusualMerchant.detect(transaction, statistics).isPresent());
+    }
+
+    @Test
+    @DisplayName(
+            "Do not detect unusual merchant when baseline amount data is insufficient and amount is zero")
+    void shouldNotDetectWhenInsufficientBaselineAndZeroAmount() {
+        UnusualMerchant unusualMerchant = new UnusualMerchant();
+
+        Transaction transaction = mock(Transaction.class);
+        Account merchantAccount = mock(Account.class);
+        when(merchantAccount.getName()).thenReturn("New Merchant");
+        when(transaction.computeTo()).thenReturn(merchantAccount);
+        when(transaction.computeAmount(merchantAccount)).thenReturn(0.0);
+        doReturn(forExpense("Groceries")).when(transaction).getMetadata();
+
+        UserCategoryStatistics statistics = new UserCategoryStatistics(12);
+        statistics.typicalMerchants().put("Groceries", java.util.Set.of("Supermarket"));
+        statistics
+                .amounts()
+                .put(
+                        "Groceries",
+                        new org.apache.commons.math3.stat.descriptive.DescriptiveStatistics());
+
+        assertFalse(unusualMerchant.detect(transaction, statistics).isPresent());
     }
 
     @Test

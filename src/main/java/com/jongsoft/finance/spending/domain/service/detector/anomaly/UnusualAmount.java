@@ -1,15 +1,23 @@
 package com.jongsoft.finance.spending.domain.service.detector.anomaly;
 
 import com.jongsoft.finance.banking.domain.model.Transaction;
+import com.jongsoft.finance.configuration.SpendingAnalysisConfiguration;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
 import com.jongsoft.finance.spending.types.InsightType;
 
-import java.util.Map;
+import java.util.HashMap;
 import java.util.Optional;
 
 public class UnusualAmount implements Anomaly {
-    private static final double AMOUNT_ANOMALY_THRESHOLD = 2.0;
-    private static final double SENSITIVITY = 0.15;
+
+    private static final double MIN_STD_DEV = 0.01;
+    private static final int MIN_TRANSACTIONS = 5;
+
+    private final SpendingAnalysisConfiguration settings;
+
+    public UnusualAmount(SpendingAnalysisConfiguration settings) {
+        this.settings = settings;
+    }
 
     @Override
     public Optional<SpendingInsight> detect(
@@ -22,17 +30,23 @@ public class UnusualAmount implements Anomaly {
         double mean = typicalAmount.getMean();
         double stdDev = typicalAmount.getStandardDeviation();
 
-        // Skip if we don't have enough data or standard deviation is too small
-        if (typicalAmount.getN() < 5 || stdDev < 0.01) {
+        if (typicalAmount.getN() < MIN_TRANSACTIONS || stdDev < MIN_STD_DEV) {
             return Optional.empty();
         }
 
         var transactionAmount = transaction.computeAmount(transaction.computeTo());
         var zScore = Math.abs(transactionAmount - mean) / stdDev;
-        var adjustedThreshold = AMOUNT_ANOMALY_THRESHOLD * (2.0 - SENSITIVITY);
+        var adjustedThreshold = settings.adjustedAmountThreshold();
 
         if (zScore > adjustedThreshold) {
             var score = Math.min(1.0, zScore / (adjustedThreshold * 2));
+            var metadata = new HashMap<String, Object>();
+            metadata.put("amount", transactionAmount);
+            metadata.put("z_score", zScore);
+            metadata.put("mean", mean);
+            metadata.put("std_dev", stdDev);
+            metadata.put("baseline_months", statistics.baselineMonths());
+            metadata.put("direction", transactionAmount > mean ? "UP" : "DOWN");
 
             return Optional.of(new SpendingInsight(
                     InsightType.UNUSUAL_AMOUNT,
@@ -42,11 +56,7 @@ public class UnusualAmount implements Anomaly {
                     transaction.getId(),
                     transaction.getDate(),
                     generateMessage(transactionAmount, mean),
-                    Map.of(
-                            "amount", transactionAmount,
-                            "z_score", zScore,
-                            "mean", mean,
-                            "std_dev", stdDev)));
+                    metadata));
         }
 
         return Optional.empty();
