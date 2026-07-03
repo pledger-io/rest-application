@@ -4,6 +4,7 @@ import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
 import com.jongsoft.finance.banking.domain.commands.LinkTransactionCommand;
 import com.jongsoft.finance.banking.domain.commands.TransactionCreated;
 import com.jongsoft.finance.banking.domain.model.Transaction;
+import com.jongsoft.finance.configuration.SpendingAnalysisConfiguration;
 import com.jongsoft.finance.core.adapter.api.CurrentUserProvider;
 import com.jongsoft.finance.core.adapter.api.UserProvider;
 import com.jongsoft.finance.core.domain.FilterProvider;
@@ -16,12 +17,14 @@ import com.jongsoft.finance.spending.domain.service.SpendingAnalyticsEnabled;
 import com.jongsoft.finance.spending.domain.service.detector.pattern.AmountPattern;
 import com.jongsoft.finance.spending.domain.service.detector.pattern.OccurrencePattern;
 import com.jongsoft.finance.spending.domain.service.detector.pattern.Pattern;
+import com.jongsoft.finance.spending.domain.service.detector.pattern.PatternMonthContext;
 import com.jongsoft.finance.spending.domain.service.detector.pattern.SeasonalPattern;
 import com.jongsoft.finance.spending.domain.service.vector.PatternVectorStore;
 
 import dev.langchain4j.data.document.Metadata;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.filter.MetadataFilterBuilder;
 
@@ -31,20 +34,22 @@ import io.micronaut.runtime.event.annotation.EventListener;
 
 import jakarta.inject.Singleton;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 @Singleton
 @SpendingAnalyticsEnabled
 class PatternDetector implements Detector<SpendingPattern> {
-    // Threshold for similarity matching
-    private static final double SIMILARITY_THRESHOLD = 0.9;
-    private static final int MIN_TRANSACTIONS_FOR_PATTERN = 3;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
     private final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(PatternDetector.class);
@@ -53,24 +58,25 @@ class PatternDetector implements Detector<SpendingPattern> {
     private final FilterProvider<TransactionProvider.FilterCommand> filterProvider;
     private final CurrentUserProvider currentUserProvider;
     private final UserProvider userProvider;
-
+    private final SpendingAnalysisConfiguration settings;
     private final EmbeddingModel embeddingModel;
     private final PledgerVectorStore patternVectorStore;
-
     private final List<Pattern> patterns;
 
-    private boolean hasInitialized;
+    private volatile boolean hasInitialized;
 
     PatternDetector(
             TransactionProvider transactionProvider,
             FilterProvider<TransactionProvider.FilterCommand> filterProvider,
             CurrentUserProvider currentUserProvider,
             UserProvider userProvider,
+            SpendingAnalysisConfiguration settings,
             EmbeddingModel embeddingModel,
             @PatternVectorStore PledgerVectorStore patternVectorStore) {
         this.transactionProvider = transactionProvider;
         this.currentUserProvider = currentUserProvider;
         this.userProvider = userProvider;
+        this.settings = settings;
         this.patternVectorStore = patternVectorStore;
         this.filterProvider = filterProvider;
         this.embeddingModel = embeddingModel;
@@ -80,29 +86,42 @@ class PatternDetector implements Detector<SpendingPattern> {
 
     @EventListener
     void handleStartup(StartupEvent startupEvent) {
-        if (patternVectorStore.shouldInitialize()) {
-            log.debug("Initially filling pattern vector store with transactions.");
-            for (UserAccount userAccount : userProvider.lookup()) {
-                executorService.submit(() -> {
-                    InternalAuthenticationEvent.authenticate(
-                            userAccount.getUsername().email());
-                    var processingPage = 0;
-                    var filterApplied =
-                            filterProvider.create().ownAccounts().page(processingPage, 500);
-                    ResultPage<Transaction> transactionPage;
-                    do {
-                        transactionPage = transactionProvider.lookup(filterApplied);
-                        transactionPage.content().forEach(this::indexTransaction);
-                        filterApplied.page(++processingPage, 500);
-                        log.trace(
-                                "Processed page {} of transactions for user {}.",
-                                processingPage,
-                                userAccount.getUsername().email());
-                    } while (transactionPage.hasNext());
-                });
-            }
+        if (!patternVectorStore.shouldInitialize()) {
+            hasInitialized = true;
+            return;
         }
-        hasInitialized = true;
+
+        log.debug("Initially filling pattern vector store with transactions.");
+        var indexingTasks = new ArrayList<CompletableFuture<Void>>();
+        for (UserAccount userAccount : userProvider.lookup()) {
+            indexingTasks.add(CompletableFuture.runAsync(
+                    () -> {
+                        InternalAuthenticationEvent.authenticate(
+                                userAccount.getUsername().email());
+                        var processingPage = 0;
+                        var filterApplied =
+                                filterProvider.create().ownAccounts().page(processingPage, 500);
+                        ResultPage<Transaction> transactionPage;
+                        do {
+                            transactionPage = transactionProvider.lookup(filterApplied);
+                            transactionPage.content().forEach(this::indexTransaction);
+                            filterApplied.page(++processingPage, 500);
+                            log.trace(
+                                    "Processed page {} of transactions for user {}.",
+                                    processingPage,
+                                    userAccount.getUsername().email());
+                        } while (transactionPage.hasNext());
+                    },
+                    executorService));
+        }
+
+        CompletableFuture.allOf(indexingTasks.toArray(CompletableFuture[]::new))
+                .whenComplete((_, error) -> {
+                    if (error != null) {
+                        log.error("Pattern vector store initialization failed", error);
+                    }
+                    hasInitialized = true;
+                });
     }
 
     @EventListener
@@ -114,13 +133,14 @@ class PatternDetector implements Detector<SpendingPattern> {
 
     @EventListener
     void handleClassificationChanged(LinkTransactionCommand command) {
-        indexTransaction(transactionProvider.lookup(command.id()).get());
+        transactionProvider.lookup(command.id()).ifPresent(this::indexTransaction);
     }
 
     @EventListener
     void handleTransactionAdded(TransactionCreated transactionCreated) {
-        indexTransaction(
-                transactionProvider.lookup(transactionCreated.transactionId()).get());
+        transactionProvider
+                .lookup(transactionCreated.transactionId())
+                .ifPresent(this::indexTransaction);
     }
 
     @Override
@@ -130,7 +150,7 @@ class PatternDetector implements Detector<SpendingPattern> {
 
     @Override
     public void updateBaseline(YearMonth forMonth) {
-        // no filling is needed
+        // Vector index is maintained incrementally; month context is built during detectForMonth.
     }
 
     @Override
@@ -140,45 +160,89 @@ class PatternDetector implements Detector<SpendingPattern> {
 
     @Override
     public List<SpendingPattern> detect(Transaction transaction) {
-        // Skip transactions without a category or budget
-        if (!transaction.getMetadata().containsKey("CATEGORY")
-                && !transaction.getMetadata().containsKey("EXPENSE")) {
-            return List.of();
-        }
-
-        var segment = createTextSegment(transaction);
-
-        // Search for similar transactions
-        var searchRequest = EmbeddingSearchRequest.builder()
-                .queryEmbedding(embeddingModel.embed(segment).content())
-                .filter(MetadataFilterBuilder.metadataKey("user")
-                        .isEqualTo(
-                                currentUserProvider.currentUser().getUsername().email())
-                        .and(MetadataFilterBuilder.metadataKey("date")
-                                .isBetween(
-                                        transaction.getDate().minusMonths(3).toString(),
-                                        transaction.getDate().toString())))
-                .maxResults(150)
-                .minScore(SIMILARITY_THRESHOLD)
-                .build();
-
-        var matches = patternVectorStore.embeddingStore().search(searchRequest).matches();
-
-        if (matches.size() >= MIN_TRANSACTIONS_FOR_PATTERN) {
-            return patterns.stream()
-                    .map(p -> p.detect(transaction, matches))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .toList();
-        }
-
         return List.of();
     }
 
+    @Override
+    public List<SpendingPattern> detectForMonth(
+            YearMonth forMonth, List<Transaction> transactions) {
+        if (transactions.isEmpty()) {
+            return List.of();
+        }
+
+        return groupByExpense(transactions).entrySet().stream()
+                .flatMap(entry ->
+                        detectForCategory(entry.getKey(), forMonth, entry.getValue()).stream())
+                .toList();
+    }
+
+    private List<SpendingPattern> detectForCategory(
+            String category, YearMonth forMonth, List<Transaction> monthTransactions) {
+        var historicMatches = searchHistoricMatches(category, forMonth, monthTransactions);
+        if (historicMatches.size() < settings.patternMinMatches()) {
+            return List.of();
+        }
+
+        var context = new PatternMonthContext(
+                monthTransactions, historicMatches, settings.patternLookbackMonths());
+
+        return patterns.stream()
+                .map(pattern -> pattern.detect(category, forMonth, context))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .toList();
+    }
+
+    private List<EmbeddingMatch<TextSegment>> searchHistoricMatches(
+            String category, YearMonth forMonth, List<Transaction> monthTransactions) {
+        LocalDate lookbackStart =
+                forMonth.minusMonths(settings.patternLookbackMonths()).atDay(1);
+        LocalDate lookbackEnd = forMonth.minusMonths(1).atEndOfMonth();
+
+        var querySegment = monthTransactions.isEmpty()
+                ? createCategoryQuerySegment(category)
+                : createTextSegment(monthTransactions.getFirst());
+
+        var searchRequest = EmbeddingSearchRequest.builder()
+                .queryEmbedding(embeddingModel.embed(querySegment).content())
+                .filter(MetadataFilterBuilder.metadataKey("user")
+                        .isEqualTo(
+                                currentUserProvider.currentUser().getUsername().email())
+                        .and(MetadataFilterBuilder.metadataKey("expense").isEqualTo(category))
+                        .and(MetadataFilterBuilder.metadataKey("date")
+                                .isBetween(lookbackStart.toString(), lookbackEnd.toString())))
+                .maxResults(150)
+                .minScore(settings.patternSimilarityThreshold())
+                .build();
+
+        return patternVectorStore.embeddingStore().search(searchRequest).matches().stream()
+                .filter(match -> category.equals(match.embedded().metadata().getString("expense")))
+                .toList();
+    }
+
+    private TextSegment createCategoryQuerySegment(String category) {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("expense", category);
+        metadata.put("user", currentUserProvider.currentUser().getUsername().email());
+        return TextSegment.textSegment(category + " - ", Metadata.from(metadata));
+    }
+
+    private Map<String, List<Transaction>> groupByExpense(List<Transaction> transactions) {
+        return transactions.stream()
+                .map(t -> Map.entry(Pattern.resolveCategory(t), t))
+                .filter(entry -> entry.getKey() != null)
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+    }
+
     private void indexTransaction(Transaction transaction) {
+        if (Pattern.resolveCategory(transaction) == null) {
+            return;
+        }
+
         TextSegment segment = createTextSegment(transaction);
 
-        // Remove any existing entries for this transaction
         patternVectorStore
                 .embeddingStore()
                 .removeAll(MetadataFilterBuilder.metadataKey("id")
@@ -189,25 +253,22 @@ class PatternDetector implements Detector<SpendingPattern> {
                                         .getUsername()
                                         .email())));
 
-        // Add the transaction to the vector store
         patternVectorStore.embeddingStore().add(embeddingModel.embed(segment).content(), segment);
     }
 
     private TextSegment createTextSegment(Transaction transaction) {
-        var expense = transaction.getMetadata().get("EXPENSE");
+        String expenseName = Pattern.resolveCategory(transaction);
+        Objects.requireNonNull(expenseName);
 
         Map<String, String> metadata = new HashMap<>();
         metadata.put("id", transaction.getId().toString());
         metadata.put("user", currentUserProvider.currentUser().getUsername().email());
         metadata.put("date", transaction.getDate().toString());
-        metadata.put(
-                "amount", String.valueOf(transaction.computeAmount(transaction.computeFrom())));
-        metadata.put("budget", expense != null ? expense.toString() : "");
+        metadata.put("amount", String.valueOf(transaction.computeAmount(transaction.computeTo())));
+        metadata.put("expense", expenseName);
+        metadata.put("budget", expenseName);
 
-        // Create a rich text representation of the transaction
-        String text =
-                String.format("%s - %s", metadata.get("budget"), transaction.getDescription());
-
+        String text = String.format("%s - %s", expenseName, transaction.getDescription());
         return TextSegment.textSegment(text, Metadata.from(metadata));
     }
 }

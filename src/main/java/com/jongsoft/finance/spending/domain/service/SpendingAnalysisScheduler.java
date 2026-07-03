@@ -26,10 +26,11 @@ class SpendingAnalysisScheduler {
 
     @Scheduled(cron = "${application.schedules.spending.planner.cron}")
     void analyzeMonthlySpendingPatterns() {
-        log.info("Scheduling monthly spending analysis, for month {}.", YearMonth.now());
+        YearMonth targetMonth = YearMonth.now().minusMonths(1);
+        log.info("Scheduling monthly spending analysis for completed month {}.", targetMonth);
         for (var user : userProvider.lookup()) {
             InternalAuthenticationEvent.authenticate(user.getUsername().email());
-            AnalyzeJob.create(user.getUsername(), YearMonth.now());
+            AnalyzeJob.create(user.getUsername(), targetMonth);
         }
     }
 }

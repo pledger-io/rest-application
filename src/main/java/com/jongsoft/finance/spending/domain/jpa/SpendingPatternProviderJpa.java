@@ -10,7 +10,6 @@ import com.jongsoft.finance.spending.domain.jpa.entity.SpendingPatternJpa;
 import com.jongsoft.finance.spending.domain.jpa.filter.SpendingPatternFilterCommand;
 import com.jongsoft.finance.spending.domain.jpa.mapper.SpendingPatternMapper;
 import com.jongsoft.finance.spending.domain.model.SpendingPattern;
-import com.jongsoft.lang.Control;
 import com.jongsoft.lang.collection.Sequence;
 import com.jongsoft.lang.control.Optional;
 
@@ -104,9 +103,7 @@ public class SpendingPatternProviderJpa implements SpendingPatternProvider {
         // Convert metadata to string values
         Map<String, String> metadata = new HashMap<>();
         for (Map.Entry<String, ?> entry : command.metadata().entrySet()) {
-            metadata.put(
-                    entry.getKey(),
-                    Control.Option(entry.getValue()).map(Object::toString).getOrSupply(() -> null));
+            metadata.put(entry.getKey(), InsightMetadataSerializer.serialize(entry.getValue()));
         }
 
         // Create the JPA entity

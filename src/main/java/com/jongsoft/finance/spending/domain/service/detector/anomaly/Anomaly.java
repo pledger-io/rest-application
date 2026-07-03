@@ -1,9 +1,8 @@
 package com.jongsoft.finance.spending.domain.service.detector.anomaly;
 
-import static com.jongsoft.finance.banking.types.TransactionLinkType.EXPENSE;
-
 import com.jongsoft.finance.banking.domain.model.Transaction;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
+import com.jongsoft.finance.spending.domain.service.detector.SpendingCategoryResolver;
 import com.jongsoft.finance.spending.types.Severity;
 
 import java.util.Optional;
@@ -23,6 +22,6 @@ public interface Anomaly {
     }
 
     default String getExpense(Transaction transaction) {
-        return transaction.getMetadata().get(EXPENSE.name()).toString();
+        return SpendingCategoryResolver.resolve(transaction);
     }
 }

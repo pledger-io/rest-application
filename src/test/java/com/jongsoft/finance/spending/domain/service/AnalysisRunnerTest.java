@@ -56,6 +56,7 @@ class AnalysisRunnerTest {
         // Create filter factory chain mocks
         when(filterFactory.create()).thenReturn(filterCommand);
         when(filterCommand.range(any())).thenReturn(filterCommand);
+        when(mockDetector.detectForMonth(any(), any())).thenReturn(List.of());
 
         new EventBus(mock(ApplicationEventPublisher.class));
 
@@ -81,8 +82,8 @@ class AnalysisRunnerTest {
     }
 
     @Test
-    @DisplayName("Should return false when no transactions exist for month")
-    void shouldReturnFalseWhenNoTransactionsForMonth() {
+    @DisplayName("Should run month-level analysis when no transactions exist for month")
+    void shouldRunMonthLevelDetectionWhenNoTransactionsForMonth() {
         // Arrange
         when(mockDetector.readyForAnalysis()).thenReturn(true);
         YearMonth month = YearMonth.now();
@@ -94,10 +95,12 @@ class AnalysisRunnerTest {
         boolean result = analysisRunner.analyzeForUser(month);
 
         // Assert
-        assertFalse(result);
+        assertTrue(result);
         verify(mockDetector).readyForAnalysis();
         verify(transactionProvider).lookup(any());
-        verify(mockDetector, never()).updateBaseline(any());
+        verify(mockDetector).updateBaseline(month);
+        verify(mockDetector).detectForMonth(eq(month), eq(List.of()));
+        verify(mockDetector, never()).detect(any(Transaction.class));
     }
 
     @Test
@@ -129,6 +132,7 @@ class AnalysisRunnerTest {
         verify(mockDetector).readyForAnalysis();
         verify(transactionProvider).lookup(any());
         verify(mockDetector).updateBaseline(month);
+        verify(mockDetector).detectForMonth(eq(month), any());
         verify(mockDetector).detect(mockTransaction);
         verify(mockInsight).signal();
     }

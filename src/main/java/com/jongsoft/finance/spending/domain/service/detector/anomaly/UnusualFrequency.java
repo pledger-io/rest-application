@@ -1,74 +1,69 @@
 package com.jongsoft.finance.spending.domain.service.detector.anomaly;
 
-import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
-import com.jongsoft.finance.banking.domain.model.EntityRef;
-import com.jongsoft.finance.banking.domain.model.Transaction;
-import com.jongsoft.finance.budget.adapter.api.BudgetProvider;
-import com.jongsoft.finance.core.domain.FilterProvider;
+import com.jongsoft.finance.configuration.SpendingAnalysisConfiguration;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
 import com.jongsoft.finance.spending.types.InsightType;
-import com.jongsoft.lang.Collections;
-import com.jongsoft.lang.Dates;
 
-import java.time.temporal.ChronoUnit;
-import java.util.Map;
+import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.Optional;
 
-public class UnusualFrequency implements Anomaly {
+/** Detects when the number of transactions in a category for the analyzed month is unusual. */
+public class UnusualFrequency implements MonthAnomaly {
 
-    private static final double FREQUENCY_ANOMALY_THRESHOLD = 1.5;
-    private static final double ADJUSTED_THRESHOLD = FREQUENCY_ANOMALY_THRESHOLD * (2.0 - .7);
+    private static final int MIN_BASELINE_MONTHS = 3;
+    private static final double MIN_STD_DEV = 0.01;
 
-    private final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(UnusualFrequency.class);
+    private final SpendingAnalysisConfiguration settings;
 
-    private final BudgetProvider budgetProvider;
-    private final TransactionProvider transactionProvider;
-    private final FilterProvider<TransactionProvider.FilterCommand> filterFactory;
-
-    public UnusualFrequency(
-            TransactionProvider transactionProvider,
-            FilterProvider<TransactionProvider.FilterCommand> filterFactory,
-            BudgetProvider budgetProvider) {
-        this.transactionProvider = transactionProvider;
-        this.filterFactory = filterFactory;
-        this.budgetProvider = budgetProvider;
+    public UnusualFrequency(SpendingAnalysisConfiguration settings) {
+        this.settings = settings;
     }
 
     @Override
     public Optional<SpendingInsight> detect(
-            Transaction transaction, UserCategoryStatistics statistics) {
-        var typicalFrequency = statistics.frequencies().get(getExpense(transaction));
-        if (typicalFrequency == null || typicalFrequency.getN() < 3) {
-            log.trace(
-                    "Not enough data for transaction {}. Skipping anomaly detection.",
-                    transaction.getId());
+            String category,
+            YearMonth forMonth,
+            CategoryMonthSummary summary,
+            UserCategoryStatistics statistics) {
+        var typicalFrequency = statistics.frequencies().get(category);
+        if (typicalFrequency == null || typicalFrequency.getN() < MIN_BASELINE_MONTHS) {
             return Optional.empty();
         }
 
-        long currentMonthCount = computeTransactionsInMonth(transaction);
+        long currentMonthCount = summary.transactionCount();
         double mean = typicalFrequency.getMean();
         double stdDev = typicalFrequency.getStandardDeviation();
-        double zScore = Math.abs(currentMonthCount - mean) / stdDev;
-
-        if (zScore > ADJUSTED_THRESHOLD) {
-            double score = Math.min(1.0, zScore / (ADJUSTED_THRESHOLD * 2));
-
-            return Optional.of(new SpendingInsight(
-                    InsightType.UNUSUAL_FREQUENCY,
-                    getExpense(transaction),
-                    getSeverityFromScore(score),
-                    score,
-                    transaction.getId(),
-                    transaction.getDate(),
-                    generateMessage(currentMonthCount, mean),
-                    Map.of(
-                            "frequency", currentMonthCount,
-                            "z_score", zScore,
-                            "mean", mean,
-                            "std_dev", stdDev)));
+        if (stdDev < MIN_STD_DEV) {
+            return Optional.empty();
         }
 
-        return Optional.empty();
+        double zScore = Math.abs(currentMonthCount - mean) / stdDev;
+        double threshold = settings.adjustedFrequencyThreshold();
+
+        if (zScore <= threshold) {
+            return Optional.empty();
+        }
+
+        double score = Math.min(1.0, zScore / (threshold * 2));
+        String direction = currentMonthCount > mean ? "UP" : "DOWN";
+
+        var metadata = new HashMap<>(baselineMetadata(statistics));
+        metadata.put("frequency", currentMonthCount);
+        metadata.put("z_score", zScore);
+        metadata.put("mean", mean);
+        metadata.put("std_dev", stdDev);
+        metadata.put("direction", direction);
+
+        return Optional.of(new SpendingInsight(
+                InsightType.UNUSUAL_FREQUENCY,
+                category,
+                getSeverityFromScore(score),
+                score,
+                null,
+                forMonth.atDay(1),
+                generateMessage(currentMonthCount, mean),
+                metadata));
     }
 
     private String generateMessage(long currentMonthCount, double mean) {
@@ -76,23 +71,5 @@ public class UnusualFrequency implements Anomaly {
             return "computed.insight.frequency.high";
         }
         return "computed.insight.frequency.low";
-    }
-
-    protected long computeTransactionsInMonth(Transaction transaction) {
-        var expense = budgetProvider
-                .lookup(transaction.getDate().getYear(), transaction.getDate().getMonthValue())
-                .stream()
-                .flatMap(b -> b.getExpenses().stream())
-                .filter(e -> e.getName().equalsIgnoreCase(getExpense(transaction)))
-                .findFirst()
-                .orElseThrow();
-
-        var filter = filterFactory
-                .create()
-                .expenses(Collections.List(new EntityRef(expense.getId())))
-                .range(Dates.range(transaction.getDate().withDayOfMonth(1), ChronoUnit.MONTHS))
-                .page(1, 1);
-
-        return transactionProvider.lookup(filter).total();
     }
 }

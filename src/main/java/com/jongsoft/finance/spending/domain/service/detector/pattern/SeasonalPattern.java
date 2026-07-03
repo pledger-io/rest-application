@@ -1,6 +1,5 @@
 package com.jongsoft.finance.spending.domain.service.detector.pattern;
 
-import com.jongsoft.finance.banking.domain.model.Transaction;
 import com.jongsoft.finance.spending.domain.model.SpendingPattern;
 import com.jongsoft.finance.spending.types.PatternType;
 
@@ -8,61 +7,73 @@ import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.time.YearMonth;
+import java.util.*;
 
+/** Detects when spending in a calendar month is elevated compared to the same month in prior years. */
 public class SeasonalPattern implements Pattern {
+
+    private static final double SEASONAL_MULTIPLIER = 2.0;
+    private static final int MIN_PRIOR_YEARS = 2;
 
     @Override
     public Optional<SpendingPattern> detect(
-            Transaction transaction, List<EmbeddingMatch<TextSegment>> matches) {
-        if (matches.isEmpty()) {
+            String category, YearMonth forMonth, PatternMonthContext context) {
+        int calendarMonth = forMonth.getMonthValue();
+        Map<Integer, Double> totalsByYear = new HashMap<>();
+
+        for (EmbeddingMatch<TextSegment> match : context.historicMatches()) {
+            LocalDate date = LocalDate.parse(
+                    Objects.requireNonNull(match.embedded().metadata().getString("date")));
+            if (date.getMonthValue() != calendarMonth) {
+                continue;
+            }
+            YearMonth matchMonth = YearMonth.from(date);
+            if (matchMonth.equals(forMonth)) {
+                continue;
+            }
+            Double amount = match.embedded().metadata().getDouble("amount");
+            if (amount != null) {
+                totalsByYear.merge(date.getYear(), amount, Double::sum);
+            }
+        }
+
+        if (totalsByYear.size() < MIN_PRIOR_YEARS) {
             return Optional.empty();
         }
 
-        int currentMonth = transaction.getDate().getMonthValue();
-        var transactionsByMonth = matches.stream()
-                .map(match -> LocalDate.parse(
-                        Objects.requireNonNull(match.embedded().metadata().getString("date"))))
-                .map(LocalDate::getMonthValue)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        double currentMonthTotal = context.monthTransactions().stream()
+                .mapToDouble(t -> t.computeAmount(t.computeTo()))
+                .sum();
+        double historicAvg = totalsByYear.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElse(0.0);
 
-        if (transactionsByMonth.isEmpty()) {
+        if (historicAvg <= 0.0 || currentMonthTotal < historicAvg * SEASONAL_MULTIPLIER) {
             return Optional.empty();
         }
 
-        var numberInMonth = transactionsByMonth.getOrDefault(currentMonth, 0L);
-        var avgPerMonth = matches.size() / transactionsByMonth.size();
-        if (isSignificantlyMoreThanAverage(numberInMonth, avgPerMonth)) {
-            return Optional.of(new SpendingPattern(
-                    PatternType.SEASONAL,
-                    getCategory(transaction),
-                    .75,
-                    transaction.getDate().withDayOfMonth(1),
-                    Map.of("season", getCurrentSeason(transaction.getDate()))));
-        }
+        var metadata = new HashMap<String, Object>();
+        metadata.put("season", getSeason(forMonth));
+        metadata.put("same_month_historic_avg", historicAvg);
+        metadata.put("current_month_total", currentMonthTotal);
+        metadata.put("years_observed", totalsByYear.size());
+        metadata.put("lookback_months", context.lookbackMonths());
 
-        return Optional.empty();
+        return Optional.of(new SpendingPattern(
+                PatternType.SEASONAL, category, 0.75, forMonth.atDay(1), metadata));
     }
 
-    private boolean isSignificantlyMoreThanAverage(long numberInMonth, long avgPerMonth) {
-        return numberInMonth >= avgPerMonth * 2.0;
-    }
-
-    private String getCurrentSeason(LocalDate date) {
-        int month = date.getMonthValue();
-        if (month >= 3 && month <= 5) {
+    private String getSeason(YearMonth month) {
+        int value = month.getMonthValue();
+        if (value >= 3 && value <= 5) {
             return "Spring";
-        } else if (month >= 6 && month <= 8) {
+        } else if (value >= 6 && value <= 8) {
             return "Summer";
-        } else if (month >= 9 && month <= 11) {
+        } else if (value >= 9 && value <= 11) {
             return "Fall";
-        } else {
-            return "Winter";
         }
+        return "Winter";
     }
 }

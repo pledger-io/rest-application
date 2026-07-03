@@ -1,12 +1,14 @@
 package com.jongsoft.finance.spending.domain.service.detector.pattern;
 
+import static com.jongsoft.finance.spending.domain.service.detector.pattern.PatternTestSupport.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.jongsoft.finance.EventBus;
 import com.jongsoft.finance.banking.domain.model.Classifier;
+import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.banking.domain.model.Transaction;
-import com.jongsoft.finance.classification.domain.model.Category;
 import com.jongsoft.finance.spending.domain.model.SpendingPattern;
 import com.jongsoft.finance.spending.types.PatternType;
 
@@ -31,12 +33,8 @@ import java.util.Optional;
 @DisplayName("Unit - Occurrence Pattern")
 class OccurrencePatternTest {
 
-    /**
-     * This test class validates the `detect` method in OccurrencePattern.
-     * The `detect` method identifies recurring weekly or monthly patterns in transactions.
-     */
-    private Map<String, ? extends Classifier> forCategory(String category) {
-        return Map.of("CATEGORY", Category.create(category, ""));
+    private Map<String, ? extends Classifier> forExpense(String expense) {
+        return Map.of("EXPENSE", new EntityRef.NamedEntity(1L, expense));
     }
 
     @BeforeEach
@@ -47,37 +45,27 @@ class OccurrencePatternTest {
     @Test
     @DisplayName("Detect weekly pattern")
     void shouldDetectWeeklyPattern() {
-        // Arrange
         OccurrencePattern occurrencePattern = new OccurrencePattern();
 
         Transaction transaction = mock(Transaction.class);
-        doReturn(forCategory("Groceries")).when(transaction).getMetadata();
+        doReturn(forExpense("Groceries")).when(transaction).getMetadata();
         when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
-        // Create a list of embedding matches with weekly pattern (every Monday)
         List<EmbeddingMatch<TextSegment>> matches = new ArrayList<>();
-
-        // Add matches with dates exactly 7 days apart (weekly pattern)
-        LocalDate startDate = LocalDate.of(2025, 3, 3); // A Monday
+        LocalDate startDate = LocalDate.of(2025, 3, 3);
         for (int i = 0; i < 10; i++) {
-            LocalDate date = startDate.plusDays(i * 7);
-            matches.add(createEmbeddingMatch(date, 100.0));
+            matches.add(match(startDate.plusDays(i * 7L), 100.0, "Groceries"));
         }
 
-        // Act
-        Optional<SpendingPattern> result = occurrencePattern.detect(transaction, matches);
+        Optional<SpendingPattern> result =
+                occurrencePattern.detect("Groceries", may2025(), context(transaction, matches, 12));
 
-        // Assert
         assertTrue(result.isPresent());
         SpendingPattern pattern = result.get();
         assertEquals(PatternType.RECURRING_WEEKLY, pattern.getType());
         assertEquals("Groceries", pattern.getCategory());
         assertEquals(LocalDate.of(2025, 5, 1), pattern.getDetectedDate());
-        assertTrue(pattern.getMetadata().containsKey("frequency"));
         assertEquals("weekly", pattern.getMetadata().get("frequency"));
-        assertTrue(pattern.getMetadata().containsKey("typical_amount"));
-        assertTrue(pattern.getMetadata().containsKey("vector_similarity"));
-        assertTrue(pattern.getMetadata().containsKey("typical_day"));
         assertEquals(
                 DayOfWeek.MONDAY.toString(),
                 pattern.getMetadata().get("typical_day").toString());
@@ -86,127 +74,66 @@ class OccurrencePatternTest {
     @Test
     @DisplayName("Detect monthly pattern")
     void shouldDetectMonthlyPattern() {
-        // Arrange
         OccurrencePattern occurrencePattern = new OccurrencePattern();
 
         Transaction transaction = mock(Transaction.class);
-        doReturn(forCategory("Rent")).when(transaction).getMetadata();
+        doReturn(forExpense("Rent")).when(transaction).getMetadata();
         when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
-        // Create a list of embedding matches with monthly pattern (1st of each month)
         List<EmbeddingMatch<TextSegment>> matches = new ArrayList<>();
-
-        // Add matches with dates exactly 1 month apart (monthly pattern)
         for (int i = 1; i <= 6; i++) {
-            LocalDate date = LocalDate.of(2024, i + 6, 1);
-            matches.add(createEmbeddingMatch(date, 1000.0));
+            matches.add(match(LocalDate.of(2024, i + 6, 1), 1000.0, "Rent"));
         }
-        for (int i = 1; i <= 5; i++) {
-            LocalDate date = LocalDate.of(2025, i, 1);
-            matches.add(createEmbeddingMatch(date, 1000.0));
+        for (int i = 1; i <= 4; i++) {
+            matches.add(match(LocalDate.of(2025, i, 1), 1000.0, "Rent"));
         }
 
-        // Act
-        Optional<SpendingPattern> result = occurrencePattern.detect(transaction, matches);
+        Optional<SpendingPattern> result =
+                occurrencePattern.detect("Rent", may2025(), context(transaction, matches, 12));
 
-        // Assert
         assertTrue(result.isPresent());
-        SpendingPattern pattern = result.get();
-        assertEquals(PatternType.RECURRING_MONTHLY, pattern.getType());
-        assertEquals("Rent", pattern.getCategory());
-        assertEquals(LocalDate.of(2025, 5, 1), pattern.getDetectedDate());
-        assertTrue(pattern.getMetadata().containsKey("frequency"));
-        assertEquals("monthly", pattern.getMetadata().get("frequency"));
+        assertEquals(PatternType.RECURRING_MONTHLY, result.get().getType());
+        assertEquals("monthly", result.get().getMetadata().get("frequency"));
     }
 
     @Test
     @DisplayName("Do not detect pattern with irregular intervals")
     void shouldNotDetectPatternWithIrregularIntervals() {
-        // Arrange
         OccurrencePattern occurrencePattern = new OccurrencePattern();
 
         Transaction transaction = mock(Transaction.class);
-        doReturn(forCategory("Entertainment")).when(transaction).getMetadata();
+        doReturn(forExpense("Entertainment")).when(transaction).getMetadata();
         when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
-        // Create a list of embedding matches with irregular intervals
-        List<EmbeddingMatch<TextSegment>> matches = new ArrayList<>();
+        List<EmbeddingMatch<TextSegment>> matches = List.of(
+                match(LocalDate.of(2025, 1, 5), 50.0, "Entertainment"),
+                match(LocalDate.of(2025, 1, 20), 60.0, "Entertainment"),
+                match(LocalDate.of(2025, 2, 3), 45.0, "Entertainment"),
+                match(LocalDate.of(2025, 2, 28), 55.0, "Entertainment"),
+                match(LocalDate.of(2025, 3, 10), 65.0, "Entertainment"),
+                match(LocalDate.of(2025, 4, 2), 70.0, "Entertainment"),
+                match(LocalDate.of(2025, 4, 25), 50.0, "Entertainment"),
+                match(LocalDate.of(2025, 5, 8), 60.0, "Entertainment"));
 
-        // Add matches with irregular intervals
-        matches.add(createEmbeddingMatch(LocalDate.of(2025, 1, 5), 50.0));
-        matches.add(createEmbeddingMatch(LocalDate.of(2025, 1, 20), 60.0));
-        matches.add(createEmbeddingMatch(LocalDate.of(2025, 2, 3), 45.0));
-        matches.add(createEmbeddingMatch(LocalDate.of(2025, 2, 28), 55.0));
-        matches.add(createEmbeddingMatch(LocalDate.of(2025, 3, 10), 65.0));
-        matches.add(createEmbeddingMatch(LocalDate.of(2025, 4, 2), 70.0));
-        matches.add(createEmbeddingMatch(LocalDate.of(2025, 4, 25), 50.0));
-        matches.add(createEmbeddingMatch(LocalDate.of(2025, 5, 8), 60.0));
-
-        // Act
-        Optional<SpendingPattern> result = occurrencePattern.detect(transaction, matches);
-
-        // Assert
-        assertFalse(result.isPresent());
-    }
-
-    @Test
-    @DisplayName("Handle null matches gracefully")
-    void shouldHandleEmptyMatches() {
-        // Arrange
-        OccurrencePattern occurrencePattern = new OccurrencePattern();
-
-        Transaction transaction = mock(Transaction.class);
-        doReturn(forCategory("Travel")).when(transaction).getMetadata();
-
-        // Create an empty list of embedding matches
-        List<EmbeddingMatch<TextSegment>> matches = new ArrayList<>();
-
-        // Act
-        Optional<SpendingPattern> result = occurrencePattern.detect(transaction, matches);
-
-        // Assert
-        assertFalse(result.isPresent());
+        assertTrue(occurrencePattern
+                .detect("Entertainment", may2025(), context(transaction, matches, 12))
+                .isEmpty());
     }
 
     @Test
     @DisplayName("Handle insufficient matches gracefully")
     void shouldHandleInsufficientMatches() {
-        // Arrange
         OccurrencePattern occurrencePattern = new OccurrencePattern();
-
         Transaction transaction = mock(Transaction.class);
-        doReturn(forCategory("Dining")).when(transaction).getMetadata();
+        doReturn(forExpense("Dining")).when(transaction).getMetadata();
         when(transaction.getDate()).thenReturn(LocalDate.of(2025, 5, 15));
 
-        // Create a list with only 2 matches (not enough to establish a pattern)
-        List<EmbeddingMatch<TextSegment>> matches = new ArrayList<>();
-        matches.add(createEmbeddingMatch(LocalDate.of(2025, 4, 1), 75.0));
-        matches.add(createEmbeddingMatch(LocalDate.of(2025, 5, 1), 80.0));
+        List<EmbeddingMatch<TextSegment>> matches = List.of(
+                match(LocalDate.of(2025, 4, 1), 75.0, "Dining"),
+                match(LocalDate.of(2025, 5, 1), 80.0, "Dining"));
 
-        // Act
-        Optional<SpendingPattern> result = occurrencePattern.detect(transaction, matches);
-
-        // Assert
-        assertFalse(result.isPresent());
-    }
-
-    /**
-     * Helper method to create a mocked EmbeddingMatch with the given date and amount
-     */
-    @SuppressWarnings("unchecked")
-    private EmbeddingMatch<TextSegment> createEmbeddingMatch(LocalDate date, double amount) {
-        TextSegment segment = mock(TextSegment.class);
-        dev.langchain4j.data.document.Metadata metadata =
-                mock(dev.langchain4j.data.document.Metadata.class);
-
-        when(segment.metadata()).thenReturn(metadata);
-        when(metadata.getString("date")).thenReturn(date.toString());
-        when(metadata.getDouble("amount")).thenReturn(amount);
-
-        EmbeddingMatch<TextSegment> match = mock(EmbeddingMatch.class);
-        when(match.embedded()).thenReturn(segment);
-        when(match.score()).thenReturn(0.95);
-
-        return match;
+        assertTrue(occurrencePattern
+                .detect("Dining", may2025(), context(transaction, matches, 12))
+                .isEmpty());
     }
 }
