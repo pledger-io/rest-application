@@ -77,7 +77,7 @@ class ImportSchedule {
         try {
             process.loadContext(importerProviders);
             if (!process.isWaiting()) {
-                log.info("Continue import {}", batchImport.getSlug());
+                log.debug("Continue import {}", batchImport.getSlug());
                 process.process(
                         importerProviders,
                         accountId -> accountProvider.lookup(accountId).get().getCurrency(),

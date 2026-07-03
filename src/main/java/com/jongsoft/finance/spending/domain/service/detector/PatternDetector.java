@@ -229,11 +229,8 @@ class PatternDetector implements Detector<SpendingPattern> {
 
     private Map<String, List<Transaction>> groupByExpense(List<Transaction> transactions) {
         return transactions.stream()
-                .map(t -> Map.entry(Pattern.resolveCategory(t), t))
-                .filter(entry -> entry.getKey() != null)
-                .collect(Collectors.groupingBy(
-                        Map.Entry::getKey,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+                .filter(SpendingCategoryResolver::hasCategory)
+                .collect(Collectors.groupingBy(SpendingCategoryResolver::resolve));
     }
 
     private void indexTransaction(Transaction transaction) {

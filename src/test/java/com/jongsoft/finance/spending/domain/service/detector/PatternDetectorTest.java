@@ -121,7 +121,19 @@ class PatternDetectorTest {
     }
 
     @Test
-    @DisplayName("Should skip indexing when transaction lookup is empty on classification change")
+    @DisplayName("Should skip uncategorized transactions during month detect")
+    void shouldSkipUncategorizedTransactionsDuringMonthDetect() {
+        Transaction uncategorized = mock(Transaction.class);
+        doReturn(Map.of()).when(uncategorized).getMetadata();
+
+        assertDoesNotThrow(() ->
+                patternDetector.detectForMonth(YearMonth.of(2014, 1), List.of(uncategorized)));
+        assertTrue(patternDetector
+                .detectForMonth(YearMonth.of(2014, 1), List.of(uncategorized))
+                .isEmpty());
+    }
+
+    @Test
     void shouldSkipIndexingWhenTransactionNotFoundOnClassificationChange() {
         when(transactionProvider.lookup(42L)).thenReturn(Control.Option());
 
