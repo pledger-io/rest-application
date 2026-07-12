@@ -34,11 +34,11 @@ dependencyResolutionManagement {
         }
 
         create("mn") {
-            from("io.micronaut.platform:micronaut-platform:5.0.3")
+            from("io.micronaut.platform:micronaut-platform:5.0.4")
         }
 
         create("llm") {
-            val langchain4jVersion: String = "1.17.1"
+            val langchain4jVersion: String = "1.17.2"
             val betaVersion: String = "$langchain4jVersion-beta27"
             library("core", "dev.langchain4j", "langchain4j").version(langchain4jVersion)
             library("retriever-sql", "dev.langchain4j", "langchain4j-pgvector").version(betaVersion)
