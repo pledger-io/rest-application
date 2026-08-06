@@ -7,6 +7,9 @@ import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.Transaction;
 import com.jongsoft.finance.configuration.SpendingAnalysisConfiguration;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.CategoryMonthSummary;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.MonthAnomalyData;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.UserCategoryStatistics;
 import com.jongsoft.finance.spending.types.Severity;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -33,7 +36,8 @@ class CategoryMonthlyDeviationTest {
         UserCategoryStatistics statistics = createStatisticsWithMonthlyTotals(
                 "Food", new double[] {200.0, 250.0, 300.0, 280.0});
 
-        Optional<SpendingInsight> result = detector.detect("Food", month, summary, statistics);
+        Optional<SpendingInsight> result =
+                detector.detect(new MonthAnomalyData("Food", month, summary), statistics);
 
         assertTrue(result.isPresent());
         SpendingInsight insight = result.get();
@@ -54,7 +58,8 @@ class CategoryMonthlyDeviationTest {
         UserCategoryStatistics statistics = createStatisticsWithMonthlyTotals(
                 "Utilities", new double[] {100.0, 120.0, 150.0, 140.0});
 
-        assertTrue(detector.detect("Utilities", month, summary, statistics).isEmpty());
+        assertTrue(detector.detect(new MonthAnomalyData("Utilities", month, summary), statistics)
+                .isEmpty());
     }
 
     @Test
@@ -65,7 +70,8 @@ class CategoryMonthlyDeviationTest {
         CategoryMonthSummary summary = new CategoryMonthSummary(500.0, 1, java.util.List.of(1L));
         UserCategoryStatistics statistics = new UserCategoryStatistics(12);
 
-        assertTrue(detector.detect("Travel", month, summary, statistics).isEmpty());
+        assertTrue(detector.detect(new MonthAnomalyData("Travel", month, summary), statistics)
+                .isEmpty());
     }
 
     @Test
@@ -79,7 +85,7 @@ class CategoryMonthlyDeviationTest {
                 createStatisticsWithMonthlyTotals("Entertainment", new double[] {10.0, 12.0, 11.0});
 
         Optional<SpendingInsight> result =
-                detector.detect("Entertainment", month, summary, statistics);
+                detector.detect(new MonthAnomalyData("Entertainment", month, summary), statistics);
 
         assertTrue(result.isPresent());
         assertEquals(Severity.ALERT, result.get().getSeverity());

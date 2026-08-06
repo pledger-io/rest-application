@@ -2,6 +2,8 @@ package com.jongsoft.finance.spending.domain.service.detector.anomaly;
 
 import com.jongsoft.finance.configuration.SpendingAnalysisConfiguration;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.MonthAnomalyData;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.UserCategoryStatistics;
 import com.jongsoft.finance.spending.types.InsightType;
 
 import java.time.YearMonth;
@@ -13,7 +15,7 @@ import java.util.Optional;
  * Detects when a category's monthly spending total deviates significantly from its historic
  * monthly average.
  */
-public class CategoryMonthlyDeviation implements MonthAnomaly {
+public class CategoryMonthlyDeviation implements Anomaly<MonthAnomalyData> {
 
     private static final double MIN_STD_DEV = 0.01;
     private static final int MIN_BASELINE_MONTHS = 3;
@@ -26,11 +28,8 @@ public class CategoryMonthlyDeviation implements MonthAnomaly {
 
     @Override
     public Optional<SpendingInsight> detect(
-            String category,
-            YearMonth forMonth,
-            CategoryMonthSummary summary,
-            UserCategoryStatistics statistics) {
-        var historicMonthlyTotals = statistics.monthlyTotals().get(category);
+            MonthAnomalyData data, UserCategoryStatistics statistics) {
+        var historicMonthlyTotals = statistics.monthlyTotals().get(data.category());
         if (historicMonthlyTotals == null || historicMonthlyTotals.getN() < MIN_BASELINE_MONTHS) {
             return Optional.empty();
         }
@@ -41,7 +40,7 @@ public class CategoryMonthlyDeviation implements MonthAnomaly {
             return Optional.empty();
         }
 
-        double currentTotal = summary.totalAmount();
+        double currentTotal = data.summary().totalAmount();
         double zScore = Math.abs(currentTotal - historicMean) / stdDev;
         double threshold = settings.adjustedMonthlyTotalThreshold();
 
@@ -55,23 +54,25 @@ public class CategoryMonthlyDeviation implements MonthAnomaly {
                 : ((currentTotal - historicMean) / historicMean) * 100.0;
         String direction = currentTotal > historicMean ? "UP" : "DOWN";
 
-        var metadata = new HashMap<>(baselineMetadata(statistics));
+        var metadata = new HashMap<String, Object>();
+        metadata.put("baseline_months", statistics.baselineMonths());
         metadata.put("current_month_total", currentTotal);
         metadata.put("historic_mean", historicMean);
         metadata.put("historic_std_dev", stdDev);
         metadata.put("percent_change", percentChange);
         metadata.put("z_score", zScore);
         metadata.put("direction", direction);
-        metadata.put("top_contributing_transactions", summary.topContributingTransactionIds());
-        addComparisonMetadata(category, forMonth, statistics, metadata);
+        metadata.put(
+                "top_contributing_transactions", data.summary().topContributingTransactionIds());
+        addComparisonMetadata(data.category(), data.forMonth(), statistics, metadata);
 
         return Optional.of(new SpendingInsight(
                 InsightType.SPENDING_SPIKE,
-                category,
+                data.category(),
                 getSeverityFromScore(score),
                 score,
                 null,
-                forMonth.atDay(1),
+                data.forMonth().atDay(1),
                 "computed.insight.spending.spike",
                 metadata));
     }

@@ -2,14 +2,15 @@ package com.jongsoft.finance.spending.domain.service.detector.anomaly;
 
 import com.jongsoft.finance.configuration.SpendingAnalysisConfiguration;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.MonthAnomalyData;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.UserCategoryStatistics;
 import com.jongsoft.finance.spending.types.InsightType;
 
-import java.time.YearMonth;
 import java.util.HashMap;
 import java.util.Optional;
 
 /** Detects when the number of transactions in a category for the analyzed month is unusual. */
-public class UnusualFrequency implements MonthAnomaly {
+public class UnusualFrequency implements Anomaly<MonthAnomalyData> {
 
     private static final int MIN_BASELINE_MONTHS = 3;
     private static final double MIN_STD_DEV = 0.01;
@@ -22,16 +23,13 @@ public class UnusualFrequency implements MonthAnomaly {
 
     @Override
     public Optional<SpendingInsight> detect(
-            String category,
-            YearMonth forMonth,
-            CategoryMonthSummary summary,
-            UserCategoryStatistics statistics) {
-        var typicalFrequency = statistics.frequencies().get(category);
+            MonthAnomalyData data, UserCategoryStatistics statistics) {
+        var typicalFrequency = statistics.frequencies().get(data.category());
         if (typicalFrequency == null || typicalFrequency.getN() < MIN_BASELINE_MONTHS) {
             return Optional.empty();
         }
 
-        long currentMonthCount = summary.transactionCount();
+        long currentMonthCount = data.summary().transactionCount();
         double mean = typicalFrequency.getMean();
         double stdDev = typicalFrequency.getStandardDeviation();
         if (stdDev < MIN_STD_DEV) {
@@ -48,7 +46,8 @@ public class UnusualFrequency implements MonthAnomaly {
         double score = Math.min(1.0, zScore / (threshold * 2));
         String direction = currentMonthCount > mean ? "UP" : "DOWN";
 
-        var metadata = new HashMap<>(baselineMetadata(statistics));
+        var metadata = new HashMap<String, Object>();
+        metadata.put("baseline_months", statistics.baselineMonths());
         metadata.put("frequency", currentMonthCount);
         metadata.put("z_score", zScore);
         metadata.put("mean", mean);
@@ -57,11 +56,11 @@ public class UnusualFrequency implements MonthAnomaly {
 
         return Optional.of(new SpendingInsight(
                 InsightType.UNUSUAL_FREQUENCY,
-                category,
+                data.category(),
                 getSeverityFromScore(score),
                 score,
                 null,
-                forMonth.atDay(1),
+                data.forMonth().atDay(1),
                 generateMessage(currentMonthCount, mean),
                 metadata));
     }

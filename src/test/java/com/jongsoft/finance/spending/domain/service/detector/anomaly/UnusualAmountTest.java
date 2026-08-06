@@ -9,6 +9,7 @@ import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.banking.domain.model.Transaction;
 import com.jongsoft.finance.configuration.SpendingAnalysisConfiguration;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.UserCategoryStatistics;
 import com.jongsoft.finance.spending.types.Severity;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;

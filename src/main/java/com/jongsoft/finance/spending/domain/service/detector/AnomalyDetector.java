@@ -8,6 +8,9 @@ import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
 import com.jongsoft.finance.spending.domain.service.SpendingAnalyticsEnabled;
 import com.jongsoft.finance.spending.domain.service.detector.anomaly.*;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.CategoryMonthSummary;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.MonthAnomalyData;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.UserCategoryStatistics;
 import com.jongsoft.lang.Dates;
 
 import jakarta.inject.Singleton;
@@ -28,8 +31,8 @@ class AnomalyDetector implements Detector<SpendingInsight> {
     private final TransactionProvider transactionProvider;
     private final FilterProvider<TransactionProvider.FilterCommand> filterFactory;
     private final SpendingAnalysisConfiguration settings;
-    private final List<Anomaly> transactionAnomalies;
-    private final List<MonthAnomaly> monthAnomalies;
+    private final List<Anomaly<Transaction>> transactionAnomalies;
+    private final List<Anomaly<MonthAnomalyData>> monthAnomalies;
 
     private final ThreadLocal<UserCategoryStatistics> userCategoryStatistics = new ThreadLocal<>();
 
@@ -145,9 +148,9 @@ class AnomalyDetector implements Detector<SpendingInsight> {
                 .flatMap(category -> {
                     var summary =
                             summariesByCategory.getOrDefault(category, CategoryMonthSummary.EMPTY);
+                    var data = new MonthAnomalyData(category, forMonth, summary);
                     return monthAnomalies.stream()
-                            .map(anomaly ->
-                                    anomaly.detect(category, forMonth, summary, userStatistics))
+                            .map(anomaly -> anomaly.detect(data, userStatistics))
                             .filter(Optional::isPresent)
                             .map(Optional::get);
                 })
