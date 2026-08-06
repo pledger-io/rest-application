@@ -4,6 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.jongsoft.finance.configuration.SpendingAnalysisConfiguration;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.CategoryMonthSummary;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.MonthAnomalyData;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.UserCategoryStatistics;
 import com.jongsoft.finance.spending.types.Severity;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -29,8 +32,8 @@ class UnusualFrequencyTest {
         UserCategoryStatistics statistics =
                 createStatisticsWithFrequencies("Groceries", new double[] {4.0, 5.0, 3.0});
 
-        Optional<SpendingInsight> result =
-                unusualFrequency.detect("Groceries", month, summary, statistics);
+        Optional<SpendingInsight> result = unusualFrequency.detect(
+                new MonthAnomalyData("Groceries", month, summary), statistics);
 
         assertTrue(result.isPresent());
         SpendingInsight insight = result.get();
@@ -51,8 +54,8 @@ class UnusualFrequencyTest {
         UserCategoryStatistics statistics =
                 createStatisticsWithFrequencies("Utilities", new double[] {5.0, 6.0, 5.0});
 
-        Optional<SpendingInsight> result =
-                unusualFrequency.detect("Utilities", month, summary, statistics);
+        Optional<SpendingInsight> result = unusualFrequency.detect(
+                new MonthAnomalyData("Utilities", month, summary), statistics);
 
         assertTrue(result.isPresent());
         assertEquals("computed.insight.frequency.low", result.get().getMessage());
@@ -70,7 +73,7 @@ class UnusualFrequencyTest {
                 createStatisticsWithFrequencies("Entertainment", new double[] {2.0, 3.0, 4.0});
 
         assertFalse(unusualFrequency
-                .detect("Entertainment", month, summary, statistics)
+                .detect(new MonthAnomalyData("Entertainment", month, summary), statistics)
                 .isPresent());
     }
 
@@ -82,8 +85,9 @@ class UnusualFrequencyTest {
         CategoryMonthSummary summary = new CategoryMonthSummary(100.0, 3, java.util.List.of());
         UserCategoryStatistics statistics = new UserCategoryStatistics(12);
 
-        assertFalse(
-                unusualFrequency.detect("Travel", month, summary, statistics).isPresent());
+        assertFalse(unusualFrequency
+                .detect(new MonthAnomalyData("Travel", month, summary), statistics)
+                .isPresent());
     }
 
     @Test
@@ -96,8 +100,9 @@ class UnusualFrequencyTest {
         UserCategoryStatistics statistics =
                 createStatisticsWithFrequencies("Dining", new double[] {2.0, 3.0});
 
-        assertFalse(
-                unusualFrequency.detect("Dining", month, summary, statistics).isPresent());
+        assertFalse(unusualFrequency
+                .detect(new MonthAnomalyData("Dining", month, summary), statistics)
+                .isPresent());
     }
 
     private UserCategoryStatistics createStatisticsWithFrequencies(

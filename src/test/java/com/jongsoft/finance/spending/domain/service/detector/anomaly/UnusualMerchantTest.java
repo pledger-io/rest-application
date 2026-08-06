@@ -8,6 +8,7 @@ import com.jongsoft.finance.banking.domain.model.Classifier;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.banking.domain.model.Transaction;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.UserCategoryStatistics;
 import com.jongsoft.finance.spending.types.Severity;
 
 import org.junit.jupiter.api.DisplayName;

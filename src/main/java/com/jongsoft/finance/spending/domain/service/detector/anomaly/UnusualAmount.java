@@ -3,12 +3,13 @@ package com.jongsoft.finance.spending.domain.service.detector.anomaly;
 import com.jongsoft.finance.banking.domain.model.Transaction;
 import com.jongsoft.finance.configuration.SpendingAnalysisConfiguration;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.UserCategoryStatistics;
 import com.jongsoft.finance.spending.types.InsightType;
 
 import java.util.HashMap;
 import java.util.Optional;
 
-public class UnusualAmount implements Anomaly {
+public class UnusualAmount implements Anomaly<Transaction> {
 
     private static final double MIN_STD_DEV = 0.01;
     private static final int MIN_TRANSACTIONS = 5;

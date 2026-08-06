@@ -1,4 +1,4 @@
-package com.jongsoft.finance.spending.domain.service.detector.anomaly;
+package com.jongsoft.finance.spending.domain.service.detector.anomaly.data;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 

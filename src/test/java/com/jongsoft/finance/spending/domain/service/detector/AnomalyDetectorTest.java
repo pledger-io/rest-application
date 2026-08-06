@@ -14,7 +14,7 @@ import com.jongsoft.finance.core.domain.FilterProvider;
 import com.jongsoft.finance.core.domain.ResultPage;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
 import com.jongsoft.finance.spending.domain.service.detector.anomaly.Anomaly;
-import com.jongsoft.finance.spending.domain.service.detector.anomaly.UserCategoryStatistics;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.UserCategoryStatistics;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -261,7 +261,7 @@ class AnomalyDetectorTest {
     }
 
     private static class TestableAnomalyDetector extends AnomalyDetector {
-        private List<Anomaly> testAnomalies = new ArrayList<>();
+        private List<Anomaly<Transaction>> testAnomalies = new ArrayList<>();
 
         TestableAnomalyDetector(
                 TransactionProvider transactionProvider,
@@ -270,7 +270,7 @@ class AnomalyDetectorTest {
             super(transactionProvider, filterFactory, settings);
         }
 
-        void setAnomalies(List<Anomaly> anomalies) {
+        void setAnomalies(List<Anomaly<Transaction>> anomalies) {
             this.testAnomalies = anomalies;
         }
 

@@ -2,6 +2,7 @@ package com.jongsoft.finance.spending.domain.service.detector.anomaly;
 
 import com.jongsoft.finance.banking.domain.model.Transaction;
 import com.jongsoft.finance.spending.domain.model.SpendingInsight;
+import com.jongsoft.finance.spending.domain.service.detector.anomaly.data.UserCategoryStatistics;
 import com.jongsoft.finance.spending.types.InsightType;
 import com.jongsoft.finance.spending.types.Severity;
 
@@ -11,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Optional;
 
-public class UnusualMerchant implements Anomaly {
+public class UnusualMerchant implements Anomaly<Transaction> {
 
     private static final int MIN_TRANSACTIONS_FOR_AMOUNT = 5;
 
