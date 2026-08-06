@@ -29,7 +29,7 @@ dependencyResolutionManagement {
             library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.85")
             library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
             library("csv", "com.opencsv", "opencsv").version("5.12.0")
-            library("archunit", "com.tngtech.archunit", "archunit-junit5").version("1.4.2")
+            library("archunit", "com.tngtech.archunit", "archunit-junit5").version("1.5.0")
             library("awaitly", "org.awaitility", "awaitility").version("4.3.0")
         }
 
