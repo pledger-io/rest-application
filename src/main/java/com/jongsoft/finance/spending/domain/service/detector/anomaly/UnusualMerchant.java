@@ -16,6 +16,8 @@ public class UnusualMerchant implements Anomaly<Transaction> {
 
     private static final int MIN_TRANSACTIONS_FOR_AMOUNT = 5;
 
+    private static final int MIN_TRANSACTIONS_FOR_AMOUNT = 5;
+
     private final Logger log = LoggerFactory.getLogger(UnusualMerchant.class);
 
     @Override

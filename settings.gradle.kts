@@ -3,11 +3,11 @@ rootProject.name="pledger-io"
 pluginManagement {
     plugins {
         id("java")
-        id("io.micronaut.application").version("5.0.0")
-        id("io.micronaut.library").version("5.0.0")
-        id("org.sonarqube").version("7.3.0.8198")
-        id("com.diffplug.spotless").version("8.7.0")
-        id("io.micronaut.openapi").version("5.0.0")
+        id("io.micronaut.application").version("5.0.2")
+        id("io.micronaut.library").version("5.0.2")
+        id("org.sonarqube").version("7.4.0.8496")
+        id("com.diffplug.spotless").version("8.9.0")
+        id("io.micronaut.openapi").version("5.0.2")
 
         id("signing")
         id("maven-publish")
@@ -25,21 +25,21 @@ dependencyResolutionManagement {
             library("lang", "com.jongsoft.lang", "language").version("1.1.6")
             library("lang.xml", "com.jongsoft.lang", "language-fasterxml").version("1.1.0")
             library("otp", "dev.samstevens.totp", "totp").version("1.7.1")
-            library("bouncy", "org.bouncycastle", "bcprov-jdk18on").version("1.84")
-            library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.84")
+            library("bouncy", "org.bouncycastle", "bcprov-jdk18on").version("1.85")
+            library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.85")
             library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
             library("csv", "com.opencsv", "opencsv").version("5.12.0")
-            library("archunit", "com.tngtech.archunit", "archunit-junit5").version("1.4.2")
+            library("archunit", "com.tngtech.archunit", "archunit-junit5").version("1.5.0")
             library("awaitly", "org.awaitility", "awaitility").version("4.3.0")
         }
 
         create("mn") {
-            from("io.micronaut.platform:micronaut-platform:5.0.2")
+            from("io.micronaut.platform:micronaut-platform:5.1.0")
         }
 
         create("llm") {
-            val langchain4jVersion: String = "1.12.2"
-            val betaVersion: String = "$langchain4jVersion-beta22"
+            val langchain4jVersion: String = "1.17.2"
+            val betaVersion: String = "$langchain4jVersion-beta27"
             library("core", "dev.langchain4j", "langchain4j").version(langchain4jVersion)
             library("retriever-sql", "dev.langchain4j", "langchain4j-pgvector").version(betaVersion)
             library("store", "dev.langchain4j", "langchain4j-embeddings-all-minilm-l6-v2").version(betaVersion)
