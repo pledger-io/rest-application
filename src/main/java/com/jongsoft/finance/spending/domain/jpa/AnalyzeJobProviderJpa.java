@@ -1,6 +1,5 @@
 package com.jongsoft.finance.spending.domain.jpa;
 
-import com.jongsoft.finance.core.domain.jpa.entity.UserAccountJpa;
 import com.jongsoft.finance.core.domain.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.spending.adapter.api.AnalyzeJobProvider;
 import com.jongsoft.finance.spending.domain.commands.CompleteAnalyzeJob;
@@ -53,14 +52,10 @@ class AnalyzeJobProviderJpa implements AnalyzeJobProvider {
 
         var entity = new AnalyzeJobJpa();
         entity.setId(UUID.randomUUID().toString());
-        entity.setUser(entityManager
-                .from(UserAccountJpa.class)
-                .fieldEq("username", command.user().email())
-                .singleResult()
-                .get());
+        entity.setUser(entityManager.currentUser());
         entity.setYearMonth(command.month().toString());
 
-        entityManager.getEntityManager().persist(entity);
+        entityManager.getEntityManager().merge(entity);
     }
 
     @EventListener
