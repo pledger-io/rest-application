@@ -8,6 +8,7 @@ import io.micronaut.context.annotation.Mapper;
 
 import jakarta.inject.Singleton;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -25,6 +26,12 @@ public interface BudgetMapper {
     Budget.Expense toDomain(ExpensePeriodJpa entity);
 
     default List<Budget.Expense> expensesList(Set<ExpensePeriodJpa> entity) {
-        return entity.stream().map(this::toDomain).toList();
+        return entity.stream()
+                .map(this::toDomain)
+                .sorted(Comparator.comparing(Budget.Expense::getName, String.CASE_INSENSITIVE_ORDER)
+                        .thenComparing(
+                                Budget.Expense::getId,
+                                Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
     }
 }
