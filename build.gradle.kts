@@ -37,6 +37,10 @@ micronaut {
     testRuntime("junit5")
     runtime("jetty")
 
+    application {
+        mainClass.set("com.jongsoft.finance.Pledger")
+    }
+
     openapi {
         server(file("src/contract/pledger-api.yaml")) {
             apiPackageName = "com.jongsoft.finance.rest"
