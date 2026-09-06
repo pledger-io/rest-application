@@ -2,6 +2,7 @@ package com.jongsoft.finance.banking.domain.jpa.handler;
 
 import com.jongsoft.finance.banking.domain.commands.CreateAccountCommand;
 import com.jongsoft.finance.banking.types.SystemAccountTypes;
+import com.jongsoft.finance.core.domain.commands.InternalAuthenticationEvent;
 import com.jongsoft.finance.core.domain.commands.UserCreatedCommand;
 
 import io.micronaut.runtime.event.annotation.EventListener;
@@ -17,6 +18,7 @@ class CreateUserHandler {
     @EventListener
     public void userWasCreated(UserCreatedCommand command) {
         log.info("[{}] - Creating reconcile account for user.", command.username());
+        InternalAuthenticationEvent.authenticate(command.username());
         CreateAccountCommand.accountCreated(
                 "Reconcile Account", "EUR", SystemAccountTypes.RECONCILE.label());
     }
