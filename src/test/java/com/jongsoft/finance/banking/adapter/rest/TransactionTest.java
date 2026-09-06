@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.*;
 
@@ -127,5 +128,56 @@ public class TransactionTest extends RestTestSetup {
 
         requests.fetchTransaction(id)
               .statusCode(410);
+    }
+
+    @Test
+    @DisplayName("Create a transaction, split it into 2 parts")
+    void splitTransaction(PledgerContext context, PledgerRequests requests) {
+        context.withUser("transaction-create-split@account.local")
+            .withBankAccount("Checking", "EUR", "default")
+            .withCreditor("Netflix", "EUR");
+        requests.authenticate("transaction-create-split@account.local");
+
+        var sourceId = requests.searchBankAccounts(0, 1, List.of(), "checking")
+            .extract().jsonPath().getLong("content[0].id");
+        var destinationId = requests.searchBankAccounts(0, 1, List.of("creditor"), "netfl")
+            .body("content[0].id", notNullValue())
+            .extract().jsonPath().getLong("content[0].id");
+
+        var id = requests.createTransaction(sourceId, destinationId, 19.99, "EUR", LocalDate.now(), "Monthly payment")
+            .statusCode(201)
+            .body("id", notNullValue())
+            .body("amount", equalTo(19.99F))
+            .body("currency", equalTo("EUR"))
+            .body("dates.transaction", equalTo(LocalDate.now().toString()))
+            .body("description", equalTo("Monthly payment"))
+            .extract().jsonPath().getLong("id");
+
+        requests.splitTransaction(id, Map.of("First line", 12.95, "Second line", 0.50))
+            .statusCode(200)
+            .body("amount", equalTo(13.45F))
+            .body("currency", equalTo("EUR"))
+            .body("dates.transaction", equalTo(LocalDate.now().toString()))
+            .body("description", equalTo("Monthly payment"))
+            .body("split.find { it.description == 'Second line' }.amount", equalTo(0.5F))
+            .body("split.find { it.description == 'First line' }.amount", equalTo(12.95F));
+
+        context.withTag("streaming")
+            .withCategory("Streaming Services");
+
+        var catId = requests.searchCategories(0, 2, "stream")
+            .body("content[0].id", notNullValue())
+            .extract().jsonPath().getLong("content[0].id");
+
+        requests.updateTransaction(id, sourceId, destinationId, "Netflix payment", 19.95, LocalDate.now(), catId, null, null, "streaming")
+            .statusCode(200)
+            .body("amount", equalTo(13.45F))
+            .body("currency", equalTo("EUR"))
+            .body("dates.transaction", equalTo(LocalDate.now().toString()))
+            .body("description", equalTo("Netflix payment"))
+            .body("metadata.category", equalTo("Streaming Services"))
+            .body("metadata.tags", hasItem("streaming"))
+            .body("split.find { it.description == 'Second line' }.amount", equalTo(0.5F))
+            .body("split.find { it.description == 'First line' }.amount", equalTo(12.95F));
     }
 }

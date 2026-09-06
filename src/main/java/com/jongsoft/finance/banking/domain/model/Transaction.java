@@ -290,7 +290,7 @@ public class Transaction implements Serializable {
      */
     public double computeAmount(Account account) {
         return transactions
-                .filter(t -> Objects.equals(t.getAccount(), account))
+                .filter(t -> Objects.equals(account.getId(), t.getAccount().getId()))
                 .map(Part::getAmount)
                 .reduce(Double::sum);
     }

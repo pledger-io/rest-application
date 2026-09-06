@@ -104,7 +104,7 @@ class TransactionCommandController implements TransactionCommandApi {
 
         transaction.split(splits);
 
-        return TransactionMapper.toTransactionResponse(transaction);
+        return TransactionMapper.toTransactionResponse(lookupTransactionByIdOrThrow(id));
     }
 
     @Override

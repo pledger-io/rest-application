@@ -17,7 +17,7 @@ public interface TransactionMapper {
         response.id(transaction.getId());
         response.description(transaction.getDescription());
         response.currency(transaction.getCurrency());
-        response.amount(transaction.computeAmount(transaction.computeTo()));
+        response.amount(transaction.computeAmount(destination));
         response.metadata(metadata);
         response.type(
                 TransactionResponseType.fromValue(transaction.computeType().name()));
@@ -69,7 +69,7 @@ public interface TransactionMapper {
 
             transaction
                     .getTransactions()
-                    .filter(t -> t.getAccount().equals(splitFor))
+                    .filter(t -> t.getAccount().getId().equals(splitFor.getId()))
                     .map(part -> new TransactionResponseSplitInner(
                             part.getDescription(), part.getAmount()))
                     .forEach(response::addSplitItem);
