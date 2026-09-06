@@ -3,6 +3,7 @@ package com.jongsoft.finance.banking.adapter.rest;
 import com.jongsoft.finance.banking.adapter.api.AccountProvider;
 import com.jongsoft.finance.banking.adapter.api.LinkableProvider;
 import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
+import com.jongsoft.finance.banking.domain.model.Account;
 import com.jongsoft.finance.banking.domain.model.Classifier;
 import com.jongsoft.finance.banking.domain.model.EntityRef;
 import com.jongsoft.finance.banking.types.TransactionLinkType;
@@ -83,7 +84,7 @@ class StatisticsBalanceController implements StatisticsBalanceApi {
 
         Sequence<? extends Classifier> entities =
                 switch (partition) {
-                    case ACCOUNT -> accountProvider.lookup();
+                    case ACCOUNT -> accountProvider.lookup().filter(Account::isRealAccount);
                     case BUDGET ->
                         linkableProviders.stream()
                                 .filter(provider -> provider.typeOf()
@@ -99,17 +100,31 @@ class StatisticsBalanceController implements StatisticsBalanceApi {
                                 .orElse(Collections.List());
                 };
 
+        if (partition == ComputePartitionedBalanceWithFilterPartitionParameter.ACCOUNT
+                && balanceRequest.getAccounts() != null
+                && !balanceRequest.getAccounts().isEmpty()) {
+            // if the search includes an account list and partition by account then filter the
+            // partition entities
+            entities = entities.filter(a -> balanceRequest.getAccounts().contains(a.getId()));
+        }
+        if (partition == ComputePartitionedBalanceWithFilterPartitionParameter.CATEGORY
+                && balanceRequest.getCategories() != null
+                && !balanceRequest.getCategories().isEmpty()) {
+            // if the search includes a category list and partition by category then filter
+            entities = entities.filter(a -> balanceRequest.getCategories().contains(a.getId()));
+        }
+
         var results = new ArrayList<BalancePartitionedResponse>();
         for (var entity : entities) {
-            var entityList = Collections.List(new EntityRef(entity.getId()));
-            var filter =
-                    switch (partition) {
-                        case ACCOUNT -> toFilterCommand(balanceRequest).accounts(entityList);
-                        case CATEGORY -> toFilterCommand(balanceRequest).categories(entityList);
-                        case BUDGET -> toFilterCommand(balanceRequest).expenses(entityList);
-                    };
+            switch (partition) {
+                case ACCOUNT -> balanceRequest.setAccounts(List.of(entity.getId()));
+                case CATEGORY -> balanceRequest.setCategories(List.of(entity.getId()));
+                case BUDGET -> balanceRequest.setExpenses(List.of(entity.getId()));
+            }
 
-            var balance = transactionProvider.balance(filter).getOrSupply(() -> BigDecimal.ZERO);
+            var balance = transactionProvider
+                    .balance(toFilterCommand(balanceRequest))
+                    .getOrSupply(() -> BigDecimal.ZERO);
             total = total.subtract(balance);
             results.add(new BalancePartitionedResponse(balance.doubleValue(), entity.toString()));
         }
