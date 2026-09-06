@@ -14,6 +14,7 @@ import io.micronaut.core.annotation.Introspected;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
 
 @Introspected
 public class Account implements Serializable, Classifier {
@@ -238,6 +239,12 @@ public class Account implements Serializable, Classifier {
         return !Collections.List(SystemAccountTypes.values())
                 .map(SystemAccountTypes::label)
                 .contains(type.toLowerCase());
+    }
+
+    public boolean isRealAccount() {
+        return !"reconcile".equals(type)
+                && Arrays.stream(SystemAccountTypes.values())
+                        .anyMatch(type -> type.label().equals(this.type));
     }
 
     public Long getId() {

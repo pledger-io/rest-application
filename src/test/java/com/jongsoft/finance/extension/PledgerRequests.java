@@ -809,4 +809,25 @@ public class PledgerRequests {
                 .log()
                 .ifValidationFails();
     }
+
+    public ValidatableResponse computeBalanceSplitAccount(
+        Range<LocalDate> range, List<Long> accountIds, List<Long> categories) {
+        return given(requestSpecification)
+            .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+            .log()
+            .ifValidationFails()
+            .contentType(ContentType.JSON)
+            .body(                        Map.of(
+                "range",
+                Map.of(
+                    "startDate", range.from().toString(),
+                    "endDate", range.until().toString()),
+                "accounts", accountIds,
+                "categories", categories))
+            .when()
+            .post("/v2/api/balance/account")
+            .then()
+            .log()
+            .ifValidationFails();
+    }
 }
