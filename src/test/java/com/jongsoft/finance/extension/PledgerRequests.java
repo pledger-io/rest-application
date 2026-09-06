@@ -8,6 +8,7 @@ import io.restassured.specification.RequestSpecification;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -596,6 +597,24 @@ public class PledgerRequests {
                 .then()
                 .log()
                 .ifValidationFails();
+    }
+
+    public ValidatableResponse splitTransaction(long id, Map<String, Double> splits) {
+        List<Map<String, Object>> splitTransactions = new ArrayList<>();
+        splits.forEach((key, value) -> splitTransactions.add(Map.of("amount", value, "description", key)));
+
+        return given(requestSpecification)
+            .header("Authorization", "Bearer " + bearerTokenProvider.apply(authenticatedUser))
+            .log()
+            .ifValidationFails()
+            .contentType(ContentType.JSON)
+            .pathParam("id", id)
+            .body(splitTransactions)
+            .when()
+            .patch("/v2/api/transactions/{id}")
+            .then()
+            .log()
+            .ifValidationFails();
     }
 
     public ValidatableResponse updateTransaction(
