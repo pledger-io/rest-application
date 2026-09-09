@@ -1,19 +1,5 @@
 rootProject.name="pledger-io"
 
-pluginManagement {
-    plugins {
-        id("java")
-        id("io.micronaut.application").version("5.0.2")
-        id("io.micronaut.library").version("5.0.2")
-        id("org.sonarqube").version("7.5.0.8588")
-        id("com.diffplug.spotless").version("8.10.2")
-        id("io.micronaut.openapi").version("5.0.2")
-
-        id("signing")
-        id("maven-publish")
-    }
-}
-
 dependencyResolutionManagement {
     @Suppress("UnstableApiUsage") // It's gradle, any of their APIs can be considered unstable
     repositories {
@@ -21,34 +7,8 @@ dependencyResolutionManagement {
     }
 
     versionCatalogs {
-        create("libs") {
-            library("lang", "com.jongsoft.lang", "language").version("1.1.6")
-            library("lang.xml", "com.jongsoft.lang", "language-fasterxml").version("1.1.0")
-            library("otp", "dev.samstevens.totp", "totp").version("1.7.1")
-            library("bouncy", "org.bouncycastle", "bcprov-jdk18on").version("1.85.2")
-            library("bcpkix", "org.bouncycastle", "bcpkix-jdk18on").version("1.85")
-            library("bcrypt", "at.favre.lib", "bcrypt").version("0.10.2")
-            library("csv", "com.opencsv", "opencsv").version("5.12.0")
-            library("archunit", "com.tngtech.archunit", "archunit-junit5").version("1.5.0")
-            library("awaitly", "org.awaitility", "awaitility").version("4.3.0")
-        }
-
         create("mn") {
             from("io.micronaut.platform:micronaut-platform:5.1.3")
-        }
-
-        create("llm") {
-            val langchain4jVersion: String = "1.19.0"
-            val betaVersion: String = "$langchain4jVersion-beta29"
-            library("core", "dev.langchain4j", "langchain4j").version(langchain4jVersion)
-            library("retriever-sql", "dev.langchain4j", "langchain4j-pgvector").version(betaVersion)
-            library("store", "dev.langchain4j", "langchain4j-embeddings-all-minilm-l6-v2").version(betaVersion)
-            library("agentic", "dev.langchain4j", "langchain4j-agentic").version(betaVersion)
-            library("model-openai", "dev.langchain4j", "langchain4j-open-ai").version(langchain4jVersion)
-            library("model-ollama", "dev.langchain4j", "langchain4j-ollama").version(langchain4jVersion)
-
-            bundle("embeddings", listOf("core", "store", "retriever-sql"))
-            bundle("langchain4j", listOf("core", "retriever-sql", "store", "agentic", "model-openai", "model-ollama"))
         }
     }
 }

@@ -1,0 +1,52 @@
+[versions]
+bouncycastle-bcprov = "1.85.2"
+bouncycastle-bcpkix = "1.85"
+bcrypt = "0.10.2"
+totp = "1.7.1"
+parser-opencsv = "5.12.0"
+
+test-awaitly = "4.3.0"
+test-archunit = "1.5.0"
+
+ai-langchain = "1.20.0"
+ai-langchain-beta = "1.20.0-beta30"
+commons-math = "3.6.1"
+
+[libraries]
+bouncycastle-bcprov = { module = "org.bouncycastle:bcprov-jdk18on", version.ref = "bouncycastle-bcprov" }
+bouncycastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle-bcpkix" }
+bcrypt = { module = "at.favre.lib:bcrypt", version.ref = "bcrypt" }
+totp = { module = "dev.samstevens.totp:totp", version.ref = "totp" }
+
+parser-opencsv = { module = "com.opencsv:opencsv", version.ref = "parser-opencsv" }
+
+jongsoft-lang = { module = "com.jongsoft.lang:language", version = "1.1.6" }
+jongsoft-xml = { module = "com.jongsoft.lang:language-fasterxml", version = "1.1.0" }
+
+test-awaitly = { module = "org.awaitility:awaitility", version.ref = "test-awaitly" }
+test-archunit = { module = "com.tngtech.archunit:archunit-junit5", version.ref = "test-archunit" }
+
+ai-langchain-core = { module = "dev.langchain4j:langchain4j", version.ref = "ai-langchain"}
+ai-langchain-agentic = { module = "dev.langchain4j:langchain4j-agentic", version.ref = "ai-langchain-beta"}
+ai-langchain-ollama = { module = "dev.langchain4j:langchain4j-ollama", version.ref = "ai-langchain"}
+ai-langchain-openai = { module = "dev.langchain4j:langchain4j-open-ai", version.ref = "ai-langchain"}
+ai-langchain-vector = { module = "dev.langchain4j:langchain4j-pgvector", version.ref = "ai-langchain-beta"}
+ai-langchain-embedding = { module = "dev.langchain4j:langchain4j-embeddings-all-minilm-l6-v2", version.ref = "ai-langchain-beta"}
+
+commons-math = { module = "org.apache.commons:commons-math3", version.ref = "commons-math" }
+
+[bundles]
+encryption = ["bouncycastle-bcprov", "bouncycastle-bcpkix", "bcrypt", "totp"]
+jongsoft = ["jongsoft-lang", "jongsoft-xml"]
+parsers = ["parser-opencsv"]
+
+test = ["test-awaitly", "test-archunit"]
+ai = ["ai-langchain-core", "ai-langchain-agentic", "ai-langchain-ollama", "ai-langchain-openai", "ai-langchain-vector", "ai-langchain-embedding"]
+
+[plugins]
+micronaut-application = { id = "io.micronaut.application", version = "5.0.2" }
+micronaut-openapi = { id = "io.micronaut.openapi", version = "5.0.2" }
+
+analysis-sonar = { id = "org.sonarqube", version = "7.5.0.8588" }
+analysis-spotless = { id = "com.diffplug.spotless", version = "8.10.2" }
+analysis-axion = { id = "pl.allegro.tech.build.axion-release", version = "1.21.3" }

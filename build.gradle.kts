@@ -1,14 +1,13 @@
 plugins {
-    id("io.micronaut.application")
-    id("com.diffplug.spotless")
     id("maven-publish")
     id("java")
-
-    id("org.sonarqube")
     id("jacoco")
-    id("io.micronaut.openapi")
 
-    id("pl.allegro.tech.build.axion-release") version "1.21.3"
+    alias(libs.plugins.micronaut.application)
+    alias(libs.plugins.micronaut.openapi)
+    alias(libs.plugins.analysis.sonar)
+    alias(libs.plugins.analysis.spotless)
+    alias(libs.plugins.analysis.axion)
 }
 
 java {
@@ -96,7 +95,7 @@ tasks.processResources {
     filesMatching("**/micronaut-banner.txt") {
         filter { line ->
             var updated = line.replace("\${application.version}", project.version.toString())
-            updated.replace("\${micronaut.version}", properties.get("micronautVersion").toString())
+            updated.replace("\${micronaut.version}", property("micronautVersion").toString())
         }
     }
 }
@@ -138,19 +137,13 @@ dependencies {
 
     implementation(mn.log4j)
 
-    implementation(libs.bouncy)
-    implementation(libs.bcpkix)
-    implementation(libs.bcrypt)
-
-    implementation(libs.lang)
-    implementation(libs.otp)
-
-    implementation(libs.csv)
+    implementation(libs.bundles.encryption)
+    implementation(libs.bundles.jongsoft)
+    implementation(libs.bundles.parsers)
 
     // Machine learning dependencies
-    implementation(llm.bundles.embeddings)
-    implementation(llm.bundles.langchain4j)
-    implementation("org.apache.commons:commons-math3:3.6.1")
+    implementation(libs.bundles.ai)
+    implementation(libs.commons.math)
 
     runtimeOnly(mn.micronaut.serde.jackson)
     runtimeOnly(mn.h2)
@@ -162,11 +155,10 @@ dependencies {
     // Setup for the test suites
     testImplementation(mn.micronaut.test.junit5)
     testImplementation(mn.micronaut.test.rest.assured)
-    testImplementation(libs.awaitly)
     testImplementation(mn.junit.jupiter.api)
     testImplementation(mn.mockito.core)
     testImplementation(mn.assertj.core)
-    testImplementation(libs.archunit)
+    testImplementation(libs.bundles.test)
     testRuntimeOnly(mn.logback.classic)
 }
 
