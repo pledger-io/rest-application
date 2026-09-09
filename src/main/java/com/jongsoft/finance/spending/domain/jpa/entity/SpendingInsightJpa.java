@@ -40,7 +40,7 @@ public class SpendingInsightJpa implements WithId {
     @Column(name = "year_month_found")
     private String yearMonth;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "spending_insight_metadata",
             joinColumns = @JoinColumn(name = "insight_id"))
