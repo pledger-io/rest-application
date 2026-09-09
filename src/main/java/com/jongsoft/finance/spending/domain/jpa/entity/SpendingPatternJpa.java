@@ -37,7 +37,7 @@ public class SpendingPatternJpa implements WithId {
     @Column(name = "year_month_found")
     private String yearMonth;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "spending_pattern_metadata",
             joinColumns = @JoinColumn(name = "pattern_id"))
