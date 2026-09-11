@@ -1,5 +1,5 @@
 [versions]
-bouncycastle-bcprov = "1.85.2"
+bouncycastle-bcprov = "1.86"
 bouncycastle-bcpkix = "1.85"
 bcrypt = "0.10.2"
 totp = "1.7.1"
