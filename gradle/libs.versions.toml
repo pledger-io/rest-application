@@ -1,6 +1,6 @@
 [versions]
 bouncycastle-bcprov = "1.86"
-bouncycastle-bcpkix = "1.85"
+bouncycastle-bcpkix = "1.86"
 bcrypt = "0.10.2"
 totp = "1.7.1"
 parser-opencsv = "5.12.0"
