@@ -5,6 +5,8 @@ import io.micronaut.core.bind.annotation.Bindable;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.time.Duration;
+
 @ConfigurationProperties("micronaut.application.security")
 public interface SecuritySettings {
 
@@ -15,4 +17,8 @@ public interface SecuritySettings {
     @NotNull
     @Bindable(defaultValue = "true")
     boolean isEncrypt();
+
+    @NotNull
+    @Bindable(defaultValue = "P30D")
+    Duration getRefreshTokenMaxAge();
 }
