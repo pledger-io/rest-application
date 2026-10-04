@@ -8,7 +8,7 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("mn") {
-            from("io.micronaut.platform:micronaut-platform:5.1.5")
+            from("io.micronaut.platform:micronaut-platform:5.2.1")
         }
     }
 }
