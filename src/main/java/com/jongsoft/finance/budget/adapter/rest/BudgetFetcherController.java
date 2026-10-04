@@ -1,8 +1,7 @@
 package com.jongsoft.finance.budget.adapter.rest;
 
 import com.jongsoft.finance.StatusException;
-import com.jongsoft.finance.banking.adapter.api.TransactionProvider;
-import com.jongsoft.finance.banking.domain.model.EntityRef;
+import com.jongsoft.finance.budget.adapter.api.BudgetCalculator;
 import com.jongsoft.finance.budget.adapter.api.BudgetProvider;
 import com.jongsoft.finance.budget.adapter.api.ExpenseProvider;
 import com.jongsoft.finance.core.domain.FilterProvider;
@@ -10,8 +9,6 @@ import com.jongsoft.finance.rest.BudgetFetcherApi;
 import com.jongsoft.finance.rest.model.BudgetResponse;
 import com.jongsoft.finance.rest.model.ExpenseComputedResponse;
 import com.jongsoft.finance.rest.model.ExpenseResponse;
-import com.jongsoft.lang.Collections;
-import com.jongsoft.lang.Dates;
 
 import io.micronaut.http.annotation.Controller;
 
@@ -20,12 +17,8 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
+import java.time.YearMonth;
 import java.util.List;
 
 @Controller
@@ -34,21 +27,18 @@ class BudgetFetcherController implements BudgetFetcherApi {
     private final Logger logger;
     private final BudgetProvider budgetProvider;
     private final ExpenseProvider expenseProvider;
+    private final BudgetCalculator budgetCalculator;
     private final FilterProvider<ExpenseProvider.FilterCommand> filterFactory;
-    private final FilterProvider<TransactionProvider.FilterCommand> transactionFilterFactory;
-    private final TransactionProvider transactionProvider;
 
     BudgetFetcherController(
             BudgetProvider budgetProvider,
             ExpenseProvider expenseProvider,
-            FilterProvider<ExpenseProvider.FilterCommand> filterFactory,
-            FilterProvider<TransactionProvider.FilterCommand> transactionFilterFactory,
-            TransactionProvider transactionProvider) {
+            BudgetCalculator budgetCalculator,
+            FilterProvider<ExpenseProvider.FilterCommand> filterFactory) {
         this.budgetProvider = budgetProvider;
         this.expenseProvider = expenseProvider;
+        this.budgetCalculator = budgetCalculator;
         this.filterFactory = filterFactory;
-        this.transactionFilterFactory = transactionFilterFactory;
-        this.transactionProvider = transactionProvider;
         this.logger = LoggerFactory.getLogger(BudgetFetcherController.class);
     }
 
@@ -57,44 +47,16 @@ class BudgetFetcherController implements BudgetFetcherApi {
             Integer year, Integer month, List<Long> expenseId) {
         logger.info("Computing budget expense balance for {}-{}.", year, month);
 
-        var budget = budgetProvider
-                .lookup(year, month)
-                .getOrThrow(() ->
-                        StatusException.badRequest("Cannot fetch expenses, no budget found."));
-
-        var dateRange = Dates.range(LocalDate.of(year, month, 1), ChronoUnit.MONTHS);
-        var days = (int) ChronoUnit.DAYS.between(dateRange.from(), dateRange.until());
-
-        var computedExpenses = new ArrayList<ExpenseComputedResponse>();
-        for (var expense : budget.getExpenses()) {
-            if (!expenseId.isEmpty() && !expenseId.contains(expense.getId())) {
-                continue;
-            }
-
-            var filter = transactionFilterFactory
-                    .create()
-                    .range(dateRange)
-                    .onlyIncome(false)
-                    .ownAccounts()
-                    .expenses(Collections.List(new EntityRef(expense.getId())));
-            var balance = transactionProvider
-                    .balance(filter)
-                    .getOrSupply(() -> BigDecimal.ZERO)
-                    .doubleValue();
-            computedExpenses.add(new ExpenseComputedResponse(
-                    expense.getId(),
-                    expense.computeBudget() - balance,
-                    calculateDaily(
-                                    BigDecimal.valueOf(expense.computeBudget())
-                                            .subtract(BigDecimal.valueOf(Math.abs(balance)))
-                                            .doubleValue(),
-                                    days)
-                            .doubleValue(),
-                    balance,
-                    calculateDaily(balance, days).doubleValue()));
-        }
-
-        return computedExpenses;
+        return budgetCalculator.computeExpenses(YearMonth.of(year, month)).stream()
+                .filter(c ->
+                        expenseId.isEmpty() || expenseId.contains(c.expense().getId()))
+                .map(c -> new ExpenseComputedResponse(
+                        c.expense().getId(),
+                        c.amountLeft().doubleValue(),
+                        c.dailyLeft().doubleValue(),
+                        c.amountSpent().doubleValue(),
+                        c.dailySpent().doubleValue()))
+                .toList();
     }
 
     @Override
@@ -134,11 +96,5 @@ class BudgetFetcherController implements BudgetFetcherApi {
                 .content()
                 .map(BudgetMapper::toBudgetExpense)
                 .toJava();
-    }
-
-    private BigDecimal calculateDaily(double spent, int days) {
-        return BigDecimal.valueOf(spent)
-                .divide(BigDecimal.valueOf(days), new MathContext(6, RoundingMode.HALF_UP))
-                .setScale(2, RoundingMode.HALF_UP);
     }
 }
