@@ -78,14 +78,25 @@ public class StatisticalTest extends RestTestSetup {
             .statusCode(200)
             .extract().jsonPath().getLong("content[0].id");
 
+        Long checkingId = requests.searchBankAccounts(0, 1, List.of("default"), "Checking")
+            .statusCode(200)
+            .extract().jsonPath().getLong("content[0].id");
+
         requests.computeBalanceSplitAccount(range(of(2023, 1, 1), of(2023, 3, 1)), List.of(), List.of())
             .statusCode(200)
-            .body("[0].balance", Matchers.equalTo(50.44F))
-            .body("[0].partition", Matchers.equalTo("Netflix"));
+            .body("find { it.partition == 'Netflix' }.balance", Matchers.equalTo(50.44F))
+            .body("find { it.partition == 'Checking' }.balance", Matchers.equalTo(-50.44F));
 
         requests.computeBalanceSplitAccount(range(of(2023, 1, 1), of(2023, 3, 1)), List.of(netflixId), List.of())
             .statusCode(200)
             .body("[0].balance", Matchers.equalTo(50.44F))
-            .body("[0].partition", Matchers.equalTo("Netflix"));
+            .body("[0].partition", Matchers.equalTo("Netflix"))
+            .body("findAll { it.partition == 'Checking' }", Matchers.empty());
+
+        requests.computeBalanceSplitAccount(range(of(2023, 1, 1), of(2023, 3, 1)), List.of(checkingId), List.of())
+            .statusCode(200)
+            .body("[0].balance", Matchers.equalTo(-50.44F))
+            .body("[0].partition", Matchers.equalTo("Checking"))
+            .body("findAll { it.partition == 'Netflix' }", Matchers.empty());
     }
 }
