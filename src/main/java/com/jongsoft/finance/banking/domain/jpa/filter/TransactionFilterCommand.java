@@ -17,6 +17,7 @@ import com.jongsoft.lang.time.Range;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public class TransactionFilterCommand extends JpaFilterBuilder<TransactionJournal>
@@ -121,6 +122,13 @@ public class TransactionFilterCommand extends JpaFilterBuilder<TransactionJourna
                         .fieldEqParentField("journal.id", "id")
                         .fieldNull("deleted")
                         .fieldEqOneOf("account.type.label", types));
+        return this;
+    }
+
+    @Override
+    public TransactionProvider.FilterCommand forAccountTypes(Set<String> accountTypes) {
+        query().condition(Expressions.fieldCondition(
+                "t", "account.type.label", FieldEquation.IN, accountTypes));
         return this;
     }
 

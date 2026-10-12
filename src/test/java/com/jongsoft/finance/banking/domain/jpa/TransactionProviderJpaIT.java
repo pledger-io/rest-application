@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 @DisplayName("Database - Transactions")
 class TransactionProviderJpaIT extends JpaTestSetup {
@@ -79,7 +80,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         var filter = filterFactory.create().currency("EUR");
 
         var check = transactionProvider.lookup(filter);
-        Assertions.assertThat(check.content()).hasSize(3);
+        Assertions.assertThat(check.content()).hasSize(4);
     }
 
     @Test
@@ -88,7 +89,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         Assertions.assertThat(check).hasSize(2);
         Assertions.assertThat(check)
                 .containsOnly(
-                        new DailySummaryImpl(LocalDate.of(2019, 1, 1), BigDecimal.valueOf(30.2D)),
+                        new DailySummaryImpl(LocalDate.of(2019, 1, 1), BigDecimal.valueOf(20.2D)),
                         new DailySummaryImpl(LocalDate.of(2019, 1, 2), BigDecimal.valueOf(20.2D)));
     }
 
@@ -98,7 +99,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         Assertions.assertThat(check).hasSize(1);
         Assertions.assertThat(check)
                 .containsOnly(
-                        new DailySummaryImpl(LocalDate.of(2019, 1, 1), BigDecimal.valueOf(50.4D)));
+                        new DailySummaryImpl(LocalDate.of(2019, 1, 1), BigDecimal.valueOf(40.4D)));
     }
 
     @Test
@@ -106,7 +107,7 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         var check = transactionProvider.balance(filterFactory.create().ownAccounts());
 
         Assertions.assertThat(check.isPresent()).isTrue();
-        Assertions.assertThat(check.get()).isEqualByComparingTo(BigDecimal.valueOf(50.4));
+        Assertions.assertThat(check.get()).isEqualByComparingTo(BigDecimal.valueOf(40.4));
     }
 
     @Test
@@ -114,5 +115,12 @@ class TransactionProviderJpaIT extends JpaTestSetup {
         var check = transactionProvider.similar(
                 new EntityRef(1L), new EntityRef(2L), 20.2, LocalDate.of(2019, 1, 1));
         Assertions.assertThat(check).hasSize(1);
+    }
+
+    @Test
+    void forAccountTypes() {
+        var check =
+                transactionProvider.lookup(filterFactory.create().forAccountTypes(Set.of("loan")));
+        Assertions.assertThat(check.content()).hasSize(1);
     }
 }

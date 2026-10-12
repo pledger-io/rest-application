@@ -9,6 +9,7 @@ import com.jongsoft.lang.time.Range;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 public interface TransactionProvider {
 
@@ -110,6 +111,14 @@ public interface TransactionProvider {
          * @return this instance
          */
         FilterCommand transfers();
+
+        /**
+         * Only include transactions for the given account types. This operation is mutually
+         * exclusive with {@link #ownAccounts()} and {@link #transfers()}.
+         *
+         * @return this instance
+         */
+        FilterCommand forAccountTypes(Set<String> accountTypes);
 
         /**
          * Set the page to retrieve, if a page is set greater then available the result will be a
