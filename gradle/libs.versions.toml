@@ -47,6 +47,6 @@ ai = ["ai-langchain-core", "ai-langchain-agentic", "ai-langchain-ollama", "ai-la
 micronaut-application = { id = "io.micronaut.application", version = "5.0.2" }
 micronaut-openapi = { id = "io.micronaut.openapi", version = "5.0.2" }
 
-analysis-sonar = { id = "org.sonarqube", version = "7.5.0.8588" }
+analysis-sonar = { id = "org.sonarqube", version = "7.6.0.18749" }
 analysis-spotless = { id = "com.diffplug.spotless", version = "8.10.4" }
 analysis-axion = { id = "pl.allegro.tech.build.axion-release", version = "1.21.4" }
