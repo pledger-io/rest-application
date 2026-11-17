@@ -4,15 +4,19 @@ import com.jongsoft.finance.health.domain.commands.HealthSnapshotCreated;
 import com.jongsoft.finance.health.types.HealthRating;
 import com.jongsoft.finance.health.types.HealthSnapshotStatus;
 
+import io.micronaut.core.annotation.Creator;
+import io.micronaut.core.annotation.Introspected;
+
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Currency;
 
+@Introspected
 public class HealthSnapshot {
 
     public record Configuration(int windowMonths, int algorithmVersion) {}
 
-    public record HealthScore(int score, HealthRating rating) {}
+    public record HealthScore(Integer score, HealthRating rating) {}
 
     private final YearMonth period;
     private final Configuration configuration;
@@ -27,25 +31,26 @@ public class HealthSnapshot {
     private HealthComponent debtToIncome;
 
     // Constructor for mappers
+    @Creator
     HealthSnapshot(
-        String period,
-        int windowMonths,
-        int algorithmVersion,
-        Currency currency,
-        HealthSnapshotStatus status,
-        LocalDateTime computedAt,
-        int score,
-        HealthRating rating,
-        HealthComponent savingRate,
-        HealthComponent budgetAdherence,
-        HealthComponent debtToIncome) {
+            String period,
+            int windowMonths,
+            int algorithmVersion,
+            Currency currency,
+            HealthSnapshotStatus status,
+            LocalDateTime computedAt,
+            Integer score,
+            HealthRating rating,
+            HealthComponent savingsRate,
+            HealthComponent budgetAdherence,
+            HealthComponent debtToIncome) {
         this.period = YearMonth.parse(period);
         this.configuration = new Configuration(windowMonths, algorithmVersion);
         this.currency = currency;
         this.status = status;
         this.computedAt = computedAt;
         this.healthScore = new HealthScore(score, rating);
-        this.savingsRate = savingRate;
+        this.savingsRate = savingsRate;
         this.budgetAdherence = budgetAdherence;
         this.debtToIncome = debtToIncome;
     }
@@ -69,5 +74,41 @@ public class HealthSnapshot {
     public static HealthSnapshot of(
             YearMonth yearMonth, int windowMonths, int algorithmVersion, Currency currency) {
         return new HealthSnapshot(yearMonth, windowMonths, algorithmVersion, currency);
+    }
+
+    public YearMonth getPeriod() {
+        return period;
+    }
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public HealthSnapshotStatus getStatus() {
+        return status;
+    }
+
+    public LocalDateTime getComputedAt() {
+        return computedAt;
+    }
+
+    public HealthScore getHealthScore() {
+        return healthScore;
+    }
+
+    public HealthComponent getSavingsRate() {
+        return savingsRate;
+    }
+
+    public HealthComponent getBudgetAdherence() {
+        return budgetAdherence;
+    }
+
+    public HealthComponent getDebtToIncome() {
+        return debtToIncome;
     }
 }

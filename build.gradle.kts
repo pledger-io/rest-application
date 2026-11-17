@@ -72,7 +72,7 @@ spotless {
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
-        palantirJavaFormat("2.75.0").style("AOSP")
+        palantirJavaFormat("2.75.0").style("AOSP").formatJavadoc(false)
     }
 }
 
