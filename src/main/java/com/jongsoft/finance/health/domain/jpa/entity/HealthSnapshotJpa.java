@@ -88,43 +88,30 @@ public class HealthSnapshotJpa implements WithId {
 
     protected HealthSnapshotJpa() {}
 
-    public HealthSnapshotJpa(
-            UserAccountJpa user,
+    private HealthSnapshotJpa(
+            UserAccountJpa userAccount,
             YearMonth yearMonth,
-            HealthSnapshotStatus status,
-            Integer score,
-            HealthRating rating,
             int windowMonths,
             int algorithmVersion,
-            Currency currency,
-            BigDecimal savingsRate,
-            Integer savingsScore,
-            BigDecimal debtToIncome,
-            Integer dtiScore,
-            BigDecimal budgetAdherence,
-            Integer budgetScore,
-            BigDecimal income,
-            BigDecimal expenses,
-            BigDecimal debtPayments,
-            LocalDateTime computedAt) {
-        this.user = user;
-        this.yearMonth = yearMonth != null ? yearMonth.toString() : null;
-        this.status = status;
-        this.score = score;
-        this.rating = rating;
+            Currency currency) {
+        this.yearMonth = yearMonth.toString();
         this.windowMonths = windowMonths;
         this.algorithmVersion = algorithmVersion;
         this.currency = currency;
-        this.savingsRate = savingsRate;
-        this.savingsScore = savingsScore;
-        this.debtToIncome = debtToIncome;
-        this.dtiScore = dtiScore;
-        this.budgetAdherence = budgetAdherence;
-        this.budgetScore = budgetScore;
-        this.income = income;
-        this.expenses = expenses;
-        this.debtPayments = debtPayments;
-        this.computedAt = computedAt;
+        this.user = userAccount;
+        this.computedAt = LocalDateTime.now();
+
+        status = HealthSnapshotStatus.PROVISIONAL;
+    }
+
+    public static HealthSnapshotJpa of(
+            UserAccountJpa userAccount,
+            YearMonth yearMonth,
+            int windowMonths,
+            int algorithmVersion,
+            Currency currency) {
+        return new HealthSnapshotJpa(
+                userAccount, yearMonth, windowMonths, algorithmVersion, currency);
     }
 
     @Override
