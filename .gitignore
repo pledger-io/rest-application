@@ -14,3 +14,8 @@ out/
 dist/
 node_modules/
 .run
+
+# Local environment files (may contain secrets)
+.env
+.env.*
+!.env.example
