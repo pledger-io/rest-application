@@ -22,9 +22,12 @@ import java.time.YearMonth;
 class HealthSnapshotProviderJpa implements HealthSnapshotProvider {
     private final Logger logger;
     private final ReactiveEntityManager entityManager;
+    private final HealthSnapshotMapper mapper;
 
-    public HealthSnapshotProviderJpa(ReactiveEntityManager entityManager) {
+    public HealthSnapshotProviderJpa(
+            ReactiveEntityManager entityManager, HealthSnapshotMapper mapper) {
         this.entityManager = entityManager;
+        this.mapper = mapper;
         logger = LoggerFactory.getLogger(HealthSnapshotProviderJpa.class);
     }
 
@@ -32,13 +35,12 @@ class HealthSnapshotProviderJpa implements HealthSnapshotProvider {
     public Optional<HealthSnapshot> lookup(YearMonth yearMonth) {
         logger.debug("[{}] - looking up snapshot for user.", yearMonth);
 
-        return entityManager.from(HealthSnapshotJpa.class)
-            .fieldEq("yearMonth", yearMonth.toString())
-            .fieldEq("user", entityManager.currentUser())
-            .singleResult()
-            .map(result -> {
-// convert HealthSnapshotJpa to HealthSnapshot
-            });
+        return entityManager
+                .from(HealthSnapshotJpa.class)
+                .fieldEq("yearMonth", yearMonth.toString())
+                .fieldEq("user", entityManager.currentUser())
+                .singleResult()
+                .map(mapper::convertToDomain);
     }
 
     @EventListener
