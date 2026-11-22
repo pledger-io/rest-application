@@ -20,8 +20,10 @@ jobs:
          architecture: x64
      - name: Prepare gradle installation
        uses: gradle/actions/setup-gradle@v6
+     - name: Build the application
+       run: ./gradlew classes -q
      - name: Verify the software
-       run: ./gradlew check -q
+       run: ./gradlew check -x classes -q
        continue-on-error: ${{github.event_name != 'pull_request' && github.ref == 'refs/heads/master'}}
      - name: Upload test results
        uses: actions/upload-artifact@v7
