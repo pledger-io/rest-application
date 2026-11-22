@@ -7,8 +7,7 @@ import dev.langchain4j.service.SystemMessage;
 public interface CategoryAgent {
 
     @Agent
-    @SystemMessage(
-            """
+    @SystemMessage("""
         ## Steps
         - Extract the needed information from the provided transaction description.
         - Use the provided tool to list the available categories.
@@ -17,9 +16,7 @@ public interface CategoryAgent {
 
         ## Important
         - Only return the chosen category text.""")
-    @Tool(
-            name = "category-classifier",
-            value = """
+    @Tool(name = "category-classifier", value = """
         Determine the correct category for any given transaction text.""")
     String classifyCategory(String question);
 }

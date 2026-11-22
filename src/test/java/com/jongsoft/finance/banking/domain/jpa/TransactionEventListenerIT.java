@@ -103,9 +103,10 @@ class TransactionEventListenerIT extends JpaTestSetup {
         LinkTransactionCommand.linkCreated(1L, TransactionLinkType.CATEGORY, 2L);
 
         var check = entityManager.find(TransactionJournal.class, 1L);
-        assertThat(check.getMetadata()).anySatisfy(metadata -> assertThat(metadata)
-                .hasFieldOrPropertyWithValue("entityId", 2L)
-                .hasFieldOrPropertyWithValue("relationType", "CATEGORY"));
+        assertThat(check.getMetadata())
+                .anySatisfy(metadata -> assertThat(metadata)
+                        .hasFieldOrPropertyWithValue("entityId", 2L)
+                        .hasFieldOrPropertyWithValue("relationType", "CATEGORY"));
     }
 
     @Test

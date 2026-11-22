@@ -58,14 +58,12 @@ public interface TransactionMapper {
         dates.interest(transaction.getInterestDate());
 
         if (transaction.isSplit()) {
-            var splitFor =
-                    switch (transaction.computeType()) {
-                        case CREDIT -> destination;
-                        case DEBIT -> source;
-                        case TRANSFER ->
-                            throw StatusException.internalError(
-                                    "Split transaction cannot be a transfer");
-                    };
+            var splitFor = switch (transaction.computeType()) {
+                case CREDIT -> destination;
+                case DEBIT -> source;
+                case TRANSFER ->
+                    throw StatusException.internalError("Split transaction cannot be a transfer");
+            };
 
             transaction
                     .getTransactions()

@@ -103,11 +103,10 @@ class AccountFetcherController implements AccountFetcherApi {
             default -> throw StatusException.badRequest("Invalid account type");
         }
 
-        var ascending =
-                switch (type) {
-                    case DEBIT -> true;
-                    case CREDITOR -> false;
-                };
+        var ascending = switch (type) {
+            case DEBIT -> true;
+            case CREDITOR -> false;
+        };
 
         return accountProvider
                 .top(filter, Dates.range(startDate, endDate), ascending)

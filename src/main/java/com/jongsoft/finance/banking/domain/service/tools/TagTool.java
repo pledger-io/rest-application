@@ -25,8 +25,7 @@ public class TagTool {
         this.tagProvider = tagProvider;
     }
 
-    @Tool(
-            """
+    @Tool("""
 This tool returns the full list of known tags that can be used when classifying financial transactions.
 
 Use this tool to retrieve or confirm the set of valid tags.

@@ -68,15 +68,12 @@ public class ImportProcess {
                 .orElseThrow(() -> new IllegalArgumentException("No importer found for format: "
                         + batchImport.getConfig().getType()));
 
-        ProcessingStage nextStage =
-                switch (importContext.getCurrentStage()) {
-                    case CONFIGURATION, MISSING_ACCOUNT, COMPLETED ->
-                        importContext.getCurrentStage();
-                    case ACCOUNT_MAPPING -> processAccountMapping(relevantProvider);
-                    case IMPORTING ->
-                        processImporting(
-                                relevantProvider, locateCurrency, transactionCreationHandler);
-                };
+        ProcessingStage nextStage = switch (importContext.getCurrentStage()) {
+            case CONFIGURATION, MISSING_ACCOUNT, COMPLETED -> importContext.getCurrentStage();
+            case ACCOUNT_MAPPING -> processAccountMapping(relevantProvider);
+            case IMPORTING ->
+                processImporting(relevantProvider, locateCurrency, transactionCreationHandler);
+        };
         importContext.setCurrentStage(nextStage);
     }
 

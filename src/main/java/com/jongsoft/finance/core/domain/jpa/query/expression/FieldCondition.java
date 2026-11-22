@@ -12,15 +12,14 @@ record FieldCondition(
     @Override
     public String hqlExpression() {
         var actualAlias = tableAlias != null ? tableAlias + "." : "";
-        var comparator =
-                switch (equation) {
-                    case EQ -> "=";
-                    case GTE -> ">=";
-                    case LTE -> "<=";
-                    case LT -> "<";
-                    case IN, NIN -> "";
-                    case LIKE -> "LIKE";
-                };
+        var comparator = switch (equation) {
+            case EQ -> "=";
+            case GTE -> ">=";
+            case LTE -> "<=";
+            case LT -> "<";
+            case IN, NIN -> "";
+            case LIKE -> "LIKE";
+        };
 
         Supplier<String> fieldFunc = () -> "%s%s".formatted(actualAlias, field);
         if (value instanceof String && equation == FieldEquation.LIKE) {
