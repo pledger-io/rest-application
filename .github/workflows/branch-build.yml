@@ -29,9 +29,7 @@ jobs:
        if: (!cancelled())
        with:
          files: |
-            test-results/**/*.xml
-            test-results/**/*.trx
-            test-results/**/*.json
+            build/test-results/**/*.xml
 
      - name: Quality gate
        run: ./gradlew sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.gradle.skipCompile=true -Dsonar.host.url=https://sonarcloud.io
