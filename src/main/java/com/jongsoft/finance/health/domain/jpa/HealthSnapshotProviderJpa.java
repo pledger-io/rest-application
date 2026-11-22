@@ -2,6 +2,7 @@ package com.jongsoft.finance.health.domain.jpa;
 
 import com.jongsoft.finance.core.domain.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.health.adapter.api.HealthSnapshotProvider;
+import com.jongsoft.finance.health.domain.commands.HealthSnapshotCompleted;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCreated;
 import com.jongsoft.finance.health.domain.jpa.entity.HealthSnapshotJpa;
 import com.jongsoft.finance.health.domain.model.HealthSnapshot;
@@ -16,6 +17,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,5 +78,20 @@ class HealthSnapshotProviderJpa implements HealthSnapshotProvider {
                 healthSnapshotCreated.currency());
 
         entityManager.persist(entity);
+    }
+
+    @EventListener
+    void snapshotCompleted(HealthSnapshotCompleted command) {
+        logger.info("[{}] Marking snapshot as completed.", command.yearMonth());
+
+        entityManager
+                .update(HealthSnapshotJpa.class)
+                .set("status", command.status())
+                .set("rating", command.healthRating())
+                .set("score", command.score())
+                .set("computedAt", LocalDateTime.now())
+                .fieldEq("user", entityManager.currentUser())
+                .fieldEq("yearMonth", command.yearMonth().toString())
+                .execute();
     }
 }

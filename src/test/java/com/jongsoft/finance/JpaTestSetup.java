@@ -21,7 +21,7 @@ import java.io.InputStreamReader;
 
 @Tag("database")
 @MicronautTest(
-        environments = {"jpa", "h2", "test", "test-jpa"}, startApplication = false, rebuildContext = true)
+        environments = {"jpa", "h2", "test", "test-jpa"}, startApplication = false)
 public abstract class JpaTestSetup {
 
     private final Logger log;

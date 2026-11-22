@@ -1,5 +1,6 @@
 package com.jongsoft.finance.health.domain.model;
 
+import com.jongsoft.finance.health.domain.commands.HealthSnapshotCompleted;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCreated;
 import com.jongsoft.finance.health.types.HealthRating;
 import com.jongsoft.finance.health.types.HealthSnapshotStatus;
@@ -75,6 +76,22 @@ public class HealthSnapshot {
             YearMonth yearMonth, int windowMonths, int algorithmVersion, Currency currency) {
         return new HealthSnapshot(yearMonth, windowMonths, algorithmVersion, currency);
     }
+
+    public void insufficientInformation() {
+        status = HealthSnapshotStatus.INSUFFICIENT_DATA;
+        computedAt = LocalDateTime.now();
+        healthScore = new HealthScore(0, HealthRating.AT_RISK);
+        HealthSnapshotCompleted.insufficientTransactions(period);
+    }
+
+    public void healthScoreComputed(int score, HealthRating rating) {
+        status = HealthSnapshotStatus.COMPLETE;
+        healthScore = new HealthScore(score, rating);
+        computedAt = LocalDateTime.now();
+        HealthSnapshotCompleted.completedComputation(period, rating, score);
+    }
+
+    // todo add the methods to register the computed health components
 
     public YearMonth getPeriod() {
         return period;
