@@ -7,6 +7,7 @@ import com.jongsoft.finance.health.domain.jpa.entity.HealthSnapshotJpa;
 import com.jongsoft.finance.health.domain.model.HealthSnapshot;
 import com.jongsoft.lang.control.Optional;
 import com.jongsoft.lang.time.Range;
+
 import io.micronaut.runtime.event.annotation.EventListener;
 
 import jakarta.inject.Singleton;

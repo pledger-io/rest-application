@@ -12,5 +12,4 @@ public interface HealthSnapshotProvider {
     Optional<HealthSnapshot> lookup(YearMonth yearMonth);
 
     List<HealthSnapshot> lookup(Range<YearMonth> range);
-
 }

@@ -7,6 +7,7 @@ import com.jongsoft.finance.JpaTestSetup;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCreated;
 import com.jongsoft.finance.health.domain.model.HealthSnapshot;
 import com.jongsoft.finance.health.types.HealthSnapshotStatus;
+import com.jongsoft.lang.Dates;
 
 import jakarta.inject.Inject;
 
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.YearMonth;
 import java.util.Currency;
+import java.util.List;
 
 @DisplayName("Database - Financial health")
 class HealthSnapshotProviderJpaIT extends JpaTestSetup {
@@ -59,6 +61,59 @@ class HealthSnapshotProviderJpaIT extends JpaTestSetup {
         assertThat(snapshot.getCurrency()).isEqualTo(Currency.getInstance("USD"));
         assertThat(snapshot.getConfiguration().windowMonths()).isEqualTo(12);
         assertThat(provider.lookup(YearMonth.of(2010, 3)).isPresent()).isFalse();
+    }
+
+    @Test
+    @DisplayName("Lookup for a range includes its start and excludes its end")
+    void lookupSelectsSnapshotsWithinRange() {
+        List<HealthSnapshot> snapshots =
+                provider.lookup(Dates.range(YearMonth.of(2010, 1), YearMonth.of(2010, 2)));
+
+        assertThat(snapshots)
+                .extracting(HealthSnapshot::getPeriod)
+                .containsExactly(YearMonth.of(2010, 1));
+    }
+
+    @Test
+    @DisplayName("Lookup for a range crosses years and skips missing months")
+    void lookupRangeCrossesYearBoundaryAndSkipsMissingMonths() {
+        List<HealthSnapshot> snapshots =
+                provider.lookup(Dates.range(YearMonth.of(2010, 12), YearMonth.of(2011, 5)));
+
+        assertThat(snapshots)
+                .extracting(HealthSnapshot::getPeriod)
+                .containsExactlyInAnyOrder(
+                        YearMonth.of(2010, 12), YearMonth.of(2011, 2), YearMonth.of(2011, 4));
+    }
+
+    @Test
+    @DisplayName("Lookup for a range without snapshots returns an empty list")
+    void lookupRangeWithoutSnapshotsReturnsEmptyList() {
+        assertThat(provider.lookup(Dates.range(YearMonth.of(2011, 3), YearMonth.of(2011, 4))))
+                .isEmpty();
+        assertThat(provider.lookup(Dates.range(YearMonth.of(2010, 2), YearMonth.of(2010, 2))))
+                .isEmpty();
+    }
+
+    @Test
+    @DisplayName("Range lookup returns snapshots only for the authenticated user")
+    void lookupRangeOnlyReturnsSnapshotsForAuthenticatedUser() {
+        var range = Dates.range(YearMonth.of(2010, 1), YearMonth.of(2010, 2));
+
+        doReturn("demo-user-not").when(authenticationFacade).authenticated();
+        List<HealthSnapshot> otherUserSnapshots = provider.lookup(range);
+        assertThat(otherUserSnapshots)
+                .extracting(HealthSnapshot::getPeriod)
+                .containsExactly(YearMonth.of(2010, 1));
+        assertThat(otherUserSnapshots.getFirst().getCurrency())
+                .isEqualTo(Currency.getInstance("USD"));
+
+        doReturn("demo-user").when(authenticationFacade).authenticated();
+        List<HealthSnapshot> snapshots = provider.lookup(range);
+        assertThat(snapshots)
+                .extracting(HealthSnapshot::getPeriod)
+                .containsExactly(YearMonth.of(2010, 1));
+        assertThat(snapshots.getFirst().getCurrency()).isEqualTo(Currency.getInstance("EUR"));
     }
 
     @Test
