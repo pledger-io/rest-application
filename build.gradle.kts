@@ -79,7 +79,11 @@ spotless {
 }
 
 tasks.classes {
-    dependsOn("spotlessApply")
+    if (System.getenv("GITHUB_ACTIONS") == "true") {
+        dependsOn("spotlessCheck")
+    } else {
+        dependsOn("spotlessApply")
+    }
 }
 
 tasks.test {
