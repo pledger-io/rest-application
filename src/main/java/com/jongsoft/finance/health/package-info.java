@@ -7,7 +7,8 @@
 ///
 /// ## Requirements
 /// ### R1
-/// - R1.1 — When a component requests a snapshot for a month, the application shall look up the corresponding health snapshot.
+/// - R1.1 — When a component requests a snapshot for a month, the application shall look up the
+/// corresponding health snapshot.
 ///
 /// ## Entities
 /// - HealthSnapshot, HealthComponent

@@ -16,7 +16,8 @@
 /// - R2.1 — When a user changes or deletes a category, the application shall rename or delete it.
 ///
 /// ### R3
-/// - R3.1 — When a user requests or searches categories, the application shall return matching categories.
+/// - R3.1 — When a user requests or searches categories, the application shall return matching
+/// categories.
 ///
 /// ## Entities
 /// - Category
