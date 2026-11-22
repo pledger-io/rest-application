@@ -68,9 +68,12 @@ class TransactionRuleHandler {
 
         var updateQuery = entityManager
                 .update(RuleJpa.class)
-                .fieldIn("id", RuleJpa.class, subQuery -> subQuery.project("id")
-                        .fieldEq("user.username", authenticationFacade.authenticated())
-                        .fieldEq("group.name", jpaEntity.getGroup().getName()));
+                .fieldIn(
+                        "id",
+                        RuleJpa.class,
+                        subQuery -> subQuery.project("id")
+                                .fieldEq("user.username", authenticationFacade.authenticated())
+                                .fieldEq("group.name", jpaEntity.getGroup().getName()));
 
         if ((command.sort() - jpaEntity.getSort()) < 0) {
             updateQuery

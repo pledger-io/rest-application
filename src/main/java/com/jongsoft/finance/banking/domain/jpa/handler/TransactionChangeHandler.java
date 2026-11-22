@@ -237,11 +237,12 @@ class TransactionChangeHandler implements TransactionCreationHandler {
                 });
 
         // Update existing parts
-        splits.filter(part -> Objects.nonNull(part.id())).forEach(part -> entityManager
-                .update(TransactionJpa.class)
-                .set("amount", part.amount())
-                .fieldEq("id", part.id())
-                .execute());
+        splits.filter(part -> Objects.nonNull(part.id()))
+                .forEach(part -> entityManager
+                        .update(TransactionJpa.class)
+                        .set("amount", part.amount())
+                        .fieldEq("id", part.id())
+                        .execute());
     }
 
     @EventListener
@@ -251,9 +252,10 @@ class TransactionChangeHandler implements TransactionCreationHandler {
         var transaction = entityManager.getById(TransactionJournal.class, command.id());
         transaction.getTags().clear();
 
-        command.tags().map(this::tag).filter(Objects::nonNull).forEach(tag -> transaction
-                .getTags()
-                .add(tag));
+        command.tags()
+                .map(this::tag)
+                .filter(Objects::nonNull)
+                .forEach(tag -> transaction.getTags().add(tag));
 
         entityManager.persist(transaction);
     }

@@ -46,12 +46,10 @@ public class RandomizedTransactions {
         var transactionSql =
                 "INSERT INTO transaction_journal(user_id, created, updated, t_date, description,"
                         + " type, currency_id) VALUES (1, ?, ?, ?, ?, 'CREDIT', 1)";
-        var metaDataSql =
-                """
+        var metaDataSql = """
             INSERT INTO transaction_journal_meta(journal_id, entity_id, relation_type)
              VALUES ((SELECT id FROM transaction_journal WHERE t_date = ? AND description = ? AND type = 'CREDIT' AND user_id = 1 limit 1), (SELECT id FROM category WHERE label = ?), 'CATEGORY')""";
-        var partSql =
-                """
+        var partSql = """
 INSERT INTO transaction_part(journal_id, created, updated, account_id, description, amount)
 VALUES (
     (SELECT id FROM transaction_journal WHERE t_date = ? AND description = ? AND type = 'CREDIT' AND user_id = 1 limit 1),
@@ -141,8 +139,7 @@ VALUES (
             }
 
             // update the transaction journal set the contract id by the company id
-            var updateSql =
-                    """
+            var updateSql = """
                     UPDATE transaction_journal
                     SET contract_id = (SELECT id FROM contract WHERE company_id = ? and name = ?)
                     WHERE exists (

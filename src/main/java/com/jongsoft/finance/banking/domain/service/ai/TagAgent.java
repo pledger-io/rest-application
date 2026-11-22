@@ -9,8 +9,7 @@ import java.util.List;
 public interface TagAgent {
 
     @Agent
-    @SystemMessage(
-            """
+    @SystemMessage("""
         ## Steps
         - Extract the needed information from the provided transaction description.
         - Use the provided tool to list the available tags.
@@ -19,9 +18,7 @@ public interface TagAgent {
 
         ## Important
         - Only return the chosen tag text.""")
-    @Tool(
-            name = "tag-classifier",
-            value = """
+    @Tool(name = "tag-classifier", value = """
         Determine the correct tags for any given transaction text.""")
     List<String> classifyTags(String question);
 }

@@ -6,4 +6,5 @@ import io.micronaut.serde.annotation.Serdeable;
 
 @Serdeable
 public record TransactionTypeIndicator(
-        @JsonProperty("deposit") String deposit, @JsonProperty("credit") String credit) {}
+        @JsonProperty("deposit") String deposit,
+        @JsonProperty("credit") String credit) {}

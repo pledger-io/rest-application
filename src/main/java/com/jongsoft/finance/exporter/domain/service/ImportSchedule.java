@@ -65,10 +65,11 @@ class ImportSchedule {
     }
 
     private Long lookupAccount(String name) {
-        return accountProvider.lookup(name).map(WithId::getId).getOrSupply(() -> accountProvider
-                .synonymOf(name)
+        return accountProvider
+                .lookup(name)
                 .map(WithId::getId)
-                .getOrSupply(() -> null));
+                .getOrSupply(() ->
+                        accountProvider.synonymOf(name).map(WithId::getId).getOrSupply(() -> null));
     }
 
     private void processImport(BatchImport batchImport) {

@@ -11,15 +11,12 @@ import java.util.UUID;
 public interface ClassificationAgent {
 
     @Agent
-    @UserMessage({
-        """
+    @UserMessage({"""
             Transaction from {{from}} to {{to}} on {{date}} with amount {{amount}}.
 
             ## Description
-            {{description}}"""
-    })
-    @SystemMessage({
-        """
+            {{description}}"""})
+    @SystemMessage({"""
             You are a financial transaction classification assistant.
 
             ## Instructions
@@ -37,8 +34,7 @@ public interface ClassificationAgent {
                 "category": "chosen category",
                 "tags": ["tag1", "tag2"]
              }
-             ```"""
-    })
+             ```"""})
     ClassificationDTO classifyTransaction(
             @MemoryId UUID chat,
             @V("description") String description,

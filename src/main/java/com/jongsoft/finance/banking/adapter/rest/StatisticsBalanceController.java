@@ -53,11 +53,10 @@ class StatisticsBalanceController implements StatisticsBalanceApi {
         logger.info("Computing balance grouped by date with provided filters.");
         var filter = toFilterCommand(balanceRequest);
 
-        var balances =
-                switch (type) {
-                    case DAILY -> transactionProvider.daily(filter);
-                    case MONTHLY -> transactionProvider.monthly(filter);
-                };
+        var balances = switch (type) {
+            case DAILY -> transactionProvider.daily(filter);
+            case MONTHLY -> transactionProvider.monthly(filter);
+        };
 
         return balances.map(b -> new BalanceDatedResponse(b.summary(), b.day())).toJava();
     }
@@ -82,23 +81,22 @@ class StatisticsBalanceController implements StatisticsBalanceApi {
                 .balance(toFilterCommand(balanceRequest))
                 .getOrSupply(() -> BigDecimal.ZERO);
 
-        Sequence<? extends Classifier> entities =
-                switch (partition) {
-                    case ACCOUNT -> accountProvider.lookup().filter(Account::isRealAccount);
-                    case BUDGET ->
-                        linkableProviders.stream()
-                                .filter(provider -> provider.typeOf()
-                                        .equals(TransactionLinkType.EXPENSE.name()))
-                                .findFirst()
-                                .map(LinkableProvider::lookup)
-                                .orElse(Collections.List());
-                    default ->
-                        linkableProviders.stream()
-                                .filter(provider -> provider.typeOf().equals(partition.name()))
-                                .findFirst()
-                                .map(LinkableProvider::lookup)
-                                .orElse(Collections.List());
-                };
+        Sequence<? extends Classifier> entities = switch (partition) {
+            case ACCOUNT -> accountProvider.lookup().filter(Account::isRealAccount);
+            case BUDGET ->
+                linkableProviders.stream()
+                        .filter(provider ->
+                                provider.typeOf().equals(TransactionLinkType.EXPENSE.name()))
+                        .findFirst()
+                        .map(LinkableProvider::lookup)
+                        .orElse(Collections.List());
+            default ->
+                linkableProviders.stream()
+                        .filter(provider -> provider.typeOf().equals(partition.name()))
+                        .findFirst()
+                        .map(LinkableProvider::lookup)
+                        .orElse(Collections.List());
+        };
 
         if (partition == ComputePartitionedBalanceWithFilterPartitionParameter.ACCOUNT
                 && balanceRequest.getAccounts() != null

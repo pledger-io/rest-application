@@ -41,13 +41,12 @@ class SettingController implements SettingsApi {
     }
 
     private SettingResponse convert(Setting setting) {
-        var settingType =
-                switch (setting.getType()) {
-                    case DATE -> SettingResponseType.DATE;
-                    case FLAG -> SettingResponseType.FLAG;
-                    case NUMBER -> SettingResponseType.NUMBER;
-                    case STRING -> SettingResponseType.STRING;
-                };
+        var settingType = switch (setting.getType()) {
+            case DATE -> SettingResponseType.DATE;
+            case FLAG -> SettingResponseType.FLAG;
+            case NUMBER -> SettingResponseType.NUMBER;
+            case STRING -> SettingResponseType.STRING;
+        };
 
         return new SettingResponse(setting.getName(), setting.getValue(), settingType);
     }

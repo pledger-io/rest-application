@@ -345,18 +345,16 @@ class ImportController implements ImportApi {
             toCreate.change(
                     rule.getName(), rule.getDescription(), rule.getRestrictive(), rule.getActive());
             for (var change : rule.getChanges()) {
-                var updatedChange =
-                        switch (change.getField()) {
-                            case BUDGET ->
-                                expenseMap.get(parseLong(change.getChange())).toString();
-                            case CATEGORY ->
-                                categoryMap.get(parseLong(change.getChange())).toString();
-                            case CONTRACT ->
-                                contractMap.get(parseLong(change.getChange())).toString();
-                            case SOURCE_ACCOUNT, TO_ACCOUNT, CHANGE_TRANSFER_TO ->
-                                accountMap.get(parseLong(change.getChange())).toString();
-                            default -> change.getChange();
-                        };
+                var updatedChange = switch (change.getField()) {
+                    case BUDGET -> expenseMap.get(parseLong(change.getChange())).toString();
+                    case CATEGORY ->
+                        categoryMap.get(parseLong(change.getChange())).toString();
+                    case CONTRACT ->
+                        contractMap.get(parseLong(change.getChange())).toString();
+                    case SOURCE_ACCOUNT, TO_ACCOUNT, CHANGE_TRANSFER_TO ->
+                        accountMap.get(parseLong(change.getChange())).toString();
+                    default -> change.getChange();
+                };
                 toCreate.registerChange(change.getField(), updatedChange);
             }
             for (var condition : rule.getConditions()) {

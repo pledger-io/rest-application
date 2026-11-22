@@ -7,8 +7,7 @@ import dev.langchain4j.service.SystemMessage;
 public interface BudgetAgent {
 
     @Agent
-    @SystemMessage(
-            """
+    @SystemMessage("""
         ## Steps
         - Extract the needed information from the provided transaction description.
         - Use the provided tool to list the available budgets.
@@ -17,10 +16,7 @@ public interface BudgetAgent {
 
         ## Important
         - Only return the chosen budget text.""")
-    @Tool(
-            name = "budget-classifier",
-            value =
-                    """
+    @Tool(name = "budget-classifier", value = """
         Determine the correct budget group for any given transaction text.""")
     String classifyBudget(String question);
 }

@@ -24,12 +24,11 @@ class RelationLocator implements ChangeLocator {
 
     @Override
     public Object locate(RuleColumn column, String change) {
-        String classifierType =
-                switch (column) {
-                    case BUDGET -> "EXPENSE";
-                    case CONTRACT, CATEGORY -> column.name();
-                    default -> throw new IllegalArgumentException("Unsupported type");
-                };
+        String classifierType = switch (column) {
+            case BUDGET -> "EXPENSE";
+            case CONTRACT, CATEGORY -> column.name();
+            default -> throw new IllegalArgumentException("Unsupported type");
+        };
 
         return linkableProviders.stream()
                 .filter(provider -> provider.typeOf().equals(classifierType))

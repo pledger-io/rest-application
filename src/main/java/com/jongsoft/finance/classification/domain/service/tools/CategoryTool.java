@@ -24,8 +24,7 @@ public class CategoryTool {
         this.categoryProvider = categoryProvider;
     }
 
-    @Tool(
-            """
+    @Tool("""
 This tool returns the full list of known subcategories that can be used when classifying financial transactions.
 
 Use this tool to retrieve or confirm the set of valid subcategories.

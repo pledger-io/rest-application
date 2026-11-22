@@ -69,11 +69,12 @@ class RuleSuggestionEngine implements SuggestionEngine {
     }
 
     RuleDataSet run(RuleDataSet input, TransactionRule rule) {
-        var matchers = rule.getConditions().map(condition -> locateMatcher(condition.getField())
-                .prepare(
-                        condition.getOperation(),
-                        condition.getCondition(),
-                        input.get(condition.getField())));
+        var matchers = rule.getConditions()
+                .map(condition -> locateMatcher(condition.getField())
+                        .prepare(
+                                condition.getOperation(),
+                                condition.getCondition(),
+                                input.get(condition.getField())));
 
         boolean matches;
         if (rule.isRestrictive()) {

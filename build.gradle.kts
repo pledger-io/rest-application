@@ -72,12 +72,18 @@ spotless {
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
-        palantirJavaFormat("2.75.0").style("AOSP")
+        palantirJavaFormat("2.102.0")
+            .style("AOSP")
+            .formatJavadoc(false)
     }
 }
 
 tasks.classes {
-    dependsOn("spotlessApply")
+    if (System.getenv("GITHUB_ACTIONS") == "true") {
+        dependsOn("spotlessCheck")
+    } else {
+        dependsOn("spotlessApply")
+    }
 }
 
 tasks.test {
