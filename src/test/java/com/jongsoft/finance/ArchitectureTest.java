@@ -49,6 +49,7 @@ class ArchitectureTest {
     void validateModuleLayering() {
         layeredArchitecture()
             .consideringOnlyDependenciesInLayers()
+            .layer("HealthModule").definedBy("..finance.health..")
             .layer("SuggestionModule").definedBy("..finance.suggestion..")
             .layer("ExportModule").definedBy("..finance.exporter..")
             .layer("SpendingModule").definedBy("..finance.spending..")
@@ -57,6 +58,7 @@ class ArchitectureTest {
             .layer("ContractModule").definedBy("..finance.contract..")
             .layer("BankingModule").definedBy("..finance.banking..")
             .layer("CoreModule").definedBy("..finance.core..")
+            .whereLayer("HealthModule").mayOnlyAccessLayers("CoreModule", "BankingModule", "BudgetModule", "HealthModule")
             .whereLayer("BankingModule").mayOnlyAccessLayers("CoreModule", "BankingModule")
             .whereLayer("ContractModule").mayOnlyAccessLayers("CoreModule", "BankingModule", "ContractModule")
             .whereLayer("BudgetModule").mayOnlyAccessLayers("CoreModule", "BankingModule", "BudgetModule")

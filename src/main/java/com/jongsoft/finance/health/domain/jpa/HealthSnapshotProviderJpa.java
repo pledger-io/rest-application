@@ -5,6 +5,7 @@ import com.jongsoft.finance.health.adapter.api.HealthSnapshotProvider;
 import com.jongsoft.finance.health.domain.commands.HealthComponentComputed;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCompleted;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCreated;
+import com.jongsoft.finance.health.domain.commands.InvalidateSnapshot;
 import com.jongsoft.finance.health.domain.jpa.entity.HealthSnapshotJpa;
 import com.jongsoft.finance.health.domain.model.HealthSnapshot;
 import com.jongsoft.lang.control.Optional;
@@ -98,6 +99,7 @@ class HealthSnapshotProviderJpa implements HealthSnapshotProvider {
 
     @EventListener
     void componentComputed(HealthComponentComputed command) {
+        logger.info("[{}] Component computed {}.", command.yearMonth(), command.type());
         var updatePipeline = entityManager
                 .update(HealthSnapshotJpa.class)
                 .fieldEq("user", entityManager.currentUser())
@@ -125,5 +127,17 @@ class HealthSnapshotProviderJpa implements HealthSnapshotProvider {
         }
 
         updatePipeline.execute();
+    }
+
+    @EventListener
+    void invalidateSnapshot(InvalidateSnapshot command) {
+        logger.info("[{}] Invalidating snapshot.", command.yearMonth());
+        entityManager
+                .getEntityManager()
+                .createQuery(
+                        "delete from HealthSnapshotJpa where user = :user and yearMonth = :yearMonth")
+                .setParameter("user", entityManager.currentUser())
+                .setParameter("yearMonth", command.yearMonth().toString())
+                .executeUpdate();
     }
 }
