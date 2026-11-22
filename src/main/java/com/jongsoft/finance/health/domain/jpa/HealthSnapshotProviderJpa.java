@@ -2,6 +2,7 @@ package com.jongsoft.finance.health.domain.jpa;
 
 import com.jongsoft.finance.core.domain.jpa.query.ReactiveEntityManager;
 import com.jongsoft.finance.health.adapter.api.HealthSnapshotProvider;
+import com.jongsoft.finance.health.domain.commands.HealthComponentComputed;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCompleted;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCreated;
 import com.jongsoft.finance.health.domain.jpa.entity.HealthSnapshotJpa;
@@ -93,5 +94,36 @@ class HealthSnapshotProviderJpa implements HealthSnapshotProvider {
                 .fieldEq("user", entityManager.currentUser())
                 .fieldEq("yearMonth", command.yearMonth().toString())
                 .execute();
+    }
+
+    @EventListener
+    void componentComputed(HealthComponentComputed command) {
+        var updatePipeline = entityManager
+                .update(HealthSnapshotJpa.class)
+                .fieldEq("user", entityManager.currentUser())
+                .fieldEq("yearMonth", command.yearMonth().toString());
+
+        switch (command.type()) {
+            case DEBT -> {
+                updatePipeline
+                        .set("dtiScore", command.score())
+                        .set("debtToIncome", command.value())
+                        .set("income", command.details().get("income"))
+                        .set("debtPayments", command.details().get("debtPayments"));
+            }
+            case BUDGET -> {
+                updatePipeline
+                        .set("budgetAdherence", command.value())
+                        .set("budgetScore", command.score());
+            }
+            case SAVINGS ->
+                updatePipeline
+                        .set("savingsRate", command.value())
+                        .set("savingsScore", command.score())
+                        .set("income", command.details().get("income"))
+                        .set("expenses", command.details().get("expenses"));
+        }
+
+        updatePipeline.execute();
     }
 }

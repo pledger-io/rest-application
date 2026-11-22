@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
 
 import com.jongsoft.finance.JpaTestSetup;
+import com.jongsoft.finance.health.domain.commands.HealthComponentComputed;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCompleted;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCreated;
 import com.jongsoft.finance.health.domain.model.HealthSnapshot;
@@ -24,6 +25,7 @@ import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.Currency;
 import java.util.List;
+import java.util.Map;
 
 @DisplayName("Database - Financial health")
 class HealthSnapshotProviderJpaIT extends JpaTestSetup {
@@ -181,6 +183,79 @@ class HealthSnapshotProviderJpaIT extends JpaTestSetup {
                     .isCloseTo(
                             LocalDateTime.now(),
                             new TemporalUnitWithinOffset(2, ChronoUnit.SECONDS));
+        }
+
+        @Test
+        @DisplayName("Store computed budget component")
+        void budgetComponentComputed() {
+            HealthComponentComputed.componentComputed(
+                    YearMonth.of(2010, 2),
+                    HealthComponentComputed.ComponentType.BUDGET,
+                    84,
+                    0.84,
+                    0.25,
+                    Map.of());
+
+            HealthSnapshot snapshot = provider.lookup(YearMonth.of(2010, 2))
+                    .getOrThrow(() -> new RuntimeException("A health snapshot should exist."));
+
+            assertThat(snapshot.getBudgetAdherence().available()).isTrue();
+            assertThat(snapshot.getBudgetAdherence().value()).isEqualTo(0.84);
+            assertThat(snapshot.getBudgetAdherence().score()).isEqualTo(84);
+            assertThat(snapshot.getSavingsRate().available()).isFalse();
+            assertThat(snapshot.getDebtToIncome().available()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Store computed savings component")
+        void savingsComponentComputed() {
+            HealthComponentComputed.componentComputed(
+                    YearMonth.of(2010, 2),
+                    HealthComponentComputed.ComponentType.SAVINGS,
+                    72,
+                    0.18,
+                    0.35,
+                    Map.of(
+                            "income", 3_000D,
+                            "expenses", 2_460D));
+
+            HealthSnapshot snapshot = provider.lookup(YearMonth.of(2010, 2))
+                    .getOrThrow(() -> new RuntimeException("A health snapshot should exist."));
+
+            assertThat(snapshot.getSavingsRate().available()).isTrue();
+            assertThat(snapshot.getSavingsRate().value()).isEqualTo(0.18);
+            assertThat(snapshot.getSavingsRate().score()).isEqualTo(72);
+            assertThat(snapshot.getSavingsRate().details())
+                    .containsEntry("income", 3_000D)
+                    .containsEntry("expenses", 2_460D);
+            assertThat(snapshot.getBudgetAdherence().available()).isFalse();
+            assertThat(snapshot.getDebtToIncome().available()).isFalse();
+        }
+
+        @Test
+        @DisplayName("Store computed debt component")
+        void debtComponentComputed() {
+            HealthComponentComputed.componentComputed(
+                    YearMonth.of(2010, 2),
+                    HealthComponentComputed.ComponentType.DEBT,
+                    91,
+                    0.12,
+                    0.40,
+                    Map.of(
+                            "income", 4_000D,
+                            "debtPayments", 480D));
+
+            HealthSnapshot snapshot = provider.lookup(YearMonth.of(2010, 2))
+                    .getOrThrow(() -> new RuntimeException("A health snapshot should exist."));
+
+            assertThat(snapshot.getDebtToIncome().available()).isTrue();
+            assertThat(snapshot.getDebtToIncome().value()).isEqualTo(0.12);
+            assertThat(snapshot.getDebtToIncome().score()).isEqualTo(91);
+            assertThat(snapshot.getDebtToIncome().details())
+                    .containsEntry("income", 4_000D)
+                    .containsEntry("debtPayments", 480D);
+            assertThat(snapshot.getBudgetAdherence().available()).isFalse();
+            assertThat(snapshot.getSavingsRate().available()).isFalse();
         }
     }
 }

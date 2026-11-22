@@ -10,7 +10,7 @@ public record HealthComponent(
         double value,
         int score,
         double weight,
-        Map<String, Number> details) {
+        Map<String, Double> details) {
 
     static HealthComponent notComputed() {
         return new HealthComponent(false, null, 0D, 0, 0D, Map.of());

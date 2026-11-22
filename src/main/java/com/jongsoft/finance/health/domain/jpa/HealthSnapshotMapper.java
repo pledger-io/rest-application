@@ -9,6 +9,7 @@ import io.micronaut.context.annotation.Mapper;
 
 import jakarta.inject.Singleton;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,12 +83,16 @@ public interface HealthSnapshotMapper {
         return new HealthComponent(false, reason, 0D, 0, 0D, Map.of());
     }
 
-    private Map<String, Number> details(Object... keyValues) {
-        Map<String, Number> details = new HashMap<>();
+    private Map<String, Double> details(Object... keyValues) {
+        Map<String, Double> details = new HashMap<>();
         for (int i = 0; i + 1 < keyValues.length; i += 2) {
-            if (keyValues[i + 1] instanceof Number value) {
-                details.put((String) keyValues[i], value);
-            }
+            details.put(
+                    keyValues[i].toString(),
+                    switch (keyValues[i + 1]) {
+                        case Double value -> value;
+                        case BigDecimal value -> value.doubleValue();
+                        default -> 0D;
+                    });
         }
         return details;
     }

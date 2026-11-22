@@ -1,5 +1,6 @@
 package com.jongsoft.finance.health.domain.model;
 
+import com.jongsoft.finance.health.domain.commands.HealthComponentComputed;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCompleted;
 import com.jongsoft.finance.health.domain.commands.HealthSnapshotCreated;
 import com.jongsoft.finance.health.types.HealthRating;
@@ -11,6 +12,7 @@ import io.micronaut.core.annotation.Introspected;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.Currency;
+import java.util.Map;
 
 @Introspected
 public class HealthSnapshot {
@@ -91,7 +93,36 @@ public class HealthSnapshot {
         HealthSnapshotCompleted.completedComputation(period, rating, score);
     }
 
-    // todo add the methods to register the computed health components
+    public void computedDebtScore(
+            double value, int score, double weight, Map<String, Double> details) {
+        debtToIncome = new HealthComponent(true, null, value, score, weight, details);
+        HealthComponentComputed.componentComputed(
+                period, HealthComponentComputed.ComponentType.DEBT, score, value, weight, details);
+    }
+
+    public void computedSavings(
+            double value, int score, double weight, Map<String, Double> details) {
+        savingsRate = new HealthComponent(true, null, value, score, weight, details);
+        HealthComponentComputed.componentComputed(
+                period,
+                HealthComponentComputed.ComponentType.SAVINGS,
+                score,
+                value,
+                weight,
+                details);
+    }
+
+    public void computedBudget(
+            double value, int score, double weight, Map<String, Double> details) {
+        budgetAdherence = new HealthComponent(true, null, value, score, weight, details);
+        HealthComponentComputed.componentComputed(
+                period,
+                HealthComponentComputed.ComponentType.BUDGET,
+                score,
+                value,
+                weight,
+                details);
+    }
 
     public YearMonth getPeriod() {
         return period;
